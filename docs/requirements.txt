@@ -1,0 +1,5 @@
+sphinx-rtd-theme
+sphinx_autodoc_typehints
+nbsphinx
+recommonmark
+toml
