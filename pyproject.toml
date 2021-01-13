@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robustnessgym"
-version = "0.0.2-alpha.0"
+version = "0.0.2"
 description = "Robustness Gym is an evaluation toolkit for natural language processing."
 authors = ["Robustness Gym <kgoel@cs.stanford.edu>"]
 maintainers = ["Karan Goel <kgoel@cs.stanford.edu>"]
