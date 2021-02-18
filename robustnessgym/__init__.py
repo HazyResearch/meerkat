@@ -1,5 +1,13 @@
 """Import common classes."""
 # flake8: noqa
+from robustnessgym.logging.utils import (
+    initialize_logging,
+    set_logging_level,
+    set_logging_level_for_imports,
+)
+
+initialize_logging()
+
 from robustnessgym.cachedops.allen.allen_predictor import AllenPredictor
 from robustnessgym.cachedops.allen.constituency_parser import AllenConstituencyParser
 from robustnessgym.cachedops.allen.dependency_parser import AllenDependencyParser

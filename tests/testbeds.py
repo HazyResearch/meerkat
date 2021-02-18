@@ -9,29 +9,31 @@ class MockTestBedv0:
     """Simple mock dataset with 6 examples."""
 
     def __init__(self):
+        # Create a fake batch of data
+        self.batch = {
+            "text": [
+                "The man is walking.",
+                "The man is running.",
+                "The woman is sprinting.",
+                "The woman is resting.",
+                "The hobbit is flying.",
+                "The hobbit is swimming.",
+            ],
+            "label": [0, 0, 1, 1, 0, 0],
+            "z": [1, 0, 1, 0, 1, 0],
+            "fast": [False, True, True, False, False, False],
+            "metadata": [
+                {"source": "real"},
+                {"source": "real"},
+                {"source": "real"},
+                {"source": "real"},
+                {"source": "fictional"},
+                {"source": "fictional"},
+            ],
+        }
         # Create a fake dataset
         self.dataset = Dataset.from_batch(
-            {
-                "text": [
-                    "The man is walking.",
-                    "The man is running.",
-                    "The woman is sprinting.",
-                    "The woman is resting.",
-                    "The hobbit is flying.",
-                    "The hobbit is swimming.",
-                ],
-                "label": [0, 0, 1, 1, 0, 0],
-                "z": [1, 0, 1, 0, 1, 0],
-                "fast": [False, True, True, False, False, False],
-                "metadata": [
-                    {"source": "real"},
-                    {"source": "real"},
-                    {"source": "real"},
-                    {"source": "real"},
-                    {"source": "fictional"},
-                    {"source": "fictional"},
-                ],
-            },
+            self.batch,
             identifier=Identifier(_name="MockDataset", version="1.0"),
         )
 
