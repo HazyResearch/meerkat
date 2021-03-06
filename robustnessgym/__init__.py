@@ -117,7 +117,7 @@ from robustnessgym.tasks.task import (
     ExtractiveQuestionAnswering,
     NaturalLanguageInference,
     QuestionAnswering,
-    Sentiment,
+    SentimentClassification,
     Summarization,
     Task,
     TernaryNaturalLanguageInference,
