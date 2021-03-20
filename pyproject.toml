@@ -56,6 +56,7 @@ semver = "^2.13.0"
 jsonlines = "^1.2.0"
 tensorflow = { version = "^2.3.0", optional = true }
 torchvision = { version = "^0.8.0", optional = true }
+scikit-learn = "^0.24.1"
 
 [tool.poetry.extras]
 augmentation = ["nlpaug"]
