@@ -87,7 +87,10 @@ Set up a development environment with `poetry` by running the following command 
    $ pip install poetry
    $ poetry install
    ```
-
+Note: in order to pass the full test suite (step 5), you'll need to install all extra in addition. 
+```bash
+   $ poetry install --extras "adversarial augmentation summarization text vision"
+```
 5. Develop features on your branch.
 
    As you work on the features, you should make sure that the test suite
