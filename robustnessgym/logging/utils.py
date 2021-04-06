@@ -12,7 +12,7 @@ def initialize_logging(
     log_dir: str = tempfile.gettempdir(),
     log_name: str = "robustnessgym.log",
     format: str = "[%(asctime)s][%(levelname)s][%(name)s:%(lineno)s] :: %(message)s",
-    level: int = logging.INFO,
+    level: int = logging.WARNING,
 ) -> None:
     """Initialize logging for Robustness Gym."""
 
@@ -38,7 +38,7 @@ def initialize_logging(
     # Set logging levels for dependencies
     set_logging_level_for_imports()
 
-    logging.info("Logging initialized.")
+    logger.info("Logging initialized.")
 
 
 def set_logging_level_for_imports(level: int = logging.WARNING) -> None:
