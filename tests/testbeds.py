@@ -1,6 +1,11 @@
 """A collection of simple testbeds to build test cases."""
+import os
+import tempfile
 from copy import deepcopy
 
+import torch
+
+from robustnessgym.core.dataformats.vision import RGImage, VisionDataset, save_image
 from robustnessgym.core.dataset import Dataset
 from robustnessgym.core.identifier import Identifier
 
@@ -87,3 +92,37 @@ class MockTestBedv1:
         self.original_dataset = deepcopy(self.dataset)
 
         assert len(self.dataset) == 4
+
+
+class MockVisionTestBed:
+    def __init__(self, wrap_dataset: bool = False):
+        """[summary]
+
+        Args:
+            wrap_dataset (bool, optional): If `True`, create a `robustnessgym.Dataset`,
+                otherwise create a `robustnessgym.core.dataformats.vision.VisionDataset`
+                Defaults to False.
+        """
+        cache_dir = os.path.join(tempfile.gettempdir(), "RGVisionTests")
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+        self.image_paths = []
+        self.image_tensors = []
+        self.images = []
+
+        for i in range(200, 231, 10):
+            self.image_paths.append(os.path.join(cache_dir, "{}.png".format(i)))
+            self.image_tensors.append(i * torch.ones((10, 10, 3)))
+            save_image(self.image_tensors[-1], self.image_paths[-1])
+            self.images.append(RGImage(self.image_paths[-1]))
+
+        self.batch = {
+            "a": [{"e": 1}, {"e": 2}, {"e": 3}, {"e": 4}],
+            "b": ["u", "v", "w", "x"],
+            "i": self.image_paths,
+        }
+
+        if wrap_dataset:
+            self.dataset = Dataset.load_image_dataset(self.batch, img_columns="i")
+        else:
+            self.dataset = VisionDataset(self.batch, img_columns="i")
