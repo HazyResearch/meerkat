@@ -57,6 +57,7 @@ jsonlines = "^1.2.0"
 tensorflow = { version = "^2.3.0", optional = true }
 torchvision = { version = "^0.8.0", optional = true }
 scikit-learn = "^0.24.1"
+ludwig = {git = "https://github.com/ludwig-ai/ludwig.git", optional = true}
 
 [tool.poetry.extras]
 augmentation = ["nlpaug"]
@@ -64,6 +65,7 @@ text = ["nltk", "textblob", "spacy", "stanza", "allennlp", "allennlp-models"]
 adversarial = ["textattack"]
 summarization = ["rouge-score"]
 vision = ["torchvision"]
+ludwig = ["ludwig", "tensorflow"]
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
