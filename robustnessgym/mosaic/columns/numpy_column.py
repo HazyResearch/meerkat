@@ -127,7 +127,16 @@ class NumpyArrayColumn(
             index = self._remap_index(index)
 
         # indices that return a single cell
-        if isinstance(index, int) or isinstance(index, np.int):
+        if (
+            isinstance(index, int)
+            or isinstance(index, np.int)
+            # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
+            # but the element at the index
+            # TODO: interestingly, np.ndarray indexed with a list of length 1 DOES 
+            # return a np.ndarray. Discuss how we want to handle this for columns in RG,
+            # ideally all columns should share the same behavior w.r.t. this.
+            or (isinstance(index, tuple) and len(index) == 1)
+        ):
             return self._data[index]
 
         # indices that return batches
@@ -150,7 +159,9 @@ class NumpyArrayColumn(
         # else:
         # if not materializing, return a new NumpyArrayColumn
         # return self.from_list(data)
-        if data.ndim > 0:
+
+        # need to check if data has `ndim`, in case data is str or other object
+        if hasattr(data, "ndim") and data.ndim > 0:
             return self.from_array(data)
         return self.from_array([data])
 

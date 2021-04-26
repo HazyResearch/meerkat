@@ -8,6 +8,7 @@ import pathlib
 from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
+from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from types import SimpleNamespace
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
@@ -37,7 +38,7 @@ Example = Dict
 Batch = Dict[str, List]
 BatchOrDataset = Union[Batch, "DataPane"]
 # TODO(sabri): change the name of this!
-Columnable = Union[AbstractColumn, List]
+Columnable = Union[AbstractColumn, List, np.ndarray, pd.Series]
 
 
 class DataPane(DatasetInfoMixin):
@@ -72,7 +73,6 @@ class DataPane(DatasetInfoMixin):
 
             # `data` is a dictionary
             if isinstance(data, dict) and len(data):
-                # Assert all columns are the same length
                 data = self._create_columns(data)
                 self._assert_columns_all_equal_length(data)
                 self._data = data
@@ -130,6 +130,10 @@ class DataPane(DatasetInfoMixin):
         # TODO (sabri): put in a registry
         if isinstance(data, AbstractColumn):
             return data
+        elif isinstance(data, np.ndarray):
+            return NumpyArrayColumn(data)
+        elif isinstance(data, pd.Series):
+            return NumpyArrayColumn(data.values)
         elif len(data) != 0 and isinstance(data[0], AbstractCell):
             return CellColumn(data)
         else:
@@ -675,17 +679,11 @@ class DataPane(DatasetInfoMixin):
         cls,
         batch: Batch,
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ) -> DataPane:
         """Convert a batch to a Dataset."""
 
-        if dataset_fmt == "in_memory":
-            return cls(batch, identifier=identifier, dataset_fmt=dataset_fmt)
-        elif dataset_fmt == "datasets":
-            return cls(table(batch), identifier=identifier, dataset_fmt=dataset_fmt)
-        else:
-            raise NotImplementedError
-
+        return cls(batch, identifier=identifier)
+        
     @classmethod
     def from_batches(
         cls,
@@ -726,13 +724,11 @@ class DataPane(DatasetInfoMixin):
         cls,
         df: pd.DataFrame,
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ):
         """Create a Dataset from a pandas DataFrame."""
         return cls.from_batch(
-            df.to_dict("list"),
+            df.to_dict("series"),
             identifier=identifier,
-            dataset_fmt=dataset_fmt,
         )
 
     @classmethod
@@ -765,7 +761,7 @@ class DataPane(DatasetInfoMixin):
         return {name: column.collate for name, column in self._data.items()}
 
     def batch(
-        self, batch_size: int = 32, drop_last_batch: bool = False, *args, **kwargs
+        self, batch_size: int = 32, drop_last_batch: bool = False, num_workers: int = 4, *args, **kwargs
     ):
         """Batch the dataset.
         TODO:
@@ -792,6 +788,7 @@ class DataPane(DatasetInfoMixin):
             batch_size=batch_size,
             collate_fn=_collate,
             drop_last=drop_last_batch,
+            num_workers=num_workers, 
             *args,
             **kwargs,
         )
@@ -804,6 +801,7 @@ class DataPane(DatasetInfoMixin):
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         remove_columns: Optional[List[str]] = None,
+        num_workers: int = 4,
         **kwargs,
     ) -> DataPane:
         """Update the columns of the dataset."""
@@ -903,6 +901,7 @@ class DataPane(DatasetInfoMixin):
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
+                    num_workers=num_workers
                 )
                 # Add new columns for the update
                 for col, vals in output.items():
@@ -924,6 +923,7 @@ class DataPane(DatasetInfoMixin):
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
+        num_workers: int = 4,
         **kwargs,
     ) -> Optional[Union[Dict, List]]:
         """Apply a map over the dataset."""
@@ -955,7 +955,7 @@ class DataPane(DatasetInfoMixin):
         logger.info("Running `map`, the dataset will be left unchanged.")
         outputs = None
         for i, batch in tqdm(
-            enumerate(self.batch(batch_size, drop_last_batch)),
+            enumerate(self.batch(batch_size, drop_last_batch, num_workers=num_workers)),
             total=(len(self) // batch_size) + (1 - int(drop_last_batch)),
         ):
 
@@ -999,6 +999,7 @@ class DataPane(DatasetInfoMixin):
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
+        num_workers: int = 4,
         **kwargs,
     ) -> Optional[DataPane]:
         """Filter operation on the dataset."""
@@ -1030,6 +1031,7 @@ class DataPane(DatasetInfoMixin):
             batched=batched,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
+            num_workers=num_workers
         )
         indices = np.where(outputs)[0]
 
