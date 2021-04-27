@@ -61,7 +61,7 @@ class AbstractColumn(abc.ABC):
 
     @classmethod
     @abstractmethod
-    def read(cls) -> AbstractColumn:
+    def read(cls, *args, **kwargs) -> AbstractColumn:
         """Read a column from disk."""
         raise NotImplementedError()
 

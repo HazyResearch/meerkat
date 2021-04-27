@@ -6,6 +6,10 @@ from robustnessgym.core.tools import nested_map
 
 @dataclass
 class StateClass:
+    """
+    An internal class to store the state of an object alongside its associated class.
+    """
+
     klass: type
     state: object
 
@@ -16,10 +20,17 @@ class StateDictMixin:
 
     @classmethod
     def _state_keys(cls) -> Collection:
-        raise NotImplementedError
+        return NotImplemented
+
+    @classmethod
+    def _assert_state_keys(cls, state: Dict) -> None:
+        """Assert that a state contains all required keys."""
+        assert (
+            set(state.keys()) == cls._state_keys()
+        ), f"State must contain all state keys: {cls._state_keys()}."
 
     def get_state(self) -> Dict:
-        """Get the internal state of the dataset."""
+        """Get the internal state of the object."""
 
         def _apply_get_state(obj):
             if hasattr(obj, "get_state"):
@@ -34,22 +45,15 @@ class StateDictMixin:
         return state
 
     @classmethod
-    def _assert_state_keys(cls, state: Dict) -> None:
-        """Assert that a state contains all required keys."""
-        assert (
-            set(state.keys()) == cls._state_keys()
-        ), f"State must contain all state keys: {cls._state_keys()}."
-
-    @classmethod
     def from_state(cls, state: Dict, *args, **kwargs):
         """Set the internal state of the dataset."""
         cls._assert_state_keys(state)
 
-        def _apply_from_state(obj):
-            if isinstance(obj, StateClass):
-                return obj.klass.from_state(obj.state, *args, **kwargs)
+        def _apply_from_state(obj_):
+            if isinstance(obj_, StateClass):
+                return obj_.klass.from_state(obj_.state, *args, **kwargs)
             else:
-                return obj
+                return obj_
 
         state = nested_map(_apply_from_state, state)
         obj = cls()

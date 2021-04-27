@@ -14,9 +14,11 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 import cytoolz as tz
 import datasets
+import dill
 import numpy as np
 import pandas as pd
 import torch
+import yaml
 from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
@@ -24,24 +26,29 @@ from pyarrow import json as jsonarrow
 from pyarrow import table
 from tqdm.auto import tqdm
 
-from robustnessgym.core.dataformats.inmemory import InMemoryDataset
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_fn, recmerge
 from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.columns.cell_column import CellColumn
 from robustnessgym.mosaic.columns.list_column import ListColumn
+from robustnessgym.mosaic.mixins.copying import CopyMixin
+from robustnessgym.mosaic.mixins.state import StateDictMixin
 
 logger = logging.getLogger(__name__)
 
 Example = Dict
-Batch = Dict[str, List]
+Batch = Dict[str, Union[List, AbstractColumn]]
 BatchOrDataset = Union[Batch, "DataPane"]
 # TODO(sabri): change the name of this!
 Columnable = Union[AbstractColumn, List, np.ndarray, pd.Series]
 
 
-class DataPane(DatasetInfoMixin):
+class DataPane(
+    DatasetInfoMixin,
+    CopyMixin,
+    StateDictMixin,
+):
     """Mosaic DataPane class."""
 
     # Path to a log directory
@@ -88,7 +95,7 @@ class DataPane(DatasetInfoMixin):
 
             # `data` is a datasets.Dataset
             elif isinstance(data, datasets.Dataset):
-                self._data = data[:]
+                self._data = self._create_columns(data[:])
                 info, split = data.info, data.split
 
         # No argument
@@ -575,22 +582,17 @@ class DataPane(DatasetInfoMixin):
         return datasets.list_datasets()
 
     @classmethod
-    def load_dataset(
-        cls,
-        *args,
-        dataset_fmt: str = "in_memory",
-        **kwargs,
-    ):
-        """Create a Dataset using Huggingface datasets.load_dataset(..). Loads
-        any dataset available in Huggingface Dataset Hub.
+    def load_huggingface(cls, *args, **kwargs):
+        """
+        Load a Huggingface dataset as a DataPane.
 
-        Use this instead of datasets.load_dataset, so
+        Use this to replace `datasets.load_dataset`, so
 
-        dict_of_datasets = datasets.load_dataset('boolq')
+        >>> dict_of_datasets = datasets.load_dataset('boolq')
 
         becomes
 
-        dict_of_datasets = Dataset.load_dataset('boolq')
+        >>> dict_of_datapanes = DataPane.load_huggingface('boolq')
         """
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
@@ -598,12 +600,12 @@ class DataPane(DatasetInfoMixin):
         if isinstance(dataset, dict):
             return dict(
                 map(
-                    lambda t: (t[0], cls(t[1], dataset_fmt=dataset_fmt)),
+                    lambda t: (t[0], cls(t[1])),
                     dataset.items(),
                 )
             )
         else:
-            return cls(dataset, dataset_fmt=dataset_fmt)
+            return cls(dataset)
 
     @classmethod
     def load_image_dataset(cls, *args, **kwargs):
@@ -1002,8 +1004,8 @@ class DataPane(DatasetInfoMixin):
         num_workers: int = 4,
         **kwargs,
     ) -> Optional[DataPane]:
-        """Filter operation on the dataset."""
-        # Compute the filter using the underlying dataset's .filter()
+        """Filter operation on the DataPane."""
+
         # Just return if the function is None
         if function is None:
             logger.info("`function` None, returning None.")
@@ -1011,7 +1013,7 @@ class DataPane(DatasetInfoMixin):
 
         # Return if `self` has no examples
         if not len(self):
-            logger.info("Dataset empty, returning None.")
+            logger.info("DataPane empty, returning None.")
             return None
 
         # Get some information about the function
@@ -1023,7 +1025,7 @@ class DataPane(DatasetInfoMixin):
         assert function_properties.bool_output, "function must return boolean."
 
         # Map to get the boolean outputs and indices
-        logger.info("Running `filter`, a new dataset will be returned.")
+        logger.info("Running `filter`, a new DataPane will be returned.")
         outputs = self.map(
             function=function,
             with_indices=with_indices,
@@ -1038,124 +1040,94 @@ class DataPane(DatasetInfoMixin):
         # Reset the format to set visible columns for the filter
         with self.format():
             # Filter returns a new dataset
-            new_dataset = self.copy()
-            new_dataset.set_visible_rows(indices)
+            new_datapane = self.copy()
+            new_datapane.set_visible_rows(indices)
 
-        return new_dataset
+        return new_datapane
 
     @classmethod
-    def interleave(
+    def read(
         cls,
-        datasets: List[DataPane],
-        identifier: Identifier,
+        path: str,
+        *args,
+        **kwargs,
     ) -> DataPane:
-
-        """Interleave a list of datasets."""
-        return cls.from_batch(
-            tz.merge_with(
-                tz.compose(list, tz.interleave),
-                *[dataset[:] for dataset in datasets],
-            ),
-            identifier=identifier,
-        )
-
-    @classmethod
-    def chain(
-        cls,
-        datasets: List[DataPane],
-        identifier: Identifier,
-    ) -> DataPane:
-
-        """Chain a list of datasets."""
-        return cls.from_batch(
-            tz.merge_with(
-                tz.compose(list, tz.concat),
-                *[dataset[:] for dataset in datasets],
-            ),
-            identifier=identifier,
-        )
-
-    @classmethod
-    def load_from_disk(
-        cls, path: str = None, identifier: Identifier = None
-    ) -> DataPane:
-        """Load a dataset stored on disk."""
-        assert (
-            path or identifier and not (path and identifier)
-        ), "Pass one of `path` or `identifier`."
-
-        if identifier:
-            # Use the default logdir to create a path to the dataset
-            path = cls.logdir / str(identifier)
-            if not os.path.exists(str(path)):
-                raise OSError(f"Path {path} does not exist.")
-
-        # Create an empty state
-        state = {}
+        """Load a DataPane stored on disk."""
 
         # Load the metadata
-        metadata = json.load(open(os.path.join(path, "metadata.json")))
+        metadata = dict(
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+        )
 
-        # Load the data
-        if metadata["_dataset_fmt"] == "in_memory":
-            state["_dataset"] = InMemoryDataset.load_from_disk(
-                os.path.join(path, "_dataset")
-            )
-        elif metadata["_dataset_fmt"] == "datasets":
-            state["_dataset"] = datasets.Dataset.load_from_disk(
-                os.path.join(path, "_dataset")
-            )
+        # Load the columns
+        if metadata["write_together"]:
+            data = dill.load(open(os.path.join(path, "data.dill"), "rb"))
+            data = {
+                name: metadata["column_dtypes"][name].from_state(state, *args, **kwargs)
+                for name, state in data.items()
+            }
         else:
-            raise NotImplementedError(
-                f"`dataset_fmt` {metadata['_dataset_fmt']} not recognized."
-            )
+            data = {
+                name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
+                for name, dtype in metadata["column_dtypes"].items()
+            }
 
-        # Merge the metadata with the state
-        state = {**state, **metadata}
+        # Create the state dict
+        state = metadata["state"]
+        state["_data"] = data
 
-        # Create an empty dataset
-        dataset = cls()
-        dataset.__setstate__(state)
+        # Create a DataPane from the loaded state
+        datapane = cls.from_state(state)
+        datapane._create_logdir()
+        datapane._initialize_state()
+        datapane.visible_rows = state["visible_rows"]
 
-        return dataset
+        return datapane
 
-    def write(self, path: str = None, write_together: bool = True) -> None:
-        """Save a dataset to disk."""
-        # TODO: make this based off of `get_state` `from_state`
-
-        if path is None:
-            path = str(self.logdir)
-
+    def write(
+        self,
+        path: str,
+        write_together: bool = False,
+    ) -> None:
+        """Save a DataPane to disk."""
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
-        # Get the dataset state
-        state = self.__getstate__()
+        # Get the DataPane state
+        state = self.get_state()
         del state["_data"]
 
+        # Get the metadata
+        metadata = {
+            "dtype": type(self),
+            "column_dtypes": {name: type(col) for name, col in self._data.items()},
+            "len": len(self),
+            "write_together": write_together,
+            "state": state,
+        }
+
         if write_together:
-            pass
+            # Write the entire DataPane together
+            data_path = os.path.join(path, "data.dill")
+
+            # Save all the columns in a single dill file
+            dill.dump(
+                {name: col.get_state() for name, col in self._data.items()},
+                open(data_path, "wb"),
+            )
+
         else:
-            # Save the data to disk
+            # Create a directory for the columns at `path`
             columns_path = os.path.join(path, "columns")
             os.makedirs(columns_path, exist_ok=True)
+
+            # Save each column in the DataPane separately
             for name, column in self._data.items():
                 column.write(os.path.join(columns_path, name))
 
-        # Save the metadata to disk
-        json.dump(
-            {k: v for k, v in state.items() if k != "_dataset"},
-            open(os.path.join(path, "metadata.json"), "w"),
-        )
-
-    def copy(self, deepcopy=False):
-        """Return a copy of the dataset."""
-        if deepcopy:
-            return copy.deepcopy(self)
-        else:
-            dataset = DataPane()
-            dataset.__dict__ = {k: copy(v) for k, v in self.__dict__.items()}
-            return dataset
+        # Save the metadata as a yaml file
+        metadata_path = os.path.join(path, "meta.yaml")
+        yaml.dump(metadata, open(metadata_path, "w"))
 
     @classmethod
     def _state_keys(cls) -> set:
@@ -1168,45 +1140,3 @@ class DataPane(DatasetInfoMixin):
             "_info",
             "_split",
         }
-
-    @classmethod
-    def _assert_state_keys(cls, state: Dict) -> None:
-        """Assert that a state contains all required keys."""
-        assert (
-            set(state.keys()) == cls._state_keys()
-        ), f"State must contain all state keys: {cls._state_keys()}."
-
-    def __getstate__(self):
-        """Get the current state of the dataset."""
-
-        state = {
-            "_identifier": self.identifier.dumps() if self.identifier else None,
-            "_data": {name: col.__getstate__() for name, col in self._data.items()},
-            **{
-                key: getattr(self, key)
-                for key in self._state_keys()
-                if key not in ["_identifier", "_data"]
-            },
-        }
-        DataPane._assert_state_keys(state)
-
-        return state
-
-    def __setstate__(self, state):
-        """Set the current state of the dataset."""
-        # Check that the state contains all keys
-        DataPane._assert_state_keys(state)
-
-        # Load the identifier
-        self._identifier = (
-            Identifier.loads(state["_identifier"]) if state["_identifier"] else None
-        )
-
-        # Load the dataset
-        self._dataset = state["_dataset"]
-
-        # Set the dataset format
-        self._dataset_fmt = state["_dataset_fmt"]
-
-        # Update the logging directory
-        self.logdir = DataPane.logdir / str(self.identifier)

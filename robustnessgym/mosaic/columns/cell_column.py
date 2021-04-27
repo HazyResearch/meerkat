@@ -256,8 +256,8 @@ class CellColumn(StateDictMixin, AbstractColumn):
         if metadata["write_together"]:
             data = dill.load(open(os.path.join(path, "data.dill"), "rb"))
             cells = [
-                dtype.decode(encoding, *args, **kwargs)
-                for dtype, encoding in zip(metadata["cell_dtypes"], data)
+                dtype.from_state(state, *args, **kwargs)
+                for dtype, state in zip(metadata["cell_dtypes"], data)
             ]
         else:
             cells = [
@@ -273,8 +273,12 @@ class CellColumn(StateDictMixin, AbstractColumn):
 
     def write(self, path: str, write_together: bool = True) -> None:
         # TODO: make this based off of `get_state` `from_state`
-        metadata_path = os.path.join(path, "meta.yaml")
-        state = self.__getstate__()
+
+        # Make all the directories to the path
+        os.makedirs(path, exist_ok=True)
+
+        # Get the cell column state
+        state = self.get_state()
         del state["_cells"]
         metadata = {
             "dtype": type(self),
@@ -286,17 +290,12 @@ class CellColumn(StateDictMixin, AbstractColumn):
         }
 
         if write_together:
-            # Make directory
-            os.makedirs(path, exist_ok=True)
-
             # Get the paths where metadata and data should be stored
-            metadata_path = os.path.join(path, "meta.yaml")
             data_path = os.path.join(path, "data.dill")
 
-            # Saving all cell data in a single pickle file
-            dill.dump([cell.encode() for cell in self._cells], open(data_path, "wb"))
+            # Saving all cell data in a single dill file
+            dill.dump([cell.get_state() for cell in self._cells], open(data_path, "wb"))
         else:
-            os.makedirs(path, exist_ok=True)
             # Save all the cells separately
             cell_paths = []
             for index, cell in enumerate(self._cells):
@@ -305,7 +304,8 @@ class CellColumn(StateDictMixin, AbstractColumn):
                 cell_paths.append(cell_path)
             metadata["cell_paths"] = cell_paths
 
-        # Saving the metadata as a yaml
+        # Save the metadata as a yaml file
+        metadata_path = os.path.join(path, "meta.yaml")
         yaml.dump(metadata, open(metadata_path, "w"))
 
     def copy(self, deepcopy: bool = False):

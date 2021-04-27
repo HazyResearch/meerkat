@@ -78,7 +78,7 @@ class AbstractCell(abc.ABC):
         yaml.dump(
             {
                 "dtype": type(self),
-                **self.metadata(),
+                **self.metadata,
             },
             open(metadata_path, "w"),
         )
