@@ -11,6 +11,8 @@ import dill
 import numpy as np
 import yaml
 
+from robustnessgym.mosaic.columns.cell_column import identity_collate
+
 try:
     import faiss
 
@@ -21,16 +23,12 @@ except ImportError:
 from tqdm.auto import tqdm
 from yaml.representer import Representer
 
-from robustnessgym.core.columns.abstract import AbstractColumn
 from robustnessgym.core.tools import convert_to_batch_column_fn
+from robustnessgym.mosaic.columns.abstract import AbstractColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 logger = logging.getLogger(__name__)
-
-
-def identity_collate(batch: List):
-    return batch
 
 
 class EmbeddingsColumn(AbstractColumn):
@@ -71,10 +69,6 @@ class EmbeddingsColumn(AbstractColumn):
             return [getattr(doc, item) for doc in self]
         except AttributeError:
             raise AttributeError(f"Attribute {item} not found.")
-
-    @property
-    def tokens(self):
-        return [list(doc) for doc in self]
 
     def metadata(self):
         return {}

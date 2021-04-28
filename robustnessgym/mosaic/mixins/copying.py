@@ -9,8 +9,14 @@ class CopyMixin:
 
     def copy(self) -> object:
         """Return a copy of the object."""
-        obj = self.__class__()
-        obj.__dict__ = {k: pycopy.copy(v) for k, v in self.__dict__.items()}
+        state = {k: pycopy.copy(v) for k, v in self.__dict__.items()}
+
+        try:
+            obj = self.__class__(**state)
+        except TypeError:
+            obj = self.__class__()
+
+        obj.__dict__ = state
         return obj
 
     def deepcopy(self) -> object:

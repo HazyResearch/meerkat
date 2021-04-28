@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Collection
+
 from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.mixins.file import FileMixin
 
@@ -18,10 +20,14 @@ class ImagePath(FileMixin, AbstractCell):
         self.transform = transform
         self.loader = self.default_loader if loader is None else loader
 
-    def __getattr__(self, item):
-        return super().__getattr__(item)
+    def __str__(self):
+        return f"Image({self.name})"
 
-    def default_loader(self, *args, **kwargs):
+    def __repr__(self):
+        return f"Image({self.name})"
+
+    @classmethod
+    def default_loader(cls, *args, **kwargs):
         import torchvision.datasets.folder as folder
 
         return folder.default_loader(*args, **kwargs)
@@ -32,23 +38,6 @@ class ImagePath(FileMixin, AbstractCell):
             image = self.transform(image)
         return image
 
-    def get_state(self):
-        return {
-            "filepath": self.filepath,
-            "loader": self.loader,
-            "transform": self.transform,
-        }
-
     @classmethod
-    def from_state(cls, state):
-        return cls(
-            state["filepath"],
-            loader=state["loader"],
-            transform=state["transform"],
-        )
-
-    def __str__(self):
-        return f"Image({self.name})"
-
-    def __repr__(self):
-        return f"Image({self.name})"
+    def _state_keys(cls) -> Collection:
+        return {"filepath", "transform", "loader"}

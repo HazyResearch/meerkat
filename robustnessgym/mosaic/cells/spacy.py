@@ -43,9 +43,9 @@ class SpacyCell(AbstractCell):
         }
 
     @classmethod
-    def from_state(cls, encoding, nlp: spacy.language.Language):
-        doc = Doc(nlp.vocab, words=encoding["words"])
-        return cls(doc.from_array(NAMES, encoding["arr"].reshape(encoding["shape"])))
+    def from_state(cls, state, nlp: spacy.language.Language):
+        doc = Doc(nlp.vocab, words=state["words"])
+        return cls(doc.from_array(NAMES, state["arr"].reshape(state["shape"])))
 
     def __getitem__(self, index):
         return self.get()[index]

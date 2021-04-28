@@ -8,7 +8,7 @@ import pathlib
 from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
+from functools import partial
 from types import SimpleNamespace
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
@@ -23,7 +23,6 @@ from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 from pyarrow import json as jsonarrow
-from pyarrow import table
 from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
@@ -32,6 +31,7 @@ from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.columns.cell_column import CellColumn
 from robustnessgym.mosaic.columns.list_column import ListColumn
+from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.mixins.copying import CopyMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
 
@@ -685,7 +685,7 @@ class DataPane(
         """Convert a batch to a Dataset."""
 
         return cls(batch, identifier=identifier)
-        
+
     @classmethod
     def from_batches(
         cls,
@@ -762,8 +762,21 @@ class DataPane(
     def _get_collate_fns(self):
         return {name: column.collate for name, column in self._data.items()}
 
+    def _collate(self, batch: List, column_to_collate):
+        batch = tz.merge_with(list, *batch)
+        new_batch = {}
+        for name, values in batch.items():
+            new_batch[name] = column_to_collate[name](values)
+
+        return new_batch
+
     def batch(
-        self, batch_size: int = 32, drop_last_batch: bool = False, num_workers: int = 4, *args, **kwargs
+        self,
+        batch_size: int = 32,
+        drop_last_batch: bool = False,
+        num_workers: int = 4,
+        *args,
+        **kwargs,
     ):
         """Batch the dataset.
         TODO:
@@ -777,20 +790,12 @@ class DataPane(
         """
         column_to_collate = self._get_collate_fns()
 
-        def _collate(_batch: List):
-            _batch = tz.merge_with(list, *_batch)
-            new_batch = {}
-            for name, values in _batch.items():
-                new_batch[name] = column_to_collate[name](values)
-
-            return new_batch
-
         return torch.utils.data.DataLoader(
             self,
             batch_size=batch_size,
-            collate_fn=_collate,
+            collate_fn=partial(self._collate, column_to_collate=column_to_collate),
             drop_last=drop_last_batch,
-            num_workers=num_workers, 
+            num_workers=num_workers,
             *args,
             **kwargs,
         )
@@ -903,7 +908,7 @@ class DataPane(
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
-                    num_workers=num_workers
+                    num_workers=num_workers,
                 )
                 # Add new columns for the update
                 for col, vals in output.items():
@@ -1033,7 +1038,7 @@ class DataPane(
             batched=batched,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
-            num_workers=num_workers
+            num_workers=num_workers,
         )
         indices = np.where(outputs)[0]
 

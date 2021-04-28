@@ -13,9 +13,31 @@ Mosaic's core contribution is the `DataPane`, a simple columnar data abstraction
 
 A `DataPane` is a Python object that contains a collection of columns. 
 
+
+#### Create a `DataPane`
 ```python
 from robustnessgym.mosaic import DataPane
 
 # Create a simple DataPane
-dp = DataPane()
+dp = DataPane({
+    'text': ['The quick brown fox.', 'Jumped over.', 'The lazy dog.'],
+    'imagepath': ['fox.png', 'jump.png', 'dog.png'],
+})
 ```
+
+
+## `Column`
+
+Mosaic supports a variety of columns.
+
+```python
+from robustnessgym.mosaic import SomeColumn
+
+sc = SomeColumn(data=some_data)
+len(sc) == len(some_data)
+
+```
+
+
+
+## `Cell`
