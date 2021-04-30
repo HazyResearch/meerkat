@@ -95,7 +95,7 @@ class AbstractColumn(
         return {"_materialize", "_collate_fn", "_data"}
 
     def _get_cell(self, index: int):
-        self.data[index]
+        return self.data[index]
 
     def __getitem__(self, index):
         if self.visible_rows is not None:
@@ -141,7 +141,7 @@ class AbstractColumn(
                 "object of type {} is not a valid index".format(type(index))
             )
         return self._get_batch(indices)
-    
+
     def _get_batch(self, indices: np.ndarray):
         if self.materialize:
             return self.collate([self._get_cell(int(i)) for i in indices])

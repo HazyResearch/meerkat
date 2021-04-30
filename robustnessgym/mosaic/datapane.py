@@ -454,6 +454,7 @@ class DataPane(
         elif isinstance(index, slice):
             # slice index => multiple row selection (DataPane)
             return {k: self._data[k][index] for k in self.visible_columns}
+
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
             # tuple or list index => multiple row selection (DataPane)
             if isinstance(index[0], str):
@@ -899,8 +900,13 @@ class DataPane(
                         if output_type == NumpyArrayColumn and mmap:
                             # Store the output in the mmap file and flush
                             writer.write(output)
+                        elif output_type == NumpyArrayColumn and not mmap:
+                            # Extend outputs
+                            outputs.extend(output)
                         else:
-                            # Extend outputs by default
+                            # Append outputs by default
+                            # TODO(karan): ask Sabri, may be inefficient to append ->
+                            #  concat vs. just extend -> asarray?
                             outputs.append(output)
 
         # Check if we are returning a special output type
@@ -929,7 +935,7 @@ class DataPane(
         first_batch = batches[0]
         if isinstance(first_batch, np.ndarray):
             return np.concatenate(batches, axis=0)
-        elif isinstance(first_batch, torch.tensor):
+        elif isinstance(first_batch, torch.Tensor):
             return torch.cat(batches, axis=0)
         elif isinstance(first_batch, list) or isinstance(first_batch, tuple):
             return tz.concat(batches)
