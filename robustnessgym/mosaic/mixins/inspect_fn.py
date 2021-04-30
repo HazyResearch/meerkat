@@ -14,32 +14,65 @@ class FunctionInspectorMixin:
         function: Callable,
         with_indices: bool = False,
         batched: bool = False,
+        data=None,
+        indices=None,
     ) -> SimpleNamespace:
+
         # Initialize variables to track
         no_output = dict_output = bool_output = list_output = False
 
-        # Run the function to test it
-        if batched:
-            if with_indices:
-                output = function(self[:2], range(2))
-            else:
-                output = function(self[:2])
+        # If dict_output = True and `function` is used for updating the `DataPane`
+        # useful to know if any existing column is modified
+        updates_existing_column = True
+        existing_columns_updated = []
 
-        else:
-            if with_indices:
-                output = function(self[0], 0)
+        # Record the shape and dtype of the output
+        output_shape = output_dtype = None
+
+        # Run the function to test it
+        if data is None:
+            if batched:
+                data = self[:2]
             else:
-                output = function(self[0])
+                data = self[0]
+
+        if indices is None:
+            if batched:
+                indices = range(2)
+            else:
+                indices = 0
+
+        if with_indices and batched:
+            output = function(data, indices)
+        elif with_indices and not batched:
+            output = function(data, indices)
+        else:
+            output = function(data)
 
         if isinstance(output, Mapping):
             # `function` returns a dict output
             dict_output = True
 
+            # Check if `self` is a `DataPane`
+            if hasattr(self, "all_columns"):
+                # Set of columns that are updated
+                existing_columns_updated = set(self.all_columns).intersection(
+                    set(output.keys())
+                )
+
+                # Check if `function` updates an existing column
+                if len(existing_columns_updated) == 0:
+                    updates_existing_column = False
+
         elif output is None:
             # `function` returns None
             no_output = True
 
-        elif isinstance(output, bool):
+        elif (
+            isinstance(output, bool)
+            or (isinstance(output, np.ndarray) and output.dtype == np.bool)
+            or (isinstance(output, torch.Tensor) and output.dtype == torch.bool)
+        ):
             # `function` returns a bool
             bool_output = True
 
@@ -48,17 +81,32 @@ class FunctionInspectorMixin:
             list_output = True
             if batched and (
                 isinstance(output[0], bool)
-                or (
-                    hasattr(output[0], "dtype")
-                    and output[0].dtype in (np.bool, torch.bool)
-                )
+                or (isinstance(output, np.ndarray) and output[0].dtype == np.bool)
+                or (isinstance(output, torch.Tensor) and output[0].dtype == torch.bool)
             ):
                 # `function` returns a bool per example
                 bool_output = True
 
+        # Record the shape of the output
+        if hasattr(output, "shape"):
+            output_shape = output.shape
+        elif hasattr(output[0], "shape"):
+            output_shape = output[0].shape
+
+        # Record the dtype of the output
+        if hasattr(output, "dtype"):
+            output_dtype = output.dtype
+        elif hasattr(output[0], "dtype"):
+            output_dtype = output[0].dtype
+
         return SimpleNamespace(
+            output=output,
             dict_output=dict_output,
             no_output=no_output,
             bool_output=bool_output,
             list_output=list_output,
+            updates_existing_column=updates_existing_column,
+            existing_columns_updated=existing_columns_updated,
+            output_shape=output_shape,
+            output_dtype=output_dtype,
         )

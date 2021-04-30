@@ -159,21 +159,29 @@ class NumpyArrayColumn(
                 yield self[i : i + batch_size]
 
     @classmethod
-    def read(cls, path: str, *args, **kwargs) -> NumpyArrayColumn:
+    def read(
+        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
+    ) -> NumpyArrayColumn:
         # Assert that the path exists
         assert os.path.exists(path), f"`path` {path} does not exist."
 
-        # Load in the metadata
-        metadata = dict(
-            yaml.load(
-                open(os.path.join(path, "meta.yaml")),
-                Loader=yaml.FullLoader,
-            )
-        )
-        assert metadata["dtype"] == cls
+        # Load in the metadata: only available if the array was stored by mosaic
+        metadata_path = os.path.join(path, "meta.yaml")
+        if os.path.exists(metadata_path):
+            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
+            assert metadata["dtype"] == cls
+
+        # If the path doesn't exist, assume that `path` points to the `.npy` file
+        data_path = os.path.join(path, "data.npy")
+        if not os.path.exists(data_path):
+            data_path = path
 
         # Load in the data
-        data = np.load(os.path.join(path, "data.npy"))
+        if mmap:
+            assert dtype is not None and shape is not None
+            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
+        else:
+            data = np.load(data_path)
 
         return cls(data)
 

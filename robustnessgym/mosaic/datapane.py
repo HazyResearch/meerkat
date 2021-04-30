@@ -9,7 +9,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from functools import partial
-from types import SimpleNamespace
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 import cytoolz as tz
@@ -22,7 +21,6 @@ import yaml
 from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
-from pyarrow import json as jsonarrow
 from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
@@ -33,7 +31,9 @@ from robustnessgym.mosaic.columns.cell_column import CellColumn
 from robustnessgym.mosaic.columns.list_column import ListColumn
 from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.mixins.copying import CopyMixin
+from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
+from robustnessgym.mosaic.writers.numpy_writer import NumpyMemmapWriter
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,7 @@ Columnable = Union[AbstractColumn, List, np.ndarray, pd.Series]
 class DataPane(
     DatasetInfoMixin,
     CopyMixin,
+    FunctionInspectorMixin,
     StateDictMixin,
 ):
     """Mosaic DataPane class."""
@@ -69,7 +70,7 @@ class DataPane(
 
         logger.debug("Creating DataPane.")
 
-        # Data is a dictionary of lists
+        # Data is a dictionary of columns
         self._data = {}
 
         # Single argument
@@ -319,78 +320,6 @@ class DataPane(
             k: [e for i, e in enumerate(v) if boolean_mask[i]] for k, v in batch.items()
         }
 
-    def _inspect_function(
-        self,
-        function: Callable,
-        with_indices: bool = False,
-        batched: bool = False,
-    ) -> SimpleNamespace:
-
-        # Initialize variables to track
-        no_output = dict_output = bool_output = list_output = False
-
-        # If dict_output = True and `function` is used for updating the dataset
-        # useful to know if any existing column is modified
-        updates_existing_column = True
-        existing_columns_updated = []
-
-        # Run the function to test it
-        if batched:
-            if with_indices:
-                output = function(self[:2], range(2))
-            else:
-                output = function(self[:2])
-
-        else:
-            if with_indices:
-                output = function(self[0], 0)
-            else:
-                output = function(self[0])
-
-        if isinstance(output, Mapping):
-            # `function` returns a dict output
-            dict_output = True
-
-            # Set of columns that are updated
-            existing_columns_updated = set(self.all_columns).intersection(
-                set(output.keys())
-            )
-
-            # Check if `function` updates an existing column
-            if len(existing_columns_updated) == 0:
-                updates_existing_column = False
-
-        elif output is None:
-            # `function` returns None
-            no_output = True
-
-        elif (
-            isinstance(output, bool)
-            or (isinstance(output, np.ndarray) and output.dtype == np.bool)
-            or (isinstance(output, torch.Tensor) and output.dtype == torch.bool)
-        ):
-            # `function` returns a bool
-            bool_output = True
-        elif isinstance(output, (Sequence, torch.Tensor, np.ndarray)):
-            # `function` returns a list
-            list_output = True
-            if batched and (
-                isinstance(output[0], bool)
-                or (isinstance(output, np.ndarray) and output[0].dtype == np.bool)
-                or (isinstance(output, torch.Tensor) and output[0].dtype == torch.bool)
-            ):
-                # `function` returns a bool per example
-                bool_output = True
-
-        return SimpleNamespace(
-            dict_output=dict_output,
-            no_output=no_output,
-            bool_output=bool_output,
-            list_output=list_output,
-            updates_existing_column=updates_existing_column,
-            existing_columns_updated=existing_columns_updated,
-        )
-
     @property
     def identifier(self):
         """Identifier."""
@@ -576,14 +505,6 @@ class DataPane(
         )
 
     @classmethod
-    def list_datasets(cls) -> List[str]:
-        """List datasets on Huggingface datasets.
-
-        Returns: list of datasets
-        """
-        return datasets.list_datasets()
-
-    @classmethod
     def load_huggingface(cls, *args, **kwargs):
         """
         Load a Huggingface dataset as a DataPane.
@@ -610,16 +531,6 @@ class DataPane(
             return cls(dataset)
 
     @classmethod
-    def load_image_dataset(cls, *args, **kwargs):
-        """Create a Dataset from a dictionary with paths to images and image
-        metadata.
-
-        Pass argument image_keys to indicate what are the keys of the
-        columns with paths to images (default="image_file").
-        """
-        return cls(*args, dataset_fmt="image", **kwargs)
-
-    @classmethod
     def from_columns(
         cls,
         columns: Dict[str, AbstractColumn],
@@ -632,51 +543,24 @@ class DataPane(
         )
 
     @classmethod
-    def from_datasets(
-        cls,
-        dataset: datasets.Dataset,
-        identifier: Identifier = None,
-        dataset_fmt: str = None,
-    ) -> DataPane:
-        """Create a Dataset from a Huggingface datasets.Dataset."""
-        return cls(
-            dataset,
-            identifier=identifier,
-            dataset_fmt=dataset_fmt,
-        )
-
-    @classmethod
     def from_jsonl(
         cls,
         json_path: str,
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ) -> DataPane:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
 
-        if dataset_fmt == "in_memory":
-            # Load the .jsonl file
-            with open(json_path) as f:
-                data = [json.loads(line) for line in f]
+        # Load the .jsonl file
+        with open(json_path) as f:
+            data = [json.loads(line) for line in f]
 
-            return cls(
-                data,
-                identifier=identifier
-                if identifier
-                else Identifier("RGDataset", jsonl=json_path),
-                dataset_fmt=dataset_fmt,
-            )
-
-        elif dataset_fmt == "datasets":
-            # Use jsonarrow to directly load the json
-            return cls(
-                jsonarrow.read_json(json_path),
-                identifier=identifier,
-                dataset_fmt=dataset_fmt,
-            )
-        else:
-            raise NotImplementedError
+        return cls(
+            data,
+            identifier=identifier
+            if identifier
+            else Identifier("Jsonl", jsonl=json_path),
+        )
 
     @classmethod
     def from_batch(
@@ -693,7 +577,6 @@ class DataPane(
         cls,
         batches: Sequence[Batch],
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ) -> DataPane:
         """Convert a list of batches to a dataset."""
 
@@ -703,7 +586,6 @@ class DataPane(
                 *batches,
             ),
             identifier=identifier,
-            dataset_fmt=dataset_fmt,
         )
 
     @classmethod
@@ -711,7 +593,6 @@ class DataPane(
         cls,
         d: Dict,
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ) -> DataPane:
         """Convert a dictionary to a dataset.
 
@@ -720,7 +601,6 @@ class DataPane(
         return cls.from_batch(
             batch=d,
             identifier=identifier,
-            dataset_fmt=dataset_fmt,
         )
 
     @classmethod
@@ -740,7 +620,6 @@ class DataPane(
         cls,
         path: str,
         identifier: Identifier = None,
-        dataset_fmt: str = "in_memory",
     ):
         """Create a Dataset from a feather file."""
         return cls.from_batch(
@@ -748,7 +627,6 @@ class DataPane(
             identifier=Identifier("Feather", path=path)
             if not identifier
             else identifier,
-            dataset_fmt=dataset_fmt,
         )
 
     def to_pandas(self) -> pd.DataFrame:
@@ -930,69 +808,114 @@ class DataPane(
         with_indices: bool = False,
         input_columns: Optional[Union[str, List[str]]] = None,
         batched: bool = False,
-        batch_size: Optional[int] = 1000,
+        batch_size: Optional[int] = 32,
         drop_last_batch: bool = False,
         num_workers: int = 4,
+        output_type: type = None,
+        mmap: bool = False,
         **kwargs,
-    ) -> Optional[Union[Dict, List]]:
+    ) -> Optional[Union[Dict, List, AbstractColumn]]:
         """Apply a map over the dataset."""
 
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
+        # Just return if `function` is None or `self` has no examples
+        if function is None or not len(self):
             return None
 
-        # Return if `self` has no examples
-        if not len(self):
-            logger.info("Dataset empty, returning None.")
-            return None
-
+        # Convert `input_columns` to a list
         if isinstance(input_columns, str):
             input_columns = [input_columns]
 
-        # Set the format
-        previous_format = self.visible_columns
-        if input_columns:
-            self.set_format(input_columns)
-
+        # Convert to a batched function
         if not batched:
-            # Convert to a batch function
             function = convert_to_batch_fn(function, with_indices=with_indices)
-            logger.info(f"Converting `function` {function} to a batched function.")
+            batched = True
 
-        # Run the map
-        logger.info("Running `map`, the dataset will be left unchanged.")
-        outputs = None
-        for i, batch in tqdm(
-            enumerate(self.batch(batch_size, drop_last_batch, num_workers=num_workers)),
-            total=(len(self) // batch_size) + (1 - int(drop_last_batch)),
-        ):
+        with self.format(input_columns):
 
-            # Run `function` on the batch
-            output = (
-                function(
-                    batch,
-                    range(i * batch_size, min(len(self), (i + 1) * batch_size)),
-                )
-                if with_indices
-                else function(batch)
-            )
+            # Variable to store the outputs
+            outputs = None
 
-            if i == 0:
-                # Create an empty dict or list for the outputs
-                outputs = defaultdict(list) if isinstance(output, Mapping) else []
+            # Create the batches
+            batches = self.batch(batch_size, drop_last_batch, num_workers=num_workers)
+            num_batches = (len(self) // batch_size) + (1 - int(drop_last_batch))
 
-            # Append the output
-            if output is not None:
-                if isinstance(output, Mapping):
-                    for k in output.keys():
-                        outputs[k].append(output[k])
+            # Run the map
+            for i, batch in tqdm(enumerate(batches), total=num_batches):
+
+                # Calculate the start and end indexes for the batch
+                start_index = i * batch_size
+                end_index = min(len(self), (i + 1) * batch_size)
+
+                # Use the first batch for setup
+                if i == 0:
+
+                    # Get some information about the function
+                    function_properties = self._inspect_function(
+                        function,
+                        with_indices,
+                        batched,
+                        batch,
+                        range(start_index, end_index),
+                    )
+
+                    # Pull out information
+                    output = function_properties.output
+                    dtype = function_properties.output_dtype
+                    shape = (len(self), *function_properties.output_shape)
+
+                    # Setup for writing to a certain output column
+                    if output_type == NumpyArrayColumn and mmap:
+                        # Create the writer
+                        writer = NumpyMemmapWriter()
+
+                        # Construct the mmap file path
+                        # TODO: how/where to store the files
+                        path = self.logdir / f"{hash(function)}"
+
+                        # Open the output writer
+                        writer.open(str(path), dtype, shape=shape)
+
+                    else:
+                        # Create an empty dict or list for the outputs
+                        outputs = (
+                            defaultdict(list) if isinstance(output, Mapping) else []
+                        )
+
                 else:
-                    outputs.append(output)
+                    # Run `function` on the batch
+                    output = (
+                        function(batch, range(start_index, end_index))
+                        if with_indices
+                        else function(batch)
+                    )
 
-        # Reset the format
-        if input_columns:
-            self.set_format(previous_format)
+                # Append the output
+                if output is not None:
+                    if isinstance(output, Mapping):
+                        for k in output.keys():
+                            outputs[k].append(output[k])
+                    else:
+                        # Store output
+                        if output_type == NumpyArrayColumn and mmap:
+                            # Store the output in the mmap file and flush
+                            writer.write(output)
+                        else:
+                            # Extend outputs by default
+                            outputs.append(output)
+
+        # Check if we are returning a special output type
+        if output_type == NumpyArrayColumn:
+            if mmap:
+                writer.flush()
+                # TODO: Writers should have correspondence to their own columns
+                return NumpyArrayColumn.read(
+                    str(path),
+                    mmap=mmap,
+                    dtype=dtype,
+                    shape=shape,
+                )
+            else:
+                return NumpyArrayColumn(outputs)
 
         if outputs is None or not len(outputs):
             return None
