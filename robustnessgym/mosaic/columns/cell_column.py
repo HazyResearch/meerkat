@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from typing import Sequence
+import numpy as np
 
 from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
@@ -23,6 +24,17 @@ class CellColumn(AbstractColumn):
             *args,
             **kwargs,
         )
+
+    def _get_batch(self, indices: np.ndarray):
+        if self.materialize:
+            # if materializing, return a batch (by default, a list of objects returned
+            # by `.get`, otherwise the batch format specified by `self.collate`)
+            return self.collate([self._data[i].get() for i in indices])
+
+        else:
+            return self.__class__(
+                [self._data[i] for i in indices], materialize=self.materialize
+            )
 
     @classmethod
     def from_cells(cls, cells: Sequence[AbstractCell], *args, **kwargs):

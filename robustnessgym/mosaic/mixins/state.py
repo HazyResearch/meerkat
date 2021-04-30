@@ -40,7 +40,7 @@ class StateDictMixin:
         return a compressed representation of the object.
 
         """
-
+        
         def _apply_get_state(obj):
             if hasattr(obj, "get_state"):
                 return StateClass(**{"klass": type(obj), "state": obj.get_state()})
@@ -65,7 +65,7 @@ class StateDictMixin:
     def from_state(cls, state: Union[Dict, StateClass], *args, **kwargs) -> object:
         """Load the object from state."""
 
-        def _apply_from_state(obj_):
+        def _apply_from_state(obj_: Union[Dict, StateClass]):
             if isinstance(obj_, StateClass):
                 return obj_.klass.from_state(obj_.state, *args, **kwargs)
             else:

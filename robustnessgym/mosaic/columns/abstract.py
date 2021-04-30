@@ -94,6 +94,9 @@ class AbstractColumn(
         """List of attributes that describe the state of the object."""
         return {"_materialize", "_collate_fn", "_data"}
 
+    def _get_cell(self, index: int):
+        self.data[index]
+
     def __getitem__(self, index):
         if self.visible_rows is not None:
             # Remap the index if only some rows are visible
@@ -101,7 +104,7 @@ class AbstractColumn(
 
         # `index` should return a single element
         if isinstance(index, int) or isinstance(index, np.int):
-            data = self.data[int(index)]
+            data = self._get_cell(int(index))
 
             # Check if the column implements materialization
             if self.materialize:
@@ -118,26 +121,35 @@ class AbstractColumn(
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
-            data = self.data[index]
-        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
-            data = [self.data[int(i)] for i in index]
-        elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            data = [self.data[int(i)] for i in index]
-        else:
-            raise TypeError("Invalid argument type: {}".format(type(index)))
-
-        if self.materialize:
-            # if materializing, return a batch (by default, a list of objects returned
-            # by `element.get`, otherwise the batch format specified by `self.collate`
-            return self.collate(
-                [
-                    element.get() if hasattr(element, "get") else element
-                    for element in data
-                ]
+            indices = np.arange(
+                0 if index.start is None else index.start,
+                len(self) if index.stop is None else index.stop,
+                1 if index.step is None else index.step,
             )
+        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
+            indices = np.array(index)
+        elif isinstance(index, np.ndarray):
+            if len(index.shape) != 1:
+                raise TypeError(
+                    "`np.ndarray` index must have 1 axis, not {}".format(
+                        len(index.shape)
+                    )
+                )
+            indices = index
         else:
-            # if not materializing, return a new Column
-            return self.__class__(data, materialize=self.materialize)
+            raise TypeError(
+                "object of type {} is not a valid index".format(type(index))
+            )
+        return self._get_batch(indices)
+    
+    def _get_batch(self, indices: np.ndarray):
+        if self.materialize:
+            return self.collate([self._get_cell(int(i)) for i in indices])
+
+        else:
+            new_column = self.copy()
+            new_column.visible_rows = indices
+            return new_column
 
     def __len__(self):
         # If only a subset of rows are visible

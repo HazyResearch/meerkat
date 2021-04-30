@@ -346,6 +346,7 @@ class DataPane(
                 output = function(self[0], 0)
             else:
                 output = function(self[0])
+
         if isinstance(output, Mapping):
             # `function` returns a dict output
             dict_output = True
@@ -362,8 +363,11 @@ class DataPane(
         elif output is None:
             # `function` returns None
             no_output = True
-        elif isinstance(output, bool) or (
-            hasattr(output, "dtype") and output.dtype in (np.bool, torch.bool)
+
+        elif (
+            isinstance(output, bool)
+            or (isinstance(output, np.ndarray) and output.dtype == np.bool)
+            or (isinstance(output, torch.Tensor) and output.dtype == torch.bool)
         ):
             # `function` returns a bool
             bool_output = True
@@ -372,10 +376,8 @@ class DataPane(
             list_output = True
             if batched and (
                 isinstance(output[0], bool)
-                or (
-                    hasattr(output[0], "dtype")
-                    and output[0].dtype in (np.bool, torch.bool)
-                )
+                or (isinstance(output, np.ndarray) and output[0].dtype == np.bool)
+                or (isinstance(output, torch.Tensor) and output[0].dtype == torch.bool)
             ):
                 # `function` returns a bool per example
                 bool_output = True
@@ -507,32 +509,32 @@ class DataPane(
             # Remap the index if only some rows are visible
             index = self._remap_index(index)
 
-        if (
-            isinstance(index, int)
-            or isinstance(index, slice)
-            or isinstance(index, np.int)
-        ):
-            # int or slice index => standard list slicing
+        if isinstance(index, int) or isinstance(index, np.int):
+            # int index => single row (dict)
             return {k: self._data[k][index] for k in self.visible_columns}
+
         elif isinstance(index, str):
-            # str index => column selection
+            # str index => column selection (AbstractColumn)
             if index in self.column_names:
                 if self.visible_rows is not None:
                     return [self._data[index][i] for i in self.visible_rows]
                 return self._data[index]
             raise AttributeError(f"Column {index} does not exist.")
-        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
 
+        # TODO(sabri): discuss with others returning a DataPane here
+        elif isinstance(index, slice):
+            # slice index => multiple row selection (DataPane)
+            return {k: self._data[k][index] for k in self.visible_columns}
+        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
+            # tuple or list index => multiple row selection (DataPane)
             if isinstance(index[0], str):
                 return DataPane.from_batch(
                     {k: self._data[k] for k in index if k in self.visible_columns}
                 )
-
-            return {k: [self._data[k][i] for i in index] for k in self.visible_columns}
+            return {k: self._data[k][index] for k in self.visible_columns}
         elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            return {
-                k: [self._data[k][int(i)] for i in index] for k in self.visible_columns
-            }
+            # numpy array index => multiple row selection (DataPane)
+            return {k: self._data[k][index] for k in self.visible_columns}
         else:
             raise TypeError("Invalid argument type: {}".format(type(index)))
 
@@ -984,19 +986,35 @@ class DataPane(
             if output is not None:
                 if isinstance(output, Mapping):
                     for k in output.keys():
-                        outputs[k].extend(output[k])
+                        outputs[k].append(output[k])
                 else:
-                    outputs.extend(output)
+                    outputs.append(output)
 
         # Reset the format
         if input_columns:
             self.set_format(previous_format)
 
-        if not len(outputs):
+        if outputs is None or not len(outputs):
             return None
-        elif isinstance(outputs, dict):
-            return dict(outputs)
-        return outputs
+
+        if isinstance(outputs, dict):
+            return {k: self._concat_batches(v) for k, v in outputs.items()}
+        return self._concat_batches(outputs)
+
+    @staticmethod
+    def _concat_batches(batches):
+        first_batch = batches[0]
+        if isinstance(first_batch, np.ndarray):
+            return np.concatenate(batches, axis=0)
+        elif isinstance(first_batch, torch.tensor):
+            return torch.cat(batches, axis=0)
+        elif isinstance(first_batch, list) or isinstance(first_batch, tuple):
+            return tz.concat(batches)
+        else:
+            output = []
+            for batch in batches:
+                output.extend(batch)
+            return output
 
     def filter(
         self,
