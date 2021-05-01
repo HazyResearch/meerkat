@@ -53,3 +53,25 @@ class NumpyMemmapWriter(AbstractWriter):
 
     def close(self, *args, **kwargs):
         pass
+
+
+class NumpyWriter(AbstractWriter):
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super(NumpyWriter, self).__init__(*args, **kwargs)
+
+    def open(self) -> None:
+        self.outputs = []
+    
+    def write(self, data, **kwargs) -> None:
+        self.outputs.extend(data)
+
+    def flush(self, *args, **kwargs):
+        return np.asarray(self.outputs)
+
+    def close(self, *args, **kwargs):
+        pass
+

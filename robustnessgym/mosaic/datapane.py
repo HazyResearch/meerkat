@@ -9,7 +9,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from functools import partial
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import cytoolz as tz
 import datasets
@@ -25,13 +25,11 @@ from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_fn, recmerge
-from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
-from robustnessgym.mosaic.columns.cell_column import CellColumn
-from robustnessgym.mosaic.columns.list_column import ListColumn
 from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.mixins.copying import CopyMixin
 from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
+from robustnessgym.mosaic.mixins.mapping import MappableMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
 from robustnessgym.mosaic.writers.numpy_writer import NumpyMemmapWriter
 
@@ -40,14 +38,13 @@ logger = logging.getLogger(__name__)
 Example = Dict
 Batch = Dict[str, Union[List, AbstractColumn]]
 BatchOrDataset = Union[Batch, "DataPane"]
-# TODO(sabri): change the name of this!
-Columnable = Union[AbstractColumn, List, np.ndarray, pd.Series]
 
 
 class DataPane(
     DatasetInfoMixin,
     CopyMixin,
     FunctionInspectorMixin,
+    MappableMixin,
     StateDictMixin,
 ):
     """Mosaic DataPane class."""
@@ -134,24 +131,10 @@ class DataPane(
             self._add_index()
 
     @classmethod
-    def _create_column(cls, data: Columnable):
-        # TODO (sabri): put in a registry
-        if isinstance(data, AbstractColumn):
-            return data
-        elif isinstance(data, np.ndarray):
-            return NumpyArrayColumn(data)
-        elif isinstance(data, pd.Series):
-            return NumpyArrayColumn(data.values)
-        elif len(data) != 0 and isinstance(data[0], AbstractCell):
-            return CellColumn(data)
-        else:
-            return ListColumn(data)
-
-    @classmethod
-    def _create_columns(cls, name_to_data: Dict[str, Columnable]):
+    def _create_columns(cls, name_to_data: Dict[str, AbstractColumn.Columnable]):
         new_data = {}
         for column_name, data in name_to_data.items():
-            new_data[column_name] = cls._create_column(data=data)
+            new_data[column_name] = AbstractColumn.from_data(data=data)
 
         return new_data
 
@@ -334,7 +317,9 @@ class DataPane(
             #     ).schema
             # )
 
-    def add_column(self, name: str, data: Columnable, overwrite=False) -> None:
+    def add_column(
+        self, name: str, data: AbstractColumn.Columnable, overwrite=False
+    ) -> None:
         """Add a column to the dataset."""
 
         assert (name not in self.all_columns) or overwrite, (
@@ -342,7 +327,7 @@ class DataPane(
             f"set `overwrite=True` to overwrite."
         )
 
-        column = self._create_column(data)
+        column = AbstractColumn.from_data(data)
 
         assert len(column) == len(self), (
             f"`add_column` failed. "
@@ -640,16 +625,21 @@ class DataPane(
             for example in self:
                 writer.write(example)
 
-    def _get_collate_fns(self):
-        return {name: column.collate for name, column in self._data.items()}
+    def _get_collate_fns(self, columns: Iterable[str] = None):
+        columns = self._data.keys() if columns is None else columns
+        return {name: self._data[name].collate for name in columns}
 
-    def _collate(self, batch: List, column_to_collate):
+    def _collate(self, batch: List, column_to_collate: Dict[str, callable]):
         batch = tz.merge_with(list, *batch)
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
 
         return new_batch
+
+    @staticmethod
+    def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
+        return convert_to_batch_fn(function=function, with_indices=with_indices)
 
     def batch(
         self,
@@ -669,17 +659,52 @@ class DataPane(
         Returns:
             batches of data
         """
+        cell_columns, batch_columns = [], []
+        for name, column in self._data.items():
+            # check if the column has overriden the base `batch`
+            if column._get_batch.__func__ == AbstractColumn._get_batch:
+                # if not, include it in the cell dataloader
+                cell_columns.append(name)
+            else:
+                batch_columns.append(name)
+
         column_to_collate = self._get_collate_fns()
 
-        return torch.utils.data.DataLoader(
-            self,
-            batch_size=batch_size,
-            collate_fn=partial(self._collate, column_to_collate=column_to_collate),
-            drop_last=drop_last_batch,
-            num_workers=num_workers,
-            *args,
-            **kwargs,
-        )
+        if cell_columns:
+            cell_dl = torch.utils.data.DataLoader(
+                self[cell_columns],
+                batch_size=batch_size,
+                collate_fn=partial(self._collate, column_to_collate=column_to_collate),
+                drop_last=drop_last_batch,
+                num_workers=num_workers,
+                *args,
+                **kwargs,
+            )
+
+        if batch_columns:
+            batch_indices = []
+            indices = np.arange(len(self))
+            for i in range(0, len(self), batch_size):
+                if drop_last_batch and i + batch_size > len(self):
+                    continue
+                batch_indices.append(indices[i : i + batch_size])
+
+            batch_dl = torch.utils.data.DataLoader(
+                self,
+                sampler=batch_indices,
+                batch_size=None,
+                batch_sampler=None,
+                drop_last=drop_last_batch,
+            )
+
+        if batch_columns and cell_columns:
+            for cell_batch, batch_batch in zip(batch_dl, cell_dl):
+                yield {**cell_batch, **batch_batch}
+
+        elif batch_columns:
+            return batch_dl
+        elif cell_columns:
+            return cell_dl
 
     def update(
         self,
@@ -816,8 +841,21 @@ class DataPane(
         mmap: bool = False,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
-        """Apply a map over the dataset."""
+        with self.format(input_columns):
+            return super().map(
+                function=function,
+                with_indices=with_indices,
+                batched=batched,
+                batch_size=batch_size,
+                drop_last_batch=drop_last_batch,
+                num_workers=num_workers,
+                output_type=output_type,
+                mmap=mmap,
+                **kwargs,
+            )
 
+    def _map(self):
+        """Apply a map over the dataset."""
         # Just return if `function` is None or `self` has no examples
         if function is None or not len(self):
             return None
@@ -832,9 +870,6 @@ class DataPane(
             batched = True
 
         with self.format(input_columns):
-
-            # Variable to store the outputs
-            outputs = None
 
             # Create the batches
             batches = self.batch(batch_size, drop_last_batch, num_workers=num_workers)
@@ -862,25 +897,23 @@ class DataPane(
                     # Pull out information
                     output = function_properties.output
                     dtype = function_properties.output_dtype
-                    shape = (len(self), *function_properties.output_shape)
+                    if function_properties.output_shape is not None:
+                        shape = (len(self), *function_properties.output_shape)
+
+                    if output_type is None:
+                        output_type = type(AbstractColumn.from_data(output))
+                    writer = output_type.get_writer(mmap=mmap)
 
                     # Setup for writing to a certain output column
-                    if output_type == NumpyArrayColumn and mmap:
-                        # Create the writer
-                        writer = NumpyMemmapWriter()
-
+                    if mmap:
                         # Construct the mmap file path
                         # TODO: how/where to store the files
                         path = self.logdir / f"{hash(function)}"
-
                         # Open the output writer
                         writer.open(str(path), dtype, shape=shape)
-
                     else:
                         # Create an empty dict or list for the outputs
-                        outputs = (
-                            defaultdict(list) if isinstance(output, Mapping) else []
-                        )
+                        writer.open()
 
                 else:
                     # Run `function` on the batch
@@ -896,39 +929,28 @@ class DataPane(
                         for k in output.keys():
                             outputs[k].append(output[k])
                     else:
-                        # Store output
-                        if output_type == NumpyArrayColumn and mmap:
-                            # Store the output in the mmap file and flush
-                            writer.write(output)
-                        elif output_type == NumpyArrayColumn and not mmap:
-                            # Extend outputs
-                            outputs.extend(output)
-                        else:
-                            # Append outputs by default
-                            # TODO(karan): ask Sabri, may be inefficient to append ->
-                            #  concat vs. just extend -> asarray?
-                            outputs.append(output)
+                        writer.write(output)
 
         # Check if we are returning a special output type
-        if output_type == NumpyArrayColumn:
-            if mmap:
-                writer.flush()
-                # TODO: Writers should have correspondence to their own columns
-                return NumpyArrayColumn.read(
-                    str(path),
-                    mmap=mmap,
-                    dtype=dtype,
-                    shape=shape,
-                )
-            else:
-                return NumpyArrayColumn(outputs)
+        if mmap:
+            writer.flush()
+            # TODO: Writers should have correspondence to their own columns
+            outputs = output_type.read(
+                str(path),
+                mmap=mmap,
+                dtype=dtype,
+                shape=shape,
+            )
+        else:
+            outputs = writer.flush()
+            outputs = output_type.from_data(outputs)
 
         if outputs is None or not len(outputs):
             return None
 
         if isinstance(outputs, dict):
-            return {k: self._concat_batches(v) for k, v in outputs.items()}
-        return self._concat_batches(outputs)
+            return {k: v for k, v in outputs.items()}
+        return outputs
 
     @staticmethod
     def _concat_batches(batches):

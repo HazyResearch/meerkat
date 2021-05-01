@@ -86,18 +86,19 @@ class FunctionInspectorMixin:
             ):
                 # `function` returns a bool per example
                 bool_output = True
+        
+        if not isinstance(output, Mapping):
+            # Record the shape of the output
+            if hasattr(output, "shape"):
+                output_shape = output.shape
+            elif len(output) > 0 and hasattr(output[0], "shape"):
+                output_shape = output[0].shape
 
-        # Record the shape of the output
-        if hasattr(output, "shape"):
-            output_shape = output.shape
-        elif hasattr(output[0], "shape"):
-            output_shape = output[0].shape
-
-        # Record the dtype of the output
-        if hasattr(output, "dtype"):
-            output_dtype = output.dtype
-        elif hasattr(output[0], "dtype"):
-            output_dtype = output[0].dtype
+            # Record the dtype of the output
+            if hasattr(output, "dtype"):
+                output_dtype = output.dtype
+            elif len(output) > 0 and hasattr(output[0], "dtype"):
+                output_dtype = output[0].dtype
 
         return SimpleNamespace(
             output=output,

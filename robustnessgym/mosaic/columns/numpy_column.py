@@ -12,6 +12,7 @@ from yaml.representer import Representer
 
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.mixins.collate import identity_collate
+from robustnessgym.mosaic.writers.numpy_writer import NumpyMemmapWriter, NumpyWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -98,65 +99,14 @@ class NumpyArrayColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def __getitem__(self, index):
-        if self.visible_rows is not None:
-            # Remap the index if only some rows are visible
-            index = self._remap_index(index)
-
-        # indices that return a single cell
-        if (
-            isinstance(index, int)
-            or isinstance(index, np.int)
-            # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
-            # but the element at the index
-            # TODO: interestingly, np.ndarray indexed with a list of length 1 DOES
-            # return a np.ndarray. Discuss how we want to handle this for columns in RG,
-            # ideally all columns should share the same behavior w.r.t. this.
-            or (isinstance(index, tuple) and len(index) == 1)
-        ):
-            return self._data[index]
-
-        # indices that return batches
-        if isinstance(index, slice):
-            # int or slice index => standard list slicing
-            data = self._data[index]
-        elif isinstance(index, tuple) and len(index):
-            data = self.__array__()[index]
-        elif isinstance(index, list) and len(index):
-            data = [self._data[i] for i in index]
-        elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            data = [self._data[int(i)] for i in index]
+    def _get_batch(self, indices):
+        return self.from_array(self.__array__()[indices])
+    
+    def get_writer(mmap: bool = False):
+        if mmap:
+            return NumpyMemmapWriter()
         else:
-            raise TypeError("Invalid argument type: {}".format(type(index)))
-
-        # TODO(karan): do we need collate in NumpyArrayColumn
-        # if self._materialize:
-        #     # return a batch
-        #     return self.collate([element for element in data])
-        # else:
-        # if not materializing, return a new NumpyArrayColumn
-        # return self.from_list(data)
-
-        # need to check if data has `ndim`, in case data is str or other object
-        if hasattr(data, "ndim") and data.ndim > 0:
-            return self.from_array(data)
-        return self.from_array([data])
-
-    def batch(
-        self,
-        batch_size: int = 32,
-        drop_last_batch: bool = False,
-        collate: bool = True,
-        *args,
-        **kwargs,
-    ):
-        for i in range(0, len(self), batch_size):
-            if drop_last_batch and i + batch_size > len(self):
-                continue
-            if collate:
-                yield self.collate(self[i : i + batch_size])
-            else:
-                yield self[i : i + batch_size]
+            return NumpyWriter()
 
     @classmethod
     def read(

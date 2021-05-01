@@ -7,16 +7,21 @@ from collections import defaultdict
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 import numpy as np
+import pandas as pd
+from robustnessgym.mosaic.mixins.mapping import MappableMixin
+from robustnessgym.mosaic.writers.list_writer import ListWriter
 import torch
 from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_column_fn
+from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.mixins.collate import CollateMixin
 from robustnessgym.mosaic.mixins.copying import CopyMixin
 from robustnessgym.mosaic.mixins.identifier import IdentifierMixin
 from robustnessgym.mosaic.mixins.index import IndexableMixin
 from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
+from robustnessgym.mosaic.mixins.mapping import MappableMixin
 from robustnessgym.mosaic.mixins.materialize import MaterializationMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
 from robustnessgym.mosaic.mixins.storage import ColumnStorageMixin
@@ -32,6 +37,7 @@ class AbstractColumn(
     FunctionInspectorMixin,
     IdentifierMixin,
     IndexableMixin,
+    MappableMixin,
     MaterializationMixin,
     StateDictMixin,
     VisibilityMixin,
@@ -103,12 +109,18 @@ class AbstractColumn(
             index = self._remap_index(index)
 
         # `index` should return a single element
-        if isinstance(index, int) or isinstance(index, np.int):
+        # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
+        # so we match this behavior
+        if (
+            isinstance(index, int)
+            or isinstance(index, np.int)
+            or (isinstance(index, tuple) and len(index) == 1)
+        ):
             data = self._get_cell(int(index))
 
             # Check if the column implements materialization
             if self.materialize:
-                if hasattr(data, "get"):
+                if isinstance(data, AbstractCell):
                     # `data` has a `get` method that can be called for retrieving the
                     # "expensive" information
                     return data.get()
@@ -121,11 +133,7 @@ class AbstractColumn(
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
-            indices = np.arange(
-                0 if index.start is None else index.start,
-                len(self) if index.stop is None else index.stop,
-                1 if index.step is None else index.step,
-            )
+            indices = np.arange(len(self))[index]
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
             indices = np.array(index)
         elif isinstance(index, np.ndarray):
@@ -150,6 +158,10 @@ class AbstractColumn(
             new_column = self.copy()
             new_column.visible_rows = indices
             return new_column
+    
+    @staticmethod
+    def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
+        return convert_to_batch_column_fn(function=function, with_indices=with_indices)
 
     def __len__(self):
         # If only a subset of rows are visible
@@ -160,91 +172,6 @@ class AbstractColumn(
         if self.data is not None:
             return len(self.data)
         return 0
-
-    def map(
-        self,
-        function: Optional[Callable] = None,
-        with_indices: bool = False,
-        batched: bool = False,
-        batch_size: Optional[int] = 1000,
-        drop_last_batch: bool = False,
-        num_proc: Optional[int] = None,
-        materialize: bool = None,
-        **kwargs,
-    ) -> Optional[Union[Dict, List, AbstractColumn]]:
-        """Map a function over the elements of the column."""
-        # Check if need to materialize:
-        # TODO(karan): figure out if we need materialize=False
-
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
-
-        # Ensure that num_proc is not None
-        if num_proc is None:
-            num_proc = 0
-
-        # Return if `self` has no examples
-        if not len(self):
-            logger.info("Dataset empty, returning None.")
-            return None
-
-        if not batched:
-            # Convert to a batch function
-            function = convert_to_batch_column_fn(function, with_indices=with_indices)
-            batched = True
-            logger.info(f"Converting `function` {function} to a batched function.")
-
-        # # Get some information about the function
-        # TODO: discuss whether this is actually required vs. doing it on first pass in
-        # loop
-        function_properties = self._inspect_function(
-            function,
-            with_indices,
-            batched=batched,
-        )
-
-        # Run the map
-        logger.info("Running `map`, the dataset will be left unchanged.")
-        outputs = defaultdict(list) if function_properties.dict_output else []
-        for i, batch in tqdm(
-            enumerate(
-                self.batch(
-                    batch_size=batch_size,
-                    drop_last_batch=drop_last_batch,
-                    collate=batched,
-                    # TODO: collate=batched was commented out in list_column
-                )
-            ),
-            total=(len(self) // batch_size)
-            + int(not drop_last_batch and len(self) % batch_size != 0),
-        ):
-
-            # Run `function` on the batch
-            output = (
-                function(
-                    batch,
-                    range(i * batch_size, min(len(self), (i + 1) * batch_size)),
-                )
-                if with_indices
-                else function(batch)
-            )
-
-            # Append the output
-            if output is not None:
-                if isinstance(output, Mapping):
-                    for k in output.keys():
-                        outputs[k].extend(output[k])
-                else:
-                    outputs.extend(output)
-
-        if not len(outputs):
-            return None
-        elif isinstance(outputs, dict):
-            # turns the defaultdict into dict
-            return dict(outputs)
-        return outputs
 
     def filter(
         self,
@@ -311,7 +238,7 @@ class AbstractColumn(
         Returns:
             batches of data
         """
-        if self.materialize:
+        if self._get_batch.__func__ == AbstractColumn._get_batch:
             return torch.utils.data.DataLoader(
                 self,
                 batch_size=batch_size,
@@ -321,7 +248,70 @@ class AbstractColumn(
                 **kwargs,
             )
         else:
+            batch_indices = []
+            indices = np.arange(len(self))
             for i in range(0, len(self), batch_size):
                 if drop_last_batch and i + batch_size > len(self):
                     continue
-                yield self[i : i + batch_size]
+                batch_indices.append(indices[i : i + batch_size])
+            return torch.utils.data.DataLoader(
+                self,
+                sampler=batch_indices,
+                batch_size=None,
+                batch_sampler=None,
+                drop_last=drop_last_batch,
+            )
+        # if self.materialize:
+        #     return torch.utils.data.DataLoader(
+        #         self,
+        #         batch_size=batch_size,
+        #         collate_fn=self.collate if collate else lambda x: x,
+        #         drop_last=drop_last_batch,
+        #         *args,
+        #         **kwargs,
+        #     )
+        # else:
+        #     for i in range(0, len(self), batch_size):
+        #         if drop_last_batch and i + batch_size > len(self):
+        #             continue
+        #         yield self[i : i + batch_size]
+
+    def get_writer(mmap: bool = False):
+        if mmap:
+            raise ValueError("Memmapping not supported with this column type.")
+        else:
+            return ListWriter()
+
+    Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
+
+    @classmethod
+    def from_data(cls, data: Union[Columnable, AbstractColumn]):
+        """ Convert data to a mosaic column using the appropriate Column type."""
+        # need to import lazily to avoid circular import
+        if isinstance(data, AbstractColumn):
+            return data
+        elif torch.is_tensor(data):
+            # TODO: update this once we've added a torch.Tensor column
+            from .numpy_column import NumpyArrayColumn
+
+            return NumpyArrayColumn(data.cpu().detach().numpy())
+        elif isinstance(data, np.ndarray):
+            from .numpy_column import NumpyArrayColumn
+
+            return NumpyArrayColumn(data)
+        elif isinstance(data, pd.Series):
+            from .numpy_column import NumpyArrayColumn
+
+            return NumpyArrayColumn(data.values)
+        elif isinstance(data, Sequence):
+            from ..cells.abstract import AbstractCell
+
+            if len(data) != 0 and isinstance(data[0], AbstractCell):
+                from .cell_column import CellColumn
+
+                return CellColumn(data)
+            from .list_column import ListColumn
+
+            return ListColumn(data)
+        else:
+            raise ValueError(f"Cannot create column out of data of type {type(data)}")
