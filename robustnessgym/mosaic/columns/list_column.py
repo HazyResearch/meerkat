@@ -4,6 +4,7 @@ import abc
 import logging
 from typing import Sequence
 
+import pandas as pd
 from yaml.representer import Representer
 
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
@@ -47,3 +48,6 @@ class ListColumn(AbstractColumn):
                 yield self.collate(self[i : i + batch_size])
             else:
                 yield self[i : i + batch_size]
+    
+    def _repr_pandas_(self) -> pd.Series:
+        return pd.Series(map(repr, self))

@@ -8,10 +8,8 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
-from robustnessgym.mosaic.mixins.mapping import MappableMixin
 from robustnessgym.mosaic.writers.list_writer import ListWriter
 import torch
-from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_column_fn
@@ -172,6 +170,13 @@ class AbstractColumn(
         if self.data is not None:
             return len(self.data)
         return 0
+    
+    def _repr_pandas_(self) -> pd.Series:
+        raise NotImplementedError
+    
+    def _repr_html_(self):
+        # pd.Series objects do not implement _repr_html_
+        return self._repr_pandas_()
 
     def filter(
         self,

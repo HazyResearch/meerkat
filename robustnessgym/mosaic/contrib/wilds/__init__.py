@@ -3,6 +3,7 @@ from __future__ import annotations
 from argparse import Namespace
 from typing import List
 
+import pandas as pd
 import numpy as np
 from datasets import DatasetInfo
 from torch.utils.data._utils.collate import default_collate
@@ -11,6 +12,7 @@ from robustnessgym.core.identifier import Identifier
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.datapane import DataPane
+import yaml
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform
@@ -25,7 +27,7 @@ except ImportError:
     )
 
 
-class WildsDataPane(DataPane):
+class WILDSDataPane(DataPane):
     def __init__(
         self,
         dataset_name: str,
@@ -37,12 +39,12 @@ class WildsDataPane(DataPane):
         split: str = None,
         use_transform: bool = True,
     ):
-        """ A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s for 
-        targets and metadata. 
+        """A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s for
+        targets and metadata.
 
 
-        Example: 
-        Run inference on the dataset and store predictions alongside the data. 
+        Example:
+        Run inference on the dataset and store predictions alongside the data.
         ```
             dp = WildsDataPane("fmow", root_dir="/datasets/", split="test")
             model = ... # get the model
@@ -57,14 +59,14 @@ class WildsDataPane(DataPane):
         ```
 
         Args:
-            dataset_name (str, optional): dataset name. Defaults to `"fmow"`. 
+            dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
             version (str, optional): dataset version number, e.g., '1.0'.
                 Defaults to the latest version.
-            root_dir (str): the directory where the WILDS dataset is downloaded. 
-                See https://wilds.stanford.edu/ for download instructions. 
+            root_dir (str): the directory where the WILDS dataset is downloaded.
+                See https://wilds.stanford.edu/ for download instructions.
             split (str, optional): see . Defaults to None.
-            use_transform (bool, optional): Whether to apply the transform from the 
-                WILDS example directory on load. Defaults to True. 
+            use_transform (bool, optional): Whether to apply the transform from the
+                WILDS example directory on load. Defaults to True.
             identifier (Identifier, optional): [description]. Defaults to None.
             column_names (List[str], optional): [description]. Defaults to None.
             info (DatasetInfo, optional): [description]. Defaults to None.
@@ -72,7 +74,7 @@ class WildsDataPane(DataPane):
         """
         self.dataset_name = dataset_name
         self.root_dir = root_dir
-        input_column = WildsInputColumn(
+        input_column = WILDSInputColumn(
             dataset_name=dataset_name,
             version=version,
             root_dir=root_dir,
@@ -80,9 +82,9 @@ class WildsDataPane(DataPane):
             use_transform=use_transform,
         )
         output_column = input_column.get_y_column()
-        metadata_column = input_column.get_metadata_column()
-        super(WildsDataPane, self).__init__(
-            {"input": input_column, "y": output_column, "meta": metadata_column},
+        metadata_columns = input_column.get_metadata_columns()
+        super(WILDSDataPane, self).__init__(
+            {"input": input_column, "y": output_column, **metadata_columns},
             identifier=identifier,
             column_names=column_names,
             info=info,
@@ -90,7 +92,7 @@ class WildsDataPane(DataPane):
         )
 
 
-class WildsInputColumn(AbstractColumn):
+class WILDSInputColumn(AbstractColumn):
     def __init__(
         self,
         dataset_name: str = "fmow",
@@ -100,27 +102,47 @@ class WildsInputColumn(AbstractColumn):
         use_transform: bool = True,
         **dataset_kwargs,
     ):
-        """ A column wrapper around a WILDS dataset that can lazily load the inputs 
+        """A column wrapper around a WILDS dataset that can lazily load the inputs
         for each dataset.
 
         Args:
-            dataset_name (str, optional): dataset name. Defaults to `"fmow"`. 
+            dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
             version (str, optional): dataset version number, e.g., '1.0'.
                 Defaults to the latest version.
             root_dir (str, optional): the directory  . Defaults to None.
             split (str, optional): the split . Defaults to None.
-            use_transform (bool, optional): Whether to apply the transform from the 
-                WILDS example directory on load. Defaults to True. 
+            use_transform (bool, optional): Whether to apply the transform from the
+                WILDS example directory on load. Defaults to True.
         """
         self._state = {
             "dataset_name": dataset_name,
             "version": version,
             "root_dir": root_dir,
+            "split": split,
+            "use_transform": use_transform,
             **dataset_kwargs,
         }
         dataset = wilds.get_dataset(
             dataset=dataset_name, version=version, root_dir=root_dir, **dataset_kwargs
         )
+        self.root = dataset.root
+        self.split = split
+
+        self.metadata_columns = {}
+        # get additional, dataset-specific metadata columns
+        if dataset_name == "fmow":
+            metadata_df = dataset.metadata
+            metadata_df = metadata_df[metadata_df.split != "seq"]
+            if self.split is not None:
+                metadata_df = metadata_df[
+                    dataset.split_array == dataset.split_dict[self.split]
+                ]
+            self.metadata_columns.update(
+                {
+                    field: NumpyArrayColumn(data=series.values)
+                    for field, series in metadata_df.iteritems()
+                }
+            )
 
         if use_transform:
             # we need a WILDS config in order to initialize transform
@@ -138,46 +160,63 @@ class WildsInputColumn(AbstractColumn):
             transform = collate = None
 
         if split is not None:
-            dataset = dataset.get_subset(split, transform=transform)
+            dataset = dataset.get_subset(split, transform=transform, frac=1.0)
         elif transform is not None:
             # only WILDSSubset supports applying a transform, so we use it even if no
             # split is applied
             dataset = WILDSSubset(dataset, np.arange(len(dataset)), transform=transform)
-
-        super(WildsInputColumn, self).__init__(data=dataset, collate_fn=collate)
+        
+        self.metadata_columns.update({
+            f"meta_{field}": NumpyArrayColumn(data=dataset.metadata_array[:, idx])
+            for idx, field in enumerate(dataset.metadata_fields)
+        })
+        super(WILDSInputColumn, self).__init__(data=dataset, collate_fn=collate)
 
     def get_y_column(self):
-        """ 
-        Get a NumpyArrayColumn holding the targets for the dataset. 
+        """
+        Get a NumpyArrayColumn holding the targets for the dataset.
         Warning: `WildsDataset`s may remap indexes in arbitrary ways so it's important
         not to directly try to access the underlying data structures, instead relying on
         the `y_array` and `metadata_array` properties which are universal across WILDS
-        datasets. 
+        datasets.
         """
         return NumpyArrayColumn(data=self.data.y_array)
 
-    def get_metadata_column(self):
-        return NumpyArrayColumn(data=self.data.metadata_array)
+    def get_metadata_columns(self):
+        return self.metadata_columns
 
     def _get_cell(self, index: int):
         # only get input (not y and meta)
         return self.data[index][0]
 
+    def _repr_pandas_(
+        self,
+    ) -> pd.Series:
+        series = pd.Series(np.arange(len(self._data)))
+        return series.apply(
+            lambda x: f"WildsInput(path={self.root}/images/rgb_img_{x}.png)"
+        )
+
     def write(
         self, path: str, write_together: bool = None, write_data: bool = None
     ) -> None:
-        # TODO (Sabri): implement read and write – I think this requires significant 
-        # changes to ColumnStorageMixin and StateDictMixin, so I'm punting to another PR
-        raise NotImplementedError("Writing `WildsInputColumn` not supported.")
-
-    def get_state(self):
-        raise NotImplementedError("Writing `WildsInputColumn` not supported.")
-
-    @classmethod
-    def from_state(cls, state, *args, **kwargs) -> object:
-        raise NotImplementedError("Reading `WildsInputColumn` not supported.")
+        """ Write this column KHBSDKHBSDJHBSDBJ
+        """
+        # TODO (Sabri): Ideally, `write` and `read` should not be reimplemented here,
+        # but instead only `get_state` and `from_state`. This requires significant
+        # changes to ColumnStorageMixin and StateDictMixin, so I'm punting to another PR.
+        
+        yaml.dump(self._state, open(path, "w"))
 
     @classmethod
     def read(cls, path: str, *args, **kwargs) -> object:
-        raise NotImplementedError("Reading `WildsInputColumn` not supported.")
+        state = dict(yaml.load(open(path),Loader=yaml.FullLoader))
+        return cls(**state)
+
+    def get_state(self):
+        raise NotImplementedError(" `WILDSInputColumn` not supported.")
+
+    @classmethod
+    def from_state(cls, state, *args, **kwargs) -> object:
+        raise NotImplementedError("Reading `WILDSInputColumn` not supported.")
 

@@ -5,6 +5,7 @@ import logging
 import os
 from typing import Sequence
 
+import pandas as pd
 import numpy as np
 import numpy.lib.mixins
 import yaml
@@ -161,3 +162,9 @@ class NumpyArrayColumn(
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))
+    
+    def _repr_pandas_(self) -> pd.Series:
+        if len(self.shape) > 1:
+            return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
+        else:
+            return pd.Series(self)
