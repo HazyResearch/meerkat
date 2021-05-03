@@ -48,10 +48,13 @@ class NumpyMemmapWriter(AbstractWriter):
         self.file[self._pointer : self._pointer + len(arr)] = arr
         self._pointer += len(arr)
 
-    def flush(self, *args, **kwargs):
+    def flush(self, *args, **kwargs) -> None:
         self.file.flush()
 
-    def close(self, *args, **kwargs):
+    def close(self, *args, **kwargs) -> None:
+        pass
+
+    def finalize(self, *args, **kwargs) -> None:
         pass
 
 

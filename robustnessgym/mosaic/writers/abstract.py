@@ -26,3 +26,7 @@ class AbstractWriter(abc.ABC):
     @abc.abstractmethod
     def close(self, *args, **kwargs) -> None:
         return NotImplemented
+
+    @abc.abstractmethod
+    def finalize(self, *args, **kwargs) -> None:
+        return NotImplemented

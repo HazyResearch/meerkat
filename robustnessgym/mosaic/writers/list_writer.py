@@ -1,8 +1,3 @@
-import os
-from pathlib import Path
-
-import numpy as np
-
 from robustnessgym.mosaic.writers.abstract import AbstractWriter
 
 
@@ -16,7 +11,7 @@ class ListWriter(AbstractWriter):
 
     def open(self) -> None:
         self.outputs = []
-    
+
     def write(self, data, **kwargs) -> None:
         self.outputs.extend(data)
 
@@ -24,4 +19,7 @@ class ListWriter(AbstractWriter):
         return self.outputs
 
     def close(self, *args, **kwargs):
+        pass
+
+    def finalize(self, *args, **kwargs) -> None:
         pass
