@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 import numpy as np
 
@@ -32,6 +32,11 @@ class VisibilityMixin:
                 self._visible_rows = self._visible_rows[np.array(indices, dtype=int)]
             else:
                 self._visible_rows = np.array(indices, dtype=int)
+
+        # Identify that `self` corresponds to a DataPane
+        if hasattr(self, "_data") and isinstance(self._data, Mapping):
+            for column in self.values():
+                column.visible_rows = self._visible_rows
 
     def _remap_index(self, index):
         if isinstance(index, int):

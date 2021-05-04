@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy as pycopy
+from collections import Mapping
 
 
 class CopyMixin:
@@ -9,7 +10,17 @@ class CopyMixin:
 
     def copy(self) -> object:
         """Return a copy of the object."""
-        state = {k: pycopy.copy(v) for k, v in self.__dict__.items()}
+
+        state = {}
+        for k, v in self.__dict__.items():
+            # TODO: make this a nested map to cover sequences
+            if isinstance(v, Mapping):
+                state[k] = {
+                    kp: pycopy.copy(vp) if not hasattr(vp, "copy") else vp.copy()
+                    for kp, vp in v.items()
+                }
+            else:
+                state[k] = pycopy.copy(v)
 
         try:
             obj = self.__class__(**state)

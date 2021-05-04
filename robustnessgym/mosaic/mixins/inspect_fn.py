@@ -86,8 +86,8 @@ class FunctionInspectorMixin:
             ):
                 # `function` returns a bool per example
                 bool_output = True
-        
-        if not isinstance(output, Mapping):
+
+        if not isinstance(output, Mapping) and not isinstance(output, bool):
             # Record the shape of the output
             if hasattr(output, "shape"):
                 output_shape = output.shape

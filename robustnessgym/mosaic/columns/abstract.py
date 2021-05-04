@@ -3,12 +3,10 @@ from __future__ import annotations
 import abc
 import logging
 import reprlib
-from collections import defaultdict
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
-from robustnessgym.mosaic.writers.list_writer import ListWriter
 import torch
 
 from robustnessgym.core.identifier import Identifier
@@ -24,6 +22,7 @@ from robustnessgym.mosaic.mixins.materialize import MaterializationMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
 from robustnessgym.mosaic.mixins.storage import ColumnStorageMixin
 from robustnessgym.mosaic.mixins.visibility import VisibilityMixin
+from robustnessgym.mosaic.writers.list_writer import ListWriter
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +95,7 @@ class AbstractColumn(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {"_materialize", "_collate_fn", "_data"}
+        return {"_materialize", "_collate_fn", "_data", "_visible_rows"}
 
     def _get_cell(self, index: int):
         return self.data[index]
@@ -156,7 +155,7 @@ class AbstractColumn(
             new_column = self.copy()
             new_column.visible_rows = indices
             return new_column
-    
+
     @staticmethod
     def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
         return convert_to_batch_column_fn(function=function, with_indices=with_indices)
@@ -170,10 +169,10 @@ class AbstractColumn(
         if self.data is not None:
             return len(self.data)
         return 0
-    
+
     def _repr_pandas_(self) -> pd.Series:
         raise NotImplementedError
-    
+
     def _repr_html_(self):
         # pd.Series objects do not implement _repr_html_
         return self._repr_pandas_()
@@ -230,7 +229,7 @@ class AbstractColumn(
         batch_size: int = 32,
         drop_last_batch: bool = False,
         collate: bool = True,
-        num_workers: int = 4, 
+        num_workers: int = 4,
         *args,
         **kwargs,
     ):
@@ -250,7 +249,7 @@ class AbstractColumn(
                 batch_size=batch_size,
                 collate_fn=self.collate if collate else lambda x: x,
                 drop_last=drop_last_batch,
-                num_workers=num_workers, 
+                num_workers=num_workers,
                 *args,
                 **kwargs,
             )
@@ -267,9 +266,9 @@ class AbstractColumn(
                 batch_size=None,
                 batch_sampler=None,
                 drop_last=drop_last_batch,
-                num_workers=num_workers, 
-                *args, 
-                **kwargs
+                num_workers=num_workers,
+                *args,
+                **kwargs,
             )
         # if self.materialize:
         #     return torch.utils.data.DataLoader(
@@ -286,7 +285,8 @@ class AbstractColumn(
         #             continue
         #         yield self[i : i + batch_size]
 
-    def get_writer(mmap: bool = False):
+    @classmethod
+    def get_writer(cls, mmap: bool = False):
         if mmap:
             raise ValueError("Memmapping not supported with this column type.")
         else:

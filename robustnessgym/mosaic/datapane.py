@@ -5,11 +5,9 @@ import json
 import logging
 import os
 import pathlib
-from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from functools import partial
-from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Union
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Union
 
 import cytoolz as tz
 import datasets
@@ -25,12 +23,11 @@ from jsonlines import jsonlines
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_fn, recmerge
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
-from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.mixins.copying import CopyMixin
 from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from robustnessgym.mosaic.mixins.mapping import MappableMixin
 from robustnessgym.mosaic.mixins.state import StateDictMixin
-from robustnessgym.mosaic.writers.numpy_writer import NumpyMemmapWriter
+from robustnessgym.mosaic.mixins.visibility import VisibilityMixin
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +42,7 @@ class DataPane(
     FunctionInspectorMixin,
     MappableMixin,
     StateDictMixin,
+    VisibilityMixin,
 ):
     """Mosaic DataPane class."""
 
@@ -63,6 +61,8 @@ class DataPane(
         split: Optional[NamedSplit] = None,
         **kwargs,
     ):
+        # TODO(karan, sabri): copy columns when they're passed in and prevent users
+        #  from setting visible_rows inside columns that belong to a datapane
 
         logger.debug("Creating DataPane.")
 
@@ -110,9 +110,6 @@ class DataPane(
         self.all_columns = list(self._data.keys())
         self.visible_columns = None
 
-        # Create attributes for visible rows
-        self.visible_rows = None
-
         # Create an identifier
         # TODO(Sabri): make _autobuild_identifier more informative
         self._identifier = Identifier(
@@ -139,10 +136,7 @@ class DataPane(
 
     def _repr_pandas_(self):
         return pd.DataFrame(
-            {
-                f"{k}({v.__class__.__name__})": v._repr_pandas_()
-                for k, v in self._data.items()
-            }
+            {f"{k}({v.__class__.__name__})": v._repr_pandas_() for k, v in self.items()}
         )
 
     def _repr_html_(self):
@@ -212,25 +206,6 @@ class DataPane(
 
         # Set the features
         self._set_features()
-
-    def set_visible_rows(self, indices: Optional[Sequence]):
-        """Set the visible rows in the dataset."""
-        if indices is None:
-            self.visible_rows = None
-        else:
-            if len(indices):
-                assert min(indices) >= 0 and max(indices) < len(self), (
-                    f"Ensure min index {min(indices)} >= 0 and "
-                    f"max index {max(indices)} < {len(self)}."
-                )
-            if self.visible_rows is not None:
-                self.visible_rows = self.visible_rows[np.array(indices, dtype=int)]
-            else:
-                self.visible_rows = np.array(indices, dtype=int)
-
-    def reset_visible_rows(self):
-        """Reset to make all rows visible."""
-        self.visible_rows = None
 
     @contextmanager
     def format(self, columns: List[str] = None):
@@ -465,20 +440,6 @@ class DataPane(
             return DataPane.from_batch(
                 {k: self._data[k][index] for k in self.visible_columns}
             )
-        else:
-            raise TypeError("Invalid argument type: {}".format(type(index)))
-
-    def _remap_index(self, index):
-        if isinstance(index, int):
-            return self.visible_rows[index].item()
-        elif isinstance(index, slice):
-            return self.visible_rows[index].tolist()
-        elif isinstance(index, str):
-            return index
-        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
-            return self.visible_rows[index].tolist()
-        elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            return self.visible_rows[index].tolist()
         else:
             raise TypeError("Invalid argument type: {}".format(type(index)))
 
@@ -779,7 +740,7 @@ class DataPane(
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
-                    input_columns=input_columns
+                    input_columns=input_columns,
                 )
             )
         else:
@@ -817,7 +778,7 @@ class DataPane(
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
-                    input_columns=input_columns
+                    input_columns=input_columns,
                 )
 
                 # Add new columns / overwrite existing columns for the update
@@ -836,7 +797,7 @@ class DataPane(
                     batched=True,
                     batch_size=batch_size,
                     num_workers=num_workers,
-                    input_columns=input_columns
+                    input_columns=input_columns,
                 )
                 # Add new columns for the update
                 for col, vals in output._data.items():
@@ -941,14 +902,24 @@ class DataPane(
         with self.format():
             # Filter returns a new dataset
             new_datapane = self.copy()
-            new_datapane.set_visible_rows(indices)
+            new_datapane.visible_rows = indices
 
         return new_datapane
-    
+
     def items(self):
         for name, column in self._data.items():
-            if name in self.visible_columns:  
+            if name in self.visible_columns:
                 yield name, column
+
+    def keys(self):
+        for name in self._data.keys():
+            if name in self.visible_columns:
+                yield name
+
+    def values(self):
+        for name, column in self._data.items():
+            if name in self.visible_columns:
+                yield column
 
     @classmethod
     def read(
@@ -1041,7 +1012,7 @@ class DataPane(
             "_identifier",
             "_data",
             "all_columns",
-            "visible_rows",
+            "_visible_rows",
             "_info",
             "_split",
         }

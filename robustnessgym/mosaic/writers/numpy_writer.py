@@ -68,7 +68,7 @@ class NumpyWriter(AbstractWriter):
 
     def open(self) -> None:
         self.outputs = []
-    
+
     def write(self, data, **kwargs) -> None:
         self.outputs.extend(data)
 
@@ -80,4 +80,3 @@ class NumpyWriter(AbstractWriter):
 
     def finalize(self, *args, **kwargs) -> None:
         pass
-

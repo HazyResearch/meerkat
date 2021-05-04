@@ -5,9 +5,9 @@ import logging
 import os
 from typing import Tuple, Sequence
 
-import pandas as pd
 import numpy as np
 import numpy.lib.mixins
+import pandas as pd
 import yaml
 from yaml.representer import Representer
 
@@ -94,7 +94,8 @@ class NumpyArrayColumn(
     def _get_batch(self, indices):
         return self.from_array(self.__array__()[indices])
 
-    def get_writer(mmap: bool = False):
+    @classmethod
+    def get_writer(cls, mmap: bool = False):
         if mmap:
             return NumpyMemmapWriter()
         else:
@@ -177,8 +178,8 @@ class NumpyArrayColumn(
     def __setstate__(self, state: Tuple):
         """ This `__setstate__` is called by `numpy.core.multiarray.reconstruct` on an
         empty `NumpyArrayColumn` instance need to fill in state.
-        TODO (sabri): is `NumpyArrayColumn.__new__` being called first? How is the 
-        object getting created.  
+        TODO (sabri): is `NumpyArrayColumn.__new__` being called first? How is the
+        object getting created.
         """
         # fill a numpy array with the data in the state
         # see the docs for __reduce__ to understand what each element in the tuple is:
