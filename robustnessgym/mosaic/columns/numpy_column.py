@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import logging
 import os
-from typing import Sequence
+from typing import Tuple, Sequence
 
 import pandas as pd
 import numpy as np
@@ -87,22 +87,13 @@ class NumpyArrayColumn(
     def __new__(cls, data, *args, **kwargs):
         return np.asarray(data).view(cls)
 
-    def __array_finalize__(self, obj) -> None:
-        if obj is None:
-            return
-
-        self._data = getattr(obj, "_data", None)
-        self._materialize = getattr(obj, "_materialize", True)
-        self.collate = getattr(obj, "collate", identity_collate)
-        self.visible_rows = getattr(obj, "visible_rows", None)
-
     @classmethod
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
     def _get_batch(self, indices):
         return self.from_array(self.__array__()[indices])
-    
+
     def get_writer(mmap: bool = False):
         if mmap:
             return NumpyMemmapWriter()
@@ -162,9 +153,67 @@ class NumpyArrayColumn(
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))
-    
+
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:
             return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
         else:
             return pd.Series(self)
+
+    def __array_finalize__(self, obj) -> None:
+        if obj is None:
+            # TODO(sabri): my understanding is that `obj` is always `None`. I think this
+            # is because in `PyArray_NewFromDescr`, `NULL` is passed in for `obj`.
+            # See docs here (under creatin arrays) https://numpy.org/devdocs/reference/c-api/array.html
+            # and the call here https://github.com/numpy/numpy/blob/2416ff43c4feb199890c13046f5f3e666a29f7e5/numpy/core/src/multiarray/multiarraymodule.c#L3082
+            # I'd like to understand why this is the case and if we need the code below.
+            return
+
+        self._data = getattr(obj, "_data", None)
+        self._materialize = getattr(obj, "_materialize", True)
+        self.collate = getattr(obj, "collate", identity_collate)
+        self.visible_rows = getattr(obj, "visible_rows", None)
+
+    def __setstate__(self, state: Tuple):
+        """ This `__setstate__` is called by `numpy.core.multiarray.reconstruct` on an
+        empty `NumpyArrayColumn` instance need to fill in state.
+        TODO (sabri): is `NumpyArrayColumn.__new__` being called first? How is the 
+        object getting created.  
+        """
+        # fill a numpy array with the data in the state
+        # see the docs for __reduce__ to understand what each element in the tuple is:
+        # https://docs.python.org/2/library/pickle.html#object.__reduce__
+        data = np.ndarray(shape=state[1], dtype=state[2])
+        data.__setstate__(state[0:-1])
+
+        # call `AbstractColumn.__init__` with the fillled `data`
+        super(NumpyArrayColumn, self).__init__(data=data)
+
+        # set additional attributes (e.g. "_materialize", "visible_rows"). Note: that
+        # `NumpyArrayColumn`'s override of `__reduce__` places a dict in the last the
+        # last element of state, containing attributes to update
+        self.__dict__.update(state[-1])
+
+        # set the state of the array with the standard `ndarray.__setstate__` passing
+        # everything but the `dict` we added in `__reduce__`
+        super(NumpyArrayColumn, self).__setstate__(state[0:-1])
+
+    def __reduce__(self):
+        """Needed for pickling. We override this to add additional state for
+        the `NumpyArrayColumn`."""
+        # TODO (Sabri): discuss with others whether this is the best way
+        # This approach is described in more detail here:
+        # https://stackoverflow.com/questions/26598109/preserve-custom-attributes-when-pickling-subclass-of-numpy-array
+        state = super(NumpyArrayColumn, self).__reduce__()
+        return (
+            state[0],
+            state[1],
+            state[2]
+            + (
+                {
+                    "_materialize": self._materialize,
+                    "collate": self.collate,
+                    "visible_rows": self.visible_rows,
+                },
+            ),
+        )

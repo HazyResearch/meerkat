@@ -230,6 +230,7 @@ class AbstractColumn(
         batch_size: int = 32,
         drop_last_batch: bool = False,
         collate: bool = True,
+        num_workers: int = 4, 
         *args,
         **kwargs,
     ):
@@ -249,6 +250,7 @@ class AbstractColumn(
                 batch_size=batch_size,
                 collate_fn=self.collate if collate else lambda x: x,
                 drop_last=drop_last_batch,
+                num_workers=num_workers, 
                 *args,
                 **kwargs,
             )
@@ -265,6 +267,9 @@ class AbstractColumn(
                 batch_size=None,
                 batch_sampler=None,
                 drop_last=drop_last_batch,
+                num_workers=num_workers, 
+                *args, 
+                **kwargs
             )
         # if self.materialize:
         #     return torch.utils.data.DataLoader(

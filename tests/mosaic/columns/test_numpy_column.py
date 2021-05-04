@@ -1,10 +1,8 @@
 """Unittests for Datasets."""
-import os
-import shutil
 from unittest import TestCase
+import pickle
 
 import numpy as np
-import torch
 
 from robustnessgym.mosaic.datapane import DataPane
 from robustnessgym.mosaic import NumpyArrayColumn
@@ -56,4 +54,11 @@ class TestNumpyColumn(TestCase):
         self.assertTrue((result["mean"] == array.mean(axis=-1)).all())
         self.assertTrue((result["std"] == array.std(axis=-1)).all())
 
-    
+    def test_pickle(self):
+        array = np.random.rand(10, 3, 3)
+        col = NumpyArrayColumn.from_array(array)
+        buf = pickle.dumps(col)
+        new_col = pickle.loads(buf)
+
+        self.assertTrue(isinstance(new_col, NumpyArrayColumn))
+        self.assertTrue((col == new_col).all())

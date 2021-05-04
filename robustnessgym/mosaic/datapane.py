@@ -21,7 +21,6 @@ import yaml
 from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
-from tqdm.auto import tqdm
 
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_fn, recmerge
@@ -262,7 +261,6 @@ class DataPane(
         """
         # Check that the columns exist
         self._check_columns_exist(columns)
-
         # Set visible columns
         self.visible_columns = columns
 
@@ -572,7 +570,6 @@ class DataPane(
         identifier: Identifier = None,
     ) -> DataPane:
         """Convert a batch to a Dataset."""
-
         return cls(batch, identifier=identifier)
 
     @classmethod
@@ -646,13 +643,14 @@ class DataPane(
         columns = self._data.keys() if columns is None else columns
         return {name: self._data[name].collate for name in columns}
 
-    def _collate(self, batch: List, column_to_collate: Dict[str, callable]):
+    def _collate(self, batch: List):
         batch = tz.merge_with(list, *batch)
+        column_to_collate = self._get_collate_fns(batch.keys())
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
-
-        return DataPane.from_batch(new_batch)
+        dp = DataPane.from_batch(new_batch)
+        return dp
 
     @staticmethod
     def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
@@ -677,26 +675,13 @@ class DataPane(
             batches of data
         """
         cell_columns, batch_columns = [], []
-        for name, column in self._data.items():
+        for name, column in self.items():
             # check if the column has overriden the base `batch`
             if column._get_batch.__func__ == AbstractColumn._get_batch:
                 # if not, include it in the cell dataloader
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)
-
-        column_to_collate = self._get_collate_fns()
-
-        if cell_columns:
-            cell_dl = torch.utils.data.DataLoader(
-                self[cell_columns],
-                batch_size=batch_size,
-                collate_fn=partial(self._collate, column_to_collate=column_to_collate),
-                drop_last=drop_last_batch,
-                num_workers=num_workers,
-                *args,
-                **kwargs,
-            )
 
         if batch_columns:
             batch_indices = []
@@ -712,22 +697,37 @@ class DataPane(
                 batch_size=None,
                 batch_sampler=None,
                 drop_last=drop_last_batch,
+                num_workers=num_workers,
+                *args,
+                **kwargs,
+            )
+
+        if cell_columns:
+            cell_dl = torch.utils.data.DataLoader(
+                self[cell_columns],
+                batch_size=batch_size,
+                collate_fn=self._collate,
+                drop_last=drop_last_batch,
+                num_workers=num_workers,
+                *args,
+                **kwargs,
             )
 
         if batch_columns and cell_columns:
-            for batch_batch, cell_batch in zip(batch_dl, cell_dl):
+            for cell_batch, batch_batch in zip(cell_dl, batch_dl):
                 yield DataPane.from_batch({**cell_batch._data, **batch_batch._data})
-
         elif batch_columns:
-            return batch_dl
+            for batch_batch in batch_dl:
+                yield batch_batch
         elif cell_columns:
-            return cell_dl
+            for cell_batch in cell_dl:
+                yield cell_batch
 
     def update(
         self,
         function: Optional[Callable] = None,
         with_indices: bool = False,
-        # input_columns: Optional[Union[str, List[str]]] = None,
+        input_columns: Optional[Union[str, List[str]]] = None,
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         remove_columns: Optional[List[str]] = None,
@@ -779,6 +779,7 @@ class DataPane(
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
+                    input_columns=input_columns
                 )
             )
         else:
@@ -816,6 +817,7 @@ class DataPane(
                     with_indices=with_indices,
                     batched=True,
                     batch_size=batch_size,
+                    input_columns=input_columns
                 )
 
                 # Add new columns / overwrite existing columns for the update
@@ -834,6 +836,7 @@ class DataPane(
                     batched=True,
                     batch_size=batch_size,
                     num_workers=num_workers,
+                    input_columns=input_columns
                 )
                 # Add new columns for the update
                 for col, vals in output._data.items():
@@ -943,7 +946,9 @@ class DataPane(
         return new_datapane
     
     def items(self):
-        return self._data.items()
+        for name, column in self._data.items():
+            if name in self.visible_columns:  
+                yield name, column
 
     @classmethod
     def read(

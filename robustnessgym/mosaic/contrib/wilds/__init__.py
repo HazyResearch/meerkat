@@ -38,6 +38,7 @@ class WILDSDataPane(DataPane):
         info: DatasetInfo = None,
         split: str = None,
         use_transform: bool = True,
+        include_raw_input: bool = True
     ):
         """A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s for
         targets and metadata.
@@ -71,6 +72,8 @@ class WILDSDataPane(DataPane):
             column_names (List[str], optional): [description]. Defaults to None.
             info (DatasetInfo, optional): [description]. Defaults to None.
             use_transform (bool, optional): [description]. Defaults to True.
+            include_raw_input (bool, optional): include a column for the input without
+                the transform applied – useful for visualizing images. Defaults to True.
         """
         self.dataset_name = dataset_name
         self.root_dir = root_dir
@@ -83,8 +86,16 @@ class WILDSDataPane(DataPane):
         )
         output_column = input_column.get_y_column()
         metadata_columns = input_column.get_metadata_columns()
+
+        data = {"input": input_column, "y": output_column, **metadata_columns}
+        if include_raw_input:
+            # remove 
+            data["raw_input"] = input_column.copy()
+            data["raw_input"]._data.transform = lambda x: x
+
+            
         super(WILDSDataPane, self).__init__(
-            {"input": input_column, "y": output_column, **metadata_columns},
+            data,
             identifier=identifier,
             column_names=column_names,
             info=info,
@@ -200,12 +211,15 @@ class WILDSInputColumn(AbstractColumn):
     def write(
         self, path: str, write_together: bool = None, write_data: bool = None
     ) -> None:
-        """ Write this column KHBSDKHBSDJHBSDBJ
+        """ Write the state of this input column to disk at `path`. Warning: this write
+        is very lightweight, only the name of the dataset (`dataset_name`), the 
+        directory of the dataset `root_dir`, and the other args to `__init__` are 
+        written to disk. If the data at `root_dir` is modified, `read` will return a 
+        column with different data.
         """
         # TODO (Sabri): Ideally, `write` and `read` should not be reimplemented here,
         # but instead only `get_state` and `from_state`. This requires significant
         # changes to ColumnStorageMixin and StateDictMixin, so I'm punting to another PR.
-        
         yaml.dump(self._state, open(path, "w"))
 
     @classmethod

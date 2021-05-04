@@ -118,3 +118,4 @@ class TestDataPane(TestCase):
     
     def test_repr_html_(self):
         self.mixed_test_dp._repr_html_()
+            

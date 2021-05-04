@@ -78,3 +78,6 @@ class NumpyWriter(AbstractWriter):
     def close(self, *args, **kwargs):
         pass
 
+    def finalize(self, *args, **kwargs) -> None:
+        pass
+
