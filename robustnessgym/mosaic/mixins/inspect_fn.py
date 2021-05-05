@@ -1,4 +1,4 @@
-from collections import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from types import SimpleNamespace
 
 import numpy as np

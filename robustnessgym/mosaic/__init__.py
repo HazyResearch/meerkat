@@ -1,6 +1,4 @@
-"""
-Imports for robustnessgym.mosaic
-"""
+"""Imports for robustnessgym.mosaic."""
 
 # flake8: noqa
 from .cells.abstract import AbstractCell

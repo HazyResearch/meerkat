@@ -3,8 +3,9 @@ from __future__ import annotations
 from argparse import Namespace
 from typing import List
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+import yaml
 from datasets import DatasetInfo
 from torch.utils.data._utils.collate import default_collate
 
@@ -12,7 +13,6 @@ from robustnessgym.core.identifier import Identifier
 from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
 from robustnessgym.mosaic.datapane import DataPane
-import yaml
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform
@@ -38,11 +38,10 @@ class WILDSDataPane(DataPane):
         info: DatasetInfo = None,
         split: str = None,
         use_transform: bool = True,
-        include_raw_input: bool = True
+        include_raw_input: bool = True,
     ):
-        """A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s for
-        targets and metadata.
-
+        """A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s
+        for targets and metadata.
 
         Example:
         Run inference on the dataset and store predictions alongside the data.
@@ -89,11 +88,10 @@ class WILDSDataPane(DataPane):
 
         data = {"input": input_column, "y": output_column, **metadata_columns}
         if include_raw_input:
-            # remove 
+            # remove
             data["raw_input"] = input_column.copy()
             data["raw_input"]._data.transform = lambda x: x
 
-            
         super(WILDSDataPane, self).__init__(
             data,
             identifier=identifier,
@@ -113,8 +111,8 @@ class WILDSInputColumn(AbstractColumn):
         use_transform: bool = True,
         **dataset_kwargs,
     ):
-        """A column wrapper around a WILDS dataset that can lazily load the inputs
-        for each dataset.
+        """A column wrapper around a WILDS dataset that can lazily load the
+        inputs for each dataset.
 
         Args:
             dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
@@ -176,16 +174,18 @@ class WILDSInputColumn(AbstractColumn):
             # only WILDSSubset supports applying a transform, so we use it even if no
             # split is applied
             dataset = WILDSSubset(dataset, np.arange(len(dataset)), transform=transform)
-        
-        self.metadata_columns.update({
-            f"meta_{field}": NumpyArrayColumn(data=dataset.metadata_array[:, idx])
-            for idx, field in enumerate(dataset.metadata_fields)
-        })
+
+        self.metadata_columns.update(
+            {
+                f"meta_{field}": NumpyArrayColumn(data=dataset.metadata_array[:, idx])
+                for idx, field in enumerate(dataset.metadata_fields)
+            }
+        )
         super(WILDSInputColumn, self).__init__(data=dataset, collate_fn=collate)
 
     def get_y_column(self):
-        """
-        Get a NumpyArrayColumn holding the targets for the dataset.
+        """Get a NumpyArrayColumn holding the targets for the dataset.
+
         Warning: `WildsDataset`s may remap indexes in arbitrary ways so it's important
         not to directly try to access the underlying data structures, instead relying on
         the `y_array` and `metadata_array` properties which are universal across WILDS
@@ -211,10 +211,12 @@ class WILDSInputColumn(AbstractColumn):
     def write(
         self, path: str, write_together: bool = None, write_data: bool = None
     ) -> None:
-        """ Write the state of this input column to disk at `path`. Warning: this write
-        is very lightweight, only the name of the dataset (`dataset_name`), the 
-        directory of the dataset `root_dir`, and the other args to `__init__` are 
-        written to disk. If the data at `root_dir` is modified, `read` will return a 
+        """Write the state of this input column to disk at `path`.
+
+        Warning: this write
+        is very lightweight, only the name of the dataset (`dataset_name`), the
+        directory of the dataset `root_dir`, and the other args to `__init__` are
+        written to disk. If the data at `root_dir` is modified, `read` will return a
         column with different data.
         """
         # TODO (Sabri): Ideally, `write` and `read` should not be reimplemented here,
@@ -224,7 +226,7 @@ class WILDSInputColumn(AbstractColumn):
 
     @classmethod
     def read(cls, path: str, *args, **kwargs) -> object:
-        state = dict(yaml.load(open(path),Loader=yaml.FullLoader))
+        state = dict(yaml.load(open(path), Loader=yaml.FullLoader))
         return cls(**state)
 
     def get_state(self):
@@ -233,4 +235,3 @@ class WILDSInputColumn(AbstractColumn):
     @classmethod
     def from_state(cls, state, *args, **kwargs) -> object:
         raise NotImplementedError("Reading `WILDSInputColumn` not supported.")
-

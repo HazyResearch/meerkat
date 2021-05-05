@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import abc
+import functools
 import logging
+import numbers
 import os
-from typing import Tuple, Sequence
+from typing import Callable, Sequence, Tuple
 
+import dill
 import numpy as np
 import numpy.lib.mixins
 import pandas as pd
@@ -20,10 +23,21 @@ Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 logger = logging.getLogger(__name__)
 
 
+def getattr_decorator(fn: Callable):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        out = fn(*args, **kwargs)
+        if isinstance(out, np.ndarray):
+            return NumpyArrayColumn(out)
+        else:
+            return out
+
+    return wrapper
+
+
 class NumpyArrayColumn(
     AbstractColumn,
-    np.ndarray,
-    numpy.lib.mixins.NDArrayOperatorsMixin,
+    np.lib.mixins.NDArrayOperatorsMixin,
 ):
     def __init__(
         self,
@@ -31,68 +45,72 @@ class NumpyArrayColumn(
         *args,
         **kwargs,
     ):
+        # TODO(sabri): Setting visible_rows breaks NumpyArrayColumn – need to think about
+        # how to support this.
         super(NumpyArrayColumn, self).__init__(data=np.asarray(data), *args, **kwargs)
 
-    def __array__(self, *args, **kwargs):
-        return np.asarray(self._data)
-
-    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
-        # Convert the inputs to np.ndarray
-        inputs = [
-            input_.view(np.ndarray) if isinstance(input_, self.__class__) else input_
-            for input_ in inputs
-        ]
-
-        outputs = out
-        out_no = []
-        if outputs:
-            out_args = []
-            for j, output in enumerate(outputs):
-                if isinstance(output, self.__class__):
-                    out_no.append(j)
-                    out_args.append(output.view(np.ndarray))
-                else:
-                    out_args.append(output)
-            kwargs["out"] = tuple(out_args)
+    @property
+    def data(self):
+        if self.visible_rows is not None:
+            return self._data[self.visible_rows]
         else:
-            outputs = (None,) * ufunc.nout
+            return self._data
 
-        # Apply ufunc, method
-        results = super().__array_ufunc__(ufunc, method, *inputs, **kwargs)
-        if results is NotImplemented:
-            return NotImplemented
+    _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
-        if ufunc.nout == 1:
-            results = (results,)
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        out = kwargs.get("out", ())
+        for x in inputs + out:
+            # Only support operations with instances of _HANDLED_TYPES.
+            # Use ArrayLike instead of type(self) for isinstance to
+            # allow subclasses that don't override __array_ufunc__ to
+            # handle ArrayLike objects.
+            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)):
+                return NotImplemented
 
-        results = tuple(
-            (
-                np.asarray(result).view(self.__class__)
-                if result.ndim > 0
-                else np.asarray([result]).view(self.__class__)
-                if output is None
-                else output
+        # Defer to the implementation of the ufunc on unwrapped values.
+        inputs = tuple(x.data if isinstance(x, NumpyArrayColumn) else x for x in inputs)
+        if out:
+            kwargs["out"] = tuple(
+                x.data if isinstance(x, NumpyArrayColumn) else x for x in out
             )
-            for result, output in zip(results, outputs)
-        )
+        result = getattr(ufunc, method)(*inputs, **kwargs)
 
-        if results and isinstance(results[0], self.__class__):
-            results[0]._data = np.asarray(results[0])
-            results[0]._materialize = self._materialize
-            results[0].collate = self.collate
-            results[0].visible_rows = self.visible_rows
+        if type(result) is tuple:
+            # multiple return values
+            return tuple(type(self)(x) for x in result)
+        elif method == "at":
+            # no return value
+            return None
+        else:
+            # one return value
+            return type(self)(result)
 
-        return results[0] if len(results) == 1 else results
-
-    def __new__(cls, data, *args, **kwargs):
-        return np.asarray(data).view(cls)
+    def __getattr__(self, name):
+        try:
+            out = getattr(object.__getattribute__(self, "data"), name)
+            if isinstance(out, Callable):
+                return getattr_decorator(out)
+            else:
+                return out
+        except AttributeError:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{name}'"
+            )
 
     @classmethod
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
+    def _remap_index(self, index):
+        # don't remap index since we take care of visibility with self.data
+        return index
+
+    def _get_cell(self, index: int):
+        return self.data[index]
+
     def _get_batch(self, indices):
-        return self.from_array(self.__array__()[indices])
+        return self.data[indices]
 
     @classmethod
     def get_writer(cls, mmap: bool = False):
@@ -126,7 +144,13 @@ class NumpyArrayColumn(
         else:
             data = np.load(data_path)
 
-        return cls(data)
+        col = cls(data)
+
+        state_path = os.path.join(path, "state.dill")
+        if os.path.exists(state_path):
+            state = dill.load(open(state_path, "rb"))
+            col.__dict__.update(state)
+        return col
 
     def write(self, path: str, **kwargs) -> None:
         # Make all the directories to the path
@@ -138,15 +162,16 @@ class NumpyArrayColumn(
 
         # Remove the data key and put the rest of `state` into a metadata dict
         del state["_data"]
+        print(state)
         metadata = {
             "dtype": type(self),
             "len": len(self),
-            "state": state,
             **self.metadata,
         }
 
         # Get the paths where metadata and data should be stored
         metadata_path = os.path.join(path, "meta.yaml")
+        state_path = os.path.join(path, "state.dill")
         data_path = os.path.join(path, "data.npy")
 
         # Saving all cell data in a single pickle file
@@ -154,67 +179,10 @@ class NumpyArrayColumn(
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))
+        dill.dump(state, open(state_path, "wb"))
 
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:
             return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
         else:
-            return pd.Series(self)
-
-    def __array_finalize__(self, obj) -> None:
-        if obj is None:
-            # TODO(sabri): my understanding is that `obj` is always `None`. I think this
-            # is because in `PyArray_NewFromDescr`, `NULL` is passed in for `obj`.
-            # See docs here (under creatin arrays) https://numpy.org/devdocs/reference/c-api/array.html
-            # and the call here https://github.com/numpy/numpy/blob/2416ff43c4feb199890c13046f5f3e666a29f7e5/numpy/core/src/multiarray/multiarraymodule.c#L3082
-            # I'd like to understand why this is the case and if we need the code below.
-            return
-
-        self._data = getattr(obj, "_data", None)
-        self._materialize = getattr(obj, "_materialize", True)
-        self.collate = getattr(obj, "collate", identity_collate)
-        self.visible_rows = getattr(obj, "visible_rows", None)
-
-    def __setstate__(self, state: Tuple):
-        """ This `__setstate__` is called by `numpy.core.multiarray.reconstruct` on an
-        empty `NumpyArrayColumn` instance need to fill in state.
-        TODO (sabri): is `NumpyArrayColumn.__new__` being called first? How is the
-        object getting created.
-        """
-        # fill a numpy array with the data in the state
-        # see the docs for __reduce__ to understand what each element in the tuple is:
-        # https://docs.python.org/2/library/pickle.html#object.__reduce__
-        data = np.ndarray(shape=state[1], dtype=state[2])
-        data.__setstate__(state[0:-1])
-
-        # call `AbstractColumn.__init__` with the fillled `data`
-        super(NumpyArrayColumn, self).__init__(data=data)
-
-        # set additional attributes (e.g. "_materialize", "visible_rows"). Note: that
-        # `NumpyArrayColumn`'s override of `__reduce__` places a dict in the last the
-        # last element of state, containing attributes to update
-        self.__dict__.update(state[-1])
-
-        # set the state of the array with the standard `ndarray.__setstate__` passing
-        # everything but the `dict` we added in `__reduce__`
-        super(NumpyArrayColumn, self).__setstate__(state[0:-1])
-
-    def __reduce__(self):
-        """Needed for pickling. We override this to add additional state for
-        the `NumpyArrayColumn`."""
-        # TODO (Sabri): discuss with others whether this is the best way
-        # This approach is described in more detail here:
-        # https://stackoverflow.com/questions/26598109/preserve-custom-attributes-when-pickling-subclass-of-numpy-array
-        state = super(NumpyArrayColumn, self).__reduce__()
-        return (
-            state[0],
-            state[1],
-            state[2]
-            + (
-                {
-                    "_materialize": self._materialize,
-                    "collate": self.collate,
-                    "visible_rows": self.visible_rows,
-                },
-            ),
-        )
+            return pd.Series(self._data)

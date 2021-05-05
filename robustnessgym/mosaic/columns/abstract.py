@@ -8,6 +8,7 @@ from typing import Callable, List, Optional, Sequence, Union
 import numpy as np
 import pandas as pd
 import torch
+from pandas.core import generic
 
 from robustnessgym.core.identifier import Identifier
 from robustnessgym.core.tools import convert_to_batch_column_fn
@@ -145,7 +146,7 @@ class AbstractColumn(
             raise TypeError(
                 "object of type {} is not a valid index".format(type(index))
             )
-        return self._get_batch(indices)
+        return self.__class__.from_data(self._get_batch(indices))
 
     def _get_batch(self, indices: np.ndarray):
         if self.materialize:
@@ -175,7 +176,11 @@ class AbstractColumn(
 
     def _repr_html_(self):
         # pd.Series objects do not implement _repr_html_
-        return self._repr_pandas_()
+        return (
+            self._repr_pandas_()
+            .to_frame(name=f"({self.__class__.__name__})")
+            ._repr_html_()
+        )
 
     def filter(
         self,
@@ -296,7 +301,8 @@ class AbstractColumn(
 
     @classmethod
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
-        """ Convert data to a mosaic column using the appropriate Column type."""
+        """Convert data to a mosaic column using the appropriate Column
+        type."""
         # need to import lazily to avoid circular import
         if isinstance(data, AbstractColumn):
             return data
@@ -320,6 +326,14 @@ class AbstractColumn(
                 from .cell_column import CellColumn
 
                 return CellColumn(data)
+
+            if len(data) != 0 and isinstance(
+                data[0], (int, float, bool, np.ndarray, np.generic)
+            ):
+                from .numpy_column import NumpyArrayColumn
+
+                return NumpyArrayColumn(data)
+
             from .list_column import ListColumn
 
             return ListColumn(data)

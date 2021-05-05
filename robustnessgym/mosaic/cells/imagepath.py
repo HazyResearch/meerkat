@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Collection
+from collections.abc import Collection
 
 from robustnessgym.mosaic.cells.abstract import AbstractCell
 from robustnessgym.mosaic.mixins.file import FileMixin

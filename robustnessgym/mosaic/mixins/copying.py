@@ -13,8 +13,10 @@ class CopyMixin:
 
         state = {}
         for k, v in self.__dict__.items():
+
             # TODO: make this a nested map to cover sequences
-            if isinstance(v, Mapping):
+            # TODO (sabri): fix __new__ missing data for numpy array
+            if False and k == "_data" and isinstance(v, Mapping):
                 state[k] = {
                     kp: pycopy.copy(vp) if not hasattr(vp, "copy") else vp.copy()
                     for kp, vp in v.items()

@@ -6,9 +6,8 @@ from robustnessgym.core.tools import nested_map
 
 @dataclass
 class StateClass:
-    """
-    An internal class to store the state of an object alongside its associated class.
-    """
+    """An internal class to store the state of an object alongside its
+    associated class."""
 
     klass: type
     state: object
@@ -33,14 +32,12 @@ class StateDictMixin:
         ), f"State must contain all state keys: {cls._state_keys()}."
 
     def get_state(self) -> Dict:
-        """
-        Get the internal state of the object.
+        """Get the internal state of the object.
 
-        For complex objects (e.g. Spacy Doc), this should
-        return a compressed representation of the object.
-
+        For complex objects (e.g. Spacy Doc), this should return a
+        compressed representation of the object.
         """
-        
+
         def _apply_get_state(obj):
             if hasattr(obj, "get_state"):
                 return StateClass(**{"klass": type(obj), "state": obj.get_state()})

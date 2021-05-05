@@ -482,8 +482,8 @@ loader_defaults = {
 
 
 def populate_defaults(config):
-    """Populates hyperparameters with defaults implied by choices
-    of other hyperparameters."""
+    """Populates hyperparameters with defaults implied by choices of other
+    hyperparameters."""
     assert config.dataset is not None, "dataset must be specified"
     # implied defaults from choice of dataset
     config = populate_config(config, dataset_defaults[config.dataset])

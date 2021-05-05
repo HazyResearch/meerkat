@@ -1,6 +1,6 @@
+import torch
 import torchvision.transforms as transforms
 from transformers import BertTokenizerFast, DistilBertTokenizerFast
-import torch
 
 
 def initialize_transform(transform_name, config, dataset):
@@ -78,9 +78,7 @@ def initialize_image_base_transform(config, dataset):
 
 
 def initialize_image_resize_and_center_crop_transform(config, dataset):
-    """
-    Resizes the image to a slightly larger square then crops the center.
-    """
+    """Resizes the image to a slightly larger square then crops the center."""
     assert dataset.original_resolution is not None
     assert config.resize_scale is not None
     scaled_resolution = tuple(

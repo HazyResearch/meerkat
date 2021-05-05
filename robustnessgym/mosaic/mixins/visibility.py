@@ -4,9 +4,7 @@ import numpy as np
 
 
 class VisibilityMixin:
-    """
-    This mixin assumes the existence of a `self.data` property
-    """
+    """This mixin assumes the existence of a `self.data` property."""
 
     _visible_rows: Optional[np.ndarray] = None
 

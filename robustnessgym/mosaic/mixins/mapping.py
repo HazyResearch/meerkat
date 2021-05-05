@@ -1,8 +1,9 @@
-from typing import Callable, Mapping, Optional, Union
 import logging
-from tqdm.auto import tqdm
-from robustnessgym.core.tools import convert_to_batch_column_fn, recmerge
+from typing import Callable, Mapping, Optional, Union
 
+from tqdm.auto import tqdm
+
+from robustnessgym.core.tools import convert_to_batch_column_fn, recmerge
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,8 @@ class MappableMixin:
         **kwargs,
     ):
         # TODO (sabri): add materialize?
-        from robustnessgym.mosaic.columns.abstract import AbstractColumn
         from robustnessgym.mosaic import DataPane
+        from robustnessgym.mosaic.columns.abstract import AbstractColumn
 
         """Map a function over the elements of the column."""
         # Check if need to materialize:

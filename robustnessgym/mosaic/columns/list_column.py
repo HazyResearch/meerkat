@@ -48,6 +48,6 @@ class ListColumn(AbstractColumn):
                 yield self.collate(self[i : i + batch_size])
             else:
                 yield self[i : i + batch_size]
-    
+
     def _repr_pandas_(self) -> pd.Series:
         return pd.Series(map(repr, self))
