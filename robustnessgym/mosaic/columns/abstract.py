@@ -71,10 +71,7 @@ class AbstractColumn(
 
     def __repr__(self):
         if self.visible_rows is not None:
-            return (
-                f"{self.__class__.__name__}View"
-                f"({reprlib.repr([self.data[i] for i in self.visible_rows[:8]])})"
-            )
+            return f"{self.__class__.__name__}View" f"({reprlib.repr(self.data)})"
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     def __str__(self):
@@ -166,9 +163,12 @@ class AbstractColumn(
         if self.visible_rows is not None:
             return len(self.visible_rows)
 
+        return self.full_length()
+
+    def full_length(self):
         # Length of the underlying data stored in the column
-        if self.data is not None:
-            return len(self.data)
+        if self._data is not None:
+            return len(self._data)
         return 0
 
     def _repr_pandas_(self) -> pd.Series:

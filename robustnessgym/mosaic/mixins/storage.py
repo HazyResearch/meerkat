@@ -76,31 +76,35 @@ class ColumnStorageMixin:
 
         # Get the column state
         state = self.get_state()
-        _data = state["_data"]
 
-        # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
         metadata = {
             "dtype": type(self),
-            "data_dtypes": list(map(type, self.data)),
             "len": len(self),
             "write_together": write_together,
-            "state": state,
             **self.metadata,
         }
 
-        if write_together:
-            # Get the path where data should be stored
-            data_path = os.path.join(path, "data.dill")
+        if not write_together:
+            metadata["data_dtypes"] = (list(map(type, self.data)),)
 
-            # Saving all of the column data in a single dill file
-            dill.dump(_data, open(data_path, "wb"))
-        else:
+            # if writing separately, remove "_data" from the dict
+            if "_data" not in state:
+                raise ValueError(
+                    "Column's state must include `_data` when using "
+                    "`write_together=False`."
+                )
+            del state["_data"]
+            state_path = os.path.join(path, "state.dill")
+            dill.dump(state, open(state_path, "wb"))
+
+            # lazy import to avoid circular dependencies
+            from robustnessgym.mosaic import AbstractCell
+
             # Save all the elements of the column separately
             data_paths = []
             for index, element in enumerate(self.data):
-                data_path = os.path.join(path, f"element_{index}")
-                if hasattr(element, "write"):
+                data_path = os.path.join(path, str(index))
+                if isinstance(element, AbstractCell):
                     # Element has its own `write` method
                     element.write(data_path)
                 else:
@@ -110,6 +114,10 @@ class ColumnStorageMixin:
 
             # Store all the data paths in the metadata dict
             metadata["data_paths"] = data_paths
+
+        # Write the state
+        state_path = os.path.join(path, "state.dill")
+        dill.dump(state, open(state_path, "wb"))
 
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
@@ -128,37 +136,24 @@ class ColumnStorageMixin:
             )
         )
 
-        # Load in the data
-        if metadata["write_together"]:
-            # All the data is written to a single dill file
-            data = dill.load(open(os.path.join(path, "data.dill"), "rb"))
+        # Load states
+        state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        if not metadata["write_together"]:
+            # lazy import to avoid circular dependencies
+            from robustnessgym.mosaic import AbstractCell
 
-            data = [
-                # `dtype` implements `from_state`, run it to get back an instance of
-                # dtype
-                dtype.from_state(
-                    state.state if isinstance(state, StateClass) else state,
-                    *args,
-                    **kwargs,
-                )
-                if hasattr(dtype, "from_state")
-                # `dtype` doesn't implement `from_state`, just return `state` directly
-                else state
-                for dtype, state in zip(metadata["data_dtypes"], data)
-            ]
-        else:
             # Each element of the data is written to individual paths
             data = [
                 # `dtype` implements `read`, run it to read back the element instance
-                dtype.read(path, *args, **kwargs) if hasattr(dtype, "read")
+                dtype.read(path, *args, **kwargs) if issubclass(dtype, AbstractCell)
                 # `dtype` doesn't implement `read`, just load with dill directly
                 else dill.load(open(path, "rb"))
                 for dtype, path in zip(metadata["data_dtypes"], metadata["data_paths"])
             ]
 
-        # Load in the column from the state
-        state = metadata["state"]
-        state["_data"] = data
+            # Load in the column from the state
+            state["_data"] = data
+
         return cls.from_state(state, *args, **kwargs)
 
     @classmethod

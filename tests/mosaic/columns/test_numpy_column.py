@@ -6,9 +6,9 @@ from itertools import product
 import numpy as np
 import numpy.testing as np_test
 import pytest
+import torch
 
 from robustnessgym.mosaic import NumpyArrayColumn
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
 from robustnessgym.mosaic.datapane import DataPane
 
 
@@ -96,6 +96,38 @@ def test_map_return_multiple(dtype, use_visible_rows, batched):
 
 
 @pytest.mark.parametrize(
+    "multiple_dim,dtype,use_visible_rows",
+    product([True, False], ["float", "int"], [True, False]),
+)
+def test_set_item_1(multiple_dim, dtype, use_visible_rows):
+    col, array = _get_data(
+        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+    )
+    index = [0, 3]
+    not_index = [i for i in range(col.shape[0]) if i not in index]
+    col[index] = 0
+
+    assert (col[not_index] == array[not_index]).all()
+    assert (col[index] == 0).all()
+
+
+@pytest.mark.parametrize(
+    "multiple_dim,dtype,use_visible_rows",
+    product([True, False], ["float", "int"], [True, False]),
+)
+def test_set_item_2(multiple_dim, dtype, use_visible_rows):
+    col, array = _get_data(
+        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+    )
+    index = 0
+    not_index = [i for i in range(col.shape[0]) if i != index]
+    col[index] = 0
+
+    assert (col[not_index] == array[not_index]).all()
+    assert (col[index] == 0).all()
+
+
+@pytest.mark.parametrize(
     "multiple_dim, dtype,use_visible_rows",
     product([True, False], ["float", "int"], [True, False]),
 )
@@ -142,3 +174,17 @@ def test_copy(multiple_dim, dtype, use_visible_rows):
 
     assert isinstance(col_copy, NumpyArrayColumn)
     assert (col == col_copy).all()
+
+
+@pytest.mark.parametrize(
+    "multiple_dim,dtype,use_visible_rows",
+    product([True, False], ["float", "int"], [True, False]),
+)
+def test_to_tensor(multiple_dim, dtype, use_visible_rows):
+    col, _ = _get_data(
+        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+    )
+    tensor = col.to_tensor()
+
+    assert torch.is_tensor(tensor)
+    assert (col == tensor.numpy()).all()

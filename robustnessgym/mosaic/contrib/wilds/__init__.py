@@ -27,78 +27,74 @@ except ImportError:
     )
 
 
-class WILDSDataPane(DataPane):
-    def __init__(
-        self,
-        dataset_name: str,
-        root_dir: str,
-        version: str = None,
-        identifier: Identifier = None,
-        column_names: List[str] = None,
-        info: DatasetInfo = None,
-        split: str = None,
-        use_transform: bool = True,
-        include_raw_input: bool = True,
-    ):
-        """A DataPane that hols a `WildsInputColumn` alongside `NumpyColumn`s
-        for targets and metadata.
+def get_wilds_datapane(
+    dataset_name: str,
+    root_dir: str,
+    version: str = None,
+    identifier: Identifier = None,
+    column_names: List[str] = None,
+    info: DatasetInfo = None,
+    split: str = None,
+    use_transform: bool = True,
+    include_raw_input: bool = True,
+):
+    """Get a DataPane that holds a `WildsInputColumn` alongside `NumpyColumn`s
+    for targets and metadata.
 
-        Example:
-        Run inference on the dataset and store predictions alongside the data.
-        ```
-            dp = WildsDataPane("fmow", root_dir="/datasets/", split="test")
-            model = ... # get the model
-            model.to(0).eval()
+    Example:
+    Run inference on the dataset and store predictions alongside the data.
+    ```
+        dp = get_wilds_datapane("fmow", root_dir="/datasets/", split="test")
+        model = ... # get the model
+        model.to(0).eval()
 
-            @torch.no_grad()
-            def predict(batch: dict):
-                out = torch.softmax(model(batch["input"].to(0)), axis=-1)
-                return {"pred": out.cpu().numpy().argmax(axis=-1)}
+        @torch.no_grad()
+        def predict(batch: dict):
+            out = torch.softmax(model(batch["input"].to(0)), axis=-1)
+            return {"pred": out.cpu().numpy().argmax(axis=-1)}
 
-            dp = dp.update(function=predict, batch_size=128, batched=True)
-        ```
+        dp = dp.update(function=predict, batch_size=128, batched=True)
+    ```
 
-        Args:
-            dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
-            version (str, optional): dataset version number, e.g., '1.0'.
-                Defaults to the latest version.
-            root_dir (str): the directory where the WILDS dataset is downloaded.
-                See https://wilds.stanford.edu/ for download instructions.
-            split (str, optional): see . Defaults to None.
-            use_transform (bool, optional): Whether to apply the transform from the
-                WILDS example directory on load. Defaults to True.
-            identifier (Identifier, optional): [description]. Defaults to None.
-            column_names (List[str], optional): [description]. Defaults to None.
-            info (DatasetInfo, optional): [description]. Defaults to None.
-            use_transform (bool, optional): [description]. Defaults to True.
-            include_raw_input (bool, optional): include a column for the input without
-                the transform applied – useful for visualizing images. Defaults to True.
-        """
-        self.dataset_name = dataset_name
-        self.root_dir = root_dir
-        input_column = WILDSInputColumn(
-            dataset_name=dataset_name,
-            version=version,
-            root_dir=root_dir,
-            split=split,
-            use_transform=use_transform,
-        )
-        output_column = input_column.get_y_column()
-        metadata_columns = input_column.get_metadata_columns()
+    Args:
+        dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
+        version (str, optional): dataset version number, e.g., '1.0'.
+            Defaults to the latest version.
+        root_dir (str): the directory where the WILDS dataset is downloaded.
+            See https://wilds.stanford.edu/ for download instructions.
+        split (str, optional): see . Defaults to None.
+        use_transform (bool, optional): Whether to apply the transform from the
+            WILDS example directory on load. Defaults to True.
+        identifier (Identifier, optional): [description]. Defaults to None.
+        column_names (List[str], optional): [description]. Defaults to None.
+        info (DatasetInfo, optional): [description]. Defaults to None.
+        use_transform (bool, optional): [description]. Defaults to True.
+        include_raw_input (bool, optional): include a column for the input without
+            the transform applied – useful for visualizing images. Defaults to True.
+    """
+    input_column = WILDSInputColumn(
+        dataset_name=dataset_name,
+        version=version,
+        root_dir=root_dir,
+        split=split,
+        use_transform=use_transform,
+    )
+    output_column = input_column.get_y_column()
+    metadata_columns = input_column.get_metadata_columns()
 
-        data = {"input": input_column, "y": output_column, **metadata_columns}
-        if include_raw_input:
-            # remove
-            data["raw_input"] = input_column.copy()
-            data["raw_input"]._data.transform = lambda x: x
+    data = {"input": input_column, "y": output_column, **metadata_columns}
+    if include_raw_input:
+        data["raw_input"] = input_column.copy()
+        data["raw_input"]._data.transform = lambda x: x
+        data["raw_input"]._collate_fn = lambda x: x
 
-        super(WILDSDataPane, self).__init__(
-            data,
-            identifier=identifier,
-            column_names=column_names,
-            info=info,
-            split=split,
-        )
+    return DataPane(
+        data,
+        identifier=identifier,
+        column_names=column_names,
+        info=info,
+        split=split,
+    )
 
 
 class WILDSInputColumn(AbstractColumn):
@@ -109,7 +105,7 @@ class WILDSInputColumn(AbstractColumn):
         root_dir: str = None,
         split: str = None,
         use_transform: bool = True,
-        **dataset_kwargs,
+        **kwargs,
     ):
         """A column wrapper around a WILDS dataset that can lazily load the
         inputs for each dataset.
@@ -123,16 +119,15 @@ class WILDSInputColumn(AbstractColumn):
             use_transform (bool, optional): Whether to apply the transform from the
                 WILDS example directory on load. Defaults to True.
         """
-        self._state = {
-            "dataset_name": dataset_name,
-            "version": version,
-            "root_dir": root_dir,
-            "split": split,
-            "use_transform": use_transform,
-            **dataset_kwargs,
-        }
+
+        self.dataset_name = dataset_name
+        self.version = version
+        self.root_dir = root_dir
+        self.split = split
+        self.use_transform = use_transform
+
         dataset = wilds.get_dataset(
-            dataset=dataset_name, version=version, root_dir=root_dir, **dataset_kwargs
+            dataset=dataset_name, version=version, root_dir=root_dir
         )
         self.root = dataset.root
         self.split = split
@@ -208,10 +203,9 @@ class WILDSInputColumn(AbstractColumn):
             lambda x: f"WildsInput(path={self.root}/images/rgb_img_{x}.png)"
         )
 
-    def write(
-        self, path: str, write_together: bool = None, write_data: bool = None
-    ) -> None:
-        """Write the state of this input column to disk at `path`.
+    @classmethod
+    def _state_keys(cls) -> set:
+        """List of attributes that describe the state of the object.
 
         Warning: this write
         is very lightweight, only the name of the dataset (`dataset_name`), the
@@ -219,19 +213,11 @@ class WILDSInputColumn(AbstractColumn):
         written to disk. If the data at `root_dir` is modified, `read` will return a
         column with different data.
         """
-        # TODO (Sabri): Ideally, `write` and `read` should not be reimplemented here,
-        # but instead only `get_state` and `from_state`. This requires significant
-        # changes to ColumnStorageMixin and StateDictMixin, so I'm punting to another PR.
-        yaml.dump(self._state, open(path, "w"))
-
-    @classmethod
-    def read(cls, path: str, *args, **kwargs) -> object:
-        state = dict(yaml.load(open(path), Loader=yaml.FullLoader))
-        return cls(**state)
-
-    def get_state(self):
-        raise NotImplementedError(" `WILDSInputColumn` not supported.")
-
-    @classmethod
-    def from_state(cls, state, *args, **kwargs) -> object:
-        raise NotImplementedError("Reading `WILDSInputColumn` not supported.")
+        return {
+            "dataset_name",
+            "version",
+            "root_dir",
+            "split",
+            "use_transform",
+            "_visible_rows",
+        }

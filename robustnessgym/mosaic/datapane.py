@@ -152,10 +152,12 @@ class DataPane(
         # If only a subset of rows are visible
         if self.visible_rows is not None:
             return len(self.visible_rows)
+        return self.full_length()
 
-        # If there are columns, len of any column
+    def full_length(self):
+        # If there are columns, full_length of any column, since they must be same size
         if self.column_names:
-            return len(self._data[self.column_names[0]])
+            return self._data[self.column_names[0]].full_length()
         return 0
 
     @property
@@ -406,10 +408,6 @@ class DataPane(
         return Identifier(_name=_name, **kwargs)
 
     def __getitem__(self, index):
-        if self.visible_rows is not None:
-            # Remap the index if only some rows are visible
-            index = self._remap_index(index)
-
         if isinstance(index, int) or isinstance(index, np.int):
             # int index => single row (dict)
             return {k: self._data[k][index] for k in self.visible_columns}
@@ -417,8 +415,6 @@ class DataPane(
         elif isinstance(index, str):
             # str index => column selection (AbstractColumn)
             if index in self.column_names:
-                if self.visible_rows is not None:
-                    return [self._data[index][i] for i in self.visible_rows]
                 return self._data[index]
             raise AttributeError(f"Column {index} does not exist.")
 
@@ -432,9 +428,13 @@ class DataPane(
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
             # tuple or list index => multiple row selection (DataPane)
             if isinstance(index[0], str):
-                return DataPane.from_batch(
-                    {k: self._data[k] for k in index if k in self.visible_columns}
-                )
+                if not set(index).issubset(self.visible_columns):
+                    missing_cols = set(self.visible_columns) - set(index)
+                    raise ValueError(f"Datapane does not have columns {missing_cols}")
+                dp = self.copy()
+                dp.visible_columns = index
+                return dp
+
             return DataPane.from_batch(
                 {k: self._data[k][index] for k in self.visible_columns}
             )
@@ -653,7 +653,6 @@ class DataPane(
                 if drop_last_batch and i + batch_size > len(self):
                     continue
                 batch_indices.append(indices[i : i + batch_size])
-
             batch_dl = torch.utils.data.DataLoader(
                 self[batch_columns],
                 sampler=batch_indices,
@@ -941,28 +940,18 @@ class DataPane(
             yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
         )
 
+        state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+
         # Load the columns
-        if metadata["write_together"]:
-            data = dill.load(open(os.path.join(path, "data.dill"), "rb"))
-            data = {
-                name: metadata["column_dtypes"][name].from_state(state, *args, **kwargs)
-                for name, state in data.items()
-            }
-        else:
+        if not metadata["write_together"]:
             data = {
                 name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
                 for name, dtype in metadata["column_dtypes"].items()
             }
-
-        # Create the state dict
-        state = metadata["state"]
-        state["_data"] = data
+            state["_data"] = data
 
         # Create a DataPane from the loaded state
         datapane = cls.from_state(state)
-        datapane._create_logdir()
-        datapane._initialize_state()
-        datapane.visible_rows = state["visible_rows"]
 
         return datapane
 
@@ -977,7 +966,6 @@ class DataPane(
 
         # Get the DataPane state
         state = self.get_state()
-        del state["_data"]
 
         # Get the metadata
         metadata = {
@@ -985,20 +973,16 @@ class DataPane(
             "column_dtypes": {name: type(col) for name, col in self._data.items()},
             "len": len(self),
             "write_together": write_together,
-            "state": state,
         }
 
-        if write_together:
-            # Write the entire DataPane together
-            data_path = os.path.join(path, "data.dill")
+        if not write_together:
+            if "_data" not in state:
+                raise ValueError(
+                    "DataPane's state must include `_data` when using "
+                    "`write_together=False`."
+                )
+            del state["_data"]
 
-            # Save all the columns in a single dill file
-            dill.dump(
-                {name: col.get_state() for name, col in self._data.items()},
-                open(data_path, "wb"),
-            )
-
-        else:
             # Create a directory for the columns at `path`
             columns_path = os.path.join(path, "columns")
             os.makedirs(columns_path, exist_ok=True)
@@ -1007,9 +991,20 @@ class DataPane(
             for name, column in self._data.items():
                 column.write(os.path.join(columns_path, name))
 
+        # Write the state
+        state_path = os.path.join(path, "state.dill")
+        dill.dump(state, open(state_path, "wb"))
+
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
         yaml.dump(metadata, open(metadata_path, "w"))
+
+    @classmethod
+    def from_state(cls, state: Dict, *args, **kwargs) -> DataPane:
+        datapane = super(DataPane, cls).from_state(state, *args, **kwargs)
+        datapane._create_logdir()
+        datapane._set_features()
+        return datapane
 
     @classmethod
     def _state_keys(cls) -> set:
@@ -1018,6 +1013,7 @@ class DataPane(
             "_identifier",
             "_data",
             "all_columns",
+            "visible_columns",
             "_visible_rows",
             "_info",
             "_split",

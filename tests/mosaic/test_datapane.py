@@ -1,6 +1,7 @@
 """Unittests for Datasets."""
 import os
 import shutil
+from itertools import product
 from unittest import TestCase
 
 import numpy as np
@@ -9,116 +10,191 @@ import torch
 
 from robustnessgym.mosaic import NumpyArrayColumn
 from robustnessgym.mosaic.datapane import DataPane
-from tests.testbeds import MockTestBedv0
 
 
-class TestDataPane(TestCase):
-    def setUp(self):
-        # Arrange
-        self.mixed_test_dp = DataPane.from_batch(
-            {"a": np.arange(16), "b": list(np.arange(16)), "c": [{"a": 2}] * 16},
-        )
+def _get_datapane(
+    use_visible_rows: bool = False,
+    use_visible_columns: bool = False,
+):
+    batch = {
+        "a": np.arange(16),
+        "b": list(np.arange(16)),
+        "c": [{"a": 2}] * 16,
+    }
+    dp = DataPane.from_batch(batch)
 
-    def test_from_batch(self):
-        # Build a dataset from a batch
-        datapane = DataPane.from_batch(
-            {
-                "a": [1, 2, 3],
-                "b": [True, False, True],
-                "c": ["x", "y", "z"],
-                "d": [{"e": 2}, {"e": 3}, {"e": 4}],
-                "e": torch.ones(3),
-                "f": np.ones(3),
-            },
-        )
+    visible_rows = [0, 4, 6, 11] if use_visible_rows else None
+    if use_visible_rows:
+        dp.visible_rows = visible_rows
 
-        self.assertEqual(
-            set(datapane.column_names), {"a", "b", "c", "d", "e", "f", "index"}
-        )
-        self.assertEqual(len(datapane), 3)
+    visible_columns = ["a", "b"] if use_visible_columns else None
+    if use_visible_columns:
+        dp.visible_columns = visible_columns
 
-    def test_map_1(self):
-        """`map`, mixed datapane, single return, `batched=True`"""
+    return dp, visible_rows, visible_columns
 
-        def func(x):
-            out = (x["a"] + np.array(x["b"])) * 2
-            return out
 
-        result = self.mixed_test_dp.map(func, batch_size=4, batched=True)
-        self.assertTrue(isinstance(result, NumpyArrayColumn))
-        self.assertEqual(len(result), 16)
-        self.assertTrue((result == np.arange(16) * 4).all())
+def test_from_batch():
+    # Build a dataset from a batch
+    datapane = DataPane.from_batch(
+        {
+            "a": [1, 2, 3],
+            "b": [True, False, True],
+            "c": ["x", "y", "z"],
+            "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+            "e": torch.ones(3),
+            "f": np.ones(3),
+        },
+    )
+    assert set(datapane.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
+    assert len(datapane) == 3
 
-    def test_map_2(self):
-        """`map`, mixed datapane, return multiple, `batched=True`"""
 
-        def func(x):
-            out = {
-                "x": (x["a"] + np.array(x["b"])) * 2,
-                "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
-            }
-            return out
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_map_1(use_visible_rows, use_visible_columns):
+    """`map`, mixed datapane, single return, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+    )
 
-        result = self.mixed_test_dp.map(func, batch_size=4, batched=True)
-        self.assertTrue(isinstance(result, DataPane))
-        self.assertEqual(len(result["x"]), 16)
-        self.assertEqual(len(result["y"]), 16)
-        self.assertTrue((result["x"] == np.arange(16) * 4).all())
-        self.assertTrue((result["y"] == np.ones(16) * 2).all())
+    def func(x):
+        out = (x["a"] + np.array(x["b"])) * 2
+        return out
 
-    def test_update_1(self):
-        """`update`, mixed datapane, return single, new columns,
-        `batched=True`"""
-        # mixed datapane (i.e. has multiple colummn types)
-        def func(x):
-            out = {"x": (x["a"] + np.array(x["b"])) * 2}
-            return out
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+    result = dp.map(func, batch_size=4, batched=True)
+    assert isinstance(result, NumpyArrayColumn)
+    assert len(result) == len(visible_rows)
+    assert (result == np.array(visible_rows) * 4).all()
 
-        result = self.mixed_test_dp.update(func, batch_size=4, batched=True)
-        self.assertTrue(isinstance(result, DataPane))
-        self.assertEqual(set(result.column_names), set(["a", "b", "c", "x", "index"]))
-        self.assertEqual(len(result["x"]), 16)
-        self.assertTrue((result["x"] == np.arange(16) * 4).all())
 
-    def test_update_2(self):
-        """`update`, mixed datapane, return multiple, new columns,
-        `batched=True`"""
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_map_2(use_visible_rows, use_visible_columns):
+    """`map`, mixed datapane, return multiple, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+    )
 
-        def func(x):
-            out = {
-                "x": (x["a"] + np.array(x["b"])) * 2,
-                "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
-            }
-            return out
+    def func(x):
+        out = {
+            "x": (x["a"] + np.array(x["b"])) * 2,
+            "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
+        }
+        return out
 
-        result = self.mixed_test_dp.update(func, batch_size=4, batched=True)
-        self.assertTrue(isinstance(result, DataPane))
-        self.assertEqual(
-            set(result.column_names), set(["a", "b", "c", "x", "y", "index"])
-        )
-        self.assertEqual(len(result["x"]), 16)
-        self.assertEqual(len(result["y"]), 16)
-        self.assertTrue((result["x"] == np.arange(16) * 4).all())
-        self.assertTrue((result["y"] == np.ones(16) * 2).all())
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+    result = dp.map(func, batch_size=4, batched=True)
+    assert isinstance(result, DataPane)
+    assert len(result["x"]) == len(visible_rows)
+    assert len(result["y"]) == len(visible_rows)
+    assert (result["x"] == np.array(visible_rows) * 4).all()
+    assert (result["y"] == np.ones(len(visible_rows)) * 2).all()
 
-    def test_update_3(self):
-        """`update`, mixed datapane, return multiple, replace existing column,
-        `batched=True`"""
 
-        def func(x):
-            out = {
-                "a": (x["a"] + np.array(x["b"])) * 2,
-                "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
-            }
-            return out
+def test_update_1():
+    """`update`, mixed datapane, return single, new columns, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=False, use_visible_columns=False
+    )
 
-        result = self.mixed_test_dp.update(func, batch_size=4, batched=True)
-        self.assertTrue(isinstance(result, DataPane))
-        self.assertEqual(set(result.column_names), set(["a", "b", "c", "y", "index"]))
-        self.assertEqual(len(result["a"]), 16)
-        self.assertEqual(len(result["y"]), 16)
-        self.assertTrue((result["a"] == np.arange(16) * 4).all())
-        self.assertTrue((result["y"] == np.ones(16) * 2).all())
+    # mixed datapane (i.e. has multiple colummn types)
+    def func(x):
+        out = {"x": (x["a"] + np.array(x["b"])) * 2}
+        return out
 
-    def test_repr_html_(self):
-        self.mixed_test_dp._repr_html_()
+    result = dp.update(func, batch_size=4, batched=True)
+    assert isinstance(result, DataPane)
+    assert set(result.column_names) == set(["a", "b", "c", "x", "index"])
+    assert len(result["x"]) == 16
+    assert (result["x"] == np.arange(16) * 4).all()
+
+
+def test_update_2():
+    """`update`, mixed datapane, return multiple, new columns,
+    `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=False, use_visible_columns=False
+    )
+
+    def func(x):
+        out = {
+            "x": (x["a"] + np.array(x["b"])) * 2,
+            "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
+        }
+        return out
+
+    result = dp.update(func, batch_size=4, batched=True)
+    assert isinstance(result, DataPane)
+    assert set(result.column_names) == set(["a", "b", "c", "x", "y", "index"])
+    assert len(result["x"]) == 16
+    assert len(result["y"]) == 16
+    assert (result["x"] == np.arange(16) * 4).all()
+    assert (result["y"] == np.ones(16) * 2).all()
+
+
+def test_update_3():
+    """`update`, mixed datapane, return multiple, replace existing column,
+    `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=False, use_visible_columns=False
+    )
+
+    def func(x):
+        out = {
+            "a": (x["a"] + np.array(x["b"])) * 2,
+            "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
+        }
+        return out
+
+    result = dp.update(func, batch_size=4, batched=True)
+    assert isinstance(result, DataPane)
+    assert set(result.column_names) == set(["a", "b", "c", "y", "index"])
+    assert len(result["a"]) == 16
+    assert len(result["y"]) == 16
+    assert (result["a"] == np.arange(16) * 4).all()
+    assert (result["y"] == np.ones(16) * 2).all()
+
+
+@pytest.mark.parametrize(
+    "write_together,use_visible_rows, use_visible_columns",
+    product([True, False], [True, False], [True, False]),
+)
+def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
+    """`map`, mixed datapane, return multiple, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+    )
+    path = os.path.join(tmp_path, "test")
+    dp.write(path, write_together=write_together)
+
+    new_dp = DataPane.read(path)
+
+    assert isinstance(new_dp, DataPane)
+    assert len(new_dp) == len(dp)
+    assert len(new_dp["a"]) == len(dp["a"])
+    assert len(new_dp["b"]) == len(dp["b"])
+    assert len(new_dp["c"]) == len(dp["c"])
+
+    assert (dp["a"] == new_dp["a"]).all()
+    assert (dp["b"] == new_dp["b"]).all()
+
+    assert dp.visible_columns == new_dp.visible_columns
+
+    visible_rows = None if dp.visible_rows is None else set(dp.visible_rows)
+    new_visible_rows = None if new_dp.visible_rows is None else set(dp.visible_rows)
+    assert visible_rows == new_visible_rows
+
+
+def test_repr_html_():
+    dp, visible_rows, visible_columns = _get_datapane(
+        use_visible_rows=False, use_visible_columns=False
+    )
+    dp._repr_html_()

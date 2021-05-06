@@ -11,6 +11,7 @@ import dill
 import numpy as np
 import numpy.lib.mixins
 import pandas as pd
+import torch
 import yaml
 from yaml.representer import Representer
 
@@ -45,9 +46,9 @@ class NumpyArrayColumn(
         *args,
         **kwargs,
     ):
-        # TODO(sabri): Setting visible_rows breaks NumpyArrayColumn – need to think about
-        # how to support this.
-        super(NumpyArrayColumn, self).__init__(data=np.asarray(data), *args, **kwargs)
+        if data is not None:
+            data = np.asarray(data)
+        super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
     @property
     def data(self):
@@ -98,6 +99,13 @@ class NumpyArrayColumn(
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
+    def __setitem__(self, index, value):
+        if self.visible_rows is not None:
+            # TODO (sabri): this is a stop-gap solution but won't work for fancy numpy
+            # indexes, should find a way to cobine index and visible rows into one index
+            index = super()._remap_index(index)
+        return self._data.__setitem__(index, value)
+
     @classmethod
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
@@ -142,7 +150,7 @@ class NumpyArrayColumn(
             assert dtype is not None and shape is not None
             data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
         else:
-            data = np.load(data_path)
+            data = np.load(data_path, allow_pickle=True)
 
         col = cls(data)
 
@@ -162,7 +170,6 @@ class NumpyArrayColumn(
 
         # Remove the data key and put the rest of `state` into a metadata dict
         del state["_data"]
-        print(state)
         metadata = {
             "dtype": type(self),
             "len": len(self),
@@ -185,4 +192,10 @@ class NumpyArrayColumn(
         if len(self.shape) > 1:
             return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
         else:
-            return pd.Series(self._data)
+            return pd.Series(self.data)
+
+    def to_tensor(self) -> torch.Tensor:
+        """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
+        very slow."""
+        # TODO (Sabri): understand why `torch.tensor(column)` is so slow
+        return torch.tensor(self.data)
