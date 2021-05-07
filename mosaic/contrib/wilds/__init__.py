@@ -27,19 +27,18 @@ except ImportError:
 
 
 def get_wilds_datapane(
-        dataset_name: str,
-        root_dir: str,
-        version: str = None,
-        identifier: Identifier = None,
-        column_names: List[str] = None,
-        info: DatasetInfo = None,
-        split: str = None,
-        use_transform: bool = True,
-        include_raw_input: bool = True,
+    dataset_name: str,
+    root_dir: str,
+    version: str = None,
+    identifier: Identifier = None,
+    column_names: List[str] = None,
+    info: DatasetInfo = None,
+    split: str = None,
+    use_transform: bool = True,
+    include_raw_input: bool = True,
 ):
-    """
-    Get a DataPane that holds a WildsInputColumn alongside NumpyColumns
-    for targets and metadata.
+    """Get a DataPane that holds a WildsInputColumn alongside NumpyColumns for
+    targets and metadata.
 
     Example:
     Run inference on the dataset and store predictions alongside the data.
@@ -109,13 +108,13 @@ def get_wilds_datapane(
 
 class WILDSInputColumn(AbstractColumn):
     def __init__(
-            self,
-            dataset_name: str = "fmow",
-            version: str = None,
-            root_dir: str = None,
-            split: str = None,
-            use_transform: bool = True,
-            **kwargs,
+        self,
+        dataset_name: str = "fmow",
+        version: str = None,
+        root_dir: str = None,
+        split: str = None,
+        use_transform: bool = True,
+        **kwargs,
     ):
         """A column wrapper around a WILDS dataset that can lazily load the
         inputs for each dataset.
@@ -150,7 +149,7 @@ class WILDSInputColumn(AbstractColumn):
             if self.split is not None:
                 metadata_df = metadata_df[
                     dataset.split_array == dataset.split_dict[self.split]
-                    ]
+                ]
             self.metadata_columns.update(
                 {
                     field: NumpyArrayColumn(data=series.values)
@@ -206,7 +205,7 @@ class WILDSInputColumn(AbstractColumn):
         return self.data[index][0]
 
     def _repr_pandas_(
-            self,
+        self,
     ) -> pd.Series:
         series = pd.Series(np.arange(len(self._data)))
         return series.apply(
