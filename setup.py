@@ -13,7 +13,7 @@ from setuptools import find_packages, setup, Command
 from mosaic import __version__
 
 # Package meta-data.
-NAME = 'mosaic'
+NAME = 'mosaicml'
 DESCRIPTION = 'Mosaic is building new data abstractions to make ' \
               'machine learning easier.'
 URL = 'https://github.com/robustness-gym/mosaic'
