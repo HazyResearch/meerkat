@@ -12,23 +12,14 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 Mosaic provides fast and flexible data structures for working with complex machine learning datasets. 
-
-[**Getting Started**](#getting-started)
-| [**What is Mosaic?**](#what-is-mosaic)
-| [**Supported Columns**](#supported-columns)
-| [**Docs**](https://mosaic.readthedocs.io/en/latest/index.html)
-| [**Contributing**](CONTRIBUTING.md)
-| [**About**](#about)
-
-
 ## Getting started
 ```bash
 pip install mosaicml
 ``` 
-> Note: some parts of Mosaic rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install mosaicml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
+> Note: some parts of Mosaic rely on optional dependencies. If you know which optional dependencies you'd like to install use something like `pip install mosaicml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
  
 Load your dataset into a `DataPanel` and get going!
-```python
+```
 from mosaic import DataPanel
 dp = DataPanel.from_csv("...")
 ```
@@ -39,7 +30,7 @@ Mosaic makes it easier for ML practitioners to interact with high-dimensional, m
 
 Mosaic's core contribution is the `DataPanel`, a simple columnar data abstraction. The Mosaic `DataPanel` can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs. 
 
-**`DataPanel` loads high-dimensional data lazily.**     A full high-dimensional dataset won't typically fit in memory. Behind the scenes, `DataPanel` handles this by only materializing these objects when they are needed. 
+**`DataPanel`s load high-dimensional data lazily.**     A full high-dimensional dataset won't typically fit in memory. Behind the scenes, `DataPanel` handles this by only materializing these objects when they are needed. 
 ```python
 from mosaic import DataPanel, ImageColumn
 
@@ -54,7 +45,7 @@ dp = DataPanel({
 dp["image"][0]
 ```
 
-**`DataPanel` supports advanced indexing.**  Using indexing patterns similar to those of Pandas and NumPy, we can access a subset of a `DataPanel`'s rows and columns. 
+**`DataPanel`s support advanced indexing.**  Using indexing patterns similar to those of Pandas and NumPy, we can access a subset of a `DataPanel`'s rows and columns. 
 ```python
 from mosaic import DataPanel, AbstractColumn
 dp = ... # create DataPanel
@@ -73,7 +64,7 @@ new_dp: DataPanel = dp[np.array([0,2,4,8])]
 new_col: ImageColumn = dp["image"][10:20]
 ```
 
-**`DataPanel` supports `map`, `update` and `filter` operations.**  When training and evaluating our models, we often perform operations on each example in our dataset (*e.g.* compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them . The `DataPanel` makes it easy to perform these operations and produce new columns (via `DataPanel.map`), store the columns alongside the original data (via `DataPanel.update`), and extract an important subset of the datset (via `DataPanel.filter`). Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottleneck our computation. Consider the example below where we use update a `DataPanel` with two new columns holding model predictions and probabilities.  
+**`DataPanel`s support `map`, `update` and `filter` operations.**  When training and evaluating our models, we often perform operations on each example in our dataset (*e.g.* compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them . The `DataPanel` makes it easy to perform these operations and produce new columns (via `DataPanel.map`), store the columns alongside the original data (via `DataPanel.update`), and extract an important subset of the datset (via `DataPanel.filter`). Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottleneck our computation. Consider the example below where we use update a `DataPanel` with two new columns holding model predictions and probabilities.  
 ```python
     # A simple evaluation loop using Mosaic 
     dp: DataPane = ... # get DataPane
@@ -90,7 +81,7 @@ new_col: ImageColumn = dp["image"][10:20]
     updated_dp: DataPane = dp.update(function=predict, batch_size=128, batched=True)
 ```
 
-**`DataPanel` is extendable.** Mosaic makes it easy for you to make custom column types for our data. The easiest way to do this is by subclassing `AbstractCell`. Subclasses of `AbstractCell` are meant to represent one element in one column of a `DataPanel`. For example, say we want our `DataPanel` to include a column of videos we have stored on disk. We want these videos to be lazily loaded using [scikit-video](http://www.scikit-video.org/stable/index.html), so we implement a `VideoCell` class as follows: 
+**`DataPanel`s are extendable.** Mosaic makes it easy for you to make custom column types for our data. The easiest way to do this is by subclassing `AbstractCell`. Subclasses of `AbstractCell` are meant to represent one element in one column of a `DataPanel`. For example, say we want our `DataPanel` to include a column of videos we have stored on disk. We want these videos to be lazily loaded using [scikit-video](http://www.scikit-video.org/stable/index.html), so we implement a `VideoCell` class as follows: 
 ```python
     from mosaic import AbstractCell, CellColumn
     import skvideo.io
@@ -117,19 +108,18 @@ new_col: ImageColumn = dp["image"][10:20]
 ```
 ## Supported Columns
 Mosaic ships with a number of core column types and the list is growing.
-#### Core Columns
+## Core
 | Column             | Supported | Description                                                  |
 |--------------------|-----------|--------------------------------------------------------------|
 | `ListColumn`       | Yes       | Flexible and can hold any type of data.                      |
 | `NumpyArrayColumn` | Yes       | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
 | `TensorColumn`     | Yes       | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
-| `ImageColumn`      | Yes       | Holds images stored on disk (*e.g.* as PNG or JPEG)                              |
 | `CellColumn`       | Yes       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
 | `SpacyColumn`      | Yes       | Optimized to hold spaCy Doc objects.                         |
 | `EmbeddingColumn`  | Planned   | Optimized for embeddings and operations on embeddings.       |
 | `PredictionColumn` | Planned   | Optimized for model predictions.                                   |
 
-#### Contributed Columns
+## Contributed
 | Column             | Supported | Description                                                  |
 |--------------------|-----------|--------------------------------------------------------------|
 | `WILDSInputColumn`       | Yes       | Build `DataPanel`s for the [WILDS benchmark](https://wilds.stanford.edu/).|
