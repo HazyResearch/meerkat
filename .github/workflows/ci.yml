@@ -82,28 +82,12 @@ jobs:
                 with:
                     python-version: ${{ matrix.python-version }}
     
-            -   name: Install Poetry
-                uses: snok/install-poetry@v1.1.2
-                with:
-                    version: 1.1.5
-                    virtualenvs-create: true
-                    virtualenvs-in-project: true
-    
-            -   name: Set up Poetry cache for Python dependencies
-                id: cached-poetry-dependencies
-                uses: actions/cache@v2
-                with:
-                    path: .venv
-                    key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-v2
-    
             -   name: Install Dependencies
-                if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
                 run: |
-                    poetry install --no-interaction --extras "augmentation text adversarial summarization vision"
+                    pip install -e .[dev, text, vision, wilds]
                     
             -   name: Test with pytest
                 run: |
-                    source .venv/bin/activate
                     make test-cov
             
             -   name: Upload to codecov.io
@@ -114,10 +98,10 @@ jobs:
                     name: codecov-umbrella
                     fail_ci_if_error: true
                     
-            -   name: Publish distribution 📦 to PyPI
-                if: startsWith(github.event.ref, 'refs/tags')
-                env:
-                    PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-                run: |
-                    poetry config pypi-token.pypi $PYPI_TOKEN
-                    poetry publish --build
+#            -   name: Publish distribution 📦 to PyPI
+#                if: startsWith(github.event.ref, 'refs/tags')
+#                env:
+#                    PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+#                run: |
+#                    poetry config pypi-token.pypi $PYPI_TOKEN
+#                    poetry publish --build
