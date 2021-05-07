@@ -75,8 +75,13 @@ EXTRAS = {
         'kaleido',
     ],
 
-    'embeddings': [
-        'faiss',
+    'embeddings-mac': [
+        'faiss-cpu',
+        'umap-learn',
+    ],
+
+    'embeddings-linux': [
+        'faiss-gpu',
         'umap-learn',
     ],
 

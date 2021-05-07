@@ -84,7 +84,7 @@ jobs:
     
             -   name: Install Dependencies
                 run: |
-                    pip install -e ".[dev, text, vision, tabular, embeddings]"
+                    pip install -e ".[dev, text, vision, tabular, embeddings-linux]"
                     
             -   name: Test with pytest
                 run: |
