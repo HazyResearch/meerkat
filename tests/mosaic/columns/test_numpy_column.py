@@ -8,8 +8,8 @@ import numpy.testing as np_test
 import pytest
 import torch
 
-from robustnessgym.mosaic import NumpyArrayColumn
-from robustnessgym.mosaic.datapane import DataPane
+from mosaic import NumpyArrayColumn
+from mosaic.datapane import DataPane
 
 
 def _get_data(multiple_dim: bool = True, dtype="float", use_visible_rows=False):
@@ -148,7 +148,8 @@ def test_pickle(multiple_dim, dtype, use_visible_rows):
     product([True, False], ["float", "int"], [True, False]),
 )
 def test_io(tmp_path, multiple_dim, dtype, use_visible_rows):
-    # uses the tmp_path fixture which will provide a temporary directory unique to the test invocation,
+    # uses the tmp_path fixture which will provide a
+    # temporary directory unique to the test invocation,
     # important for dataloader
     col, _ = _get_data(
         multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows

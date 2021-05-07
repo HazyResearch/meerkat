@@ -10,7 +10,7 @@ try:
     _is_spacy_available = True
 except ImportError:
     _is_spacy_available = False
-from robustnessgym.mosaic.cells.abstract import AbstractCell
+from mosaic.cells.abstract import AbstractCell
 
 
 class SpacyCell(AbstractCell):

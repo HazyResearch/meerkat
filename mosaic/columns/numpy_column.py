@@ -5,19 +5,17 @@ import functools
 import logging
 import numbers
 import os
-from typing import Callable, Sequence, Tuple
+from typing import Callable, Sequence
 
 import dill
 import numpy as np
-import numpy.lib.mixins
 import pandas as pd
 import torch
 import yaml
 from yaml.representer import Representer
 
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
-from robustnessgym.mosaic.mixins.collate import identity_collate
-from robustnessgym.mosaic.writers.numpy_writer import NumpyMemmapWriter, NumpyWriter
+from mosaic.columns.abstract import AbstractColumn
+from mosaic.writers.numpy_writer import NumpyMemmapWriter, NumpyWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 

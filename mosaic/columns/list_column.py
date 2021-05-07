@@ -7,7 +7,7 @@ from typing import Sequence
 import pandas as pd
 from yaml.representer import Representer
 
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
+from mosaic.columns.abstract import AbstractColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 

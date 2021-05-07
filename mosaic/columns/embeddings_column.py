@@ -11,7 +11,7 @@ import dill
 import numpy as np
 import yaml
 
-from robustnessgym.mosaic.columns.cell_column import identity_collate
+from mosaic.mixins.collate import identity_collate
 
 try:
     import faiss
@@ -23,8 +23,8 @@ except ImportError:
 from tqdm.auto import tqdm
 from yaml.representer import Representer
 
-from robustnessgym.core.tools import convert_to_batch_column_fn
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
+from mosaic.columns.abstract import AbstractColumn
+from mosaic.tools.utils import convert_to_batch_column_fn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 

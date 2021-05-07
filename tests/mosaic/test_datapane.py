@@ -1,15 +1,13 @@
 """Unittests for Datasets."""
 import os
-import shutil
 from itertools import product
-from unittest import TestCase
 
 import numpy as np
 import pytest
 import torch
 
-from robustnessgym.mosaic import NumpyArrayColumn
-from robustnessgym.mosaic.datapane import DataPane
+from mosaic import NumpyArrayColumn
+from mosaic.datapane import DataPane
 
 
 def _get_datapane(

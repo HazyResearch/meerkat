@@ -3,8 +3,6 @@ import os
 import dill
 import yaml
 
-from robustnessgym.mosaic.mixins.state import StateClass
-
 
 class CellStorageMixin:
     def write(self, path: str) -> None:
@@ -98,7 +96,7 @@ class ColumnStorageMixin:
             dill.dump(state, open(state_path, "wb"))
 
             # lazy import to avoid circular dependencies
-            from robustnessgym.mosaic import AbstractCell
+            from mosaic.cells.abstract import AbstractCell
 
             # Save all the elements of the column separately
             data_paths = []
@@ -140,7 +138,7 @@ class ColumnStorageMixin:
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         if not metadata["write_together"]:
             # lazy import to avoid circular dependencies
-            from robustnessgym.mosaic import AbstractCell
+            from mosaic.cells.abstract import AbstractCell
 
             # Each element of the data is written to individual paths
             data = [

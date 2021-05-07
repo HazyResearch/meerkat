@@ -28,9 +28,9 @@ sys.setrecursionlimit(1500)
 
 # -- Project information -----------------------------------------------------
 
-project = "Robustness Gym"
-copyright = "2021 Robustness Gym"
-author = "Robustness Gym"
+project = "Mosaic"
+copyright = "2021 Mosaic"
+author = "Mosaic"
 
 # The full version, including alpha/beta/rc tags
 # release = "0.0.0dev"

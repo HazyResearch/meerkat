@@ -7,9 +7,9 @@ from typing import Callable, Sequence, Union
 from dosma.core.io.format_io import DataReader, ImageDataFormat
 from dosma.core.io.format_io_utils import get_reader
 
-from robustnessgym.mosaic.cells.abstract import AbstractCell
-from robustnessgym.mosaic.mixins.file import PathLikeType, PathsMixin
-from robustnessgym.mosaic.mixins.state import StateClass
+from mosaic.cells.abstract import AbstractCell
+from mosaic.mixins.file import PathLikeType, PathsMixin
+from mosaic.mixins.state import StateClass
 
 
 class MedicalVolumeCell(PathsMixin, AbstractCell):

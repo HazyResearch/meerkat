@@ -1,4 +1,4 @@
-from robustnessgym.core.identifier import Identifier
+from mosaic.tools.identifier import Identifier
 
 
 class IdentifierMixin:

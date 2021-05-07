@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from robustnessgym.mosaic.cells.abstract import AbstractCell
+from mosaic.cells.abstract import AbstractCell
 
 
 class Cell(AbstractCell):
