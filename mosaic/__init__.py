@@ -17,4 +17,4 @@ from mosaic.columns.cell_column import CellColumn
 from mosaic.columns.list_column import ListColumn
 from mosaic.columns.numpy_column import NumpyArrayColumn
 from mosaic.columns.spacy_column import SpacyColumn
-from mosaic.datapane import DataPane
+from mosaic.datapanel import DataPanel

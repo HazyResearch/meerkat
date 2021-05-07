@@ -11,11 +11,12 @@
 [![Documentation Status](https://readthedocs.org/projects/mosaic/badge/?version=latest)](https://mosaic.readthedocs.io/en/latest/?badge=latest)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-The Mosaic project's goal is to create clean abstractions for ML practitioners to load, manipulate, train, evaluate, inspect, visualize and interact with complex high-dimensional, multi-modal data. 
+The Mosaic project's goal is to create clean abstractions for ML practitioners to load, manipulate, 
+train, evaluate, inspect, visualize and interact with complex high-dimensional, multi-modal data. 
 
-Mosaic's core contribution is the `DataPane`, a simple columnar data abstraction that 
+Mosaic's core contribution is the `DataPanel`, a simple columnar data abstraction that 
 can house arbitrary columns of complex data side-by-side. 
-The `DataPane` allows users to work with text, image, medical imaging, time-series, 
+The `DataPanel` allows users to work with text, image, medical imaging, time-series, 
 video, and other complex Python objects with clean, high-level interfaces.
 
 ## Supported Columns
@@ -30,17 +31,17 @@ video, and other complex Python objects with clean, high-level interfaces.
 | `PredictionColumn` | Planned   | Optimized for predictions.                                   |
 
 
-## `DataPane`
+## `DataPanel`
 
-A `DataPane` is a Python object that contains a collection of columns. 
+A `DataPanel` is a Python object that contains a collection of columns. 
 
 
-#### Create a `DataPane`
+#### Create a `DataPanel`
 ```python
-from mosaic import DataPane
+from mosaic import DataPanel
 
-# Create a simple DataPane
-dp = DataPane({
+# Create a simple DataPanel
+dp = DataPanel({
     'text': ['The quick brown fox.', 'Jumped over.', 'The lazy dog.'],
     'imagepath': ['fox.png', 'jump.png', 'dog.png'],
 })

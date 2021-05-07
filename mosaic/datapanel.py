@@ -1,4 +1,4 @@
-"""DataPane class."""
+"""DataPanel class."""
 from __future__ import annotations
 
 import json
@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 
 Example = Dict
 Batch = Dict[str, Union[List, AbstractColumn]]
-BatchOrDataset = Union[Batch, "DataPane"]
+BatchOrDataset = Union[Batch, "DataPanel"]
 
 
-class DataPane(
+class DataPanel(
     DatasetInfoMixin,
     CopyMixin,
     FunctionInspectorMixin,
@@ -44,7 +44,7 @@ class DataPane(
     StateDictMixin,
     VisibilityMixin,
 ):
-    """Mosaic DataPane class."""
+    """Mosaic DataPanel class."""
 
     # Path to a log directory
     logdir: pathlib.Path = pathlib.Path.home() / "mosaic/"
@@ -62,9 +62,9 @@ class DataPane(
         **kwargs,
     ):
         # TODO(karan, sabri): copy columns when they're passed in and prevent users
-        #  from setting visible_rows inside columns that belong to a datapane
+        #  from setting visible_rows inside columns that belong to a datapanel
 
-        logger.debug("Creating DataPane.")
+        logger.debug("Creating DataPanel.")
 
         # Data is a dictionary of columns
         self._data = {}
@@ -418,29 +418,29 @@ class DataPane(
                 return self._data[index]
             raise AttributeError(f"Column {index} does not exist.")
 
-        # cases where `index` returns a datapane
+        # cases where `index` returns a datapanel
         elif isinstance(index, slice):
-            # slice index => multiple row selection (DataPane)
-            return DataPane.from_batch(
+            # slice index => multiple row selection (DataPanel)
+            return DataPanel.from_batch(
                 {k: self._data[k][index] for k in self.visible_columns}
             )
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
-            # tuple or list index => multiple row selection (DataPane)
+            # tuple or list index => multiple row selection (DataPanel)
             if isinstance(index[0], str):
                 if not set(index).issubset(self.visible_columns):
                     missing_cols = set(self.visible_columns) - set(index)
-                    raise ValueError(f"Datapane does not have columns {missing_cols}")
+                    raise ValueError(f"DataPanel does not have columns {missing_cols}")
                 dp = self.copy()
                 dp.visible_columns = index
                 return dp
 
-            return DataPane.from_batch(
+            return DataPanel.from_batch(
                 {k: self._data[k][index] for k in self.visible_columns}
             )
         elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            # numpy array index => multiple row selection (DataPane)
-            return DataPane.from_batch(
+            # numpy array index => multiple row selection (DataPanel)
+            return DataPanel.from_batch(
                 {k: self._data[k][index] for k in self.visible_columns}
             )
         else:
@@ -471,7 +471,7 @@ class DataPane(
 
     @classmethod
     def load_huggingface(cls, *args, **kwargs):
-        """Load a Huggingface dataset as a DataPane.
+        """Load a Huggingface dataset as a DataPanel.
 
         Use this to replace `datasets.load_dataset`, so
 
@@ -479,7 +479,7 @@ class DataPane(
 
         becomes
 
-        >>> dict_of_datapanes = DataPane.load_huggingface('boolq')
+        >>> dict_of_datapanels = DataPanel.load_huggingface('boolq')
         """
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
@@ -499,7 +499,7 @@ class DataPane(
         cls,
         columns: Dict[str, AbstractColumn],
         identifier: Identifier = None,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Create a Dataset from a dict of columns."""
         return cls(
             columns,
@@ -511,7 +511,7 @@ class DataPane(
         cls,
         json_path: str,
         identifier: Identifier = None,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
 
@@ -531,7 +531,7 @@ class DataPane(
         cls,
         batch: Batch,
         identifier: Identifier = None,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Convert a batch to a Dataset."""
         return cls(batch, identifier=identifier)
 
@@ -540,7 +540,7 @@ class DataPane(
         cls,
         batches: Sequence[Batch],
         identifier: Identifier = None,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Convert a list of batches to a dataset."""
 
         return cls.from_batch(
@@ -556,7 +556,7 @@ class DataPane(
         cls,
         d: Dict,
         identifier: Identifier = None,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Convert a dictionary to a dataset.
 
         Alias for Dataset.from_batch(..).
@@ -612,7 +612,7 @@ class DataPane(
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
-        dp = DataPane.from_batch(new_batch)
+        dp = DataPanel.from_batch(new_batch)
         return dp
 
     @staticmethod
@@ -677,7 +677,7 @@ class DataPane(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield DataPane.from_batch({**cell_batch._data, **batch_batch._data})
+                yield DataPanel.from_batch({**cell_batch._data, **batch_batch._data})
         elif batch_columns:
             for batch_batch in batch_dl:
                 yield batch_batch
@@ -695,7 +695,7 @@ class DataPane(
         remove_columns: Optional[List[str]] = None,
         num_workers: int = 4,
         **kwargs,
-    ) -> DataPane:
+    ) -> DataPanel:
         """Update the columns of the dataset."""
         # TODO(karan): make this fn go faster
         # most of the time is spent on the merge, speed it up further
@@ -728,7 +728,7 @@ class DataPane(
         logger.info("Running update, a new dataset will be returned.")
         if self.visible_rows is not None:
             # Run .map() to get updated batches and pass them into a new dataset
-            new_dp = DataPane(
+            new_dp = DataPanel(
                 self.map(
                     (
                         lambda batch, indices: self._merge_batch_and_output(
@@ -868,8 +868,8 @@ class DataPane(
         drop_last_batch: bool = False,
         num_workers: int = 4,
         **kwargs,
-    ) -> Optional[DataPane]:
-        """Filter operation on the DataPane."""
+    ) -> Optional[DataPanel]:
+        """Filter operation on the DataPanel."""
 
         # Just return if the function is None
         if function is None:
@@ -878,7 +878,7 @@ class DataPane(
 
         # Return if `self` has no examples
         if not len(self):
-            logger.info("DataPane empty, returning None.")
+            logger.info("DataPanel empty, returning None.")
             return None
 
         # Get some information about the function
@@ -891,7 +891,7 @@ class DataPane(
             assert function_properties.bool_output, "function must return boolean."
 
         # Map to get the boolean outputs and indices
-        logger.info("Running `filter`, a new DataPane will be returned.")
+        logger.info("Running `filter`, a new DataPanel will be returned.")
         outputs = self.map(
             function=function,
             with_indices=with_indices,
@@ -906,10 +906,10 @@ class DataPane(
         # Reset the format to set visible columns for the filter
         with self.format():
             # Filter returns a new dataset
-            new_datapane = self.copy()
-            new_datapane.visible_rows = indices
+            new_datapanel = self.copy()
+            new_datapanel.visible_rows = indices
 
-        return new_datapane
+        return new_datapanel
 
     def items(self):
         for name, column in self._data.items():
@@ -932,8 +932,8 @@ class DataPane(
         path: str,
         *args,
         **kwargs,
-    ) -> DataPane:
-        """Load a DataPane stored on disk."""
+    ) -> DataPanel:
+        """Load a DataPanel stored on disk."""
 
         # Load the metadata
         metadata = dict(
@@ -950,21 +950,21 @@ class DataPane(
             }
             state["_data"] = data
 
-        # Create a DataPane from the loaded state
-        datapane = cls.from_state(state)
+        # Create a DataPanel from the loaded state
+        datapanel = cls.from_state(state)
 
-        return datapane
+        return datapanel
 
     def write(
         self,
         path: str,
         write_together: bool = False,
     ) -> None:
-        """Save a DataPane to disk."""
+        """Save a DataPanel to disk."""
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
-        # Get the DataPane state
+        # Get the DataPanel state
         state = self.get_state()
 
         # Get the metadata
@@ -978,7 +978,7 @@ class DataPane(
         if not write_together:
             if "_data" not in state:
                 raise ValueError(
-                    "DataPane's state must include `_data` when using "
+                    "DataPanel's state must include `_data` when using "
                     "`write_together=False`."
                 )
             del state["_data"]
@@ -987,7 +987,7 @@ class DataPane(
             columns_path = os.path.join(path, "columns")
             os.makedirs(columns_path, exist_ok=True)
 
-            # Save each column in the DataPane separately
+            # Save each column in the DataPanel separately
             for name, column in self._data.items():
                 column.write(os.path.join(columns_path, name))
 
@@ -1000,11 +1000,11 @@ class DataPane(
         yaml.dump(metadata, open(metadata_path, "w"))
 
     @classmethod
-    def from_state(cls, state: Dict, *args, **kwargs) -> DataPane:
-        datapane = super(DataPane, cls).from_state(state, *args, **kwargs)
-        datapane._create_logdir()
-        datapane._set_features()
-        return datapane
+    def from_state(cls, state: Dict, *args, **kwargs) -> DataPanel:
+        datapanel = super(DataPanel, cls).from_state(state, *args, **kwargs)
+        datapanel._create_logdir()
+        datapanel._set_features()
+        return datapanel
 
     @classmethod
     def _state_keys(cls) -> set:
