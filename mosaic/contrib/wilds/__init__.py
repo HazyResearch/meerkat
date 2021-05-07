@@ -5,14 +5,13 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-import yaml
 from datasets import DatasetInfo
 from torch.utils.data._utils.collate import default_collate
 
-from robustnessgym.core.identifier import Identifier
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
-from robustnessgym.mosaic.columns.numpy_column import NumpyArrayColumn
-from robustnessgym.mosaic.datapane import DataPane
+from mosaic.columns.abstract import AbstractColumn
+from mosaic.columns.numpy_column import NumpyArrayColumn
+from mosaic.datapane import DataPane
+from mosaic.tools.identifier import Identifier
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform

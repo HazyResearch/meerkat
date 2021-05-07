@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 
 def initialize_logging(
     log_dir: str = tempfile.gettempdir(),
-    log_name: str = "robustnessgym.log",
+    log_name: str = "mosaic.log",
     format: str = "[%(asctime)s][%(levelname)s][%(name)s:%(lineno)s] :: %(message)s",
     level: int = logging.WARNING,
 ) -> None:
-    """Initialize logging for Robustness Gym."""
+    """Initialize logging for Mosaic."""
 
     # Generate a new directory using the log_dir, if it doesn't exist
     date = datetime.now().strftime("%Y_%m_%d")
@@ -51,12 +51,12 @@ def set_logging_level_for_imports(level: int = logging.WARNING) -> None:
 
 
 def set_logging_level(level: Union[int, str] = logging.INFO):
-    """Set logging level for Robustness Gym."""
+    """Set logging level for Mosaic."""
     # Set the top-level logger
     if isinstance(level, int):
-        logging.getLogger("robustnessgym").setLevel(level)
+        logging.getLogger("mosaic").setLevel(level)
     elif isinstance(level, str):
-        logging.getLogger("robustnessgym").setLevel(
+        logging.getLogger("mosaic").setLevel(
             {
                 "debug": logging.DEBUG,
                 "info": logging.INFO,

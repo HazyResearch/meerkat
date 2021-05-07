@@ -8,22 +8,21 @@ from typing import Callable, List, Optional, Sequence, Union
 import numpy as np
 import pandas as pd
 import torch
-from pandas.core import generic
 
-from robustnessgym.core.identifier import Identifier
-from robustnessgym.core.tools import convert_to_batch_column_fn
-from robustnessgym.mosaic.cells.abstract import AbstractCell
-from robustnessgym.mosaic.mixins.collate import CollateMixin
-from robustnessgym.mosaic.mixins.copying import CopyMixin
-from robustnessgym.mosaic.mixins.identifier import IdentifierMixin
-from robustnessgym.mosaic.mixins.index import IndexableMixin
-from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
-from robustnessgym.mosaic.mixins.mapping import MappableMixin
-from robustnessgym.mosaic.mixins.materialize import MaterializationMixin
-from robustnessgym.mosaic.mixins.state import StateDictMixin
-from robustnessgym.mosaic.mixins.storage import ColumnStorageMixin
-from robustnessgym.mosaic.mixins.visibility import VisibilityMixin
-from robustnessgym.mosaic.writers.list_writer import ListWriter
+from mosaic.cells.abstract import AbstractCell
+from mosaic.mixins.collate import CollateMixin
+from mosaic.mixins.copying import CopyMixin
+from mosaic.mixins.identifier import IdentifierMixin
+from mosaic.mixins.index import IndexableMixin
+from mosaic.mixins.inspect_fn import FunctionInspectorMixin
+from mosaic.mixins.mapping import MappableMixin
+from mosaic.mixins.materialize import MaterializationMixin
+from mosaic.mixins.state import StateDictMixin
+from mosaic.mixins.storage import ColumnStorageMixin
+from mosaic.mixins.visibility import VisibilityMixin
+from mosaic.tools.identifier import Identifier
+from mosaic.tools.utils import convert_to_batch_column_fn
+from mosaic.writers.list_writer import ListWriter
 
 logger = logging.getLogger(__name__)
 

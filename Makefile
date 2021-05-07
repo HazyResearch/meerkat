@@ -1,12 +1,12 @@
 autoformat:
-	black robustnessgym/ tests/
-	isort --atomic robustnessgym/ tests/
-	docformatter --in-place --recursive robustnessgym tests
+	black mosaic/ tests/
+	isort --atomic mosaic/ tests/
+	docformatter --in-place --recursive mosaic tests
 
 lint:
-	isort -c robustnessgym/ tests/
-	black robustnessgym/ tests/ --check
-	flake8 robustnessgym/ tests/
+	isort -c mosaic/ tests/
+	black mosaic/ tests/ --check
+	flake8 mosaic/ tests/
 
 test:
 	pytest

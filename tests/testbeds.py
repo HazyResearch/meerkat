@@ -1,13 +1,8 @@
 """A collection of simple testbeds to build test cases."""
-import os
-import tempfile
 from copy import deepcopy
 
-import torch
-
-from robustnessgym.core.dataformats.vision import RGImage, VisionDataset, save_image
-from robustnessgym.core.dataset import Dataset
-from robustnessgym.core.identifier import Identifier
+from mosaic.datapane import DataPane
+from mosaic.tools.identifier import Identifier
 
 
 class MockTestBedv0:
@@ -37,9 +32,9 @@ class MockTestBedv0:
             ],
         }
         # Create a fake dataset
-        self.dataset = Dataset.from_batch(
+        self.dataset = DataPane.from_batch(
             self.batch,
-            identifier=Identifier(_name="MockDataset", version="1.0"),
+            identifier=Identifier(_name="MockDataPane", version="1.0"),
         )
 
         # Keep a copy of the original
@@ -67,7 +62,7 @@ class MockTestBedv1:
 
     def __init__(self):
         # Create a fake dataset
-        self.dataset = Dataset.from_batch(
+        self.dataset = DataPane.from_batch(
             {
                 "text_a": [
                     "Before the actor slept, the senator ran.",
@@ -85,7 +80,7 @@ class MockTestBedv1:
                 "z": [1, 0, 1, 0],
                 "fast": [False, True, True, False],
             },
-            identifier=Identifier(_name="MockDataset", version="2.0"),
+            identifier=Identifier(_name="MockDataPane", version="2.0"),
         )
 
         # Keep a copy of the original
@@ -94,35 +89,38 @@ class MockTestBedv1:
         assert len(self.dataset) == 4
 
 
-class MockVisionTestBed:
-    def __init__(self, wrap_dataset: bool = False):
-        """[summary]
-
-        Args:
-            wrap_dataset (bool, optional): If `True`, create a `robustnessgym.Dataset`,
-                otherwise create a `robustnessgym.core.dataformats.vision.VisionDataset`
-                Defaults to False.
-        """
-        cache_dir = os.path.join(tempfile.gettempdir(), "RGVisionTests")
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
-        self.image_paths = []
-        self.image_tensors = []
-        self.images = []
-
-        for i in range(200, 231, 10):
-            self.image_paths.append(os.path.join(cache_dir, "{}.png".format(i)))
-            self.image_tensors.append(i * torch.ones((10, 10, 3)))
-            save_image(self.image_tensors[-1], self.image_paths[-1])
-            self.images.append(RGImage(self.image_paths[-1]))
-
-        self.batch = {
-            "a": [{"e": 1}, {"e": 2}, {"e": 3}, {"e": 4}],
-            "b": ["u", "v", "w", "x"],
-            "i": self.image_paths,
-        }
-
-        if wrap_dataset:
-            self.dataset = Dataset.load_image_dataset(self.batch, img_columns="i")
-        else:
-            self.dataset = VisionDataset(self.batch, img_columns="i")
+# class MockVisionTestBed:
+#     def __init__(self, wrap_dataset: bool = False):
+#         """[summary]
+#
+#         Args:
+#             wrap_dataset (bool, optional): If `True`, create a
+#             `mosaic.DataPane`
+#             ,
+#                 otherwise create a
+#                 `mosaic.core.dataformats.vision.VisionDataPane`
+#                 Defaults to False.
+#         """
+#         cache_dir = os.path.join(tempfile.gettempdir(), "RGVisionTests")
+#         if not os.path.exists(cache_dir):
+#             os.makedirs(cache_dir)
+#         self.image_paths = []
+#         self.image_tensors = []
+#         self.images = []
+#
+#         for i in range(200, 231, 10):
+#             self.image_paths.append(os.path.join(cache_dir, "{}.png".format(i)))
+#             self.image_tensors.append(i * torch.ones((10, 10, 3)))
+#             save_image(self.image_tensors[-1], self.image_paths[-1])
+#             self.images.append(RGImage(self.image_paths[-1]))
+#
+#         self.batch = {
+#             "a": [{"e": 1}, {"e": 2}, {"e": 3}, {"e": 4}],
+#             "b": ["u", "v", "w", "x"],
+#             "i": self.image_paths,
+#         }
+#
+#         if wrap_dataset:
+#             self.dataset = DataPane.load_image_dataset(self.batch, img_columns="i")
+#         else:
+#             self.dataset = VisionDataPane(self.batch, img_columns="i")

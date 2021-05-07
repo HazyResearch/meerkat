@@ -5,8 +5,8 @@ from typing import Sequence
 
 import numpy as np
 
-from robustnessgym.mosaic.cells.abstract import AbstractCell
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
+from mosaic.cells.abstract import AbstractCell
+from mosaic.columns.abstract import AbstractColumn
 
 logger = logging.getLogger(__name__)
 

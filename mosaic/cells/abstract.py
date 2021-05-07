@@ -5,8 +5,8 @@ from abc import abstractmethod
 
 from yaml.representer import Representer
 
-from robustnessgym.mosaic.mixins.state import StateDictMixin
-from robustnessgym.mosaic.mixins.storage import CellStorageMixin
+from mosaic.mixins.state import StateDictMixin
+from mosaic.mixins.storage import CellStorageMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 

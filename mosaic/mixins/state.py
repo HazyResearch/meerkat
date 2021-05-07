@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Collection, Dict, Union
 
-from robustnessgym.core.tools import nested_map
+from mosaic.tools.utils import nested_map
 
 
 @dataclass

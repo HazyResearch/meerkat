@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="../../docs/mosaic.png" height=100 alt="Mosaic logo"/>
+    <img src="docs/mosaic.png" height=100 alt="Mosaic logo"/>
 </div>
 
 -----
@@ -16,7 +16,7 @@ A `DataPane` is a Python object that contains a collection of columns.
 
 #### Create a `DataPane`
 ```python
-from robustnessgym.mosaic import DataPane
+from mosaic import DataPane
 
 # Create a simple DataPane
 dp = DataPane({
@@ -31,7 +31,7 @@ dp = DataPane({
 Mosaic supports a variety of columns.
 
 ```python
-from robustnessgym.mosaic import SomeColumn
+from mosaic import SomeColumn
 
 sc = SomeColumn(data=some_data)
 len(sc) == len(some_data)

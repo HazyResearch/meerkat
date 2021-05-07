@@ -1,4 +1,4 @@
-from robustnessgym.mosaic.writers.abstract import AbstractWriter
+from mosaic.writers.abstract import AbstractWriter
 
 
 class ListWriter(AbstractWriter):

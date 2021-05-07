@@ -352,7 +352,7 @@ dataset_defaults = {
 }
 
 ##########################################
-### Split-specific defaults for Amazon ###
+#   Split-specific defaults for Amazon   #
 ##########################################
 
 amazon_split_defaults = {
@@ -436,7 +436,7 @@ for split in category_splits:
     }
 
 ########################################
-### Split-specific defaults for Yelp ###
+#   Split-specific defaults for Yelp   #
 ########################################
 
 yelp_split_defaults = {
@@ -464,7 +464,7 @@ yelp_split_defaults = {
 }
 
 ###############################
-### Split-specific defaults ###
+#   Split-specific defaults   #
 ###############################
 
 split_defaults = {

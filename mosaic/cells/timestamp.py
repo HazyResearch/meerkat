@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pandas import Timestamp
 
-from robustnessgym.mosaic.cells.abstract import AbstractCell
+from mosaic.cells.abstract import AbstractCell
 
 
 class TimestampCell(AbstractCell):

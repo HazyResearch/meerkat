@@ -1,0 +1,123 @@
+name: CI
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+    
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+jobs:
+    
+    Linting:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ['3.7', '3.8']
+        
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: Set up Python ${{ matrix.python-version }}
+                uses: actions/setup-python@v2
+                with:
+                    python-version: ${{ matrix.python-version }}
+                    
+            -   uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    key: ${{ runner.os }}-pip
+
+            -   name: Install Dependencies
+                run: |
+                    python -m pip install --upgrade pip
+                    make dev
+
+            -   name: Lint with isort, black, docformatter, flake8
+                run: |
+                    make lint
+    
+    Documentation:
+        needs: Linting
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ['3.7', '3.8']
+                
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: Set up Python ${{ matrix.python-version }}
+                uses: actions/setup-python@v2
+                with:
+                    python-version: ${{ matrix.python-version }}
+                    
+            -   uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    key: ${{ runner.os }}-pip
+    
+            -   name: Install Dependencies
+                run: |
+                    python -m pip install --upgrade pip
+                    make dev
+    
+            -   name: Generate Docs
+                run: |
+                    make docs
+
+    Build:
+        needs: Documentation
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest] #, macos-latest]
+                python-version: ['3.7', '3.8']
+                
+        steps:
+            -   uses: actions/checkout@v2
+    
+            -   name: Set up Python ${{ matrix.python-version }}
+                uses: actions/setup-python@v2
+                with:
+                    python-version: ${{ matrix.python-version }}
+    
+            -   name: Install Poetry
+                uses: snok/install-poetry@v1.1.2
+                with:
+                    version: 1.1.5
+                    virtualenvs-create: true
+                    virtualenvs-in-project: true
+    
+            -   name: Set up Poetry cache for Python dependencies
+                id: cached-poetry-dependencies
+                uses: actions/cache@v2
+                with:
+                    path: .venv
+                    key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-v2
+    
+            -   name: Install Dependencies
+                if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+                run: |
+                    poetry install --no-interaction --extras "augmentation text adversarial summarization vision"
+                    
+            -   name: Test with pytest
+                run: |
+                    source .venv/bin/activate
+                    make test-cov
+            
+            -   name: Upload to codecov.io
+                uses: codecov/codecov-action@v1
+                with:
+                    file: ./coverage.xml
+                    flags: unittests
+                    name: codecov-umbrella
+                    fail_ci_if_error: true
+                    
+            -   name: Publish distribution 📦 to PyPI
+                if: startsWith(github.event.ref, 'refs/tags')
+                env:
+                    PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+                run: |
+                    poetry config pypi-token.pypi $PYPI_TOKEN
+                    poetry publish --build

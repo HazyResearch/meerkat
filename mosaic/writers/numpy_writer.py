@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from robustnessgym.mosaic.writers.abstract import AbstractWriter
+from mosaic.writers.abstract import AbstractWriter
 
 
 class NumpyMemmapWriter(AbstractWriter):

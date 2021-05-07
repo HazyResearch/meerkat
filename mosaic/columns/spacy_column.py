@@ -5,13 +5,13 @@ import logging
 import os
 from typing import Sequence, Text
 
-import spacy
 import yaml
 from yaml.representer import Representer
 
-from robustnessgym.mosaic import ListColumn
+from mosaic.columns.list_column import ListColumn
 
 try:
+    import spacy
     from spacy.attrs import NAMES
     from spacy.tokens import Doc, DocBin
 

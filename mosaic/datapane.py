@@ -20,14 +20,14 @@ from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
-from robustnessgym.core.identifier import Identifier
-from robustnessgym.core.tools import convert_to_batch_fn, recmerge
-from robustnessgym.mosaic.columns.abstract import AbstractColumn
-from robustnessgym.mosaic.mixins.copying import CopyMixin
-from robustnessgym.mosaic.mixins.inspect_fn import FunctionInspectorMixin
-from robustnessgym.mosaic.mixins.mapping import MappableMixin
-from robustnessgym.mosaic.mixins.state import StateDictMixin
-from robustnessgym.mosaic.mixins.visibility import VisibilityMixin
+from mosaic.columns.abstract import AbstractColumn
+from mosaic.mixins.copying import CopyMixin
+from mosaic.mixins.inspect_fn import FunctionInspectorMixin
+from mosaic.mixins.mapping import MappableMixin
+from mosaic.mixins.state import StateDictMixin
+from mosaic.mixins.visibility import VisibilityMixin
+from mosaic.tools.identifier import Identifier
+from mosaic.tools.utils import convert_to_batch_fn, recmerge
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class DataPane(
     """Mosaic DataPane class."""
 
     # Path to a log directory
-    logdir: pathlib.Path = pathlib.Path.home() / "robustnessgym/mosaic/"
+    logdir: pathlib.Path = pathlib.Path.home() / "mosaic/"
 
     # Create a directory
     logdir.mkdir(parents=True, exist_ok=True)

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Collection
 
-from robustnessgym.mosaic.cells.abstract import AbstractCell
-from robustnessgym.mosaic.mixins.file import FileMixin
+from mosaic.cells.abstract import AbstractCell
+from mosaic.mixins.file import FileMixin
 
 
 class ImagePath(FileMixin, AbstractCell):
