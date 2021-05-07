@@ -84,7 +84,7 @@ jobs:
     
             -   name: Install Dependencies
                 run: |
-                    pip install -e .[dev, text, vision, wilds]
+                    pip install -e ".[dev,text,vision,wilds]"
                     
             -   name: Test with pytest
                 run: |
