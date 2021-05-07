@@ -1,3 +1,4 @@
+"""WILDS integration for Mosaic."""
 from __future__ import annotations
 
 from argparse import Namespace
@@ -19,43 +20,46 @@ from .transforms import initialize_transform
 try:
     import wilds
     from wilds.datasets.wilds_dataset import WILDSSubset
+
+    _wilds_available = True
 except ImportError:
-    raise ImportError(
-        "The WILDS package is not installed. To use the RG WILDS module, please "
-        "install by following instructions at  https://wilds.stanford.edu/get_started/"
-    )
+    _wilds_available = False
 
 
 def get_wilds_datapane(
-    dataset_name: str,
-    root_dir: str,
-    version: str = None,
-    identifier: Identifier = None,
-    column_names: List[str] = None,
-    info: DatasetInfo = None,
-    split: str = None,
-    use_transform: bool = True,
-    include_raw_input: bool = True,
+        dataset_name: str,
+        root_dir: str,
+        version: str = None,
+        identifier: Identifier = None,
+        column_names: List[str] = None,
+        info: DatasetInfo = None,
+        split: str = None,
+        use_transform: bool = True,
+        include_raw_input: bool = True,
 ):
-    """Get a DataPane that holds a `WildsInputColumn` alongside `NumpyColumn`s
+    """
+    Get a DataPane that holds a WildsInputColumn alongside NumpyColumns
     for targets and metadata.
 
     Example:
     Run inference on the dataset and store predictions alongside the data.
-    ```
+    .. code-block:: python
+
         dp = get_wilds_datapane("fmow", root_dir="/datasets/", split="test")
         model = ... # get the model
         model.to(0).eval()
 
         @torch.no_grad()
         def predict(batch: dict):
+
             out = torch.softmax(model(batch["input"].to(0)), axis=-1)
             return {"pred": out.cpu().numpy().argmax(axis=-1)}
 
         dp = dp.update(function=predict, batch_size=128, batched=True)
-    ```
+
 
     Args:
+
         dataset_name (str, optional): dataset name. Defaults to `"fmow"`.
         version (str, optional): dataset version number, e.g., '1.0'.
             Defaults to the latest version.
@@ -71,6 +75,13 @@ def get_wilds_datapane(
         include_raw_input (bool, optional): include a column for the input without
             the transform applied – useful for visualizing images. Defaults to True.
     """
+    if not _wilds_available:
+        raise ImportError(
+            "The WILDS package is not installed. To use the RG WILDS module, please "
+            "install by following instructions at "
+            "https://wilds.stanford.edu/get_started/"
+        )
+
     input_column = WILDSInputColumn(
         dataset_name=dataset_name,
         version=version,
@@ -98,13 +109,13 @@ def get_wilds_datapane(
 
 class WILDSInputColumn(AbstractColumn):
     def __init__(
-        self,
-        dataset_name: str = "fmow",
-        version: str = None,
-        root_dir: str = None,
-        split: str = None,
-        use_transform: bool = True,
-        **kwargs,
+            self,
+            dataset_name: str = "fmow",
+            version: str = None,
+            root_dir: str = None,
+            split: str = None,
+            use_transform: bool = True,
+            **kwargs,
     ):
         """A column wrapper around a WILDS dataset that can lazily load the
         inputs for each dataset.
@@ -139,7 +150,7 @@ class WILDSInputColumn(AbstractColumn):
             if self.split is not None:
                 metadata_df = metadata_df[
                     dataset.split_array == dataset.split_dict[self.split]
-                ]
+                    ]
             self.metadata_columns.update(
                 {
                     field: NumpyArrayColumn(data=series.values)
@@ -195,7 +206,7 @@ class WILDSInputColumn(AbstractColumn):
         return self.data[index][0]
 
     def _repr_pandas_(
-        self,
+            self,
     ) -> pd.Series:
         series = pd.Series(np.arange(len(self._data)))
         return series.apply(

@@ -10,6 +10,7 @@ import sys
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
+from mosaic import __version__
 
 # Package meta-data.
 NAME = 'mosaic'
@@ -19,7 +20,7 @@ URL = 'https://github.com/robustness-gym/mosaic'
 EMAIL = 'kgoel@cs.stanford.edu'
 AUTHOR = 'The Mosaic Team'
 REQUIRES_PYTHON = '>=3.7.0'
-VERSION = '0.1.0'
+VERSION = __version__
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -53,6 +54,7 @@ EXTRAS = {
         'nbsphinx>=0.8.0',
         'recommonmark>=0.7.1',
         'pre-commit>=2.9.3',
+        'sphinx-autobuild',
     ],
 
     'jupyter': [

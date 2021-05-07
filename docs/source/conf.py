@@ -12,14 +12,8 @@
 #
 import os
 import sys
-from pathlib import Path
 
-import toml
-
-# https://github.com/python-poetry/poetry/issues/144#issuecomment-559793020
-metadata = toml.load(Path(__file__).parent.parent.parent / "pyproject.toml")["tool"][
-    "poetry"
-]
+from mosaic import __version__
 
 sys.path.insert(0, os.path.abspath(""))
 sys.path.insert(0, os.path.abspath(".."))
@@ -30,11 +24,11 @@ sys.setrecursionlimit(1500)
 
 project = "Mosaic"
 copyright = "2021 Mosaic"
-author = "Mosaic"
+author = "The Mosaic Team"
 
 # The full version, including alpha/beta/rc tags
 # release = "0.0.0dev"
-version = release = metadata["version"]
+version = release = __version__
 
 # -- General configuration ---------------------------------------------------
 

@@ -1,5 +1,7 @@
 """Import common classes."""
 # flake8: noqa
+__version__ = '0.0.1'
+
 from mosaic.logging.utils import (
     initialize_logging,
     set_logging_level,

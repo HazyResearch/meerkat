@@ -4,8 +4,12 @@ import os
 from pathlib import Path
 from typing import Callable, Sequence, Union
 
-from dosma.core.io.format_io import DataReader, ImageDataFormat
-from dosma.core.io.format_io_utils import get_reader
+try:
+    from dosma.core.io.format_io import DataReader, ImageDataFormat
+    from dosma.core.io.format_io_utils import get_reader
+    _dosma_available = True
+except ImportError:
+    _dosma_available = False
 
 from mosaic.cells.abstract import AbstractCell
 from mosaic.mixins.file import PathLikeType, PathsMixin
@@ -35,6 +39,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         **kwargs,
     ):
         super(MedicalVolumeCell, self).__init__(paths=paths, *args, **kwargs)
+        assert _dosma_available, "Please install dosma."
         self.transform = transform
         self.loader = self.default_loader(self.paths) if loader is None else loader
 
