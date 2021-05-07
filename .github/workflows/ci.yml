@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [ main ]
+        branches: [ '*' ]
     pull_request:
-        branches: [ main ]
+        branches: [ '*' ]
     
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -67,6 +67,11 @@ jobs:
                     make docs
 
     Build:
+        if:
+            contains('
+            refs/heads/main
+            refs/heads/dev
+            ', github.ref)
         needs: Documentation
         runs-on: ${{ matrix.os }}
         strategy:
@@ -81,6 +86,11 @@ jobs:
                 uses: actions/setup-python@v2
                 with:
                     python-version: ${{ matrix.python-version }}
+
+            -   uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    key: ${{ runner.os }}-pip
     
             -   name: Install Dependencies
                 run: |
