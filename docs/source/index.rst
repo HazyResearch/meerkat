@@ -1,23 +1,23 @@
-.. Robustness Gym documentation master file, created by
+.. Mosaic documentation master file, created by
    sphinx-quickstart on Fri Jan  1 16:41:09 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Robustness Gym
+Welcome to Mosaic
 ==========================================
-Robustness Gym is a toolkit for evaluating natural language processing models.
+Mosaic is a library for handling data for machine learning models.
 
 ..
-    Read more about [Robustness Gym]().
+    Read more about [Mosaic]().
 
-Robustness Gym is *under active development* so expect rough edges.
+Mosaic is *under active development* so expect rough edges.
 Feedback and contributions are welcomed and appreciated.
 You can submit bugs and feature suggestions on Github Issues_
 and submit contributions using a pull request.
 
 You can get started by going to the installation_ page.
 
-.. _Issues: https://github.com/robustness-gym/robustness-gym/issues/
+.. _Issues: https://github.com/robustness-gym/mosaic/issues/
 .. _installation: getting-started/install.md
 
 .. toctree::
@@ -33,7 +33,7 @@ You can get started by going to the installation_ page.
     :maxdepth: 2
     :caption: API Docs
 
-    apidocs/robustnessgym
+    apidocs/mosaic
 
 
 ..

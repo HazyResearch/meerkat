@@ -1,7 +1,7 @@
-robustnessgym
-=============
+mosaic
+======
 
 .. toctree::
    :maxdepth: 4
 
-   robustnessgym
+   mosaic

@@ -1,6 +1,15 @@
 import torch
-import torchvision.transforms as transforms
-from transformers import BertTokenizerFast, DistilBertTokenizerFast
+try:
+    import torchvision.transforms as transforms
+    _torchvision_available = True
+except ImportError:
+    _torchvision_available = False
+
+try:
+    from transformers import BertTokenizerFast, DistilBertTokenizerFast
+    _transformers_available = True
+except ImportError:
+    _transformers_available = False
 
 
 def initialize_transform(transform_name, config, dataset):
