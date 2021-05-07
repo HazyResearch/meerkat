@@ -10,7 +10,13 @@ import sys
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
-from mosaic import __version__
+from distutils.util import convert_path
+
+main_ns = {}
+ver_path = convert_path('mosaic/version.py')
+with open(ver_path) as ver_file:
+    exec(ver_file.read(), main_ns)
+
 
 # Package meta-data.
 NAME = 'mosaicml'
@@ -20,7 +26,7 @@ URL = 'https://github.com/robustness-gym/mosaic'
 EMAIL = 'kgoel@cs.stanford.edu'
 AUTHOR = 'The Mosaic Team'
 REQUIRES_PYTHON = '>=3.7.0'
-VERSION = __version__
+VERSION = main_ns['__version__']
 
 # What packages are required for this module to be executed?
 REQUIRED = [

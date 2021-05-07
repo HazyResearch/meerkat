@@ -13,7 +13,12 @@
 import os
 import sys
 
-from mosaic import __version__
+from distutils.util import convert_path
+
+main_ns = {}
+ver_path = convert_path('../../mosaic/version.py')
+with open(ver_path) as ver_file:
+    exec(ver_file.read(), main_ns)
 
 sys.path.insert(0, os.path.abspath(""))
 sys.path.insert(0, os.path.abspath(".."))
@@ -28,7 +33,7 @@ author = "The Mosaic Team"
 
 # The full version, including alpha/beta/rc tags
 # release = "0.0.0dev"
-version = release = __version__
+version = release = main_ns['__version__']
 
 # -- General configuration ---------------------------------------------------
 
