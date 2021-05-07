@@ -84,10 +84,7 @@ jobs:
     
             -   name: Install Dependencies
                 run: |
-                    pip install -e .[dev]
-                    pip install -e .[text]
-                    pip install -e .[vision]
-                    pip install -e .[wilds]
+                    pip install -e ".[dev, text, vision, tabular, embeddings]"
                     
             -   name: Test with pytest
                 run: |
