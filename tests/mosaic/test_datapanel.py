@@ -7,10 +7,10 @@ import pytest
 import torch
 
 from mosaic import NumpyArrayColumn
-from mosaic.datapane import DataPane
+from mosaic.datapanel import DataPanel
 
 
-def _get_datapane(
+def _get_datapanel(
     use_visible_rows: bool = False,
     use_visible_columns: bool = False,
 ):
@@ -19,7 +19,7 @@ def _get_datapane(
         "b": list(np.arange(16)),
         "c": [{"a": 2}] * 16,
     }
-    dp = DataPane.from_batch(batch)
+    dp = DataPanel.from_batch(batch)
 
     visible_rows = [0, 4, 6, 11] if use_visible_rows else None
     if use_visible_rows:
@@ -34,7 +34,7 @@ def _get_datapane(
 
 def test_from_batch():
     # Build a dataset from a batch
-    datapane = DataPane.from_batch(
+    datapanel = DataPanel.from_batch(
         {
             "a": [1, 2, 3],
             "b": [True, False, True],
@@ -44,8 +44,8 @@ def test_from_batch():
             "f": np.ones(3),
         },
     )
-    assert set(datapane.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
-    assert len(datapane) == 3
+    assert set(datapanel.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
+    assert len(datapanel) == 3
 
 
 @pytest.mark.parametrize(
@@ -53,8 +53,8 @@ def test_from_batch():
     product([True, False], [True, False]),
 )
 def test_map_1(use_visible_rows, use_visible_columns):
-    """`map`, mixed datapane, single return, `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    """`map`, mixed datapanel, single return, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
 
@@ -75,8 +75,8 @@ def test_map_1(use_visible_rows, use_visible_columns):
     product([True, False], [True, False]),
 )
 def test_map_2(use_visible_rows, use_visible_columns):
-    """`map`, mixed datapane, return multiple, `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    """`map`, mixed datapanel, return multiple, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
 
@@ -90,7 +90,7 @@ def test_map_2(use_visible_rows, use_visible_columns):
     if visible_rows is None:
         visible_rows = np.arange(16)
     result = dp.map(func, batch_size=4, batched=True)
-    assert isinstance(result, DataPane)
+    assert isinstance(result, DataPanel)
     assert len(result["x"]) == len(visible_rows)
     assert len(result["y"]) == len(visible_rows)
     assert (result["x"] == np.array(visible_rows) * 4).all()
@@ -98,27 +98,27 @@ def test_map_2(use_visible_rows, use_visible_columns):
 
 
 def test_update_1():
-    """`update`, mixed datapane, return single, new columns, `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    """`update`, mixed datapanel, return single, new columns, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=False, use_visible_columns=False
     )
 
-    # mixed datapane (i.e. has multiple colummn types)
+    # mixed datapanel (i.e. has multiple colummn types)
     def func(x):
         out = {"x": (x["a"] + np.array(x["b"])) * 2}
         return out
 
     result = dp.update(func, batch_size=4, batched=True)
-    assert isinstance(result, DataPane)
+    assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "x", "index"])
     assert len(result["x"]) == 16
     assert (result["x"] == np.arange(16) * 4).all()
 
 
 def test_update_2():
-    """`update`, mixed datapane, return multiple, new columns,
+    """`update`, mixed datapanel, return multiple, new columns,
     `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=False, use_visible_columns=False
     )
 
@@ -130,7 +130,7 @@ def test_update_2():
         return out
 
     result = dp.update(func, batch_size=4, batched=True)
-    assert isinstance(result, DataPane)
+    assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "x", "y", "index"])
     assert len(result["x"]) == 16
     assert len(result["y"]) == 16
@@ -139,9 +139,9 @@ def test_update_2():
 
 
 def test_update_3():
-    """`update`, mixed datapane, return multiple, replace existing column,
+    """`update`, mixed datapanel, return multiple, replace existing column,
     `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=False, use_visible_columns=False
     )
 
@@ -153,7 +153,7 @@ def test_update_3():
         return out
 
     result = dp.update(func, batch_size=4, batched=True)
-    assert isinstance(result, DataPane)
+    assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "y", "index"])
     assert len(result["a"]) == 16
     assert len(result["y"]) == 16
@@ -166,16 +166,16 @@ def test_update_3():
     product([True, False], [True, False], [True, False]),
 )
 def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
-    """`map`, mixed datapane, return multiple, `batched=True`"""
-    dp, visible_rows, visible_columns = _get_datapane(
+    """`map`, mixed datapanel, return multiple, `batched=True`"""
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
     path = os.path.join(tmp_path, "test")
     dp.write(path, write_together=write_together)
 
-    new_dp = DataPane.read(path)
+    new_dp = DataPanel.read(path)
 
-    assert isinstance(new_dp, DataPane)
+    assert isinstance(new_dp, DataPanel)
     assert len(new_dp) == len(dp)
     assert len(new_dp["a"]) == len(dp["a"])
     assert len(new_dp["b"]) == len(dp["b"])
@@ -192,7 +192,7 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
 
 
 def test_repr_html_():
-    dp, visible_rows, visible_columns = _get_datapane(
+    dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=False, use_visible_columns=False
     )
     dp._repr_html_()

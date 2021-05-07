@@ -21,7 +21,7 @@ class FunctionInspectorMixin:
         # Initialize variables to track
         no_output = dict_output = bool_output = list_output = False
 
-        # If dict_output = True and `function` is used for updating the `DataPane`
+        # If dict_output = True and `function` is used for updating the `DataPanel`
         # useful to know if any existing column is modified
         updates_existing_column = True
         existing_columns_updated = []
@@ -53,7 +53,7 @@ class FunctionInspectorMixin:
             # `function` returns a dict output
             dict_output = True
 
-            # Check if `self` is a `DataPane`
+            # Check if `self` is a `DataPanel`
             if hasattr(self, "all_columns"):
                 # Set of columns that are updated
                 existing_columns_updated = set(self.all_columns).intersection(

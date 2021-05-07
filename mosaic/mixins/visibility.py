@@ -31,7 +31,7 @@ class VisibilityMixin:
             else:
                 self._visible_rows = np.array(indices, dtype=int)
 
-        # Identify that `self` corresponds to a DataPane
+        # Identify that `self` corresponds to a DataPanel
         if hasattr(self, "_data") and isinstance(self._data, Mapping):
             for column in self.values():
                 column.visible_rows = self._visible_rows

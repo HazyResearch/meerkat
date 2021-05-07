@@ -24,7 +24,7 @@ class MappableMixin:
     ):
         # TODO (sabri): add materialize?
         from mosaic.columns.abstract import AbstractColumn
-        from mosaic.datapane import DataPane
+        from mosaic.datapanel import DataPanel
 
         """Map a function over the elements of the column."""
         # Check if need to materialize:
@@ -149,6 +149,6 @@ class MappableMixin:
         if not is_mapping:
             outputs = outputs[0]
         else:
-            outputs = DataPane.from_batch(outputs)
+            outputs = DataPanel.from_batch(outputs)
 
         return outputs

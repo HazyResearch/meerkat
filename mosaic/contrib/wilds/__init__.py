@@ -11,7 +11,7 @@ from torch.utils.data._utils.collate import default_collate
 
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.numpy_column import NumpyArrayColumn
-from mosaic.datapane import DataPane
+from mosaic.datapanel import DataPanel
 from mosaic.tools.identifier import Identifier
 
 from .config import base_config, populate_defaults
@@ -37,7 +37,7 @@ def get_wilds_datapane(
     use_transform: bool = True,
     include_raw_input: bool = True,
 ):
-    """Get a DataPane that holds a WildsInputColumn alongside NumpyColumns for
+    """Get a DataPanel that holds a WildsInputColumn alongside NumpyColumns for
     targets and metadata.
 
     Example:
@@ -97,7 +97,7 @@ def get_wilds_datapane(
         data["raw_input"]._data.transform = lambda x: x
         data["raw_input"]._collate_fn = lambda x: x
 
-    return DataPane(
+    return DataPanel(
         data,
         identifier=identifier,
         column_names=column_names,

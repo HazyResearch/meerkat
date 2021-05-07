@@ -9,7 +9,7 @@ import pytest
 import torch
 
 from mosaic import NumpyArrayColumn
-from mosaic.datapane import DataPane
+from mosaic.datapanel import DataPanel
 
 
 def _get_data(multiple_dim: bool = True, dtype="float", use_visible_rows=False):
@@ -87,7 +87,7 @@ def test_map_return_multiple(dtype, use_visible_rows, batched):
         return {"mean": x.mean(axis=-1), "std": x.std(axis=-1)}
 
     result = col.map(func, batch_size=4, batched=batched)
-    assert isinstance(result, DataPane)
+    assert isinstance(result, DataPanel)
     assert isinstance(result["std"], NumpyArrayColumn)
     assert isinstance(result["mean"], NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))

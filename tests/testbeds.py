@@ -1,7 +1,7 @@
 """A collection of simple testbeds to build test cases."""
 from copy import deepcopy
 
-from mosaic.datapane import DataPane
+from mosaic.datapanel import DataPanel
 from mosaic.tools.identifier import Identifier
 
 
@@ -32,7 +32,7 @@ class MockTestBedv0:
             ],
         }
         # Create a fake dataset
-        self.dataset = DataPane.from_batch(
+        self.dataset = DataPanel.from_batch(
             self.batch,
             identifier=Identifier(_name="MockDataPane", version="1.0"),
         )
@@ -62,7 +62,7 @@ class MockTestBedv1:
 
     def __init__(self):
         # Create a fake dataset
-        self.dataset = DataPane.from_batch(
+        self.dataset = DataPanel.from_batch(
             {
                 "text_a": [
                     "Before the actor slept, the senator ran.",
@@ -95,7 +95,7 @@ class MockTestBedv1:
 #
 #         Args:
 #             wrap_dataset (bool, optional): If `True`, create a
-#             `mosaic.DataPane`
+#             `mosaic.DataPanel`
 #             ,
 #                 otherwise create a
 #                 `mosaic.core.dataformats.vision.VisionDataPane`
@@ -121,6 +121,6 @@ class MockTestBedv1:
 #         }
 #
 #         if wrap_dataset:
-#             self.dataset = DataPane.load_image_dataset(self.batch, img_columns="i")
+#             self.dataset = DataPanel.load_image_dataset(self.batch, img_columns="i")
 #         else:
 #             self.dataset = VisionDataPane(self.batch, img_columns="i")
