@@ -6,18 +6,15 @@
 
 The Mosaic project's goal is to create clean abstractions for ML practitioners to load, manipulate, train, evaluate, inspect, visualize and interact with complex high-dimensional, multi-modal data. 
 
-Mosaic's core contribution is the `DataPane`, a simple columnar data abstraction that can house arbitrary columns of complex data side-by-side. The `DataPane` allows users to work with text, image, medical imaging, time-series, video, and other complex Python objects with clean, high-level interfaces.
+Mosaic's core contribution is the `DataPane`, a simple columnar data abstraction that 
+can house arbitrary columns of complex data side-by-side. 
+The `DataPane` allows users to work with text, image, medical imaging, time-series, 
+video, and other complex Python objects with clean, high-level interfaces.
 
-# Use Shields.io to add badges
-# Continuous Integration
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/robustness-gym/mosaic/CI)
-# License
 ![GitHub](https://img.shields.io/github/license/robustness-gym/mosaic)
-# Code Coverage
 [![codecov](https://codecov.io/gh/robustness-gym/mosaic/branch/main/graph/badge.svg?token=MOLQYUSYQU)](https://codecov.io/gh/robustness-gym/mosaic)
-# Documentation Status
 [![Documentation Status](https://readthedocs.org/projects/mosaic/badge/?version=latest)](https://mosaic.readthedocs.io/en/latest/?badge=latest)
-# Developers use pre-commit 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 

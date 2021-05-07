@@ -55,6 +55,7 @@ EXTRAS = {
         'recommonmark>=0.7.1',
         'pre-commit>=2.9.3',
         'sphinx-autobuild',
+        'twine',
     ],
 
     'jupyter': [
