@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy as pycopy
-from collections import Mapping
+from collections.abc import Mapping
 
 
 class CopyMixin:

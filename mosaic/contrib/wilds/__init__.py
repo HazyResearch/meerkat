@@ -94,6 +94,7 @@ def get_wilds_datapane(
     data = {"input": input_column, "y": output_column, **metadata_columns}
     if include_raw_input:
         data["raw_input"] = input_column.copy()
+        data["raw_input"].use_transform = False
         data["raw_input"]._data.transform = lambda x: x
         data["raw_input"]._collate_fn = lambda x: x
 
