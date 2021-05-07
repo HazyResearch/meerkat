@@ -75,8 +75,13 @@ EXTRAS = {
         'kaleido',
     ],
 
-    'embeddings': [
-        'faiss',
+    'embeddings-mac': [
+        'faiss-cpu',
+        'umap-learn',
+    ],
+
+    'embeddings-linux': [
+        'faiss-gpu',
         'umap-learn',
     ],
 
@@ -95,8 +100,7 @@ EXTRAS = {
     ],
 
     'wilds': [
-        'transformers',
-        'wilds',
+        'wilds>=1.1.0',
     ],
 
     'medimg': [
