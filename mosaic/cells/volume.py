@@ -7,6 +7,7 @@ from typing import Callable, Sequence, Union
 try:
     from dosma.core.io.format_io import DataReader, ImageDataFormat
     from dosma.core.io.format_io_utils import get_reader
+
     _dosma_available = True
 except ImportError:
     _dosma_available = False
