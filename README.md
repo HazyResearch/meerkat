@@ -28,7 +28,7 @@ pip install mosaicml
 > Note: some parts of Mosaic rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install mosaicml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
  
 Load your dataset into a `DataPanel` and get going!
-```
+```python
 from mosaic import DataPanel
 dp = DataPanel.from_csv("...")
 ```
@@ -120,18 +120,18 @@ Mosaic ships with a number of core column types and the list is growing.
 #### Core Columns
 | Column             | Supported | Description                                                  |
 |--------------------|-----------|--------------------------------------------------------------|
-| `mosaic.ListColumn`       | Yes       | Flexible and can hold any type of data.                      |
-| `mosaic.NumpyArrayColumn` | Yes       | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
-| `mosaic.TensorColumn`     | Yes       | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
-| `mosaic.CellColumn`       | Yes       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
-| `mosaic.SpacyColumn`      | Yes       | Optimized to hold spaCy Doc objects.                         |
-| `mosaic.EmbeddingColumn`  | Planned   | Optimized for embeddings and operations on embeddings.       |
-| `mosaic.PredictionColumn` | Planned   | Optimized for model predictions.                                   |
+| `ListColumn`       | Yes       | Flexible and can hold any type of data.                      |
+| `NumpyArrayColumn` | Yes       | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
+| `TensorColumn`     | Yes       | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
+| `CellColumn`       | Yes       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
+| `SpacyColumn`      | Yes       | Optimized to hold spaCy Doc objects.                         |
+| `EmbeddingColumn`  | Planned   | Optimized for embeddings and operations on embeddings.       |
+| `PredictionColumn` | Planned   | Optimized for model predictions.                                   |
 
 #### Contributed Columns
 | Column             | Supported | Description                                                  |
 |--------------------|-----------|--------------------------------------------------------------|
-| `mosaic.contrib.WILDSInputColumn`       | Yes       | Build `DataPanel`s for the [WILDS benchmark](https://wilds.stanford.edu/).|
+| `WILDSInputColumn`       | Yes       | Build `DataPanel`s for the [WILDS benchmark](https://wilds.stanford.edu/).|
 
 
 ## About
