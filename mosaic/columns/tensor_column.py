@@ -89,10 +89,10 @@ class TensorColumn(
         # don't remap index since we take care of visibility with self.data
         return index
 
-    def _get_cell(self, index: int, materialize: bool = True):
+    def _get_cell(self, index: int):
         return self.data[index]
 
-    def _get_batch(self, indices, materialize: bool = True):
+    def _get_batch(self, indices):
         return self.data[indices]
 
     @classmethod

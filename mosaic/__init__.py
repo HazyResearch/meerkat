@@ -15,7 +15,6 @@ from mosaic.cells.spacy import LazySpacyCell, SpacyCell
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.cell_column import CellColumn
 from mosaic.columns.embedding_column import EmbeddingColumn
-from mosaic.columns.image_column import ImageColumn
 from mosaic.columns.list_column import ListColumn
 from mosaic.columns.numpy_column import NumpyArrayColumn
 from mosaic.columns.spacy_column import SpacyColumn

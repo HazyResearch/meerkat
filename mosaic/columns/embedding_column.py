@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Sequence
+from collections import Sequence
 from types import SimpleNamespace
 
 import numpy as np
@@ -31,7 +31,7 @@ class EmbeddingColumn(TensorColumn):
         # Cast to float32
         self._data = self._data.type(torch.FloatTensor)
 
-    def build_faiss_index(self, index):
+    def build_faiss_index(self, index=faiss.IndexFlatL2):
         if self.ndim < 2:
             raise ValueError("Building an index requires `ndim` >= 2.")
 
