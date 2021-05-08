@@ -579,6 +579,11 @@ class DataPanel(
         )
 
     @classmethod
+    def from_csv(cls, filepath: str, *args, **kwargs):
+        """Create a Dataset from a csv file."""
+        cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+
+    @classmethod
     def from_feather(
         cls,
         path: str,
