@@ -77,12 +77,12 @@ EXTRAS = {
 
     'embeddings-mac': [
         'faiss-cpu',
-        'umap-learn',
+        'umap-learn[plot]',
     ],
 
     'embeddings-linux': [
         'faiss-gpu',
-        'umap-learn',
+        'umap-learn[plot]',
     ],
 
     'tabular': [
