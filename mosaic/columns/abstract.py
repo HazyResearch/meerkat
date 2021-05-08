@@ -303,13 +303,13 @@ class AbstractColumn(
         """Convert data to a mosaic column using the appropriate Column
         type."""
         # need to import lazily to avoid circular import
+        print(data)
         if isinstance(data, AbstractColumn):
             return data
         elif torch.is_tensor(data):
-            # TODO: update this once we've added a torch.Tensor column
-            from .numpy_column import NumpyArrayColumn
+            from .tensor_column import TensorColumn
 
-            return NumpyArrayColumn(data.cpu().detach().numpy())
+            return TensorColumn(data)
         elif isinstance(data, np.ndarray):
             from .numpy_column import NumpyArrayColumn
 
@@ -332,6 +332,10 @@ class AbstractColumn(
                 from .numpy_column import NumpyArrayColumn
 
                 return NumpyArrayColumn(data)
+            elif len(data) != 0 and torch.is_tensor(data[0]):
+                from .tensor_column import TensorColumn
+
+                return TensorColumn(torch.stack(data))
 
             from .list_column import ListColumn
 
