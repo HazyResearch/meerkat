@@ -16,7 +16,7 @@ class CopyMixin:
 
             # TODO: make this a nested map to cover sequences
             # TODO (sabri): fix __new__ missing data for numpy array
-            if False and k == "_data" and isinstance(v, Mapping):
+            if k == "_data" and isinstance(v, Mapping):
                 state[k] = {
                     kp: pycopy.copy(vp) if not hasattr(vp, "copy") else vp.copy()
                     for kp, vp in v.items()

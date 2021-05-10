@@ -174,15 +174,25 @@ def test_filter_1(use_visible_rows, use_visible_columns, batched):
     def func(x):
         return (x["a"] % 2) == 0
 
+    result = dp.filter(func, batch_size=4, batched=batched)
     if visible_rows is None:
         visible_rows = np.arange(16)
-    result = dp.filter(func, batch_size=4, batched=batched)
-    assert isinstance(result, DataPanel)
-    assert len(result) == (np.array(visible_rows) % 2 == 0).sum()
 
-    if visible_columns is not None:
-        assert result.visible_columns == visible_columns
-        assert result.all_columns == dp.all_columns
+    assert isinstance(result, DataPanel)
+    new_len = (np.array(visible_rows) % 2 == 0).sum()
+    assert len(result) == new_len
+    for col in result._data.values():
+        assert len(col) == new_len
+
+    # old datapane unchanged
+    old_len = len(visible_rows)
+    assert len(dp) == old_len
+    for col in dp._data.values():
+        # important to check that the column lengths are correct as well
+        assert len(col) == old_len
+
+    assert result.visible_columns == dp.visible_columns
+    assert result.all_columns == dp.all_columns
 
 
 @pytest.mark.parametrize(
@@ -220,3 +230,7 @@ def test_repr_html_():
         use_visible_rows=False, use_visible_columns=False
     )
     dp._repr_html_()
+
+
+def test_copy():
+    pass
