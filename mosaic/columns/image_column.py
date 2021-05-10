@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class ImageColumn(CellColumn):
-    def __init__(
-        self,
+    @classmethod
+    def from_filepaths(
+        cls,
         filepaths: Sequence[str] = None,
         loader: callable = None,
         transform: callable = None,
@@ -20,7 +21,8 @@ class ImageColumn(CellColumn):
         **kwargs,
     ):
         cells = [ImagePath(fp, transform=transform, loader=loader) for fp in filepaths]
-        super(ImageColumn, self).__init__(
+
+        return cls(
             cells=cells,
             materialize=materialize,
             *args,
