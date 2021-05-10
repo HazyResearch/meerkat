@@ -908,11 +908,9 @@ class DataPanel(
         )
         indices = np.where(outputs)[0]
 
-        # Reset the format to set visible columns for the filter
-        with self.format():
-            # Filter returns a new dataset
-            new_datapanel = self.copy()
-            new_datapanel.visible_rows = indices
+        # Filter returns a new datapanel
+        new_datapanel = self.copy()
+        new_datapanel.visible_rows = indices
 
         return new_datapanel
 

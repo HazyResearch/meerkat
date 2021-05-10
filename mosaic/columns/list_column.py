@@ -51,3 +51,10 @@ class ListColumn(AbstractColumn):
 
     def _repr_pandas_(self) -> pd.Series:
         return pd.Series(map(repr, self))
+
+    def __setitem__(self, index, value):
+        if self.visible_rows is not None:
+            # TODO (sabri): this is a stop-gap solution but won't work for fancy numpy
+            # indexes, should find a way to cobine index and visible rows into one index
+            index = super()._remap_index(index)
+        return self._data.__setitem__(index, value)

@@ -49,6 +49,9 @@ class FunctionInspectorMixin:
         else:
             output = function(data)
 
+        # lazy import to avoid circular dependency
+        from mosaic.columns.abstract import AbstractColumn
+
         if isinstance(output, Mapping):
             # `function` returns a dict output
             dict_output = True
@@ -69,20 +72,24 @@ class FunctionInspectorMixin:
             no_output = True
 
         elif (
-            isinstance(output, bool)
+            isinstance(output, (bool, np.bool_))
             or (isinstance(output, np.ndarray) and output.dtype == np.bool)
             or (isinstance(output, torch.Tensor) and output.dtype == torch.bool)
         ):
+
             # `function` returns a bool
             bool_output = True
 
-        elif isinstance(output, (Sequence, torch.Tensor, np.ndarray)):
+        elif isinstance(output, (Sequence, AbstractColumn, torch.Tensor, np.ndarray)):
             # `function` returns a list
             list_output = True
             if batched and (
-                isinstance(output[0], bool)
-                or (isinstance(output, np.ndarray) and output[0].dtype == np.bool)
-                or (isinstance(output, torch.Tensor) and output[0].dtype == torch.bool)
+                isinstance(output[0], (bool, np.bool_))
+                or (isinstance(output[0], np.ndarray) and (output[0].dtype == np.bool))
+                or (
+                    isinstance(output[0], torch.Tensor)
+                    and (output[0].dtype == torch.bool)
+                )
             ):
                 # `function` returns a bool per example
                 bool_output = True

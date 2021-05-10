@@ -4,6 +4,7 @@ import logging
 from typing import Sequence
 
 import numpy as np
+import pandas as pd
 
 from mosaic.cells.abstract import AbstractCell
 from mosaic.columns.abstract import AbstractColumn
@@ -43,4 +44,12 @@ class CellColumn(AbstractColumn):
 
     @property
     def cells(self):
-        return self.data
+        if self.visible_rows is None:
+            return self.data
+        else:
+            return [self.data[i] for i in self.visible_rows]
+
+    def _repr_pandas_(
+        self,
+    ) -> pd.Series:
+        return pd.Series([cell.__repr__() for cell in self.cells])

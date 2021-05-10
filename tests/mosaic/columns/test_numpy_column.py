@@ -128,6 +128,24 @@ def test_set_item_2(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
+    "use_visible_rows,dtype,batched",
+    product([True, False], ["float", "int"], [True, False]),
+)
+def test_filter_1(use_visible_rows, dtype, batched):
+    """multiple_dim=False."""
+    col, array = _get_data(
+        multiple_dim=False, dtype=dtype, use_visible_rows=use_visible_rows
+    )
+
+    def func(x):
+        return x > 20
+
+    result = col.filter(func, batch_size=4, batched=batched)
+    assert isinstance(result, NumpyArrayColumn)
+    assert len(result) == (array > 20).sum()
+
+
+@pytest.mark.parametrize(
     "multiple_dim, dtype,use_visible_rows",
     product([True, False], ["float", "int"], [True, False]),
 )

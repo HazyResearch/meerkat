@@ -123,6 +123,7 @@ Mosaic ships with a number of core column types and the list is growing.
 | `ListColumn`       | Yes       | Flexible and can hold any type of data.                      |
 | `NumpyArrayColumn` | Yes       | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
 | `TensorColumn`     | Yes       | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
+| `ImageColumn`      | Yes       | Holds images stored on disk (*e.g.* as PNG or JPEG)                              |
 | `CellColumn`       | Yes       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
 | `SpacyColumn`      | Yes       | Optimized to hold spaCy Doc objects.                         |
 | `EmbeddingColumn`  | Planned   | Optimized for embeddings and operations on embeddings.       |
