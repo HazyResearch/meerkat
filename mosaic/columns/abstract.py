@@ -320,7 +320,6 @@ class AbstractColumn(
         """Convert data to a mosaic column using the appropriate Column
         type."""
         # need to import lazily to avoid circular import
-        print(data)
         if isinstance(data, AbstractColumn):
             return data.copy()
         elif torch.is_tensor(data):
