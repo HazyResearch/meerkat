@@ -166,7 +166,7 @@ def test_update_3():
     product([True, False], [True, False], [True, False]),
 )
 def test_filter_1(use_visible_rows, use_visible_columns, batched):
-    """`filter`, mixed datapanel"""
+    """`filter`, mixed datapanel."""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
