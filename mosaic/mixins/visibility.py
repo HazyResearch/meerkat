@@ -33,8 +33,9 @@ class VisibilityMixin:
 
         # Identify that `self` corresponds to a DataPanel
         if hasattr(self, "_data") and isinstance(self._data, Mapping):
-            for column in self.values():
-                column.visible_rows = self._visible_rows
+            # Need to set visible_rows for all columns, not just visible ones
+            for column in self._data.values():
+                column.visible_rows = indices
 
     def _remap_index(self, index):
         if isinstance(index, int):

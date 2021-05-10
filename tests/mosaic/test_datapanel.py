@@ -162,6 +162,30 @@ def test_update_3():
 
 
 @pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns,batched",
+    product([True, False], [True, False], [True, False]),
+)
+def test_filter_1(use_visible_rows, use_visible_columns, batched):
+    """`filter`, mixed datapanel"""
+    dp, visible_rows, visible_columns = _get_datapanel(
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+    )
+
+    def func(x):
+        return (x["a"] % 2) == 0
+
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+    result = dp.filter(func, batch_size=4, batched=batched)
+    assert isinstance(result, DataPanel)
+    assert len(result) == (np.array(visible_rows) % 2 == 0).sum()
+
+    if visible_columns is not None:
+        assert result.visible_columns == visible_columns
+        assert result.all_columns == dp.all_columns
+
+
+@pytest.mark.parametrize(
     "write_together,use_visible_rows, use_visible_columns",
     product([True, False], [True, False], [True, False]),
 )
