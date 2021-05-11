@@ -9,16 +9,11 @@ import yaml
 from yaml.representer import Representer
 
 from mosaic.columns.list_column import ListColumn
+from mosaic.tools.lazy_loader import LazyLoader
 
-try:
-    import spacy
-    from spacy.attrs import NAMES
-    from spacy.tokens import Doc, DocBin
-
-    NAMES = [name for name in NAMES if name != "HEAD"]
-    _is_spacy_available = True
-except ImportError:
-    _is_spacy_available = False
+spacy = LazyLoader("spacy")
+spacy_attrs = LazyLoader("spacy.attrs")
+spacy_tokens = LazyLoader("spacy.tokens")
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -28,14 +23,14 @@ logger = logging.getLogger(__name__)
 class SpacyColumn(ListColumn):
     def __init__(
         self,
-        data: Sequence[Doc] = None,
+        data: Sequence[spacy_tokens.Doc] = None,
         *args,
         **kwargs,
     ):
         super(SpacyColumn, self).__init__(data=data, *args, **kwargs)
 
     @classmethod
-    def from_docs(cls, data: Sequence[Doc], *args, **kwargs):
+    def from_docs(cls, data: Sequence[spacy_tokens.Doc], *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
     @classmethod
@@ -84,7 +79,7 @@ class SpacyColumn(ListColumn):
         assert metadata["dtype"] == cls
 
         # Load the `DocBin` from disk
-        docbin = DocBin().from_disk(os.path.join(path, "data.spacy"))
+        docbin = spacy_tokens.DocBin().from_disk(os.path.join(path, "data.spacy"))
         return cls(list(docbin.get_docs(nlp.vocab)))
 
     def write(self, path: str, **kwargs) -> None:
@@ -106,7 +101,8 @@ class SpacyColumn(ListColumn):
         data_path = os.path.join(path, "data.spacy")
 
         # Create a `DocBin` to store the docs
-        docbin = DocBin(attrs=NAMES, store_user_data=True, docs=self.docs)
+        attrs = [name for name in spacy_attrs.NAMES if name != "HEAD"]
+        docbin = spacy_tokens.DocBin(attrs=attrs, store_user_data=True, docs=self.docs)
 
         # Save all the docs
         docbin.to_disk(data_path)

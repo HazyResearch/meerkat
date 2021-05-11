@@ -1,18 +1,9 @@
 import torch
 
-try:
-    import torchvision.transforms as transforms
+from mosaic.tools.lazy_loader import LazyLoader
 
-    _torchvision_available = True
-except ImportError:
-    _torchvision_available = False
-
-try:
-    from transformers import BertTokenizerFast, DistilBertTokenizerFast
-
-    _transformers_available = True
-except ImportError:
-    _transformers_available = False
+transforms = LazyLoader("torchvision.transforms")
+transformers = LazyLoader("transformers")
 
 
 def initialize_transform(transform_name, config, dataset):
@@ -63,9 +54,9 @@ def initialize_bert_transform(config):
 
 def getBertTokenizer(model):
     if model == "bert-base-uncased":
-        tokenizer = BertTokenizerFast.from_pretrained(model)
+        tokenizer = transformers.BertTokenizerFast.from_pretrained(model)
     elif model == "distilbert-base-uncased":
-        tokenizer = DistilBertTokenizerFast.from_pretrained(model)
+        tokenizer = transformers.DistilBertTokenizerFast.from_pretrained(model)
     else:
         raise ValueError(f"Model: {model} not recognized.")
 

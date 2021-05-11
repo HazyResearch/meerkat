@@ -579,6 +579,11 @@ class DataPanel(
         )
 
     @classmethod
+    def from_csv(cls, filepath: str, *args, **kwargs):
+        """Create a Dataset from a csv file."""
+        cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+
+    @classmethod
     def from_feather(
         cls,
         path: str,
@@ -903,11 +908,9 @@ class DataPanel(
         )
         indices = np.where(outputs)[0]
 
-        # Reset the format to set visible columns for the filter
-        with self.format():
-            # Filter returns a new dataset
-            new_datapanel = self.copy()
-            new_datapanel.visible_rows = indices
+        # Filter returns a new datapanel
+        new_datapanel = self.copy()
+        new_datapanel.visible_rows = indices
 
         return new_datapanel
 

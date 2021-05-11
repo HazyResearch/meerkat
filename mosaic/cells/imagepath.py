@@ -4,6 +4,9 @@ from collections.abc import Collection
 
 from mosaic.cells.abstract import AbstractCell
 from mosaic.mixins.file import FileMixin
+from mosaic.tools.lazy_loader import LazyLoader
+
+folder = LazyLoader("torchvision.datasets.folder")
 
 
 class ImagePath(FileMixin, AbstractCell):
@@ -28,8 +31,6 @@ class ImagePath(FileMixin, AbstractCell):
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
-        import torchvision.datasets.folder as folder
-
         return folder.default_loader(*args, **kwargs)
 
     def get(self, *args, **kwargs):

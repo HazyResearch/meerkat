@@ -1,28 +1,20 @@
 from __future__ import annotations
 
-try:
-    import spacy
-    from spacy.attrs import NAMES
-    from spacy.tokens import Doc
-
-    NAMES = [name for name in NAMES if name != "HEAD"]
-
-    _is_spacy_available = True
-except ImportError:
-    _is_spacy_available = False
 from mosaic.cells.abstract import AbstractCell
+from mosaic.tools.lazy_loader import LazyLoader
+
+spacy = LazyLoader("spacy")
+spacy_attrs = LazyLoader("spacy.attrs")
+spacy_tokens = LazyLoader("spacy.tokens")
 
 
 class SpacyCell(AbstractCell):
     def __init__(
         self,
-        doc: Doc,
+        doc: spacy_tokens.Doc,
         *args,
         **kwargs,
     ):
-        if not _is_spacy_available:
-            raise ImportError("Please install spacy.")
-
         super(SpacyCell, self).__init__(*args, **kwargs)
 
         # Put some data into the cell
@@ -35,7 +27,8 @@ class SpacyCell(AbstractCell):
         return self.doc
 
     def get_state(self):
-        arr = self.get().to_array(NAMES)
+        attrs = [name for name in spacy_attrs.NAMES if name != "HEAD"]
+        arr = self.get().to_array(attrs)
         return {
             "arr": arr.flatten(),
             "shape": list(arr.shape),
@@ -44,8 +37,9 @@ class SpacyCell(AbstractCell):
 
     @classmethod
     def from_state(cls, state, nlp: spacy.language.Language):
-        doc = Doc(nlp.vocab, words=state["words"])
-        return cls(doc.from_array(NAMES, state["arr"].reshape(state["shape"])))
+        doc = spacy_tokens.Doc(nlp.vocab, words=state["words"])
+        attrs = [name for name in spacy_attrs.NAMES if name != "HEAD"]
+        return cls(doc.from_array(attrs, state["arr"].reshape(state["shape"])))
 
     def __getitem__(self, index):
         return self.get()[index]
@@ -68,9 +62,6 @@ class LazySpacyCell(AbstractCell):
         *args,
         **kwargs,
     ):
-        if not _is_spacy_available:
-            raise ImportError("Please install spacy.")
-
         super(LazySpacyCell, self).__init__(*args, **kwargs)
 
         # Put some data into the cell
