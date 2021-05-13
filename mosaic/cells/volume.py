@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Callable, Dict, Sequence, Union
 
@@ -9,7 +8,7 @@ try:
     from dosma.core.io.format_io import DataReader
 
     _dosma_available = True
-except ImportError as e:
+except ImportError:
     _dosma_available = False
 
 import pydicom
@@ -50,8 +49,8 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         super(MedicalVolumeCell, self).__init__(paths=paths, *args, **kwargs)
         if not _dosma_available:  # pragma: no-cover
             raise ImportError(
-                "You want to use `dosma` for medical image I/O which is not installed yet,"
-                " install it with `pip install dosma`."
+                "You want to use `dosma` for medical image I/O which is not"
+                "installed yet, install it with `pip install dosma`."
             )
         self._metadata = None
         self.transform: Callable = transform
