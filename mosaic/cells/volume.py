@@ -2,19 +2,27 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Callable, Sequence, Union
+from typing import Callable, Dict, Sequence, Union
 
 try:
-    from dosma.core.io.format_io import DataReader, ImageDataFormat
-    from dosma.core.io.format_io_utils import get_reader
+    from dosma import ImageDataFormat, get_reader
+    from dosma.core.io.format_io import DataReader
 
     _dosma_available = True
-except ImportError:
+except ImportError as e:
     _dosma_available = False
+
+import pydicom
 
 from mosaic.cells.abstract import AbstractCell
 from mosaic.mixins.file import PathLikeType, PathsMixin
 from mosaic.mixins.state import StateClass
+
+# Mapping from pydicom types to python types
+_PYDICOM_TO_PYTHON = {
+    pydicom.valuerep.DSfloat: float,
+    pydicom.multival.MultiValue: list,
+}
 
 
 class MedicalVolumeCell(PathsMixin, AbstractCell):
@@ -40,8 +48,13 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         **kwargs,
     ):
         super(MedicalVolumeCell, self).__init__(paths=paths, *args, **kwargs)
-        assert _dosma_available, "Please install dosma."
-        self.transform = transform
+        if not _dosma_available:  # pragma: no-cover
+            raise ImportError(
+                "You want to use `dosma` for medical image I/O which is not installed yet,"
+                " install it with `pip install dosma`."
+            )
+        self._metadata = None
+        self.transform: Callable = transform
         self.loader = self.default_loader(self.paths) if loader is None else loader
 
     def __getitem__(self, index):
@@ -56,7 +69,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
 
     @classmethod
     def _unroll_path(cls, paths: Sequence[Path]):
-        if len(paths) == 1 and os.path.isdir(paths[0]):
+        if len(paths) == 1:
             return paths[0]
         return paths
 
@@ -75,10 +88,38 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         if self._metadata is None:
             _img = image[0] if isinstance(image, (list, tuple)) else image
             headers = _img.headers(flatten=True)
-            self._metadata = dict(headers[0]) if headers else {}
+            self._metadata = headers[0] if headers else None
         if self.transform is not None:
             image = self.transform(image)
         return image
+
+    def get_metadata(
+        self,
+        ignore_bytes: bool = False,
+        readable: bool = False,
+        as_raw_type: bool = False,
+    ) -> Dict:
+        if self._metadata is None:
+            return None
+
+        metadata = self._metadata
+        if ignore_bytes:
+            metadata = {
+                k: v for k, v in metadata.items() if not isinstance(v.value, bytes)
+            }
+        if readable:
+            metadata = {v.name: v for v in metadata.values()}
+        if as_raw_type:
+            metadata = {
+                k: (
+                    _PYDICOM_TO_PYTHON[type(v.value)](v.value)
+                    if type(v.value) in _PYDICOM_TO_PYTHON
+                    else v.value
+                )
+                for k, v in metadata.items()
+            }
+
+        return metadata
 
     def get_state(self):
         # Check if the loader is a `DataReader` from `dosma`
