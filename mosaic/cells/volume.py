@@ -61,10 +61,10 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         return image[index]
 
     def __str__(self):
-        return f"{self.__class__.__name__}({self.name})"
+        return f"{self.__class__.__name__}({self.paths})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name})"
+        return f"{self.__class__.__name__}({self.paths})"
 
     @classmethod
     def _unroll_path(cls, paths: Sequence[Path]):
