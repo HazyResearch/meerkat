@@ -18,18 +18,23 @@ class VisibilityMixin:
     @visible_rows.setter
     def visible_rows(self, indices: Optional[Sequence]):
         """Set the visible rows of the object."""
-        if indices is None:
-            self._visible_rows = None
-        else:
-            if len(indices):
-                assert min(indices) >= 0 and max(indices) < len(self), (
-                    f"Ensure min index {min(indices)} >= 0 and "
-                    f"max index {max(indices)} < {len(self)}."
-                )
-            if self._visible_rows is not None:
-                self._visible_rows = self._visible_rows[np.array(indices, dtype=int)]
+        if indices is not None and len(indices):
+            assert min(indices) >= 0 and max(indices) < len(self), (
+                f"Ensure min index {min(indices)} >= 0 and"
+                f" max index {max(indices)} < {len(self)}."
+            )
+
+        if self._visible_rows is None:
+            if indices is None:
+                self._visible_rows = None
             else:
                 self._visible_rows = np.array(indices, dtype=int)
+        else:
+            if indices is None:
+                # do nothing – keep old visible_roows
+                pass
+            else:
+                self._visible_rows = self._visible_rows[np.array(indices, dtype=int)]
 
         # Identify that `self` corresponds to a DataPanel
         if hasattr(self, "_data") and isinstance(self._data, Mapping):

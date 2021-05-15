@@ -6,5 +6,13 @@ class MaterializationMixin:
         self._materialize = materialize
 
     @property
-    def materialize(self):
-        return self._materialize
+    def lz(self):
+        return _LazyIndexer(self)
+
+
+class _LazyIndexer:
+    def __init__(self, obj: object):
+        self.obj = obj
+
+    def __getitem__(self, index):
+        return self.obj._get(index, materialize=False)

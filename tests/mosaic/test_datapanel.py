@@ -6,30 +6,16 @@ import numpy as np
 import pytest
 import torch
 
-from mosaic import NumpyArrayColumn
+from mosaic import ImagePath, NumpyArrayColumn
+from mosaic.columns.image_column import ImageColumn
 from mosaic.datapanel import DataPanel
 
+from ..testbeds import MockDatapanel
 
-def _get_datapanel(
-    use_visible_rows: bool = False,
-    use_visible_columns: bool = False,
-):
-    batch = {
-        "a": np.arange(16),
-        "b": list(np.arange(16)),
-        "c": [{"a": 2}] * 16,
-    }
-    dp = DataPanel.from_batch(batch)
 
-    visible_rows = [0, 4, 6, 11] if use_visible_rows else None
-    if use_visible_rows:
-        dp.visible_rows = visible_rows
-
-    visible_columns = ["a", "b"] if use_visible_columns else None
-    if use_visible_columns:
-        dp.visible_columns = visible_columns
-
-    return dp, visible_rows, visible_columns
+def _get_datapanel(*args, **kwargs):
+    test_bed = MockDatapanel(length=16, *args, **kwargs)
+    return test_bed.dp, test_bed.visible_rows, test_bed.visible_columns
 
 
 def test_from_batch():
@@ -49,10 +35,56 @@ def test_from_batch():
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns",
-    product([True, False], [True, False]),
+    "use_visible_rows",
+    product([True, False]),
 )
-def test_map_1(use_visible_rows, use_visible_columns):
+def test_lz_getitem(tmpdir, use_visible_rows):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        use_visible_rows=use_visible_rows,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+    visible_rows = (
+        np.arange(length)
+        if test_bed.visible_rows is None
+        else np.array(test_bed.visible_rows)
+    )
+
+    # int index => single row (dict)
+    index = 2
+    row = dp.lz[index]
+    assert isinstance(row["img"], ImagePath)
+    assert str(row["img"].filepath) == test_bed.img_col.image_paths[visible_rows[index]]
+    assert row["a"] == visible_rows[index]
+    assert row["b"] == visible_rows[index]
+
+    # slice index => multiple row selection (DataPanel)
+    # tuple or list index => multiple row selection (DataPanel)
+    # np.array indeex => multiple row selection (DataPanel)
+    for rows, indices in (
+        (dp.lz[1:3], visible_rows[1:3]),
+        (dp.lz[[0, 2]], visible_rows[[0, 2]]),
+        (dp.lz[np.array((0,))], visible_rows[np.array((0,))]),
+        (dp.lz[np.array((1, 1))], visible_rows[np.array((1, 1))]),
+    ):
+        assert isinstance(rows["img"], ImageColumn)
+        assert list(map(lambda x: str(x.filepath), rows["img"].data)) == [
+            test_bed.img_col.image_paths[i] for i in indices
+        ]
+        assert (rows["a"].data == indices).all()
+        assert (rows["b"].data == indices).all()
+
+    # tuple or list index => multiple row selection (DataPanel)
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns, num_workers",
+    product([True, False], [True, False], [0, 2]),
+)
+def test_map_1(use_visible_rows, use_visible_columns, num_workers):
     """`map`, mixed datapanel, single return, `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
@@ -64,17 +96,17 @@ def test_map_1(use_visible_rows, use_visible_columns):
 
     if visible_rows is None:
         visible_rows = np.arange(16)
-    result = dp.map(func, batch_size=4, batched=True)
+    result = dp.map(func, batch_size=4, batched=True, num_workers=num_workers)
     assert isinstance(result, NumpyArrayColumn)
     assert len(result) == len(visible_rows)
     assert (result == np.array(visible_rows) * 4).all()
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns",
-    product([True, False], [True, False]),
+    "use_visible_rows, use_visible_columns, num_workers",
+    product([True, False], [True, False], [0, 2]),
 )
-def test_map_2(use_visible_rows, use_visible_columns):
+def test_map_2(use_visible_rows, use_visible_columns, num_workers):
     """`map`, mixed datapanel, return multiple, `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
@@ -89,7 +121,7 @@ def test_map_2(use_visible_rows, use_visible_columns):
 
     if visible_rows is None:
         visible_rows = np.arange(16)
-    result = dp.map(func, batch_size=4, batched=True)
+    result = dp.map(func, batch_size=4, batched=True, num_workers=num_workers)
     assert isinstance(result, DataPanel)
     assert len(result["x"]) == len(visible_rows)
     assert len(result["y"]) == len(visible_rows)
@@ -108,7 +140,7 @@ def test_update_1():
         out = {"x": (x["a"] + np.array(x["b"])) * 2}
         return out
 
-    result = dp.update(func, batch_size=4, batched=True)
+    result = dp.update(func, batch_size=4, batched=True, num_workers=0)
     assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "x", "index"])
     assert len(result["x"]) == 16
@@ -129,7 +161,7 @@ def test_update_2():
         }
         return out
 
-    result = dp.update(func, batch_size=4, batched=True)
+    result = dp.update(func, batch_size=4, batched=True, num_workers=0)
     assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "x", "y", "index"])
     assert len(result["x"]) == 16
@@ -152,7 +184,7 @@ def test_update_3():
         }
         return out
 
-    result = dp.update(func, batch_size=4, batched=True)
+    result = dp.update(func, batch_size=4, batched=True, num_workers=0)
     assert isinstance(result, DataPanel)
     assert set(result.column_names) == set(["a", "b", "c", "y", "index"])
     assert len(result["a"]) == 16
@@ -174,7 +206,7 @@ def test_filter_1(use_visible_rows, use_visible_columns, batched):
     def func(x):
         return (x["a"] % 2) == 0
 
-    result = dp.filter(func, batch_size=4, batched=batched)
+    result = dp.filter(func, batch_size=4, batched=batched, num_workers=0)
     if visible_rows is None:
         visible_rows = np.arange(16)
 
