@@ -24,6 +24,7 @@ from mosaic.columns.abstract import AbstractColumn
 from mosaic.mixins.copying import CopyMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
+from mosaic.mixins.materialize import MaterializationMixin
 from mosaic.mixins.state import StateDictMixin
 from mosaic.mixins.visibility import VisibilityMixin
 from mosaic.tools.identifier import Identifier
@@ -41,6 +42,7 @@ class DataPanel(
     CopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
+    MaterializationMixin,
     StateDictMixin,
     VisibilityMixin,
 ):
@@ -337,10 +339,6 @@ class DataPanel(
         """Remove a column from the dataset."""
         assert column in self.all_columns, f"Column `{column}` does not exist."
 
-        if self.visible_rows is not None:
-            # Materialize the data
-            self._materialize()
-
         # Remove the column
         del self._data[column]
         self.all_columns = [col for col in self.all_columns if col != column]
@@ -407,10 +405,13 @@ class DataPanel(
         # Create identifier
         return Identifier(_name=_name, **kwargs)
 
-    def __getitem__(self, index):
+    def _get(self, index, materialize: bool = False):
         if isinstance(index, int) or isinstance(index, np.int):
             # int index => single row (dict)
-            return {k: self._data[k][index] for k in self.visible_columns}
+            return {
+                k: self._data[k]._get(index, materialize=materialize)
+                for k in self.visible_columns
+            }
 
         elif isinstance(index, str):
             # str index => column selection (AbstractColumn)
@@ -422,7 +423,10 @@ class DataPanel(
         elif isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
@@ -436,15 +440,24 @@ class DataPanel(
                 return dp
 
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
         elif isinstance(index, np.ndarray) and len(index.shape) == 1:
             # numpy array index => multiple row selection (DataPanel)
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
         else:
             raise TypeError("Invalid argument type: {}".format(type(index)))
+
+    def __getitem__(self, index):
+        return self._get(index, materialize=True)
 
     @property
     def has_index(self) -> bool:
