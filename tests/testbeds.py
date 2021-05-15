@@ -141,7 +141,7 @@ class MockImageColumn:
         self.image_arrays = []
         self.images = []
 
-        for i in range(0, length):
+        for i in range(1, length + 1):
             self.image_paths.append(os.path.join(tmpdir, "{}.png".format(i)))
             self.image_arrays.append((i * np.ones((10, 10, 3))).astype(np.uint8))
             im = Image.fromarray(self.image_arrays[-1])
