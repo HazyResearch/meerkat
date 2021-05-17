@@ -166,8 +166,12 @@ class AbstractColumn(
         return self._get(index, materialize=True)
 
     @staticmethod
-    def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
-        return convert_to_batch_column_fn(function=function, with_indices=with_indices)
+    def _convert_to_batch_fn(
+        function: Callable, with_indices: bool, materialize: bool = True
+    ) -> callable:
+        return convert_to_batch_column_fn(
+            function=function, with_indices=with_indices, materialize=materialize
+        )
 
     def __len__(self):
         # If only a subset of rows are visible
@@ -202,6 +206,7 @@ class AbstractColumn(
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
         num_proc: Optional[int] = 64,
+        materialize: bool = True,
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
@@ -217,9 +222,7 @@ class AbstractColumn(
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function,
-            with_indices,
-            batched=batched,
+            function, with_indices, batched=batched, materialize=materialize
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -233,6 +236,7 @@ class AbstractColumn(
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_proc=num_proc,
+            materialize=materialize,
         )
         indices = np.where(outputs)[0]
 
@@ -246,6 +250,7 @@ class AbstractColumn(
         drop_last_batch: bool = False,
         collate: bool = True,
         num_workers: int = 4,
+        materialize: bool = True,
         *args,
         **kwargs,
     ):
@@ -261,7 +266,7 @@ class AbstractColumn(
         """
         if self._get_batch.__func__ == AbstractColumn._get_batch:
             return torch.utils.data.DataLoader(
-                self,
+                self if materialize else self.lz,
                 batch_size=batch_size,
                 collate_fn=self.collate if collate else lambda x: x,
                 drop_last=drop_last_batch,
@@ -277,7 +282,7 @@ class AbstractColumn(
                     continue
                 batch_indices.append(indices[i : i + batch_size])
             return torch.utils.data.DataLoader(
-                self,
+                self if materialize else self.lz,
                 sampler=batch_indices,
                 batch_size=None,
                 batch_sampler=None,
@@ -331,6 +336,11 @@ class AbstractColumn(
             return NumpyArrayColumn(data.values)
         elif isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
+
+            if len(data) != 0 and isinstance(data[0], AbstractCell):
+                from .image_column import ImageColumn
+
+                return ImageColumn.from_cells(data)
 
             if len(data) != 0 and isinstance(data[0], AbstractCell):
                 from .cell_column import CellColumn

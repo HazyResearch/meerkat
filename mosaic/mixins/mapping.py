@@ -20,6 +20,7 @@ class MappableMixin:
         num_workers: Optional[int] = None,
         output_type: type = None,
         mmap: bool = False,
+        materialize: bool = True,
         **kwargs,
     ):
         # TODO (sabri): add materialize?
@@ -46,7 +47,9 @@ class MappableMixin:
 
         if not batched:
             # Convert to a batch function
-            function = self._convert_to_batch_fn(function, with_indices=with_indices)
+            function = self._convert_to_batch_fn(
+                function, with_indices=with_indices, materialize=materialize
+            )
             batched = True
             logger.info(f"Converting `function` {function} to a batched function.")
 
@@ -57,7 +60,8 @@ class MappableMixin:
                 self.batch(
                     batch_size=batch_size,
                     drop_last_batch=drop_last_batch,
-                    num_workers=num_workers
+                    num_workers=num_workers,
+                    materialize=materialize
                     # TODO: collate=batched was commented out in list_column
                 )
             ),
@@ -77,6 +81,7 @@ class MappableMixin:
                     batched,
                     batch,
                     range(start_index, end_index),
+                    materialize=materialize,
                 )
 
                 # Pull out information
@@ -150,5 +155,4 @@ class MappableMixin:
             outputs = outputs[0]
         else:
             outputs = DataPanel.from_batch(outputs)
-
         return outputs
