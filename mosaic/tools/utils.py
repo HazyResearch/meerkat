@@ -21,7 +21,9 @@ def transpose_dict_of_lists(d: Dict):
     return [dict(zip(d, t)) for t in zip(*d.values())]
 
 
-def convert_to_batch_column_fn(function: Callable, with_indices: bool):
+def convert_to_batch_column_fn(
+    function: Callable, with_indices: bool, materialize: bool = True
+):
     """Batch a function that applies to an example."""
 
     def _function(batch: Sequence, indices: Optional[List[int]], *args, **kwargs):
@@ -35,14 +37,14 @@ def convert_to_batch_column_fn(function: Callable, with_indices: bool):
             # Apply the unbatched function
             if with_indices:
                 output = function(
-                    batch[i],
+                    batch[i] if materialize else batch.lz[i],
                     indices[i],
                     *args,
                     **kwargs,
                 )
             else:
                 output = function(
-                    batch[i],
+                    batch[i] if materialize else batch.lz[i],
                     *args,
                     **kwargs,
                 )
@@ -70,7 +72,9 @@ def convert_to_batch_column_fn(function: Callable, with_indices: bool):
         return lambda batch, *args, **kwargs: _function(batch, None, *args, **kwargs)
 
 
-def convert_to_batch_fn(function: Callable, with_indices: bool):
+def convert_to_batch_fn(
+    function: Callable, with_indices: bool, materialize: bool = True
+):
     """Batch a function that applies to an example."""
 
     def _function(
@@ -86,14 +90,14 @@ def convert_to_batch_fn(function: Callable, with_indices: bool):
             # Apply the unbatched function
             if with_indices:
                 output = function(
-                    {k: v[i] for k, v in batch.items()},
+                    {k: v[i] if materialize else v.lz[i] for k, v in batch.items()},
                     indices[i],
                     *args,
                     **kwargs,
                 )
             else:
                 output = function(
-                    {k: v[i] for k, v in batch.items()},
+                    {k: v[i] if materialize else v.lz[i] for k, v in batch.items()},
                     *args,
                     **kwargs,
                 )
