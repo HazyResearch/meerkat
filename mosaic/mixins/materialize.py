@@ -16,3 +16,6 @@ class _LazyIndexer:
 
     def __getitem__(self, index):
         return self.obj._get(index, materialize=False)
+
+    def __len__(self):
+        return len(self.obj)

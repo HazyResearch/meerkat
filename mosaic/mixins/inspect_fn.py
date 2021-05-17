@@ -16,6 +16,7 @@ class FunctionInspectorMixin:
         batched: bool = False,
         data=None,
         indices=None,
+        materialize=True,
     ) -> SimpleNamespace:
 
         # Initialize variables to track
@@ -32,9 +33,9 @@ class FunctionInspectorMixin:
         # Run the function to test it
         if data is None:
             if batched:
-                data = self[:2]
+                data = self[:2] if materialize else self.lz[:2]
             else:
-                data = self[0]
+                data = self[0] if materialize else self.lz[0]
 
         if indices is None:
             if batched:
