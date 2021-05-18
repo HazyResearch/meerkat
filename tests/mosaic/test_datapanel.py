@@ -355,7 +355,7 @@ def test_lz_update(tmpdir, use_visible_rows: bool):
     "use_visible_rows, use_visible_columns,batched",
     product([True, False], [True, False], [True, False]),
 )
-def test_filter_1(use_visible_rows, use_visible_columns, batched):
+def test_filter_2(use_visible_rows, use_visible_columns, batched):
     """`filter`, mixed datapanel."""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
