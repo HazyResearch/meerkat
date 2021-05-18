@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class ImageColumn(CellColumn):
-  
     def __init__(self, *args, **kwargs):
         super(ImageColumn, self).__init__(*args, **kwargs)
 
