@@ -352,6 +352,40 @@ def test_lz_update(tmpdir, use_visible_rows: bool):
 
 
 @pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns,batched",
+    product([True, False], [True, False], [True, False]),
+)
+def test_filter_2(use_visible_rows, use_visible_columns, batched):
+    """`filter`, mixed datapanel."""
+    dp, visible_rows, visible_columns = _get_datapanel(
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+    )
+
+    def func(x):
+        return (x["a"] % 2) == 0
+
+    result = dp.filter(func, batch_size=4, batched=batched)
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+
+    assert isinstance(result, DataPanel)
+    new_len = (np.array(visible_rows) % 2 == 0).sum()
+    assert len(result) == new_len
+    for col in result._data.values():
+        assert len(col) == new_len
+
+    # old datapane unchanged
+    old_len = len(visible_rows)
+    assert len(dp) == old_len
+    for col in dp._data.values():
+        # important to check that the column lengths are correct as well
+        assert len(col) == old_len
+
+    assert result.visible_columns == dp.visible_columns
+    assert result.all_columns == dp.all_columns
+
+
+@pytest.mark.parametrize(
     "write_together,use_visible_rows, use_visible_columns",
     product([True, False], [True, False], [True, False]),
 )
