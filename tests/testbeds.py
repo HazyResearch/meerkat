@@ -1,6 +1,11 @@
 """A collection of simple testbeds to build test cases."""
+import os
 from copy import deepcopy
 
+import numpy as np
+from PIL import Image
+
+from mosaic.columns.image_column import ImageColumn
 from mosaic.datapanel import DataPanel
 from mosaic.tools.identifier import Identifier
 
@@ -89,38 +94,57 @@ class MockTestBedv1:
         assert len(self.dataset) == 4
 
 
-# class MockVisionTestBed:
-#     def __init__(self, wrap_dataset: bool = False):
-#         """[summary]
-#
-#         Args:
-#             wrap_dataset (bool, optional): If `True`, create a
-#             `mosaic.DataPanel`
-#             ,
-#                 otherwise create a
-#                 `mosaic.core.dataformats.vision.VisionDataPane`
-#                 Defaults to False.
-#         """
-#         cache_dir = os.path.join(tempfile.gettempdir(), "RGVisionTests")
-#         if not os.path.exists(cache_dir):
-#             os.makedirs(cache_dir)
-#         self.image_paths = []
-#         self.image_tensors = []
-#         self.images = []
-#
-#         for i in range(200, 231, 10):
-#             self.image_paths.append(os.path.join(cache_dir, "{}.png".format(i)))
-#             self.image_tensors.append(i * torch.ones((10, 10, 3)))
-#             save_image(self.image_tensors[-1], self.image_paths[-1])
-#             self.images.append(RGImage(self.image_paths[-1]))
-#
-#         self.batch = {
-#             "a": [{"e": 1}, {"e": 2}, {"e": 3}, {"e": 4}],
-#             "b": ["u", "v", "w", "x"],
-#             "i": self.image_paths,
-#         }
-#
-#         if wrap_dataset:
-#             self.dataset = DataPanel.load_image_dataset(self.batch, img_columns="i")
-#         else:
-#             self.dataset = VisionDataPane(self.batch, img_columns="i")
+class MockDatapanel:
+    def __init__(
+        self,
+        length: int,
+        use_visible_rows: bool = False,
+        use_visible_columns: bool = False,
+        include_image_column: bool = False,
+        tmpdir: str = None,
+    ):
+        batch = {
+            "a": np.arange(length),
+            "b": list(np.arange(length)),
+            "c": [{"a": 2}] * length,
+        }
+
+        if include_image_column:
+            assert tmpdir is not None
+            self.img_col = MockImageColumn(length=length, tmpdir=tmpdir)
+            batch["img"] = self.img_col.col
+
+        self.dp = DataPanel.from_batch(batch)
+
+        self.visible_rows = [0, 4, 6, 11] if use_visible_rows else None
+        if use_visible_rows:
+            self.dp.visible_rows = self.visible_rows
+
+        self.visible_columns = ["a", "b"] if use_visible_columns else None
+        if use_visible_columns:
+            self.dp.visible_columns = self.visible_columns
+
+
+class MockImageColumn:
+    def __init__(self, length: int, tmpdir: str):
+        """[summary]
+
+        Args:
+            wrap_dataset (bool, optional): If `True`, create a
+            `mosaic.DataPanel`
+            ,
+                otherwise create a
+                `mosaic.core.dataformats.vision.VisionDataPane`
+                Defaults to False.
+        """
+        self.image_paths = []
+        self.image_arrays = []
+        self.images = []
+
+        for i in range(0, length):
+            self.image_paths.append(os.path.join(tmpdir, "{}.png".format(i)))
+            self.image_arrays.append((i * np.ones((10, 10, 3))).astype(np.uint8))
+            im = Image.fromarray(self.image_arrays[-1])
+            im.save(self.image_paths[-1])
+
+        self.col = ImageColumn.from_filepaths(self.image_paths)

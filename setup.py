@@ -95,7 +95,7 @@ EXTRAS = {
         "wilds>=1.1.0",
     ],
     "medimg": [
-        "dosma>=0.0.12",
+        "dosma>=0.0.13",
     ],
 }
 

@@ -21,9 +21,11 @@ from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
 from mosaic.columns.abstract import AbstractColumn
+from mosaic.columns.cell_column import CellColumn
 from mosaic.mixins.copying import CopyMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
+from mosaic.mixins.materialize import MaterializationMixin
 from mosaic.mixins.state import StateDictMixin
 from mosaic.mixins.visibility import VisibilityMixin
 from mosaic.tools.identifier import Identifier
@@ -41,6 +43,7 @@ class DataPanel(
     CopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
+    MaterializationMixin,
     StateDictMixin,
     VisibilityMixin,
 ):
@@ -337,10 +340,6 @@ class DataPanel(
         """Remove a column from the dataset."""
         assert column in self.all_columns, f"Column `{column}` does not exist."
 
-        if self.visible_rows is not None:
-            # Materialize the data
-            self._materialize()
-
         # Remove the column
         del self._data[column]
         self.all_columns = [col for col in self.all_columns if col != column]
@@ -407,10 +406,13 @@ class DataPanel(
         # Create identifier
         return Identifier(_name=_name, **kwargs)
 
-    def __getitem__(self, index):
+    def _get(self, index, materialize: bool = False):
         if isinstance(index, int) or isinstance(index, np.int):
             # int index => single row (dict)
-            return {k: self._data[k][index] for k in self.visible_columns}
+            return {
+                k: self._data[k]._get(index, materialize=materialize)
+                for k in self.visible_columns
+            }
 
         elif isinstance(index, str):
             # str index => column selection (AbstractColumn)
@@ -422,7 +424,10 @@ class DataPanel(
         elif isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
@@ -436,15 +441,24 @@ class DataPanel(
                 return dp
 
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
         elif isinstance(index, np.ndarray) and len(index.shape) == 1:
             # numpy array index => multiple row selection (DataPanel)
             return DataPanel.from_batch(
-                {k: self._data[k][index] for k in self.visible_columns}
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
             )
         else:
             raise TypeError("Invalid argument type: {}".format(type(index)))
+
+    def __getitem__(self, index):
+        return self._get(index, materialize=True)
 
     @property
     def has_index(self) -> bool:
@@ -621,14 +635,19 @@ class DataPanel(
         return dp
 
     @staticmethod
-    def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
-        return convert_to_batch_fn(function=function, with_indices=with_indices)
+    def _convert_to_batch_fn(
+        function: Callable, with_indices: bool, materialize: bool = True
+    ) -> callable:
+        return convert_to_batch_fn(
+            function=function, with_indices=with_indices, materialize=materialize
+        )
 
     def batch(
         self,
         batch_size: int = 32,
         drop_last_batch: bool = False,
         num_workers: int = 4,
+        materialize: bool = True,
         *args,
         **kwargs,
     ):
@@ -644,9 +663,7 @@ class DataPanel(
         """
         cell_columns, batch_columns = [], []
         for name, column in self.items():
-            # check if the column has overriden the base `batch`
-            if column._get_batch.__func__ == AbstractColumn._get_batch:
-                # if not, include it in the cell dataloader
+            if isinstance(column, CellColumn):
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)
@@ -659,7 +676,7 @@ class DataPanel(
                     continue
                 batch_indices.append(indices[i : i + batch_size])
             batch_dl = torch.utils.data.DataLoader(
-                self[batch_columns],
+                self[batch_columns] if materialize else self[batch_columns].lz,
                 sampler=batch_indices,
                 batch_size=None,
                 batch_sampler=None,
@@ -671,7 +688,7 @@ class DataPanel(
 
         if cell_columns:
             cell_dl = torch.utils.data.DataLoader(
-                self[cell_columns],
+                self[cell_columns] if materialize else self[cell_columns].lz,
                 batch_size=batch_size,
                 collate_fn=self._collate,
                 drop_last=drop_last_batch,
@@ -699,6 +716,7 @@ class DataPanel(
         batch_size: Optional[int] = 1000,
         remove_columns: Optional[List[str]] = None,
         num_workers: int = 4,
+        materialize: bool = True,
         **kwargs,
     ) -> DataPanel:
         """Update the columns of the dataset."""
@@ -718,7 +736,7 @@ class DataPanel(
         # Get some information about the function
         with self.format(input_columns):
             function_properties = self._inspect_function(
-                function, with_indices, batched
+                function, with_indices, batched, materialize=materialize
             )
             assert (
                 function_properties.dict_output
@@ -726,31 +744,33 @@ class DataPanel(
 
         if not batched:
             # Convert to a batch function
-            function = convert_to_batch_fn(function, with_indices=with_indices)
+            function = convert_to_batch_fn(
+                function, with_indices=with_indices, materialize=materialize
+            )
             logger.info(f"Converting `function` {function} to batched function.")
 
         # Update always returns a new dataset
         logger.info("Running update, a new dataset will be returned.")
         if self.visible_rows is not None:
             # Run .map() to get updated batches and pass them into a new dataset
-            new_dp = DataPanel(
-                self.map(
-                    (
-                        lambda batch, indices: self._merge_batch_and_output(
-                            batch, function(batch, indices)
-                        )
+            new_dp = self.map(
+                (
+                    lambda batch, indices: self._merge_batch_and_output(
+                        batch._data, function(batch, indices)
                     )
-                    if with_indices
-                    else (
-                        lambda batch: self._merge_batch_and_output(
-                            batch, function(batch)
-                        )
-                    ),
-                    with_indices=with_indices,
-                    batched=True,
-                    batch_size=batch_size,
-                    input_columns=input_columns,
                 )
+                if with_indices
+                else (
+                    lambda batch: self._merge_batch_and_output(
+                        batch._data, function(batch)
+                    )
+                ),
+                with_indices=with_indices,
+                batched=True,
+                batch_size=batch_size,
+                input_columns=input_columns,
+                materialize=materialize,
+                num_workers=num_workers,
             )
         else:
             if function_properties.updates_existing_column:
@@ -788,6 +808,8 @@ class DataPanel(
                     batched=True,
                     batch_size=batch_size,
                     input_columns=input_columns,
+                    materialize=materialize,
+                    num_workers=num_workers,
                 )
 
                 # Add new columns / overwrite existing columns for the update
@@ -807,6 +829,7 @@ class DataPanel(
                     batch_size=batch_size,
                     num_workers=num_workers,
                     input_columns=input_columns,
+                    materialize=materialize,
                 )
                 # Add new columns for the update
                 for col, vals in output._data.items():
@@ -833,6 +856,7 @@ class DataPanel(
         num_workers: int = 4,
         output_type: type = None,
         mmap: bool = False,
+        materialize: bool = True,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
         with self.format(input_columns):
@@ -845,6 +869,7 @@ class DataPanel(
                 num_workers=num_workers,
                 output_type=output_type,
                 mmap=mmap,
+                materialize=materialize,
                 **kwargs,
             )
 
@@ -872,6 +897,7 @@ class DataPanel(
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
         num_workers: int = 4,
+        materialize: bool = True,
         **kwargs,
     ) -> Optional[DataPanel]:
         """Filter operation on the DataPanel."""
@@ -889,9 +915,7 @@ class DataPanel(
         # Get some information about the function
         with self.format(input_columns):
             function_properties = self._inspect_function(
-                function,
-                with_indices,
-                batched=batched,
+                function, with_indices, batched=batched, materialize=materialize
             )
             assert function_properties.bool_output, "function must return boolean."
 
@@ -905,6 +929,7 @@ class DataPanel(
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
+            materialize=materialize,
         )
         indices = np.where(outputs)[0]
 

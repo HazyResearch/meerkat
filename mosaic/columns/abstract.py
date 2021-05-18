@@ -3,13 +3,12 @@ from __future__ import annotations
 import abc
 import logging
 import reprlib
-from typing import Callable, List, Optional, Sequence, Union
+from typing import Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
 import torch
 
-from mosaic.cells.abstract import AbstractCell
 from mosaic.mixins.collate import CollateMixin
 from mosaic.mixins.copying import CopyMixin
 from mosaic.mixins.identifier import IdentifierMixin
@@ -48,7 +47,6 @@ class AbstractColumn(
         self,
         data: Sequence = None,
         identifier: Identifier = None,
-        materialize: bool = True,
         collate_fn: Callable = None,
         *args,
         **kwargs,
@@ -59,7 +57,6 @@ class AbstractColumn(
         super(AbstractColumn, self).__init__(
             n=len(data) if data is not None else 0,
             identifier=identifier,
-            materialize=materialize,
             collate_fn=collate_fn,
             *args,
             **kwargs,
@@ -92,12 +89,43 @@ class AbstractColumn(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {"_materialize", "_collate_fn", "_data", "_visible_rows"}
+        return {"_collate_fn", "_data", "_visible_rows"}
 
-    def _get_cell(self, index: int):
-        return self.data[index]
+    def _get_cell(self, index: int, materialize: bool = True) -> Any:
+        """Get a single cell from the column.
 
-    def __getitem__(self, index):
+        Args:
+            index (int): This is an index into the ALL rows, not just visible rows. In
+                other words, we assume that the index passed in has already been
+                remapped via `_remap_index`, if `self.visible_rows` is not `None`.
+            materialize (bool, optional): Materialize and return the object. This
+                argument is used by subclasses of `AbstractColumn` that hold data in an
+                unmaterialized format. Defaults to False.
+        """
+        return self._data[index]
+
+    def _get_batch(
+        self, indices: np.ndarray, materialize: bool = True
+    ) -> AbstractColumn:
+        """Get a batch of cells from the column.
+
+        Args:
+            index (int): This is an index into the ALL rows, not just visible rows. In
+                other words, we assume that the index passed in has already been
+                remapped via `_remap_index`, if `self.visible_rows` is not `None`.
+            materialize (bool, optional): Materialize and return the object. This
+                argument is used by subclasses of `AbstractColumn` that hold data in an
+                unmaterialized format. Defaults to False.
+        """
+        if materialize:
+            return self.collate([self._get_cell(int(i)) for i in indices])
+
+        else:
+            new_column = self.copy()
+            new_column._visible_rows = indices
+            return new_column
+
+    def _get(self, index, materialize: bool = True):
         if self.visible_rows is not None:
             # Remap the index if only some rows are visible
             index = self._remap_index(index)
@@ -110,19 +138,7 @@ class AbstractColumn(
             or isinstance(index, np.int)
             or (isinstance(index, tuple) and len(index) == 1)
         ):
-            data = self._get_cell(int(index))
-
-            # Check if the column implements materialization
-            if self.materialize:
-                if isinstance(data, AbstractCell):
-                    # `data` has a `get` method that can be called for retrieving the
-                    # "expensive" information
-                    return data.get()
-                else:
-                    # `data` has no `get` method, return directly
-                    return data
-            else:
-                return data
+            return self._get_cell(int(index), materialize=materialize)
 
         # `index` should return a batch
         if isinstance(index, slice):
@@ -142,20 +158,20 @@ class AbstractColumn(
             raise TypeError(
                 "object of type {} is not a valid index".format(type(index))
             )
-        return self.__class__.from_data(self._get_batch(indices))
+        return self.__class__.from_data(
+            self._get_batch(indices, materialize=materialize)
+        )
 
-    def _get_batch(self, indices: np.ndarray):
-        if self.materialize:
-            return self.collate([self._get_cell(int(i)) for i in indices])
-
-        else:
-            new_column = self.copy()
-            new_column.visible_rows = indices
-            return new_column
+    def __getitem__(self, index):
+        return self._get(index, materialize=True)
 
     @staticmethod
-    def _convert_to_batch_fn(function: Callable, with_indices: bool) -> callable:
-        return convert_to_batch_column_fn(function=function, with_indices=with_indices)
+    def _convert_to_batch_fn(
+        function: Callable, with_indices: bool, materialize: bool = True
+    ) -> callable:
+        return convert_to_batch_column_fn(
+            function=function, with_indices=with_indices, materialize=materialize
+        )
 
     def __len__(self):
         # If only a subset of rows are visible
@@ -190,6 +206,7 @@ class AbstractColumn(
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
         num_proc: Optional[int] = 64,
+        materialize: bool = True,
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
@@ -205,9 +222,7 @@ class AbstractColumn(
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function,
-            with_indices,
-            batched=batched,
+            function, with_indices, batched=batched, materialize=materialize
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -221,6 +236,7 @@ class AbstractColumn(
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_proc=num_proc,
+            materialize=materialize,
         )
         indices = np.where(outputs)[0]
 
@@ -234,6 +250,7 @@ class AbstractColumn(
         drop_last_batch: bool = False,
         collate: bool = True,
         num_workers: int = 4,
+        materialize: bool = True,
         *args,
         **kwargs,
     ):
@@ -249,7 +266,7 @@ class AbstractColumn(
         """
         if self._get_batch.__func__ == AbstractColumn._get_batch:
             return torch.utils.data.DataLoader(
-                self,
+                self if materialize else self.lz,
                 batch_size=batch_size,
                 collate_fn=self.collate if collate else lambda x: x,
                 drop_last=drop_last_batch,
@@ -265,7 +282,7 @@ class AbstractColumn(
                     continue
                 batch_indices.append(indices[i : i + batch_size])
             return torch.utils.data.DataLoader(
-                self,
+                self if materialize else self.lz,
                 sampler=batch_indices,
                 batch_size=None,
                 batch_sampler=None,
@@ -304,7 +321,7 @@ class AbstractColumn(
         type."""
         # need to import lazily to avoid circular import
         if isinstance(data, AbstractColumn):
-            return data
+            return data.copy()
         elif torch.is_tensor(data):
             from .tensor_column import TensorColumn
 
@@ -319,6 +336,11 @@ class AbstractColumn(
             return NumpyArrayColumn(data.values)
         elif isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
+
+            if len(data) != 0 and isinstance(data[0], AbstractCell):
+                from .image_column import ImageColumn
+
+                return ImageColumn.from_cells(data)
 
             if len(data) != 0 and isinstance(data[0], AbstractCell):
                 from .cell_column import CellColumn
