@@ -197,3 +197,10 @@ class NumpyArrayColumn(
         very slow."""
         # TODO (Sabri): understand why `torch.tensor(column)` is so slow
         return torch.tensor(self.data)
+
+    def to_pandas(self) -> torch.Tensor:
+        if len(self.shape) == 1:
+            return pd.Series(self.data)
+        else:
+            # can only create a 1-D series
+            return super().to_pandas()
