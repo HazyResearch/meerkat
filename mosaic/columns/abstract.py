@@ -313,6 +313,9 @@ class AbstractColumn(
         else:
             return ListWriter()
 
+    def to_pandas(self):
+        return pd.Series([np.nan] * len(self))
+
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
     @classmethod
