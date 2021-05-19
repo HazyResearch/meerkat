@@ -613,7 +613,7 @@ class DataPanel(
 
     def to_pandas(self) -> pd.DataFrame:
         """Convert a Dataset to a pandas DataFrame."""
-        return pd.DataFrame(self[:])
+        return pd.DataFrame({name: column.to_pandas() for name, column in self.items()})
 
     def to_jsonl(self, path: str) -> None:
         """Save a Dataset to a jsonl file."""
