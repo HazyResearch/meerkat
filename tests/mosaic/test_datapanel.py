@@ -1,10 +1,12 @@
 """Unittests for Datasets."""
 import os
+import tempfile
 from itertools import product
 
 import numpy as np
 import pytest
 import torch
+import ujson as json
 
 from mosaic import ImagePath, NumpyArrayColumn
 from mosaic.columns.image_column import ImageColumn
@@ -34,6 +36,26 @@ def test_from_batch():
     assert set(datapanel.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
     assert len(datapanel) == 3
 
+
+def test_from_jsonl():
+    # Build jsonl file
+    temp_f = tempfile.NamedTemporaryFile()
+    data = {"a": [3.4, 2.3, 1.2], "b": [[7,9], [4], [1,2]], "c": ["the walk", "the talk", "blah"]}
+    with open(temp_f.name, "w") as out_f:
+        for idx in range(3):
+            to_write = {k: data[k][idx] for k in list(data.keys())}
+            out_f.write(json.dumps(to_write) + "\n")
+
+    dp_new = DataPanel.from_jsonl(temp_f.name)
+    assert dp_new.column_names == ["a", "b", "c", "index"]
+    # Skip index column
+    for k in data:
+        if isinstance(dp_new[k], NumpyArrayColumn):
+            data_to_compare = dp_new[k]._data.tolist()
+        else:
+            data_to_compare = dp_new[k]._data
+        assert data_to_compare == data[k]
+    temp_f.close()
 
 @pytest.mark.parametrize(
     "use_visible_rows",

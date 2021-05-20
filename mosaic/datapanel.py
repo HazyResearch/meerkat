@@ -1,7 +1,7 @@
 """DataPanel class."""
 from __future__ import annotations
 
-import json
+import ujson as json
 import logging
 import os
 import pathlib
@@ -528,10 +528,14 @@ class DataPanel(
     ) -> DataPanel:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
-
+        with open(json_path) as f:
+            data = {k: [] for k in json.loads(f.readline())}
         # Load the .jsonl file
         with open(json_path) as f:
-            data = [json.loads(line) for line in f]
+            for line in f:
+                line = json.loads(line)
+                for k in data:
+                    data[k].append(line[k])
 
         return cls(
             data,

@@ -36,6 +36,7 @@ REQUIRED = [
     "dill>=0.3.3",
     "numpy>=1.18.0",
     "cytoolz",
+    "ujson",
     "jsonlines>=1.2.0",
     "torch>=1.8.0",
     "tqdm>=4.49.0",
