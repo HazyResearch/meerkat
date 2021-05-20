@@ -40,7 +40,11 @@ def test_from_batch():
 def test_from_jsonl():
     # Build jsonl file
     temp_f = tempfile.NamedTemporaryFile()
-    data = {"a": [3.4, 2.3, 1.2], "b": [[7,9], [4], [1,2]], "c": ["the walk", "the talk", "blah"]}
+    data = {
+        "a": [3.4, 2.3, 1.2],
+        "b": [[7, 9], [4], [1, 2]],
+        "c": ["the walk", "the talk", "blah"],
+    }
     with open(temp_f.name, "w") as out_f:
         for idx in range(3):
             to_write = {k: data[k][idx] for k in list(data.keys())}
@@ -56,6 +60,7 @@ def test_from_jsonl():
             data_to_compare = dp_new[k]._data
         assert data_to_compare == data[k]
     temp_f.close()
+
 
 @pytest.mark.parametrize(
     "use_visible_rows",

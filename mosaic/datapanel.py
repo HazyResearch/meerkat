@@ -1,7 +1,6 @@
 """DataPanel class."""
 from __future__ import annotations
 
-import ujson as json
 import logging
 import os
 import pathlib
@@ -15,6 +14,7 @@ import dill
 import numpy as np
 import pandas as pd
 import torch
+import ujson as json
 import yaml
 from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
