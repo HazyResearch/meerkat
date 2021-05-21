@@ -144,7 +144,7 @@ class AbstractColumn(
         if isinstance(index, slice):
             # int or slice index => standard list slicing
             indices = np.arange(len(self))[index]
-        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
+        elif isinstance(index, tuple) or isinstance(index, list):
             indices = np.array(index)
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
@@ -363,6 +363,14 @@ class AbstractColumn(
             return ListColumn(data)
         else:
             raise ValueError(f"Cannot create column out of data of type {type(data)}")
+
+    def head(self, n: int = 5) -> AbstractColumn:
+        """Get the first `n` examples of the column."""
+        return self.lz[:n]
+
+    def tail(self, n: int = 5) -> AbstractColumn:
+        """Get the last `n` examples of the column."""
+        return self.lz[-n:]
 
     def to_pandas(self) -> pd.Series:
         return pd.Series([self.lz[int(idx)] for idx in range(len(self))])
