@@ -449,5 +449,31 @@ def test_repr_html_():
     dp._repr_html_()
 
 
-def test_copy():
-    pass
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_to_pandas(tmpdir, use_visible_rows, use_visible_columns):
+    import pandas as pd
+
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        use_visible_rows=use_visible_rows,
+        use_visible_columns=use_visible_columns,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+
+    df = dp.to_pandas()
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == dp.visible_columns
+    assert len(df) == len(dp)
+
+    assert (df["a"].values == dp["a"].data).all()
+    assert list(df["b"]) == list(dp["b"].data)
+
+    if not use_visible_columns:
+        assert isinstance(df["c"][0], dict)
+        assert isinstance(df["img"][0], ImagePath)
