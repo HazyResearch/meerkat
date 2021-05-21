@@ -313,9 +313,6 @@ class AbstractColumn(
         else:
             return ListWriter()
 
-    def to_pandas(self):
-        return pd.Series([np.nan] * len(self))
-
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
     @classmethod
@@ -366,3 +363,6 @@ class AbstractColumn(
             return ListColumn(data)
         else:
             raise ValueError(f"Cannot create column out of data of type {type(data)}")
+
+    def to_pandas(self) -> pd.Series:
+        return pd.Series([self.lz[int(idx)] for idx in range(len(self))])
