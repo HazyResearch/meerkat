@@ -477,3 +477,47 @@ def test_to_pandas(tmpdir, use_visible_rows, use_visible_columns):
     if not use_visible_columns:
         assert isinstance(df["c"][0], dict)
         assert isinstance(df["img"][0], ImagePath)
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_head(tmpdir, use_visible_rows, use_visible_columns):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        use_visible_rows=use_visible_rows,
+        use_visible_columns=use_visible_columns,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+
+    new_dp = dp.head(n=2)
+
+    assert isinstance(new_dp, DataPanel)
+    assert new_dp.visible_columns == dp.visible_columns
+    assert len(new_dp) == 2
+    assert (new_dp["a"] == dp["a"][:2]).all()
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows, use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_tail(tmpdir, use_visible_rows, use_visible_columns):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        use_visible_rows=use_visible_rows,
+        use_visible_columns=use_visible_columns,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+
+    new_dp = dp.tail(n=2)
+
+    assert isinstance(new_dp, DataPanel)
+    assert new_dp.visible_columns == dp.visible_columns
+    assert len(new_dp) == 2
+    assert (new_dp["a"] == dp["a"][-2:]).all()
