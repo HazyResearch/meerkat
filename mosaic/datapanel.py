@@ -111,7 +111,7 @@ class DataPanel(
 
         # Create attributes for all columns and visible columns
         self.all_columns = list(self._data.keys())
-        self.visible_columns = None
+        self._visible_columns = None
 
         # Create an identifier
         # TODO(Sabri): make _autobuild_identifier more informative
@@ -214,6 +214,20 @@ class DataPanel(
 
         # Set the features
         self._set_features()
+
+    @property
+    def visible_columns(self):
+        return self._visible_columns
+
+    @visible_columns.setter
+    def visible_columns(self, columns: Optional[Sequence[str]] = None):
+        if columns is None:
+            # do nothing, keep old visible columns
+            return
+
+        self._visible_columns = columns
+        if "index" not in self._visible_columns and "index" in self.all_columns:
+            self._visible_columns.append("index")
 
     @contextmanager
     def format(self, columns: List[str] = None):
@@ -371,10 +385,13 @@ class DataPanel(
         """Add an index to the dataset."""
         self.add_column("index", [str(i) for i in range(len(self))])
 
-    def head(self, n: int, columns: List[str] = None):
-        """View the first `n` examples of the dataset."""
-        with self.format(columns):
-            return pd.DataFrame(self[:n])
+    def head(self, n: int = 5) -> DataPanel:
+        """Get the first `n` examples of the DataPanel."""
+        return self.lz[:n]
+
+    def tail(self, n: int = 5) -> DataPanel:
+        """Get the last `n` examples of the DataPanel."""
+        return self.lz[-n:]
 
     def _create_logdir(self):
         """Create and assign a directory for logging this dataset's files."""
@@ -1045,7 +1062,7 @@ class DataPanel(
             "_identifier",
             "_data",
             "all_columns",
-            "visible_columns",
+            "_visible_columns",
             "_visible_rows",
             "_info",
             "_split",
