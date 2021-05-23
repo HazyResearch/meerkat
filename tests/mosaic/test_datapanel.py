@@ -4,6 +4,7 @@ import tempfile
 from itertools import product
 
 import numpy as np
+import pandas as pd
 import pytest
 import torch
 import ujson as json
@@ -60,6 +61,26 @@ def test_from_jsonl():
             data_to_compare = dp_new[k]._data
         assert data_to_compare == data[k]
     temp_f.close()
+
+
+def test_from_csv():
+    temp_f = tempfile.NamedTemporaryFile()
+    data = {
+        "a": [3.4, 2.3, 1.2],
+        "b": ["alpha", "beta", "gamma"],
+        "c": ["the walk", "the talk", "blah"],
+    }
+    pd.DataFrame(data).to_csv(temp_f.name)
+
+    dp_new = DataPanel.from_csv(temp_f.name)
+    assert dp_new.column_names == ["Unnamed: 0", "a", "b", "c", "index"]
+    # Skip index column
+    for k in data:
+        if isinstance(dp_new[k], NumpyArrayColumn):
+            data_to_compare = dp_new[k]._data.tolist()
+        else:
+            data_to_compare = dp_new[k]._data
+        assert data_to_compare == data[k]
 
 
 @pytest.mark.parametrize(

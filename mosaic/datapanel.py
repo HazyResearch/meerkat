@@ -615,8 +615,18 @@ class DataPanel(
 
     @classmethod
     def from_csv(cls, filepath: str, *args, **kwargs):
-        """Create a Dataset from a csv file."""
-        cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+        """Create a Dataset from a csv file.
+
+        Args:
+            filepath (str): The file path or buffer to load from.
+                Same as :func:`pandas.read_csv`.
+            *args: Argument list for :func:`pandas.read_csv`.
+            **kwargs: Keyword arguments for :func:`pandas.read_csv`.
+
+        Returns:
+            DataPanel: The constructed datapanel.
+        """
+        return cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
 
     @classmethod
     def from_feather(
