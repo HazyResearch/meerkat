@@ -128,35 +128,45 @@ def test_lz_getitem(tmpdir, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns, num_workers",
-    product([True, False], [True, False], [0, 2]),
+    "use_visible_rows, use_visible_columns, use_input_columns, num_workers",
+    product([True, False], [True, False], [True, False], [0, 2]),
 )
-def test_map_1(use_visible_rows, use_visible_columns, num_workers):
+def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_workers):
     """`map`, mixed datapanel, single return, `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
+    input_columns = ["a", "b"] if use_input_columns else None
 
     def func(x):
+        if use_input_columns:
+            assert x.visible_columns == ["a", "b", "index"]
         out = (x["a"] + np.array(x["b"])) * 2
         return out
 
     if visible_rows is None:
         visible_rows = np.arange(16)
-    result = dp.map(func, batch_size=4, batched=True, num_workers=num_workers)
+
+    result = dp.map(
+        func,
+        batch_size=4,
+        batched=True,
+        num_workers=num_workers,
+        input_columns=input_columns,
+    )
     assert isinstance(result, NumpyArrayColumn)
     assert len(result) == len(visible_rows)
     assert (result == np.array(visible_rows) * 4).all()
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns, num_workers",
-    product([True, False], [True, False], [0, 2]),
+    "use_visible_rows, num_workers",
+    product([True, False], [0, 2]),
 )
-def test_map_2(use_visible_rows, use_visible_columns, num_workers):
+def test_map_2(use_visible_rows, num_workers):
     """`map`, mixed datapanel, return multiple, `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_rows=use_visible_rows, use_visible_columns=False
     )
 
     def func(x):
@@ -168,7 +178,12 @@ def test_map_2(use_visible_rows, use_visible_columns, num_workers):
 
     if visible_rows is None:
         visible_rows = np.arange(16)
-    result = dp.map(func, batch_size=4, batched=True, num_workers=num_workers)
+    result = dp.map(
+        func,
+        batch_size=4,
+        batched=True,
+        num_workers=num_workers,
+    )
     assert isinstance(result, DataPanel)
     assert len(result["x"]) == len(visible_rows)
     assert len(result["y"]) == len(visible_rows)
@@ -177,10 +192,10 @@ def test_map_2(use_visible_rows, use_visible_columns, num_workers):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,batched",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_rows, use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False], [True, False]),
 )
-def test_update_1(use_visible_rows, use_visible_columns, batched):
+def test_update_1(use_visible_rows, use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return single, new columns."""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows,
@@ -195,18 +210,21 @@ def test_update_1(use_visible_rows, use_visible_columns, batched):
     if visible_rows is None:
         visible_rows = np.arange(16)
 
-    result = dp.update(func, batch_size=4, batched=batched, num_workers=0)
+    input_columns = ["a", "b"] if use_input_columns else None
+    result = dp.update(
+        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+    )
     assert isinstance(result, DataPanel)
-    assert set(result.column_names) == set(["a", "b", "c", "x", "index"])
+    assert set(result.visible_columns) == set(visible_columns + ["x"])
     assert len(result["x"]) == len(visible_rows)
     assert (result["x"] == np.array(visible_rows) * 4).all()
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,batched",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_rows,use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False], [True, False]),
 )
-def test_update_2(use_visible_rows, use_visible_columns, batched):
+def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, new columns,
     `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
@@ -223,9 +241,12 @@ def test_update_2(use_visible_rows, use_visible_columns, batched):
     if visible_rows is None:
         visible_rows = np.arange(16)
 
-    result = dp.update(func, batch_size=4, batched=batched, num_workers=0)
+    input_columns = ["a", "b"] if use_input_columns else None
+    result = dp.update(
+        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+    )
     assert isinstance(result, DataPanel)
-    assert set(result.column_names) == set(["a", "b", "c", "x", "y", "index"])
+    assert set(result.visible_columns) == set(visible_columns + ["x", "y"])
     assert len(result["x"]) == len(visible_rows)
     assert len(result["y"]) == len(visible_rows)
     assert (result["x"] == np.array(visible_rows) * 4).all()
@@ -233,14 +254,14 @@ def test_update_2(use_visible_rows, use_visible_columns, batched):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,batched",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_rows, use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False], [True, False]),
 )
-def test_update_3(use_visible_rows, use_visible_columns, batched):
+def test_update_3(use_visible_rows, use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, replace existing column,
     `batched=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=False, use_visible_columns=False
+        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
 
     def func(x):
@@ -253,9 +274,12 @@ def test_update_3(use_visible_rows, use_visible_columns, batched):
     if visible_rows is None:
         visible_rows = np.arange(16)
 
-    result = dp.update(func, batch_size=4, batched=batched, num_workers=0)
+    input_columns = ["a", "b"] if use_input_columns else None
+    result = dp.update(
+        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+    )
     assert isinstance(result, DataPanel)
-    assert set(result.column_names) == set(["a", "b", "c", "y", "index"])
+    assert set(result.visible_columns) == set(visible_columns + ["y"])
     assert len(result["a"]) == len(visible_rows)
     assert len(result["y"]) == len(visible_rows)
     assert (result["a"] == np.array(visible_rows) * 4).all()

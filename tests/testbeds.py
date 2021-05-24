@@ -120,7 +120,7 @@ class MockDatapanel:
         if use_visible_rows:
             self.dp.visible_rows = self.visible_rows
 
-        self.visible_columns = ["a", "b"] if use_visible_columns else None
+        self.visible_columns = ["a", "b"] if use_visible_columns else self.dp.columns
         if use_visible_columns:
             self.dp.visible_columns = self.visible_columns
 
