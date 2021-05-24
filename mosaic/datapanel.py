@@ -772,91 +772,29 @@ class DataPanel(
 
         # Update always returns a new dataset
         logger.info("Running update, a new dataset will be returned.")
+
+        # Copy the ._data dict with a reference to the actual columns
         if self.visible_rows is not None:
-            # Run .map() to get updated batches and pass them into a new dataset
-            new_dp = self.map(
-                (
-                    lambda batch, indices: self._merge_batch_and_output(
-                        batch._data, function(batch, indices)
-                    )
-                )
-                if with_indices
-                else (
-                    lambda batch: self._merge_batch_and_output(
-                        batch._data, function(batch)
-                    )
-                ),
-                with_indices=with_indices,
-                batched=True,
-                batch_size=batch_size,
-                input_columns=input_columns,
-                materialize=materialize,
-                num_workers=num_workers,
-            )
+            new_dp = self.lz[:]
         else:
-            if function_properties.updates_existing_column:
-                # Copy the ._data dict with a reference to the actual columns
-                new_dp = self.copy()
+            new_dp = self.copy()
 
-                # Calculate the values for the updated columns using a .map()
-                output = self.map(
-                    (
-                        lambda batch, indices:
-                        # Only merge columns that get updated
-                        self._merge_batch_and_output(
-                            {
-                                k: v
-                                for k, v in batch._data.items()
-                                if k in function_properties.existing_columns_updated
-                            },
-                            function(batch, indices),
-                        )
-                    )
-                    if with_indices
-                    else (
-                        lambda batch:
-                        # Only merge columns that get updated
-                        self._merge_batch_and_output(
-                            {
-                                k: v
-                                for k, v in batch._data.items()
-                                if k in function_properties.existing_columns_updated
-                            },
-                            function(batch),
-                        )
-                    ),
-                    with_indices=with_indices,
-                    batched=True,
-                    batch_size=batch_size,
-                    input_columns=input_columns,
-                    materialize=materialize,
-                    num_workers=num_workers,
-                )
+        # Calculate the values for the new columns using a .map()
+        output = new_dp.map(
+            function=function,
+            with_indices=with_indices,
+            batched=True,
+            batch_size=batch_size,
+            num_workers=num_workers,
+            input_columns=input_columns,
+            materialize=materialize,
+        )
 
-                # Add new columns / overwrite existing columns for the update
-                for col, vals in output._data.items():
-                    if col == "index":
-                        continue
-                    new_dp.add_column(col, vals, overwrite=True)
-            else:
-                # Copy the ._data dict with a reference to the actual columns
-                new_dp = self.copy()
-
-                # Calculate the values for the new columns using a .map()
-                output = new_dp.map(
-                    function=function,
-                    with_indices=with_indices,
-                    batched=True,
-                    batch_size=batch_size,
-                    num_workers=num_workers,
-                    input_columns=input_columns,
-                    materialize=materialize,
-                )
-                # Add new columns for the update
-                for col, vals in output._data.items():
-                    if col == "index":
-                        continue
-                    new_dp.add_column(col, vals)
+        # Add new columns for the update
+        for col, vals in output._data.items():
+            if col == "index":
+                continue
+            new_dp.add_column(col, vals, overwrite=True)
 
         # Remove columns
         if remove_columns:
@@ -880,6 +818,7 @@ class DataPanel(
         materialize: bool = True,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
+        input_columns = self.visible_columns if input_columns is None else input_columns
         with self.format(input_columns):
             return super().map(
                 function=function,
