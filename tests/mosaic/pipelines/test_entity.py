@@ -115,4 +115,4 @@ def test_find_similar(k):
     sim = ent.most_similar("x", k)
     assert isinstance(sim, Entity)
     assert len(sim) == k
-    assert sim.column_names == {"a", "b", "c", "d", "e", "f", "index"}
+    assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index"]
