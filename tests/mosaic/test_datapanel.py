@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 import torch
 import ujson as json
+from PIL.Image import Image
 
 from mosaic import ImagePath, NumpyArrayColumn
 from mosaic.columns.image_column import ImageColumn
@@ -118,11 +119,70 @@ def test_lz_getitem(tmpdir, use_visible_rows):
         (dp.lz[[0, 2]], visible_rows[[0, 2]]),
         (dp.lz[np.array((0,))], visible_rows[np.array((0,))]),
         (dp.lz[np.array((1, 1))], visible_rows[np.array((1, 1))]),
+        (
+            dp.lz[np.array((True, False) * (len(visible_rows) // 2))],
+            visible_rows[np.array((True, False) * (len(visible_rows) // 2))],
+        ),
+        (
+            dp.lz[dp["a"] % 2 == 0],
+            visible_rows[visible_rows % 2 == 0],
+        ),
     ):
         assert isinstance(rows["img"], ImageColumn)
         assert list(map(lambda x: str(x.filepath), rows["img"].data)) == [
             test_bed.img_col.image_paths[i] for i in indices
         ]
+        assert (rows["a"].data == indices).all()
+        assert (rows["b"].data == indices).all()
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows",
+    product([True, False]),
+)
+def test_getitem(tmpdir, use_visible_rows):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        use_visible_rows=use_visible_rows,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+    visible_rows = (
+        np.arange(length)
+        if test_bed.visible_rows is None
+        else np.array(test_bed.visible_rows)
+    )
+
+    # int index => single row (dict)
+    index = 2
+    row = dp[index]
+    assert isinstance(row["img"], Image)
+    assert (
+        np.array(row["img"]) == test_bed.img_col.image_arrays[visible_rows[index]]
+    ).all()
+    assert row["a"] == visible_rows[index]
+    assert row["b"] == visible_rows[index]
+
+    # slice index => multiple row selection (DataPanel)
+    # tuple or list index => multiple row selection (DataPanel)
+    # np.array indeex => multiple row selection (DataPanel)
+    for rows, indices in (
+        (dp[1:3], visible_rows[1:3]),
+        (dp[[0, 2]], visible_rows[[0, 2]]),
+        (dp[np.array((0,))], visible_rows[np.array((0,))]),
+        (dp[np.array((1, 1))], visible_rows[np.array((1, 1))]),
+        (
+            dp[np.array((True, False) * (len(visible_rows) // 2))],
+            visible_rows[np.array((True, False) * (len(visible_rows) // 2))],
+        ),
+        (
+            dp[dp["a"] % 2 == 0],
+            visible_rows[visible_rows % 2 == 0],
+        ),
+    ):
+        assert isinstance(rows["img"], ListColumn)
         assert (rows["a"].data == indices).all()
         assert (rows["b"].data == indices).all()
 

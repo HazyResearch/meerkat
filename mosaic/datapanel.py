@@ -468,7 +468,11 @@ class DataPanel(
                     for k in self.visible_columns
                 }
             )
-        elif isinstance(index, np.ndarray) and len(index.shape) == 1:
+        elif isinstance(index, np.ndarray):
+            if len(index.shape) != 1:
+                raise ValueError(
+                    "Index must have 1 axis, not {}".format(len(index.shape))
+                )
             # numpy array index => multiple row selection (DataPanel)
             return DataPanel.from_batch(
                 {
@@ -476,8 +480,16 @@ class DataPanel(
                     for k in self.visible_columns
                 }
             )
+        elif isinstance(index, AbstractColumn):
+            # column index => multiple row selection (DataPanel)
+            return DataPanel.from_batch(
+                {
+                    k: self._data[k]._get(index, materialize=materialize)
+                    for k in self.visible_columns
+                }
+            )
         else:
-            raise TypeError("Invalid argument type: {}".format(type(index)))
+            raise TypeError("Invalid index type: {}".format(type(index)))
 
     def __getitem__(self, index):
         return self._get(index, materialize=True)
