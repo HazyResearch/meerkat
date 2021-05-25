@@ -143,9 +143,9 @@ class AbstractColumn(
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
-            indices = np.arange(len(self))[index]
+            indices = np.arange(self.full_length())[index]
         elif isinstance(index, tuple) or isinstance(index, list):
-            indices = np.array(index)
+            indices = index
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
                 raise TypeError(
@@ -153,10 +153,12 @@ class AbstractColumn(
                         len(index.shape)
                     )
                 )
-            indices = index
+            indices = np.arange(self.full_length())[index]
+        elif isinstance(index, AbstractColumn):
+            indices = np.arange(self.full_length())[index]
         else:
             raise TypeError(
-                "object of type {} is not a valid index".format(type(index))
+                "Object of type {} is not a valid index".format(type(index))
             )
         return self.__class__.from_data(
             self._get_batch(indices, materialize=materialize)
