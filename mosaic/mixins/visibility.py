@@ -43,15 +43,23 @@ class VisibilityMixin:
                 column.visible_rows = indices
 
     def _remap_index(self, index):
+        # TODO: lazy import needed to avoid circular dependency, this is should be
+        # avoided by defining a "real" abstract class above `AbstractColumn`
+        from mosaic.columns.abstract import AbstractColumn
+
         if isinstance(index, int):
             return self.visible_rows[index].item()
         elif isinstance(index, slice):
-            return self.visible_rows[index].tolist()
+            return self.visible_rows[index]
         elif isinstance(index, str):
             return index
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
-            return self.visible_rows[index].tolist()
+            return self.visible_rows[index]
         elif isinstance(index, np.ndarray) and len(index.shape) == 1:
-            return self.visible_rows[index].tolist()
+            return self.visible_rows[index]
+        elif isinstance(index, AbstractColumn):
+            return self.visible_rows[index]
         else:
-            raise TypeError("Invalid argument type: {}".format(type(index)))
+            raise TypeError(
+                "Object of type {} is not a valid index".format(type(index))
+            )
