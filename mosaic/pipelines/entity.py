@@ -29,19 +29,24 @@ class Entity(DataPanel):
             split=None,
             **kwargs,
         )
-        self.embedding_columns = embedding_columns if embedding_columns else []
+        if len(self.column_names) > 0:
+            self.embedding_columns = embedding_columns if embedding_columns else []
 
-        self._check_columns_unique(self.embedding_columns)
-        self._check_columns_exist(self.embedding_columns)
-        for c in self.embedding_columns:
-            self._cast_to_embedding(c)
+            self._check_columns_unique(self.embedding_columns)
+            self._check_columns_exist(self.embedding_columns)
+            for c in self.embedding_columns:
+                self._cast_to_embedding(c)
 
-        self.index_column = index_column if index_column else None
-        if not self.index_column:
-            self._add_ent_index()
-        self._check_columns_exist([self.index_column])
-        # TODO (Laurel): This will break when filtering.
-        self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
+            self.index_column = index_column if index_column else None
+            if not self.index_column:
+                self._add_ent_index()
+            self._check_columns_exist([self.index_column])
+            # TODO (Laurel): This will break when changing rows in every way.
+            self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
+        else:  # Initializing empty Entity DP
+            self.embedding_columns = []
+            self.index_column = None
+            self._index_to_rowid = {}
 
     @classmethod
     def from_datapanel(
@@ -66,7 +71,13 @@ class Entity(DataPanel):
                 "Query must be the same type as the index column of the data"
             )
         assert idx in self._index_to_rowid, f"{idx} not in index set"
-        return self[self._index_to_rowid[idx]]
+        row_idx = self._index_to_rowid[idx]
+        if self.visible_rows is not None:
+            try:
+                row_idx = int(np.where(self.visible_rows == row_idx)[0][0])
+            except IndexError:
+                raise IndexError(f"{idx} not in data")
+        return self[row_idx]
 
     def _get(self, index, materialize: bool = False):
         """When _get returns a DataPanel with same columns, cast back to Entity"""
