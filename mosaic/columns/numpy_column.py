@@ -108,15 +108,11 @@ class NumpyArrayColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _remap_index(self, index):
-        # don't remap index since we take care of visibility with self.data
-        return index
-
     def _get_cell(self, index: int, materialize: bool = True):
-        return self.data[index]
+        return self._data[index]
 
     def _get_batch(self, indices, materialize: bool = True):
-        return self.data[indices]
+        return self._data[indices]
 
     @classmethod
     def get_writer(cls, mmap: bool = False):
