@@ -46,7 +46,7 @@ class TensorColumn(
         *args,
         **kwargs,
     ):
-        if data is not None:
+        if data is not None and not isinstance(data, TensorColumn):
             data = torch.as_tensor(data)
         super(TensorColumn, self).__init__(data=data, *args, **kwargs)
 

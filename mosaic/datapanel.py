@@ -103,6 +103,7 @@ class DataPanel(
 
             # Use column_names to setup the data dictionary
             if column_names:
+                self._check_columns_unique(column_names)
                 self._data = {k: [] for k in column_names}
 
         # Setup the DatasetInfo
@@ -203,6 +204,10 @@ class DataPanel(
         """Check that every column in `columns` exists."""
         for col in columns:
             assert col in self.all_columns, f"{col} is not a valid column."
+
+    def _check_columns_unique(self, columns: List[str]):
+        """Checks that all columns are unique."""
+        assert len(columns) == len(set(columns))
 
     def _initialize_state(self):
         """Dataset state initialization."""
