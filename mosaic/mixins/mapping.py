@@ -21,6 +21,7 @@ class MappableMixin:
         output_type: type = None,
         mmap: bool = False,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ):
         # TODO (sabri): add materialize?
@@ -67,6 +68,7 @@ class MappableMixin:
             ),
             total=(len(self) // batch_size)
             + int(not drop_last_batch and len(self) % batch_size != 0),
+            disable=not pbar,
         ):
             # Calculate the start and end indexes for the batch
             start_index = i * batch_size
