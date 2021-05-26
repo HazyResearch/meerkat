@@ -65,6 +65,7 @@ def test_add_emb():
     ent.add_embedding_column("embs2", embs)
     embs = EmbeddingColumn(torch.randn(3, 6))
     ent.add_embedding_column("embs3", embs)
+    ent.add_embedding_column("embs3", embs, overwrite=True)
     assert ent.embedding_columns == ["embs", "embs2", "embs3"]
     assert isinstance(ent["embs"], EmbeddingColumn)
     assert isinstance(ent["embs2"], EmbeddingColumn)
@@ -116,3 +117,34 @@ def test_find_similar(k):
     assert isinstance(sim, Entity)
     assert len(sim) == k
     assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index"]
+
+
+@pytest.mark.parametrize(
+    "k",
+    [1, 2],
+)
+def test_find_similar_multiple_columns(k):
+    data = _get_entity_data()
+
+    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    embs_data = np.random.randn(3, 6)
+    ent.add_embedding_column("embs2", embs_data)
+
+    with pytest.raises(
+        AssertionError,
+        match="Length of search embedding needs to match query embedding",
+    ):
+        ent.most_similar(
+            "x", k, query_embedding_column="g", search_embedding_column="embs2"
+        )
+
+    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    embs_data = np.random.randn(3, 5)
+    ent.add_embedding_column("embs2", embs_data)
+
+    sim = ent.most_similar(
+        "x", k, query_embedding_column="g", search_embedding_column="embs2"
+    )
+    assert isinstance(sim, Entity)
+    assert len(sim) == k
+    assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]

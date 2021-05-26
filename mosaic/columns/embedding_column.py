@@ -16,6 +16,7 @@ from mosaic.tools.lazy_loader import LazyLoader
 faiss = LazyLoader("faiss")
 umap = LazyLoader("umap")
 umap_plot = LazyLoader("umap.plot")
+sklearn_decom = LazyLoader("sklearn.decomposition")
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -63,10 +64,20 @@ class EmbeddingColumn(TensorColumn):
         self.faiss_index.add(self.numpy())
 
     def search(self, query, k: int):
+        assert (
+            self.faiss_index is not None
+        ), "You must call ``build_faiss_index`` first."
         if isinstance(query, np.ndarray):
             query = query.astype("float32")
             return self.faiss_index.search(query, k)
         return NotImplemented("`query` be np.ndarray.")
+
+    def pca(self, n_components=2):
+        pca = sklearn_decom.PCA(n_components)
+        return SimpleNamespace(
+            embeddings=pca.fit_transform(self.numpy()),
+            reducer=pca,
+        )
 
     def umap(self):
         reducer = umap.UMAP()

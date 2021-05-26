@@ -73,6 +73,7 @@ class Entity(DataPanel):
         assert idx in self._index_to_rowid, f"{idx} not in index set"
         row_idx = self._index_to_rowid[idx]
         if self.visible_rows is not None:
+            # Map from original index into visible row index (inverse of remap index)
             try:
                 row_idx = int(np.where(self.visible_rows == row_idx)[0][0])
             except IndexError:
@@ -94,8 +95,6 @@ class Entity(DataPanel):
         """Add an integer index to the dataset. Not using index from DataPanel
         as ids need to be integers to serve as embedding row indices"""
         # TODO: Why do you have a string index...feels weird and expensive.
-        #  My guess is it's to avoid confusion
-        # TODO: How do we handle filering of entities
         # with row indexes due to filtering.
         self.add_column("_ent_index", [i for i in range(len(self))])
         self.index_column = "_ent_index"
@@ -110,6 +109,7 @@ class Entity(DataPanel):
         name: str,
         embedding: Union[np.ndarray, torch.tensor, EmbeddingColumn],
         index_to_rowid: Dict[Any, int] = None,
+        overwrite: bool = False,
     ):
         """Adds embedding column to data. If index_to_rowid provided,
         maps DP index column to rowid of embedding."""
@@ -119,21 +119,36 @@ class Entity(DataPanel):
         assert len(embedding) == len(
             self
         ), "Length of embedding needs to be the same as data"
-        self.add_column(name, embedding)
+        self.add_column(name, embedding, overwrite)
         self._cast_to_embedding(name)
-        self.embedding_columns.append(name)
+        if not overwrite:
+            self.embedding_columns.append(name)
 
-    def most_similar(self, query: Any, k: int, embedding_column=None):
-        """Returns most similar entities to the given query index"""
-        if embedding_column is None:
-            embedding_column = self.embedding_columns[0]
-        self._check_columns_exist([embedding_column])
+    def most_similar(
+        self,
+        query: Any,
+        k: int,
+        query_embedding_column=None,
+        search_embedding_column=None,
+    ):
+        """Returns most similar entities distinct from query"""
+        if query_embedding_column is None:
+            query_embedding_column = self.embedding_columns[0]
+        self._check_columns_exist([query_embedding_column])
+        if search_embedding_column is None:
+            search_embedding_column = query_embedding_column
+        else:
+            self._check_columns_exist([search_embedding_column])
+            assert (
+                self[query_embedding_column].shape[-1]
+                == self[search_embedding_column].shape[-1]
+            ), "Length of search embedding needs to match query embedding"
         # Will noop if already exists
-        self[embedding_column].build_faiss_index(overwrite=False)
+        self[search_embedding_column].build_faiss_index(overwrite=False)
 
-        emb_query = self.iget(query)[embedding_column].numpy().reshape(1, -1)
-        dist, sims = self[embedding_column].search(emb_query, k + 1)
-        # Will return the emb_query. If the embeddings are not unique,
+        emb_query = self.iget(query)[query_embedding_column].numpy().reshape(1, -1)
+        dist, sims = self[search_embedding_column].search(emb_query, k + 1)
+        # May return the emb_query. If the embeddings are not unique,
         # we must selectively remove the query in the answer
         sims = sims[0][sims[0] != self._index_to_rowid[query]]
         return self[sims]
