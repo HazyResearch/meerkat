@@ -758,8 +758,9 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         remove_columns: Optional[List[str]] = None,
-        num_workers: int = 4,
+        num_workers: int = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> DataPanel:
         """Update the columns of the dataset."""
@@ -810,6 +811,7 @@ class DataPanel(
             num_workers=num_workers,
             input_columns=input_columns,
             materialize=materialize,
+            pbar=pbar,
         )
 
         # Add new columns for the update
@@ -834,10 +836,11 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 32,
         drop_last_batch: bool = False,
-        num_workers: int = 4,
+        num_workers: int = None,
         output_type: type = None,
         mmap: bool = False,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
         input_columns = self.visible_columns if input_columns is None else input_columns
@@ -852,6 +855,7 @@ class DataPanel(
                 output_type=output_type,
                 mmap=mmap,
                 materialize=materialize,
+                pbar=pbar,
                 **kwargs,
             )
 
@@ -878,8 +882,9 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_workers: int = 4,
+        num_workers: int = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[DataPanel]:
         """Filter operation on the DataPanel."""
@@ -912,6 +917,7 @@ class DataPanel(
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
             materialize=materialize,
+            pbar=pbar,
         )
         indices = np.where(outputs)[0]
 

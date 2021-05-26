@@ -207,8 +207,9 @@ class AbstractColumn(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_proc: Optional[int] = 64,
+        num_workers: Optional[int] = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
@@ -237,8 +238,9 @@ class AbstractColumn(
             batched=batched,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
-            num_proc=num_proc,
+            num_workers=num_workers,
             materialize=materialize,
+            pbar=pbar,
         )
         indices = np.where(outputs)[0]
 
@@ -251,7 +253,7 @@ class AbstractColumn(
         batch_size: int = 32,
         drop_last_batch: bool = False,
         collate: bool = True,
-        num_workers: int = 4,
+        num_workers: int = 0,
         materialize: bool = True,
         *args,
         **kwargs,
