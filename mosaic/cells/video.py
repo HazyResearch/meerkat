@@ -68,6 +68,7 @@ class VideoCell(AbstractCell):
         self.clip_sampling = clip_sampling
         self.padding_mode = padding_mode # clip-ifier needs to include padding!
         self.random_clip_start = random_clip_start
+        self.frame_indices = None
 
         # pass into both new transforms
         self.time_dim = time_dim
@@ -87,7 +88,7 @@ class VideoCell(AbstractCell):
             img = F.to_tensor(img)
             # img = F.resize(img, self.size)
             frames.append(img)
-            cap.release()
+        cap.release()
         frames = torch.stack(frames, dim=self.time_dim)
         return frames
 
@@ -116,11 +117,21 @@ class VideoCell(AbstractCell):
                 inp = torch.index_select(inp, self.time_dim, indices)
         return inp
 
+    def build_indices(self, start, length):
+        vanilla_indices = torch.arange(start, start + self.clip_length)
+        if vanilla_indices.max().item() >= length:
+            if self.padding_mode == "loop":
+                vanilla_indices %= length
+            elif self.padding_mode == "freeze":
+                vanilla_indices[vanilla_indices >= length] = length - 1
+            else:
+                raise ValueError(f"Padding mode must be 'loop' or 'freeze' but got {self.padding_mode}")
+        return vanilla_indices
 
     def temporal_crop(self, frames):
         video_length = frames.size(self.time_dim)
         clips = []
-
+        self.frame_indices = []
         # temporal up/downsampling
         if self.downsample_ratio != 1:
             downsampled_indices = torch.arange(0, video_length, self.downsample_ratio).long()
@@ -128,21 +139,14 @@ class VideoCell(AbstractCell):
 
         for clip_number in range(self.n_clips):
             start, end = self.get_sampling_boundaries(video_length, clip_number)
-            try:
-                if self.random_clip_start:
-                    first_frame = random.randint(start, end - self.clip_length)
-                else:
-                    first_frame = start
-                clip = torch.index_select(frames, self.time_dim,
-                        torch.arange(first_frame, first_frame + self.clip_length))
-            except (ValueError, IndexError):  # too short -- read past segment + loop if needed
+            if self.random_clip_start:
+                first_frame = random.randint(start, end - self.clip_length)
+            else:
                 first_frame = start
-                video_length = frames.size(self.time_dim)
-                clip_end = min(video_length, first_frame + self.clip_length)
-                clip = torch.index_select(frames, self.time_dim, torch.arange(first_frame, clip_end))
-                clip = self.temporal_padding(clip, self.clip_length)
+            indices = self.build_indices(first_frame, len(frames))
+            self.frames_indices.append(indices.numpy())
+            clip = torch.index_select(frames, self.time_dim, indices)
             clips.append(clip)
-
         if self.stack_clips:  # new dim. for clips (n_clips, channel, duration, height, width)
             return torch.stack(clips, dim=0)
             self.time_dim += 1
