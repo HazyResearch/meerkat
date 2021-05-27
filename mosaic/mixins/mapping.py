@@ -17,7 +17,7 @@ class MappableMixin:
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_workers: Optional[int] = None,
+        num_workers: Optional[int] = 0,
         output_type: type = None,
         mmap: bool = False,
         materialize: bool = True,
