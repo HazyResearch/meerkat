@@ -15,7 +15,7 @@ class MappableMixin:
         function: Optional[Callable] = None,
         with_indices: bool = False,
         batched: bool = False,
-        batch_size: Optional[int] = 1000,
+        batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
         output_type: type = None,

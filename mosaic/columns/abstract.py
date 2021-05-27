@@ -227,7 +227,7 @@ class AbstractColumn(
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
         batched: bool = False,
-        batch_size: Optional[int] = 1000,
+        batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
         materialize: bool = True,
@@ -277,7 +277,7 @@ class AbstractColumn(
 
     def batch(
         self,
-        batch_size: int = 32,
+        batch_size: int = 1,
         drop_last_batch: bool = False,
         collate: bool = True,
         num_workers: int = 0,
