@@ -207,7 +207,7 @@ class AbstractColumn(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_workers: Optional[int] = None,
+        num_workers: Optional[int] = 0,
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
