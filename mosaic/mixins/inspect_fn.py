@@ -86,7 +86,7 @@ class FunctionInspectorMixin:
             list_output = True
             if batched and (
                 isinstance(output[0], (bool, np.bool_))
-                or (isinstance(output[0], np.ndarray) and (output[0].dtype == np.bool))
+                or (isinstance(output[0], np.ndarray) and (output[0].dtype == bool))
                 or (
                     isinstance(output[0], torch.Tensor)
                     and (output[0].dtype == torch.bool)

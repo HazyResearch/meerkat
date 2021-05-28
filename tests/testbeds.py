@@ -118,9 +118,12 @@ class MockDatapanel:
 
         self.visible_rows = [0, 4, 6, 11] if use_visible_rows else None
         if use_visible_rows:
-            self.dp.visible_rows = self.visible_rows
+            for column in self.dp.values():
+                column.visible_rows = self.visible_rows
 
-        self.visible_columns = ["a", "b"] if use_visible_columns else self.dp.columns
+        self.visible_columns = (
+            ["a", "b", "index"] if use_visible_columns else self.dp.columns
+        )
         if use_visible_columns:
             self.dp.visible_columns = self.visible_columns
 

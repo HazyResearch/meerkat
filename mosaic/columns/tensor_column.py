@@ -28,7 +28,7 @@ def getattr_decorator(fn: Callable):
         out = fn(*args, **kwargs)
         if isinstance(out, torch.Tensor):
             if out.ndim == 0:
-                return torch.tensor(out)
+                return out.clone().detach()
             return TensorColumn(out)
         else:
             return out
@@ -78,22 +78,11 @@ class TensorColumn(
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
-    def __setitem__(self, index, value):
-        if self.visible_rows is not None:
-            # TODO (sabri): this is a stop-gap solution but won't work for fancy numpy
-            # indexes, should find a way to cobine index and visible rows into one index
-            index = super()._remap_index(index)
-        return self._data.__setitem__(index, value)
-
-    def _remap_index(self, index):
-        # don't remap index since we take care of visibility with self.data
-        return index
-
-    def _get_cell(self, index: int, materialize: bool = True):
-        return self.data[index]
-
     def _get_batch(self, indices, materialize: bool = True):
-        return self.data[indices]
+        return self._data[indices]
+
+    def _set_batch(self, indices, values):
+        self._data[indices] = values
 
     @classmethod
     def get_writer(cls, mmap: bool = False):
