@@ -1,4 +1,4 @@
-from typing import Mapping, Optional, Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 
@@ -36,11 +36,12 @@ class VisibilityMixin:
             else:
                 self._visible_rows = self._visible_rows[np.array(indices, dtype=int)]
 
-        # Identify that `self` corresponds to a DataPanel
-        if hasattr(self, "_data") and isinstance(self._data, Mapping):
-            # Need to set visible_rows for all columns, not just visible ones
-            for column in self._data.values():
-                column.visible_rows = indices
+        # TODO (sabri): look at this for virtual column
+        # # Identify that `self` corresponds to a DataPanel
+        # if hasattr(self, "_data") and isinstance(self._data, Mapping):
+        #     # Need to set visible_rows for all columns, not just visible ones
+        #     for column in self._data.values():
+        #         column.visible_rows = indices
 
     def _remap_index(self, index):
         # TODO: lazy import needed to avoid circular dependency, this is should be

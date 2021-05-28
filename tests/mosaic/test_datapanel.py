@@ -542,10 +542,6 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
 
     assert dp.visible_columns == new_dp.visible_columns
 
-    visible_rows = None if dp.visible_rows is None else set(dp.visible_rows)
-    new_visible_rows = None if new_dp.visible_rows is None else set(dp.visible_rows)
-    assert visible_rows == new_visible_rows
-
 
 def test_repr_html_():
     dp, visible_rows, visible_columns = _get_datapanel(
