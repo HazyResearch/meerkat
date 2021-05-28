@@ -1,3 +1,9 @@
+"""WILDS configuration defaults and operations.
+
+All default configurations are integrated from the WILDS repository:
+https://github.com/p-lambda/wilds/blob/ca7e4fd345aa4f998b8322191b083444d85e2a08/examples/configs/datasets.py
+"""
+
 base_config = {
     "split_scheme": None,
     "dataset_kwargs": {},
