@@ -121,7 +121,9 @@ class Entity(DataPanel):
         ), "Length of embedding needs to be the same as data"
         self.add_column(name, embedding, overwrite)
         self._cast_to_embedding(name)
-        if not overwrite:
+        # If name is duplicate, overwrite must be true
+        # otherwise ``add_column`` would fail
+        if name not in self.embedding_columns:
             self.embedding_columns.append(name)
 
     def most_similar(

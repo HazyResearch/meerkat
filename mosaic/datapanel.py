@@ -347,8 +347,10 @@ class DataPanel(
 
         # Add the column
         self._data[name] = column
-        self.all_columns.append(name)
-        self.visible_columns.append(name)
+        # The overwrite check is already passing
+        if name not in self.all_columns:
+            self.all_columns.append(name)
+            self.visible_columns.append(name)
 
         # Set features
         self._set_features()
