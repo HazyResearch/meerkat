@@ -21,6 +21,8 @@ class CopyMixin:
                     kp: pycopy.copy(vp) if not hasattr(vp, "copy") else vp.copy()
                     for kp, vp in v.items()
                 }
+            elif k == "_data":
+                pass
             else:
                 state[k] = pycopy.copy(v)
 
