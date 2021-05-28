@@ -35,7 +35,7 @@ class ListColumn(AbstractColumn):
 
     def batch(
         self,
-        batch_size: int = 32,
+        batch_size: int = 1,
         drop_last_batch: bool = False,
         collate: bool = True,
         *args,
