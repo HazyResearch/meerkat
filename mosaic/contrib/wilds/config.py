@@ -78,7 +78,7 @@ dataset_defaults = {
         "irm_lambda": 1.0,
         "coral_penalty_weight": 1.0,
         "loader_kwargs": {
-            "num_workers": 0,
+            "num_workers": 1,
             "pin_memory": True,
         },
         "process_outputs_function": "multiclass_logits_to_pred",
@@ -163,7 +163,7 @@ dataset_defaults = {
         "irm_lambda": 1.0,
         "coral_penalty_weight": 10.0,
         "loader_kwargs": {
-            "num_workers": 0,
+            "num_workers": 1,
             "pin_memory": True,
         },
         "process_outputs_function": "multiclass_logits_to_pred",
@@ -480,7 +480,7 @@ split_defaults = {
 
 loader_defaults = {
     "loader_kwargs": {
-        "num_workers": 0,
+        "num_workers": 4,
         "pin_memory": True,
     },
     "n_groups_per_batch": 4,
