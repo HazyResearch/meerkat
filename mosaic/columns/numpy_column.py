@@ -97,22 +97,15 @@ class NumpyArrayColumn(
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
-    def __setitem__(self, index, value):
-        if self.visible_rows is not None:
-            # TODO (sabri): this is a stop-gap solution but won't work for fancy numpy
-            # indexes, should find a way to cobine index and visible rows into one index
-            index = super()._remap_index(index)
-        return self._data.__setitem__(index, value)
-
     @classmethod
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _get_cell(self, index: int, materialize: bool = True):
-        return self._data[index]
-
     def _get_batch(self, indices, materialize: bool = True):
         return self._data[indices]
+
+    def _set_batch(self, indices, values):
+        self._data[indices] = values
 
     @classmethod
     def get_writer(cls, mmap: bool = False):

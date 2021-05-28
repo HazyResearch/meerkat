@@ -6,7 +6,7 @@ import os
 import pathlib
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Union
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import cytoolz as tz
 import datasets
@@ -20,6 +20,7 @@ from datasets import DatasetInfo, NamedSplit
 from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
+import mosaic
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.cell_column import CellColumn
 from mosaic.mixins.copying import CopyMixin
@@ -27,7 +28,6 @@ from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
 from mosaic.mixins.state import StateDictMixin
-from mosaic.mixins.visibility import VisibilityMixin
 from mosaic.tools.identifier import Identifier
 from mosaic.tools.utils import convert_to_batch_fn, recmerge
 
@@ -45,7 +45,6 @@ class DataPanel(
     MappableMixin,
     MaterializationMixin,
     StateDictMixin,
-    VisibilityMixin,
 ):
     """Mosaic DataPanel class."""
 
@@ -154,9 +153,9 @@ class DataPanel(
 
     def __len__(self):
         # If only a subset of rows are visible
-        if self.visible_rows is not None:
-            return len(self.visible_rows)
-        return self.full_length()
+        if len(self.visible_columns) == 0:
+            return 0
+        return len(self[self.visible_columns[0]])
 
     def full_length(self):
         # If there are columns, full_length of any column, since they must be same size
@@ -214,9 +213,6 @@ class DataPanel(
         # Show all columns by default
         self.visible_columns = copy(self.all_columns)
 
-        # Show all rows by default
-        self.visible_rows = None
-
         # Set the features
         self._set_features()
 
@@ -230,7 +226,7 @@ class DataPanel(
             # do nothing, keep old visible columns
             return
 
-        self._visible_columns = columns
+        self._visible_columns = copy(columns)
         if "index" not in self._visible_columns and "index" in self.all_columns:
             self._visible_columns.append("index")
 
@@ -379,14 +375,50 @@ class DataPanel(
 
     def append(
         self,
-        example_or_batch: Union[Example, Batch],
+        dp: DataPanel,
+        axis: Union[str, int] = "rows",
+        suffixes: Tuple[str] = None,
+        overwrite: bool = False,
     ) -> None:
         """Append a batch of data to the dataset.
 
         `example_or_batch` must have the same columns as the dataset
         (regardless of what columns are visible).
         """
-        self._dataset.append(example_or_batch)
+        if axis == 0 or axis == "rows":
+            # append new rows
+            if set(dp.visible_columns) != set(self.visible_columns):
+                unmatched_columns = set(dp.visible_columns) ^ set(self.visible_columns)
+                raise ValueError(
+                    "Can only append DataPanels along axis 0 (rows) if they have the "
+                    f"same columns. Columns in one but not both: {unmatched_columns}."
+                )
+            return DataPanel(
+                {self[column].append(dp[column]) for column in dp.visible_columns}
+            )
+        elif axis == 1 or axis == "columns":
+            # append new columns
+            if len(dp) != len(self):
+                raise ValueError(
+                    "Can only append DataPanels along axis 1 (columns) if they have the"
+                    f"same length. {len(self)} != {len(dp)}"
+                )
+
+            shared = set(dp.visible_columns).intersection(set(self.visible_columns))
+            if not overwrite and shared:
+                if suffixes is None:
+                    raise ValueError()
+                left_suf, right_suf = suffixes
+                data = {
+                    **{k + left_suf if k in shared else k: v for k, v in self.items()},
+                    **{k + right_suf if k in shared else k: v for k, v in dp.items()},
+                }
+            else:
+                data = {**dict(self.items()), **dict(dp.items())}
+
+            return DataPanel.from_batch(data)
+        else:
+            raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
     def _add_index(self):
         """Add an index to the dataset."""
@@ -431,7 +463,7 @@ class DataPanel(
         return Identifier(_name=_name, **kwargs)
 
     def _get(self, index, materialize: bool = False):
-        if isinstance(index, int) or isinstance(index, np.int):
+        if isinstance(index, int):
             # int index => single row (dict)
             return {
                 k: self._data[k]._get(index, materialize=materialize)
@@ -765,8 +797,9 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         remove_columns: Optional[List[str]] = None,
-        num_workers: int = 4,
+        num_workers: int = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> DataPanel:
         """Update the columns of the dataset."""
@@ -803,10 +836,7 @@ class DataPanel(
         logger.info("Running update, a new dataset will be returned.")
 
         # Copy the ._data dict with a reference to the actual columns
-        if self.visible_rows is not None:
-            new_dp = self.lz[:]
-        else:
-            new_dp = self.copy()
+        new_dp = self.copy()
 
         # Calculate the values for the new columns using a .map()
         output = new_dp.map(
@@ -817,6 +847,7 @@ class DataPanel(
             num_workers=num_workers,
             input_columns=input_columns,
             materialize=materialize,
+            pbar=pbar,
         )
 
         # Add new columns for the update
@@ -841,10 +872,11 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 32,
         drop_last_batch: bool = False,
-        num_workers: int = 4,
+        num_workers: int = None,
         output_type: type = None,
         mmap: bool = False,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
         input_columns = self.visible_columns if input_columns is None else input_columns
@@ -859,23 +891,9 @@ class DataPanel(
                 output_type=output_type,
                 mmap=mmap,
                 materialize=materialize,
+                pbar=pbar,
                 **kwargs,
             )
-
-    @staticmethod
-    def _concat_batches(batches):
-        first_batch = batches[0]
-        if isinstance(first_batch, np.ndarray):
-            return np.concatenate(batches, axis=0)
-        elif isinstance(first_batch, torch.Tensor):
-            return torch.cat(batches, axis=0)
-        elif isinstance(first_batch, list) or isinstance(first_batch, tuple):
-            return tz.concat(batches)
-        else:
-            output = []
-            for batch in batches:
-                output.extend(batch)
-            return output
 
     def filter(
         self,
@@ -885,8 +903,9 @@ class DataPanel(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_workers: int = 4,
+        num_workers: int = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[DataPanel]:
         """Filter operation on the DataPanel."""
@@ -919,14 +938,43 @@ class DataPanel(
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
             materialize=materialize,
+            pbar=pbar,
         )
         indices = np.where(outputs)[0]
 
-        # Filter returns a new datapanel
+        # filter returns a new datapanel
         new_datapanel = self.copy()
-        new_datapanel.visible_rows = indices
+        for column in new_datapanel._data.values():
+            column.visible_rows = indices
 
         return new_datapanel
+
+    def merge(
+        self,
+        right: mosaic.DataPanel,
+        how: str = "inner",
+        on: Union[str, List[str]] = None,
+        left_on: Union[str, List[str]] = None,
+        right_on: Union[str, List[str]] = None,
+        sort: bool = False,
+        suffixes: Sequence[str] = ("_x", "_y"),
+        validate=None,
+        keep_indexes: bool = False,
+    ):
+        from mosaic import merge
+
+        return merge(
+            self,
+            right,
+            how=how,
+            on=on,
+            left_on=left_on,
+            right_on=right_on,
+            sort=sort,
+            suffixes=suffixes,
+            validate=validate,
+            keep_indexes=keep_indexes,
+        )
 
     def items(self):
         for name, column in self._data.items():
@@ -1031,7 +1079,6 @@ class DataPanel(
             "_data",
             "all_columns",
             "_visible_columns",
-            "_visible_rows",
             "_info",
             "_split",
         }

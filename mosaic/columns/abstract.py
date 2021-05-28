@@ -126,6 +126,37 @@ class AbstractColumn(
             return new_column
 
     def _get(self, index, materialize: bool = True):
+        index = self._translate_index(index)
+        if isinstance(index, int):
+            return self._get_cell(index, materialize=materialize)
+        elif isinstance(index, np.ndarray):
+            return self.__class__.from_data(
+                self._get_batch(index, materialize=materialize)
+            )
+
+    def __getitem__(self, index):
+        return self._get(index, materialize=True)
+
+    def _set_cell(self, index, value):
+        self._data[index] = value
+
+    def _set_batch(self, indices: np.ndarray, values):
+        for index, value in zip(indices, values):
+            self._set_cell(int(index), value)
+
+    def _set(self, index, value):
+        index = self._translate_index(index)
+        if isinstance(index, int):
+            self._set_cell(index, value)
+        elif isinstance(index, Sequence) or isinstance(index, np.ndarray):
+            self._set_batch(index, value)
+        else:
+            raise ValueError
+
+    def __setitem__(self, index, value):
+        self._set(index, value)
+
+    def _translate_index(self, index):
         if self.visible_rows is not None:
             # Remap the index if only some rows are visible
             index = self._remap_index(index)
@@ -133,19 +164,15 @@ class AbstractColumn(
         # `index` should return a single element
         # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
         # so we match this behavior
-        if (
-            isinstance(index, int)
-            or isinstance(index, np.int)
-            or (isinstance(index, tuple) and len(index) == 1)
-        ):
-            return self._get_cell(int(index), materialize=materialize)
+        if isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1):
+            return index
 
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
             indices = np.arange(self.full_length())[index]
         elif isinstance(index, tuple) or isinstance(index, list):
-            indices = index
+            indices = np.array(index)
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
                 raise TypeError(
@@ -160,12 +187,7 @@ class AbstractColumn(
             raise TypeError(
                 "Object of type {} is not a valid index".format(type(index))
             )
-        return self.__class__.from_data(
-            self._get_batch(indices, materialize=materialize)
-        )
-
-    def __getitem__(self, index):
-        return self._get(index, materialize=True)
+        return indices
 
     @staticmethod
     def _convert_to_batch_fn(
@@ -207,8 +229,9 @@ class AbstractColumn(
         batched: bool = False,
         batch_size: Optional[int] = 1000,
         drop_last_batch: bool = False,
-        num_proc: Optional[int] = 64,
+        num_workers: Optional[int] = None,
         materialize: bool = True,
+        pbar: bool = False,
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
@@ -237,8 +260,9 @@ class AbstractColumn(
             batched=batched,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
-            num_proc=num_proc,
+            num_workers=num_workers,
             materialize=materialize,
+            pbar=pbar,
         )
         indices = np.where(outputs)[0]
 
@@ -246,12 +270,17 @@ class AbstractColumn(
         new_column.visible_rows = indices
         return new_column
 
+    def append(self, column: AbstractColumn) -> None:
+        # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
+        # implement specific ones for ListColumn, NumpyColumn etc.
+        raise NotImplementedError
+
     def batch(
         self,
         batch_size: int = 32,
         drop_last_batch: bool = False,
         collate: bool = True,
-        num_workers: int = 4,
+        num_workers: int = 0,
         materialize: bool = True,
         *args,
         **kwargs,
@@ -324,19 +353,29 @@ class AbstractColumn(
         # need to import lazily to avoid circular import
         if isinstance(data, AbstractColumn):
             return data.copy()
-        elif torch.is_tensor(data):
+
+        if torch.is_tensor(data):
             from .tensor_column import TensorColumn
 
             return TensorColumn(data)
-        elif isinstance(data, np.ndarray):
+
+        if isinstance(data, np.ndarray):
             from .numpy_column import NumpyArrayColumn
 
             return NumpyArrayColumn(data)
-        elif isinstance(data, pd.Series):
+
+        if isinstance(data, pd.Series):
             from .numpy_column import NumpyArrayColumn
 
-            return NumpyArrayColumn(data.values)
-        elif isinstance(data, Sequence):
+            if data.dtype != object or (len(data) > 0 and isinstance(data[0], str)):
+                # if first element in object series is str, still return a
+                # `NumpyArrayColumn`
+                return NumpyArrayColumn(data.values)
+            # otherwise, get the list of objects and proceed to `Sequence` case
+            # below (e.g. `pd.Series` of AbstractCells)
+            data: List = list(data.values)
+
+        if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
 
             if len(data) != 0 and isinstance(data[0], AbstractCell):
