@@ -5,7 +5,13 @@ from typing import Any, Dict, List, Union
 import numpy as np
 import torch
 
-from mosaic import DataPanel, EmbeddingColumn
+from mosaic import (
+    DataPanel,
+    EmbeddingColumn,
+    ListColumn,
+    NumpyArrayColumn,
+    TensorColumn,
+)
 from mosaic.tools.identifier import Identifier
 
 logger = logging.getLogger(__name__)
@@ -41,9 +47,8 @@ class Entity(DataPanel):
             if not self.index_column:
                 self._add_ent_index()
             self._check_columns_exist([self.index_column])
-            # TODO (Laurel): This will break when changing rows in every way.
             self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
-        else:  # Initializing empty Entity DP
+        else:  # Initializing empty Entity DP - needed when loading
             self.embedding_columns = []
             self.index_column = None
             self._index_to_rowid = {}
@@ -55,6 +60,7 @@ class Entity(DataPanel):
         embedding_columns: List[str] = None,
         index_column: str = None,
     ):
+        """Returns Entity DP from standard DP"""
         return cls(
             datapanel._data,
             embedding_columns=embedding_columns,
@@ -66,16 +72,17 @@ class Entity(DataPanel):
         return self[self.index_column]
 
     def iget(self, idx: Any):
+        """Gets the row given the entity index"""
         if not isinstance(idx, type(next(iter(self._index_to_rowid.keys())))):
             raise ValueError(
                 "Query must be the same type as the index column of the data"
             )
         assert idx in self._index_to_rowid, f"{idx} not in index set"
         row_idx = self._index_to_rowid[idx]
-        if self.visible_rows is not None:
+        if self.index.visible_rows is not None:
             # Map from original index into visible row index (inverse of remap index)
             try:
-                row_idx = int(np.where(self.visible_rows == row_idx)[0][0])
+                row_idx = int(np.where(self.index.visible_rows == row_idx)[0][0])
             except IndexError:
                 raise IndexError(f"{idx} not in data")
         return self[row_idx]
@@ -125,6 +132,24 @@ class Entity(DataPanel):
         # otherwise ``add_column`` would fail
         if name not in self.embedding_columns:
             self.embedding_columns.append(name)
+
+    def convert_entities_to_ids(
+        self, column: Union[ListColumn, TensorColumn, NumpyArrayColumn]
+    ):
+        """Maps column of entity idx to their row ids for the embeddings.
+        Used in data prep before training."""
+
+        def recursive_map(seq):
+            if isinstance(seq, (np.ndarray, torch.Tensor, list)):
+                return [recursive_map(item) for item in seq]
+            else:
+                # TODO: handle UNK entity ids
+                return self._index_to_rowid[seq]
+
+        assert isinstance(
+            column, (ListColumn, TensorColumn, NumpyArrayColumn)
+        ), "We only support list types"
+        return column.map(lambda x: recursive_map(x))
 
     def most_similar(
         self,

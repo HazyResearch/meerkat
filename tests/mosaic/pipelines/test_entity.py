@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import torch
 
-from mosaic import EmbeddingColumn
+from mosaic import DataPanel, EmbeddingColumn, ListColumn, NumpyArrayColumn
 from mosaic.pipelines.entity import Entity
 
 
@@ -127,6 +127,7 @@ def test_find_similar_multiple_columns(k):
     data = _get_entity_data()
 
     ent = Entity(data, index_column="c", embedding_columns=["g"])
+    np.random.seed(1234)
     embs_data = np.random.randn(3, 6)
     ent.add_embedding_column("embs2", embs_data)
 
@@ -148,3 +149,23 @@ def test_find_similar_multiple_columns(k):
     assert isinstance(sim, Entity)
     assert len(sim) == k
     assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]
+
+
+def test_convert_entities_to_ids():
+    data = _get_entity_data()
+
+    ent = Entity(data, index_column="c", embedding_columns=["g"])
+
+    train_data = DataPanel(
+        {
+            "col1": NumpyArrayColumn(np.array(["x", "z", "z", "y"])),
+            "col2": [["x", "x"], ["y"], ["z", "x", "x"], ["y"]],
+        }
+    )
+
+    col1 = ent.convert_entities_to_ids(train_data["col1"])
+    assert isinstance(col1, NumpyArrayColumn)
+    assert all(col1 == np.array([0, 2, 2, 1]))
+    col2 = ent.convert_entities_to_ids(train_data["col2"])
+    assert isinstance(col2, ListColumn)
+    assert col2._data == [[0, 0], [1], [2, 0, 0], [1]]
