@@ -10,9 +10,8 @@ import pandas as pd
 import torch
 
 from mosaic.mixins.collate import CollateMixin
-from mosaic.mixins.copying import CopyMixin
+from mosaic.mixins.copying import ColumnCopyMixin
 from mosaic.mixins.identifier import IdentifierMixin
-from mosaic.mixins.index import IndexableMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
@@ -29,10 +28,9 @@ logger = logging.getLogger(__name__)
 class AbstractColumn(
     CollateMixin,
     ColumnStorageMixin,
-    CopyMixin,
+    ColumnCopyMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
-    IndexableMixin,
     MappableMixin,
     MaterializationMixin,
     StateDictMixin,
@@ -55,7 +53,6 @@ class AbstractColumn(
         self._data = data
 
         super(AbstractColumn, self).__init__(
-            n=len(data) if data is not None else 0,
             identifier=identifier,
             collate_fn=collate_fn,
             *args,
@@ -121,7 +118,7 @@ class AbstractColumn(
             return self.collate([self._get_cell(int(i)) for i in indices])
 
         else:
-            new_column = self.copy()
+            new_column = self.view()
             new_column._visible_rows = indices
             return new_column
 
@@ -130,9 +127,8 @@ class AbstractColumn(
         if isinstance(index, int):
             return self._get_cell(index, materialize=materialize)
         elif isinstance(index, np.ndarray):
-            return self.__class__.from_data(
-                self._get_batch(index, materialize=materialize)
-            )
+            batch = self._get_batch(index, materialize=materialize)
+            return self.__class__.from_data(batch)
 
     def __getitem__(self, index):
         return self._get(index, materialize=True)
@@ -170,6 +166,7 @@ class AbstractColumn(
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
+            # TODO (sabri): get rid of the np.arange here, very slow for large columns
             indices = np.arange(self.full_length())[index]
         elif isinstance(index, tuple) or isinstance(index, list):
             indices = np.array(index)
@@ -180,8 +177,12 @@ class AbstractColumn(
                         len(index.shape)
                     )
                 )
-            indices = np.arange(self.full_length())[index]
+            if index.dtype == bool:
+                indices = np.where(index)[0]
+            else:
+                return index
         elif isinstance(index, AbstractColumn):
+            # TODO (sabri): get rid of the np.arange here, very slow for large columns
             indices = np.arange(self.full_length())[index]
         else:
             raise TypeError(
@@ -266,7 +267,7 @@ class AbstractColumn(
         )
         indices = np.where(outputs)[0]
 
-        new_column = self.copy()
+        new_column = self.view()
         new_column.visible_rows = indices
         return new_column
 
@@ -350,9 +351,8 @@ class AbstractColumn(
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to a mosaic column using the appropriate Column
         type."""
-        # need to import lazily to avoid circular import
         if isinstance(data, AbstractColumn):
-            return data.copy()
+            return data.view()
 
         if torch.is_tensor(data):
             from .tensor_column import TensorColumn

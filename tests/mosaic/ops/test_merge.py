@@ -58,7 +58,7 @@ def get_dps(
                 column.visible_rows = visible_rows
 
         if use_visible_columns:
-            dp.visible_columns = visible_columns
+            dp.visible_columns = [c for c in visible_columns if c in dp.all_columns]
 
         dps.append(dp)
     return dps[0], dps[1], visible_rows, visible_columns, shuffle1, shuffle2
