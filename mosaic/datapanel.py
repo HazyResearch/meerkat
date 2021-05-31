@@ -23,7 +23,7 @@ from jsonlines import jsonlines
 import mosaic
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.cell_column import CellColumn
-from mosaic.mixins.copying import CopyMixin
+from mosaic.mixins.copying import DataPanelCopyMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
@@ -40,7 +40,7 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 class DataPanel(
     DatasetInfoMixin,
-    CopyMixin,
+    DataPanelCopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
     MaterializationMixin,
@@ -157,6 +157,9 @@ class DataPanel(
             return 0
         return len(self[self.visible_columns[0]])
 
+    def __contains__(self, item):
+        return item in self.visible_columns
+
     def full_length(self):
         # If there are columns, full_length of any column, since they must be same size
         if self.column_names:
@@ -225,6 +228,9 @@ class DataPanel(
         if columns is None:
             # do nothing, keep old visible columns
             return
+        for c in columns:
+            if c not in self.all_columns:
+                raise ValueError(f"Trying to set nonexistant column {c} to visible.")
 
         self._visible_columns = copy(columns)
         if "index" not in self._visible_columns and "index" in self.all_columns:
@@ -343,7 +349,7 @@ class DataPanel(
 
         # Add the column
         self._data[name] = column
-        # The overwrite check is already passing
+
         if name not in self.all_columns:
             self.all_columns.append(name)
             self.visible_columns.append(name)
@@ -492,7 +498,7 @@ class DataPanel(
                 if not set(index).issubset(self.visible_columns):
                     missing_cols = set(self.visible_columns) - set(index)
                     raise ValueError(f"DataPanel does not have columns {missing_cols}")
-                dp = self.copy()
+                dp = self.view()
                 dp.visible_columns = index
                 return dp
 
@@ -836,7 +842,7 @@ class DataPanel(
         logger.info("Running update, a new dataset will be returned.")
 
         # Copy the ._data dict with a reference to the actual columns
-        new_dp = self.copy()
+        new_dp = self.view()
 
         # Calculate the values for the new columns using a .map()
         output = new_dp.map(
@@ -943,7 +949,7 @@ class DataPanel(
         indices = np.where(outputs)[0]
 
         # filter returns a new datapanel
-        new_datapanel = self.copy()
+        new_datapanel = self.view()
         for column in new_datapanel._data.values():
             column.visible_rows = indices
 
@@ -977,19 +983,15 @@ class DataPanel(
         )
 
     def items(self):
-        for name, column in self._data.items():
-            if name in self.visible_columns:
-                yield name, column
+        for name in self.visible_columns:
+            yield name, self._data[name]
 
     def keys(self):
-        for name in self._data.keys():
-            if name in self.visible_columns:
-                yield name
+        return self.visible_columns
 
     def values(self):
-        for name, column in self._data.items():
-            if name in self.visible_columns:
-                yield column
+        for name in self.visible_columns:
+            yield self._data[name]
 
     @classmethod
     def read(
