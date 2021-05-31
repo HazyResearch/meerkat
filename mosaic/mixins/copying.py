@@ -16,11 +16,11 @@ class AbstractCopyMixin(abc.ABC):
         return NotImplemented
 
     def view(self) -> object:
-        """When called on a column, returns a new column with the same underlying data,
-        but distinct views into that data (e.g. `AbstractColumn.visible_rows`,
-        `AbstractColumn._collate_fn`, and `DataPanel.visible_columns`).
-        Consider the following example:
-        ```
+        """When called on a column, returns a new column with the same
+        underlying data, but distinct views into that data (e.g.
+        `AbstractColumn.visible_rows`, `AbstractColumn._collate_fn`, and
+        `DataPanel.visible_columns`). Consider the following example: ```
+
             >>> column = ListColumn([0,0,0])
             >>> view = column.view()
             >>> view[0] = 10
@@ -45,7 +45,7 @@ class AbstractCopyMixin(abc.ABC):
         return self._copy(view=True)
 
     def copy(self) -> object:
-        """ Returns columns with a shallow copy of the underlying data."""
+        """Returns columns with a shallow copy of the underlying data."""
         return self._copy(view=False)
 
     def deepcopy(self) -> object:
