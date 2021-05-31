@@ -46,7 +46,7 @@ from mosaic import DataPanel, ImageColumn
 # Images are NOT read from disk at DataPanel creation...
 dp = DataPanel({
     'text': ['The quick brown fox.', 'Jumped over.', 'The lazy dog.'],
-    'image': ImageColumn(['fox.png', 'jump.png', 'dog.png']),
+    'image': ImageColumn.from_filepaths(['fox.png', 'jump.png', 'dog.png']),
     'label': [0, 1, 0]
 }) 
 
