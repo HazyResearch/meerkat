@@ -29,6 +29,9 @@ def merge(
         raise ValueError("Merge expects either `on` or `left_on` and `right_on`")
     left_on = on if left_on is None else left_on
     right_on = on if right_on is None else right_on
+    # cast `left_on` and `right_on` to lists
+    left_on = [left_on] if isinstance(left_on, str) else left_on
+    right_on = [right_on] if isinstance(right_on, str) else right_on
 
     # ensure we can merge on specified columns
     _check_merge_columns(left, left_on)
@@ -36,14 +39,15 @@ def merge(
 
     # convert datapanels to dataframes so we can apply Pandas merge
     # (1) only include columns we are joining on
-    left_on = [left_on] if isinstance(left_on, str) else left_on
-    right_on = [right_on] if isinstance(right_on, str) else right_on
     left_df = left[left_on].to_pandas()
     right_df = right[right_on].to_pandas()
     # (2) add index columns, which we'll use to reconstruct the columns we excluded from
     # the Pandas merge
     if ("__right_indices__" in right_df) or ("__left_indices__" in left_df):
-        raise ValueError("The column names '__right_indices__' and ")
+        raise ValueError(
+            "The column names '__right_indices__' and '__left_indices__' cannot appear "
+            "in the right and left panels respectively. They are used by merge."
+        )
     left_df["__left_indices__"] = np.arange(len(left_df))
     right_df["__right_indices__"] = np.arange(len(right_df))
 
@@ -59,48 +63,52 @@ def merge(
     )
     left_indices = merged_df.pop("__left_indices__").values
     right_indices = merged_df.pop("__right_indices__").values
+    merged_df = merged_df[set(left_on) & set(right_on)]
 
-    # reconstruct other columns not in the `left_on | right_on` using `left_indices`
+    # reconstruct other columns not in the `left_on & right_on` using `left_indices`
     # and `right_indices`, the row order returned by merge
-    merged_df = merged_df[set(left_on) | set(right_on)]
-    new_dps = []
-    for indices, dp in [(left_indices, left), (right_indices, right)]:
-        cols_to_create = [k for k in dp.keys() if k not in merged_df]
-        if np.isnan(indices).any():
-            # when performing "outer", "left", and "right" merges, column indices output
-            # by pandas merge can include `nan` in rows corresponding to merge keys that
-            # only appear in one of the two frames. For these columns, we convert the
-            # column to  ListColumn, and fill with "None" wherever indices is "nan".
-            data = {
-                name: ListColumn(
-                    [
-                        None if np.isnan(index) else col.lz[int(index)]
-                        for index in indices
-                    ]
-                )
-                for name, col in dp.items()
-                if name in cols_to_create
-            }
-            new_dp = DataPanel.from_batch(data)
-        else:
-            # if there are no `nan`s in the indices, then we can just lazy index the
-            # original column
-            new_dp = dp[cols_to_create].lz[indices]
-        new_dps.append(new_dp)
+    def _cols_to_construct(dp: DataPanel):
+        # don't construct columns in both `left_on` and `right_on` because we use
+        # `merged_df` for these
+        return [k for k in dp.keys() if k not in (set(left_on) & set(right_on))]
 
-    # concatenate the three datapanels (1) reconstructed from left indices,
-    # (2) reconstructed from right indices, (3) created out of the output of pandas
-    # merge
-    merged_dp = new_dps[0].append(new_dps[1], axis="columns", suffixes=suffixes)
-    merged_dp = DataPanel.from_pandas(merged_df).append(
-        merged_dp, axis="columns", overwrite=True
-    )
+    new_left = _construct_from_indices(left[_cols_to_construct(left)], left_indices)
+    new_right = _construct_from_indices(right[_cols_to_construct(right)], right_indices)
+
+    # concatenate the two new datapanels
+    merged_dp = new_left.append(new_right, axis="columns", suffixes=suffixes)
+
+    # add columns in both `left_on` and `right_on`, casting to the column type in left
+    for name, column in merged_df.iteritems():
+        merged_dp.add_column(name, left[name].__class__(data=column.values))
+        merged_dp.visible_columns = (
+            merged_dp.visible_columns[-1:] + merged_dp.visible_columns[:-1]
+        )
 
     if not keep_indexes:
         merged_dp.remove_column("index" + suffixes[0])
         merged_dp.remove_column("index" + suffixes[1])
 
     return merged_dp
+
+
+def _construct_from_indices(dp: DataPanel, indices: np.ndarray):
+    if np.isnan(indices).any():
+        # when performing "outer", "left", and "right" merges, column indices output
+        # by pandas merge can include `nan` in rows corresponding to merge keys that
+        # only appear in one of the two panels. For these columns, we convert the
+        # column to  ListColumn, and fill with "None" wherever indices is "nan".
+        data = {
+            name: ListColumn(
+                [None if np.isnan(index) else col.lz[int(index)] for index in indices]
+            )
+            for name, col in dp.items()
+        }
+        return DataPanel.from_batch(data)
+    else:
+        # if there are no `nan`s in the indices, then we can just lazy index the
+        # original column
+        return dp.lz[indices]
 
 
 def _check_merge_columns(dp: DataPanel, on: List[str]):
