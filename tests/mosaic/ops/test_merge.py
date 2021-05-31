@@ -58,7 +58,7 @@ def get_dps(
                 column.visible_rows = visible_rows
 
         if use_visible_columns:
-            dp.visible_columns = visible_columns
+            dp.visible_columns = [c for c in visible_columns if c in dp.all_columns]
 
         dps.append(dp)
     return dps[0], dps[1], visible_rows, visible_columns, shuffle1, shuffle2
@@ -261,10 +261,17 @@ def test_merge_right(use_visible_rows, use_visible_columns, sort):
         assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
 
 
+def test_merge_output_column_types():
+    dp1 = DataPanel.from_batch({"a": np.arange(3), "b": ListColumn(["1", "2", "3"])})
+    dp2 = dp1.copy()
+
+    out = dp1.merge(dp2, on="b", how="inner")
+    assert isinstance(out["b"], ListColumn)
+
+
 def test_cell_merge(tmpdir):
     length = 16
     img_col_test_bed = MockImageColumn(length=length, tmpdir=tmpdir)
-    # check dictionary not hashable
     dp1 = DataPanel.from_batch(
         {
             "a": np.arange(length),
