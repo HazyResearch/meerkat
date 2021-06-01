@@ -50,13 +50,6 @@ class TensorColumn(
             data = torch.as_tensor(data)
         super(TensorColumn, self).__init__(data=data, *args, **kwargs)
 
-    @property
-    def data(self):
-        if self.visible_rows is not None:
-            return self._data[self.visible_rows]
-        else:
-            return self._data
-
     def __torch_function__(self, func, types, args=(), kwargs=None):
         if kwargs is None:
             kwargs = {}
@@ -83,6 +76,10 @@ class TensorColumn(
 
     def _set_batch(self, indices, values):
         self._data[indices] = values
+
+    @staticmethod
+    def concat(columns: Sequence[TensorColumn]):
+        return TensorColumn(torch.cat([c.data for c in columns]))
 
     @classmethod
     def get_writer(cls, mmap: bool = False):

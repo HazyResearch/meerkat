@@ -68,16 +68,18 @@ class AbstractColumn(
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     def __str__(self):
-        if self.visible_rows is not None:
-            return (
-                f"{self.__class__.__name__}View"
-                f"({reprlib.repr([self.data[i] for i in self.visible_rows[:8]])})"
-            )
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     @property
     def data(self):
-        return self._data
+        """Get the underlying data (excluding invisible rows).
+
+        To access underlying data with invisible rows, use `_data`.
+        """
+        if self.visible_rows is not None:
+            return self._data[self.visible_rows]
+        else:
+            return self._data
 
     @property
     def metadata(self):
@@ -272,6 +274,12 @@ class AbstractColumn(
         return new_column
 
     def append(self, column: AbstractColumn) -> None:
+        # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
+        # implement specific ones for ListColumn, NumpyColumn etc.
+        raise NotImplementedError
+
+    @staticmethod
+    def concat(columns: Sequence[AbstractColumn]) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
