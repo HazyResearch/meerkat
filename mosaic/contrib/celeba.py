@@ -1,6 +1,5 @@
 import hashlib
 import os
-from functools import partial
 from typing import List
 
 import pandas as pd
@@ -50,9 +49,10 @@ ATTRIBUTES = [
 ]
 
 
-def download_celeba(root_dir: str):
-    CelebA(root_dir, download=True)
-    build_celeba_df(os.path.join(root_dir, "celeba"))
+def download_celeba(dataset_dir: str):
+    if not os.path.exists(dataset_dir):
+        CelebA(os.path.split(dataset_dir)[:-1], download=True)
+    build_celeba_df(dataset_dir)
 
 
 def build_celeba_df(
@@ -82,31 +82,16 @@ def build_celeba_df(
         lambda x: os.path.join(dataset_dir, "img_align_celeba", x)
     )
 
-    # add splits by hashing each file name to a number between 0 and 1
-    if split_configs is None:
-        split_configs = [{"split": "train", "size": len(celeb_df)}]
+    split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))
+    split_df["split"] = split_df["partition"].replace(
+        {0: "test", 1: "valid", 2: "test"}
+    )
+    celeb_df = celeb_df.merge(
+        split_df[["image_id", "split"]], left_on="file", right_on="image_id"
+    )
 
-    # hash on identity to avoid same person straddling the train-test divide
-    example_hash = celeb_df.identity.apply(partial(_hash_for_split, salt=salt))
-    total_size = sum([config["size"] for config in split_configs])
-
-    if total_size > len(celeb_df):
-        raise ValueError("Total size cannot exceed full dataset size.")
-
-    start = 0
-    celeb_df["example_hash"] = example_hash
-    dfs = []
-    for config in split_configs:
-        frac = config["size"] / total_size
-        end = start + frac
-        df = celeb_df[(start < example_hash) & (example_hash <= end)]
-        df = df.sample(n=config["size"])
-        df["split"] = config["split"]
-        dfs.append(df)
-        start = end
-    df = pd.concat(dfs)
-    df.to_csv(os.path.join(dataset_dir, "celeba.csv"))
-    return df
+    celeb_df.to_csv(os.path.join(dataset_dir, "celeba.csv"), index=False)
+    return celeb_df
 
 
 def _hash_for_split(example_id: str, salt=""):

@@ -24,10 +24,10 @@ class ImagePath(FileMixin, AbstractCell):
         self.loader = self.default_loader if loader is None else loader
 
     def __str__(self):
-        return f"Image({self.name})"
+        return f"ImagePathCell({self.name})"
 
     def __repr__(self):
-        return f"Image({self.name})"
+        return f"ImagePathCell({self.name})"
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
