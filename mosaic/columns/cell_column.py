@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Sequence
 
+import cytoolz as tz
 import numpy as np
 import pandas as pd
 
@@ -47,12 +48,15 @@ class CellColumn(AbstractColumn):
 
     @property
     def cells(self):
-        if self.visible_rows is None:
-            return self.data
-        else:
-            return [self.data[i] for i in self.visible_rows]
+        return self.data
 
     def _repr_pandas_(
         self,
     ) -> pd.Series:
         return pd.Series([cell.__repr__() for cell in self.cells])
+
+    @staticmethod
+    def concat(columns: Sequence[CellColumn]):
+        return columns[0].__class__.from_cells(
+            list(tz.concat([c.data for c in columns]))
+        )

@@ -387,15 +387,7 @@ class DataPanel(
         """
         if axis == 0 or axis == "rows":
             # append new rows
-            if set(dp.visible_columns) != set(self.visible_columns):
-                unmatched_columns = set(dp.visible_columns) ^ set(self.visible_columns)
-                raise ValueError(
-                    "Can only append DataPanels along axis 0 (rows) if they have the "
-                    f"same columns. Columns in one but not both: {unmatched_columns}."
-                )
-            return DataPanel(
-                {self[column].append(dp[column]) for column in dp.visible_columns}
-            )
+            return mosaic.concat([self, dp], axis="rows")
         elif axis == 1 or axis == "columns":
             # append new columns
             if len(dp) != len(self):
