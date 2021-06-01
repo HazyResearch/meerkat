@@ -538,7 +538,7 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
     assert len(new_dp["c"]) == len(dp["c"])
 
     assert (dp["a"] == new_dp["a"]).all()
-    assert (dp["b"] == new_dp["b"]).all()
+    assert dp["b"].data == new_dp["b"].data
 
     assert dp.visible_columns == new_dp.visible_columns
 
@@ -622,3 +622,23 @@ def test_tail(tmpdir, use_visible_rows, use_visible_columns):
     assert new_dp.visible_columns == dp.visible_columns
     assert len(new_dp) == 2
     assert (new_dp["a"] == dp["a"][-2:]).all()
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows,use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_append_columns(use_visible_rows, use_visible_columns):
+    mock = MockDatapanel(
+        length=16,
+        use_visible_rows=use_visible_rows,
+        use_visible_columns=use_visible_columns,
+    )
+
+    out = mock.dp.append(mock.dp, axis="rows")
+
+    assert len(out) == len(mock.visible_rows) * 2
+    assert isinstance(out, DataPanel)
+    assert set(out.visible_columns) == set(mock.visible_columns)
+    assert (out["a"].data == np.concatenate([mock.visible_rows] * 2)).all()
+    assert out["b"].data == list(np.concatenate([mock.visible_rows] * 2))
