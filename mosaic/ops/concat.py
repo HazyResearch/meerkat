@@ -11,16 +11,23 @@ def concat(
     objs: Union[Sequence[DataPanel], Sequence[AbstractColumn]],
     axis: Union[str, int] = "rows",
 ) -> Union[DataPanel, AbstractColumn]:
-    """Concatenate a sequence of columns or a sequence of datapanels.
-
-    If sequence is empty, returns an empty DataPanels.
+    """Concatenate a sequence of columns or a sequence of `DataPanel`s. If sequence is
+    empty, returns an empty `DataPanel`.
+    - If concatenating columns, all columns must be of the same type (e.g. all
+    `ListColumn`).
+    - If concatenating `DataPanel`s along axis 0 (rows), all `DataPanel`s must have the
+    same set of columns.
+    - If concatenating `DataPanel`s along axis 1 (columns), all `DataPanel`s must have
+    the same length and cannot have any of the same column names.
 
     Args:
-        objs (Union[Sequence[DataPanel], Sequence[AbstractColumn]]): [description]
+        objs (Union[Sequence[DataPanel], Sequence[AbstractColumn]]): sequence of columns
+            or DataPanels.
+        axis (Union[str, int]): The axis along which to concatenate. Ignored if
+            concatenating columns.
 
     Returns:
-        Union[DataPanel, AbstractColumn]: concatenated datapanel or column, depending on
-            type of objs.
+        Union[DataPanel, AbstractColumn]: concatenated DataPanel or column
     """
     if len(objs) == 0:
         return DataPanel()
