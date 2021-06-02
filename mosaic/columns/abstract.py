@@ -229,7 +229,7 @@ class AbstractColumn(
         function: Optional[Callable] = None,
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
@@ -250,7 +250,7 @@ class AbstractColumn(
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function, with_indices, batched=batched, materialize=materialize
+            function, with_indices, is_batched_fn=is_batched_fn, materialize=materialize
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -260,7 +260,7 @@ class AbstractColumn(
             function=function,
             with_indices=with_indices,
             input_columns=input_columns,
-            batched=batched,
+            is_batched_fn=is_batched_fn,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,

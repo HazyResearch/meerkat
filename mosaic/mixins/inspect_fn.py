@@ -13,7 +13,7 @@ class FunctionInspectorMixin:
         self,
         function: Callable,
         with_indices: bool = False,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         data=None,
         indices=None,
         materialize=True,
@@ -32,20 +32,20 @@ class FunctionInspectorMixin:
 
         # Run the function to test it
         if data is None:
-            if batched:
+            if is_batched_fn:
                 data = self[:2] if materialize else self.lz[:2]
             else:
                 data = self[0] if materialize else self.lz[0]
 
         if indices is None:
-            if batched:
+            if is_batched_fn:
                 indices = range(2)
             else:
                 indices = 0
 
-        if with_indices and batched:
+        if with_indices and is_batched_fn:
             output = function(data, indices)
-        elif with_indices and not batched:
+        elif with_indices and not is_batched_fn:
             output = function(data, indices)
         else:
             output = function(data)
@@ -84,7 +84,7 @@ class FunctionInspectorMixin:
         elif isinstance(output, (Sequence, AbstractColumn, torch.Tensor, np.ndarray)):
             # `function` returns a list
             list_output = True
-            if batched and (
+            if is_batched_fn and (
                 isinstance(output[0], (bool, np.bool_))
                 or (isinstance(output[0], np.ndarray) and (output[0].dtype == bool))
                 or (
