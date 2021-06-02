@@ -14,7 +14,7 @@ class MappableMixin:
         self,
         function: Optional[Callable] = None,
         with_indices: bool = False,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
@@ -46,12 +46,12 @@ class MappableMixin:
             logger.info("Dataset empty, returning None.")
             return None
 
-        if not batched:
+        if not is_batched_fn:
             # Convert to a batch function
             function = self._convert_to_batch_fn(
                 function, with_indices=with_indices, materialize=materialize
             )
-            batched = True
+            is_batched_fn = True
             logger.info(f"Converting `function` {function} to a batched function.")
 
         # Run the map
@@ -80,7 +80,7 @@ class MappableMixin:
                 function_properties = self._inspect_function(
                     function,
                     with_indices,
-                    batched,
+                    is_batched_fn,
                     batch,
                     range(start_index, end_index),
                     materialize=materialize,
