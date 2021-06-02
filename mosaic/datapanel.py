@@ -786,7 +786,7 @@ class DataPanel(
         function: Optional[Callable] = None,
         with_indices: bool = False,
         input_columns: Optional[Union[str, List[str]]] = None,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         remove_columns: Optional[List[str]] = None,
         num_workers: int = 0,
@@ -811,13 +811,13 @@ class DataPanel(
         # Get some information about the function
         with self.format(input_columns):
             function_properties = self._inspect_function(
-                function, with_indices, batched, materialize=materialize
+                function, with_indices, is_batched_fn, materialize=materialize
             )
             assert (
                 function_properties.dict_output
             ), f"`function` {function} must return dict."
 
-        if not batched:
+        if not is_batched_fn:
             # Convert to a batch function
             function = convert_to_batch_fn(
                 function, with_indices=with_indices, materialize=materialize
@@ -834,7 +834,7 @@ class DataPanel(
         output = new_dp.map(
             function=function,
             with_indices=with_indices,
-            batched=True,
+            is_batched_fn=True,
             batch_size=batch_size,
             num_workers=num_workers,
             input_columns=input_columns,
@@ -861,7 +861,7 @@ class DataPanel(
         function: Optional[Callable] = None,
         with_indices: bool = False,
         input_columns: Optional[Union[str, List[str]]] = None,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: int = 0,
@@ -876,7 +876,7 @@ class DataPanel(
             return super().map(
                 function=function,
                 with_indices=with_indices,
-                batched=batched,
+                is_batched_fn=is_batched_fn,
                 batch_size=batch_size,
                 drop_last_batch=drop_last_batch,
                 num_workers=num_workers,
@@ -892,7 +892,7 @@ class DataPanel(
         function: Optional[Callable] = None,
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: int = 0,
@@ -915,7 +915,10 @@ class DataPanel(
         # Get some information about the function
         with self.format(input_columns):
             function_properties = self._inspect_function(
-                function, with_indices, batched=batched, materialize=materialize
+                function,
+                with_indices,
+                is_batched_fn=is_batched_fn,
+                materialize=materialize,
             )
             assert function_properties.bool_output, "function must return boolean."
 
@@ -925,7 +928,7 @@ class DataPanel(
             function=function,
             with_indices=with_indices,
             input_columns=input_columns,
-            batched=batched,
+            is_batched_fn=is_batched_fn,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
