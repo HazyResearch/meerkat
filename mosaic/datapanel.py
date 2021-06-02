@@ -330,6 +330,10 @@ class DataPanel(
     ) -> None:
         """Add a column to the dataset."""
 
+        assert isinstance(
+            name, str
+        ), f"Column name must of type `str`, not `{type(name)}`."
+
         assert (name not in self.all_columns) or overwrite, (
             f"Column with name `{name}` already exists, "
             f"set `overwrite=True` to overwrite."
@@ -519,6 +523,14 @@ class DataPanel(
 
     def __getitem__(self, index):
         return self._get(index, materialize=True)
+
+    def get(self, column, value=None):
+        if column in self:
+            return self[column]
+        return value
+
+    def __setitem__(self, index, value):
+        self.add_column(name=index, data=value, overwrite=True)
 
     @property
     def has_index(self) -> bool:
