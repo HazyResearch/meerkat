@@ -4,6 +4,8 @@ import abc
 import copy as pycopy
 from typing import TYPE_CHECKING
 
+from mosaic.mixins.provenance import ProvenanceObjNode
+
 if TYPE_CHECKING:
     from mosaic import AbstractColumn, DataPanel
 
@@ -61,7 +63,7 @@ class ColumnCopyMixin(AbstractCopyMixin):
             if k == "_data" and view:
                 # don't copy the underlying data of the column if creating view
                 state[k] = v
-            else:
+            elif k != "_node":
                 state[k] = pycopy.copy(v)
 
         try:
@@ -72,6 +74,8 @@ class ColumnCopyMixin(AbstractCopyMixin):
             obj = self.__class__.__new__(self.__class__)
 
         obj.__dict__ = state
+        obj._node = ProvenanceObjNode(obj)
+
         return obj
 
 
@@ -89,7 +93,7 @@ class DataPanelCopyMixin(AbstractCopyMixin):
                     else vp._copy(view=view)
                     for kp, vp in v.items()
                 }
-            else:
+            elif k != "_node":
                 state[k] = pycopy.copy(v)
 
         try:
@@ -98,6 +102,6 @@ class DataPanelCopyMixin(AbstractCopyMixin):
             # use `__new__` to instantiate a bare class, in case __init__ does work
             # we do not want to repeat on copy
             obj = self.__class__.__new__(self.__class__)
-
         obj.__dict__ = state
+        obj._node = ProvenanceObjNode(obj)
         return obj

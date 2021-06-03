@@ -15,6 +15,7 @@ from mosaic.mixins.identifier import IdentifierMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
+from mosaic.mixins.provenance import ProvenanceMixin
 from mosaic.mixins.state import StateDictMixin
 from mosaic.mixins.storage import ColumnStorageMixin
 from mosaic.mixins.visibility import VisibilityMixin
@@ -33,6 +34,7 @@ class AbstractColumn(
     IdentifierMixin,
     MappableMixin,
     MaterializationMixin,
+    ProvenanceMixin,
     StateDictMixin,
     VisibilityMixin,
     abc.ABC,

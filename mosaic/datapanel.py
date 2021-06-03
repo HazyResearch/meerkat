@@ -27,6 +27,7 @@ from mosaic.mixins.copying import DataPanelCopyMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
+from mosaic.mixins.provenance import ProvenanceMixin, capture_provenance
 from mosaic.mixins.state import StateDictMixin
 from mosaic.tools.identifier import Identifier
 from mosaic.tools.utils import convert_to_batch_fn, recmerge
@@ -39,12 +40,13 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 
 class DataPanel(
-    DatasetInfoMixin,
     DataPanelCopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
     MaterializationMixin,
+    ProvenanceMixin,
     StateDictMixin,
+    DatasetInfoMixin,  # this should be the last in order of mixins
 ):
     """Mosaic DataPanel class."""
 
@@ -65,7 +67,6 @@ class DataPanel(
     ):
         # TODO(karan, sabri): copy columns when they're passed in and prevent users
         #  from setting visible_rows inside columns that belong to a datapanel
-
         logger.debug("Creating DataPanel.")
 
         # Data is a dictionary of columns
@@ -127,6 +128,13 @@ class DataPanel(
         # Add an index to the dataset
         if not self.has_index:
             self._add_index()
+
+        super(DataPanel, self).__init__(
+            info=info,
+            split=split,
+            *args,
+            **kwargs,
+        )
 
     @classmethod
     def _create_columns(cls, name_to_data: Dict[str, AbstractColumn.Columnable]):
@@ -521,6 +529,7 @@ class DataPanel(
         else:
             raise TypeError("Invalid index type: {}".format(type(index)))
 
+    @capture_provenance(capture_args=[])
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
@@ -793,6 +802,7 @@ class DataPanel(
             for cell_batch in cell_dl:
                 yield cell_batch
 
+    @capture_provenance(capture_args=["with_indices"])
     def update(
         self,
         function: Optional[Callable] = None,
@@ -868,6 +878,7 @@ class DataPanel(
 
         return new_dp
 
+    @capture_provenance(capture_args=["with_indices", "batch_size"])
     def map(
         self,
         function: Optional[Callable] = None,
@@ -899,6 +910,7 @@ class DataPanel(
                 **kwargs,
             )
 
+    @capture_provenance()
     def filter(
         self,
         function: Optional[Callable] = None,
