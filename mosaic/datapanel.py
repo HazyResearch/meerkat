@@ -389,7 +389,7 @@ class DataPanel(
         axis: Union[str, int] = "rows",
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
-    ) -> None:
+    ) -> DataPanel:
         """Append a batch of data to the dataset.
 
         `example_or_batch` must have the same columns as the dataset

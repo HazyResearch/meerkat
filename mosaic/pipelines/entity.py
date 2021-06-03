@@ -1,6 +1,6 @@
 """Entity Class"""
 import logging
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -46,6 +46,8 @@ class Entity(DataPanel):
             self.index_column = index_column if index_column else None
             if not self.index_column:
                 self._add_ent_index()
+            else:
+                self._check_index_unique()
             self._check_columns_exist([self.index_column])
             self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
         else:  # Initializing empty Entity DP - needed when loading
@@ -70,6 +72,15 @@ class Entity(DataPanel):
     @property
     def index(self):
         return self[self.index_column]
+
+    def _check_index_unique(self):
+        assert len(self.index) == len(
+            set(self.index)
+        ), "Index must be unique and hashable"
+
+    def icontain(self, idx: Any):
+        """Checks if idx in the index column or not"""
+        return idx in self._index_to_rowid
 
     def iget(self, idx: Any):
         """Gets the row given the entity index"""
@@ -133,6 +144,80 @@ class Entity(DataPanel):
         if name not in self.embedding_columns:
             self.embedding_columns.append(name)
 
+    def append(
+        self,
+        dp: "Entity",
+        axis: Union[str, int] = "rows",
+        suffixes: Tuple[str] = None,
+        overwrite: bool = False,
+    ) -> "Entity":
+        """Append a batch of data to the dataset.
+
+        `example_or_batch` must have the same columns as the dataset
+        (regardless of what columns are visible).
+        """
+        if axis == 0 or axis == "rows":
+            # append new rows
+            ret = super(Entity, self).append(dp, axis, suffixes, overwrite)
+            return Entity.from_datapanel(
+                ret,
+                embedding_columns=self.embedding_columns,
+                index_column=self.index_column,
+            )
+        elif axis == 1 or axis == "columns":
+            # append new columns; must make sure the entities are in the same order
+            if self.index._data != dp.index._data:
+                raise ValueError(
+                    "Can only append along axis 1 (columns) if the entity indexes match"
+                )
+            new_embedding_cols = self.embedding_columns + dp.embedding_columns
+            # Capture the new embedding columns before merging
+            if len(set(self.embedding_columns).intersection(dp.embedding_columns)) > 0:
+                if overwrite:
+                    new_embedding_cols = self.embedding_columns + [
+                        c
+                        for c in dp.embedding_columns
+                        if c not in self.embedding_columns
+                    ]
+                else:
+                    assert (
+                        suffixes is not None and len(suffixes) == 2
+                    ), "Suffixes must be tuple of len 2"
+                    new_embedding_cols = (
+                        [
+                            c
+                            for c in self.embedding_columns
+                            if c not in dp.embedding_columns
+                        ]
+                        + [
+                            c
+                            for c in dp.embedding_columns
+                            if c not in self.embedding_columns
+                        ]
+                        + [
+                            c + suffixes[0]
+                            for c in self.embedding_columns
+                            if c in dp.embedding_columns
+                        ]
+                        + [
+                            c + suffixes[1]
+                            for c in dp.embedding_columns
+                            if c in self.embedding_columns
+                        ]
+                    )
+            # As the index matches, we remove it from dp before appending
+            dp_cols_no_index = [c for c in dp.column_names if c != dp.index_column]
+            ret = super(Entity, self).append(
+                dp[dp_cols_no_index], axis, suffixes, overwrite
+            )
+            return Entity.from_datapanel(
+                ret,
+                embedding_columns=new_embedding_cols,
+                index_column=self.index_column,
+            )
+        else:
+            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+
     def convert_entities_to_ids(
         self, column: Union[ListColumn, TensorColumn, NumpyArrayColumn]
     ):
@@ -146,9 +231,10 @@ class Entity(DataPanel):
                 # TODO: handle UNK entity ids
                 return self._index_to_rowid[seq]
 
-        assert isinstance(
-            column, (ListColumn, TensorColumn, NumpyArrayColumn)
-        ), "We only support list types"
+        assert isinstance(column, (ListColumn, TensorColumn, NumpyArrayColumn)), (
+            "We only support DataPanel list column types "
+            "(ListColumn, TensorColumn, NumpyArrayColumn)"
+        )
         return column.map(lambda x: recursive_map(x))
 
     def most_similar(
@@ -159,6 +245,7 @@ class Entity(DataPanel):
         search_embedding_column=None,
     ):
         """Returns most similar entities distinct from query"""
+        assert k < len(self), "k must be less than the total number of entities"
         if query_embedding_column is None:
             query_embedding_column = self.embedding_columns[0]
         self._check_columns_exist([query_embedding_column])
@@ -175,7 +262,20 @@ class Entity(DataPanel):
 
         emb_query = self.iget(query)[query_embedding_column].numpy().reshape(1, -1)
         dist, sims = self[search_embedding_column].search(emb_query, k + 1)
-        # May return the emb_query. If the embeddings are not unique,
+        # May or may not return the emb_query. If the embeddings are not unique,
         # we must selectively remove the query in the answer
         sims = sims[0][sims[0] != self._index_to_rowid[query]]
+        sims = sims[:k]
         return self[sims]
+
+    @classmethod
+    def _state_keys(cls) -> set:
+        """List of attributes that describe the state of the object."""
+        return {
+            "_data",
+            "all_columns",
+            "_visible_columns",
+            "_identifier",
+            "embedding_columns",
+            "index_column",
+        }

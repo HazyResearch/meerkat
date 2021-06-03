@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import torch
 from torch import Tensor
@@ -59,6 +59,10 @@ class Embedding(torch.nn.Module):
         # Save entity_dp to read in memmap mode if path is provided.
         # If not, keep it all in memory
         self._read_write_entity_dp()
+
+    @property
+    def shape(self) -> List[int]:
+        return self.emb.weight.shape
 
     def forward(self, input: Tensor) -> Tensor:
         return self.emb(input)

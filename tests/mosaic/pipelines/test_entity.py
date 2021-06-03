@@ -127,7 +127,6 @@ def test_find_similar_multiple_columns(k):
     data = _get_entity_data()
 
     ent = Entity(data, index_column="c", embedding_columns=["g"])
-    np.random.seed(1234)
     embs_data = np.random.randn(3, 6)
     ent.add_embedding_column("embs2", embs_data)
 
@@ -169,3 +168,72 @@ def test_convert_entities_to_ids():
     col2 = ent.convert_entities_to_ids(train_data["col2"])
     assert isinstance(col2, ListColumn)
     assert col2._data == [[0, 0], [1], [2, 0, 0], [1]]
+
+
+def test_append_entities():
+    data1 = _get_entity_data()
+    ent1 = Entity(data1, index_column="c", embedding_columns=["g"])
+
+    # Test append column
+    data = {
+        "c": ["x", "y", "z"],
+        "h": [3, 4, 5],
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+
+    ent3 = ent1.append(ent2, axis=1, overwrite=True)
+
+    gold_data = {
+        "a": [1, 2, 3],
+        "b": [True, False, True],
+        "c": ["x", "y", "z"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g": data["g"],
+        "h": [3, 4, 5],
+    }
+    assert ent3.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "h"]
+    assert ent3["h"].tolist() == gold_data["h"]
+    assert ent3["c"]._data == gold_data["c"]
+    assert ent3.index_column == "c"
+    assert ent3.embedding_columns == ["g"]
+
+    # Test append column no index match
+    data = {
+        "c": ["x", "a", "z"],
+        "h": [3, 4, 5],
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+    with pytest.raises(
+        ValueError,
+        match=r"Can only append along axis 1 \(columns\) if the entity indexes match",
+    ):
+        _ = ent1.append(ent2, axis=1)
+
+    # Test append rows
+    data = {
+        "a": [4, 5, 6],
+        "b": [True, False, True],
+        "c": ["x", "y", "z"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+
+    ent3 = ent1.append(ent2, axis=1)
+
+    gold_data = {
+        "a": [4, 5, 6],
+        "b": [True, False, True],
+        "c": ["x", "y", "z"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g": np.random.rand(3, 5),
+    }
+    assert ent3._data == gold_data

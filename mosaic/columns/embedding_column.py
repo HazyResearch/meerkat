@@ -79,18 +79,19 @@ class EmbeddingColumn(TensorColumn):
             reducer=pca,
         )
 
-    def umap(self):
-        reducer = umap.UMAP()
+    def umap(self, n_neighbors=15, n_components=2):
+        reducer = umap.UMAP(
+            n_neighbors=n_neighbors,
+            n_components=n_components,
+        )
         return SimpleNamespace(
             embeddings=reducer.fit_transform(self.numpy()),
             reducer=reducer,
         )
 
-    def visualize_umap(self):
+    def visualize_umap(self, n_neighbors=15, n_components=2, point_size=4):
         p = umap_plot.interactive(
-            self.umap().reducer,
-            # labels=list(output['first-person']),
-            # hover_data={'article': output['short:article']},
-            point_size=4,
+            self.umap(n_neighbors, n_components).reducer,
+            point_size=point_size,
         )
         umap_plot.show(p)
