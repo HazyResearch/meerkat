@@ -54,7 +54,7 @@ def get_wilds_datapane(
             out = torch.softmax(model(batch["input"].to(0)), axis=-1)
             return {"pred": out.cpu().numpy().argmax(axis=-1)}
 
-        dp = dp.update(function=predict, batch_size=128, batched=True)
+        dp = dp.update(function=predict, batch_size=128, is_batched_fn=True)
 
 
     Args:

@@ -87,7 +87,7 @@ new_col: ImageColumn = dp["image"][10:20]
 
     # updated_dp has two new `TensorColumn`s: 1 for probabilities and one
     # for predictions
-    updated_dp: DataPane = dp.update(function=predict, batch_size=128, batched=True)
+    updated_dp: DataPane = dp.update(function=predict, batch_size=128, is_batched_fn=True)
 ```
 
 **`DataPanel` is extendable.** Mosaic makes it easy for you to make custom column types for our data. The easiest way to do this is by subclassing `AbstractCell`. Subclasses of `AbstractCell` are meant to represent one element in one column of a `DataPanel`. For example, say we want our `DataPanel` to include a column of videos we have stored on disk. We want these videos to be lazily loaded using [scikit-video](http://www.scikit-video.org/stable/index.html), so we implement a `VideoCell` class as follows: 

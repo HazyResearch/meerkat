@@ -21,4 +21,5 @@ from mosaic.columns.numpy_column import NumpyArrayColumn
 from mosaic.columns.spacy_column import SpacyColumn
 from mosaic.columns.tensor_column import TensorColumn
 from mosaic.datapanel import DataPanel
+from mosaic.ops.concat import concat
 from mosaic.ops.merge import merge

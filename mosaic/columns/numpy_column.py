@@ -48,13 +48,6 @@ class NumpyArrayColumn(
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
-    @property
-    def data(self):
-        if self.visible_rows is not None:
-            return self._data[self.visible_rows]
-        else:
-            return self._data
-
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
@@ -106,6 +99,10 @@ class NumpyArrayColumn(
 
     def _set_batch(self, indices, values):
         self._data[indices] = values
+
+    @staticmethod
+    def concat(columns: Sequence[NumpyArrayColumn]):
+        return NumpyArrayColumn.from_array(np.concatenate([c.data for c in columns]))
 
     @classmethod
     def get_writer(cls, mmap: bool = False):

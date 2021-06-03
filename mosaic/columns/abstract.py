@@ -68,16 +68,18 @@ class AbstractColumn(
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     def __str__(self):
-        if self.visible_rows is not None:
-            return (
-                f"{self.__class__.__name__}View"
-                f"({reprlib.repr([self.data[i] for i in self.visible_rows[:8]])})"
-            )
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     @property
     def data(self):
-        return self._data
+        """Get the underlying data (excluding invisible rows).
+
+        To access underlying data with invisible rows, use `_data`.
+        """
+        if self.visible_rows is not None:
+            return self._data[self.visible_rows]
+        else:
+            return self._data
 
     @property
     def metadata(self):
@@ -227,7 +229,7 @@ class AbstractColumn(
         function: Optional[Callable] = None,
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
-        batched: bool = False,
+        is_batched_fn: bool = False,
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
@@ -248,7 +250,7 @@ class AbstractColumn(
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function, with_indices, batched=batched, materialize=materialize
+            function, with_indices, is_batched_fn=is_batched_fn, materialize=materialize
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -258,7 +260,7 @@ class AbstractColumn(
             function=function,
             with_indices=with_indices,
             input_columns=input_columns,
-            batched=batched,
+            is_batched_fn=is_batched_fn,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
@@ -272,6 +274,12 @@ class AbstractColumn(
         return new_column
 
     def append(self, column: AbstractColumn) -> None:
+        # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
+        # implement specific ones for ListColumn, NumpyColumn etc.
+        raise NotImplementedError
+
+    @staticmethod
+    def concat(columns: Sequence[AbstractColumn]) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError

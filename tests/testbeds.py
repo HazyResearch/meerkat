@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 
 from mosaic.columns.image_column import ImageColumn
+from mosaic.columns.list_column import ListColumn
 from mosaic.datapanel import DataPanel
 from mosaic.tools.identifier import Identifier
 
@@ -105,7 +106,7 @@ class MockDatapanel:
     ):
         batch = {
             "a": np.arange(length),
-            "b": list(np.arange(length)),
+            "b": ListColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
         }
 
@@ -116,7 +117,7 @@ class MockDatapanel:
 
         self.dp = DataPanel.from_batch(batch)
 
-        self.visible_rows = [0, 4, 6, 11] if use_visible_rows else None
+        self.visible_rows = [0, 4, 6, 11] if use_visible_rows else np.arange(length)
         if use_visible_rows:
             for column in self.dp.values():
                 column.visible_rows = self.visible_rows
@@ -126,6 +127,17 @@ class MockDatapanel:
         )
         if use_visible_columns:
             self.dp.visible_columns = self.visible_columns
+
+
+class MockColumn:
+    def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
+        self.col = col_type(np.arange(16))
+
+        if use_visible_rows:
+            self.visible_rows = [0, 4, 6, 11]
+            self.col.visible_rows = self.visible_rows
+        else:
+            self.visible_rows = np.arange(16)
 
 
 class MockImageColumn:

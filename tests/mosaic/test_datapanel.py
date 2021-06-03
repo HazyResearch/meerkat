@@ -192,7 +192,7 @@ def test_getitem(tmpdir, use_visible_rows):
     product([True, False], [True, False], [True, False], [0, 2]),
 )
 def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_workers):
-    """`map`, mixed datapanel, single return, `batched=True`"""
+    """`map`, mixed datapanel, single return, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
@@ -210,7 +210,7 @@ def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_wor
     result = dp.map(
         func,
         batch_size=4,
-        batched=True,
+        is_batched_fn=True,
         num_workers=num_workers,
         input_columns=input_columns,
     )
@@ -224,7 +224,7 @@ def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_wor
     product([True, False], [0, 2]),
 )
 def test_map_2(use_visible_rows, num_workers):
-    """`map`, mixed datapanel, return multiple, `batched=True`"""
+    """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=False
     )
@@ -241,7 +241,7 @@ def test_map_2(use_visible_rows, num_workers):
     result = dp.map(
         func,
         batch_size=4,
-        batched=True,
+        is_batched_fn=True,
         num_workers=num_workers,
     )
     assert isinstance(result, DataPanel)
@@ -272,7 +272,11 @@ def test_update_1(use_visible_rows, use_visible_columns, use_input_columns, batc
 
     input_columns = ["a", "b"] if use_input_columns else None
     result = dp.update(
-        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+        func,
+        batch_size=4,
+        is_batched_fn=batched,
+        num_workers=0,
+        input_columns=input_columns,
     )
     assert isinstance(result, DataPanel)
     assert set(result.visible_columns) == set(visible_columns + ["x"])
@@ -286,7 +290,7 @@ def test_update_1(use_visible_rows, use_visible_columns, use_input_columns, batc
 )
 def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, new columns,
-    `batched=True`"""
+    `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
@@ -303,7 +307,11 @@ def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batc
 
     input_columns = ["a", "b"] if use_input_columns else None
     result = dp.update(
-        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+        func,
+        batch_size=4,
+        is_batched_fn=batched,
+        num_workers=0,
+        input_columns=input_columns,
     )
     assert isinstance(result, DataPanel)
     assert set(result.visible_columns) == set(visible_columns + ["x", "y"])
@@ -319,7 +327,7 @@ def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batc
 )
 def test_update_3(use_visible_rows, use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, replace existing column,
-    `batched=True`"""
+    `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
@@ -336,7 +344,11 @@ def test_update_3(use_visible_rows, use_visible_columns, use_input_columns, batc
 
     input_columns = ["a", "b"] if use_input_columns else None
     result = dp.update(
-        func, batch_size=4, batched=batched, num_workers=0, input_columns=input_columns
+        func,
+        batch_size=4,
+        is_batched_fn=batched,
+        num_workers=0,
+        input_columns=input_columns,
     )
     assert isinstance(result, DataPanel)
     assert set(result.visible_columns) == set(visible_columns + ["y"])
@@ -359,7 +371,7 @@ def test_filter_1(use_visible_rows, use_visible_columns, batched):
     def func(x):
         return (x["a"] % 2) == 0
 
-    result = dp.filter(func, batch_size=4, batched=batched, num_workers=0)
+    result = dp.filter(func, batch_size=4, is_batched_fn=batched, num_workers=0)
     if visible_rows is None:
         visible_rows = np.arange(16)
 
@@ -403,7 +415,7 @@ def test_lz_map(tmpdir, use_visible_rows):
         assert isinstance(x["img"], ImageColumn)
         return [str(img.filepath) for img in x["img"].lz]
 
-    result = dp.map(func, materialize=False, num_workers=0, batched=True)
+    result = dp.map(func, materialize=False, num_workers=0, is_batched_fn=True)
 
     assert isinstance(result, ListColumn)
     assert result.data == [test_bed.img_col.image_paths[i] for i in visible_rows]
@@ -432,7 +444,7 @@ def test_lz_filter(tmpdir, use_visible_rows):
         # see `MockImageColumn` for filepath naming logic
         return (int(str(x["img"].filepath.name).split(".")[0]) % 2) == 0
 
-    result = dp.filter(func, batched=False, num_workers=0, materialize=False)
+    result = dp.filter(func, is_batched_fn=False, num_workers=0, materialize=False)
 
     assert isinstance(result, DataPanel)
     new_len = (np.array(visible_rows) % 2 == 0).sum()
@@ -456,7 +468,8 @@ def test_lz_filter(tmpdir, use_visible_rows):
     product([True, False]),
 )
 def test_lz_update(tmpdir, use_visible_rows: bool):
-    """`update`, mixed datapanel, return single, new columns, `batched=True`"""
+    """`update`, mixed datapanel, return single, new columns,
+    `is_batched_fn=True`"""
     length = 16
     test_bed = MockDatapanel(
         length=length,
@@ -476,7 +489,7 @@ def test_lz_update(tmpdir, use_visible_rows: bool):
         return out
 
     result = dp.update(
-        func, batch_size=4, batched=False, num_workers=0, materialize=False
+        func, batch_size=4, is_batched_fn=False, num_workers=0, materialize=False
     )
     assert set(result.column_names) == set(["a", "b", "c", "x", "img", "index"])
     assert len(result["x"]) == len(visible_rows)
@@ -496,7 +509,7 @@ def test_filter_2(use_visible_rows, use_visible_columns, batched):
     def func(x):
         return (x["a"] % 2) == 0
 
-    result = dp.filter(func, batch_size=4, batched=batched)
+    result = dp.filter(func, batch_size=4, is_batched_fn=batched)
     if visible_rows is None:
         visible_rows = np.arange(16)
 
@@ -522,7 +535,7 @@ def test_filter_2(use_visible_rows, use_visible_columns, batched):
     product([True, False], [True, False], [True, False]),
 )
 def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
-    """`map`, mixed datapanel, return multiple, `batched=True`"""
+    """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
     )
@@ -538,7 +551,7 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
     assert len(new_dp["c"]) == len(dp["c"])
 
     assert (dp["a"] == new_dp["a"]).all()
-    assert (dp["b"] == new_dp["b"]).all()
+    assert dp["b"].data == new_dp["b"].data
 
     assert dp.visible_columns == new_dp.visible_columns
 
@@ -622,3 +635,23 @@ def test_tail(tmpdir, use_visible_rows, use_visible_columns):
     assert new_dp.visible_columns == dp.visible_columns
     assert len(new_dp) == 2
     assert (new_dp["a"] == dp["a"][-2:]).all()
+
+
+@pytest.mark.parametrize(
+    "use_visible_rows,use_visible_columns",
+    product([True, False], [True, False]),
+)
+def test_append_columns(use_visible_rows, use_visible_columns):
+    mock = MockDatapanel(
+        length=16,
+        use_visible_rows=use_visible_rows,
+        use_visible_columns=use_visible_columns,
+    )
+
+    out = mock.dp.append(mock.dp, axis="rows")
+
+    assert len(out) == len(mock.visible_rows) * 2
+    assert isinstance(out, DataPanel)
+    assert set(out.visible_columns) == set(mock.visible_columns)
+    assert (out["a"].data == np.concatenate([mock.visible_rows] * 2)).all()
+    assert out["b"].data == list(np.concatenate([mock.visible_rows] * 2))
