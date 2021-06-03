@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, List, Sequence, Union
 
 if TYPE_CHECKING:
     from mosaic import AbstractCell, AbstractColumn, DataPanel
+from mosaic.tools.utils import nested_map
 
 
 class ProvenanceMixin:
@@ -63,8 +64,6 @@ class ProvenanceOpNode:
                 self.inputs[name] = inp.node
                 inp.node.add_child(self)
 
-        outputs = outputs if isinstance(outputs, Sequence) else [outputs]
-
         self.outputs = []
         for output in outputs:
             if isinstance(output, ProvenanceMixin) and hasattr(output, "node"):
@@ -96,7 +95,17 @@ def capture_provenance(capture_args: Sequence[str] = None):
 
             metadata = {arg: args_dict[arg] for arg in capture_args}
             out = fn(*args, **kwargs)
-            ProvenanceOpNode(fn=fn, inputs=args_dict, outputs=out, meta=metadata)
+
+            # collect instances of ProvenanceMixin nested in the output
+            outputs = []
+
+            def collect_outputs(output):
+                if isinstance(output, ProvenanceMixin):
+                    outputs.append(output)
+
+            nested_map(collect_outputs, out)
+
+            ProvenanceOpNode(fn=fn, inputs=args_dict, outputs=outputs, meta=metadata)
             return out
 
         return _wrapper
