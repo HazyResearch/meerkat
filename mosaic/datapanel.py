@@ -385,6 +385,7 @@ class DataPanel(
             assert col in self._data
         return tz.keyfilter(lambda k: k in columns, self._data)
 
+    @capture_provenance(capture_args=["axis"])
     def append(
         self,
         dp: DataPanel,

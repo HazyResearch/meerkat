@@ -7,13 +7,11 @@ from typing import Any, Dict, List, Mapping, Sequence, Tuple, Union
 
 import mosaic as ms
 
-provenance_enabled = False
+_provenance_enabled = False
 
 
 class provenance:
-    def __init__(
-        self,
-    ):
+    def __init__(self, enabled: bool = True):
         """Context manager for enabling provenance capture in Mosaic.
         Example:
         ```python
@@ -22,16 +20,21 @@ class provenance:
             dp = ms.DataPanel.from_batch({...})
         ```
         """
-        self.prev = True
+        self.prev = None
+        self.enabled = enabled
 
     def __enter__(self):
-        global provenance_enabled
-        self.prev = provenance_enabled
-        provenance_enabled = True
+        global _provenance_enabled
+        self.prev = _provenance_enabled
+        _provenance_enabled = self.enabled
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any):
-        global provenance_enabled
-        provenance_enabled = self.prev
+        global _provenance_enabled
+        _provenance_enabled = self.prev
+
+
+def is_provenance_enabled():
+    return _provenance_enabled
 
 
 class ProvenanceMixin:
@@ -43,10 +46,39 @@ class ProvenanceMixin:
     def node(self):
         return self._node
 
-    def get_provenance(self):
+    def get_provenance(self, include_columns: bool = False):
         if self._node is None:
             return None
-        return self._node.get_provenance()
+        nodes, edges = self._node.get_provenance()
+        if include_columns:
+            return nodes, edges
+        else:
+            # filter out edges and nodes
+            nodes = [
+                node
+                for node in nodes
+                if (
+                    (
+                        isinstance(node, ProvenanceOpNode)
+                        and any(
+                            [
+                                issubclass(node.type, ms.DataPanel)
+                                for node, key in node.children
+                            ]
+                        )
+                    )
+                    or issubclass(node.type, ms.DataPanel)
+                )
+            ]
+            edges = [
+                edge for edge in edges if all([(node in nodes) for node in edge[:2]])
+            ]
+            return nodes, edges
+
+    def __del__(self):
+        #  need to cache the representation when the object is deleted
+        if hasattr(self, "_node"):
+            self.node.cache_repr()
 
 
 class ProvenanceNode:
@@ -61,37 +93,56 @@ class ProvenanceNode:
         return self._parents
 
     @property
+    def last_parent(self):
+        if len(self._parents) > 0:
+            return self._parents[-1]
+        else:
+            return None
+
+    @property
     def children(self):
         return self._children
 
     def get_provenance(self):
-        edges = []
+        edges = set()
         nodes = set()
         for parent, key in self._parents:
             prev_nodes, prev_edges = parent.get_provenance()
-            edges.extend(prev_edges)
-            edges.append({"parent": parent, "child": self, "key": key})
+            edges |= prev_edges
+            edges.add((parent, self, key))
             nodes |= prev_nodes
-            nodes.add(self)
+
+        nodes.add(self)
         return nodes, edges
+
+    def cache_repr(self):
+        self._cached_repr = self._repr() + "(deleted)"
+
+    def _repr(self):
+        raise NotImplementedError()
+
+    def __repr__(self):
+        if self.ref() is None:
+            return self._cached_repr
+        else:
+            return self._repr()
 
 
 class ProvenanceObjNode(ProvenanceNode):
     def __init__(self, obj: ProvenanceMixin):
-        self.obj = weakref.ref(obj)
+        self.ref = weakref.ref(obj)
         self.type = type(obj)
         self._parents: List[Tuple(ProvenanceOpNode, tuple)] = []
         self._children: List[Tuple(ProvenanceOpNode, tuple)] = []
 
-    def __repr__(self):
-        return str(self.obj())
+    def _repr(self):
+        return f"ObjNode({str(self.ref())})"
 
 
 class ProvenanceOpNode(ProvenanceNode):
     def __init__(self, fn: callable, inputs: dict, outputs: object, meta: dict):
-        # import pdb
-        # pdb.set_trace()
-        self.fn = weakref.ref(fn)
+        self.ref = weakref.ref(fn)
+        self.type = type(fn)
         self.name = fn.__qualname__
         self.module = fn.__module__
         self.meta = meta
@@ -110,8 +161,8 @@ class ProvenanceOpNode(ProvenanceNode):
                 self.add_child(output.node, key)
                 output.node.add_parent(self, key)
 
-    def __repr__(self):
-        return f"{self.module}.{self.name}"
+    def _repr(self):
+        return f"OpNode({self.module}.{self.name})"
 
 
 def capture_provenance(capture_args: Sequence[str] = None):
@@ -120,7 +171,7 @@ def capture_provenance(capture_args: Sequence[str] = None):
     def _provenance(fn: callable):
         @wraps(fn)
         def _wrapper(*args, **kwargs):
-            if not provenance_enabled:
+            if not is_provenance_enabled():
                 return fn(*args, **kwargs)
             args_dict = getcallargs(fn, *args, **kwargs)
             if "kwargs" in args_dict:
@@ -155,12 +206,7 @@ def _get_nested_objs(objs: Dict, key: Tuple[str], data: object):
     elif isinstance(data, Mapping):
         for curr_key, item in data.items():
             _get_nested_objs(objs, key=(*key, curr_key), data=item)
-    elif isinstance(data, ms.DataPanel):
-        objs[key] = data
-        for curr_key, item in data.items():
-            _get_nested_objs(objs, key=(*key, curr_key), data=item)
-
-    elif isinstance(data, ms.AbstractColumn):
+    elif isinstance(data, ms.DataPanel) or isinstance(data, ms.AbstractColumn):
         objs[key] = data
 
 
@@ -175,7 +221,7 @@ def visualize_provenance(
             "See https://github.com/cytoscape/cytoscape-jupyter-widget"
         )
 
-    nodes, edges = obj.get_provenance()
+    nodes, edges = obj.get_provenance(include_columns=show_columns)
     cy_nodes = [
         {
             "data": {
@@ -185,18 +231,13 @@ def visualize_provenance(
             }
         }
         for node in nodes
-        if (
-            show_columns
-            or isinstance(node, ProvenanceOpNode)
-            or issubclass(node.type, ms.DataPanel)
-        )
     ]
     cy_edges = [
         {
             "data": {
-                "source": id(edge["parent"]),
-                "target": id(edge["child"]),
-                "key": edge["key"],
+                "source": id(edge[0]),
+                "target": id(edge[1]),
+                "key": edge[2],
             }
         }
         for edge in edges
