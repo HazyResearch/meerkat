@@ -1,13 +1,9 @@
 import unittest
-from logging import log
 
 import torch
 from torch.distributions.categorical import Categorical
 
-from mosaic.columns.prediction_column import (
-    ClassificationOutputColumn,
-    _ClassifierOutputType,
-)
+from mosaic.columns.prediction_column import ClassificationOutputColumn
 
 logits = torch.as_tensor(
     [
