@@ -4,7 +4,7 @@ import abc
 import copy as pycopy
 from typing import TYPE_CHECKING
 
-from mosaic.mixins.provenance import ProvenanceObjNode
+from mosaic.provenance import ProvenanceObjNode
 
 if TYPE_CHECKING:
     from mosaic import AbstractColumn, DataPanel
