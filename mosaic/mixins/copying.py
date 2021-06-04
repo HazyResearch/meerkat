@@ -66,7 +66,7 @@ class ColumnCopyMixin(AbstractCopyMixin):
 
         try:
             obj = self.__class__(**state)
-        except TypeError:
+        except (TypeError, ValueError):
             # use `__new__` to instantiate a bare class, in case __init__ does work
             # we do not want to repeat on copy
             obj = self.__class__.__new__(self.__class__)
