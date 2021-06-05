@@ -4,7 +4,7 @@ import abc
 import functools
 import logging
 import os
-from typing import Callable, Sequence
+from typing import Callable, List, Mapping, Sequence, Tuple
 
 import dill
 import numpy as np
@@ -51,13 +51,40 @@ class TensorColumn(
         super(TensorColumn, self).__init__(data=data, *args, **kwargs)
 
     def __torch_function__(self, func, types, args=(), kwargs=None):
+        def _process_arg(arg):
+            if isinstance(arg, type(self)):
+                return arg.data
+            elif isinstance(arg, (List, Tuple)):
+                # Specifically use list and tuple because these are
+                # expected types for arguments in torch operations.
+                return type(arg)([_process_arg(_a) for _a in arg])
+            elif isinstance(arg, Mapping):
+                # All mappings can be converted to dictionaries
+                # when processed by torch operations.
+                return {_k: _process_arg(_a) for _k, _a in arg.items()}
+            else:
+                return arg
+
+        def _process_ret(ret):
+            # This function may need to be refactored into an instance method
+            # because the from_data implementation is different for each
+            # class.
+            if isinstance(ret, torch.Tensor):
+                if ret.ndim == 0:
+                    return torch.tensor(ret)
+                return self.from_data(ret)
+            elif isinstance(ret, (List, Tuple)):
+                return type(ret)([_process_arg(_a) for _a in ret])
+            elif isinstance(ret, Mapping):
+                return {_k: _process_arg(_a) for _k, _a in ret.items()}
+            else:
+                return ret
+
         if kwargs is None:
             kwargs = {}
-        args = [a._t if hasattr(a, "_t") else a for a in args]
+        args = [_process_arg(a) for a in args]
         ret = func(*args, **kwargs)
-        if ret.ndim == 0:
-            return torch.tensor(ret)
-        return TensorColumn(ret)
+        return _process_ret(ret)
 
     def __getattr__(self, name):
         try:
