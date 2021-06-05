@@ -110,6 +110,7 @@ class DataPanel(
 
             # Use column_names to setup the data dictionary
             if column_names:
+                self._check_columns_unique(column_names)
                 self._data = {k: [] for k in column_names}
 
         # Setup the DatasetInfo
@@ -213,6 +214,10 @@ class DataPanel(
         """Check that every column in `columns` exists."""
         for col in columns:
             assert col in self.all_columns, f"{col} is not a valid column."
+
+    def _check_columns_unique(self, columns: List[str]):
+        """Checks that all columns are unique."""
+        assert len(columns) == len(set(columns))
 
     def _initialize_state(self):
         """Dataset state initialization."""
@@ -356,6 +361,7 @@ class DataPanel(
 
         # Add the column
         self._data[name] = column
+
         if name not in self.all_columns:
             self.all_columns.append(name)
             self.visible_columns.append(name)
@@ -392,7 +398,7 @@ class DataPanel(
         axis: Union[str, int] = "rows",
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
-    ) -> None:
+    ) -> DataPanel:
         """Append a batch of data to the dataset.
 
         `example_or_batch` must have the same columns as the dataset
