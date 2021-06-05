@@ -18,6 +18,7 @@ from mosaic.mixins.materialize import MaterializationMixin
 from mosaic.mixins.state import StateDictMixin
 from mosaic.mixins.storage import ColumnStorageMixin
 from mosaic.mixins.visibility import VisibilityMixin
+from mosaic.provenance import ProvenanceMixin, capture_provenance
 from mosaic.tools.identifier import Identifier
 from mosaic.tools.utils import convert_to_batch_column_fn
 from mosaic.writers.list_writer import ListWriter
@@ -33,6 +34,7 @@ class AbstractColumn(
     IdentifierMixin,
     MappableMixin,
     MaterializationMixin,
+    ProvenanceMixin,
     StateDictMixin,
     VisibilityMixin,
     abc.ABC,
@@ -132,6 +134,7 @@ class AbstractColumn(
             batch = self._get_batch(index, materialize=materialize)
             return self.__class__.from_data(batch)
 
+    @capture_provenance()
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
@@ -224,6 +227,7 @@ class AbstractColumn(
             ._repr_html_()
         )
 
+    @capture_provenance()
     def filter(
         self,
         function: Optional[Callable] = None,
@@ -356,6 +360,7 @@ class AbstractColumn(
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
     @classmethod
+    @capture_provenance()
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to a mosaic column using the appropriate Column
         type."""

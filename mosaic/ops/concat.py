@@ -5,8 +5,10 @@ import cytoolz as tz
 from mosaic import DataPanel
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.errors import ConcatError
+from mosaic.provenance import capture_provenance
 
 
+@capture_provenance(capture_args=["axis"])
 def concat(
     objs: Union[Sequence[DataPanel], Sequence[AbstractColumn]],
     axis: Union[str, int] = "rows",

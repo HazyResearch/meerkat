@@ -23,3 +23,4 @@ from mosaic.columns.tensor_column import TensorColumn
 from mosaic.datapanel import DataPanel
 from mosaic.ops.concat import concat
 from mosaic.ops.merge import merge
+from mosaic.provenance import provenance
