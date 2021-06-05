@@ -252,7 +252,89 @@ def test_merge_entities():
     data1 = _get_entity_data()
     ent1 = EntityDataPanel(data1, index_column="c", embedding_columns=["g"])
 
-    # Test append column
+    # Test append column with same index column
+    data = {
+        "c": ["y", "x", "z"],
+        "h": [4, 3, 5],
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
+    ent3 = ent1.merge(ent2)
+    gold_data = {
+        "a": [1, 2, 3],
+        "b": [True, False, True],
+        "c": ["x", "y", "z"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g_x": data1["g"],
+        "g_y": data["g"],
+        "h": [3, 4, 5],
+    }
+    # import pdb; pdb.set_trace()
+    assert ent3.column_names == [
+        "a",
+        "b",
+        "d",
+        "e",
+        "f",
+        "g_x",
+        "h",
+        "g_y",
+        "index",
+        "c",
+    ]
+    assert ent3._index_column == "c"
+    assert ent3._embedding_columns == ["g_x", "g_y"]
+    for c in ["a", "b", "c", "d", "e", "f", "g_x", "g_y", "h"]:
+        if c in ["a", "b", "c", "d", "h"]:  # if gold is not torch or numpy
+            assert [i for i in ent3[c]] == gold_data[c]
+        else:
+            assert ent3[c] == gold_data[c]
+
+    # Test append column with left getting index on same index column
+    data = {
+        "c": ["y", "x", "z"],
+        "h": ["x", "y", "z"],
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
+    ent3 = ent2.merge(ent1, left_on="h")
+    gold_data = {
+        "a": [1, 2, 3],
+        "b": [True, False, True],
+        "c_x": ["y", "x", "z"],
+        "c_y": ["x", "y", "z"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g_x": data1["g"],
+        "g_y": data["g"],
+        "h": ["x", "y", "z"],
+    }
+    # import pdb; pdb.set_trace()
+    assert ent3.column_names == [
+        "c_x",
+        "h",
+        "g_x",
+        "a",
+        "b",
+        "c_y",
+        "d",
+        "e",
+        "f",
+        "g_y",
+        "index",
+    ]
+    assert ent3._index_column == "c_x"
+    assert ent3._embedding_columns == ["g_x", "g_y"]
+    for c in ["a", "b", "c_x", "c_y", "d", "e", "f", "g_x", "g_y", "h"]:
+        if c in ["a", "b", "c_x", "c_y", "d", "h"]:  # if gold is not torch or numpy
+            assert [i for i in ent3[c]] == gold_data[c]
+        else:
+            assert ent3[c] == gold_data[c]
+
+    # Test append column different index
     data = {
         "d": ["y", "x", "z"],
         "h": [4, 3, 5],

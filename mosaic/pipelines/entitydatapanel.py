@@ -83,6 +83,10 @@ class EntityDataPanel(DataPanel):
             index_column=index_column,
         )
 
+    def to_datapanel(self):
+        """Casts to a DataPanel"""
+        return DataPanel.from_batch({k: self[k] for k in self.visible_columns})
+
     @property
     def index(self):
         "Returns index column"
@@ -127,6 +131,15 @@ class EntityDataPanel(DataPanel):
         """When _get returns a DataPanel with same columns,
         cast back to EntityDataPanel"""
         ret = super(EntityDataPanel, self)._get(index, materialize)
+        # If _get subselects columns and _removes_ the index column, this is no longer
+        # an EntityDataPanel. In DataPanel, a column subselection will not recast to
+        # a DataPanel (it just creates a view). In this case, we need to explicitly cast
+        # _back_ to a DataPanel
+        if (
+            isinstance(ret, EntityDataPanel)
+            and self.index_column not in ret.visible_columns
+        ):
+            return DataPanel.from_batch({k: ret._data[k] for k in ret.visible_columns})
         if isinstance(ret, DataPanel) and ret.visible_columns == self.visible_columns:
             return EntityDataPanel.from_datapanel(
                 ret,
@@ -222,29 +235,42 @@ class EntityDataPanel(DataPanel):
         self,
         right: "EntityDataPanel",
         how: str = "inner",
+        left_on: str = None,
         sort: bool = False,
         suffixes: Sequence[str] = ("_x", "_y"),
         validate=None,
         keep_indexes: bool = False,
     ):
-        """Perform merge of two EntityDPs. We merge on their index columns."""
+        """Perform merge of two EntityDPs. By default we merge both on their index columns.
+        We do allow for changing the join column of the left side"""
+        left_on = left_on if left_on is not None else self.index_column
         new_embedding_cols = self._get_merged_embedding_columns(
             right, overwrite=False, suffixes=suffixes
         )
-        # If the indices are not the same and the left index column
-        # is in the right set of columns,
-        # the left index column will change to have a suffix.
+        # If the left index column is in the right set of columns,
+        # and the left index column won't stay the same because it's the
+        # the joining column, then the index column will change to
+        # have a suffix
         new_index_column = self.index_column
         if self.index_column in right.column_names:
-            assert suffixes is not None and len(suffixes) == 2, (
-                "The index column is the same as rights columns. "
-                "Must provide suffixes"
-            )
-            new_index_column += suffixes[0]
-        ret = super(EntityDataPanel, self).merge(
-            right,
+            # Column will stay the same if it's the joining
+            # column of both left and right
+            if not (
+                self.index_column == left_on and self.index_column == right.index_column
+            ):
+                assert suffixes is not None and len(suffixes) == 2, (
+                    "The index column is the same as rights columns. "
+                    "Must provide suffixes"
+                )
+                new_index_column += suffixes[0]
+        # Merge calls append and EntityDataPanel append ensures
+        # indexes are aligned. When merging, we adopt the index of
+        # the left, making it okay that indexes are unaligned. To avoid
+        # this, we cast to DataPanel.
+        ret = self.to_datapanel().merge(
+            right.to_datapanel(),
             how=how,
-            left_on=self.index_column,
+            left_on=left_on,
             right_on=right.index_column,
             sort=sort,
             suffixes=suffixes,
