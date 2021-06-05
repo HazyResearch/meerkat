@@ -548,7 +548,8 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
     assert len(new_dp) == len(dp)
     assert len(new_dp["a"]) == len(dp["a"])
     assert len(new_dp["b"]) == len(dp["b"])
-    assert len(new_dp["c"]) == len(dp["c"])
+    if not use_visible_columns:
+        assert len(new_dp["c"]) == len(dp["c"])
 
     assert (dp["a"] == new_dp["a"]).all()
     assert dp["b"].data == new_dp["b"].data
