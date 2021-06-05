@@ -182,6 +182,12 @@ def test_append_entities():
     }
     ent2 = Entity(data, index_column="c", embedding_columns=["g"])
 
+    with pytest.raises(
+        AssertionError,
+        match="Suffixes must be tuple of len 2 when columns share names",
+    ):
+        ent1.append(ent2, axis=1, overwrite=False)
+
     ent3 = ent1.append(ent2, axis=1, overwrite=True)
 
     gold_data = {
@@ -217,7 +223,7 @@ def test_append_entities():
     data = {
         "a": [4, 5, 6],
         "b": [True, False, True],
-        "c": ["x", "y", "z"],
+        "c": ["a", "b", "c"],
         "d": [{"e": 2}, {"e": 3}, {"e": 4}],
         "e": torch.ones(3),
         "f": np.ones(3),
@@ -225,15 +231,19 @@ def test_append_entities():
     }
     ent2 = Entity(data, index_column="c", embedding_columns=["g"])
 
-    ent3 = ent1.append(ent2, axis=1)
-
+    ent3 = ent1.append(ent2, axis=0)
     gold_data = {
-        "a": [4, 5, 6],
-        "b": [True, False, True],
-        "c": ["x", "y", "z"],
-        "d": [{"e": 2}, {"e": 3}, {"e": 4}],
-        "e": torch.ones(3),
-        "f": np.ones(3),
-        "g": np.random.rand(3, 5),
+        "a": [1, 2, 3, 4, 5, 6],
+        "b": [True, False, True, True, False, True],
+        "c": ["x", "y", "z", "a", "b", "c"],
+        "d": [{"e": 2}, {"e": 3}, {"e": 4}, {"e": 2}, {"e": 3}, {"e": 4}],
+        "e": torch.ones(6),
+        "f": np.ones(6),
+        "g": np.concatenate([ent1["g"].numpy(), ent2["g"].numpy()]),
     }
-    assert ent3._data == gold_data
+    # import pdb; pdb.set_trace()
+    for c in ["a", "b", "c", "d", "e", "f", "g"]:
+        if c in ["a", "b", "c", "d"]:  # if gold is not torch or numpy
+            assert [i for i in ent3[c]] == gold_data[c]
+        else:
+            assert ent3[c] == gold_data[c]

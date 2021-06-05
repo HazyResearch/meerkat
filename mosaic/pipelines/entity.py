@@ -182,7 +182,7 @@ class Entity(DataPanel):
                 else:
                     assert (
                         suffixes is not None and len(suffixes) == 2
-                    ), "Suffixes must be tuple of len 2"
+                    ), "Suffixes must be tuple of len 2 when columns share names"
                     new_embedding_cols = (
                         [
                             c
