@@ -10,7 +10,6 @@ from mosaic.provenance import (
     ProvenanceOpNode,
     capture_provenance,
     provenance,
-    visualize_provenance,
 )
 
 
@@ -151,22 +150,3 @@ def test_get_provenance():
     assert sum([isinstance(node, ProvenanceObjNode) for node in nodes]) == 7
     assert sum([isinstance(node, ProvenanceOpNode) for node in nodes]) == 9
     assert len(edges) == 28
-
-
-def test_visualize_provenance():
-    with provenance():
-        dp1 = DataPanel.from_batch(
-            {
-                "x": np.arange(4),
-            }
-        )
-        dp2 = DataPanel.from_batch(
-            {
-                "y": np.arange(4),
-            }
-        )
-        d, _ = custom_fn(dp1, dp2, x="abc")
-        dp3 = d["dp"]
-
-    # just test that it runs without exception
-    visualize_provenance(dp3)
