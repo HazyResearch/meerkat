@@ -6,7 +6,7 @@ import pytest
 import torch
 
 from mosaic import DataPanel, EmbeddingColumn, ListColumn, NumpyArrayColumn
-from mosaic.pipelines.entity import Entity
+from mosaic.pipelines.entitydatapanel import EntityDataPanel
 
 
 def _get_entity_data():
@@ -31,14 +31,14 @@ def test_load(with_embs, with_index):
     data = _get_entity_data()
     if with_embs:
         if with_index:
-            ent = Entity(data, embedding_columns=["g"], index_column="a")
+            ent = EntityDataPanel(data, embedding_columns=["g"], index_column="a")
         else:
-            ent = Entity(data, embedding_columns=["g"])
+            ent = EntityDataPanel(data, embedding_columns=["g"])
     else:
         if with_index:
-            ent = Entity(data, index_column="a")
+            ent = EntityDataPanel(data, index_column="a")
         else:
-            ent = Entity(data)
+            ent = EntityDataPanel(data)
 
     if with_embs:
         assert ent._embedding_columns == ["g"]
@@ -58,7 +58,7 @@ def test_add_emb():
     data = _get_entity_data()
 
     # Test add embedding columns
-    ent = Entity(data)
+    ent = EntityDataPanel(data)
     embs = np.random.randn(3, 6)
     ent.add_embedding_column("embs", embs)
     embs = torch.randn(3, 6)
@@ -87,19 +87,19 @@ def test_add_emb():
     gold_embs[2] = embs[3]
 
     # Test numpy
-    ent = Entity(data, index_column="c")
+    ent = EntityDataPanel(data, index_column="c")
     embs = embs_data
     ent.add_embedding_column("embs", embs, index_to_rowid={"x": 1, "y": 0, "z": 3})
     assert ent["embs"] == gold_embs
 
     # Test tensor
-    ent = Entity(data, index_column="c")
+    ent = EntityDataPanel(data, index_column="c")
     embs = torch.as_tensor(embs_data)
     ent.add_embedding_column("embs", embs, index_to_rowid={"x": 1, "y": 0, "z": 3})
     assert ent["embs"] == gold_embs
 
     # Test embedding column
-    ent = Entity(data, index_column="c")
+    ent = EntityDataPanel(data, index_column="c")
     embs = EmbeddingColumn(embs_data)
     ent.add_embedding_column("embs", embs, index_to_rowid={"x": 1, "y": 0, "z": 3})
     assert ent["embs"] == gold_embs
@@ -112,9 +112,9 @@ def test_add_emb():
 def test_find_similar(k):
     data = _get_entity_data()
 
-    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    ent = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
     sim = ent.most_similar("x", k)
-    assert isinstance(sim, Entity)
+    assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
     assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index"]
 
@@ -126,7 +126,7 @@ def test_find_similar(k):
 def test_find_similar_multiple_columns(k):
     data = _get_entity_data()
 
-    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    ent = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
     embs_data = np.random.randn(3, 6)
     ent.add_embedding_column("embs2", embs_data)
 
@@ -138,14 +138,14 @@ def test_find_similar_multiple_columns(k):
             "x", k, query_embedding_column="g", search_embedding_column="embs2"
         )
 
-    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    ent = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
     embs_data = np.random.randn(3, 5)
     ent.add_embedding_column("embs2", embs_data)
 
     sim = ent.most_similar(
         "x", k, query_embedding_column="g", search_embedding_column="embs2"
     )
-    assert isinstance(sim, Entity)
+    assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
     assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]
 
@@ -153,7 +153,7 @@ def test_find_similar_multiple_columns(k):
 def test_convert_entities_to_ids():
     data = _get_entity_data()
 
-    ent = Entity(data, index_column="c", embedding_columns=["g"])
+    ent = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
 
     train_data = DataPanel(
         {
@@ -172,7 +172,7 @@ def test_convert_entities_to_ids():
 
 def test_append_entities():
     data1 = _get_entity_data()
-    ent1 = Entity(data1, index_column="c", embedding_columns=["g"])
+    ent1 = EntityDataPanel(data1, index_column="c", embedding_columns=["g"])
 
     # Test append column
     data = {
@@ -180,7 +180,7 @@ def test_append_entities():
         "h": [3, 4, 5],
         "g": np.random.rand(3, 5),
     }
-    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+    ent2 = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
 
     with pytest.raises(
         AssertionError,
@@ -211,7 +211,7 @@ def test_append_entities():
         "h": [3, 4, 5],
         "g": np.random.rand(3, 5),
     }
-    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+    ent2 = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
     with pytest.raises(
         ValueError,
         match=r"Can only append along axis 1 \(columns\) if the entity indexes match",
@@ -228,7 +228,7 @@ def test_append_entities():
         "f": np.ones(3),
         "g": np.random.rand(3, 5),
     }
-    ent2 = Entity(data, index_column="c", embedding_columns=["g"])
+    ent2 = EntityDataPanel(data, index_column="c", embedding_columns=["g"])
 
     ent3 = ent1.append(ent2, axis=0)
     gold_data = {
@@ -250,7 +250,7 @@ def test_append_entities():
 
 def test_merge_entities():
     data1 = _get_entity_data()
-    ent1 = Entity(data1, index_column="c", embedding_columns=["g"])
+    ent1 = EntityDataPanel(data1, index_column="c", embedding_columns=["g"])
 
     # Test append column
     data = {
@@ -258,7 +258,7 @@ def test_merge_entities():
         "h": [4, 3, 5],
         "g": np.random.rand(3, 5),
     }
-    ent2 = Entity(data, index_column="d", embedding_columns=["g"])
+    ent2 = EntityDataPanel(data, index_column="d", embedding_columns=["g"])
 
     ent3 = ent1.merge(ent2)
     gold_data = {
@@ -302,7 +302,7 @@ def test_merge_entities():
         "i": np.random.rand(3, 5),
     }
 
-    ent2 = Entity(data, index_column="d", embedding_columns=["i"])
+    ent2 = EntityDataPanel(data, index_column="d", embedding_columns=["i"])
     ent3 = ent1.merge(ent2)
     gold_data = {
         "a": [1, 3],
