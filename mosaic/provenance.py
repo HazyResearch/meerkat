@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import weakref
+from copy import copy
 from functools import wraps
 from inspect import getcallargs
 from typing import Any, Dict, List, Mapping, Sequence, Tuple, Union
@@ -46,10 +47,12 @@ class ProvenanceMixin:
     def node(self):
         return self._node
 
-    def get_provenance(self, include_columns: bool = False):
+    def get_provenance(
+        self, include_columns: bool = False, last_parent_only: bool = False
+    ):
         if self._node is None:
             return None
-        nodes, edges = self._node.get_provenance()
+        nodes, edges = self._node.get_provenance(last_parent_only=last_parent_only)
         if include_columns:
             return nodes, edges
         else:
@@ -75,18 +78,17 @@ class ProvenanceMixin:
             ]
             return nodes, edges
 
-    def __del__(self):
-        #  need to cache the representation when the object is deleted
-        if hasattr(self, "_node"):
-            self.node.cache_repr()
-
 
 class ProvenanceNode:
     def add_child(self, node: ProvenanceNode, key: Tuple):
         self._children.append((node, key))
+        with provenance(enabled=False):
+            self.cache_repr()
 
     def add_parent(self, node: ProvenanceNode, key: Tuple):
         self._parents.append((node, key))
+        with provenance(enabled=False):
+            self.cache_repr()
 
     @property
     def parents(self):
@@ -103,11 +105,17 @@ class ProvenanceNode:
     def children(self):
         return self._children
 
-    def get_provenance(self):
+    def get_provenance(self, last_parent_only: bool = False):
         edges = set()
         nodes = set()
-        for parent, key in self._parents:
-            prev_nodes, prev_edges = parent.get_provenance()
+        for parent, key in (
+            self.parents[-1:]
+            if (last_parent_only and self.__class__ == ProvenanceObjNode)
+            else self.parents
+        ):
+            prev_nodes, prev_edges = parent.get_provenance(
+                last_parent_only=last_parent_only
+            )
             edges |= prev_edges
             edges.add((parent, self, key))
             nodes |= prev_nodes
@@ -127,6 +135,15 @@ class ProvenanceNode:
         else:
             return self._repr()
 
+    def __getstate__(self):
+        state = copy(self.__dict__)
+        state["ref"] = None
+        return state
+
+    def __setstate__(self, state: dict):
+        state["ref"] = lambda: None
+        self.__dict__.update(state)
+
 
 class ProvenanceObjNode(ProvenanceNode):
     def __init__(self, obj: ProvenanceMixin):
@@ -140,12 +157,14 @@ class ProvenanceObjNode(ProvenanceNode):
 
 
 class ProvenanceOpNode(ProvenanceNode):
-    def __init__(self, fn: callable, inputs: dict, outputs: object, meta: dict):
+    def __init__(
+        self, fn: callable, inputs: dict, outputs: object, captured_args: dict
+    ):
         self.ref = weakref.ref(fn)
         self.type = type(fn)
         self.name = fn.__qualname__
         self.module = fn.__module__
-        self.meta = meta
+        self.captured_args = captured_args
 
         self._parents: List[Tuple(ProvenanceObjNode, tuple)] = []
         self._children: List[Tuple(ProvenanceObjNode, tuple)] = []
@@ -177,13 +196,15 @@ def capture_provenance(capture_args: Sequence[str] = None):
             if "kwargs" in args_dict:
                 args_dict.update(args_dict.pop("kwargs"))
 
-            metadata = {arg: args_dict[arg] for arg in capture_args}
+            captured_args = {arg: args_dict[arg] for arg in capture_args}
             out = fn(*args, **kwargs)
 
             # collect instances of ProvenanceMixin nested in the output
             inputs = get_nested_objs(args_dict)
             outputs = get_nested_objs(out)
-            ProvenanceOpNode(fn=fn, inputs=inputs, outputs=outputs, meta=metadata)
+            ProvenanceOpNode(
+                fn=fn, inputs=inputs, outputs=outputs, captured_args=captured_args
+            )
             return out
 
         return _wrapper
@@ -206,12 +227,18 @@ def _get_nested_objs(objs: Dict, key: Tuple[str], data: object):
     elif isinstance(data, Mapping):
         for curr_key, item in data.items():
             _get_nested_objs(objs, key=(*key, curr_key), data=item)
-    elif isinstance(data, ms.DataPanel) or isinstance(data, ms.AbstractColumn):
+    elif isinstance(data, ms.DataPanel):
+        objs[key] = data
+        for curr_key, item in data.items():
+            _get_nested_objs(objs, key=(*key, curr_key), data=item)
+    elif isinstance(data, ms.AbstractColumn):
         objs[key] = data
 
 
 def visualize_provenance(
-    obj: Union[ProvenanceObjNode, ProvenanceOpNode], show_columns: bool = False
+    obj: Union[ProvenanceObjNode, ProvenanceOpNode],
+    show_columns: bool = False,
+    last_parent_only: bool = False,
 ):
     try:
         import cyjupyter
@@ -221,7 +248,9 @@ def visualize_provenance(
             "See https://github.com/cytoscape/cytoscape-jupyter-widget"
         )
 
-    nodes, edges = obj.get_provenance(include_columns=show_columns)
+    nodes, edges = obj.get_provenance(
+        include_columns=show_columns, last_parent_only=last_parent_only
+    )
     cy_nodes = [
         {
             "data": {
@@ -250,21 +279,21 @@ def visualize_provenance(
             "selector": "node",
             "css": {
                 "content": "data(name)",
-                "border-color": "rgb(256,256,256)",
+                "background-color": "#fc8d62",
+                "border-color": "#252525",
                 "border-opacity": 1.0,
-                "border-width": 2,
+                "border-width": 3,
             },
         },
         {
             "selector": "node[type = 'op']",
             "css": {
-                "shape": "rectangle",
-                "background-color": "#f53e37",
-                "width": 20,
-                "height": 20,
+                "shape": "barrel",
+                "background-color": "#8da0cb",
             },
         },
         {
+            # need to double index to access metadata (degree etc.)
             "selector": "node[[degree = 0]]",
             "css": {
                 "visibility": "hidden",
@@ -274,8 +303,10 @@ def visualize_provenance(
             "selector": "edge",
             "css": {
                 "content": "data(key)",
-                "mid-target-arrow-color": "#f53e37",
+                "line-color": "#252525",
+                "mid-target-arrow-color": "#8da0cb",
                 "mid-target-arrow-shape": "triangle",
+                "arrow-scale": 2.5,
                 "text-margin-x": 10,
                 "text-margin-y": 10,
             },

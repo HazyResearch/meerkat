@@ -590,8 +590,8 @@ class DataPanel(
         else:
             return cls(dataset)
 
-    @capture_provenance
     @classmethod
+    @capture_provenance()
     def from_columns(
         cls,
         columns: Dict[str, AbstractColumn],
@@ -603,8 +603,8 @@ class DataPanel(
             identifier=identifier,
         )
 
-    @capture_provenance
     @classmethod
+    @capture_provenance()
     def from_jsonl(
         cls,
         json_path: str,
@@ -638,8 +638,8 @@ class DataPanel(
         """Convert a batch to a Dataset."""
         return cls(batch, identifier=identifier)
 
-    @capture_provenance()
     @classmethod
+    @capture_provenance()
     def from_batches(
         cls,
         batches: Sequence[Batch],
@@ -655,8 +655,8 @@ class DataPanel(
             identifier=identifier,
         )
 
-    @capture_provenance()
     @classmethod
+    @capture_provenance()
     def from_dict(
         cls,
         d: Dict,
@@ -671,8 +671,8 @@ class DataPanel(
             identifier=identifier,
         )
 
-    @capture_provenance()
     @classmethod
+    @capture_provenance()
     def from_pandas(
         cls,
         df: pd.DataFrame,
@@ -684,8 +684,8 @@ class DataPanel(
             identifier=identifier,
         )
 
-    @capture_provenance(capture_args=["filepath"])
     @classmethod
+    @capture_provenance(capture_args=["filepath"])
     def from_csv(cls, filepath: str, *args, **kwargs):
         """Create a Dataset from a csv file.
 
@@ -700,8 +700,8 @@ class DataPanel(
         """
         return cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
 
-    @capture_provenance()
     @classmethod
+    @capture_provenance()
     def from_feather(
         cls,
         path: str,

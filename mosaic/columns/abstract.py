@@ -227,7 +227,7 @@ class AbstractColumn(
             ._repr_html_()
         )
 
-    @capture_provenance
+    @capture_provenance()
     def filter(
         self,
         function: Optional[Callable] = None,
