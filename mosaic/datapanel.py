@@ -28,6 +28,7 @@ from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
 from mosaic.mixins.materialize import MaterializationMixin
 from mosaic.mixins.state import StateDictMixin
+from mosaic.provenance import ProvenanceMixin, capture_provenance
 from mosaic.tools.identifier import Identifier
 from mosaic.tools.utils import convert_to_batch_fn, recmerge
 
@@ -39,12 +40,13 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 
 class DataPanel(
-    DatasetInfoMixin,
     DataPanelCopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
     MaterializationMixin,
+    ProvenanceMixin,
     StateDictMixin,
+    DatasetInfoMixin,  # this should be the last in order of mixins
 ):
     """Mosaic DataPanel class."""
 
@@ -63,9 +65,15 @@ class DataPanel(
         split: Optional[NamedSplit] = None,
         **kwargs,
     ):
+        super(DataPanel, self).__init__(
+            info=info,
+            split=split,
+            *args,
+            **kwargs,
+        )
+
         # TODO(karan, sabri): copy columns when they're passed in and prevent users
         #  from setting visible_rows inside columns that belong to a datapanel
-
         logger.debug("Creating DataPanel.")
 
         # Data is a dictionary of columns
@@ -377,6 +385,7 @@ class DataPanel(
             assert col in self._data
         return tz.keyfilter(lambda k: k in columns, self._data)
 
+    @capture_provenance(capture_args=["axis"])
     def append(
         self,
         dp: DataPanel,
@@ -521,6 +530,7 @@ class DataPanel(
         else:
             raise TypeError("Invalid index type: {}".format(type(index)))
 
+    @capture_provenance(capture_args=[])
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
@@ -581,6 +591,7 @@ class DataPanel(
             return cls(dataset)
 
     @classmethod
+    @capture_provenance()
     def from_columns(
         cls,
         columns: Dict[str, AbstractColumn],
@@ -593,6 +604,7 @@ class DataPanel(
         )
 
     @classmethod
+    @capture_provenance()
     def from_jsonl(
         cls,
         json_path: str,
@@ -617,6 +629,7 @@ class DataPanel(
         )
 
     @classmethod
+    @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
@@ -626,6 +639,7 @@ class DataPanel(
         return cls(batch, identifier=identifier)
 
     @classmethod
+    @capture_provenance()
     def from_batches(
         cls,
         batches: Sequence[Batch],
@@ -642,6 +656,7 @@ class DataPanel(
         )
 
     @classmethod
+    @capture_provenance()
     def from_dict(
         cls,
         d: Dict,
@@ -657,6 +672,7 @@ class DataPanel(
         )
 
     @classmethod
+    @capture_provenance()
     def from_pandas(
         cls,
         df: pd.DataFrame,
@@ -669,6 +685,7 @@ class DataPanel(
         )
 
     @classmethod
+    @capture_provenance(capture_args=["filepath"])
     def from_csv(cls, filepath: str, *args, **kwargs):
         """Create a Dataset from a csv file.
 
@@ -684,6 +701,7 @@ class DataPanel(
         return cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
 
     @classmethod
+    @capture_provenance()
     def from_feather(
         cls,
         path: str,
@@ -697,6 +715,7 @@ class DataPanel(
             else identifier,
         )
 
+    @capture_provenance()
     def to_pandas(self) -> pd.DataFrame:
         """Convert a Dataset to a pandas DataFrame."""
         return pd.DataFrame({name: column.to_pandas() for name, column in self.items()})
@@ -793,6 +812,7 @@ class DataPanel(
             for cell_batch in cell_dl:
                 yield cell_batch
 
+    @capture_provenance(capture_args=["with_indices"])
     def update(
         self,
         function: Optional[Callable] = None,
@@ -899,6 +919,7 @@ class DataPanel(
                 **kwargs,
             )
 
+    @capture_provenance()
     def filter(
         self,
         function: Optional[Callable] = None,

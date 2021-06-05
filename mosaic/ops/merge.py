@@ -8,8 +8,10 @@ from mosaic.columns.cell_column import CellColumn
 from mosaic.columns.numpy_column import NumpyArrayColumn
 from mosaic.columns.tensor_column import TensorColumn
 from mosaic.errors import MergeError
+from mosaic.provenance import capture_provenance
 
 
+@capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
 def merge(
     left: DataPanel,
     right: DataPanel,

@@ -3,6 +3,8 @@ from typing import Callable, Mapping, Optional
 
 from tqdm.auto import tqdm
 
+from mosaic.provenance import capture_provenance
+
 logger = logging.getLogger(__name__)
 
 
@@ -10,6 +12,7 @@ class MappableMixin:
     def __init__(self, *args, **kwargs):
         super(MappableMixin, self).__init__(*args, **kwargs)
 
+    @capture_provenance()
     def map(
         self,
         function: Optional[Callable] = None,
