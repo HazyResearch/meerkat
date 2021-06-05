@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Sequence, Union
 
+import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 
 from mosaic.columns.tensor_column import TensorColumn
+
+Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
 
 class _ClassifierOutputType(Enum):
@@ -49,9 +54,9 @@ class _ClassifierOutputType(Enum):
 class ClassificationOutputColumn(TensorColumn):
     def __init__(
         self,
-        logits=None,
-        probs=None,
-        preds=None,
+        logits: Columnable = None,
+        probs: Columnable = None,
+        preds: Columnable = None,
         num_classes: int = None,
         multi_label: bool = False,
         one_hot: bool = None,
