@@ -177,12 +177,12 @@ class DataPanel(
     @property
     def column_names(self):
         """Column names in the dataset."""
-        return self.all_columns
+        return self.visible_columns
 
     @property
     def columns(self):
         """Column names in the dataset."""
-        return self.column_names
+        return self.visible_columns
 
     @property
     def num_rows(self):

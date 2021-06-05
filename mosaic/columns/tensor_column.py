@@ -71,7 +71,7 @@ class TensorColumn(
             # class.
             if isinstance(ret, torch.Tensor):
                 if ret.ndim == 0:
-                    return torch.tensor(ret)
+                    return ret.clone().detach()
                 return self.from_data(ret)
             elif isinstance(ret, (List, Tuple)):
                 return type(ret)([_process_arg(_a) for _a in ret])
