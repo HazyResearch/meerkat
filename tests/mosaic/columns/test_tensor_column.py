@@ -178,3 +178,25 @@ def test_copy(multiple_dim, dtype, use_visible_rows):
 
     assert isinstance(col_copy, TensorColumn)
     assert (col == col_copy).all()
+
+
+def test_tensor_ops():
+    """Test prototype tensor operations on tensor columns."""
+    col = TensorColumn(torch.ones(4, 3))
+
+    assert torch.all(torch.sum(col, dim=1) == 3)
+    assert torch.all(col.sum() == torch.sum(col))
+    assert torch.all(col.sum(dim=1) == torch.sum(col, dim=1))
+
+    assert torch.cat([col, col]).shape == (8, 3)
+    assert torch.vstack([col, col]).shape == (8, 3)
+    assert torch.cat([col, col, col], dim=1).shape == (4, 9)
+
+    assert torch.stack([col, col], dim=0).shape == (2, 4, 3)
+
+    chunk1, chunk2 = torch.chunk(col, chunks=2, dim=0)
+    assert chunk1.shape == (2, 3)
+    assert chunk2.shape == (2, 3)
+
+    col_nd = TensorColumn(torch.ones(4, 3, 5, 6))
+    assert col_nd.permute(3, 2, 1, 0).shape == col_nd.shape[::-1]
