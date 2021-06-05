@@ -1,6 +1,6 @@
 """Entity Class"""
 import logging
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import numpy as np
 import torch
@@ -36,23 +36,23 @@ class Entity(DataPanel):
             **kwargs,
         )
         if len(self.column_names) > 0:
-            self.embedding_columns = embedding_columns if embedding_columns else []
+            self._embedding_columns = embedding_columns if embedding_columns else []
 
-            self._check_columns_unique(self.embedding_columns)
-            self._check_columns_exist(self.embedding_columns)
-            for c in self.embedding_columns:
+            self._check_columns_unique(self._embedding_columns)
+            self._check_columns_exist(self._embedding_columns)
+            for c in self._embedding_columns:
                 self._cast_to_embedding(c)
 
-            self.index_column = index_column if index_column else None
-            if not self.index_column:
+            self._index_column = index_column if index_column else None
+            if not self._index_column:
                 self._add_ent_index()
             else:
                 self._check_index_unique()
-            self._check_columns_exist([self.index_column])
+            self._check_columns_exist([self._index_column])
             self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
         else:  # Initializing empty Entity DP - needed when loading
-            self.embedding_columns = []
-            self.index_column = None
+            self._embedding_columns = []
+            self._index_column = None
             self._index_to_rowid = {}
 
     @classmethod
@@ -72,6 +72,14 @@ class Entity(DataPanel):
     @property
     def index(self):
         return self[self.index_column]
+
+    @property
+    def embedding_columns(self):
+        return [e for e in self._embedding_columns if e in self.visible_columns]
+
+    @property
+    def index_column(self):
+        return self._index_column
 
     def _check_index_unique(self):
         assert len(self.index) == len(
@@ -101,7 +109,7 @@ class Entity(DataPanel):
     def _get(self, index, materialize: bool = False):
         """When _get returns a DataPanel with same columns, cast back to Entity"""
         ret = super(Entity, self)._get(index, materialize)
-        if isinstance(ret, DataPanel) and ret.column_names == self.column_names:
+        if isinstance(ret, DataPanel) and ret.visible_columns == self.visible_columns:
             return Entity.from_datapanel(
                 ret,
                 embedding_columns=self.embedding_columns,
@@ -115,7 +123,7 @@ class Entity(DataPanel):
         # TODO: Why do you have a string index...feels weird and expensive.
         # with row indexes due to filtering.
         self.add_column("_ent_index", [i for i in range(len(self))])
-        self.index_column = "_ent_index"
+        self._index_column = "_ent_index"
 
     def _cast_to_embedding(self, name):
         """Cast column to Embedding column if not already"""
@@ -141,8 +149,15 @@ class Entity(DataPanel):
         self._cast_to_embedding(name)
         # If name is duplicate, overwrite must be true
         # otherwise ``add_column`` would fail
-        if name not in self.embedding_columns:
-            self.embedding_columns.append(name)
+        if name not in self._embedding_columns:
+            self._embedding_columns.append(name)
+
+    def remove_column(self, column: str) -> None:
+        """Remove column. Assert index column is not removed"""
+        assert column != self.index_column, "Can't remove an index column"
+        super(Entity, self).remove_column(column)
+        if column in self._embedding_columns:
+            self._embedding_columns.remove(column)
 
     def append(
         self,
@@ -166,57 +181,99 @@ class Entity(DataPanel):
             )
         elif axis == 1 or axis == "columns":
             # append new columns; must make sure the entities are in the same order
-            if self.index._data != dp.index._data:
+            # data property takes `visible_rows` into account
+            if self.index.data != dp.index.data:
                 raise ValueError(
                     "Can only append along axis 1 (columns) if the entity indexes match"
                 )
-            new_embedding_cols = self.embedding_columns + dp.embedding_columns
-            # Capture the new embedding columns before merging
-            if len(set(self.embedding_columns).intersection(dp.embedding_columns)) > 0:
-                if overwrite:
-                    new_embedding_cols = self.embedding_columns + [
+            new_embedding_cols = self._get_merged_embedding_columns(
+                dp, overwrite, suffixes
+            )
+            # Save the new index column for saving Entity
+            new_index_column = self.index_column
+            if self.index_column in dp.column_names and not overwrite:
+                new_index_column += suffixes[0]
+            ret = super(Entity, self).append(dp, axis, suffixes, overwrite)
+            return Entity.from_datapanel(
+                ret,
+                embedding_columns=new_embedding_cols,
+                index_column=new_index_column,
+            )
+        else:
+            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+
+    def merge(
+        self,
+        right: "Entity",
+        how: str = "inner",
+        sort: bool = False,
+        suffixes: Sequence[str] = ("_x", "_y"),
+        validate=None,
+        keep_indexes: bool = False,
+    ):
+        """Perform merge of two Entities. We merge on their index columns."""
+        new_embedding_cols = self._get_merged_embedding_columns(
+            right, overwrite=False, suffixes=suffixes
+        )
+        # If the indices are not the same and the left index column
+        # is in the right set of columns,
+        # the left index column will change to have a suffix.
+        new_index_column = self.index_column
+        if self.index_column in right.column_names:
+            assert suffixes is not None and len(suffixes) == 2, (
+                "The index column is the same as rights columns. "
+                "Must provide suffixes"
+            )
+            new_index_column += suffixes[0]
+        ret = super(Entity, self).merge(
+            right,
+            how=how,
+            left_on=self.index_column,
+            right_on=right.index_column,
+            sort=sort,
+            suffixes=suffixes,
+            validate=validate,
+            keep_indexes=False,
+        )
+        return Entity.from_datapanel(
+            ret,
+            embedding_columns=new_embedding_cols,
+            index_column=new_index_column,
+        )
+
+    def _get_merged_embedding_columns(self, dp, overwrite, suffixes):
+        """In order to create Entity post merge/append, we need to have the embedding columns.
+        This calculates the new Entity embedding columns."""
+        new_embedding_cols = self.embedding_columns + dp.embedding_columns
+        # Capture the new embedding columns before merging
+        if len(set(self.embedding_columns).intersection(dp.embedding_columns)) > 0:
+            if overwrite:
+                new_embedding_cols = self.embedding_columns + [
+                    c for c in dp.embedding_columns if c not in self.embedding_columns
+                ]
+            else:
+                assert (
+                    suffixes is not None and len(suffixes) == 2
+                ), "Suffixes must be tuple of len 2 when columns share names"
+                new_embedding_cols = (
+                    [c for c in self.embedding_columns if c not in dp.embedding_columns]
+                    + [
                         c
                         for c in dp.embedding_columns
                         if c not in self.embedding_columns
                     ]
-                else:
-                    assert (
-                        suffixes is not None and len(suffixes) == 2
-                    ), "Suffixes must be tuple of len 2 when columns share names"
-                    new_embedding_cols = (
-                        [
-                            c
-                            for c in self.embedding_columns
-                            if c not in dp.embedding_columns
-                        ]
-                        + [
-                            c
-                            for c in dp.embedding_columns
-                            if c not in self.embedding_columns
-                        ]
-                        + [
-                            c + suffixes[0]
-                            for c in self.embedding_columns
-                            if c in dp.embedding_columns
-                        ]
-                        + [
-                            c + suffixes[1]
-                            for c in dp.embedding_columns
-                            if c in self.embedding_columns
-                        ]
-                    )
-            # As the index matches, we remove it from dp before appending
-            dp_cols_no_index = [c for c in dp.column_names if c != dp.index_column]
-            ret = super(Entity, self).append(
-                dp[dp_cols_no_index], axis, suffixes, overwrite
-            )
-            return Entity.from_datapanel(
-                ret,
-                embedding_columns=new_embedding_cols,
-                index_column=self.index_column,
-            )
-        else:
-            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+                    + [
+                        c + suffixes[0]
+                        for c in self.embedding_columns
+                        if c in dp.embedding_columns
+                    ]
+                    + [
+                        c + suffixes[1]
+                        for c in dp.embedding_columns
+                        if c in self.embedding_columns
+                    ]
+                )
+        return new_embedding_cols
 
     def convert_entities_to_ids(
         self, column: Union[ListColumn, TensorColumn, NumpyArrayColumn]
@@ -276,6 +333,6 @@ class Entity(DataPanel):
             "all_columns",
             "_visible_columns",
             "_identifier",
-            "embedding_columns",
-            "index_column",
+            "_embedding_columns",
+            "_index_column",
         }

@@ -41,16 +41,16 @@ def test_load(with_embs, with_index):
             ent = Entity(data)
 
     if with_embs:
-        assert ent.embedding_columns == ["g"]
+        assert ent._embedding_columns == ["g"]
         assert isinstance(ent["g"], EmbeddingColumn)
     else:
-        assert ent.embedding_columns == []
+        assert ent._embedding_columns == []
 
     if with_index:
-        assert ent.index_column == "a"
+        assert ent._index_column == "a"
         assert ent["a"].tolist() == [1, 2, 3]
     else:
-        assert ent.index_column == "_ent_index"
+        assert ent._index_column == "_ent_index"
         assert ent["_ent_index"].tolist() == [0, 1, 2]
 
 
@@ -66,7 +66,7 @@ def test_add_emb():
     embs = EmbeddingColumn(torch.randn(3, 6))
     ent.add_embedding_column("embs3", embs)
     ent.add_embedding_column("embs3", embs, overwrite=True)
-    assert ent.embedding_columns == ["embs", "embs2", "embs3"]
+    assert ent._embedding_columns == ["embs", "embs2", "embs3"]
     assert isinstance(ent["embs"], EmbeddingColumn)
     assert isinstance(ent["embs2"], EmbeddingColumn)
     assert isinstance(ent["embs3"], EmbeddingColumn)
@@ -187,8 +187,7 @@ def test_append_entities():
         match="Suffixes must be tuple of len 2 when columns share names",
     ):
         ent1.append(ent2, axis=1, overwrite=False)
-
-    ent3 = ent1.append(ent2, axis=1, overwrite=True)
+    ent3 = ent1.append(ent2, axis=1, overwrite=True, suffixes=("_x", "_y"))
 
     gold_data = {
         "a": [1, 2, 3],
@@ -203,8 +202,8 @@ def test_append_entities():
     assert ent3.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "h"]
     assert ent3["h"].tolist() == gold_data["h"]
     assert ent3["c"]._data == gold_data["c"]
-    assert ent3.index_column == "c"
-    assert ent3.embedding_columns == ["g"]
+    assert ent3._index_column == "c"
+    assert ent3._embedding_columns == ["g"]
 
     # Test append column no index match
     data = {
@@ -244,6 +243,108 @@ def test_append_entities():
     # import pdb; pdb.set_trace()
     for c in ["a", "b", "c", "d", "e", "f", "g"]:
         if c in ["a", "b", "c", "d"]:  # if gold is not torch or numpy
+            assert [i for i in ent3[c]] == gold_data[c]
+        else:
+            assert ent3[c] == gold_data[c]
+
+
+def test_merge_entities():
+    data1 = _get_entity_data()
+    ent1 = Entity(data1, index_column="c", embedding_columns=["g"])
+
+    # Test append column
+    data = {
+        "d": ["y", "x", "z"],
+        "h": [4, 3, 5],
+        "g": np.random.rand(3, 5),
+    }
+    ent2 = Entity(data, index_column="d", embedding_columns=["g"])
+
+    ent3 = ent1.merge(ent2)
+    gold_data = {
+        "a": [1, 2, 3],
+        "b": [True, False, True],
+        "c": ["x", "y", "z"],
+        "d_x": [{"e": 2}, {"e": 3}, {"e": 4}],
+        "d_y": ["x", "y", "z"],
+        "e": torch.ones(3),
+        "f": np.ones(3),
+        "g_x": data1["g"],
+        "g_y": data["g"],
+        "h": [3, 4, 5],
+    }
+    # import pdb; pdb.set_trace()
+    assert ent3.column_names == [
+        "a",
+        "b",
+        "c",
+        "d_x",
+        "e",
+        "f",
+        "g_x",
+        "d_y",
+        "h",
+        "g_y",
+        "index",
+    ]
+    assert ent3._index_column == "c"
+    assert ent3._embedding_columns == ["g_x", "g_y"]
+    for c in ["a", "b", "c", "d_x", "d_y", "e", "f", "g_x", "g_y", "h"]:
+        if c in ["a", "b", "c", "d_x", "d_y", "h"]:  # if gold is not torch or numpy
+            assert [i for i in ent3[c]] == gold_data[c]
+        else:
+            assert ent3[c] == gold_data[c]
+
+    # Test append column with missing index and index column on ent1 in data for ent2
+    data = {
+        "d": ["x", "a", "z"],
+        "c": [3, 4, 5],
+        "i": np.random.rand(3, 5),
+    }
+
+    ent2 = Entity(data, index_column="d", embedding_columns=["i"])
+    ent3 = ent1.merge(ent2)
+    gold_data = {
+        "a": [1, 3],
+        "b": [True, True],
+        "c_x": ["x", "z"],
+        "d_x": [{"e": 2}, {"e": 4}],
+        "d_y": ["x", "z"],
+        "e": torch.ones(2),
+        "f": np.ones(2),
+        "g": np.concatenate(
+            [data1["g"][0].reshape(1, 5), data1["g"][2].reshape(1, 5)], axis=0
+        ),
+        "i": np.concatenate(
+            [data["i"][0].reshape(1, 5), data["i"][2].reshape(1, 5)], axis=0
+        ),
+        "c_y": [3, 5],
+    }
+    assert ent3.column_names == [
+        "a",
+        "b",
+        "c_x",
+        "d_x",
+        "e",
+        "f",
+        "g",
+        "d_y",
+        "c_y",
+        "i",
+        "index",
+    ]
+    assert ent3._index_column == "c_x"
+    assert ent3._embedding_columns == ["g", "i"]
+    for c in ["a", "b", "c_x", "c_y", "d_x", "d_y", "e", "f", "g", "i"]:
+        if c in [
+            "a",
+            "b",
+            "c_x",
+            "c_y",
+            "d_x",
+            "d_y",
+            "h",
+        ]:  # if gold is not torch or numpy
             assert [i for i in ent3[c]] == gold_data[c]
         else:
             assert ent3[c] == gold_data[c]
