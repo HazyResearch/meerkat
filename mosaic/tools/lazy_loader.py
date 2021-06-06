@@ -34,7 +34,12 @@ class LazyLoader(types.ModuleType):
 
     # The lint error here is incorrect.
     def __init__(
-        self, local_name, parent_module_globals=None, name=None, warning=None
+        self,
+        local_name,
+        parent_module_globals=None,
+        name=None,
+        warning=None,
+        error=None,
     ):  # pylint: disable=super-on-old-class
         if parent_module_globals is None:
             parent_module_globals = globals()
@@ -42,6 +47,7 @@ class LazyLoader(types.ModuleType):
         self._local_name = local_name
         self._parent_module_globals = parent_module_globals
         self._warning = warning
+        self._error = error
 
         if name is None:
             name = local_name
@@ -51,7 +57,10 @@ class LazyLoader(types.ModuleType):
     def _load(self):
         """Load the module and insert it into the parent's globals."""
         # Import the target module and insert it into the parent's namespace
-        module = importlib.import_module(self.__name__)
+        try:
+            module = importlib.import_module(self.__name__)
+        except ImportError:
+            raise ImportError(self._error) if self._error else ImportError
         self._parent_module_globals[self._local_name] = module
 
         # Emit a warning if one was specified
