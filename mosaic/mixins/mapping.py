@@ -159,5 +159,8 @@ class MappableMixin:
         if not is_mapping:
             outputs = outputs[0]
         else:
-            outputs = DataPanel.from_batch(outputs)
+            # TODO (arjundd): This is duck type. We should probably make this
+            # class signature explicit.
+            klass = type(self) if isinstance(self, DataPanel) else DataPanel
+            outputs = klass.from_batch(outputs)
         return outputs

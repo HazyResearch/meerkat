@@ -59,8 +59,8 @@ class LazyLoader(types.ModuleType):
         # Import the target module and insert it into the parent's namespace
         try:
             module = importlib.import_module(self.__name__)
-        except ImportError:
-            raise ImportError(self._error) if self._error else ImportError
+        except ImportError as e:
+            raise ImportError(self._error) if self._error else e
         self._parent_module_globals[self._local_name] = module
 
         # Emit a warning if one was specified

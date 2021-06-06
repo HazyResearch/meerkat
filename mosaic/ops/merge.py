@@ -106,7 +106,7 @@ def _construct_from_indices(dp: DataPanel, indices: np.ndarray):
             )
             for name, col in dp.items()
         }
-        return DataPanel.from_batch(data)
+        return dp.from_batch(data)
     else:
         # if there are no `nan`s in the indices, then we can just lazy index the
         # original column

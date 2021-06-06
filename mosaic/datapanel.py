@@ -430,7 +430,7 @@ class DataPanel(
             else:
                 data = {**dict(self.items()), **dict(dp.items())}
 
-            return DataPanel.from_batch(data)
+            return self.from_batch(data)
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -493,7 +493,7 @@ class DataPanel(
         # cases where `index` returns a datapanel
         elif isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
+            return self.from_batch(
                 {
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
@@ -510,7 +510,7 @@ class DataPanel(
                 dp.visible_columns = index
                 return dp
 
-            return DataPanel.from_batch(
+            return self.from_batch(
                 {
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
@@ -522,7 +522,7 @@ class DataPanel(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
             # numpy array index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
+            return self.from_batch(
                 {
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
@@ -530,7 +530,7 @@ class DataPanel(
             )
         elif isinstance(index, AbstractColumn):
             # column index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
+            return self.from_batch(
                 {
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
@@ -745,7 +745,7 @@ class DataPanel(
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
-        dp = DataPanel.from_batch(new_batch)
+        dp = self.from_batch(new_batch)
         return dp
 
     @staticmethod
@@ -813,7 +813,7 @@ class DataPanel(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield DataPanel.from_batch({**cell_batch._data, **batch_batch._data})
+                yield self.from_batch({**cell_batch._data, **batch_batch._data})
         elif batch_columns:
             for batch_batch in batch_dl:
                 yield batch_batch
