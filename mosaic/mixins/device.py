@@ -6,10 +6,10 @@ import torch
 class DeviceMixin:
 
     def __init__(
-        self,
-        device: Union[int, str],
-        *args,
-        **kwargs,
+            self,
+            device: Union[int, str],
+            *args,
+            **kwargs,
     ):
         super(DeviceMixin, self).__init__(*args, **kwargs)
 
