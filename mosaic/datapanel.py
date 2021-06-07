@@ -536,7 +536,7 @@ class DataPanel(
         else:
             raise TypeError("Invalid index type: {}".format(type(index)))
 
-    @capture_provenance(capture_args=[])
+    # @capture_provenance(capture_args=[])
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
@@ -635,7 +635,7 @@ class DataPanel(
         )
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
@@ -925,7 +925,7 @@ class DataPanel(
                 **kwargs,
             )
 
-    @capture_provenance()
+    @capture_provenance(capture_args=['function'])
     def filter(
         self,
         function: Optional[Callable] = None,
