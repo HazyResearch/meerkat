@@ -126,9 +126,11 @@ class EntityDataPanel(DataPanel):
 
     def iget(self, idx: Any):
         """Gets the row given the entity index."""
-        if not isinstance(idx, type(next(iter(self._index_to_rowid.keys())))):
+        idx_col_type = type(next(iter(self._index_to_rowid.keys())))
+        if not isinstance(idx, idx_col_type):
             raise ValueError(
-                "Query must be the same type as the index column of the data"
+                f"Query ({type(idx)}) must be the same type as the "
+                f"index column ({idx_col_type}) of the data"
             )
         assert idx in self._index_to_rowid, f"{idx} not in index set"
         row_idx = self._index_to_rowid[idx]
@@ -144,7 +146,6 @@ class EntityDataPanel(DataPanel):
         """When _get returns a DataPanel with same columns, cast back to
         EntityDataPanel."""
         ret = super(EntityDataPanel, self)._get(index, materialize)
-        self._remove_ent_idx_column(ret)
 
         # If _get subselects columns and _removes_ the index column, this is no longer
         # an EntityDataPanel. In DataPanel, a column subselection will not recast to
@@ -225,7 +226,6 @@ class EntityDataPanel(DataPanel):
         if axis == 0 or axis == "rows":
             # append new rows
             ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
-            self._remove_ent_idx_column(ret)
             return EntityDataPanel.from_datapanel(
                 ret,
                 embedding_columns=self.embedding_columns,
@@ -246,7 +246,6 @@ class EntityDataPanel(DataPanel):
             if self.index_column in dp.column_names and not overwrite:
                 new_index_column += suffixes[0]
             ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
-            self._remove_ent_idx_column(ret)
             return EntityDataPanel.from_datapanel(
                 ret,
                 embedding_columns=new_embedding_cols,
@@ -412,18 +411,7 @@ class EntityDataPanel(DataPanel):
             "_index_column",
         }
 
-    def _remove_ent_idx_column(self, dp: DataPanel):
-        """Removes '_ent_idx' column from datapanel.
-
-        DataPanel._get() calls self.from_batch, which calls the constructor for the
-        subclassed DataPanel. In this case, it calls the constructor without setting
-        index_column, which results in an extra column.
-        This is a stopgap solution to remove the index column from the returned
-        DataPanel if it is already set in the current EntityDataPanel.
-
-        TODO (arjundd): Fix this.
-        """
-        if isinstance(dp, EntityDataPanel) and (self.index_column is not None):
-            dp._index_column = self.index_column
-            if dp.index_column != "_ent_index":
-                dp.remove_column("_ent_index")
+    def _clone_kwargs(self) -> Dict[str, Any]:
+        default_kwargs = super()._clone_kwargs()
+        default_kwargs.update({"index_column": self.index_column})
+        return default_kwargs
