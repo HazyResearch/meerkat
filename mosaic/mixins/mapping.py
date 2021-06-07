@@ -161,6 +161,9 @@ class MappableMixin:
         else:
             # TODO (arjundd): This is duck type. We should probably make this
             # class signature explicit.
-            klass = type(self) if isinstance(self, DataPanel) else DataPanel
-            outputs = klass.from_batch(outputs)
+            outputs = (
+                self._clone(data=outputs)
+                if isinstance(self, DataPanel)
+                else DataPanel.from_batch(outputs)
+            )
         return outputs
