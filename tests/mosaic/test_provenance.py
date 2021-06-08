@@ -7,7 +7,7 @@ import mosaic as ms
 from mosaic.datapanel import DataPanel
 from mosaic.provenance import (
     ProvenanceObjNode,
-    ProvenanceOpNode,
+    # ProvenanceOpNode,
     capture_provenance,
     provenance,
 )
