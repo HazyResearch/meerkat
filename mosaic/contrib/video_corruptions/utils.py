@@ -1,12 +1,15 @@
 import os
 
+
 class stderr_suppress(object):
-    '''
-    A context manager for doing a "deep suppression" of stdout and stderr in
-    Python. This is necessary when reading in a corrupted video, or else stderr 
-    will emit 10000s of errors via ffmpeg. Great for decoding IRL, not great for
-    loading 100s of corrupted videos.
-    '''
+    """A context manager for doing a "deep suppression" of stdout and stderr in
+    Python.
+
+    This is necessary when reading in a corrupted video, or else stderr
+    will emit 10000s of errors via ffmpeg. Great for decoding IRL, not
+    great for loading 100s of corrupted videos.
+    """
+
     def __init__(self):
         # Open a pair of null files
         self.null_fd = os.open(os.devnull, os.O_RDWR)

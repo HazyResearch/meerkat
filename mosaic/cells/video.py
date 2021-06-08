@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Collection, Optional, Tuple
+from typing import Callable, Collection, Optional
 
 import cv2
 import torch
@@ -7,6 +7,7 @@ import torchvision.transforms.functional as F
 
 from mosaic import AbstractCell
 from mosaic.contrib.video_corruptions.utils import stderr_suppress
+
 
 class VideoCell(AbstractCell):
     """Interface for loading video data.
@@ -17,10 +18,12 @@ class VideoCell(AbstractCell):
     >>> cell = VideoCell("/path/to/video.mp4", time_dim=1)
     """
 
-    def __init__(self,
-            filepath: str,
-            transform: Optional[Callable] = None,
-            time_dim: Optional[int] = 1):
+    def __init__(
+        self,
+        filepath: str,
+        transform: Optional[Callable] = None,
+        time_dim: Optional[int] = 1,
+    ):
         super().__init__()
         self.filepath = filepath
         self.time_dim = time_dim
@@ -46,7 +49,7 @@ class VideoCell(AbstractCell):
 
     def get(self):
         with stderr_suppress():
-            frames = self._read_all_frames() # TODO: support different decoders
+            frames = self._read_all_frames()  # TODO: support different decoders
         if self.transform is not None:
             frames = self.transform(frames)
         return frames
@@ -54,5 +57,3 @@ class VideoCell(AbstractCell):
     @classmethod
     def _state_keys(cls) -> Collection:
         return {"filepath", "time_dim", "transform"}
-
-

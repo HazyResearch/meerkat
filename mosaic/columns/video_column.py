@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 from typing import Callable, Optional, Sequence
 
-from mosaic.cells.video import VideoCell
 from mosaic.cells.cell_column import CellColumn
+from mosaic.cells.video import VideoCell
 
 logger = logging.getLogger(__name__)
 
+
 class VideoColumn(CellColumn):
-    """Interface for creating a CellColumn from VideoCell objects.
-    """
+    """Interface for creating a CellColumn from VideoCell objects."""
+
     def __init__(self, *args, **kwargs):
         super(VideoColumn, self).__init__(*args, **kwargs)
 
@@ -24,7 +25,9 @@ class VideoColumn(CellColumn):
         *args,
         **kwargs,
     ):
-        cells = [VideoCell(fp, time_dim=time_dim, transform=transform) for fp in filepaths]
+        cells = [
+            VideoCell(fp, time_dim=time_dim, transform=transform) for fp in filepaths
+        ]
         return cls(
             cells=cells,
             *args,
