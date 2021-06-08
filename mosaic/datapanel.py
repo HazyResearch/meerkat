@@ -156,6 +156,9 @@ class DataPanel(
     def _repr_html_(self):
         return self._repr_pandas_()._repr_html_()
 
+    def streamlit(self):
+        return self._repr_pandas_()
+
     def __repr__(self):
         return f"{self.__class__.__name__}" f"(num_rows: {self.num_rows})"
 
