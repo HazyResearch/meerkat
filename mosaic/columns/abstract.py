@@ -72,6 +72,9 @@ class AbstractColumn(
     def __str__(self):
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
+    def streamlit(self):
+        return self._repr_pandas_()
+
     @property
     def data(self):
         """Get the underlying data (excluding invisible rows).
