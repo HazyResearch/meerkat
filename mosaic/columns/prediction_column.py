@@ -128,7 +128,7 @@ class ClassificationOutputColumn(TensorColumn):
         self._ctype = _ClassifierOutputType.get_ctype(ctype)
         self.num_classes = int(num_classes)
         self.multi_label = multi_label
-        self.out_hot = one_hot
+        self.one_hot = one_hot
         self.threshold = threshold
 
     def logits(self) -> ClassificationOutputColumn:
