@@ -91,6 +91,7 @@ EXTRAS = {
     ],
     "vision": [
         "torchvision>=0.9.0",
+        "opencv-python",
     ],
     "wilds": [
         "wilds>=1.1.0",
