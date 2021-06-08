@@ -137,7 +137,7 @@ class AbstractColumn(
             batch = self._get_batch(index, materialize=materialize)
             return self.__class__.from_data(batch)
 
-    @capture_provenance()
+    # @capture_provenance()
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
@@ -363,7 +363,7 @@ class AbstractColumn(
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to a mosaic column using the appropriate Column
         type."""
