@@ -5,9 +5,8 @@ import numpy as np
 
 import mosaic as ms
 from mosaic.datapanel import DataPanel
-from mosaic.provenance import (
+from mosaic.provenance import (  # ProvenanceOpNode,
     ProvenanceObjNode,
-    # ProvenanceOpNode,
     capture_provenance,
     provenance,
 )
