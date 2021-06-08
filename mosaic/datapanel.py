@@ -925,7 +925,7 @@ class DataPanel(
                 **kwargs,
             )
 
-    @capture_provenance(capture_args=['function'])
+    @capture_provenance(capture_args=["function"])
     def filter(
         self,
         function: Optional[Callable] = None,

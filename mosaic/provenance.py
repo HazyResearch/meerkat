@@ -19,6 +19,7 @@ def set_provenance(enabled=True):
 class provenance:
     def __init__(self, enabled: bool = True):
         """Context manager for enabling provenance capture in Mosaic.
+
         Example:
         ```python
         import mosaic as ms
