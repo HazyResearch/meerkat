@@ -60,6 +60,7 @@ EXTRAS = {
         "sphinx-rtd-theme>=0.5.1",
         "nbsphinx>=0.8.0",
         "recommonmark>=0.7.1",
+        "parameterized",
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
         "twine",
@@ -91,6 +92,7 @@ EXTRAS = {
     ],
     "vision": [
         "torchvision>=0.9.0",
+        "opencv-python",
     ],
     "wilds": [
         "wilds>=1.1.0",
