@@ -47,7 +47,7 @@ def concat(
                     "Can only concatenate DataPanels along axis 0 (rows) if they have "
                     " the same set of columns names."
                 )
-            return DataPanel.from_batch(
+            return objs[0].from_batch(
                 {column: concat([dp[column] for dp in objs]) for column in columns}
             )
         elif axis == 1 or axis == "columns":
@@ -68,7 +68,7 @@ def concat(
                 )
 
             data = tz.merge(*(dict(dp.items()) for dp in objs))
-            return DataPanel.from_batch(data)
+            return objs[0].from_batch(data)
     elif isinstance(objs[0], AbstractColumn):
         # use the concat method of the column
         return objs[0].concat(objs)

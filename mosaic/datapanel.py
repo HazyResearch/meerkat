@@ -6,7 +6,7 @@ import os
 import pathlib
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import cytoolz as tz
 import datasets
@@ -430,7 +430,7 @@ class DataPanel(
             else:
                 data = {**dict(self.items()), **dict(dp.items())}
 
-            return DataPanel.from_batch(data)
+            return self._clone(data=data)
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -493,8 +493,8 @@ class DataPanel(
         # cases where `index` returns a datapanel
         elif isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
-                {
+            return self._clone(
+                data={
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
                 }
@@ -510,8 +510,8 @@ class DataPanel(
                 dp.visible_columns = index
                 return dp
 
-            return DataPanel.from_batch(
-                {
+            return self._clone(
+                data={
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
                 }
@@ -522,16 +522,16 @@ class DataPanel(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
             # numpy array index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
-                {
+            return self._clone(
+                data={
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
                 }
             )
         elif isinstance(index, AbstractColumn):
             # column index => multiple row selection (DataPanel)
-            return DataPanel.from_batch(
-                {
+            return self._clone(
+                data={
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
                 }
@@ -745,7 +745,7 @@ class DataPanel(
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
-        dp = DataPanel.from_batch(new_batch)
+        dp = self._clone(data=new_batch)
         return dp
 
     @staticmethod
@@ -813,7 +813,7 @@ class DataPanel(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield DataPanel.from_batch({**cell_batch._data, **batch_batch._data})
+                yield self._clone(data={**cell_batch._data, **batch_batch._data})
         elif batch_columns:
             for batch_batch in batch_dl:
                 yield batch_batch
@@ -1115,3 +1115,26 @@ class DataPanel(
             "_info",
             "_split",
         }
+
+    def _clone_kwargs(self) -> Dict[str, Any]:
+        """Returns __init__ kwargs for instantiating new object.
+
+        This function returns the default parameters that should be plumbed
+        from the current instance to the new instance.
+
+        This is the API that should be used by subclasses of :class:`DataPanel`.
+
+        Returns:
+            Dict[str, Any]: The keyword arguments for initialization
+        """
+        # identifier, info, and split are not passed by default because they have
+        # not been plumbed so far.
+        return {}
+
+    def _clone(self, data=None, **kwargs):
+        default_kwargs = self._clone_kwargs()
+        if data is None:
+            data = kwargs.pop("data", self.data)
+        if kwargs:
+            default_kwargs.update(kwargs)
+        return self.__class__(data, **default_kwargs)

@@ -1,4 +1,4 @@
-"""EntityDataPanel Class"""
+"""EntityDataPanel Class."""
 import logging
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
@@ -76,30 +76,43 @@ class EntityDataPanel(DataPanel):
         embedding_columns: List[str] = None,
         index_column: str = None,
     ):
-        """Returns EntityDataPanel DP from standard DP"""
+        """Returns EntityDataPanel DP from standard DP."""
         return cls(
             datapanel._data,
             embedding_columns=embedding_columns,
             index_column=index_column,
         )
 
-    def to_datapanel(self):
-        """Casts to a DataPanel"""
-        return DataPanel.from_batch({k: self[k] for k in self.visible_columns})
+    def to_datapanel(self, klass: type = None):
+        """Casts to a DataPanel.
+
+        Args:
+            klass (type): If specified, casts to this class.
+                This class must be a subclass of :ref:`mosaic.datapanel.DataPanel`.
+                If not specified, defaults to :ref:`mosaic.datapanel.DataPanel`.
+
+        Returns:
+            DataPanel: The datapanel.
+        """
+        if klass is None:
+            klass = DataPanel
+        elif not issubclass(klass, DataPanel):
+            raise ValueError("`klass` must be a subclass of DataPanel")
+        return klass.from_batch({k: self[k] for k in self.visible_columns})
 
     @property
     def index(self):
-        "Returns index column"
+        """Returns index column."""
         return self[self.index_column]
 
     @property
     def embedding_columns(self):
-        """Returns _visible_ embedding columns"""
+        """Returns _visible_ embedding columns."""
         return [e for e in self._embedding_columns if e in self.visible_columns]
 
     @property
     def index_column(self):
-        """Returns index column"""
+        """Returns index column."""
         return self._index_column
 
     def _check_index_unique(self):
@@ -108,14 +121,16 @@ class EntityDataPanel(DataPanel):
         ), "Index must be unique and hashable"
 
     def icontain(self, idx: Any):
-        """Checks if idx in the index column or not"""
+        """Checks if idx in the index column or not."""
         return idx in self._index_to_rowid
 
     def iget(self, idx: Any):
-        """Gets the row given the entity index"""
-        if not isinstance(idx, type(next(iter(self._index_to_rowid.keys())))):
+        """Gets the row given the entity index."""
+        idx_col_type = type(next(iter(self._index_to_rowid.keys())))
+        if not isinstance(idx, idx_col_type):
             raise ValueError(
-                "Query must be the same type as the index column of the data"
+                f"Query ({type(idx)}) must be the same type as the "
+                f"index column ({idx_col_type}) of the data"
             )
         assert idx in self._index_to_rowid, f"{idx} not in index set"
         row_idx = self._index_to_rowid[idx]
@@ -128,9 +143,10 @@ class EntityDataPanel(DataPanel):
         return self[row_idx]
 
     def _get(self, index, materialize: bool = False):
-        """When _get returns a DataPanel with same columns,
-        cast back to EntityDataPanel"""
+        """When _get returns a DataPanel with same columns, cast back to
+        EntityDataPanel."""
         ret = super(EntityDataPanel, self)._get(index, materialize)
+
         # If _get subselects columns and _removes_ the index column, this is no longer
         # an EntityDataPanel. In DataPanel, a column subselection will not recast to
         # a DataPanel (it just creates a view). In this case, we need to explicitly cast
@@ -149,15 +165,18 @@ class EntityDataPanel(DataPanel):
         return ret
 
     def _add_ent_index(self):
-        """Add an integer index to the dataset. Not using index from DataPanel
-        as ids need to be integers to serve as embedding row indices"""
+        """Add an integer index to the dataset.
+
+        Not using index from DataPanel as ids need to be integers to
+        serve as embedding row indices
+        """
         # TODO: Why do you have a string index...feels weird and expensive.
         # with row indexes due to filtering.
         self.add_column("_ent_index", [i for i in range(len(self))])
         self._index_column = "_ent_index"
 
     def _cast_to_embedding(self, name):
-        """Cast column to Embedding column if not already"""
+        """Cast column to Embedding column if not already."""
         if not isinstance(self._data[name], EmbeddingColumn):
             self._data[name] = EmbeddingColumn(self._data[name])
 
@@ -168,8 +187,11 @@ class EntityDataPanel(DataPanel):
         index_to_rowid: Dict[Any, int] = None,
         overwrite: bool = False,
     ):
-        """Adds embedding column to data. If index_to_rowid provided,
-        maps DP index column to rowid of embedding."""
+        """Adds embedding column to data.
+
+        If index_to_rowid provided, maps DP index column to rowid of
+        embedding.
+        """
         if index_to_rowid is not None:
             permutation = [index_to_rowid[i] for i in self.index]
             embedding = embedding[permutation]
@@ -184,7 +206,10 @@ class EntityDataPanel(DataPanel):
             self._embedding_columns.append(name)
 
     def remove_column(self, column: str) -> None:
-        """Remove column. Assert index column is not removed"""
+        """Remove column.
+
+        Assert index column is not removed
+        """
         assert column != self.index_column, "Can't remove an index column"
         super(EntityDataPanel, self).remove_column(column)
         if column in self._embedding_columns:
@@ -197,9 +222,7 @@ class EntityDataPanel(DataPanel):
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
     ) -> "EntityDataPanel":
-        """
-        Append an EntityDataPanel.
-        """
+        """Append an EntityDataPanel."""
         if axis == 0 or axis == "rows":
             # append new rows
             ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
@@ -241,8 +264,11 @@ class EntityDataPanel(DataPanel):
         validate=None,
         keep_indexes: bool = False,
     ):
-        """Perform merge of two EntityDPs. By default we merge both on their index columns.
-        We do allow for changing the join column of the left side"""
+        """Perform merge of two EntityDPs.
+
+        By default we merge both on their index columns. We do allow for
+        changing the join column of the left side
+        """
         left_on = left_on if left_on is not None else self.index_column
         new_embedding_cols = self._get_merged_embedding_columns(
             right, overwrite=False, suffixes=suffixes
@@ -285,8 +311,11 @@ class EntityDataPanel(DataPanel):
 
     def _get_merged_embedding_columns(self, dp, overwrite, suffixes):
         """In order to create EntityDataPanel post merge/append, we need to
-        have the embedding columns. This calculates the new EntityDataPanel
-        embedding columns in the case of suffix changes."""
+        have the embedding columns.
+
+        This calculates the new EntityDataPanel embedding columns in the
+        case of suffix changes.
+        """
         new_embedding_cols = self.embedding_columns + dp.embedding_columns
         # Capture the new embedding columns before merging
         if len(set(self.embedding_columns).intersection(dp.embedding_columns)) > 0:
@@ -322,7 +351,9 @@ class EntityDataPanel(DataPanel):
         self, column: Union[ListColumn, TensorColumn, NumpyArrayColumn]
     ):
         """Maps column of entity idx to their row ids for the embeddings.
-        Used in data prep before training."""
+
+        Used in data prep before training.
+        """
 
         def recursive_map(seq):
             if isinstance(seq, (np.ndarray, torch.Tensor, list)):
@@ -344,7 +375,7 @@ class EntityDataPanel(DataPanel):
         query_embedding_column=None,
         search_embedding_column=None,
     ):
-        """Returns most similar entities distinct from query"""
+        """Returns most similar entities distinct from query."""
         assert k < len(self), "k must be less than the total number of entities"
         if query_embedding_column is None:
             query_embedding_column = self.embedding_columns[0]
@@ -379,3 +410,8 @@ class EntityDataPanel(DataPanel):
             "_embedding_columns",
             "_index_column",
         }
+
+    def _clone_kwargs(self) -> Dict[str, Any]:
+        default_kwargs = super()._clone_kwargs()
+        default_kwargs.update({"index_column": self.index_column})
+        return default_kwargs

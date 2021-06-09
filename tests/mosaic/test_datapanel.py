@@ -656,3 +656,23 @@ def test_append_columns(use_visible_rows, use_visible_columns):
     assert set(out.visible_columns) == set(mock.visible_columns)
     assert (out["a"].data == np.concatenate([mock.visible_rows] * 2)).all()
     assert out["b"].data == list(np.concatenate([mock.visible_rows] * 2))
+
+
+class DataPanelSubclass(DataPanel):
+    """Mock class to test that ops on subclass returns subclass."""
+
+    pass
+
+
+def test_subclass():
+    dp1 = DataPanelSubclass.from_dict({"a": np.arange(3), "b": ["may", "jun", "jul"]})
+    dp2 = DataPanelSubclass.from_dict(
+        {"c": np.arange(3), "d": ["2021", "2022", "2023"]}
+    )
+
+    assert isinstance(dp1.lz[np.asarray([0, 1])], DataPanelSubclass)
+    assert isinstance(dp1.lz[:2], DataPanelSubclass)
+    assert isinstance(dp1[:2], DataPanelSubclass)
+
+    assert isinstance(dp1.merge(dp2, left_on="a", right_on="c"), DataPanelSubclass)
+    assert isinstance(dp1.append(dp1), DataPanelSubclass)
