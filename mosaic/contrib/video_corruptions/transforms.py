@@ -96,7 +96,7 @@ class TemporalCrop(object):
             time_dim=1,
             transform=TemporalCrop(10, 16, time_dim=1)
             )
-        # output shape: (10, C, 16, H, W)
+        # output shape: (10, n_channels, 16, H, W)
 
         # Create a VideoCell from "/path/to/video.mp4" with time in dimension one,
         sampling 8 clips each of length 8, sampling clips from arbitrary video
@@ -106,7 +106,7 @@ class TemporalCrop(object):
             transform=TemporalCrop(8, 8, time_dim=1, clip_spacing="anywhere",
             padding_mode="freeze")
             )
-        # output shape: (8, C, 8, H, W)
+        # output shape: (8, n_channels, 8, H, W)
 
         # Create a VideoCell from "/path/to/video.mp4" with time in dimension one,
         sampling one frame from each third of the video, concatenating the frames
@@ -116,7 +116,7 @@ class TemporalCrop(object):
             transform=TemporalCrop(1, 3, time_dim=1, clip_spacing="equal",
                 sample_starting_location=True, stack_clips=False)
             )
-        # output shape: (C, 3, H, W)
+        # output shape: (n_channels, 3, H, W)
 
     Note that time_dim in the TemporalDownsampling call must match the the time_dim
     in the VideoCell constructor!
@@ -184,9 +184,9 @@ class TemporalCrop(object):
             indices = self._build_indices(first_frame, video_length)
             clip = torch.index_select(video, self.time_dim, indices)
             clips.append(clip)
-        if self.stack_clips:  # new dim. for clips (n_clips, ch, duration, h, w)
+        if self.stack_clips:  # new dim for clips (n_clips, n_channels, duration, h, w)
             all_clips = torch.stack(clips, dim=0)
-        else:  # concat clips in time dimension (ch, n_clips * duration, h, w)
+        else:  # concat clips in time dimension (n_channels, n_clips * duration, h, w)
             all_clips = torch.cat(clips, dim=self.time_dim)
 
         return all_clips
