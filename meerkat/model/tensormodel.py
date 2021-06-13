@@ -73,7 +73,6 @@ class TensorModel(Model):
 
         for idx in range(0, len(dataset), batch_size):
             # Create the batch
-            print(f"Batch: {idx//batch_size}")
             batch = dataset[idx : idx + batch_size]
 
             # Predict on the batch
