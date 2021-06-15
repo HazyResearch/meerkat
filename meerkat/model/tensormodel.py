@@ -4,11 +4,11 @@ from typing import Dict, List
 
 import cytoolz as tz
 import torch
+from tqdm import tqdm
 
 from mosaic import DataPanel
 from mosaic.columns.embedding_column import EmbeddingColumn
 from mosaic.columns.prediction_column import ClassificationOutputColumn
-from mosaic.columns.tensor_column import TensorColumn
 from mosaic.model.activation import ActivationOp
 from mosaic.model.model import Model
 
@@ -47,16 +47,12 @@ class TensorModel(Model):
         # TODO(Priya): See if there is any case where these are to be returned
         return {"logits": outputs.to("cpu")}
 
-    def predict_batch(self, batch: DataPanel, input_columns: List[str]):
+    def process_batch(self, batch: DataPanel, input_columns: List[str]):
 
-        # Convert the batch to torch.Tensor
-        # TODO(Priya): Generalize for multiple input columns
-        input_batch: TensorColumn = batch[input_columns[0]]
+        # Convert the batch to torch.Tensor and move to device
+        input_batch = batch[input_columns[0]].data.to(self.device)
 
-        input = input_batch.data.to(device=self.device)
-
-        # Apply the model to the batch
-        return self.forward(input)
+        return input_batch
 
     def classifier(
         self,
@@ -70,15 +66,13 @@ class TensorModel(Model):
     ) -> DataPanel:
 
         predictions = []
+        # TODO (Priya): Include other arguments of batch method
+        for batch in tqdm(dataset.batch(batch_size)):
 
-        for idx in range(0, len(dataset), batch_size):
-            # Create the batch
-            batch = dataset[idx : idx + batch_size]
-
-            # Predict on the batch
-            prediction_dict = self.predict_batch(
-                batch=batch, input_columns=input_columns
-            )
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
             # Append the predictions
             predictions.append(prediction_dict)
 
@@ -118,12 +112,20 @@ class TensorModel(Model):
         activation_op = ActivationOp(self.model, target_module, self.device)
         activations = []
 
-        for idx in range(0, len(dataset), batch_size):
-            # Create the batch
-            batch = dataset[idx : idx + batch_size]
+        for batch in tqdm(dataset.batch(batch_size)):
+            # Process the batch
+            input_batch = self.process_batch(batch, input_columns)
+
+            # Forward pass
+            with torch.no_grad():
+                self.model(input_batch)
 
             # Get activations for the batch
-            batch_activation = activation_op.process_batch(batch, input_columns)
+            batch_activation = {
+                f"activation ({target_module})": EmbeddingColumn(
+                    activation_op.extractor.activation.cpu().detach()
+                )
+            }
 
             # Append the activations
             activations.append(batch_activation)

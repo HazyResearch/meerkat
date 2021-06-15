@@ -25,6 +25,7 @@ nltk = LazyLoader("nltk")
 """
 
 
+# TODO(Priya): Move some general functions here
 class Model:
     def __init__(
         self,
