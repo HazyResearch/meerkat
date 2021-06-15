@@ -1,10 +1,6 @@
 from functools import reduce
-from typing import Dict, List
 
 import torch
-
-from mosaic import DataPanel
-from mosaic.columns.embedding_column import EmbeddingColumn
 
 
 def _nested_getattr(obj, attr, *args):
@@ -64,6 +60,8 @@ class ActivationOp:
         if self.device is not None:
             self.model.to(self.device)
 
+    # Functionality included in specific models
+    '''
     def process_batch(
         self,
         dp: DataPanel,
@@ -93,3 +91,4 @@ class ActivationOp:
                 self.extractor.activation.cpu().detach()
             )
         }
+    '''
