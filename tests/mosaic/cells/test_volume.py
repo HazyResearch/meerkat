@@ -39,6 +39,7 @@ class TestMedicalVolumeCell(unittest.TestCase):
         _ = cell.get()
         assert cell._metadata is not None
         metadata = cell._metadata
+        assert "PixelData" not in metadata
 
         # Fetching the cell again should not update the underlying metadata.
         _ = cell.get()

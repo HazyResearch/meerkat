@@ -87,10 +87,19 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         if self._metadata is None:
             _img = image[0] if isinstance(image, (list, tuple)) else image
             headers = _img.headers(flatten=True)
-            self._metadata = headers[0] if headers else None
+            self._metadata = self._prune_metadata(headers[0]) if headers else None
         if self.transform is not None:
             image = self.transform(image)
         return image
+
+    def _prune_metadata(self, metadata):
+        """Prunes the metadata to avoid keeping large fields.
+
+        We delete the PixelData field, because that data is a duplicate
+        of the image.
+        """
+        del metadata["PixelData"]
+        return metadata
 
     def get_metadata(
         self,
