@@ -97,9 +97,7 @@ EXTRAS = {
     "wilds": [
         "wilds>=1.1.0",
     ],
-    "medimg": [
-        "dosma>=0.0.13",
-    ],
+    "medimg": ["dosma>=0.0.13", "kaggle"],
 }
 
 # The rest you shouldn't have to touch too much :)
