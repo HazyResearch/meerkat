@@ -9,8 +9,15 @@ from PIL import Image
 
 from mosaic.cells.volume import MedicalVolumeCell
 
+GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/mosaic/dev/examples/03-med_img/cxr_gaze_data.pkl"  # noqa: E501
 
-def download_siim_cxr(dataset_dir: str, kaggle_username: str, kaggle_key: str):
+
+def download_siim_cxr(
+    dataset_dir: str,
+    kaggle_username: str,
+    kaggle_key: str,
+    download_gaze_data: bool = True,
+):
     """Download the dataset from the SIIM-ACR Pneumothorax Segmentation
     challenge. https://www.kaggle.com/c/siim-acr-pneumothorax-
     segmentation/data.
@@ -27,6 +34,8 @@ def download_siim_cxr(dataset_dir: str, kaggle_username: str, kaggle_key: str):
             with a "username" and "key" field. Copy and paste the "key" field and pass
             it in as `kaggle_key`.
             Instructions copied from Kaggle API docs: https://www.kaggle.com/docs/api
+        download_gaze_data (str): Download a pkl file containing eye-tracking data
+            collected on a radiologist interpreting the xray.
     """
     os.environ["KAGGLE_USERNAME"] = kaggle_username
     os.environ["KAGGLE_KEY"] = kaggle_key
@@ -84,6 +93,17 @@ def download_siim_cxr(dataset_dir: str, kaggle_username: str, kaggle_key: str):
     # important to perform a left join here, because there are some images in the
     # directory without labels in `segment_df` and we only want those with labelsy
     df = df.merge(filepath_df, how="left", on="image_id")
+
+    # download and integrate gaze data
+    if download_gaze_data:
+        subprocess.run(
+            [
+                "curl",
+                GAZE_DATA_URL,
+                "--output",
+                os.path.join(dataset_dir, "gaze_data.pkl"),
+            ]
+        )
 
     df.to_csv(os.path.join(dataset_dir, "siim_cxr.csv"), index=False)
 
