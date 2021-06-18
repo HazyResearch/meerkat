@@ -18,6 +18,7 @@ from mosaic.columns.embedding_column import EmbeddingColumn
 from mosaic.columns.image_column import ImageColumn
 from mosaic.columns.list_column import ListColumn
 from mosaic.columns.numpy_column import NumpyArrayColumn
+from mosaic.columns.prediction_column import ClassificationOutputColumn
 from mosaic.columns.spacy_column import SpacyColumn
 from mosaic.columns.tensor_column import TensorColumn
 from mosaic.datapanel import DataPanel
