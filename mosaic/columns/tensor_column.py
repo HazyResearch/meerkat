@@ -4,7 +4,7 @@ import abc
 import functools
 import logging
 import os
-from typing import Callable, List, Mapping, Sequence, Tuple
+from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
 import dill
 import numpy as np
@@ -18,6 +18,8 @@ from mosaic.writers.numpy_writer import NumpyMemmapWriter
 from mosaic.writers.torch_writer import TorchWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
+
+Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
 logger = logging.getLogger(__name__)
 
@@ -136,8 +138,8 @@ class TensorColumn(
         # Load in the data
         if mmap:
             # assert dtype is not None and shape is not None
-            # data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            data = np.load(data_path, mmap_mode="r")
+            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
+            # data = np.load(data_path, mmap_mode="r")
         else:
             data = np.load(data_path, allow_pickle=True)
 
@@ -179,6 +181,14 @@ class TensorColumn(
 
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:
-            return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
+            return pd.Series([f"torch.Tensor(shape={self.shape[1:]})"] * len(self))
         else:
             return pd.Series(self.data)
+
+    @classmethod
+    def from_data(cls, data: Union[Columnable, AbstractColumn]):
+        """Convert data to an EmbeddingColumn."""
+        if torch.is_tensor(data):
+            return cls(data)
+        else:
+            return super(TensorColumn, cls).from_data(data)
