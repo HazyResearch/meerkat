@@ -39,14 +39,6 @@ class EmbeddingColumn(TensorColumn):
 
         self.faiss_index = None
 
-    @classmethod
-    def from_data(cls, data: Union[Columnable, AbstractColumn]):
-        """Convert data to an EmbeddingColumn."""
-        if torch.is_tensor(data):
-            return EmbeddingColumn(data)
-        else:
-            return super(EmbeddingColumn, cls).from_data(data)
-
     def build_faiss_index(self, index=None, overwrite=False):
         if self.ndim < 2:
             raise ValueError("Building an index requires `ndim` >= 2.")
