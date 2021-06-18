@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-from mosaic import AbstractColumn
 from mosaic.columns.tensor_column import TensorColumn
 from mosaic.tools.lazy_loader import LazyLoader
 
@@ -38,14 +37,6 @@ class EmbeddingColumn(TensorColumn):
         self._data = self._data.type(torch.FloatTensor)
 
         self.faiss_index = None
-
-    @classmethod
-    def from_data(cls, data: Union[Columnable, AbstractColumn]):
-        """Convert data to an EmbeddingColumn."""
-        if torch.is_tensor(data):
-            return EmbeddingColumn(data)
-        else:
-            return super(EmbeddingColumn, cls).from_data(data)
 
     def build_faiss_index(self, index=None, overwrite=False):
         if self.ndim < 2:

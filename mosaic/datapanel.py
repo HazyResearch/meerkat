@@ -23,6 +23,7 @@ from jsonlines import jsonlines
 import mosaic
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.cell_column import CellColumn
+from mosaic.mixins.cloneable import CloneableMixin
 from mosaic.mixins.copying import DataPanelCopyMixin
 from mosaic.mixins.inspect_fn import FunctionInspectorMixin
 from mosaic.mixins.mapping import MappableMixin
@@ -40,6 +41,7 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 
 class DataPanel(
+    CloneableMixin,
     DataPanelCopyMixin,
     FunctionInspectorMixin,
     MappableMixin,
@@ -831,6 +833,7 @@ class DataPanel(
         batch_size: Optional[int] = 1,
         remove_columns: Optional[List[str]] = None,
         num_workers: int = 0,
+        mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
@@ -879,6 +882,7 @@ class DataPanel(
             batch_size=batch_size,
             num_workers=num_workers,
             input_columns=input_columns,
+            mmap=mmap,
             materialize=materialize,
             pbar=pbar,
         )
