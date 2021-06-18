@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-from mosaic import AbstractColumn
 from mosaic.columns.tensor_column import TensorColumn
 from mosaic.tools.lazy_loader import LazyLoader
 
