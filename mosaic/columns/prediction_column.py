@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Sequence, Union
+from typing import Any, Dict, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 
 from mosaic.columns.tensor_column import TensorColumn
+from mosaic.mixins.cloneable import CloneableMixin
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -51,7 +52,7 @@ class _ClassifierOutputType(Enum):
         return self.names[0]
 
 
-class ClassificationOutputColumn(TensorColumn):
+class ClassificationOutputColumn(TensorColumn, CloneableMixin):
     def __init__(
         self,
         logits: Columnable = None,
@@ -253,8 +254,45 @@ class ClassificationOutputColumn(TensorColumn):
             "threshold",
         }
 
+    def _clone_kwargs(self) -> Dict[str, Any]:
+        """Returns __init__ kwargs for instantiating new object.
 
-def _is_binary(tensor):
+        This function returns the default parameters that should be plumbed
+        from the current instance to the new instance.
+
+        This is the API that should be used by DataPanel and AbstractColumn
+        subclasses that require unique protocols for instantiation.
+
+        Returns:
+            Dict[str, Any]: The keyword arguments for initialization.
+                These arguments will be used by :meth:`_clone`.
+        """
+        return {
+            "num_classes": self.num_classes,
+            "multi_label": self.multi_label,
+            "one_hot": self.one_hot,
+            "threshold": self.threshold,
+        }
+
+    def _clone(self, data=None, **kwargs):
+        default_kwargs = self._clone_kwargs()
+        if data is None:
+            data = kwargs.pop("data", self.data)
+        if kwargs:
+            default_kwargs.update(kwargs)
+
+        # Map from current classification type to __init__ keyword.
+        ctype_to_kw = {
+            _ClassifierOutputType.LOGIT: "logits",
+            _ClassifierOutputType.PROBABILITY: "probs",
+            _ClassifierOutputType.PREDICTION: "preds",
+        }
+        default_kwargs[ctype_to_kw[self._ctype]] = data
+
+        return self.__class__(**default_kwargs)
+
+
+def _is_binary(tensor: torch.Tensor):
     return torch.all(
-        (tensor == tensor.astype(torch.uint8)) & (tensor >= 0) & (tensor <= 0)
+        (tensor == tensor.type(torch.uint8)) & (tensor >= 0) & (tensor <= 0)
     )
