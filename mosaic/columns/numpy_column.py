@@ -44,7 +44,7 @@ class NumpyArrayColumn(
         *args,
         **kwargs,
     ):
-        if data is not None:
+        if data is not None and not isinstance(data, np.memmap):
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
@@ -132,8 +132,8 @@ class NumpyArrayColumn(
         # Load in the data
         if mmap:
             # assert dtype is not None and shape is not None
-            # data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            data = np.load(data_path, mmap_mode="r")
+            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
+            # data = np.load(data_path, mmap_mode="r")
         else:
             data = np.load(data_path, allow_pickle=True)
 
