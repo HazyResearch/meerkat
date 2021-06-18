@@ -37,6 +37,17 @@ class TestMedicalVolumeCell(unittest.TestCase):
             loader=DicomReader(group_by=None),
         )
         _ = cell.get()
+        assert cell.get_metadata() is None
+        metadata = cell.get_metadata(force_load=True)
+        assert metadata is not None
+        assert "PixelData" not in metadata
+
+        cell = MedicalVolumeCell(
+            self._ct_file,
+            loader=DicomReader(group_by=None),
+            cache_metadata=True,
+        )
+        _ = cell.get()
         assert cell._metadata is not None
         metadata = cell._metadata
         assert "PixelData" not in metadata
