@@ -12,6 +12,7 @@ initialize_logging()
 from mosaic.cells.abstract import AbstractCell
 from mosaic.cells.imagepath import ImagePath
 from mosaic.cells.spacy import LazySpacyCell, SpacyCell
+from mosaic.cells.volume import MedicalVolumeCell
 from mosaic.columns.abstract import AbstractColumn
 from mosaic.columns.cell_column import CellColumn
 from mosaic.columns.embedding_column import EmbeddingColumn
@@ -21,6 +22,7 @@ from mosaic.columns.numpy_column import NumpyArrayColumn
 from mosaic.columns.prediction_column import ClassificationOutputColumn
 from mosaic.columns.spacy_column import SpacyColumn
 from mosaic.columns.tensor_column import TensorColumn
+from mosaic.columns.volume_column import MedicalVolumeColumn
 from mosaic.datapanel import DataPanel
 from mosaic.ops.concat import concat
 from mosaic.ops.merge import merge

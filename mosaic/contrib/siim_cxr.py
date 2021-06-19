@@ -9,7 +9,7 @@ from PIL import Image
 
 from mosaic.cells.volume import MedicalVolumeCell
 
-GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/mosaic/dev/examples/03-med_img/cxr_gaze_data.pkl"  # noqa: E501
+GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/mosaic/cxr-gaze/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
 
 
 def download_siim_cxr(
@@ -17,6 +17,7 @@ def download_siim_cxr(
     kaggle_username: str,
     kaggle_key: str,
     download_gaze_data: bool = True,
+    include_mock_reports: bool = True,
 ):
     """Download the dataset from the SIIM-ACR Pneumothorax Segmentation
     challenge. https://www.kaggle.com/c/siim-acr-pneumothorax-
@@ -37,6 +38,7 @@ def download_siim_cxr(
         download_gaze_data (str): Download a pkl file containing eye-tracking data
             collected on a radiologist interpreting the xray.
     """
+    # download and integrate gaze data
     os.environ["KAGGLE_USERNAME"] = kaggle_username
     os.environ["KAGGLE_KEY"] = kaggle_key
     subprocess.run(
@@ -50,15 +52,17 @@ def download_siim_cxr(
             dataset_dir,
         ]
     )
-    subprocess.run(
-        [
-            "unzip",
-            "-q",
-            os.path.join(dataset_dir, "siim-train-test.zip"),
-            "-d",
-            dataset_dir,
-        ]
-    )
+    if os.path.exists(os.path.join(dataset_dir, "siim-train-test.zip")):
+        subprocess.run(
+            [
+                "unzip",
+                "-q",
+                os.path.join(dataset_dir, "siim-train-test.zip"),
+                "-d",
+                dataset_dir,
+            ]
+        )
+        os.remove(os.path.join(dataset_dir, "siim-train-test.zip"))
 
     # get segment annotations
     segment_df = pd.read_csv(os.path.join(dataset_dir, "siim", "train-rle.csv"))
@@ -94,16 +98,18 @@ def download_siim_cxr(
     # directory without labels in `segment_df` and we only want those with labelsy
     df = df.merge(filepath_df, how="left", on="image_id")
 
-    # download and integrate gaze data
     if download_gaze_data:
         subprocess.run(
             [
                 "curl",
                 GAZE_DATA_URL,
                 "--output",
-                os.path.join(dataset_dir, "gaze_data.pkl"),
+                os.path.join(dataset_dir, "cxr_gaze_data.json"),
             ]
         )
+
+    if include_mock_reports:
+        df["report"] = (df["pmx"] == 1).apply(_get_mock_report)
 
     df.to_csv(os.path.join(dataset_dir, "siim_cxr.csv"), index=False)
 
@@ -128,3 +134,29 @@ def cxr_transform(volume: MedicalVolumeCell):
         ]
     )(img)
     return img.repeat([3, 1, 1])
+
+
+def _get_mock_report(pmx: bool):
+    state = (np.random.choice(["severe", "moderate"])) if pmx else "no"
+    return np.random.choice(
+        [
+            (
+                "Cardiac size cannot be evaluated. Large left pleural effusion is new. "
+                "Small right effusion is new. The upper lungs are clear. Right lower "
+                f" lobe opacities are better seen in prior CT. There is {state} "
+                " pneumothorax. There are mild degenerative changes in the thoracic "
+                "spine."
+            ),
+            (
+                f"There is {state} pneumothorax. There are mild degenerative changes "
+                "in the thoracic spine. The upper lungs are clear. Right lower lobe "
+                "opacities are better seen in prior CT."
+                "There are mild degenerative changes in the thoracic spine."
+            ),
+            (
+                "The upper lungs are clear. Right lower lobe opacities are better "
+                f"seen in prior CT. There is {state} pneumothorax. "
+                "There are mild degenerative changes in the thoracic spine."
+            ),
+        ]
+    )
