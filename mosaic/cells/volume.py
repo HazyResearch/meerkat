@@ -24,6 +24,7 @@ _PYDICOM_TO_PYTHON = {
     pydicom.valuerep.IS: int,
     pydicom.valuerep.PersonName: str,
     pydicom.multival.MultiValue: list,
+    pydicom.sequence.Sequence: list,
 }
 
 
@@ -46,6 +47,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         paths: Union[PathLikeType, Sequence[PathLikeType]],
         loader: Callable = None,
         transform: Callable = None,
+        cache_metadata: bool = False,
         *args,
         **kwargs,
     ):
@@ -57,6 +59,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
             )
         self._metadata = None
         self.transform: Callable = transform
+        self.cache_metadata = cache_metadata
         self.loader = self.default_loader(self.paths) if loader is None else loader
 
     def __getitem__(self, index):
@@ -80,14 +83,16 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         paths = cls._unroll_path(paths)
         return get_reader(ImageDataFormat.get_image_data_format(paths))
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, cache_metadata: bool = None, **kwargs):
         image = self.loader(self._unroll_path(self.paths))
+        if cache_metadata is None:
+            cache_metadata = self.cache_metadata
         # DOSMA returns a list of MedicalVolumes by default.
         # RG overrides this functinality  - if only one MedicalVolume
         # is returned, unpack that volume from the list.
         if isinstance(image, (list, tuple)) and len(image) == 1:
             image = image[0]
-        if self._metadata is None:
+        if self._metadata is None and cache_metadata:
             _img = image[0] if isinstance(image, (list, tuple)) else image
             headers = _img.headers(flatten=True)
             self._metadata = self._prune_metadata(headers[0]) if headers else None
@@ -109,11 +114,18 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         ignore_bytes: bool = False,
         readable: bool = False,
         as_raw_type: bool = False,
+        force_load: bool = False,
     ) -> Dict:
         if self._metadata is None:
-            return None
-
-        metadata = self._metadata
+            if force_load:
+                _ = self.get(cache_metadata=True)
+                metadata = self._metadata
+                if not self.cache_metadata:
+                    self.clear_metadata()
+            else:
+                return None
+        else:
+            metadata = self._metadata
 
         # Raw data elements need to be decoded.
         metadata = {
@@ -138,6 +150,9 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
             }
 
         return metadata
+
+    def clear_metadata(self):
+        self._metadata = None
 
     def get_state(self):
         # Check if the loader is a `DataReader` from `dosma`
