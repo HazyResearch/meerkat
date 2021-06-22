@@ -1,6 +1,5 @@
 import hashlib
 import os
-from typing import List
 
 import pandas as pd
 from torchvision.datasets import CelebA
@@ -55,11 +54,7 @@ def download_celeba(dataset_dir: str):
     build_celeba_df(dataset_dir)
 
 
-def build_celeba_df(
-    dataset_dir: str = "/afs/cs.stanford.edu/u/sabrieyuboglu/data/datasets/celeba",
-    split_configs: List[dict] = None,
-    salt: str = "abc",
-):
+def build_celeba_df(dataset_dir: str, save_csv: bool = True):
     """Build the dataframe by joining on the attribute, split and identity
     CelebA CSVs."""
     identity_df = pd.read_csv(
@@ -84,13 +79,13 @@ def build_celeba_df(
 
     split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))
     split_df["split"] = split_df["partition"].replace(
-        {0: "test", 1: "valid", 2: "test"}
+        {0: "train", 1: "valid", 2: "test"}
     )
     celeb_df = celeb_df.merge(
         split_df[["image_id", "split"]], left_on="file", right_on="image_id"
     )
-
-    celeb_df.to_csv(os.path.join(dataset_dir, "celeba.csv"), index=False)
+    if save_csv:
+        celeb_df.to_csv(os.path.join(dataset_dir, "celeba.csv"), index=False)
     return celeb_df
 
 
