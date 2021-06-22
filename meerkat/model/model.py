@@ -1,28 +1,10 @@
-from typing import Callable, Dict, List
+from typing import Dict, List
 
 import torch
 
 from mosaic import DataPanel
-
-"""
-from mosaic.tools.lazy_loader import LazyLoader
-
-from transformers import (
-    AutoModel,
-    AutoModelForQuestionAnswering,
-    AutoModelForSeq2SeqLM,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-)
-
-
-from robustnessgym.core.metrics import compute_metric
-from robustnessgym.core.slice import SliceDataPanel as DataPanel
-from robustnessgym.tasks.task import Task
-
-ludwig_api = LazyLoader("ludwig.api")
-nltk = LazyLoader("nltk")
-"""
+from mosaic.columns.prediction_column import ClassificationOutputColumn
+from mosaic.model.metrics import compute_metric
 
 
 # TODO(Priya): Move some general functions here
@@ -34,7 +16,7 @@ class Model:
         model=None,
         evaluation_fn=None,
         device: str = None,
-        # is_classifier: bool = None,
+        is_classifier: bool = None,
     ):
 
         self.identifier = identifier
@@ -44,34 +26,12 @@ class Model:
         if evaluation_fn is not None:
             self.evaluate = evaluation_fn
 
+        if is_classifier is None:
+            is_classifier = True  # TODO(Priya): Better logic here
+        self.is_classifier = is_classifier
         # TODO(Priya): Implementation for non-classification tasks
-        self.outputs = {"probs", "logits", "pred"}
+        # self.outputs = {"probs", "logits", "pred"}
 
-        """
-        if self.task is None:
-            if is_classifier is None:
-                raise ValueError("'is_classifier' required when task not passed")
-        else:
-            is_classifier = self.task.classification()
-
-
-        if is_classifier:
-            self.outputs = {
-                "probs",
-                "logits",
-                "pred",
-                # 'embeddings',
-                # TODO(karan): other information from the model e.g. embeddings which
-                #  aren't task related?
-            }
-        else:
-            self.outputs = {
-                "pred",
-                # 'embeddings',
-                # TODO(karan): other information from the model e.g. embeddings which
-                #  aren't task related?
-            }
-        """
         if not device:
             self.device = "cpu"
             if torch.cuda.is_available():
@@ -81,6 +41,7 @@ class Model:
         self.device = device
         return self.model.to(device)
 
+    """
     def __call__(
         self,
         dataset: DataPanel,
@@ -101,43 +62,7 @@ class Model:
             *args,
             **kwargs
         )
-
-    '''
-    @classmethod
-    def huggingface(
-        cls,
-        identifier: str,
-        task: Task = None,
-        model: Optional[AutoModel] = None,
-        tokenizer: Optional[AutoTokenizer] = None,
-        is_classifier=None,
-    ):
-        """
-
-        Args:
-            identifier:
-            task:
-            model:
-            tokenizer:
-
-        Returns:
-
-        Examples:
-            >>> Model.huggingface(identifier='', task=TernaryNaturalLanguageInference())
-            >>> Model.huggingface(identifier='', \
-            model=AutoModelForSequenceClassification.from_pretrained(''),
-            tokenizer=AutoTokenizer.from_pretrained(''))
-
-        """
-
-        return HuggingfaceModel(
-            identifier=identifier,
-            task=task,
-            model=model,
-            tokenizer=tokenizer,
-            is_classifier=is_classifier,
-        )
-    '''
+    """
 
     def forward(self, input_batch: Dict) -> Dict:
         raise NotImplementedError
@@ -145,12 +70,29 @@ class Model:
     def evaluate(
         self,
         dataset: DataPanel,
-        input_columns: List[str],
-        output_columns: List[str],
-        batch_size: int = 32,
-        coerce_fn: Callable = None,
+        target_column: List[str],  # str?
+        pred_column: List[str],  # str?
+        metrics: List[str],
+        num_classes: int = None,
     ):
-        raise NotImplementedError
+        preds = dataset[pred_column[0]]
+        labels = dataset[target_column[0]]
+
+        if num_classes is None and self.is_classifier:
+            if isinstance(preds, ClassificationOutputColumn):
+                num_classes = preds.num_classes
+            else:
+                raise ValueError(
+                    "Must specify num_classes if column type \
+                        is not ClassificationOutputColumn"
+                )
+
+        evaluation_dict = {
+            metric: compute_metric(metric, preds, labels, num_classes)
+            for metric in metrics
+        }
+
+        return evaluation_dict
 
     @staticmethod
     def remap_labels(output_dict: Dict, label_map: List[int]) -> Dict:
