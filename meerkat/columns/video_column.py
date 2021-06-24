@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Callable, Optional, Sequence
 
-from meerkat.columns.cell_column import CellColumn
 from meerkat.cells.video import VideoCell
+from meerkat.columns.cell_column import CellColumn
 
 logger = logging.getLogger(__name__)
 

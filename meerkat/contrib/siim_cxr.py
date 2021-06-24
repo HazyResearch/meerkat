@@ -5,8 +5,9 @@ from glob import glob
 import numpy as np
 import pandas as pd
 import torchvision.transforms as transforms
-from meerkat.cells.volume import MedicalVolumeCell
 from PIL import Image
+
+from meerkat.cells.volume import MedicalVolumeCell
 
 GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/meerkat/dev/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
 
