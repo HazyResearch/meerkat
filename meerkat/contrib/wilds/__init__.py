@@ -26,7 +26,7 @@ except ImportError:
     _wilds_available = False
 
 
-def get_wilds_datapane(
+def get_wilds_datapanel(
     dataset_name: str,
     root_dir: str,
     version: str = None,

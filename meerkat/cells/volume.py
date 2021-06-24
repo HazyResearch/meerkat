@@ -3,19 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Dict, Sequence, Union
 
-try:
-    from dosma import ImageDataFormat, get_reader
-    from dosma.core.io.format_io import DataReader
-
-    _dosma_available = True
-except ImportError:
-    _dosma_available = False
-
-import pydicom
-
 from meerkat.cells.abstract import AbstractCell
 from meerkat.mixins.file import PathLikeType, PathsMixin
 from meerkat.mixins.state import StateClass
+from meerkat.tools.lazy_loader import LazyLoader
+
+pydicom = LazyLoader("pydicom")
+dosma = LazyLoader("dosma")
+dosma_core_io_format_io = LazyLoader("dosma.core.io.format_io")
 
 # Mapping from pydicom types to python types
 _PYDICOM_TO_PYTHON = {
@@ -52,11 +47,6 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         **kwargs,
     ):
         super(MedicalVolumeCell, self).__init__(paths=paths, *args, **kwargs)
-        if not _dosma_available:  # pragma: no-cover
-            raise ImportError(
-                "You want to use `dosma` for medical image I/O which is not"
-                "installed yet, install it with `pip install dosma`."
-            )
         self._metadata = None
         self.transform: Callable = transform
         self.cache_metadata = cache_metadata
@@ -81,7 +71,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
     @classmethod
     def default_loader(cls, paths: Sequence[Path], *args, **kwargs):
         paths = cls._unroll_path(paths)
-        return get_reader(ImageDataFormat.get_image_data_format(paths))
+        return dosma.get_reader(dosma.ImageDataFormat.get_image_data_format(paths))
 
     def get(self, *args, cache_metadata: bool = None, **kwargs):
         image = self.loader(self._unroll_path(self.paths))
@@ -156,7 +146,7 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
 
     def get_state(self):
         # Check if the loader is a `DataReader` from `dosma`
-        is_dosma_reader = isinstance(self.loader, DataReader)
+        is_dosma_reader = isinstance(self.loader, dosma_core_io_format_io.DataReader)
 
         loader = StateClass(
             klass=type(self.loader) if is_dosma_reader else None,

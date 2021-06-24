@@ -7,9 +7,9 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/robustness-gym/meerkat/CI)
 ![GitHub](https://img.shields.io/github/license/robustness-gym/meerkat)
-[![codecov](https://codecov.io/gh/robustness-gym/meerkat/branch/main/graph/badge.svg?token=MOLQYUSYQU)](https://codecov.io/gh/robustness-gym/meerkat)
 [![Documentation Status](https://readthedocs.org/projects/meerkat/badge/?version=latest)](https://meerkat.readthedocs.io/en/latest/?badge=latest)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+<!---[![codecov](https://codecov.io/gh/robustness-gym/meerkat/branch/main/graph/badge.svg?token=MOLQYUSYQU)](https://codecov.io/gh/robustness-gym/meerkat)--->
 
 Meerkat provides fast and flexible data structures for working with complex machine learning datasets. 
 
@@ -75,59 +75,62 @@ new_col: mk.ImageColumn = dp["image"][10:20]
 
 **`DataPanel` supports `map`, `update` and `filter` operations.**  When training and evaluating our models, we often perform operations on each example in our dataset (*e.g.* compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them . The `DataPanel` makes it easy to perform these operations and produce new columns (via `DataPanel.map`), store the columns alongside the original data (via `DataPanel.update`), and extract an important subset of the datset (via `DataPanel.filter`). Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottleneck our computation. Consider the example below where we use update a `DataPanel` with two new columns holding model predictions and probabilities.  
 ```python
-    # A simple evaluation loop using Meerkat 
-    dp: DataPane = ... # get DataPane
-    model: nn.Module = ... # get the model
-    model.to(0).eval() # prepare the model for evaluation
+# A simple evaluation loop using Meerkat 
+dp: DataPane = ... # get DataPane
+model: nn.Module = ... # get the model
+model.to(0).eval() # prepare the model for evaluation
 
-    @torch.no_grad()
-    def predict(batch: dict):
-        probs = torch.softmax(model(batch["input"].to(0)), dim=-1)
-        return {"probs": probs.cpu(), "pred": probs.cpu().argmax(dim=-1)}
+@torch.no_grad()
+def predict(batch: dict):
+    probs = torch.softmax(model(batch["input"].to(0)), dim=-1)
+    return {"probs": probs.cpu(), "pred": probs.cpu().argmax(dim=-1)}
 
-    # updated_dp has two new `TensorColumn`s: 1 for probabilities and one
-    # for predictions
-    updated_dp: mk.DataPanel = dp.update(function=predict, batch_size=128, is_batched_fn=True)
+# updated_dp has two new `TensorColumn`s: 1 for probabilities and one
+# for predictions
+updated_dp: mk.DataPanel = dp.update(function=predict, batch_size=128, is_batched_fn=True)
 ```
 
 **`DataPanel` is extendable.** Meerkat makes it easy for you to make custom column types for our data. The easiest way to do this is by subclassing `AbstractCell`. Subclasses of `AbstractCell` are meant to represent one element in one column of a `DataPanel`. For example, say we want our `DataPanel` to include a column of videos we have stored on disk. We want these videos to be lazily loaded using [scikit-video](http://www.scikit-video.org/stable/index.html), so we implement a `VideoCell` class as follows: 
 ```python
-    import meerkat as mk
-    import skvideo.io
+import meerkat as mk
+import skvideo.io
 
-    class VideoCell(mk.AbstractCell):
-        
-        # What information will we eventually  need to materialize the cell? 
-        def __init__(filepath: str):
-            super().__init__()
-            self.filepath = filepath
-        
-        # How do we actually materialize the cell?
-        def get(self):
-            return skvideo.io.vread(self.filepath)
-        
-        # What attributes should be written to disk on `VideoCell.write`?
-        @classmethod
-        def _state_keys(cls) -> Collection:
-            return {"filepath"}
+class VideoCell(mk.AbstractCell):
+    
+    # What information will we eventually  need to materialize the cell? 
+    def __init__(filepath: str):
+        super().__init__()
+        self.filepath = filepath
+    
+    # How do we actually materialize the cell?
+    def get(self):
+        return skvideo.io.vread(self.filepath)
+    
+    # What attributes should be written to disk on `VideoCell.write`?
+    @classmethod
+    def _state_keys(cls) -> Collection:
+        return {"filepath"}
 
-    # We don't need to define a `VideoColumn` class and can instead just
-    # create a CellColumn fro a list of `VideoCell`
-    vid_column = mk.CellColumn(map(VideoCell, ["vid1.mp4", "vid2.mp4", "vid3.mp4"]))
+# We don't need to define a `VideoColumn` class and can instead just
+# create a CellColumn fro a list of `VideoCell`
+vid_column = mk.CellColumn(map(VideoCell, ["vid1.mp4", "vid2.mp4", "vid3.mp4"]))
 ```
 ## Supported Columns
 Meerkat ships with a number of core column types and the list is growing.
 #### Core Columns
-| Column             | Supported | Description                                                  |
-|--------------------|-----------|--------------------------------------------------------------|
-| `ListColumn`       | Yes       | Flexible and can hold any type of data.                      |
-| `NumpyArrayColumn` | Yes       | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
-| `TensorColumn`     | Yes       | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
-| `ImageColumn`      | Yes       | Holds images stored on disk (*e.g.* as PNG or JPEG)                              |
-| `CellColumn`       | Yes       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
-| `SpacyColumn`      | Yes       | Optimized to hold spaCy Doc objects.                         |
-| `EmbeddingColumn`  | Planned   | Optimized for embeddings and operations on embeddings.       |
-| `PredictionColumn` | Planned   | Optimized for model predictions.                                   |
+| Column             |Description                                                  |
+|--------------------|--------------------------------------------------------------|
+| `ListColumn`       | Flexible and can hold any type of data.                      |
+| `NumpyArrayColumn` | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
+| `TensorColumn`     | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
+| `ImageColumn`      | Holds images stored on disk (*e.g.* as PNG or JPEG)                              |
+| `VideoColumn`      | Holds videos stored on disk (*e.g.* as MP4)                              |
+| `MedicalVolumeColumn` |Optimized for medical images stored DICOM or NIFTI format.|
+| `SpacyColumn`      | Holds processed text in spaCy Doc objects.                         |
+| `EmbeddingColumn`  | Holds embeddings and provides utility methods like `umap` and `build_faiss_index`.|
+| `ClassificationOutputColumn` | Holds classifier predictions.|
+| `CellColumn`       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
+
 
 #### Contributed Columns
 | Column             | Supported | Description                                                  |
