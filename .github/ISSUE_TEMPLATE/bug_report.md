@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 
 **System Information**
  - OS: [e.g. MacOS, Linux]
- - Versions for RG and relevant dependencies [e.g. `mosaic` (v0.0.1), `spacy` (v2.3.5)]
+ - Versions for RG and relevant dependencies [e.g. `meerkat-ml` (v0.0.1), `spacy` (v2.3.5)]
 
 **Additional context**
 Add any other context about the problem here.

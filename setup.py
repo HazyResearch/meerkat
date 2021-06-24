@@ -13,19 +13,19 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 main_ns = {}
-ver_path = convert_path("mosaic/version.py")
+ver_path = convert_path("meerkat/version.py")
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
 
 # Package meta-data.
-NAME = "mosaicml"
+NAME = "meerkat-ml"
 DESCRIPTION = (
-    "Mosaic is building new data abstractions to make " "machine learning easier."
+    "Meerkat is building new data abstractions to make " "machine learning easier."
 )
-URL = "https://github.com/robustness-gym/mosaic"
+URL = "https://github.com/robustness-gym/meerkat"
 EMAIL = "kgoel@cs.stanford.edu"
-AUTHOR = "The Mosaic Team"
+AUTHOR = "The Meerkat Team"
 REQUIRES_PYTHON = ">=3.7.0"
 VERSION = main_ns["__version__"]
 
@@ -36,6 +36,7 @@ REQUIRED = [
     "dill>=0.3.3",
     "numpy>=1.18.0",
     "cytoolz",
+    "ujson",
     "jsonlines>=1.2.0",
     "torch>=1.8.0",
     "tqdm>=4.49.0",
@@ -59,6 +60,7 @@ EXTRAS = {
         "sphinx-rtd-theme>=0.5.1",
         "nbsphinx>=0.8.0",
         "recommonmark>=0.7.1",
+        "parameterized",
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
         "twine",
@@ -90,13 +92,12 @@ EXTRAS = {
     ],
     "vision": [
         "torchvision>=0.9.0",
+        "opencv-python",
     ],
     "wilds": [
         "wilds>=1.1.0",
     ],
-    "medimg": [
-        "dosma>=0.0.13",
-    ],
+    "medimg": ["dosma>=0.0.13", "kaggle"],
 }
 
 # The rest you shouldn't have to touch too much :)

@@ -8,8 +8,8 @@ import numpy.testing as np_test
 import pytest
 import torch
 
-from mosaic import NumpyArrayColumn
-from mosaic.datapanel import DataPanel
+from meerkat import NumpyArrayColumn
+from meerkat.datapanel import DataPanel
 
 
 def _get_data(multiple_dim: bool = True, dtype="float", use_visible_rows=False):
@@ -69,7 +69,7 @@ def test_map_return_single(dtype, use_visible_rows, batched):
         out = x.mean(axis=-1)
         return out
 
-    result = col.map(func, batch_size=4, batched=batched)
+    result = col.map(func, batch_size=4, is_batched_fn=batched)
     assert isinstance(result, NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))
     assert (result == array.mean(axis=-1)).all()
@@ -86,7 +86,7 @@ def test_map_return_multiple(dtype, use_visible_rows, batched):
     def func(x):
         return {"mean": x.mean(axis=-1), "std": x.std(axis=-1)}
 
-    result = col.map(func, batch_size=4, batched=batched)
+    result = col.map(func, batch_size=4, is_batched_fn=batched)
     assert isinstance(result, DataPanel)
     assert isinstance(result["std"], NumpyArrayColumn)
     assert isinstance(result["mean"], NumpyArrayColumn)
@@ -140,7 +140,7 @@ def test_filter_1(use_visible_rows, dtype, batched):
     def func(x):
         return x > 20
 
-    result = col.filter(func, batch_size=4, batched=batched)
+    result = col.filter(func, batch_size=4, is_batched_fn=batched)
     assert isinstance(result, NumpyArrayColumn)
     assert len(result) == (array > 20).sum()
 

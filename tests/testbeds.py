@@ -5,9 +5,10 @@ from copy import deepcopy
 import numpy as np
 from PIL import Image
 
-from mosaic.columns.image_column import ImageColumn
-from mosaic.datapanel import DataPanel
-from mosaic.tools.identifier import Identifier
+from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.list_column import ListColumn
+from meerkat.datapanel import DataPanel
+from meerkat.tools.identifier import Identifier
 
 
 class MockTestBedv0:
@@ -105,7 +106,7 @@ class MockDatapanel:
     ):
         batch = {
             "a": np.arange(length),
-            "b": list(np.arange(length)),
+            "b": ListColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
         }
 
@@ -116,13 +117,27 @@ class MockDatapanel:
 
         self.dp = DataPanel.from_batch(batch)
 
-        self.visible_rows = [0, 4, 6, 11] if use_visible_rows else None
+        self.visible_rows = [0, 4, 6, 11] if use_visible_rows else np.arange(length)
         if use_visible_rows:
-            self.dp.visible_rows = self.visible_rows
+            for column in self.dp.values():
+                column.visible_rows = self.visible_rows
 
-        self.visible_columns = ["a", "b"] if use_visible_columns else None
+        self.visible_columns = (
+            ["a", "b", "index"] if use_visible_columns else self.dp.columns
+        )
         if use_visible_columns:
             self.dp.visible_columns = self.visible_columns
+
+
+class MockColumn:
+    def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
+        self.col = col_type(np.arange(16))
+
+        if use_visible_rows:
+            self.visible_rows = [0, 4, 6, 11]
+            self.col.visible_rows = self.visible_rows
+        else:
+            self.visible_rows = np.arange(16)
 
 
 class MockImageColumn:
@@ -131,10 +146,10 @@ class MockImageColumn:
 
         Args:
             wrap_dataset (bool, optional): If `True`, create a
-            `mosaic.DataPanel`
+            `meerkat.DataPanel`
             ,
                 otherwise create a
-                `mosaic.core.dataformats.vision.VisionDataPane`
+                `meerkat.core.dataformats.vision.VisionDataPane`
                 Defaults to False.
         """
         self.image_paths = []
