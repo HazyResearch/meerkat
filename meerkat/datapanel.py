@@ -577,7 +577,7 @@ class DataPanel(
         )
 
     @classmethod
-    def load_huggingface(cls, *args, **kwargs):
+    def from_huggingface(cls, *args, **kwargs):
         """Load a Huggingface dataset as a DataPanel.
 
         Use this to replace `datasets.load_dataset`, so
@@ -586,7 +586,7 @@ class DataPanel(
 
         becomes
 
-        >>> dict_of_datapanels = DataPanel.load_huggingface('boolq')
+        >>> dict_of_datapanels = DataPanel.from_huggingface('boolq')
         """
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
