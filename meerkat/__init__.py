@@ -22,6 +22,7 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.spacy_column import SpacyColumn
 from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.video_column import VideoColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
 from meerkat.datapanel import DataPanel
 from meerkat.ops.concat import concat
