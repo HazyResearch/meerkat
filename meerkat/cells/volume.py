@@ -27,16 +27,6 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         loader=DicomReader(group_by="EchoNumbers"))
     """
 
-    # Mapping from pydicom types to python types
-    _PYDICOM_TO_PYTHON = {
-        pydicom.valuerep.DSdecimal: float,
-        pydicom.valuerep.DSfloat: float,
-        pydicom.valuerep.IS: int,
-        pydicom.valuerep.PersonName: str,
-        pydicom.multival.MultiValue: list,
-        pydicom.sequence.Sequence: list,
-    }
-
     def __init__(
         self,
         paths: Union[PathLikeType, Sequence[PathLikeType]],
@@ -51,6 +41,16 @@ class MedicalVolumeCell(PathsMixin, AbstractCell):
         self.transform: Callable = transform
         self.cache_metadata = cache_metadata
         self.loader = self.default_loader(self.paths) if loader is None else loader
+
+        # Mapping from pydicom types to python types
+        self._PYDICOM_TO_PYTHON = {
+            pydicom.valuerep.DSdecimal: float,
+            pydicom.valuerep.DSfloat: float,
+            pydicom.valuerep.IS: int,
+            pydicom.valuerep.PersonName: str,
+            pydicom.multival.MultiValue: list,
+            pydicom.sequence.Sequence: list,
+        }
 
     def __getitem__(self, index):
         image = self.get()
