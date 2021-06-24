@@ -1,7 +1,7 @@
-mosaic
-======
+meerkat
+=======
 
 .. toctree::
    :maxdepth: 4
 
-   mosaic
+   meerkat

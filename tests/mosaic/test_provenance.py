@@ -3,9 +3,9 @@
 
 import numpy as np
 
-import mosaic as ms
-from mosaic.datapanel import DataPanel
-from mosaic.provenance import (  # ProvenanceOpNode,
+import meerkat as mk
+from meerkat.datapanel import DataPanel
+from meerkat.provenance import (  # ProvenanceOpNode,
     ProvenanceObjNode,
     capture_provenance,
     provenance,
@@ -68,7 +68,7 @@ def test_from_batch_no_provenance():
 
 @capture_provenance(capture_args=["x"])
 def custom_fn(dp1, dp2, x):
-    dp3 = ms.concat([dp1, dp2], axis="columns")
+    dp3 = mk.concat([dp1, dp2], axis="columns")
     return {"dp": dp3, "x": x}, dp2
 
 

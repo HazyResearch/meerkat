@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = mosaic
+source = meerkat
 
 [report]
 exclude_lines =

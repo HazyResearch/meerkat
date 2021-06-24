@@ -8,8 +8,8 @@ import torch
 from parameterized import parameterized
 from torchvision.transforms import ColorJitter, Compose
 
-from mosaic.cells.video import VideoCell
-from mosaic.contrib.video_corruptions.transforms import (
+from meerkat.cells.video import VideoCell
+from meerkat.contrib.video_corruptions.transforms import (
     TemporalCrop,
     TemporalDownsampling,
 )

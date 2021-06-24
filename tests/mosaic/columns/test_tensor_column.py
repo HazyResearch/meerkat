@@ -8,8 +8,8 @@ import numpy.testing as np_test
 import pytest
 import torch
 
-from mosaic.columns.tensor_column import TensorColumn
-from mosaic.datapanel import DataPanel
+from meerkat.columns.tensor_column import TensorColumn
+from meerkat.datapanel import DataPanel
 
 
 def _get_data(multiple_dim: bool = True, dtype="float", use_visible_rows=False):

@@ -13,19 +13,19 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 main_ns = {}
-ver_path = convert_path("mosaic/version.py")
+ver_path = convert_path("meerkat/version.py")
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
 
 # Package meta-data.
-NAME = "mosaicml"
+NAME = "meerkat-ml"
 DESCRIPTION = (
-    "Mosaic is building new data abstractions to make " "machine learning easier."
+    "Meerkat is building new data abstractions to make " "machine learning easier."
 )
-URL = "https://github.com/robustness-gym/mosaic"
+URL = "https://github.com/robustness-gym/meerkat"
 EMAIL = "kgoel@cs.stanford.edu"
-AUTHOR = "The Mosaic Team"
+AUTHOR = "The Meerkat Team"
 REQUIRES_PYTHON = ">=3.7.0"
 VERSION = main_ns["__version__"]
 
