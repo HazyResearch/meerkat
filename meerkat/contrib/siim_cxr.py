@@ -5,9 +5,8 @@ from glob import glob
 import numpy as np
 import pandas as pd
 import torchvision.transforms as transforms
-from PIL import Image
-
 from mosaic.cells.volume import MedicalVolumeCell
+from PIL import Image
 
 GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/mosaic/dev/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
 

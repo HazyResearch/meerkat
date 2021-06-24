@@ -5,14 +5,13 @@ import unittest
 import cv2
 import numpy as np
 import torch
-from parameterized import parameterized
-from torchvision.transforms import ColorJitter, Compose
-
 from mosaic.cells.video import VideoCell
 from mosaic.contrib.video_corruptions.transforms import (
     TemporalCrop,
     TemporalDownsampling,
 )
+from parameterized import parameterized
+from torchvision.transforms import ColorJitter, Compose
 
 TEMP_DIR = "./tmp"
 MOCK_VIDEO_FILE = f"{TEMP_DIR}/video.mp4"
