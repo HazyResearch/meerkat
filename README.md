@@ -25,7 +25,7 @@ Meerkat provides fast and flexible data structures for working with complex mach
 ```bash
 pip install meerkat-ml
 ``` 
-> Note: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install mosaicml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
+> Note: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install meerkat-ml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
  
 Load your dataset into a `DataPanel` and get going!
 ```python
