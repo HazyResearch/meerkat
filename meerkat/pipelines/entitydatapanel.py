@@ -88,8 +88,8 @@ class EntityDataPanel(DataPanel):
 
         Args:
             klass (type): If specified, casts to this class.
-                This class must be a subclass of :ref:`mosaic.datapanel.DataPanel`.
-                If not specified, defaults to :ref:`mosaic.datapanel.DataPanel`.
+                This class must be a subclass of :ref:`meerkat.datapanel.DataPanel`.
+                If not specified, defaults to :ref:`meerkat.datapanel.DataPanel`.
 
         Returns:
             DataPanel: The datapanel.

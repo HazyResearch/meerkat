@@ -5,8 +5,8 @@ import unittest
 import cv2
 import numpy as np
 import torch
-from mosaic.cells.video import VideoCell
-from mosaic.contrib.video_corruptions.transforms import (
+from meerkat.cells.video import VideoCell
+from meerkat.contrib.video_corruptions.transforms import (
     TemporalCrop,
     TemporalDownsampling,
 )

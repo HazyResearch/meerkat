@@ -4,8 +4,8 @@ from typing import Callable, Collection, Optional
 import cv2
 import torch
 import torchvision.transforms.functional as F
-from mosaic import AbstractCell
-from mosaic.contrib.video_corruptions.utils import stderr_suppress
+from meerkat import AbstractCell
+from meerkat.contrib.video_corruptions.utils import stderr_suppress
 
 
 class VideoCell(AbstractCell):

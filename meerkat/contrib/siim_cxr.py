@@ -5,10 +5,10 @@ from glob import glob
 import numpy as np
 import pandas as pd
 import torchvision.transforms as transforms
-from mosaic.cells.volume import MedicalVolumeCell
+from meerkat.cells.volume import MedicalVolumeCell
 from PIL import Image
 
-GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/mosaic/dev/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
+GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/meerkat/dev/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
 
 
 def download_siim_cxr(

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Sequence
 
-from mosaic.cells.volume import MedicalVolumeCell
-from mosaic.columns.cell_column import CellColumn
+from meerkat.cells.volume import MedicalVolumeCell
+from meerkat.columns.cell_column import CellColumn
 
 logger = logging.getLogger(__name__)
 
