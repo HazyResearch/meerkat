@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 import torch
 
-from mosaic import DataPanel, EmbeddingColumn, ListColumn, NumpyArrayColumn
-from mosaic.pipelines.entitydatapanel import EntityDataPanel
+from meerkat import DataPanel, EmbeddingColumn, ListColumn, NumpyArrayColumn
+from meerkat.pipelines.entitydatapanel import EntityDataPanel
 
 
 def _get_entity_data():

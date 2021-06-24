@@ -3,7 +3,7 @@ import unittest
 import torch
 from torch.distributions.categorical import Categorical
 
-from mosaic.columns.prediction_column import ClassificationOutputColumn
+from meerkat.columns.prediction_column import ClassificationOutputColumn
 
 logits = torch.as_tensor(
     [

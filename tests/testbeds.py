@@ -5,10 +5,10 @@ from copy import deepcopy
 import numpy as np
 from PIL import Image
 
-from mosaic.columns.image_column import ImageColumn
-from mosaic.columns.list_column import ListColumn
-from mosaic.datapanel import DataPanel
-from mosaic.tools.identifier import Identifier
+from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.list_column import ListColumn
+from meerkat.datapanel import DataPanel
+from meerkat.tools.identifier import Identifier
 
 
 class MockTestBedv0:
@@ -146,10 +146,10 @@ class MockImageColumn:
 
         Args:
             wrap_dataset (bool, optional): If `True`, create a
-            `mosaic.DataPanel`
+            `meerkat.DataPanel`
             ,
                 otherwise create a
-                `mosaic.core.dataformats.vision.VisionDataPane`
+                `meerkat.core.dataformats.vision.VisionDataPane`
                 Defaults to False.
         """
         self.image_paths = []

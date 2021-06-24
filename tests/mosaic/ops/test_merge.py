@@ -5,12 +5,12 @@ import numpy as np
 import pytest
 import torch
 
-from mosaic.columns.image_column import ImageColumn
-from mosaic.columns.list_column import ListColumn
-from mosaic.columns.numpy_column import NumpyArrayColumn
-from mosaic.columns.tensor_column import TensorColumn
-from mosaic.datapanel import DataPanel
-from mosaic.errors import MergeError
+from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.list_column import ListColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.tensor_column import TensorColumn
+from meerkat.datapanel import DataPanel
+from meerkat.errors import MergeError
 
 from ...testbeds import MockImageColumn
 

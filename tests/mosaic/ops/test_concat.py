@@ -4,13 +4,13 @@ from itertools import product
 import numpy as np
 import pytest
 
-from mosaic import concat
-from mosaic.columns.image_column import ImageColumn
-from mosaic.columns.list_column import ListColumn
-from mosaic.columns.numpy_column import NumpyArrayColumn
-from mosaic.columns.tensor_column import TensorColumn
-from mosaic.datapanel import DataPanel
-from mosaic.errors import ConcatError
+from meerkat import concat
+from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.list_column import ListColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.tensor_column import TensorColumn
+from meerkat.datapanel import DataPanel
+from meerkat.errors import ConcatError
 
 from ...testbeds import MockColumn, MockDatapanel, MockImageColumn
 

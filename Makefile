@@ -1,12 +1,12 @@
 autoformat:
-	black mosaic/ tests/
-	isort --atomic mosaic/ tests/
-	docformatter --in-place --recursive mosaic tests
+	black meerkat/ tests/
+	isort --atomic meerkat/ tests/
+	docformatter --in-place --recursive meerkat tests
 
 lint:
-	isort -c mosaic/ tests/
-	black mosaic/ tests/ --check
-	flake8 mosaic/ tests/
+	isort -c meerkat/ tests/
+	black meerkat/ tests/ --check
+	flake8 meerkat/ tests/
 
 test:
 	pytest
