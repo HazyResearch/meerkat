@@ -1,7 +1,7 @@
-# Contributing to Mosaic
+# Contributing to Meerkat
 
 We welcome contributions of all kinds: code, documentation, feedback and support. If
- you use Mosaic in your work (blogs posts, research, company) and find it
+ you use Meerkat in your work (blogs posts, research, company) and find it
   useful, spread the word!  
   
 This contribution borrows from and is heavily inspired by [Huggingface transformers](https://github.com/huggingface/transformers). 
@@ -53,7 +53,7 @@ issues to make sure that nobody is already working on the same thing. If you are
 unsure, it is always a good idea to open an issue to get some feedback.
 
 You will need basic `git` proficiency to be able to contribute to
-`mosaic`. `git` is not the easiest tool to use but it has the greatest
+`meerkat`. `git` is not the easiest tool to use but it has the greatest
 manual. Type `git --help` in a shell and enjoy. If you prefer books, [Pro
 Git](https://git-scm.com/book/en/v2) is a very good reference.
 
@@ -79,7 +79,7 @@ Follow these steps to start contributing:
 
    **Do not** work on the `main` branch.
 
-4. Mosaic manages dependencies using [`poetry`](https://python-poetry.org). 
+4. Meerkat manages dependencies using [`poetry`](https://python-poetry.org). 
 Set up a development environment with `poetry` by running the following command in
  a virtual environment:
 
@@ -100,14 +100,14 @@ Note: in order to pass the full test suite (step 5), you'll need to install all 
    $ pytest
    ```
 
-   `mosaic` relies on `black` and `isort` to format its source code
+   Meerkat relies on `black` and `isort` to format its source code
    consistently. After you make changes, autoformat them with:
 
    ```bash
    $ make autoformat
    ```
 
-   `mosaic` also uses `flake8` to check for coding mistakes. Quality control
+   Meerkat also uses `flake8` to check for coding mistakes. Quality control
     runs in CI, however you should also run the same checks with:
 
    ```bash
@@ -200,7 +200,7 @@ $ make test
 You can specify a smaller set of tests in order to test only the feature
 you're working on.
 
-Mosaic uses `pytest` as a test runner only. It doesn't use any
+Meerkat uses `pytest` as a test runner only. It doesn't use any
 `pytest`-specific features in the test suite itself.
 
 This means `unittest` is fully supported. Here's how to run tests with
@@ -213,5 +213,5 @@ $ python -m unittest discover -s tests -t . -v
 
 ### Style guide
 
-For documentation strings, `mosaic` follows the 
+For documentation strings, Meerkat follows the 
 [google style](https://google.github.io/styleguide/pyguide.html).
