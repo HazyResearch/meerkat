@@ -16,7 +16,7 @@ import sys
 from distutils.util import convert_path
 
 main_ns = {}
-ver_path = convert_path('../../mosaic/version.py')
+ver_path = convert_path('../../meerkat/version.py')
 with open(ver_path) as ver_file:
     exec(ver_file.read(), main_ns)
 
@@ -27,9 +27,9 @@ sys.setrecursionlimit(1500)
 
 # -- Project information -----------------------------------------------------
 
-project = "Mosaic"
-copyright = "2021 Mosaic"
-author = "The Mosaic Team"
+project = "Meerkat"
+copyright = "2021 Meerkat"
+author = "The Meerkat Team"
 
 # The full version, including alpha/beta/rc tags
 # release = "0.0.0dev"

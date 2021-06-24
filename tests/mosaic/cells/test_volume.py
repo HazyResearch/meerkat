@@ -5,7 +5,7 @@ import torch
 from dosma.core.io.dicom_io import DicomReader
 from pydicom.data import get_testdata_file
 
-from mosaic.cells.volume import MedicalVolumeCell
+from meerkat.cells.volume import MedicalVolumeCell
 
 
 class TestMedicalVolumeCell(unittest.TestCase):

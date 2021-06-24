@@ -10,10 +10,10 @@ import torch
 import ujson as json
 from PIL.Image import Image
 
-from mosaic import ImagePath, NumpyArrayColumn
-from mosaic.columns.image_column import ImageColumn
-from mosaic.columns.list_column import ListColumn
-from mosaic.datapanel import DataPanel
+from meerkat import ImagePath, NumpyArrayColumn
+from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.list_column import ListColumn
+from meerkat.datapanel import DataPanel
 
 from ..testbeds import MockDatapanel
 
