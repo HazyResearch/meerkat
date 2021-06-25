@@ -5,15 +5,14 @@ from typing import Dict, List, Optional
 
 import cytoolz as tz
 import torch
-from tqdm import tqdm
-from transformers import AutoTokenizer
-
 from mosaic import DataPanel
 from mosaic.columns.embedding_column import EmbeddingColumn
 from mosaic.columns.prediction_column import ClassificationOutputColumn
 from mosaic.columns.text_column import TextOutputColumn
 from mosaic.model.activation import ActivationOp
 from mosaic.model.model import Model
+from tqdm import tqdm
+from transformers import AutoTokenizer
 
 
 class HuggingfaceModel(Model):

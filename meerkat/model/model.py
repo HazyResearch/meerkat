@@ -1,7 +1,6 @@
 from typing import Dict, List
 
 import torch
-
 from mosaic import DataPanel
 from mosaic.columns.prediction_column import ClassificationOutputColumn
 from mosaic.model.metrics import compute_metric

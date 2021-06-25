@@ -4,9 +4,8 @@ from typing import Callable, Sequence, Union
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, f1_score
-
 from mosaic.tools.lazy_loader import LazyLoader
+from sklearn.metrics import accuracy_score, f1_score
 
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")

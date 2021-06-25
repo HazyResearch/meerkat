@@ -4,13 +4,12 @@ from typing import Dict, List
 
 import cytoolz as tz
 import torch
-from tqdm import tqdm
-
 from mosaic import DataPanel
 from mosaic.columns.embedding_column import EmbeddingColumn
 from mosaic.columns.prediction_column import ClassificationOutputColumn
 from mosaic.model.activation import ActivationOp
 from mosaic.model.model import Model
+from tqdm import tqdm
 
 
 class TensorModel(Model):
