@@ -2,7 +2,6 @@ import os
 from typing import Callable, Collection, Optional
 
 import torch
-import torchvision.transforms.functional as F
 
 from meerkat import AbstractCell
 from meerkat.contrib.video_corruptions.utils import stderr_suppress
