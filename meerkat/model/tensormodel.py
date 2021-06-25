@@ -4,12 +4,13 @@ from typing import Dict, List
 
 import cytoolz as tz
 import torch
-from mosaic import DataPanel
-from mosaic.columns.embedding_column import EmbeddingColumn
-from mosaic.columns.prediction_column import ClassificationOutputColumn
-from mosaic.model.activation import ActivationOp
-from mosaic.model.model import Model
 from tqdm import tqdm
+
+from meerkat import DataPanel
+from meerkat.columns.embedding_column import EmbeddingColumn
+from meerkat.columns.prediction_column import ClassificationOutputColumn
+from meerkat.model.activation import ActivationOp
+from meerkat.model.model import Model
 
 
 class TensorModel(Model):
@@ -19,12 +20,13 @@ class TensorModel(Model):
         # task: Task = None,
         model,
         device=None,
-        # is_classifier=None,
+        is_classifier: bool = None,
     ):
 
         super(TensorModel, self).__init__(
             identifier=identifier,
-            device=device,  # task = task, is_classifier=is_classifier
+            device=device,
+            is_classifier=is_classifier,  # , task = task
         )
 
         self.model = model
@@ -42,9 +44,17 @@ class TensorModel(Model):
         with torch.no_grad():
             outputs = self.model(input_batch)
 
-        # probs and preds can be handled at ClassificationOutputColumn
-        # TODO(Priya): See if there is any case where these are to be returned
-        return {"logits": outputs.to("cpu")}
+        if self.is_classifier:
+            # probs and preds can be handled at ClassificationOutputColumn
+            # TODO(Priya): See if there is any case where these are to be returned
+            output_dict = {"logits": outputs.to("cpu")}
+
+        else:
+            # TODO(Priya): Specific to semantic segmentation
+            # Output is a dict with key 'out'
+            output_dict = {"logits": outputs["out"].to("cpu")}
+
+        return output_dict
 
     def process_batch(self, batch: DataPanel, input_columns: List[str]):
 
@@ -53,53 +63,7 @@ class TensorModel(Model):
 
         return input_batch
 
-    def classifier(
-        self,
-        dataset: DataPanel,
-        input_columns: List[str],
-        batch_size: int = 32,
-        num_classes: int = None,
-        multi_label: bool = False,
-        one_hot: bool = None,
-        threshold=0.5,
-    ) -> DataPanel:
-
-        predictions = []
-        # TODO (Priya): Include other arguments of batch method
-        for batch in tqdm(dataset.batch(batch_size)):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
-
-        logits = predictions["logits"]
-        classifier_output = ClassificationOutputColumn(
-            logits=logits,
-            num_classes=num_classes,
-            multi_label=multi_label,
-            one_hot=one_hot,
-            threshold=threshold,
-        )
-
-        classifier_dp = DataPanel(
-            {
-                "logits": classifier_output,
-                "probs": classifier_output.probabilities(),
-                "preds": classifier_output.predictions(),
-            }
-        )
-
-        # TODO(Priya): Uncomment after append bug is resolved
-        # dataset = dataset.append(classifier_dp, axis=1)
-
-        return classifier_dp
-
-    def get_activation(
+    def activation(
         self,
         dataset: DataPanel,
         target_module: str,  # TODO(Priya): Support multiple activation layers
@@ -134,3 +98,69 @@ class TensorModel(Model):
 
         dataset.add_column(f"activation ({target_module})", activation_col)
         return activation_col
+
+    def classification(
+        self,
+        dataset: DataPanel,
+        input_columns: List[str],
+        batch_size: int = 32,
+        num_classes: int = None,
+        multi_label: bool = False,
+        one_hot: bool = None,
+        threshold=0.5,
+    ) -> DataPanel:
+
+        predictions = []
+        # TODO(Priya): Include other arguments of batch method
+        for batch in tqdm(dataset.batch(batch_size)):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+
+        logits = predictions["logits"]
+        output_col = ClassificationOutputColumn(
+            logits=logits,
+            num_classes=num_classes,
+            multi_label=multi_label,
+            one_hot=one_hot,
+            threshold=threshold,
+        )
+
+        output_dp = DataPanel(
+            {
+                "logits": output_col,
+                "probs": output_col.probabilities(),
+                "preds": output_col.predictions(),
+            }
+        )
+        # TODO(Priya): Uncomment after append bug is resolved
+        # dataset = dataset.append(classifier_dp, axis=1)
+        return output_dp
+
+    def output(
+        self,
+        dataset: DataPanel,
+        input_columns: List[str],
+        batch_size: int = 32,
+        num_classes: int = None,
+        multi_label: bool = False,
+        one_hot: bool = None,
+        threshold=0.5,
+    ):
+        # TODO(Priya): The separate functions can be merged later
+        # segmentation and classification models differ only in forward method
+        return self.classification(
+            dataset,
+            input_columns,
+            batch_size,
+            num_classes,
+            multi_label,
+            one_hot,
+            threshold,
+        )

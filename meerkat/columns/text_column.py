@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from mosaic.columns.list_column import ListColumn
+from meerkat.columns.list_column import ListColumn
 
 
 class TextOutputColumn(ListColumn):

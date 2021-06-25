@@ -5,14 +5,15 @@ from typing import Dict, List, Optional
 
 import cytoolz as tz
 import torch
-from mosaic import DataPanel
-from mosaic.columns.embedding_column import EmbeddingColumn
-from mosaic.columns.prediction_column import ClassificationOutputColumn
-from mosaic.columns.text_column import TextOutputColumn
-from mosaic.model.activation import ActivationOp
-from mosaic.model.model import Model
 from tqdm import tqdm
 from transformers import AutoTokenizer
+
+from meerkat import DataPanel
+from meerkat.columns.embedding_column import EmbeddingColumn
+from meerkat.columns.prediction_column import ClassificationOutputColumn
+from meerkat.columns.text_column import TextOutputColumn
+from meerkat.model.activation import ActivationOp
+from meerkat.model.model import Model
 
 
 class HuggingfaceModel(Model):
@@ -140,7 +141,10 @@ class HuggingfaceModel(Model):
         dataset: DataPanel,
         input_columns: List[str],
         batch_size: int = 32,
-        **kwargs,
+        num_classes: int = None,
+        multi_label: bool = False,
+        one_hot: bool = None,
+        threshold=0.5,
     ) -> DataPanel:
 
         predictions = []
@@ -161,14 +165,10 @@ class HuggingfaceModel(Model):
         # TODO(Priya): Better way for feeding classifier input
         output_col = ClassificationOutputColumn(
             logits=logits,
-            num_classes=kwargs["num_classes"]
-            if "num_classes" in kwargs.keys()
-            else None,
-            multi_label=kwargs["multi_label"]
-            if "multi_label" in kwargs.keys()
-            else False,
-            one_hot=kwargs["one_hot"] if "one_hot" in kwargs.keys() else None,
-            threshold=kwargs["threshold"] if "threshold" in kwargs.keys() else 0.5,
+            num_classes=num_classes,
+            multi_label=multi_label,
+            one_hot=one_hot,
+            threshold=threshold,
         )
 
         output_dp = DataPanel(
@@ -214,10 +214,21 @@ class HuggingfaceModel(Model):
         dataset: DataPanel,
         input_columns: List[str],
         batch_size: int = 32,
-        **kwargs,  # TODO(Priya): Keep separate arguments instead of kwargs?
+        num_classes: int = None,
+        multi_label: bool = False,
+        one_hot: bool = None,
+        threshold=0.5,
     ):
         # TODO(Priya): The separate functions can be merged later
         if self.is_classifier:
-            return self.classification(dataset, input_columns, batch_size, **kwargs)
+            return self.classification(
+                dataset,
+                input_columns,
+                batch_size,
+                num_classes,
+                multi_label,
+                one_hot,
+                threshold,
+            )
         else:
             return self.summarization(dataset, input_columns, batch_size)

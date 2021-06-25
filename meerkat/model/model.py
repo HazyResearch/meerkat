@@ -1,9 +1,10 @@
 from typing import Dict, List
 
 import torch
-from mosaic import DataPanel
-from mosaic.columns.prediction_column import ClassificationOutputColumn
-from mosaic.model.metrics import compute_metric
+
+from meerkat import DataPanel
+from meerkat.columns.prediction_column import ClassificationOutputColumn
+from meerkat.model.metrics import compute_metric
 
 
 # TODO(Priya): Move some general functions here
@@ -77,17 +78,17 @@ class Model:
         preds = dataset[pred_column[0]]
         labels = dataset[target_column[0]]
 
-        if num_classes is None and self.is_classifier:
+        if num_classes is None:
             if isinstance(preds, ClassificationOutputColumn):
                 num_classes = preds.num_classes
-            else:
+            elif self.is_classifier:
                 raise ValueError(
                     "Must specify num_classes if column type \
                         is not ClassificationOutputColumn"
                 )
 
         evaluation_dict = {
-            metric: compute_metric(metric, preds, labels, num_classes)
+            metric: compute_metric(metric, preds.data, labels.data, num_classes)
             for metric in metrics
         }
 
