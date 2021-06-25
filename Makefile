@@ -11,6 +11,11 @@ lint:
 test:
 	pytest
 
+test-basic:
+	set -e
+	python -c "import meerkat as mk"
+	python -c "import meerkat.version as mversion"
+
 test-cov:
 	pytest --cov=./ --cov-report=xml
 
