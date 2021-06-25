@@ -4,8 +4,10 @@ from typing import Callable, Sequence, Union
 
 import numpy as np
 import torch
-from mosaic.tools.lazy_loader import LazyLoader
 from sklearn.metrics import accuracy_score, f1_score
+from torchmetrics.functional import dice_score, iou
+
+from meerkat.tools.lazy_loader import LazyLoader
 
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")
@@ -85,6 +87,23 @@ def class_distribution(
         raise ValueError("`labels` must be 1 or 2-dimensional.")
 
 
+def iou_score(
+    predictions: Union[list, np.array, torch.Tensor],
+    labels: Union[list, np.array, torch.Tensor],
+    num_classes: int = None,
+):
+    """Calculate IoU."""
+    return iou(predictions, labels, num_classes=num_classes).item()
+
+
+def dice(
+    predictions: Union[list, np.array, torch.Tensor],
+    labels: Union[list, np.array, torch.Tensor],
+):
+    """Calculate Dice Score."""
+    return dice_score(predictions, labels).item()
+
+
 # TODO Refactor into separate class for each metric
 # TODO change signature of compute_metric
 def compute_metric(
@@ -143,6 +162,14 @@ def compute_metric(
     elif metric == "pred_dist":
         # Calculate predicted class distribution
         score = class_distribution(labels=predictions, num_classes=num_classes)
+    elif metric == "iou":
+        # Calculate IoU
+        score = iou_score(
+            predictions=predictions, labels=labels, num_classes=num_classes
+        )
+    elif metric == "dice_score":
+        # Calculate Dice Score
+        score = dice(predictions=predictions, labels=labels)
     else:
         raise NotImplementedError
 
