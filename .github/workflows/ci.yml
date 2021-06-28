@@ -66,12 +66,41 @@ jobs:
                 run: |
                     make docs
 
+    Build-Basic:
+        needs: Documentation
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest] #, macos-latest]
+                python-version: ['3.7', '3.8']
+                
+        steps:
+            -   uses: actions/checkout@v2
+    
+            -   name: Set up Python ${{ matrix.python-version }}
+                uses: actions/setup-python@v2
+                with:
+                    python-version: ${{ matrix.python-version }}
+
+            -   uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    key: ${{ runner.os }}-pip
+    
+            -   name: Install Bare Dependencies
+                run: |
+                    pip install -e .
+                    
+            -   name: Test basic importing
+                run: |
+                    make test-basic
+
     Build:
         if:
             contains('
             refs/heads/main
             ', github.event.pull_request.base.ref)
-        needs: Documentation
+        needs: Build-Basic
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:

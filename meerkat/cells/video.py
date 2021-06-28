@@ -1,12 +1,14 @@
 import os
 from typing import Callable, Collection, Optional
 
-import cv2
 import torch
-import torchvision.transforms.functional as F
 
 from meerkat import AbstractCell
 from meerkat.contrib.video_corruptions.utils import stderr_suppress
+from meerkat.tools.lazy_loader import LazyLoader
+
+cv2 = LazyLoader("cv2")
+F = LazyLoader("torchvision.transforms.functional")
 
 
 class VideoCell(AbstractCell):

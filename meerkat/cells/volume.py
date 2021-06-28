@@ -12,15 +12,18 @@ pydicom = LazyLoader("pydicom")
 dosma = LazyLoader("dosma")
 dosma_core_io_format_io = LazyLoader("dosma.core.io.format_io")
 
-# Mapping from pydicom types to python types
-_PYDICOM_TO_PYTHON = {
-    pydicom.valuerep.DSdecimal: float,
-    pydicom.valuerep.DSfloat: float,
-    pydicom.valuerep.IS: int,
-    pydicom.valuerep.PersonName: str,
-    pydicom.multival.MultiValue: list,
-    pydicom.sequence.Sequence: list,
-}
+try:
+    # Mapping from pydicom types to python types
+    _PYDICOM_TO_PYTHON = {
+        pydicom.valuerep.DSdecimal: float,
+        pydicom.valuerep.DSfloat: float,
+        pydicom.valuerep.IS: int,
+        pydicom.valuerep.PersonName: str,
+        pydicom.multival.MultiValue: list,
+        pydicom.sequence.Sequence: list,
+    }
+except ImportError:
+    _PYDICOM_TO_PYTHON = {}
 
 
 class MedicalVolumeCell(PathsMixin, AbstractCell):
