@@ -124,7 +124,7 @@ class ClassificationOutputColumn(TensorColumn, CloneableMixin):
                             "and have at least 2 dimensions - (N, C, ...)"
                         )
                     one_hot = True
-                num_classes = data.shape[1] if multi_label else torch.max(data)
+                num_classes = data.shape[1] if multi_label else torch.max(data) + 1
 
         self._ctype = _ClassifierOutputType.get_ctype(ctype)
         self.num_classes = int(num_classes)
