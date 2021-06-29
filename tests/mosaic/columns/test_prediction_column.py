@@ -44,6 +44,9 @@ class TestClassificationOutputColumn(unittest.TestCase):
         with self.assertRaises(ValueError):
             pred_col.probabilities()
 
+        assert logit_col.num_classes == prob_col.num_classes
+        assert logit_col.num_classes == pred_col.num_classes
+
     def test_bincount(self):
         col = ClassificationOutputColumn(logits=logits)
         expected_bincount = torch.as_tensor([1, 0, 0, 1, 2])
