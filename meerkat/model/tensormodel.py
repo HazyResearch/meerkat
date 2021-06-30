@@ -62,7 +62,7 @@ class TensorModel(Model):
     def process_batch(self, batch: DataPanel, input_columns: List[str]):
 
         # Convert the batch to torch.Tensor and move to device
-        input_batch = batch[input_columns].data.to(self.device)
+        input_batch = batch[input_columns[0]].data.to(self.device)
 
         return input_batch
 

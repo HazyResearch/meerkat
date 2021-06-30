@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 from typing import List, Sequence, Union
 
-import cv2
+# import cv2
 import numpy as np
 import pandas as pd
 import torch
@@ -60,8 +60,8 @@ def _convert_rle2mask(
                 current_position += lengths[index]
             mask = mask.reshape(width, height)
 
-        if resize_dim is not None:
-            mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
+        # if resize_dim is not None:
+        #    mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
         if to_nan:
             mask[mask == 0] = np.nan
 

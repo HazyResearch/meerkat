@@ -29,8 +29,8 @@ class Model:
         if task is None:
             if is_classifier is None or not is_classifier:
                 raise ValueError("Task is required for non-classification models.")
-            else:
-                is_classifier = False
+        else:
+            is_classifier = False
 
         self.is_classifier = is_classifier
         self.task = task
