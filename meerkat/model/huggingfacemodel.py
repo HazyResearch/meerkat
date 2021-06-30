@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 import cytoolz as tz
 import torch
 from tqdm import tqdm
-from transformers import AutoTokenizer
 
 from meerkat import DataPanel
 from meerkat.columns.embedding_column import EmbeddingColumn
@@ -14,6 +13,9 @@ from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.text_column import TextOutputColumn
 from meerkat.model.activation import ActivationOp
 from meerkat.model.model import Model
+from meerkat.tools.lazy_loader import LazyLoader
+
+AutoTokenizer = LazyLoader("transformers.AutoTokenizer")
 
 
 class HuggingfaceModel(Model):
