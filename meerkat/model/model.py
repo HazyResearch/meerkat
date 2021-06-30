@@ -12,11 +12,11 @@ class Model:
     def __init__(
         self,
         identifier: str,
-        # task: Task,
-        model=None,
+        model,
         evaluation_fn=None,
         device: str = None,
         is_classifier: bool = None,
+        task: str = None,
     ):
 
         self.identifier = identifier
@@ -26,11 +26,14 @@ class Model:
         if evaluation_fn is not None:
             self.evaluate = evaluation_fn
 
-        if is_classifier is None:
-            is_classifier = True  # TODO(Priya): Better logic here
+        if task is None:
+            if is_classifier is None or not is_classifier:
+                raise ValueError("Task is required for non-classification models.")
+            else:
+                is_classifier = False
+
         self.is_classifier = is_classifier
-        # TODO(Priya): Implementation for non-classification tasks
-        # self.outputs = {"probs", "logits", "pred"}
+        self.task = task
 
         if not device:
             self.device = "cpu"

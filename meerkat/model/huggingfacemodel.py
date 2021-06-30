@@ -20,30 +20,30 @@ class HuggingfaceModel(Model):
     def __init__(
         self,
         identifier: str,
-        # task: Task = None,
         model,
         tokenizer: Optional[AutoTokenizer] = None,
         device: str = None,
-        is_classifier: bool = None,  # TODO: See default value
+        is_classifier: bool = None,
+        task: str = None,
     ):
+
+        if model is None:
+            raise ValueError(
+                f"A HuggingFace model is required with {self.__class__.__name__}."
+            )
 
         super(HuggingfaceModel, self).__init__(
             identifier=identifier,
+            model=model,
             device=device,
-            is_classifier=is_classifier,  # task=task
+            is_classifier=is_classifier,
+            task=task,
         )
 
         self.tokenizer = tokenizer
         if tokenizer is None:
             # Load the tokenizer
             self.tokenizer = AutoTokenizer.from_pretrained(self.identifier)
-
-        self.model = model
-        if model is None:
-            # TODO(Priya): See what to do if used without any model
-            raise ValueError(
-                f"A HuggingFace model is required with {self.__class__.__name__}."
-            )
 
         # Move the model to device
         self.to(self.device)
@@ -110,8 +110,10 @@ class HuggingfaceModel(Model):
         activation_op = ActivationOp(self.model, target_module, self.device)
         activations = []
 
-        for batch in tqdm(dataset.batch(batch_size)):
-
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
             # Process the batch
             input_batch = self.process_batch(batch, input_columns)
 
@@ -149,7 +151,10 @@ class HuggingfaceModel(Model):
 
         predictions = []
         # TODO (Priya): Include other arguments of batch method
-        for batch in tqdm(dataset.batch(batch_size)):
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
 
             # Process the batch
             input_batch = self.process_batch(batch, input_columns)
@@ -188,7 +193,10 @@ class HuggingfaceModel(Model):
 
         predictions = []
         # TODO (Priya): Include other arguments of batch method
-        for batch in tqdm(dataset.batch(batch_size)):
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
 
             # Process the batch
             input_batch = self.process_batch(batch, input_columns)
@@ -230,5 +238,7 @@ class HuggingfaceModel(Model):
                 one_hot,
                 threshold,
             )
-        else:
+        elif self.task == "summarization":
             return self.summarization(dataset, input_columns, batch_size)
+        else:
+            raise NotImplementedError
