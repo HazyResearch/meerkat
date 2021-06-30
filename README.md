@@ -1,6 +1,6 @@
 
 <div align="center">
-    <img src="docs/meerkat.png" height=100 alt="Meerkat logo"/>
+    <img src="docs/meerkat_banner.png" height=100 alt="Meerkat logo"/>
 </div>
 
 -----
