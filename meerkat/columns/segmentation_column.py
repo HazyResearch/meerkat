@@ -7,7 +7,6 @@ from typing import List, Sequence, Union
 import numpy as np
 import pandas as pd
 import torch
-from mosaic.datapanel import DataPanel
 from tqdm import tqdm
 
 from meerkat.columns.prediction_column import (
@@ -15,6 +14,7 @@ from meerkat.columns.prediction_column import (
     _ClassifierOutputType,
 )
 from meerkat.columns.tensor_column import TensorColumn
+from meerkat.datapanel import DataPanel
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
