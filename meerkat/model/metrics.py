@@ -4,13 +4,14 @@ from typing import Callable, Sequence, Union
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, f1_score
-from torchmetrics.functional import dice_score, iou
 
 from meerkat.tools.lazy_loader import LazyLoader
 
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")
+accuracy_score = LazyLoader("sklearn.metrics.accuracy_score")
+f1_score = LazyLoader("sklearn.metrics.f1_score")
+torchmetrics = LazyLoader("torchmetrics")
 
 
 def get_metric(name: str) -> Callable:
@@ -93,7 +94,9 @@ def iou_score(
     num_classes: int = None,
 ):
     """Calculate IoU."""
-    return iou(predictions, labels, num_classes=num_classes).item()
+    return torchmetrics.functional.iou(
+        predictions, labels, num_classes=num_classes
+    ).item()
 
 
 def dice(
@@ -101,7 +104,7 @@ def dice(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate Dice Score."""
-    return dice_score(predictions, labels).item()
+    return torchmetrics.functional.dice_score(predictions, labels).item()
 
 
 # TODO Refactor into separate class for each metric

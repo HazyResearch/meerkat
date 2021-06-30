@@ -3,7 +3,6 @@ from __future__ import annotations
 import itertools
 from typing import List, Sequence, Union
 
-# import cv2
 import numpy as np
 import pandas as pd
 import torch
@@ -15,6 +14,9 @@ from meerkat.columns.prediction_column import (
 )
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
+from meerkat.tools.lazy_loader import LazyLoader
+
+cv2 = LazyLoader("cv2")
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -60,8 +62,8 @@ def _convert_rle2mask(
                 current_position += lengths[index]
             mask = mask.reshape(width, height)
 
-        # if resize_dim is not None:
-        #    mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
+        if resize_dim is not None:
+            mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
         if to_nan:
             mask[mask == 0] = np.nan
 
