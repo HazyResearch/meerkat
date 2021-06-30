@@ -22,11 +22,14 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
+from meerkat.columns.segmentation_column import SegmentationOutputColumn
 from meerkat.columns.spacy_column import SpacyColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.columns.video_column import VideoColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
 from meerkat.datapanel import DataPanel
+from meerkat.models.huggingfacemodel import HuggingfaceModel
+from meerkat.models.tensormodel import TensorModel
 from meerkat.ops.concat import concat
 from meerkat.ops.merge import merge
 from meerkat.provenance import provenance
