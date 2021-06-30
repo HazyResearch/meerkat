@@ -9,6 +9,8 @@ from tqdm import tqdm
 from meerkat import DataPanel
 from meerkat.columns.embedding_column import EmbeddingColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
+from meerkat.columns.segmentation_column import SegmentationOutputColumn
+from meerkat.columns.tensor_column import TensorColumn
 from meerkat.model.activation import ActivationOp
 from meerkat.model.model import Model
 
@@ -16,25 +18,24 @@ from meerkat.model.model import Model
 class TensorModel(Model):
     def __init__(
         self,
-        identifier,
-        # task: Task = None,
+        identifier: str,
         model,
-        device=None,
+        device: str = None,
         is_classifier: bool = None,
+        task: str = None,
     ):
 
-        super(TensorModel, self).__init__(
-            identifier=identifier,
-            device=device,
-            is_classifier=is_classifier,  # , task = task
-        )
-
-        self.model = model
         if model is None:
-            # TODO(Priya): See what to do if used without any model
             raise ValueError(
                 f"A PyTorch model is required with {self.__class__.__name__}."
             )
+        super(TensorModel, self).__init__(
+            identifier=identifier,
+            model=model,
+            device=device,
+            is_classifier=is_classifier,
+            task=task,
+        )
 
         # Move the model to device
         self.to(self.device)
@@ -49,17 +50,19 @@ class TensorModel(Model):
             # TODO(Priya): See if there is any case where these are to be returned
             output_dict = {"logits": outputs.to("cpu")}
 
-        else:
-            # TODO(Priya): Specific to semantic segmentation
+        elif self.task == "segmentation":
             # Output is a dict with key 'out'
             output_dict = {"logits": outputs["out"].to("cpu")}
+
+        elif self.task == "timeseries":
+            output_dict = {"preds": outputs.to("cpu")}
 
         return output_dict
 
     def process_batch(self, batch: DataPanel, input_columns: List[str]):
 
         # Convert the batch to torch.Tensor and move to device
-        input_batch = batch[input_columns[0]].data.to(self.device)
+        input_batch = batch[input_columns].data.to(self.device)
 
         return input_batch
 
@@ -75,7 +78,10 @@ class TensorModel(Model):
         activation_op = ActivationOp(self.model, target_module, self.device)
         activations = []
 
-        for batch in tqdm(dataset.batch(batch_size)):
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
             # Process the batch
             input_batch = self.process_batch(batch, input_columns)
 
@@ -111,8 +117,11 @@ class TensorModel(Model):
     ) -> DataPanel:
 
         predictions = []
-        # TODO(Priya): Include other arguments of batch method
-        for batch in tqdm(dataset.batch(batch_size)):
+
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
 
             # Process the batch to prepare input
             input_batch = self.process_batch(batch, input_columns)
@@ -143,6 +152,71 @@ class TensorModel(Model):
         # dataset = dataset.append(classifier_dp, axis=1)
         return output_dp
 
+    def segmentation(
+        self,
+        dataset: DataPanel,
+        input_columns: List[str],
+        batch_size: int = 32,
+        num_classes: int = None,
+    ) -> DataPanel:
+
+        predictions = []
+
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+
+        logits = predictions["logits"]
+        output_col = SegmentationOutputColumn(logits=logits, num_classes=num_classes)
+
+        output_dp = DataPanel(
+            {
+                "logits": output_col,
+                "probs": SegmentationOutputColumn(output_col.probabilities().data),
+                "preds": SegmentationOutputColumn(output_col.predictions().data),
+            }
+        )
+        # TODO(Priya): Uncomment after append bug is resolved
+        # dataset = dataset.append(classifier_dp, axis=1)
+        return output_dp
+
+    def timeseries(
+        self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
+    ) -> DataPanel:
+
+        predictions = []
+
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+
+        output_col = TensorColumn(predictions["preds"])
+        output_dp = DataPanel({"preds": output_col})
+
+        # TODO(Priya): Uncomment after append bug is resolved
+        # dataset = dataset.append(classifier_dp, axis=1)
+        return output_dp
+
     def output(
         self,
         dataset: DataPanel,
@@ -155,12 +229,19 @@ class TensorModel(Model):
     ):
         # TODO(Priya): The separate functions can be merged later
         # segmentation and classification models differ only in forward method
-        return self.classification(
-            dataset,
-            input_columns,
-            batch_size,
-            num_classes,
-            multi_label,
-            one_hot,
-            threshold,
-        )
+        if self.is_classifier:
+            return self.classification(
+                dataset,
+                input_columns,
+                batch_size,
+                num_classes,
+                multi_label,
+                one_hot,
+                threshold,
+            )
+        elif self.task == "segmentation":
+            return self.segmentation(dataset, input_columns, batch_size, num_classes)
+        elif self.task == "timeseries":
+            return self.timeseries(dataset, input_columns, batch_size)
+        else:
+            raise NotImplementedError
