@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 from PIL import Image
 
-from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.image_column import ImageCellColumn, ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
 from meerkat.tools.identifier import Identifier
@@ -141,7 +141,7 @@ class MockColumn:
 
 
 class MockImageColumn:
-    def __init__(self, length: int, tmpdir: str):
+    def __init__(self, length: int, tmpdir: str, use_cell_column: bool = False):
         """[summary]
 
         Args:
@@ -162,4 +162,7 @@ class MockImageColumn:
             im = Image.fromarray(self.image_arrays[-1])
             im.save(self.image_paths[-1])
 
-        self.col = ImageColumn.from_filepaths(self.image_paths)
+        if use_cell_column:
+            self.col = ImageCellColumn.from_filepaths(self.image_paths)
+        else:
+            self.col = ImageColumn.from_filepaths(self.image_paths)
