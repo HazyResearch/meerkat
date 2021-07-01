@@ -81,7 +81,7 @@ def test_image_column(use_visible_rows, tmpdir):
 
     assert len(out) == 10
     assert isinstance(out, ImageColumn)
-    assert [str(cell.filepath) for cell in out.lz] == mock.image_paths[:10]
+    assert [cell for cell in out.data] == mock.image_paths[:10]
 
 
 def test_concat_different_type():
