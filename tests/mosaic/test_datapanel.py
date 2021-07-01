@@ -129,7 +129,7 @@ def test_lz_getitem(tmpdir, use_visible_rows):
         ),
     ):
         assert isinstance(rows["img"], ImageColumn)
-        assert list(map(lambda x: str(x.filepath), rows["img"].data)) == [
+        assert list(map(lambda x: x, rows["img"].data)) == [
             test_bed.img_col.image_paths[i] for i in indices
         ]
         assert (rows["a"].data == indices).all()
@@ -413,7 +413,7 @@ def test_lz_map(tmpdir, use_visible_rows):
 
     def func(x):
         assert isinstance(x["img"], ImageColumn)
-        return [str(img.filepath) for img in x["img"].lz]
+        return [str(filepath) for filepath in x["img"].data]
 
     result = dp.map(func, materialize=False, num_workers=0, is_batched_fn=True)
 

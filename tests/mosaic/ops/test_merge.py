@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import torch
 
-from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.image_column import ImageCellColumn, ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
@@ -269,7 +269,7 @@ def test_merge_output_column_types():
     assert isinstance(out["b"], ListColumn)
 
 
-def test_cell_merge(tmpdir):
+def test_image_merge(tmpdir):
     length = 16
     img_col_test_bed = MockImageColumn(length=length, tmpdir=tmpdir)
     dp1 = DataPanel.from_batch(
@@ -287,6 +287,31 @@ def test_cell_merge(tmpdir):
 
     out = dp1.merge(dp2, on="a", how="inner")
     assert isinstance(out["img"], ImageColumn)
+    assert [str(fp) for fp in out["img"].data] == [
+        img_col_test_bed.image_paths[row] for row in rows
+    ]
+
+
+def test_cell_merge(tmpdir):
+    length = 16
+    img_col_test_bed = MockImageColumn(
+        length=length, tmpdir=tmpdir, use_cell_column=True
+    )
+    dp1 = DataPanel.from_batch(
+        {
+            "a": np.arange(length),
+            "img": img_col_test_bed.col,
+        }
+    )
+    rows = np.arange(4, 8)
+    dp2 = DataPanel.from_batch(
+        {
+            "a": rows,
+        }
+    )
+
+    out = dp1.merge(dp2, on="a", how="inner")
+    assert isinstance(out["img"], ImageCellColumn)
     assert [str(cell.filepath) for cell in out["img"].data] == [
         img_col_test_bed.image_paths[row] for row in rows
     ]
