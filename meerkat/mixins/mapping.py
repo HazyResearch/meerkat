@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Mapping, Optional
 
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 from meerkat.provenance import capture_provenance
 
