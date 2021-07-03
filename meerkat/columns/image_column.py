@@ -89,7 +89,7 @@ class ImageColumn(AbstractColumn):
         return "ImagePathCell(" + self.data + ")"
 
     @staticmethod
-    def concat(columns: Sequence[NumpyArrayColumn]):
+    def concat(columns: Sequence[ImageColumn]):
         loader, transform = (
             columns[0].loader,
             columns[0].transform,
