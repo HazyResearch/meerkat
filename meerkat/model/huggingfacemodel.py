@@ -24,9 +24,9 @@ class HuggingfaceModel(Model):
         identifier: str,
         model,
         tokenizer: Optional[AutoTokenizer] = None,
-        device: str = None,
         is_classifier: bool = None,
         task: str = None,
+        device: str = None,
     ):
 
         if model is None:
@@ -35,11 +35,11 @@ class HuggingfaceModel(Model):
             )
 
         super(HuggingfaceModel, self).__init__(
-            identifier=identifier,
+            # identifier=identifier,
             model=model,
-            device=device,
             is_classifier=is_classifier,
             task=task,
+            device=device,
         )
 
         self.tokenizer = tokenizer
@@ -244,3 +244,15 @@ class HuggingfaceModel(Model):
             return self.summarization(dataset, input_columns, batch_size)
         else:
             raise NotImplementedError
+
+    @classmethod
+    def _state_keys(cls) -> set:
+        """List of attributes that describe the state of the object."""
+        return super()._state_keys() | {
+            "identifier",
+            "model",
+            "tokenizer",
+            "is_classifier",
+            "task",
+            "device",
+        }
