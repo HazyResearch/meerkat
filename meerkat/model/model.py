@@ -11,20 +11,20 @@ from meerkat.model.metrics import compute_metric
 class Model:
     def __init__(
         self,
-        identifier: str,
+        # identifier: str,
         model,
-        evaluation_fn=None,
-        device: str = None,
+        # evaluation_fn=None,
         is_classifier: bool = None,
         task: str = None,
+        device: str = None,
     ):
 
-        self.identifier = identifier
-        # self.task = task
+        # self.identifier = identifier
+
         self.model = model
 
-        if evaluation_fn is not None:
-            self.evaluate = evaluation_fn
+        # if evaluation_fn is not None:
+        #    self.evaluate = evaluation_fn
 
         if task is None:
             if is_classifier is None or not is_classifier:
@@ -120,3 +120,8 @@ class Model:
         output_dict["pred"] = torch.tensor(inverse_label_map)[output_dict["pred"]]
 
         return output_dict
+
+    @classmethod
+    def _state_keys(cls) -> set:
+        """List of attributes that describe the state of the object."""
+        return {"model", "is_classifier", "task", "device"}

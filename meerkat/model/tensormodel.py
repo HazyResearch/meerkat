@@ -18,11 +18,11 @@ from meerkat.model.model import Model
 class TensorModel(Model):
     def __init__(
         self,
-        identifier: str,
+        # identifier: str,
         model,
-        device: str = None,
         is_classifier: bool = None,
         task: str = None,
+        device: str = None,
     ):
 
         if model is None:
@@ -30,11 +30,11 @@ class TensorModel(Model):
                 f"A PyTorch model is required with {self.__class__.__name__}."
             )
         super(TensorModel, self).__init__(
-            identifier=identifier,
+            # identifier=identifier,
             model=model,
-            device=device,
             is_classifier=is_classifier,
             task=task,
+            device=device,
         )
 
         # Move the model to device
