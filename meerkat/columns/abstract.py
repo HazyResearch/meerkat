@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
+from meerkat.mixins.cloneable import CloneableMixin
 import reprlib
 from typing import Any, Callable, List, Optional, Sequence, Union
 
@@ -126,6 +127,7 @@ class AbstractColumn(
 
         else:
             new_column = self.view()
+            # indices have already been remapped so we don't use the setter
             new_column._visible_rows = indices
             return new_column
 

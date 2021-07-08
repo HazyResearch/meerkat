@@ -15,8 +15,7 @@ class AbstractCell(CellStorageMixin, StateDictMixin, abc.ABC):
     def __init__(self, *args, **kwargs):
         super(AbstractCell, self).__init__(*args, **kwargs)
 
-    @abstractmethod
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> object:
         """Get me the thing that this cell exists for."""
         raise NotImplementedError("Must implement `get`.")
 
