@@ -10,8 +10,9 @@ import torch
 import ujson as json
 from PIL.Image import Image
 
-from meerkat import ImagePath, NumpyArrayColumn
+from meerkat import NumpyArrayColumn
 from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
 
@@ -106,8 +107,8 @@ def test_lz_getitem(tmpdir, use_visible_rows):
     # int index => single row (dict)
     index = 2
     row = dp.lz[index]
-    assert isinstance(row["img"], ImagePath)
-    assert str(row["img"].filepath) == test_bed.img_col.image_paths[visible_rows[index]]
+    assert isinstance(row["img"], LambdaCell)
+    assert str(row["img"].data) == test_bed.img_col.image_paths[visible_rows[index]]
     assert row["a"] == visible_rows[index]
     assert row["b"] == visible_rows[index]
 
@@ -442,7 +443,7 @@ def test_lz_filter(tmpdir, use_visible_rows):
 
     def func(x):
         # see `MockImageColumn` for filepath naming logic
-        return (int(str(x["img"].filepath.name).split(".")[0]) % 2) == 0
+        return (int(str(x["img"].data).split("/")[-1].split(".")[0]) % 2) == 0
 
     result = dp.filter(func, is_batched_fn=False, num_workers=0, materialize=False)
 
@@ -485,7 +486,7 @@ def test_lz_update(tmpdir, use_visible_rows: bool):
     )
 
     def func(x):
-        out = {"x": str(x["img"].filepath)}
+        out = {"x": str(x["img"].data)}
         return out
 
     result = dp.update(
@@ -591,7 +592,7 @@ def test_to_pandas(tmpdir, use_visible_rows, use_visible_columns):
 
     if not use_visible_columns:
         assert isinstance(df["c"][0], dict)
-        assert isinstance(df["img"][0], ImagePath)
+        assert isinstance(df["img"][0], LambdaCell)
 
 
 @pytest.mark.parametrize(

@@ -13,6 +13,7 @@ from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.copying import ColumnCopyMixin
 from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
+from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.mixins.state import StateDictMixin
@@ -32,6 +33,7 @@ class AbstractColumn(
     ColumnCopyMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
+    LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
@@ -126,6 +128,7 @@ class AbstractColumn(
 
         else:
             new_column = self.view()
+            # indices have already been remapped so we don't use the setter
             new_column._visible_rows = indices
             return new_column
 

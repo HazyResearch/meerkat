@@ -131,7 +131,8 @@ class MockDatapanel:
 
 class MockColumn:
     def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
-        self.col = col_type(np.arange(16))
+        self.array = np.arange(16)
+        self.col = col_type(self.array)
 
         if use_visible_rows:
             self.visible_rows = [0, 4, 6, 11]
