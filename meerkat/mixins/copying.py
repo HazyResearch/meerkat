@@ -59,8 +59,16 @@ class ColumnCopyMixin(AbstractCopyMixin):
     def _copy(self, view: bool = False) -> AbstractColumn:
         """Return a copy of the object."""
         state = {}
+        from meerkat import AbstractColumn, DataPanel
+
         for k, v in self.__dict__.items():
-            if k == "_data" and view:
+
+            if isinstance(v, (AbstractColumn, DataPanel)):
+                if view:
+                    state[k] = v.view()
+                else:
+                    state[k] = v.copy()
+            elif k == "_data" and view:
                 # don't copy the underlying data of the column if creating view
                 state[k] = v
             elif k != "_node":
