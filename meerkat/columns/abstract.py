@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import logging
-from meerkat.mixins.cloneable import CloneableMixin
 import reprlib
 from typing import Any, Callable, List, Optional, Sequence, Union
 
@@ -14,6 +13,7 @@ from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.copying import ColumnCopyMixin
 from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
+from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.mixins.state import StateDictMixin
@@ -33,6 +33,7 @@ class AbstractColumn(
     ColumnCopyMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
+    LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,

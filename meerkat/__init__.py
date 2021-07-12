@@ -17,6 +17,7 @@ from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.embedding_column import EmbeddingColumn
 from meerkat.columns.image_column import ImageColumn
+from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn

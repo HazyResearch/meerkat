@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from meerkat.mixins.cloneable import CloneableMixin
 from typing import Collection, Mapping, Optional, Sequence, Union
 
 import numpy as np
@@ -10,21 +9,24 @@ import pandas as pd
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
+from meerkat.mixins.cloneable import CloneableMixin
 
 logger = logging.getLogger(__name__)
 
 
-# dp = get_dp()
-# col: LambdaColumn = dp.to_lambda(lambda x: ...)
-# col: AbstractColumn = dp.map(lambda x: ...)
-# LambdaColumn(lambda x: x['filepaths'] + '.png', x, ['filepaths'])
-# dp.visible_rows = [0,2,3]
-
-
 class LambdaCell(AbstractCell):
-    def __init__(self, fn: callable = None, data: any = None):
+    def __init__(
+        self,
+        fn: callable = None,
+        data: any = None,
+    ):
         self.fn = fn
-        self.data = data
+        self._data = data
+
+    @property
+    def data(self) -> object:
+        """Get the data associated with this cell."""
+        return self._data
 
     def get(self, *args, **kwargs):
         if isinstance(self.data, AbstractCell):
@@ -53,11 +55,13 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
             self.fn = fn
 
     def fn(self, data: object):
+        """Subclasses like `ImageColumn` should be able to implement their own
+        version."""
         raise NotImplementedError
 
     @property
     def data(self):
-        """The LambdaColumn"""
+        """The LambdaColumn."""
         return None
 
     @property
@@ -77,8 +81,8 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
             return self.fn(self._data._get(index, materialize=True))
         else:
             return LambdaCell(
-                fn=self.fn, data=self.data._get(index, materialize=False)
-            )  # TODO
+                fn=self.fn, data=self._data._get(index, materialize=False)
+            )
 
     def _get_batch(self, indices: np.ndarray, materialize: bool = True):
         if materialize:
@@ -89,7 +93,6 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
             )
 
         else:
-            # TODO:use clone design pattern here
             return self._clone(data=self._data.lz[indices])
 
     def _clone_kwargs(self):
@@ -108,4 +111,4 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
     def concat(columns: Sequence[LambdaColumn]):
 
         # TODO: raise a warning if the functions don't match
-        return columns[0]._clone(columns[0].concat([c._data for c in columns]))
+        return columns[0]._clone(columns[0]._data.concat([c._data for c in columns]))

@@ -7,6 +7,9 @@ from meerkat.cells.imagepath import ImagePath
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.tools.lazy_loader import LazyLoader
+
+folder = LazyLoader("torchvision.datasets.folder")
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +23,22 @@ class ImageColumn(LambdaColumn):
         *args,
         **kwargs,
     ):
-        super(ImageColumn, self).__init__(NumpyArrayColumn(data), *args, **kwargs)
-        self.loader = loader
+        super(ImageColumn, self).__init__(
+            NumpyArrayColumn.from_data(data), *args, **kwargs
+        )
+        self.loader = self.default_loader if loader is None else loader
         self.transform = transform
 
     @property
     def data(self):
-        """The LambdaColumn"""
+        """The LambdaColumn."""
         return self._data.data
 
     def fn(self, filepath: str):
         image = self.loader(filepath)
         if self.transform is not None:
             image = self.transform(image)
+        return image
 
     @classmethod
     def from_filepaths(
@@ -50,6 +56,10 @@ class ImageColumn(LambdaColumn):
             *args,
             **kwargs,
         )
+
+    @classmethod
+    def default_loader(cls, *args, **kwargs):
+        return folder.default_loader(*args, **kwargs)
 
     @classmethod
     def _state_keys(cls) -> Collection:

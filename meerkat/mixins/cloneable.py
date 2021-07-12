@@ -11,7 +11,7 @@ class CloneableMixin:
         This is the API that should be used by DataPanel and AbstractColumn
         subclasses that require unique protocols for instantiation.
 
-        When subclassing you can update the _clone_kwargs with additional kwargs. e.g. 
+        When subclassing you can update the _clone_kwargs with additional kwargs. e.g.
         ```
         class EntityDataPanel:
             def _clone_kwargs(self) -> EntityDataPanel:
@@ -31,7 +31,7 @@ class CloneableMixin:
 
         if kwargs:
             default_kwargs.update(kwargs)
-        
+
         if data is None:
             data = default_kwargs.pop("data", self.data)
         else:
