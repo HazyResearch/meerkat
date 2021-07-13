@@ -15,7 +15,8 @@ import yaml
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.writers.numpy_writer import NumpyMemmapWriter, NumpyWriter
+from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -48,6 +49,7 @@ class NumpyArrayColumn(
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
+    # TODO (sabri): need to support str here
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
@@ -100,16 +102,21 @@ class NumpyArrayColumn(
     def _set_batch(self, indices, values):
         self._data[indices] = values
 
-    @staticmethod
-    def concat(columns: Sequence[NumpyArrayColumn]):
-        return NumpyArrayColumn.from_array(np.concatenate([c.data for c in columns]))
+    @classmethod
+    def concat(cls, columns: Sequence[NumpyArrayColumn]):
+        data = np.concatenate([c.data for c in columns])
+        if issubclass(cls, CloneableMixin):
+            return columns[0]._clone(data=data)
+        return cls.from_array(data)
 
     @classmethod
-    def get_writer(cls, mmap: bool = False):
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
         if mmap:
+            from meerkat.writers.numpy_writer import NumpyMemmapWriter
+
             return NumpyMemmapWriter()
         else:
-            return NumpyWriter()
+            return ConcatWriter(template=template, output_type=NumpyArrayColumn)
 
     @classmethod
     def read(

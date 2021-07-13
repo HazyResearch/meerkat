@@ -8,6 +8,8 @@ from meerkat import concat
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
@@ -17,7 +19,11 @@ from ...testbeds import MockColumn, MockDatapanel, MockImageColumn
 
 @pytest.mark.parametrize(
     "use_visible_rows,col_type,n",
-    product([True, False], [ListColumn, NumpyArrayColumn, TensorColumn], [1, 2, 3]),
+    product(
+        [True, False],
+        [ListColumn, NumpyArrayColumn, TensorColumn, PandasSeriesColumn],
+        [1, 2, 3],
+    ),
 )
 def test_column_concat(use_visible_rows, col_type, n):
     mock_col = MockColumn(use_visible_rows=use_visible_rows, col_type=col_type)
@@ -112,6 +118,12 @@ def test_concat_same_columns():
 
     with pytest.raises(ConcatError):
         concat([a, b], axis="columns")
+
+
+def test_concat_maintains_subclass():
+    col = ClassificationOutputColumn(logits=[0, 1, 0, 1], num_classes=2)
+    out = concat([col, col])
+    assert isinstance(out, ClassificationOutputColumn)
 
 
 def test_empty_concat():
