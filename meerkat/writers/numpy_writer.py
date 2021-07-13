@@ -3,8 +3,8 @@ from pathlib import Path
 
 import numpy as np
 
-from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.writers.abstract import AbstractWriter
 
 

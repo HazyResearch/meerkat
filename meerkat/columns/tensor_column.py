@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import functools
 import logging
-from meerkat.writers.concat_writer import ConcatWriter
 import os
 from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
@@ -15,6 +14,7 @@ import yaml
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -54,9 +54,9 @@ class TensorColumn(
                 and len(data) > 0
                 and torch.is_tensor(data[0])
             ):
-                # np.asarray supports a list of numpy arrays (it simply stacks them 
-                # before putting them into an array) but torch.as_tensor does not. 
-                # we want to support this for consistency and because it is important 
+                # np.asarray supports a list of numpy arrays (it simply stacks them
+                # before putting them into an array) but torch.as_tensor does not.
+                # we want to support this for consistency and because it is important
                 # for map
                 data = torch.stack(data)
             data = torch.as_tensor(data)

@@ -5,11 +5,15 @@ import functools
 import logging
 import numbers
 import os
-from typing import Callable, Sequence
+from typing import Any, Callable, Sequence
 
 import dill
 import numpy as np
 import pandas as pd
+import torch
+import yaml
+from pandas.core.accessor import CachedAccessor
+from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.dtypes.common import (
     is_categorical_dtype,
     is_datetime64_dtype,
@@ -18,17 +22,13 @@ from pandas.core.dtypes.common import (
     is_timedelta64_dtype,
 )
 from pandas.core.dtypes.generic import ABCSeries
-from pandas.core.strings.accessor import StringMethods
-from pandas.core.accessor import CachedAccessor
-from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.indexes.accessors import (
     CombinedDatetimelikeProperties,
     DatetimeProperties,
     PeriodProperties,
     TimedeltaProperties,
 )
-import torch
-import yaml
+from pandas.core.strings.accessor import StringMethods
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
@@ -189,7 +189,7 @@ class PandasSeriesColumn(
 
     def __getattr__(self, name):
         if name == "__getstate__" or name == "__setstate__":
-            # for pickle, it's important to raise an attribute error if __getstate__ 
+            # for pickle, it's important to raise an attribute error if __getstate__
             # or __setstate__ is called. Without this, pickle will use the __setstate__
             # and __getstate__ of the underlying pandas Series
             raise AttributeError()
@@ -223,7 +223,7 @@ class PandasSeriesColumn(
 
     def _get_batch(self, indices, materialize: bool = True):
         return self._data.iloc[indices]
-    
+
     def _set_cell(self, index, value):
         self._data[index] = value
 
@@ -248,17 +248,12 @@ class PandasSeriesColumn(
             assert metadata["dtype"] == cls
 
         # If the path doesn't exist, assume that `path` points to the `.npy` file
-        data_path = os.path.join(path, "data.npy")
+        data_path = os.path.join(path, "data.pd")
         if not os.path.exists(data_path):
             data_path = path
 
         # Load in the data
-        if mmap:
-            # assert dtype is not None and shape is not None
-            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            # data = np.load(data_path, mmap_mode="r")
-        else:
-            data = np.load(data_path, allow_pickle=True)
+        data = pd.read_pickle(data_path)
 
         col = cls(data)
 
@@ -287,10 +282,10 @@ class PandasSeriesColumn(
         # Get the paths where metadata and data should be stored
         metadata_path = os.path.join(path, "meta.yaml")
         state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.npy")
+        data_path = os.path.join(path, "data.pd")
 
         # Saving all cell data in a single pickle file
-        np.save(data_path, _data)
+        _data.to_pickle(data_path)
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))

@@ -4,14 +4,13 @@ import pickle
 from itertools import product
 
 import numpy as np
-import numpy.testing as np_test
-import pytest
 import pandas as pd
-import torch
+import pytest
 
-from meerkat.datapanel import DataPanel
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from ...testbeds import MockColumn, MockDatapanel, MockStrColumn, MockAnyColumn
+from meerkat.datapanel import DataPanel
+
+from ...testbeds import MockAnyColumn, MockColumn, MockStrColumn
 
 
 @pytest.mark.parametrize(
@@ -182,9 +181,9 @@ def test_set_item_1(dtype, use_visible_rows):
 
 @pytest.mark.parametrize(
     "dtype,use_visible_rows",
-    product(["float", "int","str"], [True, False]),
+    product(["float", "int", "str"], [True, False]),
 )
-def test_set_item_2( dtype, use_visible_rows):
+def test_set_item_2(dtype, use_visible_rows):
     if dtype == "str":
         testbed = MockStrColumn(
             use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
@@ -199,8 +198,10 @@ def test_set_item_2( dtype, use_visible_rows):
     index = 1
     not_index = [i for i in range(col.shape[0]) if i != index]
     col[index] = 0
-    assert (col[not_index] == testbed.array[testbed.visible_rows[not_index]]).all()
-    assert (col[index] == 0).all()
+    assert (
+        col[not_index].values == testbed.array[testbed.visible_rows[not_index]]
+    ).all()
+    assert col[index] == 0
 
 
 @pytest.mark.parametrize(
@@ -240,22 +241,28 @@ def test_pickle(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim, dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "dtype,use_visible_rows",
+    product(["float", "int", "str"], [True, False]),
 )
-def test_io(tmp_path, multiple_dim, dtype, use_visible_rows):
+def test_io(tmp_path, dtype, use_visible_rows):
     # uses the tmp_path fixture which will provide a
     # temporary directory unique to the test invocation,
     # important for dataloader
-    col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
-    )
+    if dtype == "str":
+        testbed = MockStrColumn(
+            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
+        )
+    else:
+        testbed = MockColumn(
+            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
+        )
+    col = testbed.col
     path = os.path.join(tmp_path, "test")
     col.write(path)
 
-    new_col = NumpyArrayColumn.read(path)
+    new_col = PandasSeriesColumn.read(path)
 
-    assert isinstance(new_col, NumpyArrayColumn)
+    assert isinstance(new_col, PandasSeriesColumn)
     assert (col == new_col).all()
 
 

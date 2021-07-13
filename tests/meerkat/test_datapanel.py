@@ -1,5 +1,4 @@
 """Unittests for Datasets."""
-from meerkat.columns.pandas_column import PandasSeriesColumn
 import os
 import tempfile
 from itertools import product
@@ -15,6 +14,7 @@ from meerkat import NumpyArrayColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
 
 from ..testbeds import MockDatapanel

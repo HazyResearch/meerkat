@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import functools
 import logging
-from meerkat.writers.concat_writer import ConcatWriter
 import numbers
 import os
 from typing import Callable, Sequence
@@ -16,6 +15,7 @@ import yaml
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -106,9 +106,10 @@ class NumpyArrayColumn(
         return NumpyArrayColumn.from_array(np.concatenate([c.data for c in columns]))
 
     @classmethod
-    def get_writer(cls, mmap: bool = False,  template: AbstractColumn = None):
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
         if mmap:
             from meerkat.writers.numpy_writer import NumpyMemmapWriter
+
             return NumpyMemmapWriter()
         else:
             return ConcatWriter(template=template, output_type=NumpyArrayColumn)

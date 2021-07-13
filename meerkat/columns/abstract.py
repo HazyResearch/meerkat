@@ -23,7 +23,6 @@ from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -359,6 +358,7 @@ class AbstractColumn(
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
         from meerkat.writers.concat_writer import ConcatWriter
+
         if mmap:
             raise ValueError("Memmapping not supported with this column type.")
         else:
@@ -376,6 +376,7 @@ class AbstractColumn(
 
         if isinstance(data, pd.Series):
             from .pandas_column import PandasSeriesColumn
+
             return PandasSeriesColumn(data)
 
         if torch.is_tensor(data):

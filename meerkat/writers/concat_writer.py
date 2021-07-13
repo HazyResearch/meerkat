@@ -1,8 +1,3 @@
-import os
-from pathlib import Path
-
-import numpy as np
-
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.writers.abstract import AbstractWriter
 
