@@ -69,7 +69,9 @@ def test_map_return_single(dtype, use_visible_rows, batched):
         out = x.type(torch.FloatTensor).mean(axis=-1)
         return out
 
-    result = col.map(func, batch_size=4, is_batched_fn=batched)
+    result = col.map(
+        func, batch_size=4, is_batched_fn=batched, output_type=TensorColumn
+    )
     assert isinstance(result, TensorColumn)
     np_test.assert_equal(len(result), len(array))
     assert np.allclose(result.numpy(), array.mean(axis=-1))

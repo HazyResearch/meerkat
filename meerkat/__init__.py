@@ -20,6 +20,7 @@ from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.spacy_column import SpacyColumn
 from meerkat.columns.tensor_column import TensorColumn

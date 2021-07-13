@@ -14,6 +14,7 @@ from meerkat import NumpyArrayColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
 
 from ..testbeds import MockDatapanel
@@ -78,7 +79,7 @@ def test_from_csv():
     assert dp_new.column_names == ["Unnamed: 0", "a", "b", "c", "index"]
     # Skip index column
     for k in data:
-        if isinstance(dp_new[k], NumpyArrayColumn):
+        if isinstance(dp_new[k], PandasSeriesColumn):
             data_to_compare = dp_new[k]._data.tolist()
         else:
             data_to_compare = dp_new[k]._data

@@ -95,21 +95,23 @@ class MappableMixin:
                 output = function_properties.output
                 dtype = function_properties.output_dtype
                 is_mapping = isinstance(output, Mapping)
-                writers, output_types, templates, mmap_info = {}, {}, {}, {}
+                writers = {}
                 for key, curr_output in output.items() if is_mapping else [(0, output)]:
                     curr_output_type = (
                         type(AbstractColumn.from_data(curr_output))
                         if output_type is None
                         else output_type
                     )
-                    output_types[key] = curr_output_type
-                    templates[key] = (
-                        curr_output.copy()
-                        if isinstance(curr_output, AbstractColumn)
-                        and isinstance(curr_output, CloneableMixin)
-                        else None
+                    print(curr_output_type)
+                    writer = curr_output_type.get_writer(
+                        mmap=mmap,
+                        template=(
+                            curr_output.copy()
+                            if isinstance(curr_output, AbstractColumn)
+                            and isinstance(curr_output, CloneableMixin)
+                            else None
+                        ),
                     )
-                    writer = curr_output_type.get_writer(mmap=mmap)
 
                     # Setup for writing to a certain output column
                     # TODO: support optionally memmapping only some columns
@@ -119,7 +121,6 @@ class MappableMixin:
                         # Construct the mmap file path
                         # TODO: how/where to store the files
                         path = self.logdir / f"{hash(function)}" / key
-                        mmap_info[key] = {"path": path, "shape": shape, "dtype": dtype}
                         # Open the output writer
                         writer.open(str(path), dtype, shape=shape)
                     else:
@@ -148,30 +149,11 @@ class MappableMixin:
                     for k, writer in writers.items():
                         writer.write(output[k])
                 else:
+                    print(output)
                     writers[0].write(output)
 
         # Check if we are returning a special output type
-        outputs = {}
-        for key, writer in writers.items():
-            if mmap:
-                writer.flush()
-                # TODO: Writers should have correspondence to their own columns
-                out = output_types[key].read(
-                    path=str(mmap_info[key]["path"]),
-                    mmap=mmap,
-                    dtype=mmap_info[key]["dtype"],
-                    shape=mmap_info[key]["shape"],
-                )
-                if templates[key] is not None:
-                    out = templates[key]._clone(data=out.data)
-                outputs[key] = out
-            else:
-                data = writer.flush()
-                outputs[key] = (
-                    templates[key]._clone(data=data)
-                    if templates[key] is not None
-                    else output_types[key].from_data(data)
-                )
+        outputs = {key: writer.flush() for key, writer in writers.items()}
 
         if not is_mapping:
             outputs = outputs[0]
