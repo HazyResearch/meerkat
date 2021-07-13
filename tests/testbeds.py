@@ -1,6 +1,7 @@
 """A collection of simple testbeds to build test cases."""
 import os
 from copy import deepcopy
+from typing import Sequence
 
 import numpy as np
 from PIL import Image
@@ -130,8 +131,42 @@ class MockDatapanel:
 
 
 class MockColumn:
+    def __init__(
+        self,
+        use_visible_rows: bool = False,
+        col_type: type = ListColumn,
+        dtype: str = "int",
+    ):
+        self.array = np.arange(16, dtype=dtype)
+        self.col = col_type(self.array)
+
+        if use_visible_rows:
+            self.visible_rows = np.array([0, 4, 6, 11])
+            self.col.visible_rows = self.visible_rows
+        else:
+            self.visible_rows = np.arange(16)
+
+
+class MockStrColumn:
     def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
-        self.array = np.arange(16)
+        self.array = np.array([f"row_{idx}" for idx in range(16)])
+        self.col = col_type(self.array)
+
+        if use_visible_rows:
+            self.visible_rows = np.array([0, 4, 6, 11])
+            self.col.visible_rows = self.visible_rows
+        else:
+            self.visible_rows = np.arange(16)
+
+
+class MockAnyColumn:
+    def __init__(
+        self,
+        data: Sequence,
+        use_visible_rows: bool = False,
+        col_type: type = ListColumn,
+    ):
+        self.array = data
         self.col = col_type(self.array)
 
         if use_visible_rows:

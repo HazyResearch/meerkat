@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import functools
 import logging
+from meerkat.writers.concat_writer import ConcatWriter
 import os
 from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
@@ -15,7 +16,6 @@ from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
-from meerkat.writers.torch_writer import TorchWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -111,11 +111,11 @@ class TensorColumn(
         return TensorColumn(torch.cat([c.data for c in columns]))
 
     @classmethod
-    def get_writer(cls, mmap: bool = False):
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
         if mmap:
             return NumpyMemmapWriter()
         else:
-            return TorchWriter()
+            return ConcatWriter(template=template, output_type=TensorColumn)
 
     @classmethod
     def read(

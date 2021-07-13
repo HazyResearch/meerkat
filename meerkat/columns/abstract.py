@@ -22,7 +22,7 @@ from meerkat.mixins.visibility import VisibilityMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
-from meerkat.writers.list_writer import ListWriter
+
 
 logger = logging.getLogger(__name__)
 
@@ -357,11 +357,12 @@ class AbstractColumn(
         #         yield self[i : i + batch_size]
 
     @classmethod
-    def get_writer(cls, mmap: bool = False):
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+        from meerkat.writers.concat_writer import ConcatWriter
         if mmap:
             raise ValueError("Memmapping not supported with this column type.")
         else:
-            return ListWriter()
+            return ConcatWriter(output_type=cls, template=template)
 
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -373,6 +374,10 @@ class AbstractColumn(
         if isinstance(data, AbstractColumn):
             return data.view()
 
+        if isinstance(data, pd.Series):
+            from .pandas_column import PandasSeriesColumn
+            return PandasSeriesColumn(data)
+
         if torch.is_tensor(data):
             from .tensor_column import TensorColumn
 
@@ -382,17 +387,6 @@ class AbstractColumn(
             from .numpy_column import NumpyArrayColumn
 
             return NumpyArrayColumn(data)
-
-        if isinstance(data, pd.Series):
-            from .numpy_column import NumpyArrayColumn
-
-            if data.dtype != object or (len(data) > 0 and isinstance(data[0], str)):
-                # if first element in object series is str, still return a
-                # `NumpyArrayColumn`
-                return NumpyArrayColumn(data.values)
-            # otherwise, get the list of objects and proceed to `Sequence` case
-            # below (e.g. `pd.Series` of AbstractCells)
-            data: List = list(data.values)
 
         if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell

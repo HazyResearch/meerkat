@@ -1,4 +1,5 @@
 """Unittests for Datasets."""
+from meerkat.columns.pandas_column import PandasSeriesColumn
 import os
 import tempfile
 from itertools import product
@@ -78,7 +79,7 @@ def test_from_csv():
     assert dp_new.column_names == ["Unnamed: 0", "a", "b", "c", "index"]
     # Skip index column
     for k in data:
-        if isinstance(dp_new[k], NumpyArrayColumn):
+        if isinstance(dp_new[k], PandasSeriesColumn):
             data_to_compare = dp_new[k]._data.tolist()
         else:
             data_to_compare = dp_new[k]._data

@@ -3,6 +3,8 @@ from pathlib import Path
 
 import numpy as np
 
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.writers.abstract import AbstractWriter
 
 
@@ -13,6 +15,8 @@ class NumpyMemmapWriter(AbstractWriter):
         dtype: str = "float32",
         mode: str = "r",
         shape: tuple = None,
+        output_type: type = NumpyArrayColumn,
+        template: AbstractColumn = False,
         *args,
         **kwargs,
     ):
@@ -25,8 +29,14 @@ class NumpyMemmapWriter(AbstractWriter):
         self._pointer = 0
 
         # If `path` is specified
+        self.path = path
+        self.dtype = dtype
+        self.shape = shape
         if path is not None:
             self.open(path=path, dtype=dtype, mode=mode, shape=shape)
+
+        self.output_type = output_type
+        self.template = template
 
     def open(
         self,
@@ -50,32 +60,11 @@ class NumpyMemmapWriter(AbstractWriter):
 
     def flush(self, *args, **kwargs) -> None:
         self.file.flush()
+        return self.output_type.read(
+            path=str(self.path), mmap=True, dtype=self.dtype, shape=self.shape
+        )
 
     def close(self, *args, **kwargs) -> None:
-        pass
-
-    def finalize(self, *args, **kwargs) -> None:
-        pass
-
-
-class NumpyWriter(AbstractWriter):
-    def __init__(
-        self,
-        *args,
-        **kwargs,
-    ):
-        super(NumpyWriter, self).__init__(*args, **kwargs)
-
-    def open(self) -> None:
-        self.outputs = []
-
-    def write(self, data, **kwargs) -> None:
-        self.outputs.extend(data)
-
-    def flush(self, *args, **kwargs):
-        return np.asarray(self.outputs)
-
-    def close(self, *args, **kwargs):
         pass
 
     def finalize(self, *args, **kwargs) -> None:
