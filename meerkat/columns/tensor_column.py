@@ -49,6 +49,16 @@ class TensorColumn(
         **kwargs,
     ):
         if data is not None and not isinstance(data, TensorColumn):
+            if (
+                isinstance(data, Sequence)
+                and len(data) > 0
+                and torch.is_tensor(data[0])
+            ):
+                # np.asarray supports a list of numpy arrays (it simply stacks them 
+                # before putting them into an array) but torch.as_tensor does not. 
+                # we want to support this for consistency and because it is important 
+                # for map
+                data = torch.stack(data)
             data = torch.as_tensor(data)
         super(TensorColumn, self).__init__(data=data, *args, **kwargs)
 

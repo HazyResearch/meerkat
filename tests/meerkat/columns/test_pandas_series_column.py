@@ -181,10 +181,10 @@ def test_set_item_1(dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "dtype,use_visible_rows",
+    product(["float", "int","str"], [True, False]),
 )
-def test_set_item_2(multiple_dim, dtype, use_visible_rows):
+def test_set_item_2( dtype, use_visible_rows):
     if dtype == "str":
         testbed = MockStrColumn(
             use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
@@ -260,14 +260,20 @@ def test_io(tmp_path, multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "dtype,use_visible_rows",
+    product(["float", "int", "str"], [True, False]),
 )
-def test_copy(multiple_dim, dtype, use_visible_rows):
-    col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
-    )
+def test_copy(dtype, use_visible_rows):
+    if dtype == "str":
+        testbed = MockStrColumn(
+            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
+        )
+    else:
+        testbed = MockColumn(
+            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
+        )
+    col = testbed.col
     col_copy = col.copy()
 
-    assert isinstance(col_copy, NumpyArrayColumn)
+    assert isinstance(col_copy, PandasSeriesColumn)
     assert (col == col_copy).all()

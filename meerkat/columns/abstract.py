@@ -411,7 +411,7 @@ class AbstractColumn(
             elif len(data) != 0 and torch.is_tensor(data[0]):
                 from .tensor_column import TensorColumn
 
-                return TensorColumn(torch.stack(data))
+                return TensorColumn(data)
 
             from .list_column import ListColumn
 

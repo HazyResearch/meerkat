@@ -149,6 +149,7 @@ class MappableMixin:
                     for k, writer in writers.items():
                         writer.write(output[k])
                 else:
+                    print(output)
                     writers[0].write(output)
 
         # Check if we are returning a special output type
