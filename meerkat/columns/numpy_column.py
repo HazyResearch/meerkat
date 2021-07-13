@@ -15,6 +15,7 @@ import yaml
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -101,9 +102,12 @@ class NumpyArrayColumn(
     def _set_batch(self, indices, values):
         self._data[indices] = values
 
-    @staticmethod
-    def concat(columns: Sequence[NumpyArrayColumn]):
-        return NumpyArrayColumn.from_array(np.concatenate([c.data for c in columns]))
+    @classmethod
+    def concat(cls, columns: Sequence[NumpyArrayColumn]):
+        data = np.concatenate([c.data for c in columns])
+        if issubclass(cls, CloneableMixin):
+            return columns[0]._clone(data=data)
+        return cls.from_array(data)
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):

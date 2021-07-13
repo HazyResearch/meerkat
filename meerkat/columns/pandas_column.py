@@ -32,6 +32,7 @@ from pandas.core.strings.accessor import StringMethods
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.cloneable import CloneableMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -230,9 +231,12 @@ class PandasSeriesColumn(
     def _set_batch(self, indices, values):
         self._data.iloc[indices] = values
 
-    @staticmethod
-    def concat(columns: Sequence[PandasSeriesColumn]):
-        return PandasSeriesColumn.from_array(pd.concat([c.data for c in columns]))
+    @classmethod
+    def concat(cls, columns: Sequence[PandasSeriesColumn]):
+        data = pd.concat([c.data for c in columns])
+        if issubclass(cls, CloneableMixin):
+            return columns[0]._clone(data=data)
+        return cls.from_array(data)
 
     @classmethod
     def read(

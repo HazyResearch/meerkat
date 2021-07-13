@@ -14,6 +14,7 @@ import yaml
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
@@ -116,9 +117,12 @@ class TensorColumn(
     def _set_batch(self, indices, values):
         self._data[indices] = values
 
-    @staticmethod
-    def concat(columns: Sequence[TensorColumn]):
-        return TensorColumn(torch.cat([c.data for c in columns]))
+    @classmethod
+    def concat(cls, columns: Sequence[TensorColumn]):
+        data = torch.cat([c.data for c in columns])
+        if issubclass(cls, CloneableMixin):
+            return columns[0]._clone(data=data)
+        return cls(data)
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):

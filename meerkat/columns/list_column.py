@@ -9,6 +9,7 @@ import pandas as pd
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.cloneable import CloneableMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -66,6 +67,9 @@ class ListColumn(AbstractColumn):
     def _repr_pandas_(self) -> pd.Series:
         return pd.Series(map(repr, self))
 
-    @staticmethod
-    def concat(columns: Sequence[ListColumn]):
-        return ListColumn.from_list(list(tz.concat([c.data for c in columns])))
+    @classmethod
+    def concat(cls, columns: Sequence[ListColumn]):
+        data = list(tz.concat([c.data for c in columns]))
+        if issubclass(cls, CloneableMixin):
+            return columns[0]._clone(data=data)
+        return cls.from_list(data)
