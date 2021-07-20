@@ -3,10 +3,12 @@ from __future__ import annotations
 import itertools
 from typing import Sequence
 
-from torchvision.ops import nms
 from tqdm import tqdm
 
 from meerkat.columns.list_column import ListColumn
+from meerkat.tools.lazy_loader import LazyLoader
+
+nms = LazyLoader("torchvision.ops.nms")
 
 
 class InstancesColumn(ListColumn):
