@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from meerkat import DataPanel
 from meerkat.columns.embedding_column import EmbeddingColumn
+from meerkat.columns.instances_column import InstancesColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.segmentation_column import SegmentationOutputColumn
 from meerkat.columns.tensor_column import TensorColumn
@@ -50,12 +51,17 @@ class TensorModel(Model):
             # TODO(Priya): See if there is any case where these are to be returned
             output_dict = {"logits": outputs.to("cpu")}
 
-        elif self.task == "segmentation":
+        elif self.task == "semantic_segmentation":
             # Output is a dict with key 'out'
             output_dict = {"logits": outputs["out"].to("cpu")}
 
         elif self.task == "timeseries":
             output_dict = {"preds": outputs.to("cpu")}
+
+        elif self.task == "instance_segmentation":
+            output_dict = {
+                "preds": [output["instances"].to("cpu") for output in outputs]
+            }
 
         return output_dict
 
@@ -116,6 +122,8 @@ class TensorModel(Model):
         threshold=0.5,
     ) -> DataPanel:
 
+        # Handles outputs for classification tasks
+
         predictions = []
 
         for batch in tqdm(
@@ -152,13 +160,15 @@ class TensorModel(Model):
         # dataset = dataset.append(classifier_dp, axis=1)
         return output_dp
 
-    def segmentation(
+    def semantic_segmentation(
         self,
         dataset: DataPanel,
         input_columns: List[str],
         batch_size: int = 32,
         num_classes: int = None,
     ) -> DataPanel:
+
+        # Handles outputs for semantic_segmentation tasks
 
         predictions = []
 
@@ -194,6 +204,8 @@ class TensorModel(Model):
         self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
     ) -> DataPanel:
 
+        # Handles outputs for timeseries
+
         predictions = []
 
         for batch in tqdm(
@@ -211,6 +223,35 @@ class TensorModel(Model):
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         output_col = TensorColumn(predictions["preds"])
+        output_dp = DataPanel({"preds": output_col})
+
+        # TODO(Priya): Uncomment after append bug is resolved
+        # dataset = dataset.append(classifier_dp, axis=1)
+        return output_dp
+
+    def instance_segmentation(
+        self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
+    ) -> DataPanel:
+
+        # Handles outputs for instance segmentation
+
+        predictions = []
+
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+
+        output_col = InstancesColumn(predictions["preds"])
         output_dp = DataPanel({"preds": output_col})
 
         # TODO(Priya): Uncomment after append bug is resolved
@@ -239,9 +280,13 @@ class TensorModel(Model):
                 one_hot,
                 threshold,
             )
-        elif self.task == "segmentation":
-            return self.segmentation(dataset, input_columns, batch_size, num_classes)
+        elif self.task == "semantic_segmentation":
+            return self.semantic_segmentation(
+                dataset, input_columns, batch_size, num_classes
+            )
         elif self.task == "timeseries":
             return self.timeseries(dataset, input_columns, batch_size)
+        elif self.task == "instance_segmentation":
+            return self.instance_segmentation(dataset, input_columns, batch_size)
         else:
             raise NotImplementedError
