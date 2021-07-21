@@ -192,8 +192,12 @@ class HuggingfaceModel(Model):
                 "preds": output_col.predictions(),
             }
         )
-        # TODO(Priya): Uncomment after append bug is resolved
+        # TODO(Priya): Use this instead after append bug is resolved
         # dataset = dataset.append(output_dp, axis=1)
+        dataset.add_column("logits", output_col)
+        dataset.add_column("probs", output_col.probabilities())
+        dataset.add_column("preds", output_col.predictions())
+
         return output_dp
 
     def summarization(
@@ -211,6 +215,8 @@ class HuggingfaceModel(Model):
 
         # TODO(Priya): Uncomment after append bug is resolved
         # dataset = dataset.append(output_dp, axis=1)
+        dataset.add_column("preds", output_col)
+
         return output_dp
 
     def output(
