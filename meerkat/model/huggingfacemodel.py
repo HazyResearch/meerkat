@@ -100,6 +100,26 @@ class HuggingfaceModel(Model):
         # Return the converted batch
         return input_batch
 
+    def predict_batch(
+        self, dataset: DataPanel, input_columns: List[str], batch_size=32
+    ):
+        # Gathers predictions for entire dataset
+
+        predictions = []
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        return predictions
+
     def activation(
         self,
         dataset: DataPanel,
@@ -151,20 +171,7 @@ class HuggingfaceModel(Model):
         threshold=0.5,
     ) -> DataPanel:
 
-        predictions = []
-        # TODO (Priya): Include other arguments of batch method
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         logits = predictions["logits"]
@@ -193,20 +200,7 @@ class HuggingfaceModel(Model):
         self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
     ) -> DataPanel:
 
-        predictions = []
-        # TODO (Priya): Include other arguments of batch method
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(
             lambda x: list(itertools.chain.from_iterable(x)), *predictions
         )

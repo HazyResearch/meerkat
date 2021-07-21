@@ -68,9 +68,32 @@ class TensorModel(Model):
     def process_batch(self, batch: DataPanel, input_columns: List[str]):
 
         # Convert the batch to torch.Tensor and move to device
-        input_batch = batch[input_columns[0]].data.to(self.device)
+        if self.task == "instance_segmentation":
+            input_batch = batch[input_columns[0]].data
+        else:
+            input_batch = batch[input_columns[0]].data.to(self.device)
 
         return input_batch
+
+    def predict_batch(
+        self, dataset: DataPanel, input_columns: List[str], batch_size=32
+    ):
+        # Gathers predictions for entire dataset
+
+        predictions = []
+        for batch in tqdm(
+            dataset.batch(batch_size),
+            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
+        ):
+
+            # Process the batch to prepare input
+            input_batch = self.process_batch(batch, input_columns)
+            # Run forward pass
+            prediction_dict = self.forward(input_batch)
+            # Append the predictions
+            predictions.append(prediction_dict)
+
+        return predictions
 
     def activation(
         self,
@@ -124,20 +147,7 @@ class TensorModel(Model):
 
         # Handles outputs for classification tasks
 
-        predictions = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         logits = predictions["logits"]
@@ -170,20 +180,7 @@ class TensorModel(Model):
 
         # Handles outputs for semantic_segmentation tasks
 
-        predictions = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         logits = predictions["logits"]
@@ -206,20 +203,7 @@ class TensorModel(Model):
 
         # Handles outputs for timeseries
 
-        predictions = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         output_col = TensorColumn(predictions["preds"])
@@ -235,20 +219,7 @@ class TensorModel(Model):
 
         # Handles outputs for instance segmentation
 
-        predictions = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
+        predictions = self.predict_batch(dataset, input_columns, batch_size)
         predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
 
         output_col = InstancesColumn(predictions["preds"])

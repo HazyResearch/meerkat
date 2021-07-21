@@ -8,7 +8,7 @@ from tqdm import tqdm
 from meerkat.columns.list_column import ListColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
-nms = LazyLoader("torchvision.ops.nms")
+ops = LazyLoader("torchvision.ops")
 
 
 class InstancesColumn(ListColumn):
@@ -61,7 +61,7 @@ class InstancesColumn(ListColumn):
             total=(len(self) // batch_size + int(len(self) % batch_size != 0)),
         ):
             batch_data = [
-                nms(
+                ops.nms(
                     instance.get_fields()["pred_boxes"].tensor,
                     instance.get_fields()["scores"],
                     iou_threshold,
