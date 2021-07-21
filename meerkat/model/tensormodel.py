@@ -166,8 +166,12 @@ class TensorModel(Model):
                 "preds": output_col.predictions(),
             }
         )
-        # TODO(Priya): Uncomment after append bug is resolved
+        # TODO(Priya): Use this instead after append bug is resolved
         # dataset = dataset.append(classifier_dp, axis=1)
+        dataset.add_column("logits", output_col)
+        dataset.add_column("probs", output_col.probabilities())
+        dataset.add_column("preds", output_col.predictions())
+
         return output_dp
 
     def semantic_segmentation(
@@ -195,6 +199,10 @@ class TensorModel(Model):
         )
         # TODO(Priya): Uncomment after append bug is resolved
         # dataset = dataset.append(classifier_dp, axis=1)
+        dataset.add_column("logits", output_col)
+        dataset.add_column("probs", output_col.probabilities())
+        dataset.add_column("preds", output_col.predictions())
+
         return output_dp
 
     def timeseries(
@@ -211,6 +219,8 @@ class TensorModel(Model):
 
         # TODO(Priya): Uncomment after append bug is resolved
         # dataset = dataset.append(classifier_dp, axis=1)
+        dataset.add_column("preds", output_col)
+
         return output_dp
 
     def instance_segmentation(
@@ -220,13 +230,15 @@ class TensorModel(Model):
         # Handles outputs for instance segmentation
 
         predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+        predictions = tz.merge_with(lambda v: list(itertools.chain.from_iterable(v)), *predictions)
 
         output_col = InstancesColumn(predictions["preds"])
         output_dp = DataPanel({"preds": output_col})
 
         # TODO(Priya): Uncomment after append bug is resolved
         # dataset = dataset.append(classifier_dp, axis=1)
+        dataset.add_column("preds", output_col)
+
         return output_dp
 
     def output(
@@ -239,8 +251,7 @@ class TensorModel(Model):
         one_hot: bool = None,
         threshold=0.5,
     ):
-        # TODO(Priya): The separate functions can be merged later
-        # segmentation and classification models differ only in forward method
+
         if self.is_classifier:
             return self.classification(
                 dataset,
