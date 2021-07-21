@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from typing import Dict, List
 
 import cytoolz as tz
@@ -230,7 +231,9 @@ class TensorModel(Model):
         # Handles outputs for instance segmentation
 
         predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: list(itertools.chain.from_iterable(v)), *predictions)
+        predictions = tz.merge_with(
+            lambda v: list(itertools.chain.from_iterable(v)), *predictions
+        )
 
         output_col = InstancesColumn(predictions["preds"])
         output_dp = DataPanel({"preds": output_col})
