@@ -9,8 +9,7 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")
-accuracy_score = LazyLoader("sklearn.metrics.accuracy_score")
-f1_score = LazyLoader("sklearn.metrics.f1_score")
+metrics = LazyLoader("sklearn.metrics")
 torchmetrics = LazyLoader("torchmetrics")
 
 
@@ -33,7 +32,7 @@ def accuracy(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate accuracy."""
-    return accuracy_score(y_true=labels, y_pred=predictions)
+    return metrics.accuracy_score(y_true=labels, y_pred=predictions)
 
 
 def f1(
@@ -41,7 +40,7 @@ def f1(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate F1 score for binary classification."""
-    return f1_score(y_true=labels, y_pred=predictions)
+    return metrics.f1_score(y_true=labels, y_pred=predictions)
 
 
 def f1_micro(
@@ -49,7 +48,7 @@ def f1_micro(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate micro F1 score for multi-class classification."""
-    return f1_score(y_true=labels, y_pred=predictions, average="micro")
+    return metrics.f1_score(y_true=labels, y_pred=predictions, average="micro")
 
 
 def f1_macro(
@@ -57,7 +56,7 @@ def f1_macro(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate macro F1 score for multi-class classification."""
-    return f1_score(y_true=labels, y_pred=predictions, average="macro")
+    return metrics.f1_score(y_true=labels, y_pred=predictions, average="macro")
 
 
 def class_distribution(
