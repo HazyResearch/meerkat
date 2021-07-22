@@ -44,6 +44,8 @@ class AbstractColumn(
 
     _data: Sequence = None
 
+    block_type: Union[None, ] = None
+
     def __init__(
         self,
         data: Sequence = None,

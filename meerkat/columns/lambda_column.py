@@ -47,12 +47,25 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
         self,
         data: Union[DataPanel, AbstractColumn],
         fn: callable = None,
+        output_type: type = None,
         *args,
         **kwargs
     ):
         super(LambdaColumn, self).__init__(data.view(), *args, **kwargs)
         if fn is not None:
             self.fn = fn
+        self._output_type = output_type
+
+    def __getattr__(self, name):
+        if not self._output_type:
+            raise AttributeError(name)
+
+        data = self[:2]
+        if not hasattr(data, name):
+            raise AttributeError(name)
+
+        data = self[:]
+        return data.__getattr__(name)
 
     def fn(self, data: object):
         """Subclasses like `ImageColumn` should be able to implement their own
@@ -88,10 +101,12 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
         if materialize:
             # if materializing, return a batch (by default, a list of objects returned
             # by `.get`, otherwise the batch format specified by `self.collate`)
-            return self.collate(
+            data = self.collate(
                 [self._get_cell(int(i), materialize=True) for i in indices]
             )
-
+            if self._output_type is not None:
+                data = self._output_type(data)
+            return data
         else:
             return self._clone(data=self._data.lz[indices])
 
