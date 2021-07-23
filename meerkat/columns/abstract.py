@@ -43,10 +43,6 @@ class AbstractColumn(
 
     _data: Sequence = None
 
-    block_type: Union[
-        None,
-    ] = None
-
     def __init__(
         self,
         data: Sequence = None,
@@ -84,6 +80,10 @@ class AbstractColumn(
         To access underlying data with invisible rows, use `_data`.
         """
         return self._data
+
+    @data.setter
+    def data(self, value):
+        self._data = value
 
     @property
     def metadata(self):
@@ -130,13 +130,17 @@ class AbstractColumn(
                 [self._get_cell(int(i), materialize=materialize) for i in indices]
             )
 
-    def _get(self, index, materialize: bool = True):
-        index = self._translate_index(index)
+    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
         if isinstance(index, int):
-            return self._get_cell(index, materialize=materialize)
+            if _data is None:
+                _data = self._get_cell(index, materialize=materialize)
+            return _data
+
         elif isinstance(index, np.ndarray):
-            batch = self._get_batch(index, materialize=materialize)
-            return self.__class__.from_data(batch)
+            # support for blocks
+            if _data is None:
+                _data = self._get_batch(index, materialize=materialize)
+            return self._clone(data=_data)
 
     # @capture_provenance()
     def __getitem__(self, index):

@@ -6,7 +6,18 @@ import os
 import pathlib
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import cytoolz as tz
 import datasets
@@ -21,6 +32,7 @@ from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
 import meerkat
+from meerkat.block_manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
@@ -81,7 +93,7 @@ class DataPanel(
         logger.debug("Creating DataPanel.")
 
         # Data is a dictionary of columns
-        self._data = {}
+        self._data = BlockManager()
 
         # Single argument
         if len(args) == 1:
@@ -93,7 +105,7 @@ class DataPanel(
             if isinstance(data, dict) and len(data):
                 data = self._create_columns(data)
                 self._assert_columns_all_equal_length(data)
-                self._data = data
+                self.data = data
 
             # `data` is a list
             elif isinstance(data, list) and len(data):
@@ -102,11 +114,11 @@ class DataPanel(
                 # Assert all columns are the same length
                 data = self._create_columns(data)
                 self._assert_columns_all_equal_length(data)
-                self._data = data
+                self.data = data
 
             # `data` is a datasets.Dataset
             elif isinstance(data, datasets.Dataset):
-                self._data = self._create_columns(data[:])
+                self.data = self._create_columns(data[:])
                 info, split = data.info, data.split
 
         # No argument
@@ -115,7 +127,7 @@ class DataPanel(
             # Use column_names to setup the data dictionary
             if column_names:
                 self._check_columns_unique(column_names)
-                self._data = {k: [] for k in column_names}
+                self.data = {k: [] for k in column_names}
 
         # Setup the DatasetInfo
         info = info.copy() if info is not None else DatasetInfo()
@@ -174,10 +186,29 @@ class DataPanel(
     def __contains__(self, item):
         return item in self.visible_columns
 
+    @property
+    def data(self) -> BlockManager:
+        """Get the underlying data (excluding invisible rows).
+
+        To access underlying data with invisible rows, use `_data`.
+        """
+        return self._data
+
+    @data.setter
+    def data(self, value):
+        if isinstance(value, BlockManager):
+            self._data = value
+        elif isinstance(value, Mapping):
+            self._data = BlockManager.from_dict(value)
+        else:
+            raise ValueError(
+                f"Cannot set DataPanel data to object of type {type(value)}"
+            )
+
     def full_length(self):
         # If there are columns, full_length of any column, since they must be same size
         if self.column_names:
-            return self._data[self.column_names[0]].full_length()
+            return self.data[self.column_names[0]].full_length()
         return 0
 
     @property
@@ -235,7 +266,7 @@ class DataPanel(
 
     @property
     def all_columns(self):
-        return list(self._data.keys())
+        return list(self.data.keys())
 
     @property
     def visible_columns(self):
@@ -372,7 +403,7 @@ class DataPanel(
         )
 
         # Add the column
-        self._data[name] = column
+        self.data[name] = column
 
         if name not in self.all_columns:
             self.all_columns.append(name)
@@ -391,7 +422,7 @@ class DataPanel(
 
         # Remove the column
         self.visible_columns = [col for col in self.visible_columns if col != column]
-        del self._data[column]
+        del self.data[column]
 
         # Set features
         self._set_features()
@@ -401,8 +432,8 @@ class DataPanel(
     def select_columns(self, columns: List[str]) -> Batch:
         """Select a subset of columns."""
         for col in columns:
-            assert col in self._data
-        return tz.keyfilter(lambda k: k in columns, self._data)
+            assert col in self.data
+        return tz.keyfilter(lambda k: k in columns, self.data)
 
     @capture_provenance(capture_args=["axis"])
     def append(
@@ -490,13 +521,13 @@ class DataPanel(
         if isinstance(index, str):
             # str index => column selection (AbstractColumn)
             if index in self.column_names:
-                return self._data[index]
+                return self.data[index]
             raise AttributeError(f"Column {index} does not exist.")
 
         elif isinstance(index, int):
             # int index => single row (dict)
             return {
-                k: self._data[k]._get(index, materialize=materialize)
+                k: self.data[k]._get(index, materialize=materialize)
                 for k in self.visible_columns
             }
 
@@ -545,16 +576,11 @@ class DataPanel(
                 raise ValueError(f"DataPanel does not have columns {missing_cols}")
 
             dp = self._clone(
-                data={k: self._data[k].view() for k in index}, _visible_columns=index
+                data={k: self.data[k].view() for k in index}, _visible_columns=index
             )
             return dp
         elif index_type == "row":
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            return self._clone(data=self.data._get(index, materialize=materialize))
 
     # @capture_provenance(capture_args=[])
     def __getitem__(self, index):
@@ -738,8 +764,8 @@ class DataPanel(
                 writer.write(example)
 
     def _get_collate_fns(self, columns: Iterable[str] = None):
-        columns = self._data.keys() if columns is None else columns
-        return {name: self._data[name].collate for name in columns}
+        columns = self.data.keys() if columns is None else columns
+        return {name: self.data[name].collate for name in columns}
 
     def _collate(self, batch: List):
         batch = tz.merge_with(list, *batch)
@@ -751,10 +777,10 @@ class DataPanel(
         return dp
 
     def _copy_data(self) -> object:
-        return {name: column.copy() for name, column in self._data.items()}
+        return {name: column.copy() for name, column in self.data.items()}
 
     def _view_data(self) -> object:
-        return {name: column.view() for name, column in self._data.items()}
+        return {name: column.view() for name, column in self.data.items()}
 
     @staticmethod
     def _convert_to_batch_fn(
@@ -821,7 +847,7 @@ class DataPanel(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield self._clone(data={**cell_batch._data, **batch_batch._data})
+                yield self._clone(data={**cell_batch.data, **batch_batch.data})
         elif batch_columns:
             for batch_batch in batch_dl:
                 yield batch_batch
@@ -894,7 +920,7 @@ class DataPanel(
         )
 
         # Add new columns for the update
-        for col, vals in output._data.items():
+        for col, vals in output.data.items():
             if col == "index":
                 continue
             new_dp.add_column(col, vals, overwrite=True)
@@ -1021,14 +1047,14 @@ class DataPanel(
 
     def items(self):
         for name in self.visible_columns:
-            yield name, self._data[name]
+            yield name, self.data[name]
 
     def keys(self):
         return self.visible_columns
 
     def values(self):
         for name in self.visible_columns:
-            yield self._data[name]
+            yield self.data[name]
 
     @classmethod
     def read(
@@ -1074,7 +1100,7 @@ class DataPanel(
         # Get the metadata
         metadata = {
             "dtype": type(self),
-            "column_dtypes": {name: type(col) for name, col in self._data.items()},
+            "column_dtypes": {name: type(col) for name, col in self.data.items()},
             "len": len(self),
             "write_together": write_together,
         }
@@ -1092,7 +1118,7 @@ class DataPanel(
             os.makedirs(columns_path, exist_ok=True)
 
             # Save each column in the DataPanel separately
-            for name, column in self._data.items():
+            for name, column in self.data.items():
                 column.write(os.path.join(columns_path, name))
 
         # Write the state

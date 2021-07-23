@@ -72,23 +72,6 @@ class LambdaColumn(AbstractColumn):
         version."""
         raise NotImplementedError
 
-    @property
-    def data(self):
-        """The LambdaColumn."""
-        return None
-
-    @property
-    def visible_rows(self):
-        return None
-
-    @visible_rows.setter
-    def visible_rows(self, indices: Optional[Sequence]):
-        if isinstance(self._data, AbstractColumn):
-            self._data.visible_rows = indices
-        else:
-            for column in self._data._data.values():
-                column.visible_rows = indices
-
     def _get_cell(self, index: int, materialize: bool = True):
         if materialize:
             return self.fn(self._data._get(index, materialize=True))

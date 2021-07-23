@@ -29,11 +29,6 @@ class ImageColumn(LambdaColumn):
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
 
-    @property
-    def data(self):
-        """The LambdaColumn."""
-        return self._data.data
-
     def fn(self, filepath: str):
         image = self.loader(filepath)
         if self.transform is not None:

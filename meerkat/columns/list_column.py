@@ -37,14 +37,6 @@ class ListColumn(AbstractColumn):
     def from_list(cls, data: Sequence):
         return cls(data=data)
 
-    @property
-    def data(self):
-        """Get the underlying data (excluding invisible rows).
-
-        To access underlying data with invisible rows, use `_data`.
-        """
-        return self._data
-
     def batch(
         self,
         batch_size: int = 1,

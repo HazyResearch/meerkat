@@ -177,17 +177,6 @@ class PandasSeriesColumn(
             # one return value
             return type(self)(result)
 
-    @property
-    def data(self):
-        """Get the underlying data (excluding invisible rows).
-
-        To access underlying data with invisible rows, use `_data`.
-        """
-        if self.visible_rows is not None:
-            return self._data.iloc[self.visible_rows]
-        else:
-            return self._data
-
     def __getattr__(self, name):
         if name == "__getstate__" or name == "__setstate__":
             # for pickle, it's important to raise an attribute error if __getstate__
