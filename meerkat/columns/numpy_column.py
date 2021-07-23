@@ -198,3 +198,9 @@ class NumpyArrayColumn(
         else:
             # can only create a 1-D series
             return super().to_pandas()
+
+    def _copy_data(self) -> object:
+        return self._data.copy()
+
+    def _view_data(self) -> object:
+        return self._data

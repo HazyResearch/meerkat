@@ -52,7 +52,7 @@ class _ClassifierOutputType(Enum):
         return self.names[0]
 
 
-class ClassificationOutputColumn(TensorColumn, CloneableMixin):
+class ClassificationOutputColumn(TensorColumn):
     def __init__(
         self,
         logits: Columnable = None,

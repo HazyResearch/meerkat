@@ -43,10 +43,7 @@ class ListColumn(AbstractColumn):
 
         To access underlying data with invisible rows, use `_data`.
         """
-        if self.visible_rows is not None:
-            return [self._data[row] for row in self.visible_rows]
-        else:
-            return self._data
+        return self._data
 
     def batch(
         self,

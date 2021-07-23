@@ -11,6 +11,7 @@ import ujson as json
 from PIL.Image import Image
 
 from meerkat import NumpyArrayColumn
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
@@ -86,48 +87,134 @@ def test_from_csv():
         assert data_to_compare == data[k]
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_lz_getitem(tmpdir, use_visible_rows):
+def test_col_index_single(tmpdir):
     length = 16
     test_bed = MockDatapanel(
         length=length,
         include_image_column=True,
-        use_visible_rows=use_visible_rows,
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
-    visible_rows = (
-        np.arange(length)
-        if test_bed.visible_rows is None
-        else np.array(test_bed.visible_rows)
+
+    # str index => single column ()
+    index = "a"
+    col = dp[index]
+    assert isinstance(col, AbstractColumn)
+    # enforce that a single column index returns a coreference
+    assert col is dp._data["a"]
+
+
+def test_col_index_multiple(tmpdir):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        tmpdir=tmpdir,
     )
+    dp = test_bed.dp
+
+    # str index => single column ()
+    index = ["a", "b"]
+    new_dp = dp[index]
+    assert isinstance(new_dp, DataPanel)
+
+    # enforce that a column index multiple returns a view of the old datapanel
+    for col_name in index:
+        assert new_dp._data[col_name] is not dp._data[col_name]
+        assert new_dp._data[col_name].data is dp._data[col_name].data
+
+
+def test_row_index_single(tmpdir):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+
+    # int index => single row (dict)
+    index = 2
+    row = dp[index]
+    assert isinstance(row["img"], Image)
+    assert (np.array(row["img"]) == test_bed.img_col.image_arrays[index]).all()
+    assert row["a"] == index
+    assert row["b"] == index
+
+
+def test_row_index_multiple(tmpdir):
+    length = 16
+    rows = np.arange(length)
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
+    # slice index => multiple row selection (DataPanel)
+    # tuple or list index => multiple row selection (DataPanel)
+    # np.array indeex => multiple row selection (DataPanel)
+    for rows, indices in (
+        (dp[1:3], rows[1:3]),
+        (dp[[0, 2]], rows[[0, 2]]),
+        (dp[np.array((0,))], rows[np.array((0,))]),
+        (dp[np.array((1, 1))], rows[np.array((1, 1))]),
+        (
+            dp[np.array((True, False) * (length // 2))],
+            rows[np.array((True, False) * (length // 2))],
+        ),
+        (
+            dp[dp["a"] % 2 == 0],
+            rows[rows % 2 == 0],
+        ),
+    ):
+        assert isinstance(rows["img"], ListColumn)
+        assert (rows["a"].data == indices).all()
+        assert (rows["b"].data == indices).all()
+
+
+def test_row_lz_index_single(tmpdir):
+    length = 16
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
 
     # int index => single row (dict)
     index = 2
     row = dp.lz[index]
     assert isinstance(row["img"], LambdaCell)
-    assert str(row["img"].data) == test_bed.img_col.image_paths[visible_rows[index]]
-    assert row["a"] == visible_rows[index]
-    assert row["b"] == visible_rows[index]
+    assert str(row["img"].data) == test_bed.img_col.image_paths[index]
+    assert row["a"] == index
+    assert row["b"] == index
 
+
+def test_row_lz_index_multiple(tmpdir):
+    length = 16
+    rows = np.arange(length)
+    test_bed = MockDatapanel(
+        length=length,
+        include_image_column=True,
+        tmpdir=tmpdir,
+    )
+    dp = test_bed.dp
     # slice index => multiple row selection (DataPanel)
     # tuple or list index => multiple row selection (DataPanel)
     # np.array indeex => multiple row selection (DataPanel)
     for rows, indices in (
-        (dp.lz[1:3], visible_rows[1:3]),
-        (dp.lz[[0, 2]], visible_rows[[0, 2]]),
-        (dp.lz[np.array((0,))], visible_rows[np.array((0,))]),
-        (dp.lz[np.array((1, 1))], visible_rows[np.array((1, 1))]),
+        (dp.lz[1:3], rows[1:3]),
+        (dp.lz[[0, 2]], rows[[0, 2]]),
+        (dp.lz[np.array((0,))], rows[np.array((0,))]),
+        (dp.lz[np.array((1, 1))], rows[np.array((1, 1))]),
         (
-            dp.lz[np.array((True, False) * (len(visible_rows) // 2))],
-            visible_rows[np.array((True, False) * (len(visible_rows) // 2))],
+            dp.lz[np.array((True, False) * (length // 2))],
+            rows[np.array((True, False) * (length // 2))],
         ),
         (
             dp.lz[dp["a"] % 2 == 0],
-            visible_rows[visible_rows % 2 == 0],
+            rows[rows % 2 == 0],
         ),
     ):
         assert isinstance(rows["img"], ImageColumn)
@@ -139,64 +226,13 @@ def test_lz_getitem(tmpdir, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
+    "use_visible_columns, use_input_columns, num_workers",
+    product([True, False], [True, False], [0, 2]),
 )
-def test_getitem(tmpdir, use_visible_rows):
-    length = 16
-    test_bed = MockDatapanel(
-        length=length,
-        include_image_column=True,
-        use_visible_rows=use_visible_rows,
-        tmpdir=tmpdir,
-    )
-    dp = test_bed.dp
-    visible_rows = (
-        np.arange(length)
-        if test_bed.visible_rows is None
-        else np.array(test_bed.visible_rows)
-    )
-
-    # int index => single row (dict)
-    index = 2
-    row = dp[index]
-    assert isinstance(row["img"], Image)
-    assert (
-        np.array(row["img"]) == test_bed.img_col.image_arrays[visible_rows[index]]
-    ).all()
-    assert row["a"] == visible_rows[index]
-    assert row["b"] == visible_rows[index]
-
-    # slice index => multiple row selection (DataPanel)
-    # tuple or list index => multiple row selection (DataPanel)
-    # np.array indeex => multiple row selection (DataPanel)
-    for rows, indices in (
-        (dp[1:3], visible_rows[1:3]),
-        (dp[[0, 2]], visible_rows[[0, 2]]),
-        (dp[np.array((0,))], visible_rows[np.array((0,))]),
-        (dp[np.array((1, 1))], visible_rows[np.array((1, 1))]),
-        (
-            dp[np.array((True, False) * (len(visible_rows) // 2))],
-            visible_rows[np.array((True, False) * (len(visible_rows) // 2))],
-        ),
-        (
-            dp[dp["a"] % 2 == 0],
-            visible_rows[visible_rows % 2 == 0],
-        ),
-    ):
-        assert isinstance(rows["img"], ListColumn)
-        assert (rows["a"].data == indices).all()
-        assert (rows["b"].data == indices).all()
-
-
-@pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns, use_input_columns, num_workers",
-    product([True, False], [True, False], [True, False], [0, 2]),
-)
-def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_workers):
+def test_map_1(use_visible_columns, use_input_columns, num_workers):
     """`map`, mixed datapanel, single return, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
     input_columns = ["a", "b"] if use_input_columns else None
 
@@ -206,9 +242,7 @@ def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_wor
         out = (x["a"] + np.array(x["b"])) * 2
         return out
 
-    if visible_rows is None:
-        visible_rows = np.arange(16)
-
+    rows = np.arange(16)
     result = dp.map(
         func,
         batch_size=4,
@@ -217,19 +251,14 @@ def test_map_1(use_visible_rows, use_visible_columns, use_input_columns, num_wor
         input_columns=input_columns,
     )
     assert isinstance(result, NumpyArrayColumn)
-    assert len(result) == len(visible_rows)
-    assert (result == np.array(visible_rows) * 4).all()
+    assert len(result) == len(rows)
+    assert (result == np.array(rows) * 4).all()
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows, num_workers",
-    product([True, False], [0, 2]),
-)
-def test_map_2(use_visible_rows, num_workers):
+@pytest.mark.parametrize("num_workers", [0, 2])
+def test_map_2(num_workers):
     """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
-    dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=False
-    )
+    dp, visible_rows, visible_columns = _get_datapanel(use_visible_columns=False)
 
     def func(x):
         out = {
@@ -254,13 +283,12 @@ def test_map_2(use_visible_rows, num_workers):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,use_input_columns,batched",
-    product([True, False], [True, False], [True, False], [True, False]),
+    "use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False]),
 )
-def test_update_1(use_visible_rows, use_visible_columns, use_input_columns, batched):
+def test_update_1(use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return single, new columns."""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
 
@@ -287,14 +315,14 @@ def test_update_1(use_visible_rows, use_visible_columns, use_input_columns, batc
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,use_input_columns,batched",
-    product([True, False], [True, False], [True, False], [True, False]),
+    "use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False]),
 )
-def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batched):
+def test_update_2(use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, new columns,
     `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
 
     def func(x):
@@ -324,14 +352,14 @@ def test_update_2(use_visible_rows, use_visible_columns, use_input_columns, batc
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,use_input_columns,batched",
-    product([True, False], [True, False], [True, False], [True, False]),
+    "use_visible_columns,use_input_columns,batched",
+    product([True, False], [True, False], [True, False]),
 )
-def test_update_3(use_visible_rows, use_visible_columns, use_input_columns, batched):
+def test_update_3(use_visible_columns, use_input_columns, batched):
     """`update`, mixed datapanel, return multiple, replace existing column,
     `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
 
     def func(x):
@@ -361,13 +389,13 @@ def test_update_3(use_visible_rows, use_visible_columns, use_input_columns, batc
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,batched",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_columns,batched",
+    product([True, False], [True, False]),
 )
-def test_filter_1(use_visible_rows, use_visible_columns, batched):
+def test_filter_1(use_visible_columns, batched):
     """`filter`, mixed datapanel."""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
 
     def func(x):
@@ -391,19 +419,15 @@ def test_filter_1(use_visible_rows, use_visible_columns, batched):
         assert len(col) == old_len
 
     assert result.visible_columns == dp.visible_columns
-    assert result.all_columns == dp.all_columns
+    # filtering does not keep invisible columns
+    assert result.all_columns == visible_columns
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_lz_map(tmpdir, use_visible_rows):
+def test_lz_map(tmpdir):
     length = 16
     test_bed = MockDatapanel(
         length=length,
         include_image_column=True,
-        use_visible_rows=use_visible_rows,
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
@@ -423,16 +447,11 @@ def test_lz_map(tmpdir, use_visible_rows):
     assert result.data == [test_bed.img_col.image_paths[i] for i in visible_rows]
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_lz_filter(tmpdir, use_visible_rows):
+def test_lz_filter(tmpdir):
     length = 16
     test_bed = MockDatapanel(
         length=length,
         include_image_column=True,
-        use_visible_rows=use_visible_rows,
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
@@ -465,18 +484,15 @@ def test_lz_filter(tmpdir, use_visible_rows):
     assert result.all_columns == dp.all_columns
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_lz_update(tmpdir, use_visible_rows: bool):
+def test_lz_update(
+    tmpdir,
+):
     """`update`, mixed datapanel, return single, new columns,
     `is_batched_fn=True`"""
     length = 16
     test_bed = MockDatapanel(
         length=length,
         include_image_column=True,
-        use_visible_rows=use_visible_rows,
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
@@ -499,13 +515,13 @@ def test_lz_update(tmpdir, use_visible_rows: bool):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns,batched",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_columns,batched",
+    product([True, False], [True, False]),
 )
-def test_filter_2(use_visible_rows, use_visible_columns, batched):
+def test_filter_2(use_visible_columns, batched):
     """`filter`, mixed datapanel."""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
 
     def func(x):
@@ -529,17 +545,18 @@ def test_filter_2(use_visible_rows, use_visible_columns, batched):
         assert len(col) == old_len
 
     assert result.visible_columns == dp.visible_columns
-    assert result.all_columns == dp.all_columns
+    # filtering does not keep invisible columns
+    assert result.all_columns == visible_columns
 
 
 @pytest.mark.parametrize(
-    "write_together,use_visible_rows, use_visible_columns",
-    product([True, False], [True, False], [True, False]),
+    "write_together, use_visible_columns",
+    product([True, False], [True, False]),
 )
-def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
+def test_io(tmp_path, write_together, use_visible_columns):
     """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=use_visible_rows, use_visible_columns=use_visible_columns
+        use_visible_columns=use_visible_columns
     )
     path = os.path.join(tmp_path, "test")
     dp.write(path, write_together=write_together)
@@ -560,24 +577,21 @@ def test_io(tmp_path, write_together, use_visible_rows, use_visible_columns):
 
 
 def test_repr_html_():
-    dp, visible_rows, visible_columns = _get_datapanel(
-        use_visible_rows=False, use_visible_columns=False
-    )
+    dp, visible_rows, visible_columns = _get_datapanel(use_visible_columns=False)
     dp._repr_html_()
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns",
-    product([True, False], [True, False]),
+    "use_visible_columns",
+    product([True, False]),
 )
-def test_to_pandas(tmpdir, use_visible_rows, use_visible_columns):
+def test_to_pandas(tmpdir, use_visible_columns):
     import pandas as pd
 
     length = 16
     test_bed = MockDatapanel(
         length=length,
         include_image_column=True,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
         tmpdir=tmpdir,
     )
@@ -597,14 +611,13 @@ def test_to_pandas(tmpdir, use_visible_rows, use_visible_columns):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns",
-    product([True, False], [True, False]),
+    "use_visible_columns",
+    product([True, False]),
 )
-def test_head(tmpdir, use_visible_rows, use_visible_columns):
+def test_head(tmpdir, use_visible_columns):
     length = 16
     test_bed = MockDatapanel(
         length=length,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
         tmpdir=tmpdir,
     )
@@ -619,14 +632,13 @@ def test_head(tmpdir, use_visible_rows, use_visible_columns):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows, use_visible_columns",
-    product([True, False], [True, False]),
+    "use_visible_columns",
+    product([True, False]),
 )
-def test_tail(tmpdir, use_visible_rows, use_visible_columns):
+def test_tail(tmpdir, use_visible_columns):
     length = 16
     test_bed = MockDatapanel(
         length=length,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
         tmpdir=tmpdir,
     )
@@ -641,13 +653,12 @@ def test_tail(tmpdir, use_visible_rows, use_visible_columns):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns",
+    "use_visible_columns",
     product([True, False], [True, False]),
 )
-def test_append_columns(use_visible_rows, use_visible_columns):
+def test_append_columns(use_visible_columns):
     mock = MockDatapanel(
         length=16,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
 

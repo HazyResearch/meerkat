@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import torch
 import yaml
+from torch.tensor import Tensor
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
@@ -206,3 +207,9 @@ class TensorColumn(
             return cls(data)
         else:
             return super(TensorColumn, cls).from_data(data)
+
+    def _copy_data(self) -> Tensor:
+        return self._data.clone()
+
+    def _view_data(self) -> object:
+        return self._data

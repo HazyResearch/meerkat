@@ -42,7 +42,7 @@ class LambdaCell(AbstractCell):
             return self.fn(self.data)
 
 
-class LambdaColumn(CloneableMixin, AbstractColumn):
+class LambdaColumn(AbstractColumn):
     def __init__(
         self,
         data: Union[DataPanel, AbstractColumn],
@@ -120,7 +120,7 @@ class LambdaColumn(CloneableMixin, AbstractColumn):
 
     @classmethod
     def _state_keys(cls) -> Collection:
-        return super()._state_keys() | {"fn"}
+        return super()._state_keys() | {"fn", "_output_type"}
 
     @staticmethod
     def concat(columns: Sequence[LambdaColumn]):

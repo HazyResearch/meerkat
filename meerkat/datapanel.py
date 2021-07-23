@@ -122,7 +122,6 @@ class DataPanel(
         DatasetInfoMixin.__init__(self, info=info, split=split)
 
         # Create attributes for all columns and visible columns
-        self.all_columns = list(self._data.keys())
         self._visible_columns = None
 
         # Create an identifier
@@ -235,7 +234,13 @@ class DataPanel(
         self._set_features()
 
     @property
+    def all_columns(self):
+        return list(self._data.keys())
+
+    @property
     def visible_columns(self):
+        if self._visible_columns is None:
+            return self.all_columns
         return self._visible_columns
 
     @visible_columns.setter
@@ -371,6 +376,8 @@ class DataPanel(
 
         if name not in self.all_columns:
             self.all_columns.append(name)
+
+        if self._visible_columns is not None:
             self.visible_columns.append(name)
 
         # Set features
@@ -383,9 +390,8 @@ class DataPanel(
         assert column in self.all_columns, f"Column `{column}` does not exist."
 
         # Remove the column
-        del self._data[column]
-        self.all_columns = [col for col in self.all_columns if col != column]
         self.visible_columns = [col for col in self.visible_columns if col != column]
+        del self._data[column]
 
         # Set features
         self._set_features()
@@ -434,7 +440,7 @@ class DataPanel(
             else:
                 data = {**dict(self.items()), **dict(dp.items())}
 
-            return self._clone(data=data)
+            return self._clone(data=data, _visible_columns=None)
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -481,67 +487,74 @@ class DataPanel(
         return Identifier(_name=_name, **kwargs)
 
     def _get(self, index, materialize: bool = False):
-        if isinstance(index, int):
+        if isinstance(index, str):
+            # str index => column selection (AbstractColumn)
+            if index in self.column_names:
+                return self._data[index]
+            raise AttributeError(f"Column {index} does not exist.")
+
+        elif isinstance(index, int):
             # int index => single row (dict)
             return {
                 k: self._data[k]._get(index, materialize=materialize)
                 for k in self.visible_columns
             }
 
-        elif isinstance(index, str):
-            # str index => column selection (AbstractColumn)
-            if index in self.column_names:
-                return self._data[index]
-            raise AttributeError(f"Column {index} does not exist.")
-
         # cases where `index` returns a datapanel
-        elif isinstance(index, slice):
+        index_type = None
+        if isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            index_type = "row"
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
             # tuple or list index => multiple row selection (DataPanel)
             if isinstance(index[0], str):
-                if not set(index).issubset(self.visible_columns):
-                    missing_cols = set(self.visible_columns) - set(index)
-                    raise ValueError(f"DataPanel does not have columns {missing_cols}")
-                dp = self.view()
-                dp.visible_columns = index
-                return dp
+                index_type = "column"
+            else:
+                index_type = "row"
 
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
                 raise ValueError(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
             # numpy array index => multiple row selection (DataPanel)
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            index_type = "row"
+
+        elif torch.is_tensor(index):
+            if len(index.shape) != 1:
+                raise ValueError(
+                    "Index must have 1 axis, not {}".format(len(index.shape))
+                )
+            # torch tensor index => multiple row selection (DataPanel)
+            index_type = "row"
+
+        elif isinstance(index, pd.Series):
+            index_type = "row"
+
         elif isinstance(index, AbstractColumn):
             # column index => multiple row selection (DataPanel)
+            index_type = "row"
+
+        else:
+            raise TypeError("Invalid index type: {}".format(type(index)))
+
+        if index_type == "column":
+            if not set(index).issubset(self.visible_columns):
+                missing_cols = set(index) - set(self.visible_columns)
+                raise ValueError(f"DataPanel does not have columns {missing_cols}")
+
+            dp = self._clone(
+                data={k: self._data[k].view() for k in index}, _visible_columns=index
+            )
+            return dp
+        elif index_type == "row":
             return self._clone(
                 data={
                     k: self._data[k]._get(index, materialize=materialize)
                     for k in self.visible_columns
                 }
             )
-        else:
-            raise TypeError("Invalid index type: {}".format(type(index)))
 
     # @capture_provenance(capture_args=[])
     def __getitem__(self, index):
@@ -562,21 +575,6 @@ class DataPanel(
             return "index" in self.column_names
         # Just return True if the dataset is empty
         return True
-
-    @classmethod
-    def uncached_batch(cls, batch: Batch, copy=True) -> Batch:
-        """Return batch with the "cache" and "slices" columns removed."""
-        return tz.keyfilter(
-            lambda k: k not in ["cache", "slices"], deepcopy(batch) if copy else batch
-        )
-
-    @classmethod
-    def uncached_example(cls, example: Dict, copy=True) -> Dict:
-        """Return example with the "cache" and "slices" columns removed."""
-        return tz.keyfilter(
-            lambda k: k not in ["cache", "slices"],
-            deepcopy(example) if copy else example,
-        )
 
     @classmethod
     def from_huggingface(cls, *args, **kwargs):
@@ -751,6 +749,12 @@ class DataPanel(
             new_batch[name] = column_to_collate[name](values)
         dp = self._clone(data=new_batch)
         return dp
+
+    def _copy_data(self) -> object:
+        return {name: column.copy() for name, column in self._data.items()}
+
+    def _view_data(self) -> object:
+        return {name: column.view() for name, column in self._data.items()}
 
     @staticmethod
     def _convert_to_batch_fn(
@@ -986,11 +990,7 @@ class DataPanel(
         indices = np.where(outputs)[0]
 
         # filter returns a new datapanel
-        new_datapanel = self.view()
-        for column in new_datapanel._data.values():
-            column.visible_rows = indices
-
-        return new_datapanel
+        return self.lz[indices]
 
     def merge(
         self,
@@ -1115,32 +1115,7 @@ class DataPanel(
         """List of attributes that describe the state of the object."""
         return {
             "_identifier",
-            "_data",
-            "all_columns",
             "_visible_columns",
             "_info",
             "_split",
         }
-
-    def _clone_kwargs(self) -> Dict[str, Any]:
-        """Returns __init__ kwargs for instantiating new object.
-
-        This function returns the default parameters that should be plumbed
-        from the current instance to the new instance.
-
-        This is the API that should be used by subclasses of :class:`DataPanel`.
-
-        Returns:
-            Dict[str, Any]: The keyword arguments for initialization
-        """
-        # identifier, info, and split are not passed by default because they have
-        # not been plumbed so far.
-        return {}
-
-    def _clone(self, data=None, **kwargs):
-        default_kwargs = self._clone_kwargs()
-        if data is None:
-            data = kwargs.pop("data", self.data)
-        if kwargs:
-            default_kwargs.update(kwargs)
-        return self.__class__(data, **default_kwargs)

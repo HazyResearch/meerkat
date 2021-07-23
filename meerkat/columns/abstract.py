@@ -3,14 +3,15 @@ from __future__ import annotations
 import abc
 import logging
 import reprlib
+from copy import copy
 from typing import Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
 import torch
 
+from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
-from meerkat.mixins.copying import ColumnCopyMixin
 from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
@@ -18,7 +19,6 @@ from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.mixins.state import StateDictMixin
 from meerkat.mixins.storage import ColumnStorageMixin
-from meerkat.mixins.visibility import VisibilityMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractColumn(
+    CloneableMixin,
     CollateMixin,
     ColumnStorageMixin,
-    ColumnCopyMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
     LambdaMixin,
@@ -37,14 +37,15 @@ class AbstractColumn(
     MaterializationMixin,
     ProvenanceMixin,
     StateDictMixin,
-    VisibilityMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
 
     _data: Sequence = None
 
-    block_type: Union[None, ] = None
+    block_type: Union[
+        None,
+    ] = None
 
     def __init__(
         self,
@@ -68,8 +69,6 @@ class AbstractColumn(
         logger.info(f"Created `{self.__class__.__name__}` with {len(self)} rows.")
 
     def __repr__(self):
-        if self.visible_rows is not None:
-            return f"{self.__class__.__name__}View" f"({reprlib.repr(self.data)})"
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     def __str__(self):
@@ -84,10 +83,7 @@ class AbstractColumn(
 
         To access underlying data with invisible rows, use `_data`.
         """
-        if self.visible_rows is not None:
-            return self._data[self.visible_rows]
-        else:
-            return self._data
+        return self._data
 
     @property
     def metadata(self):
@@ -96,7 +92,7 @@ class AbstractColumn(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {"_collate_fn", "_data", "_visible_rows"}
+        return {"_collate_fn"}
 
     def _get_cell(self, index: int, materialize: bool = True) -> Any:
         """Get a single cell from the column.
@@ -125,13 +121,14 @@ class AbstractColumn(
                 unmaterialized format. Defaults to False.
         """
         if materialize:
-            return self.collate([self._get_cell(int(i)) for i in indices])
+            return self.collate(
+                [self._get_cell(int(i), materialize=materialize) for i in indices]
+            )
 
         else:
-            new_column = self.view()
-            # indices have already been remapped so we don't use the setter
-            new_column._visible_rows = indices
-            return new_column
+            return self.collate(
+                [self._get_cell(int(i), materialize=materialize) for i in indices]
+            )
 
     def _get(self, index, materialize: bool = True):
         index = self._translate_index(index)
@@ -165,10 +162,6 @@ class AbstractColumn(
         self._set(index, value)
 
     def _translate_index(self, index):
-        if self.visible_rows is not None:
-            # Remap the index if only some rows are visible
-            index = self._remap_index(index)
-
         # `index` should return a single element
         # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
         # so we match this behavior
@@ -211,10 +204,6 @@ class AbstractColumn(
         )
 
     def __len__(self):
-        # If only a subset of rows are visible
-        if self.visible_rows is not None:
-            return len(self.visible_rows)
-
         return self.full_length()
 
     def full_length(self):
@@ -279,10 +268,7 @@ class AbstractColumn(
             pbar=pbar,
         )
         indices = np.where(outputs)[0]
-
-        new_column = self.view()
-        new_column.visible_rows = indices
-        return new_column
+        return self.lz[indices]
 
     def append(self, column: AbstractColumn) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
@@ -432,3 +418,9 @@ class AbstractColumn(
 
     def to_pandas(self) -> pd.Series:
         return pd.Series([self.lz[int(idx)] for idx in range(len(self))])
+
+    def _copy_data(self) -> object:
+        return copy(self._data)
+
+    def _view_data(self) -> object:
+        return self._data
