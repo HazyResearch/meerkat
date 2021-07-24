@@ -32,7 +32,7 @@ from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
 import meerkat
-from meerkat.block_manager import BlockManager
+from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin

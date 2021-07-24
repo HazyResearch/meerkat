@@ -4,7 +4,7 @@ from typing import Any, Dict
 class CloneableMixin:
     @classmethod
     def _state_keys(cls) -> set:
-        """List of attributes that describe the state of the object."""
+        """"""
         raise NotImplementedError()
 
     def copy(self, **kwargs) -> object:
@@ -25,8 +25,8 @@ class CloneableMixin:
             state.update(kwargs)
 
         obj = self.__class__.__new__(self.__class__)
-        obj._set_data(data)
         obj._set_state(state)
+        obj._set_data(data)
         return obj
 
     def _copy_data(self) -> object:
