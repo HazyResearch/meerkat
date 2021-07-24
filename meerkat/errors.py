@@ -4,3 +4,7 @@ class MergeError(ValueError):
 
 class ConcatError(ValueError):
     pass
+
+
+class ConsolidationError(ValueError):
+    pass

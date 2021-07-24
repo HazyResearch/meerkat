@@ -2,15 +2,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import MutableMapping
-from dataclasses import dataclass
-from typing import Any, Dict, Hashable, List, Mapping, Sequence, Tuple, Union
-
-from torch._C import Block
+from typing import Dict, Mapping, Sequence, Union
 
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.blockable import BlockableMixin
-
-from .abstract import AbstractBlock
 from .ref import BlockRef
 
 
@@ -59,10 +53,7 @@ class BlockManager(MutableMapping):
         """
         mgr = BlockManager()
         for block_ref in self._block_refs().values():
-            new_block_ref = getattr(block_ref.block, method_name)(
-                *args,
-                **kwargs,
-            )
+            new_block_ref = block_ref.apply(method_name=method_name, *args, **kwargs)
             mgr.add(new_block_ref)
 
         # apply method to columns not stored in block
@@ -79,7 +70,10 @@ class BlockManager(MutableMapping):
         self._blocks: Dict[int, BlockRef] = {}
         for block_refs in block_ref_groups.values():
             block_class = block_refs[0].block.__class__
-            block_ref = block_class.consolidate(block_refs)
+            block_indices = [ref.block_indices for block ]
+            block_ref, block_indices = block_class.consolidate(block_refs, block_indices)
+            # TODO: AM_HERE need to implement 
+            
             self.add(block_ref)
 
     def remove(self, name):
@@ -92,6 +86,10 @@ class BlockManager(MutableMapping):
         column_spec.remove(name)
         if len(column_spec) == 0:
             del column_spec
+    
+    @property
+    def block_indices(self) -> Mapping[str, Index]:
+        return {name: col.index for name, col in self._columns}
 
     def __getitem__(self, index: Union[str, Sequence[str]]):
         if isinstance(index, str):

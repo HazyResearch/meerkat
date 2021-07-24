@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import uuid
-from dataclasses import dataclass
 from typing import Mapping, Sequence, Union
 
 from meerkat.block.abstract import AbstractBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.blockable import BlockableMixin, Index
+from meerkat.mixins.blockable import BlockableMixin
 
 
 class BlockRef(Mapping):
@@ -28,20 +26,24 @@ class BlockRef(Mapping):
 
     def __iter__(self):
         return iter(self.name_to_spec)
+    
+    @property
+    def block_indices(self):
+        return {name: col.index for name, col in self.columns.items()}
 
     def apply(self, method_name: str = "_get", *args, **kwargs):
         # apply method to the block
-        block, name_to_block_idx = getattr(self.block, method_name)(
-            *args, **kwargs, block_ref=self
+        block, block_indices = getattr(self.block, method_name)(
+            *args, **kwargs, block_indices=self.block_indices
         )
 
         # create new columns
         columns = {}
         for name, col in self.columns.items():
-            block_idx = name_to_block_idx[name]
+            block_index = block_indices[name]
             # create a new col
-            new_col = col._clone(data=block.view(block_idx))
-            new_col._block_idx = block_idx
+            new_col = col._clone(data=block[block_index])
+            new_col._block_index = block_index
             new_col._block = block
             columns[name] = new_col
 
