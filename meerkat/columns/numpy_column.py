@@ -3,6 +3,8 @@ from __future__ import annotations
 import abc
 import functools
 import logging
+from meerkat.block.numpy_block import NumpyBlock
+from meerkat.mixins.blockable import BlockableMixin
 import numbers
 import os
 from typing import Callable, Sequence
@@ -37,8 +39,12 @@ def getattr_decorator(fn: Callable):
 
 class NumpyArrayColumn(
     AbstractColumn,
+    BlockableMixin,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
+
+    block_class: type = NumpyBlock
+    
     def __init__(
         self,
         data: Sequence = None,

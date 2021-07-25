@@ -13,23 +13,23 @@ class BlockRef(Mapping):
         self.block: AbstractBlock = block
 
     def __getitem__(self, index: str):
-        return self.name_to_spec[index]
+        return self.columns[index]
 
     def __delitem__(self, key):
-        del self.name_to_spec[key]
+        del self.columns[key]
 
     def __len__(self):
-        return len(self.name_to_spec)
+        return len(self.columns)
 
     def __contains__(self, value):
-        return value in self.name_to_spec
+        return value in self.columns
 
     def __iter__(self):
-        return iter(self.name_to_spec)
+        return iter(self.columns)
     
     @property
     def block_indices(self):
-        return {name: col.index for name, col in self.columns.items()}
+        return {name: col._block_index for name, col in self.columns.items()}
 
     def apply(self, method_name: str = "_get", *args, **kwargs):
         # apply method to the block
@@ -56,29 +56,4 @@ class BlockRef(Mapping):
                 "Can only update BlockRef with another BlockRef pointing "
                 "to the same block."
             )
-        self._columns.update(block_ref._update)
-
-    @classmethod
-    def infer(cls, data, names: Union[Sequence[str], str] = None):
-        """Convert data to a meerkat column using the appropriate Column
-        type."""
-        if names is str:
-            cls._infer_single(data, name=names)
-        else:
-            cls._infer_multiple(data, names=names)
-
-    @classmethod
-    def _infer_multiple(cls, data, names: Sequence[str] = None):
-        if isinstance(data, np.ndarray):
-            from .numpy_column import NumpyArrayColumn
-
-            return NumpyArrayColumn(data)
-
-    @classmethod
-    def _infer_single(cls, data, name: str = None) -> Union[AbstractColumn, BlockRef]:
-        col = AbstractColumn.from_data(data=data)
-
-        if isinstance(col, BlockableMixin):
-            return cls(names=[name], block=data.block, columns=[data])
-        else:
-            return col
+        self._columns.update(block_ref._columns)

@@ -39,9 +39,7 @@ class NumpyBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_data(
-        cls, data: np.ndarray, block_indices: Sequence[Mapping[str, BlockIndex]]
-    ) -> Tuple[NumpyBlock, Mapping[str, BlockIndex]]:
+    def from_data(cls, data: np.ndarray) -> Tuple[NumpyBlock, Mapping[str, BlockIndex]]:
         """[summary]
 
         Args:
@@ -54,10 +52,15 @@ class NumpyBlock(AbstractBlock):
         Returns:
             Tuple[NumpyBlock, Mapping[str, BlockIndex]]: [description]
         """
-        if data.shape == 1:
+        if len(data.shape) == 1:
             data = np.expand_dims(data, axis=1)
+            block_index = 0
+        elif data.shape[1] == 1:
+            block_index = 0
+        else:
+            block_index = slice(0, data.shape[1])
 
-        return cls(data), block_indices
+        return cls(data), block_index
 
     @classmethod
     def _consolidate(
