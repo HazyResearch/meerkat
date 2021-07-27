@@ -9,8 +9,8 @@ from tqdm import tqdm
 
 from meerkat import DataPanel
 from meerkat.columns.embedding_column import EmbeddingColumn
+from meerkat.columns.list_column import ListColumn
 from meerkat.columns.prediction_column import ClassificationOutputColumn
-from meerkat.columns.text_column import TextOutputColumn
 from meerkat.model.activation import ActivationOp
 from meerkat.model.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
@@ -210,7 +210,7 @@ class HuggingfaceModel(Model):
         )
 
         # Store in correct column type
-        output_col = TextOutputColumn(predictions["preds"])
+        output_col = ListColumn(predictions["preds"])
         output_dp = DataPanel({"preds": output_col})
 
         # TODO(Priya): Uncomment after append bug is resolved
