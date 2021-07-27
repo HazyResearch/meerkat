@@ -37,7 +37,7 @@ class NumpyBlock(AbstractBlock):
             dtype=self.data.dtype,
         )
 
-    def __getitem__(self, index: BlockIndex):
+    def _get_data(self, index: BlockIndex) -> np.ndarray:
         return self.data[:, index]
 
     @classmethod
@@ -102,15 +102,15 @@ class NumpyBlock(AbstractBlock):
         block = cls(np.concatenate(to_concat, axis=1))
 
         # create columns
-        new_columns = {}
-        for name, block_index in new_indices.items():
-            col = columns[name]._clone(data=block[block_index])
-            col._block = block
-            col._block_index = block_index
-            new_columns[name] = col
+        new_columns = {
+            name: columns[name]._clone(data=block[block_index])
+            for name, block_index in new_indices.items()
+        }
         return BlockRef(block=block, columns=new_columns)
 
-    def _get(self, index, block_ref: BlockRef) -> Union[BlockRef, dict]:
+    def _get(
+        self, index, block_ref: BlockRef, materialize: bool = True
+    ) -> Union[BlockRef, dict]:
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]
         if isinstance(index, int):
@@ -119,12 +119,9 @@ class NumpyBlock(AbstractBlock):
                 name: data[col._block_index] for name, col in block_ref.columns.items()
             }
         block = self.__class__(data)
-        columns = {}
-        for name, col in block_ref.columns.items():
-            # create a new col
-            new_col = col._clone(data=block[col._block_index])
-            new_col._block_index = col._block_index
-            new_col._block = block
-            columns[name] = new_col
+        columns = {
+            name: col._clone(data=block[col._block_index])
+            for name, col in block_ref.columns.items()
+        }
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)

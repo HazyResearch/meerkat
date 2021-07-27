@@ -419,8 +419,6 @@ def test_filter_1(use_visible_columns, batched):
         assert len(col) == old_len
 
     assert result.visible_columns == dp.visible_columns
-    # filtering does not keep invisible columns
-    assert result.all_columns == visible_columns
 
 
 def test_lz_map(tmpdir):
@@ -545,8 +543,6 @@ def test_filter_2(use_visible_columns, batched):
         assert len(col) == old_len
 
     assert result.visible_columns == dp.visible_columns
-    # filtering does not keep invisible columns
-    assert result.all_columns == visible_columns
 
 
 @pytest.mark.parametrize(

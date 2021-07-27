@@ -14,6 +14,7 @@ import torch
 import yaml
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.blockable import BlockableMixin
@@ -39,7 +40,6 @@ def getattr_decorator(fn: Callable):
 
 class NumpyArrayColumn(
     AbstractColumn,
-    BlockableMixin,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
 
@@ -51,7 +51,13 @@ class NumpyArrayColumn(
         *args,
         **kwargs,
     ):
-        if data is not None and not isinstance(data, np.memmap):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, NumpyBlock):
+                raise ValueError(
+                    "Cannot create `NumpyArrayColumn` from a `BlockView` not "
+                    "referencing a `NumpyBlock`."
+                )
+        elif data is not None and not isinstance(data, np.memmap):
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
@@ -84,7 +90,7 @@ class NumpyArrayColumn(
             return None
         else:
             # one return value
-            return type(self)(result)
+            return type(self)(data=result)
 
     def __getattr__(self, name):
         try:

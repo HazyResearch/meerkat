@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import torch
 
+from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.identifier import IdentifierMixin
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractColumn(
+    BlockableMixin,
     CloneableMixin,
     CollateMixin,
     ColumnStorageMixin,
@@ -52,7 +54,7 @@ class AbstractColumn(
         **kwargs,
     ):
         # Assign to data
-        self._data = data
+        self._set_data(data)
 
         super(AbstractColumn, self).__init__(
             identifier=identifier,
@@ -73,17 +75,22 @@ class AbstractColumn(
     def streamlit(self):
         return self._repr_pandas_()
 
+    def _unpack_data(self, data):
+        return super(AbstractColumn, self)._unpack_data(data)
+
+    def _set_data(self, data):
+        if self.is_blockable():
+            data = self._unpack_block_view(data)
+        self._data = data
+
     @property
     def data(self):
-        """Get the underlying data (excluding invisible rows).
-
-        To access underlying data with invisible rows, use `_data`.
-        """
+        """Get the underlying data."""
         return self._data
 
     @data.setter
     def data(self, value):
-        self._data = value
+        self._set_data(value)
 
     @property
     def metadata(self):
@@ -175,7 +182,7 @@ class AbstractColumn(
 
     def _translate_index(self, index):
         # `index` should return a single element
-        if self._is_batch_index(index):
+        if not self._is_batch_index(index):
             return index
 
         # `index` should return a batch

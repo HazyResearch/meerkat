@@ -91,7 +91,24 @@ class LambdaColumn(AbstractColumn):
                 data = self._output_type(data)
             return data
         else:
-            return self._clone(data=self._data.lz[indices])
+            return self._data.lz[indices]
+
+    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
+        index = self._translate_index(index)
+        if isinstance(index, int):
+            if _data is None:
+                _data = self._get_cell(index, materialize=materialize)
+            return _data
+
+        elif isinstance(index, np.ndarray):
+            # support for blocks
+            if _data is None:
+                _data = self._get_batch(index, materialize=materialize)
+            if materialize:
+                # materialize could change the data in unknown ways, cannot clone
+                return self.__class__.from_data(data=_data)
+            else:
+                return self._clone(data=_data)
 
     def _clone_kwargs(self):
         return {"fn": self.fn, "data": self._data}

@@ -93,10 +93,12 @@ class ClassificationOutputColumn(TensorColumn):
 
         if len(valid_data) == 0:
             raise ValueError("Must specify one of `logits`, `probs`, or `preds`")
+
         if len(valid_data) > 1:
             raise ValueError(
                 "Only one of `logits`, `probs`, or `preds` should be specified"
             )
+
         data, ctype = valid_data[0]
 
         if isinstance(data, TensorColumn):
@@ -107,30 +109,34 @@ class ClassificationOutputColumn(TensorColumn):
             data = torch.argmax(data)
             one_hot = False
 
+        self._ctype = _ClassifierOutputType.get_ctype(ctype)
+        self.num_classes = num_classes
+        self.multi_label = multi_label
+        self.one_hot = one_hot
+        self.threshold = threshold
+
         super().__init__(data=data, *args, **kwargs)
 
-        data = self.data
-        if num_classes is None:
-            if ctype in (
+    def _set_data(self, data):
+
+        if self.num_classes is None:
+            if self._ctype in (
                 _ClassifierOutputType.LOGIT,
                 _ClassifierOutputType.PROBABILITY,
             ):
-                num_classes = data.shape[1]
-            if ctype == _ClassifierOutputType.PREDICTION:
-                if multi_label:
-                    if one_hot is False or data.ndim < 2 or not _is_binary(data):
+                self.num_classes = data.shape[1]
+            if self._ctype == _ClassifierOutputType.PREDICTION:
+                if self.multi_label:
+                    if self.one_hot is False or data.ndim < 2 or not _is_binary(data):
                         raise ValueError(
                             "Multi-label predictions must be one-hot encoded "
                             "and have at least 2 dimensions - (N, C, ...)"
                         )
-                    one_hot = True
-                num_classes = data.shape[1] if multi_label else torch.max(data) + 1
-
-        self._ctype = _ClassifierOutputType.get_ctype(ctype)
-        self.num_classes = int(num_classes)
-        self.multi_label = multi_label
-        self.one_hot = one_hot
-        self.threshold = threshold
+                    self.one_hot = True
+                self.num_classes = (
+                    data.shape[1] if self.multi_label else torch.max(data) + 1
+                )
+        super(ClassificationOutputColumn, self)._set_data(data)
 
     def logits(self) -> ClassificationOutputColumn:
         if self._ctype in (
@@ -253,43 +259,6 @@ class ClassificationOutputColumn(TensorColumn):
             "one_hot",
             "threshold",
         }
-
-    def _clone_kwargs(self) -> Dict[str, Any]:
-        """Returns __init__ kwargs for instantiating new object.
-
-        This function returns the default parameters that should be plumbed
-        from the current instance to the new instance.
-
-        This is the API that should be used by DataPanel and AbstractColumn
-        subclasses that require unique protocols for instantiation.
-
-        Returns:
-            Dict[str, Any]: The keyword arguments for initialization.
-                These arguments will be used by :meth:`_clone`.
-        """
-        return {
-            "num_classes": self.num_classes,
-            "multi_label": self.multi_label,
-            "one_hot": self.one_hot,
-            "threshold": self.threshold,
-        }
-
-    def _clone(self, data=None, **kwargs):
-        default_kwargs = self._clone_kwargs()
-        if data is None:
-            data = kwargs.pop("data", self.data)
-        if kwargs:
-            default_kwargs.update(kwargs)
-
-        # Map from current classification type to __init__ keyword.
-        ctype_to_kw = {
-            _ClassifierOutputType.LOGIT: "logits",
-            _ClassifierOutputType.PROBABILITY: "probs",
-            _ClassifierOutputType.PREDICTION: "preds",
-        }
-        default_kwargs[ctype_to_kw[self._ctype]] = data
-
-        return self.__class__(**default_kwargs)
 
 
 def _is_binary(tensor: torch.Tensor):

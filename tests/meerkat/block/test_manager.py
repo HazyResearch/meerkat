@@ -11,7 +11,7 @@ from meerkat.errors import ConsolidationError
 def test_consolidate():
     mgr = BlockManager()
 
-    col1 = mk.NumpyArrayColumn(np.arange(10))
+    col1 = mk.NumpyArrayColumn(data=np.arange(10))
     mgr.add_column(col1, "col1")
     col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
     mgr.add_column(col2, "col2")

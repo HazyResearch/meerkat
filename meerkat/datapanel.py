@@ -93,9 +93,6 @@ class DataPanel(
         #  from setting visible_rows inside columns that belong to a datapanel
         logger.debug("Creating DataPanel.")
 
-        # Data is a dictionary of columns
-        self._data = BlockManager()
-
         if data is not None:
             assert column_names is None, "Don't pass in column_names."
             # The data is passed in
@@ -192,16 +189,21 @@ class DataPanel(
         """
         return self._data
 
-    @data.setter
-    def data(self, value):
+    def _set_data(self, value: Union[BlockManager, Mapping] = None):
         if isinstance(value, BlockManager):
             self._data = value
         elif isinstance(value, Mapping):
             self._data = BlockManager.from_dict(value)
+        elif value is None:
+            self._data = BlockManager()
         else:
             raise ValueError(
                 f"Cannot set DataPanel data to object of type {type(value)}"
             )
+
+    @data.setter
+    def data(self, value):
+        self._set_data(value)
 
     def full_length(self):
         # If there are columns, full_length of any column, since they must be same size
@@ -469,7 +471,9 @@ class DataPanel(
             else:
                 data = {**dict(self.items()), **dict(dp.items())}
 
-            return self._clone(data=data, _visible_columns=None)
+            col = self._clone(data=data)
+            col._visible_columns = None
+            return col
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -573,12 +577,13 @@ class DataPanel(
                 missing_cols = set(index) - set(self.visible_columns)
                 raise ValueError(f"DataPanel does not have columns {missing_cols}")
 
-            dp = self._clone(
-                data={k: self.data[k].view() for k in index}, _visible_columns=index
-            )
+            dp = self._clone(data=self.data[index])
+            dp.visible_columns = index
             return dp
         elif index_type == "row":
-            return self._clone(data=self.data._get(index, materialize=materialize))
+            return self._clone(
+                data=self.data.apply("_get", index=index, materialize=materialize)
+            )
 
     # @capture_provenance(capture_args=[])
     def __getitem__(self, index):

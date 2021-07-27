@@ -1,24 +1,26 @@
-from torch._C import Block
-from meerkat.block.abstract import AbstractBlock, BlockIndex
+from meerkat.block.abstract import AbstractBlock, BlockIndex, BlockView
 
 
 class BlockableMixin:
-    block_class: type
-
-    def __init__(
-        self,
-        block: AbstractBlock = None,
-        block_index: BlockIndex = None,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, *args, **kwargs):
         super(BlockableMixin, self).__init__(*args, **kwargs)
-        if (block is None) != (block_index is None):
-            raise ValueError("Must pass both `block` and `block_index` or neither.")
 
-        if block is None:
-            self._block, self._block_index = self.block_class.from_data(self.data)
+    block_class: type = None
+
+    @classmethod
+    def is_blockable(cls):
+        return cls.block_class is not None
+
+    def _unpack_block_view(self, data):
+        if isinstance(data, BlockView):
+            self._block = data.block
+            self._block_index = data.block_index
+            data = data.data
         else:
-            self._block = block
-            self._block_index = block_index
-    
+            self._block, self._block_index = self.block_class.from_data(data)
+        return data
+
+    def _pack_block_view(self):
+        return BlockView(
+            data=self.data, block_index=self._block_index, block=self._block
+        )

@@ -12,8 +12,13 @@ class BlockRef(Mapping):
         self.columns: Mapping[str, AbstractColumn] = columns
         self.block: AbstractBlock = block
 
-    def __getitem__(self, index: str):
-        return self.columns[index]
+    def __getitem__(self, index: Union[str, Sequence[str]]):
+        if isinstance(index, str):
+            return self.columns[index]
+        else:
+            return self.__class__(
+                columns={col: self.columns[col] for col in index}, block=self.block
+            )
 
     def __delitem__(self, key):
         del self.columns[key]

@@ -158,8 +158,9 @@ class MappableMixin:
             # TODO (arjundd): This is duck type. We should probably make this
             # class signature explicit.
             outputs = (
-                self._clone(data=outputs, _visible_columns=None)
+                self._clone(data=outputs)
                 if isinstance(self, DataPanel)
                 else DataPanel.from_batch(outputs)
             )
+            outputs._visible_columns = None
         return outputs

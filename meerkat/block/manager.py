@@ -28,7 +28,10 @@ class BlockManager(MutableMapping):
         """
         data (): a single blockable object, potentially contains multiple columns
         """
-        self._columns.update({name: column for name, column in block_ref.items()})
+        # can't have the same column living in multiple managers, so we view
+        self._columns.update(
+            {name: column.view() for name, column in block_ref.items()}
+        )
 
         block_id = id(block_ref.block)
         # check if there already is a block_ref in the manager for this block
@@ -91,20 +94,48 @@ class BlockManager(MutableMapping):
 
         del self._columns[name]
 
-        column_spec = self._column_specs[name]
-        column_spec.remove(name)
-        if len(column_spec) == 0:
-            del column_spec
+        if name in self._column_to_block_id:
+            # column is blockable
+            block_ref = self._block_refs[self._column_to_block_id[name]]
+            del block_ref[name]
+
+            if len(block_ref) == 0:
+                del self._block_refs[self._column_to_block_id[name]]
 
     @property
     def block_indices(self) -> Mapping[str, BlockIndex]:
         return {name: col.index for name, col in self._columns}
 
-    def __getitem__(self, index: Union[str, Sequence[str]]):
+    def __getitem__(
+        self, index: Union[str, Sequence[str]]
+    ) -> Union[AbstractColumn, BlockManager]:
         if isinstance(index, str):
             return self._columns[index]
         elif isinstance(index, Sequence):
-            pass
+            mgr = BlockManager()
+            block_id_to_names = defaultdict(list)
+            for name in index:
+                if name not in self._column_to_block_id:
+                    if name in self:
+                        # non-blockable column
+                        mgr.add_column(col=self._columns[name], name=name)
+                    else:
+                        raise ValueError(
+                            f"BlockManager does not contain column '{name}'."
+                        )
+                else:
+                    # group blockable columns by block
+                    block_id_to_names[self._column_to_block_id[name]].append(name)
+
+            # block refs for blockable columns
+            for block_id, names in block_id_to_names.items():
+                block_ref = self._block_refs[block_id]
+                mgr.update(block_ref[names])
+            return mgr
+        else:
+            raise ValueError(
+                f"Unsupported index of type {type(index)}passed to `BlockManager`."
+            )
 
     def __setitem__(self, index, data: Union[str, Sequence[str]]):
         if isinstance(data, AbstractColumn):
@@ -129,20 +160,13 @@ class BlockManager(MutableMapping):
     def add_column(self, col: AbstractColumn, name: str):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        if not isinstance(col, BlockableMixin):
+        if not col.is_blockable():
             col = col.view()
             self._columns[name] = col
 
         else:
-            if col._block is None:
-                block, block_index = col.block_class.from_data(col.data)
-                # TODO: need to be able to set block on clone
-                col._clone(data=block[block_index])
-                col._block = block
-                col._block_index = block_index
-            else:
-                # TODO: this should be a view and the _block should get carried
-                col = col  # .view()
+            # TODO: this should be a view and the _block should get carried
+            col = col.view()
             self.update(BlockRef(columns={name: col}, block=col._block))
 
     @classmethod

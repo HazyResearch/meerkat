@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Hashable, Mapping, Sequence, Tuple, Union
 
 import numpy as np
@@ -13,9 +14,22 @@ if TYPE_CHECKING:
     from meerkat.block.ref import BlockRef
 
 
+@dataclass
+class BlockView:
+    data: object
+    block_index: BlockIndex
+    block: AbstractBlock
+
+
 class AbstractBlock:
     def __init__(self, *args, **kwargs):
         super(AbstractBlock, self).__init__(*args, **kwargs)
+
+    def __getitem__(self, index: BlockIndex) -> Blockview:
+        return BlockView(data=self._get_data(index), block_index=index, block=self)
+
+    def _get_data(self, index: BlockIndex) -> object:
+        raise NotImplementedError()
 
     @property
     def signature(self) -> Hashable:
@@ -25,8 +39,7 @@ class AbstractBlock:
     def from_data(
         cls, data: object, names: Sequence[str]
     ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
-
-        return
+        raise NotImplementedError()
 
     @classmethod
     def consolidate(
@@ -46,5 +59,5 @@ class AbstractBlock:
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
         raise NotImplementedError
 
-    def _get():
+    def _get(self, index, block_ref: BlockRef) -> Union[BlockRef, dict]:
         raise NotImplementedError

@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from meerkat import NumpyArrayColumn
+from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.block.ref import BlockRef
 from meerkat.errors import ConsolidationError
@@ -53,7 +54,11 @@ def test_consolidate_1(num_blocks):
     cols = [
         {
             str(slc): NumpyArrayColumn(
-                data=blocks[block_idx][slc], block=blocks[block_idx], block_index=slc
+                data=BlockView(
+                    data=blocks[block_idx].data[slc],
+                    block=blocks[block_idx],
+                    block_index=slc,
+                )
             )
             for slc in slices[block_idx]
         }
@@ -88,7 +93,11 @@ def test_consolidate_mismatched_signature():
     cols = [
         {
             str(slc): NumpyArrayColumn(
-                data=blocks[block_idx][slc], block=blocks[block_idx], block_index=slc
+                data=BlockView(
+                    data=blocks[block_idx].data[slc],
+                    block=blocks[block_idx],
+                    block_index=slc,
+                )
             )
             for slc in slices[block_idx]
         }
