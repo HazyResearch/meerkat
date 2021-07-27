@@ -16,20 +16,10 @@ class InstancesColumn(ListColumn):
 
         super(InstancesColumn, self).__init__(data=data, *args, **kwargs)
 
-    def num_instances(
-        self, batch_size: int = 32
-    ) -> ListColumn:  # TODO(Priya): ListColumn or some other type
+    def num_instances(self) -> ListColumn:
         # Returns a column with the number of instances in each Instances object
 
-        data = []  # Holds the number of instances in each object
-        for batch in tqdm(
-            self.batch(batch_size),
-            total=(len(self) // batch_size + int(len(self) % batch_size != 0)),
-        ):
-            batch_data = [len(instance) for instance in batch]
-            data = list(itertools.chain(data, batch_data))
-
-        data_col = ListColumn(data)
+        data_col = ListColumn([len(instance) for instance in self])
 
         return data_col
 
@@ -48,7 +38,7 @@ class InstancesColumn(ListColumn):
 
         return data_col
 
-    def get_nms(
+    def nms(
         self,
         iou_threshold: float,
         batch_size: int = 32,
