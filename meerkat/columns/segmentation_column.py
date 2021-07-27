@@ -21,57 +21,6 @@ cv2 = LazyLoader("cv2")
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
 
-def _convert_rle2mask(
-    batch: DataPanel,
-    input_columns: List[str],
-    orig_dim,
-    resize_dim=None,
-    to_nan: bool = False,
-):
-
-    """Convert run length encoding (RLE) to 2D binary mask.
-
-    Args:
-    batch (DataPanel): DataPanel.
-    input_columns: List of columns containing Run Length Encodings
-    orig_dim (Tuple[int]): Shape of the image.
-    resize_dim (Tuple[int]): Shape to resize to.
-      Resizing is done with cubic interporlation.
-    to_nan (bool, optional): Convert 0s to np.nan.
-
-    Returns:
-    List[np.ndarray]: List of np.ndarray containing binary mask
-    """
-
-    # TODO(Priya): Support for multiple input_columns?
-    rle_data = batch[input_columns[0]].data
-    height, width = orig_dim
-    masks = []
-
-    for rle in rle_data:
-        mask = np.zeros(width * height)
-        if rle != "-1":
-            array = np.asarray([int(x) for x in rle.split()])
-            starts = array[0::2]
-            lengths = array[1::2]
-            current_position = 0
-
-            for index, start in enumerate(starts):
-                current_position += start
-                mask[current_position : current_position + lengths[index]] = 1
-                current_position += lengths[index]
-            mask = mask.reshape(width, height)
-
-        if resize_dim is not None:
-            mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
-        if to_nan:
-            mask[mask == 0] = np.nan
-
-        masks.append(mask)
-
-    return masks
-
-
 # TODO(Priya): Make probs, preds method return SegmentationOutputColumn type
 class SegmentationOutputColumn(ClassificationOutputColumn):
     def __init__(
@@ -144,3 +93,54 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
         dataset.add_column(f"Binary Mask (from {input_columns[0]})", masks_col)
 
         return masks_col
+
+
+def _convert_rle2mask(
+    batch: DataPanel,
+    input_columns: List[str],
+    orig_dim,
+    resize_dim=None,
+    to_nan: bool = False,
+):
+
+    """Convert run length encoding (RLE) to 2D binary mask.
+
+    Args:
+    batch (DataPanel): DataPanel.
+    input_columns: List of columns containing Run Length Encodings
+    orig_dim (Tuple[int]): Shape of the image.
+    resize_dim (Tuple[int]): Shape to resize to.
+      Resizing is done with cubic interporlation.
+    to_nan (bool, optional): Convert 0s to np.nan.
+
+    Returns:
+    List[np.ndarray]: List of np.ndarray containing binary mask
+    """
+
+    # TODO(Priya): Support for multiple input_columns?
+    rle_data = batch[input_columns[0]].data
+    height, width = orig_dim
+    masks = []
+
+    for rle in rle_data:
+        mask = np.zeros(width * height)
+        if rle != "-1":
+            array = np.asarray([int(x) for x in rle.split()])
+            starts = array[0::2]
+            lengths = array[1::2]
+            current_position = 0
+
+            for index, start in enumerate(starts):
+                current_position += start
+                mask[current_position : current_position + lengths[index]] = 1
+                current_position += lengths[index]
+            mask = mask.reshape(width, height)
+
+        if resize_dim is not None:
+            mask = cv2.resize(mask, resize_dim, interpolation=cv2.INTER_CUBIC)
+        if to_nan:
+            mask[mask == 0] = np.nan
+
+        masks.append(mask)
+
+    return masks
