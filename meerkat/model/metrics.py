@@ -9,7 +9,6 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")
-metrics = LazyLoader("sklearn.metrics")
 torchmetrics = LazyLoader("torchmetrics")
 
 
@@ -32,7 +31,7 @@ def accuracy(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate accuracy."""
-    return metrics.accuracy_score(y_true=labels, y_pred=predictions)
+    return torchmetrics.functional.accuracy(preds=predictions, target=labels)
 
 
 def f1(
@@ -40,7 +39,7 @@ def f1(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate F1 score for binary classification."""
-    return metrics.f1_score(y_true=labels, y_pred=predictions)
+    return torchmetrics.functional.f1(preds=predictions, target=labels)
 
 
 def f1_micro(
@@ -48,7 +47,7 @@ def f1_micro(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate micro F1 score for multi-class classification."""
-    return metrics.f1_score(y_true=labels, y_pred=predictions, average="micro")
+    return torchmetrics.functional.f1(preds=predictions, target=labels, average="micro")
 
 
 def f1_macro(
@@ -56,7 +55,7 @@ def f1_macro(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate macro F1 score for multi-class classification."""
-    return metrics.f1_score(y_true=labels, y_pred=predictions, average="macro")
+    return torchmetrics.functional.f1(preds=predictions, target=labels, average="macro")
 
 
 def class_distribution(
@@ -94,7 +93,7 @@ def iou_score(
 ):
     """Calculate IoU."""
     return torchmetrics.functional.iou(
-        predictions, labels, num_classes=num_classes
+        preds=predictions, target=labels, num_classes=num_classes
     ).item()
 
 
@@ -103,7 +102,7 @@ def dice(
     labels: Union[list, np.array, torch.Tensor],
 ):
     """Calculate Dice Score."""
-    return torchmetrics.functional.dice_score(predictions, labels).item()
+    return torchmetrics.functional.dice_score(preds=predictions, target=labels).item()
 
 
 # TODO Refactor into separate class for each metric
