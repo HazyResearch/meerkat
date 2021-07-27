@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Mapping, Sequence, Union
 
-from meerkat.block.abstract import AbstractBlock
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.blockable import BlockableMixin
+if TYPE_CHECKING:
+    from meerkat.block.abstract import AbstractBlock
+    from meerkat.columns.abstract import AbstractColumn
 
 
 class BlockRef(Mapping):
@@ -26,29 +26,14 @@ class BlockRef(Mapping):
 
     def __iter__(self):
         return iter(self.columns)
-    
+
     @property
     def block_indices(self):
         return {name: col._block_index for name, col in self.columns.items()}
 
     def apply(self, method_name: str = "_get", *args, **kwargs):
         # apply method to the block
-        block, block_indices = getattr(self.block, method_name)(
-            *args, **kwargs, block_indices=self.block_indices
-        )
-
-        # create new columns
-        columns = {}
-        for name, col in self.columns.items():
-            block_index = block_indices[name]
-            # create a new col
-            new_col = col._clone(data=block[block_index])
-            new_col._block_index = block_index
-            new_col._block = block
-            columns[name] = new_col
-
-        # create new BlockRef from the columns
-        return BlockRef(columns, block)
+        return getattr(self.block, method_name)(*args, **kwargs, block_ref=self)
 
     def update(self, block_ref: BlockRef):
         if id(block_ref.block) != id(self.block):

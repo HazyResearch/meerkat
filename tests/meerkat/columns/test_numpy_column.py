@@ -70,6 +70,7 @@ def test_map_return_single(dtype, batched):
         return out
 
     result = col.map(func, batch_size=4, is_batched_fn=batched)
+
     assert isinstance(result, NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))
     assert (result == array.mean(axis=-1)).all()

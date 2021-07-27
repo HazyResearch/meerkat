@@ -3,8 +3,6 @@ from __future__ import annotations
 import abc
 import functools
 import logging
-from meerkat.block.numpy_block import NumpyBlock
-from meerkat.mixins.blockable import BlockableMixin
 import numbers
 import os
 from typing import Callable, Sequence
@@ -16,7 +14,9 @@ import torch
 import yaml
 from yaml.representer import Representer
 
+from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 
@@ -44,7 +44,7 @@ class NumpyArrayColumn(
 ):
 
     block_class: type = NumpyBlock
-    
+
     def __init__(
         self,
         data: Sequence = None,
@@ -102,11 +102,17 @@ class NumpyArrayColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data[indices]
-
     def _set_batch(self, indices, values):
         self._data[indices] = values
+
+    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
+        if _data is None:
+            _data = self._data[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=_data)
+        else:
+            return _data
 
     @classmethod
     def concat(cls, columns: Sequence[NumpyArrayColumn]):

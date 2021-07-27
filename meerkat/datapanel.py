@@ -74,11 +74,12 @@ class DataPanel(
 
     def __init__(
         self,
-        *args,
+        data: Union[dict, list, datasets.Dataset] = None,
         identifier: Identifier = None,
         column_names: List[str] = None,
         info: DatasetInfo = None,
         split: Optional[NamedSplit] = None,
+        *args,
         **kwargs,
     ):
         super(DataPanel, self).__init__(
@@ -95,11 +96,9 @@ class DataPanel(
         # Data is a dictionary of columns
         self._data = BlockManager()
 
-        # Single argument
-        if len(args) == 1:
+        if data is not None:
             assert column_names is None, "Don't pass in column_names."
             # The data is passed in
-            data = args[0]
 
             # `data` is a dictionary
             if isinstance(data, dict) and len(data):
@@ -121,8 +120,7 @@ class DataPanel(
                 self.data = self._create_columns(data[:])
                 info, split = data.info, data.split
 
-        # No argument
-        elif len(args) == 0:
+        else:
 
             # Use column_names to setup the data dictionary
             if column_names:

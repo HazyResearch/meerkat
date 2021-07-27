@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import MutableMapping
-from meerkat.mixins.blockable import BlockableMixin
-from meerkat.block.numpy_block import NumpyBlock
 from typing import Dict, Mapping, Sequence, Union
 
-from meerkat.columns.abstract import AbstractColumn
-from .ref import BlockRef
 import numpy as np
+
+from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.blockable import BlockableMixin
+
+from .abstract import BlockIndex
+from .ref import BlockRef
 
 
 class BlockManager(MutableMapping):
@@ -22,19 +24,11 @@ class BlockManager(MutableMapping):
         self._column_to_block_id: Dict[str, int] = {}
         self._block_refs: Dict[int, BlockRef] = {}
 
-    def add(self, block_ref: BlockRef):
+    def update(self, block_ref: BlockRef):
         """
-        Loop through all block instances, and check for a match.
-
-        If match, then insert into that block.
-        If not match, create a new block.
-
-        Args:
-            data (): a single blockable object, potentially contains multiple columns
+        data (): a single blockable object, potentially contains multiple columns
         """
-        self._columns.update(
-            {name: column for name, column in block_ref.items()}
-        )
+        self._columns.update({name: column for name, column in block_ref.items()})
 
         block_id = id(block_ref.block)
         # check if there already is a block_ref in the manager for this block
@@ -54,16 +48,24 @@ class BlockManager(MutableMapping):
         Returns:
             [type]: [description]
         """
-        mgr = BlockManager()
+        results = None
         for block_ref in self._block_refs.values():
-            new_block_ref = block_ref.apply(method_name=method_name, *args, **kwargs)
-            mgr.add(new_block_ref)
+            result = block_ref.apply(method_name=method_name, *args, **kwargs)
+            if results is None:
+                results = BlockManager() if isinstance(result, BlockRef) else {}
+            results.update(result)
 
         # apply method to columns not stored in block
         for name, col in self._columns.items():
-            if name not in mgr:
-                mgr[name] = getattr(col, method_name)(*args, **kwargs)
-        return mgr
+            if name in results:
+                continue
+            result = getattr(col, method_name)(*args, **kwargs)
+            if results is None:
+                results = BlockManager() if isinstance(result, AbstractColumn) else {}
+
+            results[name] = result
+
+        return results
 
     def consolidate(self):
         block_ref_groups = defaultdict(list)
@@ -72,26 +74,16 @@ class BlockManager(MutableMapping):
 
         for block_refs in block_ref_groups.values():
             if len(block_refs) == 0:
-                continue 
+                continue
 
-            # remove old block_refs 
+            # remove old block_refs
             for old_ref in block_refs:
                 del self._block_refs[id(old_ref.block)]
 
-            # consolidate group 
+            # consolidate group
             block_class = block_refs[0].block.__class__
-            block_indices = [ref.block_indices for ref in block_refs]
-            blocks = [ref.block for ref in block_refs]
-            block, block_indices = block_class.consolidate(blocks, block_indices)
-            
-            # create columns 
-            columns = {}
-            for name, block_index in block_indices.items():
-                col = self._columns[name]._clone(data=block[block_index])
-                col._block = block 
-                col._block_index = block_index
-                columns[name] = col
-            self.add(BlockRef(columns=columns, block=block))
+            block_ref = block_class.consolidate(block_refs)
+            self.update(block_ref)
 
     def remove(self, name):
         if name not in self._columns:
@@ -103,7 +95,7 @@ class BlockManager(MutableMapping):
         column_spec.remove(name)
         if len(column_spec) == 0:
             del column_spec
-    
+
     @property
     def block_indices(self) -> Mapping[str, BlockIndex]:
         return {name: col.index for name, col in self._columns}
@@ -115,7 +107,12 @@ class BlockManager(MutableMapping):
             pass
 
     def __setitem__(self, index, data: Union[str, Sequence[str]]):
-        self.add(column_spec=BlockRef.infer(data, index))
+        if isinstance(data, AbstractColumn):
+            self.add_column(data, name=index)
+        else:
+            raise ValueError(
+                f"Can't set item with object of type {type(data)} on BlockManager."
+            )
 
     def __delitem__(self, key):
         self.remove(key)
@@ -139,27 +136,19 @@ class BlockManager(MutableMapping):
         else:
             if col._block is None:
                 block, block_index = col.block_class.from_data(col.data)
-                # TODO: need to be able to set block on clone 
+                # TODO: need to be able to set block on clone
                 col._clone(data=block[block_index])
-                col._block = block 
+                col._block = block
                 col._block_index = block_index
             else:
                 # TODO: this should be a view and the _block should get carried
-                col = col#.view()
-            self.add(BlockRef(columns={name: col}, block=col._block))
+                col = col  # .view()
+            self.update(BlockRef(columns={name: col}, block=col._block))
 
     @classmethod
-    def _infer_multiple(cls, data, names: Sequence[str] = None):
-        if isinstance(data, np.ndarray):
-            from .numpy_column import NumpyArrayColumn
-
-            return NumpyArrayColumn(data)
-
-    @classmethod
-    def _infer_single(cls, data, name: str = None) -> Union[AbstractColumn, BlockRef]:
-        col = AbstractColumn.from_data(data=data)
-
-        if isinstance(col, BlockableMixin):
-            return cls(names=[name], block=data.block, columns=[data])
-        else:
-            return col
+    def from_dict(cls, data):
+        mgr = cls()
+        for name, data in data.items():
+            col = AbstractColumn.from_data(data)
+            mgr.add_column(col=col, name=name)
+        return mgr

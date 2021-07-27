@@ -2,6 +2,9 @@ from typing import Any, Dict
 
 
 class CloneableMixin:
+    def __init__(self, *args, **kwargs):
+        super(CloneableMixin, self).__init__(*args, **kwargs)
+
     @classmethod
     def _state_keys(cls) -> set:
         """"""

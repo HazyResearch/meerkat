@@ -1,11 +1,16 @@
 from __future__ import annotations
-from meerkat.errors import ConsolidationError
+
+from typing import TYPE_CHECKING, Hashable, Mapping, Sequence, Tuple, Union
 
 import numpy as np
-from typing import Hashable, Mapping, Sequence, Tuple, Union
+
+from meerkat.errors import ConsolidationError
 
 # an index into a block that specifies where a column's data lives in the block
 BlockIndex = Union[int, slice, str]
+
+if TYPE_CHECKING:
+    from meerkat.block.ref import BlockRef
 
 
 class AbstractBlock:
@@ -25,31 +30,20 @@ class AbstractBlock:
 
     @classmethod
     def consolidate(
-        cls,
-        blocks: Sequence[AbstractBlock],
-        block_indices: Sequence[Mapping[str, BlockIndex]],
+        cls, block_refs: Sequence[BlockRef]
     ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
-        if len(blocks) != len(block_indices):
-            raise ConsolidationError(
-                "Number blocks and block_indices passed to consolidate must be equal."
-            )
+        if len(block_refs) == 0:
+            raise ConsolidationError("Must pass at least 1 BlockRef to consolidate.")
 
-        if len(blocks) == 0:
-            raise ConsolidationError("Must pass at least 1 block to consolidate.")
-        
-        if len({block.signature for block in blocks}) != 1:
+        if len({ref.block.signature for ref in block_refs}) != 1:
             raise ConsolidationError(
                 "Can only consolidate blocks with matching signatures."
             )
-        
-        return cls._consolidate(blocks=blocks, block_indices=block_indices)
+
+        return cls._consolidate(block_refs=block_refs)
 
     @classmethod
-    def _consolidate(
-        cls,
-        blocks: Sequence[AbstractBlock],
-        block_indices: Sequence[Mapping[str, BlockIndex]],
-    ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
+    def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
         raise NotImplementedError
 
     def _get():

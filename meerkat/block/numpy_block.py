@@ -1,10 +1,12 @@
 from __future__ import annotations
-from meerkat.errors import ConsolidationError
 
-from typing import Hashable, Mapping, Sequence, Tuple
 from dataclasses import dataclass
+from typing import Hashable, Mapping, Sequence, Tuple, Union
 
 import numpy as np
+
+from meerkat.block.ref import BlockRef
+from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex
 
@@ -34,7 +36,7 @@ class NumpyBlock(AbstractBlock):
             shape=self.data.shape[2:],
             dtype=self.data.dtype,
         )
-    
+
     def __getitem__(self, index: BlockIndex):
         return self.data[:, index]
 
@@ -65,32 +67,64 @@ class NumpyBlock(AbstractBlock):
     @classmethod
     def _consolidate(
         cls,
-        blocks: Sequence[NumpyBlock],
-        block_indices: Sequence[Mapping[str, BlockIndex]],
-    ) -> Tuple[NumpyBlock, Mapping[str, BlockIndex]]:
+        block_refs: Sequence[BlockRef],
+    ) -> BlockRef:
         offset = 0
         new_indices = {}
+        columns = {}
         to_concat = []
-        for block, curr_indices in zip(blocks, block_indices):
-            for name, index in curr_indices.items():
-                if isinstance(index, slice):
-                    block_view = block.data[:, index]
+        for block_ref in block_refs:
+            for name, col in block_ref.items():
+                # keep track of all the columns in the block_refs
+                if name in columns:
+                    raise ConsolidationError(
+                        "Cannot consolidate two block refs containing the same column."
+                    )
+                columns[name] = col
+
+                # add block and compute new indices
+                block_index = col._block_index
+                if isinstance(block_index, slice):
+                    block_view = col._block.data[:, block_index]
                     new_indices[name] = slice(
                         # need to update slice offset and remove step
                         offset,
                         block_view.shape[1] + offset,
                         1,
                     )
-                elif isinstance(index, int):
+                elif isinstance(block_index, int):
                     # keep block axis
-                    block_view = block.data[:, index : index + 1]
+                    block_view = col._block.data[:, block_index : block_index + 1]
                     new_indices[name] = offset
                 to_concat.append(block_view)
                 offset += block_view.shape[1]
-        block = np.concatenate(to_concat, axis=1)
-        return cls(block), new_indices
 
-    def _get(self, index, block_indices: Mapping[str, BlockIndex]):
+        block = cls(np.concatenate(to_concat, axis=1))
+
+        # create columns
+        new_columns = {}
+        for name, block_index in new_indices.items():
+            col = columns[name]._clone(data=block[block_index])
+            col._block = block
+            col._block_index = block_index
+            new_columns[name] = col
+        return BlockRef(block=block, columns=new_columns)
+
+    def _get(self, index, block_ref: BlockRef) -> Union[BlockRef, dict]:
+        # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]
+        if isinstance(index, int):
+            # if indexing a single row, we do not return a block manager, just a dict
+            return {
+                name: data[col._block_index] for name, col in block_ref.columns.items()
+            }
+        block = self.__class__(data)
+        columns = {}
+        for name, col in block_ref.columns.items():
+            # create a new col
+            new_col = col._clone(data=block[col._block_index])
+            new_col._block_index = col._block_index
+            new_col._block = block
+            columns[name] = new_col
         # note that the new block may share memory with the old block
-        return self.__class__(data), block_indices
+        return BlockRef(block=block, columns=columns)

@@ -131,6 +131,7 @@ class AbstractColumn(
             )
 
     def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
+        index = self._translate_index(index)
         if isinstance(index, int):
             if _data is None:
                 _data = self._get_cell(index, materialize=materialize)
@@ -165,11 +166,16 @@ class AbstractColumn(
     def __setitem__(self, index, value):
         self._set(index, value)
 
-    def _translate_index(self, index):
-        # `index` should return a single element
+    def _is_batch_index(self, index):
         # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
         # so we match this behavior
-        if isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1):
+        return not (
+            isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1)
+        )
+
+    def _translate_index(self, index):
+        # `index` should return a single element
+        if self._is_batch_index(index):
             return index
 
         # `index` should return a batch
@@ -305,7 +311,10 @@ class AbstractColumn(
         Returns:
             batches of data
         """
-        if self._get_batch.__func__ == AbstractColumn._get_batch:
+        if (
+            self._get_batch.__func__ == AbstractColumn._get_batch
+            and self._get.__func__ == AbstractColumn._get
+        ):
             return torch.utils.data.DataLoader(
                 self if materialize else self.lz,
                 batch_size=batch_size,
@@ -364,7 +373,8 @@ class AbstractColumn(
         """Convert data to a meerkat column using the appropriate Column
         type."""
         if isinstance(data, AbstractColumn):
-            return data.view()
+            # TODO: Need ton make this view but should decide where to do it exactly
+            return data  # .view()
 
         if isinstance(data, pd.Series):
             from .pandas_column import PandasSeriesColumn

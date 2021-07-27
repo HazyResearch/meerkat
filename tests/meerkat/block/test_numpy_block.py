@@ -1,7 +1,10 @@
-import pytest
-from meerkat.errors import ConsolidationError
-from meerkat.block.numpy_block import NumpyBlock
 import numpy as np
+import pytest
+
+from meerkat import NumpyArrayColumn
+from meerkat.block.numpy_block import NumpyBlock
+from meerkat.block.ref import BlockRef
+from meerkat.errors import ConsolidationError
 
 
 def test_signature_hash():
@@ -42,36 +45,57 @@ def test_consolidate_1(num_blocks):
     data = np.stack([np.arange(8)] * 12)
     blocks = [NumpyBlock(data.copy()) for _ in range(num_blocks)]
 
-    block_indices = [
-        {"0": 0, "2:5:1": slice(2, 5, 1)},
-        {"6": 6, "2:7:2": slice(2, 7, 2)},
-        {"2:7:2": slice(2, 7, 2), "1:8:1": slice(1, 8, 1)},
-    ][:num_blocks]
-
-    new_block, new_indices = NumpyBlock.consolidate(
-        blocks=blocks, block_indices=block_indices
-    )
-    for block, indices in zip(blocks, block_indices):
-        for name, index in indices.items():
-            assert (block.data[:, index] == new_block.data[:, new_indices[name]]).all()
+    slices = [
+        [0, slice(2, 5, 1)],
+        [6, slice(2, 7, 2)],
+        [slice(2, 7, 3), slice(1, 8, 1)],
+    ]
+    cols = [
+        {
+            str(slc): NumpyArrayColumn(
+                data=blocks[block_idx][slc], block=blocks[block_idx], block_index=slc
+            )
+            for slc in slices[block_idx]
+        }
+        for block_idx in range(num_blocks)
+    ]
+    block_refs = [
+        BlockRef(block=block, columns=cols) for block, cols in zip(blocks, cols)
+    ]
+    block_ref = NumpyBlock.consolidate(block_refs=block_refs)
+    for ref in block_refs:
+        block = ref.block
+        for name, col in ref.items():
+            assert (
+                block.data[:, col._block_index]
+                == block_ref.block.data[:, block_ref[name]._block_index]
+            ).all()
 
 
 def test_consolidate_empty():
     with pytest.raises(ConsolidationError):
-        NumpyBlock.consolidate([], [])
-
-
-def test_consolidate_inconsistent():
-    with pytest.raises(ConsolidationError):
-        NumpyBlock.consolidate([NumpyBlock(np.zeros((10, 10)))], [])
+        NumpyBlock.consolidate([])
 
 
 def test_consolidate_mismatched_signature():
+    data = np.stack([np.arange(8)] * 12)
+    blocks = [NumpyBlock(data.astype(int)), NumpyBlock(data.astype(float))]
+
+    slices = [
+        [0, slice(2, 5, 1)],
+        [6, slice(2, 7, 2)],
+    ]
+    cols = [
+        {
+            str(slc): NumpyArrayColumn(
+                data=blocks[block_idx][slc], block=blocks[block_idx], block_index=slc
+            )
+            for slc in slices[block_idx]
+        }
+        for block_idx in range(2)
+    ]
+    block_refs = [
+        BlockRef(block=block, columns=cols) for block, cols in zip(blocks, cols)
+    ]
     with pytest.raises(ConsolidationError):
-        NumpyBlock.consolidate(
-            [
-                NumpyBlock(np.zeros((10, 10), dtype=float)),
-                NumpyBlock(np.zeros((10, 10), dtype=int)),
-            ],
-            [{}, {}],
-        )
+        NumpyBlock.consolidate(block_refs)
