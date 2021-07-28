@@ -14,6 +14,8 @@ import yaml
 from torch.tensor import Tensor
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.tensor_block import TensorBlock
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
@@ -44,13 +46,21 @@ class TensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
     AbstractColumn,
 ):
+    block_class: type = TensorBlock
+
     def __init__(
         self,
         data: Sequence = None,
         *args,
         **kwargs,
     ):
-        if data is not None and not isinstance(data, TensorColumn):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, TensorBlock):
+                raise ValueError(
+                    "Cannot create `TensorColumn` from a `BlockView` not "
+                    "referencing a `TensorBlock`."
+                )
+        elif data is not None and not isinstance(data, TensorColumn):
             if (
                 isinstance(data, Sequence)
                 and len(data) > 0
@@ -163,7 +173,7 @@ class TensorColumn(
         state_path = os.path.join(path, "state.dill")
         if os.path.exists(state_path):
             state = dill.load(open(state_path, "rb"))
-            col.__dict__.update(state)
+            col._set_state(state)
         return col
 
     def write(self, path: str, **kwargs) -> None:
@@ -171,11 +181,9 @@ class TensorColumn(
         os.makedirs(path, exist_ok=True)
 
         # Get the column state
-        state = self.get_state()
-        _data = state["_data"]
+        state = self._get_state()
 
         # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
         metadata = {
             "dtype": type(self),
             "len": len(self),
@@ -188,7 +196,7 @@ class TensorColumn(
         data_path = os.path.join(path, "data.npy")
 
         # Saving all cell data in a single pickle file
-        np.save(data_path, _data)
+        np.save(data_path, self.data)
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))

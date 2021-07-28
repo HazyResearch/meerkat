@@ -18,7 +18,6 @@ from ...testbeds import MockImageColumn
 def get_dps(
     length1: int,
     length2: int,
-    use_visible_rows: bool = False,
     use_visible_columns: bool = False,
     include_image_column: bool = False,
     tmpdir: str = None,
@@ -47,34 +46,29 @@ def get_dps(
         img_col = MockImageColumn(length=length2, tmpdir=tmpdir).col
         batch2["img"] = img_col.lz[shuffle2]
 
-    visible_rows = [0, 4, 6, 11] if use_visible_rows else None
     visible_columns = ["a", "b", "c"] if use_visible_columns else None
 
     dps = []
     for batch, shuffle in [(batch1, shuffle1), (batch2, shuffle2)]:
         dp = DataPanel.from_batch(batch)
-        if use_visible_rows:
-            for column in dp.values():
-                column.visible_rows = visible_rows
 
         if use_visible_columns:
             dp.visible_columns = [c for c in visible_columns if c in dp.all_columns]
 
         dps.append(dp)
-    return dps[0], dps[1], visible_rows, visible_columns, shuffle1, shuffle2
+    return dps[0], dps[1], visible_columns, shuffle1, shuffle2
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,diff_length,sort",
-    product([True, False], [True, False], [True, False], [True, False]),
+    "use_visible_columns,diff_length,sort",
+    product([True, False], [True, False], [True, False]),
 )
-def test_merge_inner(use_visible_rows, use_visible_columns, diff_length, sort):
+def test_merge_inner(use_visible_columns, diff_length, sort):
     length1 = 16
     length2 = 12 if diff_length else 16
-    dp1, dp2, visible_rows, visible_columns, shuffle1, shuffle2 = get_dps(
+    dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
         length1=length1,
         length2=length2,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
     out = dp1.merge(
@@ -82,20 +76,14 @@ def test_merge_inner(use_visible_rows, use_visible_columns, diff_length, sort):
     )
 
     assert isinstance(out, DataPanel)
-    if use_visible_rows:
-        # need to compute how many shared rows there are between the two dps
-        expected_length = sum(
-            [row_idx in visible_rows for row_idx in shuffle2[visible_rows]]
-        )
-    else:
-        expected_length = min(length1, length2)
+    expected_length = min(length1, length2)
     assert len(out) == expected_length
 
     # check columns
     if use_visible_columns:
-        expected_columns = ["a", "index", "b_1", "b_2", "c"]
+        expected_columns = ["a", "b_1", "b_2", "c"]
     else:
-        expected_columns = ["a", "index", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
 
     # check sorted
     if sort:
@@ -109,31 +97,30 @@ def test_merge_inner(use_visible_rows, use_visible_columns, diff_length, sort):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,sort",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_columns,sort",
+    product([True, False], [True, False]),
 )
-def test_merge_outer(use_visible_rows, use_visible_columns, sort):
-    dp1, dp2, visible_rows, visible_columns, shuffle1, shuffle2 = get_dps(
+def test_merge_outer(use_visible_columns, sort):
+    dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
         length1=16,
         length2=12,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
     out = dp1.merge(
         dp2, on="a", how="outer", keep_indexes=False, suffixes=("_1", "_2"), sort=sort
     )
 
-    a1 = set(shuffle1[visible_rows]) if use_visible_rows else set(shuffle1)
-    a2 = set(shuffle2[visible_rows]) if use_visible_rows else set(shuffle2)
+    a1 = set(shuffle1)
+    a2 = set(shuffle2)
 
     assert isinstance(out, DataPanel)
     assert len(out) == len(a1 | a2)
 
     # check columns
     if use_visible_columns:
-        expected_columns = ["a", "index", "b_1", "b_2", "c"]
+        expected_columns = ["a", "b_1", "b_2", "c"]
     else:
-        expected_columns = ["a", "index", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
     assert set(out.columns) == set(expected_columns)
 
     # check sorted
@@ -163,31 +150,30 @@ def test_merge_outer(use_visible_rows, use_visible_columns, sort):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,sort",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_columns,sort",
+    product([True, False], [True, False]),
 )
-def test_merge_left(use_visible_rows, use_visible_columns, sort):
-    dp1, dp2, visible_rows, visible_columns, shuffle1, shuffle2 = get_dps(
+def test_merge_left(use_visible_columns, sort):
+    dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
         length1=16,
         length2=12,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
     out = dp1.merge(
         dp2, on="a", how="left", keep_indexes=False, suffixes=("_1", "_2"), sort=sort
     )
 
-    a1 = set(shuffle1[visible_rows]) if use_visible_rows else set(shuffle1)
-    a2 = set(shuffle2[visible_rows]) if use_visible_rows else set(shuffle2)
+    a1 = set(shuffle1)
+    a2 = set(shuffle2)
 
     assert isinstance(out, DataPanel)
     assert len(out) == len(a1)
 
     # check columns
     if use_visible_columns:
-        expected_columns = ["a", "index", "b_1", "b_2", "c"]
+        expected_columns = ["a", "b_1", "b_2", "c"]
     else:
-        expected_columns = ["a", "index", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
     assert set(out.columns) == set(expected_columns)
 
     # check sorted
@@ -213,31 +199,30 @@ def test_merge_left(use_visible_rows, use_visible_columns, sort):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,sort",
-    product([True, False], [True, False], [True, False]),
+    "use_visible_columns,sort",
+    product([True, False], [True, False]),
 )
-def test_merge_right(use_visible_rows, use_visible_columns, sort):
-    dp1, dp2, visible_rows, visible_columns, shuffle1, shuffle2 = get_dps(
+def test_merge_right(use_visible_columns, sort):
+    dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
         length1=16,
         length2=12,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
     out = dp1.merge(
         dp2, on="a", how="right", keep_indexes=False, suffixes=("_1", "_2"), sort=sort
     )
 
-    a1 = set(shuffle1[visible_rows]) if use_visible_rows else set(shuffle1)
-    a2 = set(shuffle2[visible_rows]) if use_visible_rows else set(shuffle2)
+    a1 = set(shuffle1)
+    a2 = set(shuffle2)
 
     assert isinstance(out, DataPanel)
     assert len(out) == len(a2)
 
     # check columns
     if use_visible_columns:
-        expected_columns = ["a", "index", "b_1", "b_2", "c"]
+        expected_columns = ["a", "b_1", "b_2", "c"]
     else:
-        expected_columns = ["a", "index", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
     assert set(out.columns) == set(expected_columns)
 
     # check sorted

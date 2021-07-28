@@ -2,10 +2,10 @@ from itertools import product
 
 import numpy as np
 import pytest
+import torch
 
 import meerkat as mk
 from meerkat.block.manager import BlockManager
-from meerkat.errors import ConsolidationError
 
 
 def test_consolidate():
@@ -15,14 +15,32 @@ def test_consolidate():
     mgr.add_column(col1, "col1")
     col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
     mgr.add_column(col2, "col2")
+    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    mgr.add_column(col3, "col3")
+    col4 = mk.PandasSeriesColumn(np.arange(10) * 4)
+    mgr.add_column(col4, "col4")
+    col5 = mk.TensorColumn(torch.arange(10) * 5)
+    mgr.add_column(col5, "col5")
+    col6 = mk.TensorColumn(torch.arange(10) * 6)
+    mgr.add_column(col6, "col6")
 
-    assert len(mgr._block_refs) == 2
+    assert len(mgr._block_refs) == 6
     mgr.consolidate()
-    assert len(mgr._block_refs) == 1
+    assert len(mgr._block_refs) == 3
+
+    # check that the same object backs both the block and the column
+    for name, col in [("col1", col1), ("col2", col2)]:
+        assert mgr[name].data.base is mgr.get_block_ref(name).block.data
+        assert (mgr[name] == col).all()
+
+    # check that the same object backs both the block and the column
+    for name, col in [("col3", col3), ("col4", col4)]:
+        assert mgr[name].data is mgr.get_block_ref(name).block.data[name]
+        assert (mgr[name] == col).all()
 
     # check that the same object backs both the bock
-    for name, col in [("col1", col1), ("col2", col2)]:
-        assert mgr[name].data.base is list(mgr._block_refs.values())[0].block.data
+    for name, col in [("col5", col5), ("col6", col6)]:
+        # TODO (sabri): Figure out a way to check this for tensors
         assert (mgr[name] == col).all()
 
 
@@ -33,10 +51,12 @@ def test_consolidate_multiple_types():
         for idx in range(3):
             col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype))
             mgr.add_column(col, f"col{idx}_{dtype}")
+    mgr.add_column(mk.PandasSeriesColumn(np.arange(10) * 4), "col4_pandas")
+    mgr.add_column(mk.PandasSeriesColumn(np.arange(10) * 5), "col5_pandas")
 
-    assert len(mgr._block_refs) == 6
+    assert len(mgr._block_refs) == 8
     mgr.consolidate()
-    assert len(mgr._block_refs) == 2
+    assert len(mgr._block_refs) == 3
 
 
 @pytest.mark.parametrize(

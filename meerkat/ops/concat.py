@@ -60,7 +60,6 @@ def concat(
                 )
 
             columns = list(tz.concat((dp.visible_columns for dp in objs)))
-            columns.remove("index")  # need to remove index before checking distinct
             if not tz.isdistinct(columns):
                 raise ConcatError(
                     "Can only concatenate DataPanels along axis 1 (columns) if they "

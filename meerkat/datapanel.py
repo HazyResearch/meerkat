@@ -5,9 +5,8 @@ import logging
 import os
 import pathlib
 from contextlib import contextmanager
-from copy import copy, deepcopy
+from copy import copy
 from typing import (
-    Any,
     Callable,
     Dict,
     Iterable,
@@ -116,13 +115,16 @@ class DataPanel(
             elif isinstance(data, datasets.Dataset):
                 self.data = self._create_columns(data[:])
                 info, split = data.info, data.split
+            elif isinstance(data, BlockManager):
+                self.data = data
 
         else:
-
-            # Use column_names to setup the data dictionary
             if column_names:
+                # Use column_names to setup the manager
                 self._check_columns_unique(column_names)
                 self.data = {k: [] for k in column_names}
+            else:
+                self.data = {}
 
         # Setup the DatasetInfo
         info = info.copy() if info is not None else DatasetInfo()
@@ -605,6 +607,9 @@ class DataPanel(
         # Just return True if the dataset is empty
         return True
 
+    def consolidate(self):
+        self.data.consolidate()
+
     @classmethod
     def from_huggingface(cls, *args, **kwargs):
         """Load a Huggingface dataset as a DataPanel.
@@ -1074,55 +1079,43 @@ class DataPanel(
         )
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        dp = cls.__new__(cls)
+        dp._set_state(state)
 
         # Load the columns
-        if not metadata["write_together"]:
-            data = {
-                name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
-                for name, dtype in metadata["column_dtypes"].items()
-            }
-            state["_data"] = data
+        data = {
+            name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
+            for name, dtype in metadata["column_dtypes"].items()
+        }
+        dp._set_data(data)
 
-        # Create a DataPanel from the loaded state
-        datapanel = cls.from_state(state)
-
-        return datapanel
+        return dp
 
     def write(
         self,
         path: str,
-        write_together: bool = False,
     ) -> None:
         """Save a DataPanel to disk."""
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
         # Get the DataPanel state
-        state = self.get_state()
+        state = self._get_state()
 
         # Get the metadata
         metadata = {
             "dtype": type(self),
             "column_dtypes": {name: type(col) for name, col in self.data.items()},
             "len": len(self),
-            "write_together": write_together,
         }
 
-        if not write_together:
-            if "_data" not in state:
-                raise ValueError(
-                    "DataPanel's state must include `_data` when using "
-                    "`write_together=False`."
-                )
-            del state["_data"]
+        # Create a directory for the columns at `path`
+        columns_path = os.path.join(path, "columns")
+        os.makedirs(columns_path, exist_ok=True)
 
-            # Create a directory for the columns at `path`
-            columns_path = os.path.join(path, "columns")
-            os.makedirs(columns_path, exist_ok=True)
-
-            # Save each column in the DataPanel separately
-            for name, column in self.data.items():
-                column.write(os.path.join(columns_path, name))
+        # Save each column in the DataPanel separately
+        for name, column in self.data.items():
+            column.write(os.path.join(columns_path, name))
 
         # Write the state
         state_path = os.path.join(path, "state.dill")

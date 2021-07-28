@@ -4,10 +4,7 @@ from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, Mapping, Sequence, Union
 
-import numpy as np
-
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.blockable import BlockableMixin
 
 from .abstract import BlockIndex
 from .ref import BlockRef
@@ -60,9 +57,11 @@ class BlockManager(MutableMapping):
 
         # apply method to columns not stored in block
         for name, col in self._columns.items():
-            if name in results:
+            if results is not None and name in results:
                 continue
+
             result = getattr(col, method_name)(*args, **kwargs)
+
             if results is None:
                 results = BlockManager() if isinstance(result, AbstractColumn) else {}
 
@@ -156,6 +155,9 @@ class BlockManager(MutableMapping):
 
     def __iter__(self):
         return iter(self._columns)
+
+    def get_block_ref(self, name: str):
+        return self._block_refs[self._column_to_block_id[name]]
 
     def add_column(self, col: AbstractColumn, name: str):
         """Convert data to a meerkat column using the appropriate Column

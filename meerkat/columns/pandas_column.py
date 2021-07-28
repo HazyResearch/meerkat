@@ -31,6 +31,8 @@ from pandas.core.indexes.accessors import (
 from pandas.core.strings.accessor import StringMethods
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
 
@@ -126,6 +128,8 @@ class PandasSeriesColumn(
     AbstractColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
+    block_class: type = PandasBlock
+
     def __init__(
         self,
         data: Sequence = None,
@@ -133,7 +137,13 @@ class PandasSeriesColumn(
         *args,
         **kwargs,
     ):
-        if isinstance(data, pd.Series):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, PandasBlock):
+                raise ValueError(
+                    "Cannot create `PandasSeriesColumn` from a `BlockView` not "
+                    "referencing a `PandasBlock`."
+                )
+        elif isinstance(data, pd.Series):
             data = data if dtype is None else data.astype(dtype)
         elif data is not None:
             data = pd.Series(data, dtype=dtype)
@@ -253,7 +263,7 @@ class PandasSeriesColumn(
         state_path = os.path.join(path, "state.dill")
         if os.path.exists(state_path):
             state = dill.load(open(state_path, "rb"))
-            col.__dict__.update(state)
+            col._set_state(state)
         return col
 
     def write(self, path: str, **kwargs) -> None:
@@ -261,11 +271,9 @@ class PandasSeriesColumn(
         os.makedirs(path, exist_ok=True)
 
         # Get the column state
-        state = self.get_state()
-        _data = state["_data"]
+        state = self._get_state()
 
         # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
         metadata = {
             "dtype": type(self),
             "len": len(self),
@@ -278,7 +286,7 @@ class PandasSeriesColumn(
         data_path = os.path.join(path, "data.pd")
 
         # Saving all cell data in a single pickle file
-        _data.to_pickle(data_path)
+        self.data.to_pickle(data_path)
 
         # Saving the metadata as a yaml
         yaml.dump(metadata, open(metadata_path, "w"))

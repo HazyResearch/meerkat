@@ -61,68 +61,35 @@ class ColumnStorageMixin:
     def write(
         self,
         path: str,
-        write_together: bool = None,
     ) -> None:
         assert hasattr(self, "_data"), f"{self.__class__.__name__} requires `self.data`"
-
-        # If unspecified, use the column's property to decide whether to write together
-        if write_together is None:
-            write_together = self.write_together
 
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
         # Get the column state
-        state = self.get_state()
+        state = self._get_state()
 
         metadata = {
             "dtype": type(self),
             "len": len(self),
-            "write_together": write_together,
             **self.metadata,
         }
-
-        if not write_together:
-            metadata["data_dtypes"] = (list(map(type, self.data)),)
-
-            # if writing separately, remove "_data" from the dict
-            if "_data" not in state:
-                raise ValueError(
-                    "Column's state must include `_data` when using "
-                    "`write_together=False`."
-                )
-            del state["_data"]
-            state_path = os.path.join(path, "state.dill")
-            dill.dump(state, open(state_path, "wb"))
-
-            # lazy import to avoid circular dependencies
-            from meerkat.cells.abstract import AbstractCell
-
-            # Save all the elements of the column separately
-            data_paths = []
-            for index, element in enumerate(self.data):
-                data_path = os.path.join(path, str(index))
-                if isinstance(element, AbstractCell):
-                    # Element has its own `write` method
-                    element.write(data_path)
-                else:
-                    # No `write` method: default to writing with dill
-                    dill.dump(element, open(data_path, "wb"))
-                data_paths.append(data_path)
-
-            # Store all the data paths in the metadata dict
-            metadata["data_paths"] = data_paths
 
         # Write the state
         state_path = os.path.join(path, "state.dill")
         dill.dump(state, open(state_path, "wb"))
+
+        # Write the data
+        data_path = os.path.join(path, "data.dill")
+        dill.dump(self.data, open(data_path, "wb"))
 
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
         yaml.dump(metadata, open(metadata_path, "w"))
 
     @classmethod
-    def read(cls, path: str, *args, **kwargs) -> object:
+    def read(cls, path: str) -> object:
         # Assert that the path exists
         assert os.path.exists(path), f"`path` {path} does not exist."
 
@@ -136,23 +103,14 @@ class ColumnStorageMixin:
 
         # Load states
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
-        if not metadata["write_together"]:
-            # lazy import to avoid circular dependencies
-            from meerkat.cells.abstract import AbstractCell
+        # Load states
+        data = dill.load(open(os.path.join(path, "data.dill"), "rb"))
 
-            # Each element of the data is written to individual paths
-            data = [
-                # `dtype` implements `read`, run it to read back the element instance
-                dtype.read(path, *args, **kwargs) if issubclass(dtype, AbstractCell)
-                # `dtype` doesn't implement `read`, just load with dill directly
-                else dill.load(open(path, "rb"))
-                for dtype, path in zip(metadata["data_dtypes"], metadata["data_paths"])
-            ]
+        col = metadata["dtype"].__new__(metadata["dtype"])
+        col._set_state(state)
+        col._set_data(data)
 
-            # Load in the column from the state
-            state["_data"] = data
-
-        return cls.from_state(state, *args, **kwargs)
+        return col
 
     @classmethod
     def read_metadata(cls, path: str) -> dict:

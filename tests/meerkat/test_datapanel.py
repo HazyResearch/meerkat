@@ -545,17 +545,14 @@ def test_filter_2(use_visible_columns, batched):
     assert result.visible_columns == dp.visible_columns
 
 
-@pytest.mark.parametrize(
-    "write_together, use_visible_columns",
-    product([True, False], [True, False]),
-)
-def test_io(tmp_path, write_together, use_visible_columns):
+@pytest.mark.parametrize("use_visible_columns", [True, False])
+def test_io(tmp_path, use_visible_columns):
     """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_columns=use_visible_columns
     )
     path = os.path.join(tmp_path, "test")
-    dp.write(path, write_together=write_together)
+    dp.write(path)
 
     new_dp = DataPanel.read(path)
 

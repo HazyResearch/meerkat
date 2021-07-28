@@ -46,4 +46,4 @@ class BlockRef(Mapping):
                 "Can only update BlockRef with another BlockRef pointing "
                 "to the same block."
             )
-        self._columns.update(block_ref._columns)
+        self.columns.update(block_ref.columns)
