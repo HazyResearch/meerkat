@@ -1,4 +1,4 @@
-from meerkat.block.abstract import AbstractBlock, BlockIndex, BlockView
+from meerkat.block.abstract import BlockView
 
 
 class BlockableMixin:

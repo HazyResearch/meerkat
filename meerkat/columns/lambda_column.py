@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Collection, Mapping, Optional, Sequence, Union
+from typing import Collection, Mapping, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,6 @@ import pandas as pd
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
-from meerkat.mixins.cloneable import CloneableMixin
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Hashable, Mapping, Sequence, Tuple, Union
 
-import numpy as np
-
 from meerkat.errors import ConsolidationError
 
 # an index into a block that specifies where a column's data lives in the block
@@ -25,7 +23,7 @@ class AbstractBlock:
     def __init__(self, *args, **kwargs):
         super(AbstractBlock, self).__init__(*args, **kwargs)
 
-    def __getitem__(self, index: BlockIndex) -> Blockview:
+    def __getitem__(self, index: BlockIndex) -> BlockView:
         return BlockView(data=self._get_data(index), block_index=index, block=self)
 
     def _get_data(self, index: BlockIndex) -> object:

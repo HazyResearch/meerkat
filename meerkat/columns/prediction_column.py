@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,6 @@ import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.mixins.cloneable import CloneableMixin
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 

@@ -5,8 +5,6 @@ from tqdm.auto import tqdm
 
 from meerkat.provenance import capture_provenance
 
-from .cloneable import CloneableMixin
-
 logger = logging.getLogger(__name__)
 
 
