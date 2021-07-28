@@ -11,10 +11,7 @@ from .ref import BlockRef
 
 
 class BlockManager(MutableMapping):
-    """
-
-    This manager manages all blocks.
-    """
+    """This manager manages all blocks."""
 
     def __init__(self) -> None:
         self._columns: Dict[str, AbstractColumn] = {}
@@ -22,9 +19,8 @@ class BlockManager(MutableMapping):
         self._block_refs: Dict[int, BlockRef] = {}
 
     def update(self, block_ref: BlockRef):
-        """
-        data (): a single blockable object, potentially contains multiple columns
-        """
+        """data (): a single blockable object, potentially contains multiple
+        columns."""
         # can't have the same column living in multiple managers, so we view
         self._columns.update(
             {name: column.view() for name, column in block_ref.items()}
