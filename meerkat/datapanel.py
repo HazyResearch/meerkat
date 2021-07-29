@@ -154,6 +154,11 @@ class DataPanel(
         return new_data
 
     def _repr_pandas_(self):
+        return self.data._repr_pandas_()[self.column_names].rename(
+            columns={k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
+        )
+
+    def old_repr(self):
         return pd.DataFrame(
             {
                 f"{k} ({v.__class__.__name__})": v._repr_pandas_()

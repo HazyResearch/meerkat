@@ -5,6 +5,7 @@ from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, Sequence, Union
 
+import pandas as pd
 import yaml
 
 from meerkat.block.abstract import AbstractBlock
@@ -232,11 +233,6 @@ class BlockManager(MutableMapping):
             yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
         )
 
-        if meta["dtype"] is not cls:
-            raise ValueError(
-                "`path` passed to `read` does not point to a saved `BlockManager`."
-            )
-
         blocks = {}
         mgr = cls()
         for name, col_meta in meta["columns"].items():
@@ -248,9 +244,11 @@ class BlockManager(MutableMapping):
             if "block" in col_meta:
                 # read block or fetch it from `blocks` if it's already been read
                 block_meta = col_meta["block"]
-                block = blocks.setdefault(
-                    block_meta["block_dir"], AbstractBlock.read(block_meta["block_dir"])
-                )
+                if block_meta["block_dir"] not in blocks:
+                    blocks[block_meta["block_dir"]] = AbstractBlock.read(
+                        block_meta["block_dir"]
+                    )
+                block = blocks[block_meta["block_dir"]]
 
                 # read column, passing in a block_view
                 col = col_meta["dtype"].read(
@@ -265,3 +263,13 @@ class BlockManager(MutableMapping):
                 )
 
         return mgr
+
+    def _repr_pandas_(self):
+        dfs = []
+        cols = set(self._columns.keys())
+        for _, block_ref in self._block_refs.items():
+            if hasattr(block_ref.block, "_repr_pandas_"):
+                dfs.append(block_ref.block._repr_pandas_(block_ref))
+                cols -= set(block_ref.keys())
+        dfs.append(pd.DataFrame({k: self[k]._repr_pandas_() for k in cols}))
+        return pd.concat(objs=dfs, axis=1)

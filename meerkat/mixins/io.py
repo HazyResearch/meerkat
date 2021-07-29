@@ -105,11 +105,12 @@ class ColumnIOMixin:
             else _meta
         )
 
+        col_type = meta["dtype"]
         # Load states
-        state = cls._read_state(path)
-        data = cls._read_data(path, *args, **kwargs) if _data is None else _data
+        state = col_type._read_state(path)
+        data = col_type._read_data(path, *args, **kwargs) if _data is None else _data
 
-        col = meta["dtype"].__new__(meta["dtype"])
+        col = col_type.__new__(col_type)
         col._set_state(state)
         col._set_data(data)
 

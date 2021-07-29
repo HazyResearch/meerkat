@@ -3,10 +3,12 @@ from __future__ import annotations
 import logging
 from typing import Collection, Sequence
 
+import pandas as pd
+
 from meerkat.cells.imagepath import ImagePath
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 folder = LazyLoader("torchvision.datasets.folder")
@@ -24,7 +26,7 @@ class ImageColumn(LambdaColumn):
         **kwargs,
     ):
         super(ImageColumn, self).__init__(
-            NumpyArrayColumn.from_data(data), *args, **kwargs
+            PandasSeriesColumn.from_data(data), *args, **kwargs
         )
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
@@ -60,15 +62,8 @@ class ImageColumn(LambdaColumn):
     def _state_keys(cls) -> Collection:
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
 
-    def _clone_kwargs(self):
-        default_kwargs = super()._clone_kwargs()
-        default_kwargs.update(
-            {
-                "loader": self.loader,
-                "transform": self.transform,
-            }
-        )
-        return default_kwargs
+    def _repr_pandas_(self) -> pd.Series:
+        return "ImageCell(" + self.data.data + ")"
 
 
 class ImageCellColumn(CellColumn):

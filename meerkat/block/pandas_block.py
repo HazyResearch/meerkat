@@ -98,3 +98,8 @@ class PandasBlock(AbstractBlock):
     @staticmethod
     def _read_data(path: str):
         return pd.read_feather(os.path.join(path, "data.feather"))
+
+    def _repr_pandas_(self, block_ref: BlockRef):
+        return self.data[block_ref.keys()].rename(
+            columns={col._block_index: name for name, col in block_ref.items()}
+        )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Collection, Mapping, Sequence, Union
 
 import numpy as np
@@ -48,7 +49,7 @@ class LambdaColumn(AbstractColumn):
         fn: callable = None,
         output_type: type = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super(LambdaColumn, self).__init__(data.view(), *args, **kwargs)
         if fn is not None:
@@ -112,10 +113,20 @@ class LambdaColumn(AbstractColumn):
     def _clone_kwargs(self):
         return {"fn": self.fn, "data": self._data}
 
-    def _repr_pandas_(
-        self,
-    ) -> pd.Series:
-        return pd.Series([self.fn.__repr__] * len(self))
+    def _repr_pandas_(self) -> pd.Series:
+        cell_repr = self._repr_cell_()
+        if len(self) <= pd.options.display.max_rows:
+            return pd.Series([cell_repr] * len(self))
+        else:
+            # faster than creating a full pandas series
+            series = pd.Series(np.empty(len(self)), copy=False)
+            series.iloc[: pd.options.display.min_rows] = cell_repr
+            series.iloc[-pd.options.display.min_rows :] = cell_repr
+            return series
+
+    def _repr_cell_(self):
+        name = getattr(self.fn, "__qualname__", repr(self.fn))
+        return f"LambdaCell(fn={name})"
 
     @classmethod
     def _state_keys(cls) -> Collection:
@@ -123,6 +134,14 @@ class LambdaColumn(AbstractColumn):
 
     @staticmethod
     def concat(columns: Sequence[LambdaColumn]):
-
         # TODO: raise a warning if the functions don't match
         return columns[0]._clone(columns[0]._data.concat([c._data for c in columns]))
+
+    def _write_data(self, path):
+        # TODO (Sabri): avoid redundant writes in dataframes
+        return self.data.write(os.path.join(path, "data"))
+
+    @staticmethod
+    def _read_data(path: str):
+        # TODO (Sabri): make this work for dataframes underlying the lambda column
+        return AbstractColumn.read(os.path.join(path, "data"))
