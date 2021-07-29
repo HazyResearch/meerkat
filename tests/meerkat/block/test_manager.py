@@ -189,7 +189,7 @@ def test_getitem():
     # check that manager holds view of original column, but returns a coreference
     assert mgr["a"].data is out["a"].data
     assert mgr["a"] is not out["a"]
-    assert out["a"] is out["a"].data
+    assert out["a"] is out["a"]
 
     with pytest.raises(ValueError, match="`BlockManager` does not contain column 'c'."):
         mgr[["a", "c"]]
