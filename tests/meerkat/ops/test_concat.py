@@ -86,6 +86,20 @@ def test_concat_different_type():
         concat([a, b])
 
 
+def test_concat_unsupported_type():
+    a = [1, 2, 3]
+    b = [4, 5, 6]
+    with pytest.raises(ConcatError):
+        concat([a, b])
+
+
+def test_concat_unsupported_axis():
+    a = DataPanel.from_batch({"a": [1, 2, 3]})
+    b = DataPanel.from_batch({"b": [1, 2, 3]})
+    with pytest.raises(ConcatError):
+        concat([a, b], axis="abc")
+
+
 def test_concat_different_column_names():
     a = DataPanel.from_batch({"a": [1, 2, 3]})
     b = DataPanel.from_batch({"b": [1, 2, 3]})

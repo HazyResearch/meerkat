@@ -1,4 +1,15 @@
+from dataclasses import dataclass
+
 from meerkat.mixins.blockable import BlockableMixin
+
+
+@dataclass
+class StateClass:
+    """An internal class to store the state of an object alongside its
+    associated class."""
+
+    klass: type
+    state: object
 
 
 class CloneableMixin:

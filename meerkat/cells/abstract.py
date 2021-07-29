@@ -4,13 +4,12 @@ import abc
 
 from yaml.representer import Representer
 
-from meerkat.mixins.state import StateDictMixin
 from meerkat.mixins.storage import CellStorageMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 
-class AbstractCell(CellStorageMixin, StateDictMixin, abc.ABC):
+class AbstractCell(CellStorageMixin, abc.ABC):
     def __init__(self, *args, **kwargs):
         super(AbstractCell, self).__init__(*args, **kwargs)
 
@@ -45,3 +44,6 @@ class AbstractCell(CellStorageMixin, StateDictMixin, abc.ABC):
 
     def __repr__(self):
         return f"{self.__class__.__name__}"
+
+    def __eq__(self, other):
+        raise NotImplementedError

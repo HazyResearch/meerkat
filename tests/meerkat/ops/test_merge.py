@@ -59,6 +59,20 @@ def get_dps(
     return dps[0], dps[1], visible_columns, shuffle1, shuffle2
 
 
+def test_no_on():
+    length = 16
+    # check dictionary not hashable
+    dp1 = DataPanel.from_batch(
+        {
+            "a": ListColumn([{"a": 1}] * length),
+            "b": list(np.arange(length)),
+        }
+    )
+    dp2 = dp1.copy()
+    with pytest.raises(MergeError):
+        dp1.merge(dp2)
+
+
 @pytest.mark.parametrize(
     "use_visible_columns,diff_length,sort",
     product([True, False], [True, False], [True, False]),
@@ -351,3 +365,26 @@ def test_check_merge_columns():
     dp2 = dp1.copy()
     with pytest.raises(MergeError):
         dp1.merge(dp2, on="a")
+
+    # checks if Cells in cell columns are NOT hashable
+    dp1 = DataPanel.from_batch(
+        {
+            "a": ImageCellColumn.from_filepaths(["a"] * length),
+            "b": list(np.arange(length)),
+        }
+    )
+    dp2 = dp1.copy()
+    with pytest.raises(MergeError):
+        dp1.merge(dp2, on="a")
+
+    # checks that having a column called __right_indices__ raises a merge error
+    dp1 = DataPanel.from_batch(
+        {
+            "a": ListColumn(["hello"] + [{"a": 1}] * (length - 1)),
+            "b": list(np.arange(length)),
+            "__right_indices__": list(np.arange(length)),
+        }
+    )
+    dp2 = dp1.copy()
+    with pytest.raises(MergeError):
+        dp1.merge(dp2, on="__right_indices__")

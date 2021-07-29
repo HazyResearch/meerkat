@@ -35,12 +35,10 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
-from meerkat.mixins.copying import DataPanelCopyMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
-from meerkat.mixins.state import StateDictMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_fn
@@ -54,13 +52,11 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 class DataPanel(
     CloneableMixin,
-    DataPanelCopyMixin,
     FunctionInspectorMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
-    StateDictMixin,
     DatasetInfoMixin,  # this should be the last in order of mixins
 ):
     """Meerkat DataPanel class."""

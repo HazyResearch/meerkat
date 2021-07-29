@@ -68,6 +68,8 @@ def concat(
 
             data = tz.merge(*(dict(dp.items()) for dp in objs))
             return objs[0].from_batch(data)
+        else:
+            raise ConcatError(f"Invalid axis `{axis}` passed to concat.")
     elif isinstance(objs[0], AbstractColumn):
         # use the concat method of the column
         return objs[0].concat(objs)

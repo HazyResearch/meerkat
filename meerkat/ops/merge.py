@@ -25,10 +25,11 @@ def merge(
     keep_indexes: bool = False,
 ):
     if how == "cross":
-        raise ValueError("DataPanel does not support cross merges.")
+        raise ValueError("DataPanel does not support cross merges.")  # pragma: no cover
 
     if (on is None) and (left_on is None) and (right_on is None):
-        raise ValueError("Merge expects either `on` or `left_on` and `right_on`")
+        raise MergeError("Merge expects either `on` or `left_on` and `right_on`")
+
     left_on = on if left_on is None else left_on
     right_on = on if right_on is None else right_on
     # cast `left_on` and `right_on` to lists
@@ -46,7 +47,7 @@ def merge(
     # (2) add index columns, which we'll use to reconstruct the columns we excluded from
     # the Pandas merge
     if ("__right_indices__" in right_df) or ("__left_indices__" in left_df):
-        raise ValueError(
+        raise MergeError(
             "The column names '__right_indices__' and '__left_indices__' cannot appear "
             "in the right and left panels respectively. They are used by merge."
         )
