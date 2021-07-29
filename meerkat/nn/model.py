@@ -2,9 +2,9 @@ from typing import Dict, List
 
 import torch
 
-from meerkat import DataPanel
-from meerkat.columns.prediction_column import ClassificationOutputColumn
-from meerkat.model.metrics import compute_metric
+from meerkat.datapanel import DataPanel
+from meerkat.nn.metrics import compute_metric
+from meerkat.nn.prediction_column import ClassificationOutputColumn
 
 
 # TODO(Priya): Move some general functions here
