@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
@@ -90,3 +91,10 @@ class PandasBlock(AbstractBlock):
         }
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
+
+    def _write_data(self, path: str):
+        self.data.to_feather(os.path.join(path, "data.feather"))
+
+    @staticmethod
+    def _read_data(path: str):
+        return pd.read_feather(os.path.join(path, "data.feather"))

@@ -114,3 +114,13 @@ def test_consolidate_mismatched_signature():
     ]
     with pytest.raises(ConsolidationError):
         TensorBlock.consolidate(block_refs)
+
+
+def test_io(tmpdir):
+    torch.manual_seed(123)
+    block = TensorBlock(torch.randn(100, 10))
+    block.write(tmpdir)
+    new_block = TensorBlock.read(tmpdir)
+
+    assert isinstance(block, TensorBlock)
+    assert (block.data == new_block.data).all()

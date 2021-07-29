@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
@@ -128,3 +129,10 @@ class TensorBlock(AbstractBlock):
         }
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
+
+    def _write_data(self, path: str):
+        torch.save(self.data, os.path.join(path, "data.pt"))
+
+    @staticmethod
+    def _read_data(path: str):
+        return torch.load(os.path.join(path, "data.pt"))

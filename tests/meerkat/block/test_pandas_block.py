@@ -89,3 +89,12 @@ def test_consolidate_mismatched_signature():
     ]
     with pytest.raises(ConsolidationError):
         PandasBlock.consolidate(block_refs)
+
+
+def test_io(tmpdir):
+    block = PandasBlock(pd.DataFrame({"a": [1, 2, 3], "b": ["4", "5", "6"]}))
+    block.write(tmpdir)
+    new_block = block.read(tmpdir)
+
+    assert isinstance(block, PandasBlock)
+    assert block.data.equals(new_block.data)

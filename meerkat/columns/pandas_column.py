@@ -7,11 +7,9 @@ import numbers
 import os
 from typing import Any, Callable, Sequence
 
-import dill
 import numpy as np
 import pandas as pd
 import torch
-import yaml
 from pandas.core.accessor import CachedAccessor
 from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.dtypes.common import (
@@ -237,60 +235,20 @@ class PandasSeriesColumn(
             return columns[0]._clone(data=data)
         return cls.from_array(data)
 
-    @classmethod
-    def read(
-        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> PandasSeriesColumn:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
+    def _write_data(self, path: str) -> None:
+        data_path = os.path.join(path, "data.pd")
+        self.data.to_pickle(data_path)
 
-        # Load in the metadata: only available if the array was stored by meerkat
-        metadata_path = os.path.join(path, "meta.yaml")
-        if os.path.exists(metadata_path):
-            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-            assert metadata["dtype"] == cls
-
-        # If the path doesn't exist, assume that `path` points to the `.npy` file
+    @staticmethod
+    def _read_data(
+        path: str,
+    ):
         data_path = os.path.join(path, "data.pd")
         if not os.path.exists(data_path):
             data_path = path
 
         # Load in the data
-        data = pd.read_pickle(data_path)
-
-        col = cls(data)
-
-        state_path = os.path.join(path, "state.dill")
-        if os.path.exists(state_path):
-            state = dill.load(open(state_path, "rb"))
-            col._set_state(state)
-        return col
-
-    def write(self, path: str, **kwargs) -> None:
-        # Make all the directories to the path
-        os.makedirs(path, exist_ok=True)
-
-        # Get the column state
-        state = self._get_state()
-
-        # Remove the data key and put the rest of `state` into a metadata dict
-        metadata = {
-            "dtype": type(self),
-            "len": len(self),
-            **self.metadata,
-        }
-
-        # Get the paths where metadata and data should be stored
-        metadata_path = os.path.join(path, "meta.yaml")
-        state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.pd")
-
-        # Saving all cell data in a single pickle file
-        self.data.to_pickle(data_path)
-
-        # Saving the metadata as a yaml
-        yaml.dump(metadata, open(metadata_path, "w"))
-        dill.dump(state, open(state_path, "wb"))
+        return pd.read_pickle(data_path)
 
     def _repr_pandas_(self) -> pd.Series:
         return self.data

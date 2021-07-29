@@ -7,11 +7,9 @@ import numbers
 import os
 from typing import Callable, Sequence
 
-import dill
 import numpy as np
 import pandas as pd
 import torch
-import yaml
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
@@ -119,6 +117,30 @@ class NumpyArrayColumn(
         else:
             return _data
 
+    def _copy_data(self) -> object:
+        return self._data.copy()
+
+    def _view_data(self) -> object:
+        return self._data
+
+    def _write_data(self, path: str) -> None:
+        # Saving all cell data in a single pickle file
+        np.save(os.path.join(path, "data.npy"), self.data)
+
+    @staticmethod
+    def _read_data(
+        path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
+    ) -> NumpyArrayColumn:
+        data_path = os.path.join(path, "data.npy")
+        # Load in the data
+        if mmap:
+            # assert dtype is not None and shape is not None
+            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
+            # data = np.load(data_path, mmap_mode="r")
+        else:
+            data = np.load(data_path, allow_pickle=True)
+        return data
+
     @classmethod
     def concat(cls, columns: Sequence[NumpyArrayColumn]):
         data = np.concatenate([c.data for c in columns])
@@ -134,66 +156,6 @@ class NumpyArrayColumn(
             return NumpyMemmapWriter()
         else:
             return ConcatWriter(template=template, output_type=NumpyArrayColumn)
-
-    @classmethod
-    def read(
-        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> NumpyArrayColumn:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
-        # Load in the metadata: only available if the array was stored by meerkat
-        metadata_path = os.path.join(path, "meta.yaml")
-        if os.path.exists(metadata_path):
-            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-            assert metadata["dtype"] == cls
-
-        # If the path doesn't exist, assume that `path` points to the `.npy` file
-        data_path = os.path.join(path, "data.npy")
-        if not os.path.exists(data_path):
-            data_path = path
-
-        # Load in the data
-        if mmap:
-            # assert dtype is not None and shape is not None
-            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            # data = np.load(data_path, mmap_mode="r")
-        else:
-            data = np.load(data_path, allow_pickle=True)
-
-        col = cls(data)
-
-        state_path = os.path.join(path, "state.dill")
-        if os.path.exists(state_path):
-            state = dill.load(open(state_path, "rb"))
-            col._set_state(state)
-        return col
-
-    def write(self, path: str, **kwargs) -> None:
-        # Make all the directories to the path
-        os.makedirs(path, exist_ok=True)
-
-        # Get the column state
-        state = self._get_state()
-
-        # Remove the data key and put the rest of `state` into a metadata dict
-        metadata = {
-            "dtype": type(self),
-            "len": len(self),
-            **self.metadata,
-        }
-
-        # Get the paths where metadata and data should be stored
-        metadata_path = os.path.join(path, "meta.yaml")
-        state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.npy")
-
-        # Saving all cell data in a single pickle file
-        np.save(data_path, self.data)
-
-        # Saving the metadata as a yaml
-        yaml.dump(metadata, open(metadata_path, "w"))
-        dill.dump(state, open(state_path, "wb"))
 
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:
@@ -213,9 +175,3 @@ class NumpyArrayColumn(
         else:
             # can only create a 1-D series
             return super().to_pandas()
-
-    def _copy_data(self) -> object:
-        return self._data.copy()
-
-    def _view_data(self) -> object:
-        return self._data

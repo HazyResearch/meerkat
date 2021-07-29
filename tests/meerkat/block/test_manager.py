@@ -241,3 +241,35 @@ def test_len(num_blocks, consolidated):
         mgr.consolidate()
 
     assert len(mgr) == num_blocks * 2
+
+
+def test_io(tmpdir):
+    mgr = BlockManager()
+
+    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    mgr.add_column(col1, "col1")
+    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    mgr.add_column(col2, "col2")
+    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    mgr.add_column(col3, "col3")
+    col4 = mk.PandasSeriesColumn(np.arange(10) * 4)
+    mgr.add_column(col4, "col4")
+    col5 = mk.TensorColumn(torch.arange(10) * 5)
+    mgr.add_column(col5, "col5")
+    col6 = mk.TensorColumn(torch.arange(10) * 6)
+    mgr.add_column(col6, "col6")
+    col7 = mk.ListColumn(list(range(10)))
+    mgr.add_column(col7, "col7")
+    col8 = mk.ListColumn(list(range(10)))
+    mgr.add_column(col8, "col8")
+
+    assert len(mgr._block_refs) == 6
+    mgr.write(tmpdir)
+    new_mgr = BlockManager.read(tmpdir)
+    assert len(new_mgr._block_refs) == 3
+
+    for idx in range(1, 7):
+        assert (mgr[f"col{idx}"] == new_mgr[f"col{idx}"]).all()
+
+    for idx in range(7, 8):
+        assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data

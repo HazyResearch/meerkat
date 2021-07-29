@@ -108,3 +108,13 @@ def test_consolidate_mismatched_signature():
     ]
     with pytest.raises(ConsolidationError):
         NumpyBlock.consolidate(block_refs)
+
+
+def test_io(tmpdir):
+    np.random.seed(123)
+    block = NumpyBlock(np.random.randn(100, 10))
+    block.write(tmpdir)
+    new_block = NumpyBlock.read(tmpdir)
+
+    assert isinstance(block, NumpyBlock)
+    assert (block.data == new_block.data).all()

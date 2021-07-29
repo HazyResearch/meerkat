@@ -1032,11 +1032,17 @@ class DataPanel(
         dp = cls.__new__(cls)
         dp._set_state(state)
 
-        # Load the columns
-        data = {
-            name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
-            for name, dtype in metadata["column_dtypes"].items()
-        }
+        # Load the the manager
+        mgr_dir = os.path.join(path, "mgr")
+        if os.path.exists(mgr_dir):
+            data = BlockManager.read(mgr_dir)
+        else:
+            # backwards compatability to pre-manager datapanels
+            data = {
+                name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
+                for name, dtype in metadata["column_dtypes"].items()
+            }
+
         dp._set_data(data)
 
         return dp
@@ -1059,13 +1065,10 @@ class DataPanel(
             "len": len(self),
         }
 
-        # Create a directory for the columns at `path`
-        columns_path = os.path.join(path, "columns")
-        os.makedirs(columns_path, exist_ok=True)
-
-        # Save each column in the DataPanel separately
-        for name, column in self.data.items():
-            column.write(os.path.join(columns_path, name))
+        # write the block manager
+        mgr_dir = os.path.join(path, "mgr")
+        os.makedirs(mgr_dir, exist_ok=True)
+        self.data.write(mgr_dir)
 
         # Write the state
         state_path = os.path.join(path, "state.dill")

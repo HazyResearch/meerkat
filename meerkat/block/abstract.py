@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Hashable, Mapping, Sequence, Tuple, Union
+
+import yaml
 
 from meerkat.errors import ConsolidationError
 
@@ -60,3 +63,20 @@ class AbstractBlock:
 
     def _get(self, index, block_ref: BlockRef) -> Union[BlockRef, dict]:
         raise NotImplementedError
+
+    def write(self, path: str, *args, **kwargs):
+        os.makedirs(path, exist_ok=True)
+        self._write_data(path, *args, **kwargs)
+        metadata = {"klass": type(self)}
+        metadata_path = os.path.join(path, "meta.yaml")
+        yaml.dump(metadata, open(metadata_path, "w"))
+
+    @classmethod
+    def read(cls, path: str, *args, **kwargs):
+        assert os.path.exists(path), f"`path` {path} does not exist."
+        metadata_path = os.path.join(path, "meta.yaml")
+        metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
+
+        block_class = metadata["klass"]
+        data = block_class._read_data(path, *args, **kwargs)
+        return block_class(data)

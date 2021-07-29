@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import os
 from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, Sequence, Union
 
+import yaml
+
+from meerkat.block.abstract import AbstractBlock
 from meerkat.columns.abstract import AbstractColumn
 
 from .ref import BlockRef
@@ -169,4 +173,95 @@ class BlockManager(MutableMapping):
         for name, data in data.items():
             col = AbstractColumn.from_data(data)
             mgr.add_column(col=col, name=name)
+        return mgr
+
+    def write(self, path: str):
+        meta = {"dtype": BlockManager, "columns": {}}
+
+        # prepare directories
+        os.makedirs(path, exist_ok=True)
+        block_dirs = os.path.join(path, "blocks")
+        os.makedirs(block_dirs)
+        columns_dir = os.path.join(path, "columns")
+        os.makedirs(columns_dir)
+
+        # consolidate before writing
+        self.consolidate()
+        for block_id, block_ref in self._block_refs.items():
+            block: AbstractBlock = block_ref.block
+            block_dir = os.path.join(block_dirs, str(block_id))
+            block.write(block_dir)
+
+            for name, column in block_ref.items():
+                column_dir = os.path.join(columns_dir, name)
+                os.makedirs(column_dir, exist_ok=True)
+
+                # don't write the data, reference the block
+                meta["columns"][name] = {
+                    **column._get_meta(),
+                    "block": {
+                        "block_dir": block_dir,
+                        "block_index": column._block_index,
+                    },
+                }
+                column._write_state(column_dir)
+
+        # write columns not in a block
+        for name, column in self._columns.items():
+            if name in meta["columns"]:
+                continue
+            meta["columns"][name] = column._get_meta()
+            column.write(os.path.join(columns_dir, name))
+
+        # Save the metadata as a yaml file
+        meta_path = os.path.join(path, "meta.yaml")
+        yaml.dump(meta, open(meta_path, "w"))
+
+    @classmethod
+    def read(
+        cls,
+        path: str,
+        columns: Sequence[str] = None,
+        *args,
+        **kwargs,
+    ) -> BlockManager:
+        """Load a DataPanel stored on disk."""
+
+        # Load the metadata
+        meta = dict(
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+        )
+
+        if meta["dtype"] is not cls:
+            raise ValueError(
+                "`path` passed to `read` does not point to a saved `BlockManager`."
+            )
+
+        blocks = {}
+        mgr = cls()
+        for name, col_meta in meta["columns"].items():
+            column_dir = os.path.join(path, "columns", name)
+            # load a subset of columns
+            if columns is not None and name not in columns:
+                continue
+
+            if "block" in col_meta:
+                # read block or fetch it from `blocks` if it's already been read
+                block_meta = col_meta["block"]
+                block = blocks.setdefault(
+                    block_meta["block_dir"], AbstractBlock.read(block_meta["block_dir"])
+                )
+
+                # read column, passing in a block_view
+                col = col_meta["dtype"].read(
+                    column_dir,
+                    _data=block[block_meta["block_index"]],
+                    _meta=col_meta,
+                )
+                mgr.add_column(col, name)
+            else:
+                mgr.add_column(
+                    col_meta["dtype"].read(path=column_dir, _meta=col_meta), name
+                )
+
         return mgr

@@ -15,10 +15,10 @@ from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
+from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
-from meerkat.mixins.storage import ColumnStorageMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
@@ -30,7 +30,7 @@ class AbstractColumn(
     BlockableMixin,
     CloneableMixin,
     CollateMixin,
-    ColumnStorageMixin,
+    ColumnIOMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
     LambdaMixin,
@@ -346,20 +346,6 @@ class AbstractColumn(
                 *args,
                 **kwargs,
             )
-        # if self.materialize:
-        #     return torch.utils.data.DataLoader(
-        #         self,
-        #         batch_size=batch_size,
-        #         collate_fn=self.collate if collate else lambda x: x,
-        #         drop_last=drop_last_batch,
-        #         *args,
-        #         **kwargs,
-        #     )
-        # else:
-        #     for i in range(0, len(self), batch_size):
-        #         if drop_last_batch and i + batch_size > len(self):
-        #             continue
-        #         yield self[i : i + batch_size]
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):

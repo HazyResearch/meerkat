@@ -4,12 +4,12 @@ import abc
 
 from yaml.representer import Representer
 
-from meerkat.mixins.storage import CellStorageMixin
+from meerkat.mixins.io import CellIOMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 
-class AbstractCell(CellStorageMixin, abc.ABC):
+class AbstractCell(CellIOMixin, abc.ABC):
     def __init__(self, *args, **kwargs):
         super(AbstractCell, self).__init__(*args, **kwargs)
 
