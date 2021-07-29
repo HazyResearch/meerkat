@@ -8,12 +8,12 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from meerkat.columns.prediction_column import (
+from meerkat.columns.tensor_column import TensorColumn
+from meerkat.datapanel import DataPanel
+from meerkat.nn.prediction_column import (
     ClassificationOutputColumn,
     _ClassifierOutputType,
 )
-from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
 from meerkat.tools.lazy_loader import LazyLoader
 
 cv2 = LazyLoader("cv2")

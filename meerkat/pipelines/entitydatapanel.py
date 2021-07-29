@@ -8,13 +8,8 @@ import datasets
 import numpy as np
 import torch
 
-from meerkat import (
-    DataPanel,
-    EmbeddingColumn,
-    ListColumn,
-    NumpyArrayColumn,
-    TensorColumn,
-)
+from meerkat import DataPanel, ListColumn, NumpyArrayColumn, TensorColumn
+from meerkat.nn import EmbeddingColumn
 from meerkat.tools.identifier import Identifier
 
 logger = logging.getLogger(__name__)
