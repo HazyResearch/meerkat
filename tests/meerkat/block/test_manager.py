@@ -138,23 +138,80 @@ def test_apply_get_single(num_blocks, consolidated):
                 assert result_dict[f"col{idx}_{dtype}"] == mgr[f"col{idx}_{dtype}"][slc]
 
 
-def test_remove():
+@pytest.mark.parametrize(
+    "consolidated",
+    [True, False],
+)
+def test_remove(consolidated):
     mgr = BlockManager()
     col = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(col, "a")
     col = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(col, "b")
 
+    if consolidated:
+        mgr.consolidate()
+
     assert len(mgr) == 2
+    assert len(mgr._block_refs) == 1 if consolidated else 2
     mgr.remove("a")
     assert len(mgr) == 1
     assert list(mgr.keys()) == ["b"]
+    assert len(mgr._block_refs) == 1
 
     with pytest.raises(
         expected_exception=ValueError,
         match="Remove failed: no column 'c' in BlockManager.",
     ):
         mgr.remove("c")
+
+
+def test_getitem():
+    mgr = BlockManager()
+    a = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(a, "a")
+    b = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(b, "b")
+
+    # check that manager holds view of original column, but returns a coreference
+    assert mgr["a"] is not a
+    assert mgr["a"] is mgr["a"]
+    assert mgr["a"].data is a.data
+
+    with pytest.raises(
+        ValueError,
+        match="Unsupported index of type `<class 'int'>` passed to `BlockManager`.",
+    ):
+        mgr[0]
+
+    out = mgr[["a", "b"]]
+    assert isinstance(out, BlockManager)
+    # check that manager holds view of original column, but returns a coreference
+    assert mgr["a"].data is out["a"].data
+    assert mgr["a"] is not out["a"]
+    assert out["a"] is out["a"].data
+
+    with pytest.raises(ValueError, match="`BlockManager` does not contain column 'c'."):
+        mgr[["a", "c"]]
+
+
+def test_setitem():
+    mgr = BlockManager()
+    a = mk.NumpyArrayColumn(np.arange(10))
+    mgr["a"] = a
+    b = mk.NumpyArrayColumn(np.arange(10)) * 2
+    mgr["b"] = b
+
+    # check that manager holds view of original column, but returns a coreference
+    assert mgr["a"] is not a
+    assert mgr["a"] is mgr["a"]
+    assert mgr["a"].data is a.data
+
+    with pytest.raises(
+        ValueError,
+        match="Cannot set item with object of type `<class 'int'>` on `BlockManager`.",
+    ):
+        mgr["a"] = 1
 
 
 def test_contains():

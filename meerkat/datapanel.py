@@ -43,7 +43,7 @@ from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.mixins.state import StateDictMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
-from meerkat.tools.utils import convert_to_batch_fn, recmerge
+from meerkat.tools.utils import convert_to_batch_fn
 
 logger = logging.getLogger(__name__)
 
@@ -329,46 +329,6 @@ class DataPanel(
         # All columns are visible
         self.visible_columns = self.all_columns
 
-    def _example_or_batch_to_batch(
-        self, example_or_batch: Union[Example, Batch]
-    ) -> Batch:
-
-        # Check if example_or_batch is a batch
-        is_batch = all(
-            [isinstance(v, List) for v in example_or_batch.values()]
-        ) and self._columns_all_equal_length(example_or_batch)
-
-        # Convert to a batch if not
-        if not is_batch:
-            batch = {k: [v] for k, v in example_or_batch.items()}
-        else:
-            batch = example_or_batch
-
-        return batch
-
-    @classmethod
-    def _merge_batch_and_output(cls, batch: Batch, output: Batch):
-        """Merge an output during .map() into a batch."""
-        combined = batch
-        for k in output.keys():
-            if k not in batch:
-                combined[k] = output[k]
-            else:
-                if isinstance(batch[k][0], dict) and isinstance(output[k][0], dict):
-                    combined[k] = [
-                        recmerge(b_i, o_i) for b_i, o_i in zip(batch[k], output[k])
-                    ]
-                else:
-                    combined[k] = output[k]
-        return combined
-
-    @classmethod
-    def _mask_batch(cls, batch: Batch, boolean_mask: List[bool]):
-        """Remove elements in `batch` that are masked by `boolean_mask`."""
-        return {
-            k: [e for i, e in enumerate(v) if boolean_mask[i]] for k, v in batch.items()
-        }
-
     @property
     def identifier(self):
         """Identifier."""
@@ -430,12 +390,6 @@ class DataPanel(
         self._set_features()
 
         logger.info(f"Removed column `{column}`.")
-
-    def select_columns(self, columns: List[str]) -> Batch:
-        """Select a subset of columns."""
-        for col in columns:
-            assert col in self.data
-        return tz.keyfilter(lambda k: k in columns, self.data)
 
     @capture_provenance(capture_args=["axis"])
     def append(

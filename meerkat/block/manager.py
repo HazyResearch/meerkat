@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import MutableMapping
-from typing import Dict, Mapping, Sequence, Union
+from typing import Dict, Sequence, Union
 
 from meerkat.columns.abstract import AbstractColumn
 
-from .abstract import BlockIndex
 from .ref import BlockRef
 
 
@@ -98,10 +97,6 @@ class BlockManager(MutableMapping):
             if len(block_ref) == 0:
                 self._block_refs.pop(self._column_to_block_id[name])
 
-    @property
-    def block_indices(self) -> Mapping[str, BlockIndex]:
-        return {name: col.index for name, col in self._columns}
-
     def __getitem__(
         self, index: Union[str, Sequence[str]]
     ) -> Union[AbstractColumn, BlockManager]:
@@ -117,7 +112,7 @@ class BlockManager(MutableMapping):
                         mgr.add_column(col=self._columns[name], name=name)
                     else:
                         raise ValueError(
-                            f"BlockManager does not contain column '{name}'."
+                            f"`BlockManager` does not contain column '{name}'."
                         )
                 else:
                     # group blockable columns by block
@@ -130,15 +125,15 @@ class BlockManager(MutableMapping):
             return mgr
         else:
             raise ValueError(
-                f"Unsupported index of type {type(index)}passed to `BlockManager`."
+                f"Unsupported index of type `{type(index)}` passed to `BlockManager`."
             )
 
-    def __setitem__(self, index, data: Union[str, Sequence[str]]):
+    def __setitem__(self, index: str, data: Union[str, Sequence[str]]):
         if isinstance(data, AbstractColumn):
             self.add_column(data, name=index)
         else:
             raise ValueError(
-                f"Can't set item with object of type {type(data)} on BlockManager."
+                f"Cannot set item with object of type `{type(data)}` on `BlockManager`."
             )
 
     def __delitem__(self, key):
