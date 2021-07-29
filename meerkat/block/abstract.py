@@ -27,6 +27,7 @@ class AbstractBlock:
         return BlockView(data=self._get_data(index), block_index=index, block=self)
 
     def _get_data(self, index: BlockIndex) -> object:
+        """Must return view of the underlying data."""
         raise NotImplementedError()
 
     @property

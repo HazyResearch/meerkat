@@ -71,12 +71,13 @@ class BlockManager(MutableMapping):
             block_ref_groups[block_ref.block.signature].append(block_ref)
 
         for block_refs in block_ref_groups.values():
-            if len(block_refs) == 0:
+            if len(block_refs) == 1:
+                # if there is only one block ref in the group, do not consolidate
                 continue
 
             # remove old block_refs
             for old_ref in block_refs:
-                del self._block_refs[id(old_ref.block)]
+                self._block_refs.pop(id(old_ref.block))
 
             # consolidate group
             block_class = block_refs[0].block.__class__
@@ -87,7 +88,7 @@ class BlockManager(MutableMapping):
         if name not in self._columns:
             raise ValueError(f"Remove failed: no column '{name}' in BlockManager.")
 
-        del self._columns[name]
+        self._columns.pop(name)
 
         if name in self._column_to_block_id:
             # column is blockable
@@ -95,7 +96,7 @@ class BlockManager(MutableMapping):
             del block_ref[name]
 
             if len(block_ref) == 0:
-                del self._block_refs[self._column_to_block_id[name]]
+                self._block_refs.pop(self._column_to_block_id[name])
 
     @property
     def block_indices(self) -> Mapping[str, BlockIndex]:

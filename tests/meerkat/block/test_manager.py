@@ -8,6 +8,24 @@ import meerkat as mk
 from meerkat.block.manager import BlockManager
 
 
+def test_consolidate_no_op():
+    mgr = BlockManager()
+    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    mgr.add_column(col1, "a")
+    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    mgr.add_column(col2, "b")
+    col2 = mk.NumpyArrayColumn(np.arange(10, dtype=float) * 2)
+    mgr.add_column(col2, "c")
+    block_ref = mgr.get_block_ref("c")
+
+    assert len(mgr._block_refs) == 3
+    mgr.consolidate()
+    assert len(mgr._block_refs) == 2
+
+    # assert that the block_ref hasn't changed for the isolated block ref
+    assert mgr.get_block_ref("c") is block_ref
+
+
 def test_consolidate():
     mgr = BlockManager()
 
@@ -118,3 +136,51 @@ def test_apply_get_single(num_blocks, consolidated):
             for idx in range(num_blocks):
                 # check it's equivalent to applying the slice to each column in turn
                 assert result_dict[f"col{idx}_{dtype}"] == mgr[f"col{idx}_{dtype}"][slc]
+
+
+def test_remove():
+    mgr = BlockManager()
+    col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(col, "a")
+    col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(col, "b")
+
+    assert len(mgr) == 2
+    mgr.remove("a")
+    assert len(mgr) == 1
+    assert list(mgr.keys()) == ["b"]
+
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="Remove failed: no column 'c' in BlockManager.",
+    ):
+        mgr.remove("c")
+
+
+def test_contains():
+    mgr = BlockManager()
+    col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(col, "a")
+    col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(col, "b")
+
+    assert "a" in mgr
+    assert "b" in mgr
+    assert "c" not in mgr
+
+
+@pytest.mark.parametrize(
+    "num_blocks, consolidated",
+    product([1, 2, 3], [True, False]),
+)
+def test_len(num_blocks, consolidated):
+    mgr = BlockManager()
+    for dtype in [int, float]:
+        for idx in range(num_blocks):
+            col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype) * idx)
+            mgr.add_column(col, f"col{idx}_{dtype}")
+
+    if consolidated:
+        mgr.consolidate()
+
+    assert len(mgr) == num_blocks * 2

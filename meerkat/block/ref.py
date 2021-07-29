@@ -21,7 +21,7 @@ class BlockRef(Mapping):
             )
 
     def __delitem__(self, key):
-        del self.columns[key]
+        self.columns.pop(key)
 
     def __len__(self):
         return len(self.columns)
