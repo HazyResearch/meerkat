@@ -26,7 +26,7 @@ from pandas.core.indexes.accessors import (
     PeriodProperties,
     TimedeltaProperties,
 )
-from pandas.core.strings.accessor import StringMethods
+from pandas.core.strings import StringMethods
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
