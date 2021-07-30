@@ -10,7 +10,7 @@ from typing import Callable, Sequence
 import numpy as np
 import pandas as pd
 import torch
-from pandas.core.accessor import CachedAccessor, StringMethods
+from pandas.core.accessor import CachedAccessor
 from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.dtypes.common import (
     is_categorical_dtype,
@@ -26,6 +26,7 @@ from pandas.core.indexes.accessors import (
     PeriodProperties,
     TimedeltaProperties,
 )
+from pandas.core.strings import StringMethods
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
