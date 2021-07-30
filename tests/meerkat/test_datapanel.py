@@ -687,6 +687,9 @@ def test_to_pandas(tmpdir, use_visible_columns):
         assert isinstance(df["c"][0], dict)
         assert isinstance(df["img"][0], LambdaCell)
 
+        assert isinstance(df["d"].values == dp["d"].numpy()).all()
+        assert isinstance(df["d"].values == dp["d"].numpy()).all()
+
 
 @pytest.mark.parametrize(
     "use_visible_columns",

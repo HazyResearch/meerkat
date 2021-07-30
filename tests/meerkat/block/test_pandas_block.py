@@ -26,7 +26,10 @@ def test_consolidate_1(num_blocks):
     # check equal
     blocks = [
         PandasBlock(
-            pd.DataFrame({f"a_{idx}": np.arange(10), f"b_{idx}": np.arange(10) * 2})
+            pd.DataFrame(
+                {f"a_{idx}": np.arange(10), f"b_{idx}": np.arange(10) * 2},
+                index=np.arange(idx, idx + 10),  # need to test with different
+            )
         )
         for idx in range(num_blocks)
     ]
@@ -52,7 +55,7 @@ def test_consolidate_1(num_blocks):
         block = ref.block
         for name, col in ref.items():
             assert (
-                block.data[col._block_index]
+                block.data[col._block_index].reset_index(drop=True)
                 == block_ref.block.data[block_ref[name]._block_index]
             ).all()
 
@@ -98,3 +101,13 @@ def test_io(tmpdir):
 
     assert isinstance(block, PandasBlock)
     assert block.data.equals(new_block.data)
+
+    # test with non-contiguous index, which is not supported by feather
+    block = PandasBlock(
+        pd.DataFrame({"a": [1, 2, 3], "b": ["4", "5", "6"]}, index=np.arange(1, 4))
+    )
+    block.write(tmpdir)
+    new_block = block.read(tmpdir)
+
+    assert isinstance(block, PandasBlock)
+    assert block.data.reset_index(drop=True).equals(new_block.data)
