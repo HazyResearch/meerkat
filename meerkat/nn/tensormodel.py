@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import itertools
+from functools import partial
 from typing import Dict, List
 
 import cytoolz as tz
@@ -13,7 +13,6 @@ from meerkat.nn.activation import ActivationOp
 from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.instances_column import InstancesColumn
 from meerkat.nn.model import Model
-from meerkat.nn.prediction_column import ClassificationOutputColumn
 from meerkat.nn.segmentation_column import SegmentationOutputColumn
 
 
@@ -21,7 +20,7 @@ class TensorModel(Model):
     def __init__(
         self,
         # identifier: str,
-        model,
+        model: torch.nn.Module,
         is_classifier: bool = None,
         task: str = None,
         device: str = None,
@@ -76,26 +75,6 @@ class TensorModel(Model):
 
         return input_batch
 
-    def predict_batch(
-        self, dataset: DataPanel, input_columns: List[str], batch_size=32
-    ):
-        # Gathers predictions for entire dataset
-
-        predictions = []
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
-        return predictions
-
     def activation(
         self,
         dataset: DataPanel,
@@ -135,46 +114,6 @@ class TensorModel(Model):
         dataset.add_column(f"activation ({target_module})", activation_col)
         return activation_col
 
-    def classification(
-        self,
-        dataset: DataPanel,
-        input_columns: List[str],
-        batch_size: int = 32,
-        num_classes: int = None,
-        multi_label: bool = False,
-        one_hot: bool = None,
-        threshold=0.5,
-    ) -> DataPanel:
-
-        # Handles outputs for classification tasks
-
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
-
-        logits = predictions["logits"]
-        output_col = ClassificationOutputColumn(
-            logits=logits,
-            num_classes=num_classes,
-            multi_label=multi_label,
-            one_hot=one_hot,
-            threshold=threshold,
-        )
-
-        output_dp = DataPanel(
-            {
-                "logits": output_col,
-                "probs": output_col.probabilities(),
-                "preds": output_col.predictions(),
-            }
-        )
-        # TODO(Priya): Use this instead after append bug is resolved
-        # dataset = dataset.append(classifier_dp, axis=1)
-        dataset.add_column("logits", output_col)
-        dataset.add_column("probs", output_col.probabilities())
-        dataset.add_column("preds", output_col.predictions())
-
-        return output_dp
-
     def semantic_segmentation(
         self,
         dataset: DataPanel,
@@ -185,11 +124,17 @@ class TensorModel(Model):
 
         # Handles outputs for semantic_segmentation tasks
 
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+        predictions = dataset.map(
+            function=partial(self._predict, input_columns=input_columns),
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=SegmentationOutputColumn,
+        )
 
-        logits = predictions["logits"]
-        output_col = SegmentationOutputColumn(logits=logits, num_classes=num_classes)
+        # TODO(Priya): How to pass other args of SegmentationOutputColumn above?
+        output_col = SegmentationOutputColumn(
+            logits=predictions["logits"].data, num_classes=num_classes
+        )
 
         output_dp = DataPanel(
             {
@@ -198,8 +143,7 @@ class TensorModel(Model):
                 "preds": SegmentationOutputColumn(output_col.predictions().data),
             }
         )
-        # TODO(Priya): Uncomment after append bug is resolved
-        # dataset = dataset.append(classifier_dp, axis=1)
+
         dataset.add_column("logits", output_col)
         dataset.add_column("probs", output_col.probabilities())
         dataset.add_column("preds", output_col.predictions())
@@ -212,15 +156,14 @@ class TensorModel(Model):
 
         # Handles outputs for timeseries
 
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
+        output_dp = dataset.map(
+            function=partial(self._predict, input_columns=input_columns),
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=TensorColumn,
+        )
 
-        output_col = TensorColumn(predictions["preds"])
-        output_dp = DataPanel({"preds": output_col})
-
-        # TODO(Priya): Uncomment after append bug is resolved
-        # dataset = dataset.append(classifier_dp, axis=1)
-        dataset.add_column("preds", output_col)
+        dataset.add_column("preds", output_dp["preds"])
 
         return output_dp
 
@@ -230,17 +173,14 @@ class TensorModel(Model):
 
         # Handles outputs for instance segmentation
 
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(
-            lambda v: list(itertools.chain.from_iterable(v)), *predictions
+        output_dp = dataset.map(
+            function=partial(self._predict, input_columns=input_columns),
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=InstancesColumn,
         )
 
-        output_col = InstancesColumn(predictions["preds"])
-        output_dp = DataPanel({"preds": output_col})
-
-        # TODO(Priya): Uncomment after append bug is resolved
-        # dataset = dataset.append(classifier_dp, axis=1)
-        dataset.add_column("preds", output_col)
+        dataset.add_column("preds", output_dp["preds"])
 
         return output_dp
 
