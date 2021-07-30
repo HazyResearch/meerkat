@@ -16,6 +16,7 @@ from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
 from ..testbeds import MockDatapanel
@@ -142,7 +143,11 @@ def test_row_index_single(tmpdir):
     assert row["b"] == index
 
 
-def test_row_index_multiple(tmpdir):
+@pytest.mark.parametrize(
+    "index_type,consolidate",
+    product([NumpyArrayColumn, PandasSeriesColumn, TensorColumn], [True, False]),
+)
+def test_row_index_multiple(tmpdir, index_type, consolidate):
     length = 16
     rows = np.arange(length)
     test_bed = MockDatapanel(
@@ -151,22 +156,24 @@ def test_row_index_multiple(tmpdir):
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
+    if consolidate:
+        dp.consolidate()
     # slice index => multiple row selection (DataPanel)
     # tuple or list index => multiple row selection (DataPanel)
     # np.array indeex => multiple row selection (DataPanel)
     for rows, indices in (
         (dp[1:3], rows[1:3]),
         (dp[[0, 2]], rows[[0, 2]]),
-        (dp[np.array((0,))], rows[np.array((0,))]),
-        (dp[np.array((1, 1))], rows[np.array((1, 1))]),
+        (dp[index_type(np.array((0,)))], rows[np.array((0,))]),
+        (dp[index_type(np.array((1, 1)))], rows[np.array((1, 1))]),
         (
-            dp[np.array((True, False) * (length // 2))],
+            dp[index_type(np.array((True, False) * (length // 2)))],
             rows[np.array((True, False) * (length // 2))],
         ),
-        (
-            dp[dp["a"] % 2 == 0],
-            rows[rows % 2 == 0],
-        ),
+        # (
+        #     dp[index_type(dp["a"].data % 2 == 0)],
+        #     rows[rows % 2 == 0],
+        # ),
     ):
         assert isinstance(rows["img"], ListColumn)
         assert (rows["a"].data == indices).all()
@@ -191,7 +198,11 @@ def test_row_lz_index_single(tmpdir):
     assert row["b"] == index
 
 
-def test_row_lz_index_multiple(tmpdir):
+@pytest.mark.parametrize(
+    "index_type,consolidate",
+    product([NumpyArrayColumn, PandasSeriesColumn, TensorColumn], [True, False]),
+)
+def test_row_lz_index_multiple(tmpdir, index_type, consolidate):
     length = 16
     rows = np.arange(length)
     test_bed = MockDatapanel(
@@ -200,20 +211,22 @@ def test_row_lz_index_multiple(tmpdir):
         tmpdir=tmpdir,
     )
     dp = test_bed.dp
+    if consolidate:
+        dp.consolidate()
     # slice index => multiple row selection (DataPanel)
     # tuple or list index => multiple row selection (DataPanel)
     # np.array indeex => multiple row selection (DataPanel)
     for rows, indices in (
         (dp.lz[1:3], rows[1:3]),
         (dp.lz[[0, 2]], rows[[0, 2]]),
-        (dp.lz[np.array((0,))], rows[np.array((0,))]),
-        (dp.lz[np.array((1, 1))], rows[np.array((1, 1))]),
+        (dp.lz[index_type(np.array((0,)))], rows[np.array((0,))]),
+        (dp.lz[index_type(np.array((1, 1)))], rows[np.array((1, 1))]),
         (
-            dp.lz[np.array((True, False) * (length // 2))],
+            dp.lz[index_type(np.array((True, False) * (length // 2)))],
             rows[np.array((True, False) * (length // 2))],
         ),
         (
-            dp.lz[dp["a"] % 2 == 0],
+            dp.lz[index_type(dp["a"].data % 2 == 0)],
             rows[rows % 2 == 0],
         ),
     ):
@@ -223,6 +236,77 @@ def test_row_lz_index_multiple(tmpdir):
         ]
         assert (rows["a"].data == indices).all()
         assert (rows["b"].data == indices).all()
+
+
+def test_col_indexing_view_copy_semantics(tmpdir):
+    testbed = MockDatapanel(length=16, include_image_column=True, tmpdir=tmpdir)
+    dp = testbed.dp
+
+    # Columns (1): Indexing a single column (i.e. with a str) returns the underlying
+    # AbstractColumn object directly. In the example below col1 and col2 are
+    # coreferences of the same column.
+    for name in dp.columns:
+        dp[name] is dp[name]
+
+    # Columns (2): Indexing multiple columns (i.e. with Sequence[str]) returns a view of
+    # the DataPanel holding views to the columns in the original DataPanel. This means
+    # the AbstractColumn objects held in the new DataPanel are the same AbstractColumn
+    # objects held in the original DataPanel.
+    view_dp = dp[["a", "b"]]
+    for name in view_dp.columns:
+        dp[name] is not view_dp[name]
+        dp[name].data is dp[name].data
+
+
+def test_row_indexing_view_copy_semantics(tmpdir):
+    testbed = MockDatapanel(length=16, include_image_column=True, tmpdir=tmpdir)
+    dp = testbed.dp
+
+    # slice index
+    dp2 = dp[:8]
+    col = "a"
+    assert isinstance(dp2[col], NumpyArrayColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    assert dp[col].data is dp2[col].data.base
+
+    col = "d"
+    assert isinstance(dp2[col], TensorColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    # note `data_ptr` checks whether the tensors have the same memory address of the
+    # first element, so this would not work if the slice didn't start at 0
+    assert dp[col].data.data_ptr() == dp2[col].data.data_ptr()
+
+    col = "e"
+    assert isinstance(dp2[col], PandasSeriesColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    # TODO (sabri): Figure out pandas copying behavior, it's not clear how it works and
+    # this deserves a deeper investigation.
+    # assert dp[col].data.values.base is dp2[col].data.values.base
+
+    # slice index
+    dp2 = dp[np.array([0, 1, 2, 5])]
+    col = "a"
+    assert isinstance(dp2[col], NumpyArrayColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    assert dp[col].data is not dp2[col].data.base
+
+    col = "d"
+    assert isinstance(dp2[col], TensorColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    # note `data_ptr` checks whether the tensors have the same memory address of the
+    # first element, so this would not work if the slice didn't start at 0
+    assert dp[col].data.data_ptr() != dp2[col].data.data_ptr()
+
+    col = "e"
+    assert isinstance(dp2[col], PandasSeriesColumn)
+    assert dp[col] is not dp2[col]
+    assert dp[col].data is not dp2[col].data
+    assert dp[col].data.values is not dp2[col].data.values.base
 
 
 @pytest.mark.parametrize(
@@ -479,7 +563,6 @@ def test_lz_filter(tmpdir):
         assert len(col) == old_len
 
     assert result.visible_columns == dp.visible_columns
-    assert result.all_columns == dp.all_columns
 
 
 def test_lz_update(
@@ -507,7 +590,9 @@ def test_lz_update(
     result = dp.update(
         func, batch_size=4, is_batched_fn=False, num_workers=0, materialize=False
     )
-    assert set(result.column_names) == set(["a", "b", "c", "x", "img", "index"])
+    assert set(result.column_names) == set(
+        ["a", "b", "c", "d", "e", "x", "img", "index"]
+    )
     assert len(result["x"]) == len(visible_rows)
     assert result["x"].data == [test_bed.img_col.image_paths[i] for i in visible_rows]
 

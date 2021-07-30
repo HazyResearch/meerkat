@@ -7,7 +7,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat import NumpyArrayColumn, PandasSeriesColumn
+from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
 from ...testbeds import MockAnyColumn, MockColumn, MockStrColumn
@@ -49,10 +50,12 @@ def test_cat_accessor():
 
 
 @pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
+    "dtype,index_type",
+    product(
+        ["float", "int", "str"], [NumpyArrayColumn, PandasSeriesColumn, TensorColumn]
+    ),
 )
-def test_getitem(dtype):
+def test_getitem(dtype, index_type):
     """`map`, single return,"""
     if dtype == "str":
         testbed = MockStrColumn(col_type=PandasSeriesColumn)
@@ -64,6 +67,10 @@ def test_getitem(dtype):
     assert testbed.array[testbed.visible_rows[1]] == col[1]
 
     assert (testbed.array[testbed.visible_rows[2:4]] == col[2:4].values).all()
+
+    bool_index = (np.arange(len(col)) % 2).astype(bool)
+    bool_index_col = index_type(bool_index)
+    assert (testbed.array[bool_index] == col[bool_index_col].values).all()
 
 
 @pytest.mark.parametrize(

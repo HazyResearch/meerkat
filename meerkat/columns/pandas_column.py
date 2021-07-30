@@ -207,6 +207,8 @@ class PandasSeriesColumn(
         return cls(data=data, *args, **kwargs)
 
     def _get(self, index, materialize: bool = True):
+        index = self.block_class._convert_index(index)
+
         data = self._data.iloc[index]
         if self._is_batch_index(index):
             # only create a numpy array column

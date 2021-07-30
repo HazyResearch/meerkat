@@ -119,8 +119,15 @@ class TensorColumn(
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data[indices]
+    def _get(self, index, materialize: bool = True):
+        index = self.block_class._convert_index(index)
+
+        data = self._data[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=data)
+        else:
+            return data
 
     def _set_batch(self, indices, values):
         self._data[indices] = values

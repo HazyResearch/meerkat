@@ -4,9 +4,11 @@ import os
 from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
+import numpy as np
 import torch
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex
@@ -112,9 +114,37 @@ class TensorBlock(AbstractBlock):
         }
         return BlockRef(block=block, columns=new_columns)
 
+    @staticmethod
+    def _convert_index(index):
+        if isinstance(index, NumpyArrayColumn) and index.data.dtype == np.bool_:
+            # needed to silence torch deprecation warning
+            # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
+            # to be interpreted as an index
+            return torch.as_tensor(index.data)
+
+        from meerkat.columns.pandas_column import PandasSeriesColumn
+
+        if (
+            isinstance(index, PandasSeriesColumn)
+            and index.data.values.dtype == np.bool_
+        ):
+            # needed to silence torch deprecation warning
+            # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
+            # to be interpreted as an index
+            return torch.as_tensor(index.data.values)
+
+        from meerkat.columns.tensor_column import TensorColumn
+
+        if isinstance(index, TensorColumn):
+            # need to convert to numpy for boolean indexing
+            return index.data
+        return index
+
     def _get(
         self, index, block_ref: BlockRef, materialize: bool = True
     ) -> Union[BlockRef, dict]:
+
+        index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]
         if isinstance(index, int):

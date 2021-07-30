@@ -7,6 +7,8 @@ from typing import Hashable, Mapping, Sequence, Tuple, Union
 import pandas as pd
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.tensor_column import TensorColumn
 
 from .abstract import AbstractBlock, BlockIndex
 
@@ -74,9 +76,23 @@ class PandasBlock(AbstractBlock):
         }
         return BlockRef(block=block, columns=new_columns)
 
+    @staticmethod
+    def _convert_index(index):
+        if isinstance(index, NumpyArrayColumn):
+            return index.data
+        if isinstance(index, TensorColumn):
+            # need to convert to numpy for boolean indexing
+            return index.data.numpy()
+        from meerkat.columns.pandas_column import PandasSeriesColumn
+
+        if isinstance(index, PandasSeriesColumn):
+            return index.data.values
+        return index
+
     def _get(
         self, index, block_ref: BlockRef, materialize: bool = True
     ) -> Union[BlockRef, dict]:
+        index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data.iloc[index]
         if isinstance(index, int):
@@ -101,6 +117,6 @@ class PandasBlock(AbstractBlock):
         return pd.read_feather(os.path.join(path, "data.feather"))
 
     def _repr_pandas_(self, block_ref: BlockRef):
-        return self.data[block_ref.keys()].rename(
+        return self.data[[col._block_index for col in block_ref.values()]].rename(
             columns={col._block_index: name for name, col in block_ref.items()}
         )
