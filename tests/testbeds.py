@@ -112,7 +112,8 @@ class MockDatapanel:
             "b": ListColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
             "d": torch.arange(length),
-            "e": pd.Series(np.arange(length)),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
         }
 
         if include_image_column:

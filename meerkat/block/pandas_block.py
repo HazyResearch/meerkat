@@ -58,8 +58,9 @@ class PandasBlock(AbstractBlock):
         block_refs: Sequence[BlockRef],
     ) -> BlockRef:
         df = pd.DataFrame(
+            # need to ignore index when concatenating
             {
-                name: ref.block.data[col._block_index]
+                name: ref.block.data[col._block_index].reset_index(drop=True)
                 for ref in block_refs
                 for name, col in ref.items()
             }
@@ -110,7 +111,7 @@ class PandasBlock(AbstractBlock):
         return BlockRef(block=block, columns=columns)
 
     def _write_data(self, path: str):
-        self.data.to_feather(os.path.join(path, "data.feather"))
+        self.data.reset_index(drop=True).to_feather(os.path.join(path, "data.feather"))
 
     @staticmethod
     def _read_data(path: str):
