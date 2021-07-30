@@ -114,6 +114,9 @@ class MockDatapanel:
             "d": torch.arange(length),
             # offset the index to test robustness to nonstandard indices
             "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            # test multidimensional
+            "f": np.ones((length, 5)).astype(int),
+            "g": torch.ones(length, 5).to(int),
         }
 
         if include_image_column:

@@ -11,6 +11,7 @@ from meerkat.errors import ConsolidationError
 # an index into a block that specifies where a column's data lives in the block
 BlockIndex = Union[int, slice, str]
 
+
 if TYPE_CHECKING:
     from meerkat.block.ref import BlockRef
 
