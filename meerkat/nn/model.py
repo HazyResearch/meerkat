@@ -9,11 +9,11 @@ from meerkat.nn.prediction_column import ClassificationOutputColumn
 
 
 # TODO(Priya): Move some general functions here
-class Model:
+class Model(torch.nn.Module):
     def __init__(
         self,
         # identifier: str,
-        model,
+        model: torch.nn.Module,
         # evaluation_fn=None,
         is_classifier: bool = None,
         task: str = None,
@@ -40,33 +40,6 @@ class Model:
             self.device = "cpu"
             if torch.cuda.is_available():
                 self.device = "cuda:0"
-
-    def to(self, device: str):
-        self.device = device
-        return self.model.to(device)
-
-    """
-    def __call__(
-        self,
-        dataset: DataPanel,
-        input_columns: List[str],
-        output_columns: List[str],
-        batch_size: int = 32,
-        coerce_fn: Callable = None,
-        *args,
-        **kwargs
-    ):
-
-        return self.evaluate(
-            dataset,
-            input_columns,
-            output_columns,
-            batch_size,
-            coerce_fn,
-            *args,
-            **kwargs
-        )
-    """
 
     def forward(self, input_batch: Dict) -> Dict:
         raise NotImplementedError
