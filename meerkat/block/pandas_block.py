@@ -85,6 +85,7 @@ class PandasBlock(AbstractBlock):
                 name: data[col._block_index] for name, col in block_ref.columns.items()
             }
         block = self.__class__(data)
+
         columns = {
             name: col._clone(data=block[col._block_index])
             for name, col in block_ref.columns.items()

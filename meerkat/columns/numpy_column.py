@@ -108,14 +108,13 @@ class NumpyArrayColumn(
     def _set_batch(self, indices, values):
         self._data[indices] = values
 
-    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
-        if _data is None:
-            _data = self._data[index]
+    def _get(self, index, materialize: bool = True):
+        data = self._data[index]
         if self._is_batch_index(index):
             # only create a numpy array column
-            return self._clone(data=_data)
+            return self._clone(data=data)
         else:
-            return _data
+            return data
 
     def _copy_data(self) -> object:
         return self._data.copy()

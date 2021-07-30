@@ -5,7 +5,7 @@ import functools
 import logging
 import numbers
 import os
-from typing import Any, Callable, Sequence
+from typing import Callable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -206,21 +206,13 @@ class PandasSeriesColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _get_cell(self, index: int, materialize: bool = True) -> Any:
-        """Get a single cell from the column.
-
-        Args:
-            index (int): This is an index into the ALL rows, not just visible rows. In
-                other words, we assume that the index passed in has already been
-                remapped via `_remap_index`, if `self.visible_rows` is not `None`.
-            materialize (bool, optional): Materialize and return the object. This
-                argument is used by subclasses of `AbstractColumn` that hold data in an
-                unmaterialized format. Defaults to False.
-        """
-        return self._data.iloc[index]
-
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data.iloc[indices]
+    def _get(self, index, materialize: bool = True):
+        data = self._data.iloc[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=data)
+        else:
+            return data
 
     def _set_cell(self, index, value):
         self._data[index] = value

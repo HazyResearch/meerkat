@@ -384,8 +384,8 @@ class DataPanel(
         assert column in self.all_columns, f"Column `{column}` does not exist."
 
         # Remove the column
-        self.visible_columns = [col for col in self.visible_columns if col != column]
         del self.data[column]
+        self.visible_columns = [col for col in self.visible_columns if col != column]
 
         # Set features
         self._set_features()
@@ -679,6 +679,8 @@ class DataPanel(
         identifier: Identifier = None,
     ):
         """Create a Dataset from a pandas DataFrame."""
+        # column names must be str in meerkat
+        df = df.rename(mapper=str, axis="columns")
         return cls.from_batch(
             df.to_dict("series"),
             identifier=identifier,

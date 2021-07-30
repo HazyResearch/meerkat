@@ -25,10 +25,9 @@ class BlockManager(MutableMapping):
     def update(self, block_ref: BlockRef):
         """data (): a single blockable object, potentially contains multiple
         columns."""
-        # can't have the same column living in multiple managers, so we view
-        self._columns.update(
-            {name: column.view() for name, column in block_ref.items()}
-        )
+        # although we can't have the same column living in multiple managers
+        # we don't view here because it can lead to multiple calls to clone
+        self._columns.update({name: column for name, column in block_ref.items()})
 
         block_id = id(block_ref.block)
         # check if there already is a block_ref in the manager for this block
@@ -164,7 +163,6 @@ class BlockManager(MutableMapping):
             self._columns[name] = col
 
         else:
-            # TODO: this should be a view and the _block should get carried
             col = col.view()
             self.update(BlockRef(columns={name: col}, block=col._block))
 
