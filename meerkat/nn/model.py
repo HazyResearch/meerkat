@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Dict, List
 
 import torch
@@ -69,6 +70,56 @@ class Model:
 
     def forward(self, input_batch: Dict) -> Dict:
         raise NotImplementedError
+
+    def _predict(self, batch, input_columns):
+        # Process the batch to prepare input
+        input_batch = self.process_batch(batch, input_columns)
+        # Run forward pass
+        prediction_dict = self.forward(input_batch)
+        return prediction_dict
+
+    def classification(
+        self,
+        dataset: DataPanel,
+        input_columns: List[str],
+        batch_size: int = 32,
+        num_classes: int = None,
+        multi_label: bool = False,
+        one_hot: bool = None,
+        threshold=0.5,
+    ) -> DataPanel:
+
+        # Handles outputs for classification tasks
+
+        predictions = dataset.map(
+            function=partial(self._predict, input_columns=input_columns),
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=ClassificationOutputColumn,
+        )
+
+        # TODO(Priya): How to pass other args of ClassificationOutputColumn above?
+        output_col = ClassificationOutputColumn(
+            logits=predictions["logits"].data,
+            num_classes=num_classes,
+            multi_label=multi_label,
+            one_hot=one_hot,
+            threshold=threshold,
+        )
+
+        output_dp = DataPanel(
+            {
+                "logits": output_col,
+                "probs": output_col.probabilities(),
+                "preds": output_col.predictions(),
+            }
+        )
+
+        dataset.add_column("logits", output_col)
+        dataset.add_column("probs", output_col.probabilities())
+        dataset.add_column("preds", output_col.predictions())
+
+        return output_dp
 
     def evaluate(
         self,

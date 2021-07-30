@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import itertools
+from functools import partial
 from typing import Dict, List, Optional
 
 import cytoolz as tz
@@ -12,7 +12,6 @@ from meerkat.datapanel import DataPanel
 from meerkat.nn.activation import ActivationOp
 from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.model import Model
-from meerkat.nn.prediction_column import ClassificationOutputColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 AutoTokenizer = LazyLoader("transformers.AutoTokenizer")
@@ -100,26 +99,6 @@ class HuggingfaceModel(Model):
         # Return the converted batch
         return input_batch
 
-    def predict_batch(
-        self, dataset: DataPanel, input_columns: List[str], batch_size=32
-    ):
-        # Gathers predictions for entire dataset
-
-        predictions = []
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-
-            # Process the batch to prepare input
-            input_batch = self.process_batch(batch, input_columns)
-            # Run forward pass
-            prediction_dict = self.forward(input_batch)
-            # Append the predictions
-            predictions.append(prediction_dict)
-
-        return predictions
-
     def activation(
         self,
         dataset: DataPanel,
@@ -159,63 +138,18 @@ class HuggingfaceModel(Model):
         dataset.add_column(f"activation ({target_module})", activation_col)
         return activation_col
 
-    # TODO(Priya): Need to test on NLP model
-    def classification(
-        self,
-        dataset: DataPanel,
-        input_columns: List[str],
-        batch_size: int = 32,
-        num_classes: int = None,
-        multi_label: bool = False,
-        one_hot: bool = None,
-        threshold=0.5,
-    ) -> DataPanel:
-
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(lambda v: torch.cat(v).to("cpu"), *predictions)
-
-        logits = predictions["logits"]
-        # Store in correct column type
-        # TODO(Priya): Better way for feeding classifier input
-        output_col = ClassificationOutputColumn(
-            logits=logits,
-            num_classes=num_classes,
-            multi_label=multi_label,
-            one_hot=one_hot,
-            threshold=threshold,
-        )
-
-        output_dp = DataPanel(
-            {
-                "logits": output_col,
-                "probs": output_col.probabilities(),
-                "preds": output_col.predictions(),
-            }
-        )
-        # TODO(Priya): Use this instead after append bug is resolved
-        # dataset = dataset.append(output_dp, axis=1)
-        dataset.add_column("logits", output_col)
-        dataset.add_column("probs", output_col.probabilities())
-        dataset.add_column("preds", output_col.predictions())
-
-        return output_dp
-
     def summarization(
         self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
     ) -> DataPanel:
 
-        predictions = self.predict_batch(dataset, input_columns, batch_size)
-        predictions = tz.merge_with(
-            lambda x: list(itertools.chain.from_iterable(x)), *predictions
+        output_dp = dataset.map(
+            function=partial(self._predict, input_columns=input_columns),
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=ListColumn,
         )
 
-        # Store in correct column type
-        output_col = ListColumn(predictions["preds"])
-        output_dp = DataPanel({"preds": output_col})
-
-        # TODO(Priya): Uncomment after append bug is resolved
-        # dataset = dataset.append(output_dp, axis=1)
-        dataset.add_column("preds", output_col)
+        dataset.add_column("preds", output_dp["preds"])
 
         return output_dp
 
