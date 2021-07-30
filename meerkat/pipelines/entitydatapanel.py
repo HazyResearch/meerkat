@@ -1,7 +1,10 @@
 """EntityDataPanel Class."""
+from __future__ import annotations
+
 import logging
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
+import datasets
 import numpy as np
 import torch
 
@@ -20,7 +23,7 @@ logger = logging.getLogger(__name__)
 class EntityDataPanel(DataPanel):
     def __init__(
         self,
-        *args,
+        data: Union[dict, list, datasets.Dataset] = None,
         identifier: Identifier = None,
         column_names: List[str] = None,
         embedding_columns: List[str] = None,
@@ -42,7 +45,7 @@ class EntityDataPanel(DataPanel):
             index_column: index column
         """
         super().__init__(
-            *args,
+            data=data,
             identifier=identifier,
             column_names=column_names,
             info=None,
@@ -78,7 +81,7 @@ class EntityDataPanel(DataPanel):
     ):
         """Returns EntityDataPanel DP from standard DP."""
         return cls(
-            datapanel._data,
+            data=datapanel.data,
             embedding_columns=embedding_columns,
             index_column=index_column,
         )
@@ -142,28 +145,6 @@ class EntityDataPanel(DataPanel):
                 raise IndexError(f"{idx} not in data")
         return self[row_idx]
 
-    def _get(self, index, materialize: bool = False):
-        """When _get returns a DataPanel with same columns, cast back to
-        EntityDataPanel."""
-        ret = super(EntityDataPanel, self)._get(index, materialize)
-
-        # If _get subselects columns and _removes_ the index column, this is no longer
-        # an EntityDataPanel. In DataPanel, a column subselection will not recast to
-        # a DataPanel (it just creates a view). In this case, we need to explicitly cast
-        # _back_ to a DataPanel
-        if (
-            isinstance(ret, EntityDataPanel)
-            and self.index_column not in ret.visible_columns
-        ):
-            return DataPanel.from_batch({k: ret._data[k] for k in ret.visible_columns})
-        if isinstance(ret, DataPanel) and ret.visible_columns == self.visible_columns:
-            return EntityDataPanel.from_datapanel(
-                ret,
-                embedding_columns=self.embedding_columns,
-                index_column=self.index_column,
-            )
-        return ret
-
     def _add_ent_index(self):
         """Add an integer index to the dataset.
 
@@ -217,20 +198,15 @@ class EntityDataPanel(DataPanel):
 
     def append(
         self,
-        dp: "EntityDataPanel",
+        dp: EntityDataPanel,
         axis: Union[str, int] = "rows",
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
-    ) -> "EntityDataPanel":
+    ) -> EntityDataPanel:
         """Append an EntityDataPanel."""
         if axis == 0 or axis == "rows":
             # append new rows
-            ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
-            return EntityDataPanel.from_datapanel(
-                ret,
-                embedding_columns=self.embedding_columns,
-                index_column=self.index_column,
-            )
+            return super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
         elif axis == 1 or axis == "columns":
             # append new columns; must make sure the entities are in the same order
             # data property takes `visible_rows` into account
@@ -246,11 +222,9 @@ class EntityDataPanel(DataPanel):
             if self.index_column in dp.column_names and not overwrite:
                 new_index_column += suffixes[0]
             ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
-            return EntityDataPanel.from_datapanel(
-                ret,
-                embedding_columns=new_embedding_cols,
-                index_column=new_index_column,
-            )
+            ret._embedding_columns = new_embedding_cols
+            ret._index_column = new_index_column
+            return ret
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -304,7 +278,7 @@ class EntityDataPanel(DataPanel):
             keep_indexes=False,
         )
         return EntityDataPanel.from_datapanel(
-            ret,
+            datapanel=ret,
             embedding_columns=new_embedding_cols,
             index_column=new_index_column,
         )
@@ -403,8 +377,6 @@ class EntityDataPanel(DataPanel):
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
         return {
-            "_data",
-            "all_columns",
             "_visible_columns",
             "_identifier",
             "_embedding_columns",

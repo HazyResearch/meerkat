@@ -18,15 +18,14 @@ from ...testbeds import MockColumn, MockDatapanel, MockImageColumn
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,col_type,n",
+    "col_type,n",
     product(
-        [True, False],
         [ListColumn, NumpyArrayColumn, TensorColumn, PandasSeriesColumn],
         [1, 2, 3],
     ),
 )
-def test_column_concat(use_visible_rows, col_type, n):
-    mock_col = MockColumn(use_visible_rows=use_visible_rows, col_type=col_type)
+def test_column_concat(col_type, n):
+    mock_col = MockColumn(col_type=col_type)
     out = concat([mock_col.col] * n)
 
     assert len(out) == len(mock_col.visible_rows) * n
@@ -35,14 +34,13 @@ def test_column_concat(use_visible_rows, col_type, n):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,use_visible_columns,n",
-    product([True, False], [True, False], [1, 2, 3]),
+    "use_visible_columns,n",
+    product([True, False], [1, 2, 3]),
 )
-def test_datapanel_row_concat(use_visible_rows, use_visible_columns, n):
+def test_datapanel_row_concat(use_visible_columns, n):
 
     mock_dp = MockDatapanel(
         length=16,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=use_visible_columns,
     )
 
@@ -55,15 +53,10 @@ def test_datapanel_row_concat(use_visible_rows, use_visible_columns, n):
     assert out["b"].data == list(np.concatenate([mock_dp.visible_rows] * n))
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_datapanel_column_concat(use_visible_rows):
+def test_datapanel_column_concat():
 
     mock_dp = MockDatapanel(
         length=16,
-        use_visible_rows=use_visible_rows,
         use_visible_columns=False,
     )
 
@@ -75,11 +68,7 @@ def test_datapanel_column_concat(use_visible_rows):
     assert list(out["a"].data) == out["b"].data
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    product([True, False]),
-)
-def test_image_column(use_visible_rows, tmpdir):
+def test_image_column(tmpdir):
 
     mock = MockImageColumn(length=16, tmpdir=tmpdir)
 
@@ -95,6 +84,20 @@ def test_concat_different_type():
     b = ListColumn.from_list([1, 2, 3])
     with pytest.raises(ConcatError):
         concat([a, b])
+
+
+def test_concat_unsupported_type():
+    a = [1, 2, 3]
+    b = [4, 5, 6]
+    with pytest.raises(ConcatError):
+        concat([a, b])
+
+
+def test_concat_unsupported_axis():
+    a = DataPanel.from_batch({"a": [1, 2, 3]})
+    b = DataPanel.from_batch({"b": [1, 2, 3]})
+    with pytest.raises(ConcatError):
+        concat([a, b], axis="abc")
 
 
 def test_concat_different_column_names():

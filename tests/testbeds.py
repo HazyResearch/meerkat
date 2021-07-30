@@ -4,6 +4,8 @@ from copy import deepcopy
 from typing import Sequence
 
 import numpy as np
+import pandas as pd
+import torch
 from PIL import Image
 
 from meerkat.columns.image_column import ImageCellColumn, ImageColumn
@@ -109,6 +111,8 @@ class MockDatapanel:
             "a": np.arange(length),
             "b": ListColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
+            "d": torch.arange(length),
+            "e": pd.Series(np.arange(length)),
         }
 
         if include_image_column:

@@ -5,8 +5,6 @@ from tqdm.auto import tqdm
 
 from meerkat.provenance import capture_provenance
 
-from .cloneable import CloneableMixin
-
 logger = logging.getLogger(__name__)
 
 
@@ -102,13 +100,11 @@ class MappableMixin:
                         if output_type is None
                         else output_type
                     )
-                    print(curr_output_type)
                     writer = curr_output_type.get_writer(
                         mmap=mmap,
                         template=(
                             curr_output.copy()
                             if isinstance(curr_output, AbstractColumn)
-                            and isinstance(curr_output, CloneableMixin)
                             else None
                         ),
                     )
@@ -149,7 +145,6 @@ class MappableMixin:
                     for k, writer in writers.items():
                         writer.write(output[k])
                 else:
-                    print(output)
                     writers[0].write(output)
 
         # Check if we are returning a special output type
@@ -165,4 +160,5 @@ class MappableMixin:
                 if isinstance(self, DataPanel)
                 else DataPanel.from_batch(outputs)
             )
+            outputs._visible_columns = None
         return outputs

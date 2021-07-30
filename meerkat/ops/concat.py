@@ -60,7 +60,6 @@ def concat(
                 )
 
             columns = list(tz.concat((dp.visible_columns for dp in objs)))
-            columns.remove("index")  # need to remove index before checking distinct
             if not tz.isdistinct(columns):
                 raise ConcatError(
                     "Can only concatenate DataPanels along axis 1 (columns) if they "
@@ -69,6 +68,8 @@ def concat(
 
             data = tz.merge(*(dict(dp.items()) for dp in objs))
             return objs[0].from_batch(data)
+        else:
+            raise ConcatError(f"Invalid axis `{axis}` passed to concat.")
     elif isinstance(objs[0], AbstractColumn):
         # use the concat method of the column
         return objs[0].concat(objs)

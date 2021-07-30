@@ -25,10 +25,11 @@ def merge(
     keep_indexes: bool = False,
 ):
     if how == "cross":
-        raise ValueError("DataPanel does not support cross merges.")
+        raise ValueError("DataPanel does not support cross merges.")  # pragma: no cover
 
     if (on is None) and (left_on is None) and (right_on is None):
-        raise ValueError("Merge expects either `on` or `left_on` and `right_on`")
+        raise MergeError("Merge expects either `on` or `left_on` and `right_on`")
+
     left_on = on if left_on is None else left_on
     right_on = on if right_on is None else right_on
     # cast `left_on` and `right_on` to lists
@@ -46,7 +47,7 @@ def merge(
     # (2) add index columns, which we'll use to reconstruct the columns we excluded from
     # the Pandas merge
     if ("__right_indices__" in right_df) or ("__left_indices__" in left_df):
-        raise ValueError(
+        raise MergeError(
             "The column names '__right_indices__' and '__left_indices__' cannot appear "
             "in the right and left panels respectively. They are used by merge."
         )
@@ -82,11 +83,10 @@ def merge(
 
     # add columns in both `left_on` and `right_on`, casting to the column type in left
     for name, column in merged_df.iteritems():
-        merged_dp.add_column(name, left[name].__class__(data=column.values))
+        merged_dp.add_column(name, left[name]._clone(data=column.values))
         merged_dp.visible_columns = (
             merged_dp.visible_columns[-1:] + merged_dp.visible_columns[:-1]
         )
-
     if not keep_indexes:
         merged_dp.remove_column("index" + suffixes[0])
         merged_dp.remove_column("index" + suffixes[1])
@@ -106,7 +106,7 @@ def _construct_from_indices(dp: DataPanel, indices: np.ndarray):
             )
             for name, col in dp.items()
         }
-        return dp.from_batch(data)
+        return dp._clone(data=data)
     else:
         # if there are no `nan`s in the indices, then we can just lazy index the
         # original column

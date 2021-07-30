@@ -7,20 +7,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat import NumpyArrayColumn, PandasSeriesColumn
+from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
 from ...testbeds import MockAnyColumn, MockColumn, MockStrColumn
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    [True, False],
-)
-def test_str_accessor(use_visible_rows):
-    testbed = MockStrColumn(
-        col_type=PandasSeriesColumn, use_visible_rows=use_visible_rows
-    )
+def test_str_accessor():
+    testbed = MockStrColumn(col_type=PandasSeriesColumn)
     col = testbed.col
 
     upper_col = col.str.upper()
@@ -30,15 +25,10 @@ def test_str_accessor(use_visible_rows):
     ).all()
 
 
-@pytest.mark.parametrize(
-    "use_visible_rows",
-    [True, False],
-)
-def test_dt_accessor(use_visible_rows):
+def test_dt_accessor():
     testbed = MockAnyColumn(
         data=[f"01/{idx+1}/2001" for idx in range(16)],
         col_type=PandasSeriesColumn,
-        use_visible_rows=use_visible_rows,
     )
     col = testbed.col
     col = pd.to_datetime(col)
@@ -60,19 +50,17 @@ def test_cat_accessor():
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype,index_type",
+    product(
+        ["float", "int", "str"], [NumpyArrayColumn, PandasSeriesColumn, TensorColumn]
+    ),
 )
-def test_getitem(dtype, use_visible_rows):
+def test_getitem(dtype, index_type):
     """`map`, single return,"""
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
 
     col = testbed.col
 
@@ -80,23 +68,23 @@ def test_getitem(dtype, use_visible_rows):
 
     assert (testbed.array[testbed.visible_rows[2:4]] == col[2:4].values).all()
 
+    bool_index = (np.arange(len(col)) % 2).astype(bool)
+    bool_index_col = index_type(bool_index)
+    assert (testbed.array[bool_index] == col[bool_index_col].values).all()
+
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype",
+    ["float", "int", "str"],
 )
-def test_ops(dtype, use_visible_rows):
+def test_ops(dtype):
     """`map`, single return,"""
     col = PandasSeriesColumn(["a", "b", "c", "d"])
     col == "a"
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
 
     col = testbed.col
 
@@ -106,14 +94,12 @@ def test_ops(dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows,batched",
-    product(["float", "int"], [True, False], [True, False]),
+    "dtype,batched",
+    product(["float", "int"], [True, False]),
 )
-def test_map_return_single(dtype, use_visible_rows, batched):
+def test_map_return_single(dtype, batched):
     """`map`, single return,"""
-    testbed = MockColumn(
-        dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-    )
+    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
     def func(x):
@@ -129,14 +115,12 @@ def test_map_return_single(dtype, use_visible_rows, batched):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows, batched",
-    product(["float", "int"], [True, False], [True, False]),
+    "dtype, batched",
+    product(["float", "int"], [True, False]),
 )
-def test_map_return_multiple(dtype, use_visible_rows, batched):
+def test_map_return_multiple(dtype, batched):
     """`map`, multiple return."""
-    testbed = MockColumn(
-        dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-    )
+    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
     def func(x):
@@ -156,19 +140,15 @@ def test_map_return_multiple(dtype, use_visible_rows, batched):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype",
+    ["float", "int", "str"],
 )
-def test_set_item_1(dtype, use_visible_rows):
+def test_set_item_1(dtype):
 
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
 
     col = testbed.col
 
@@ -180,18 +160,14 @@ def test_set_item_1(dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype",
+    ["float", "int", "str"],
 )
-def test_set_item_2(dtype, use_visible_rows):
+def test_set_item_2(dtype):
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
 
     col = testbed.col
 
@@ -205,14 +181,12 @@ def test_set_item_2(dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,dtype,batched",
-    product([True, False], ["float", "int"], [True, False]),
+    "dtype,batched",
+    product(["float", "int"], [True, False]),
 )
-def test_filter_1(use_visible_rows, dtype, batched):
+def test_filter_1(dtype, batched):
     """multiple_dim=False."""
-    testbed = MockColumn(
-        dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-    )
+    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
     def func(x):
@@ -241,21 +215,20 @@ def test_pickle(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype",
+    ["float", "int", "str"],
 )
-def test_io(tmp_path, dtype, use_visible_rows):
+def test_io(
+    tmp_path,
+    dtype,
+):
     # uses the tmp_path fixture which will provide a
     # temporary directory unique to the test invocation,
     # important for dataloader
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col = testbed.col
     path = os.path.join(tmp_path, "test")
     col.write(path)
@@ -267,18 +240,14 @@ def test_io(tmp_path, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows",
-    product(["float", "int", "str"], [True, False]),
+    "dtype",
+    ["float", "int", "str"],
 )
-def test_copy(dtype, use_visible_rows):
+def test_copy(dtype):
     if dtype == "str":
-        testbed = MockStrColumn(
-            use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockStrColumn(col_type=PandasSeriesColumn)
     else:
-        testbed = MockColumn(
-            dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-        )
+        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col = testbed.col
     col_copy = col.copy()
 

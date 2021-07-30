@@ -5,8 +5,18 @@ import logging
 import os
 import pathlib
 from contextlib import contextmanager
-from copy import copy, deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from copy import copy
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import cytoolz as tz
 import datasets
@@ -21,18 +31,17 @@ from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
 import meerkat
+from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
-from meerkat.mixins.copying import DataPanelCopyMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
-from meerkat.mixins.state import StateDictMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
-from meerkat.tools.utils import convert_to_batch_fn, recmerge
+from meerkat.tools.utils import convert_to_batch_fn
 
 logger = logging.getLogger(__name__)
 
@@ -43,13 +52,11 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 
 class DataPanel(
     CloneableMixin,
-    DataPanelCopyMixin,
     FunctionInspectorMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
-    StateDictMixin,
     DatasetInfoMixin,  # this should be the last in order of mixins
 ):
     """Meerkat DataPanel class."""
@@ -62,11 +69,12 @@ class DataPanel(
 
     def __init__(
         self,
-        *args,
+        data: Union[dict, list, datasets.Dataset] = None,
         identifier: Identifier = None,
         column_names: List[str] = None,
         info: DatasetInfo = None,
         split: Optional[NamedSplit] = None,
+        *args,
         **kwargs,
     ):
         super(DataPanel, self).__init__(
@@ -80,20 +88,15 @@ class DataPanel(
         #  from setting visible_rows inside columns that belong to a datapanel
         logger.debug("Creating DataPanel.")
 
-        # Data is a dictionary of columns
-        self._data = {}
-
-        # Single argument
-        if len(args) == 1:
+        if data is not None:
             assert column_names is None, "Don't pass in column_names."
             # The data is passed in
-            data = args[0]
 
             # `data` is a dictionary
             if isinstance(data, dict) and len(data):
                 data = self._create_columns(data)
                 self._assert_columns_all_equal_length(data)
-                self._data = data
+                self.data = data
 
             # `data` is a list
             elif isinstance(data, list) and len(data):
@@ -102,27 +105,28 @@ class DataPanel(
                 # Assert all columns are the same length
                 data = self._create_columns(data)
                 self._assert_columns_all_equal_length(data)
-                self._data = data
+                self.data = data
 
             # `data` is a datasets.Dataset
             elif isinstance(data, datasets.Dataset):
-                self._data = self._create_columns(data[:])
+                self.data = self._create_columns(data[:])
                 info, split = data.info, data.split
+            elif isinstance(data, BlockManager):
+                self.data = data
 
-        # No argument
-        elif len(args) == 0:
-
-            # Use column_names to setup the data dictionary
+        else:
             if column_names:
+                # Use column_names to setup the manager
                 self._check_columns_unique(column_names)
-                self._data = {k: [] for k in column_names}
+                self.data = {k: [] for k in column_names}
+            else:
+                self.data = {}
 
         # Setup the DatasetInfo
         info = info.copy() if info is not None else DatasetInfo()
         DatasetInfoMixin.__init__(self, info=info, split=split)
 
         # Create attributes for all columns and visible columns
-        self.all_columns = list(self._data.keys())
         self._visible_columns = None
 
         # Create an identifier
@@ -150,6 +154,11 @@ class DataPanel(
         return new_data
 
     def _repr_pandas_(self):
+        return self.data._repr_pandas_()[self.column_names].rename(
+            columns={k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
+        )
+
+    def old_repr(self):
         return pd.DataFrame(
             {
                 f"{k} ({v.__class__.__name__})": v._repr_pandas_()
@@ -175,10 +184,34 @@ class DataPanel(
     def __contains__(self, item):
         return item in self.visible_columns
 
+    @property
+    def data(self) -> BlockManager:
+        """Get the underlying data (excluding invisible rows).
+
+        To access underlying data with invisible rows, use `_data`.
+        """
+        return self._data
+
+    def _set_data(self, value: Union[BlockManager, Mapping] = None):
+        if isinstance(value, BlockManager):
+            self._data = value
+        elif isinstance(value, Mapping):
+            self._data = BlockManager.from_dict(value)
+        elif value is None:
+            self._data = BlockManager()
+        else:
+            raise ValueError(
+                f"Cannot set DataPanel data to object of type {type(value)}"
+            )
+
+    @data.setter
+    def data(self, value):
+        self._set_data(value)
+
     def full_length(self):
         # If there are columns, full_length of any column, since they must be same size
         if self.column_names:
-            return self._data[self.column_names[0]].full_length()
+            return self.data[self.column_names[0]].full_length()
         return 0
 
     @property
@@ -235,7 +268,13 @@ class DataPanel(
         self._set_features()
 
     @property
+    def all_columns(self):
+        return list(self.data.keys())
+
+    @property
     def visible_columns(self):
+        if self._visible_columns is None:
+            return self.all_columns
         return self._visible_columns
 
     @visible_columns.setter
@@ -291,46 +330,6 @@ class DataPanel(
         # All columns are visible
         self.visible_columns = self.all_columns
 
-    def _example_or_batch_to_batch(
-        self, example_or_batch: Union[Example, Batch]
-    ) -> Batch:
-
-        # Check if example_or_batch is a batch
-        is_batch = all(
-            [isinstance(v, List) for v in example_or_batch.values()]
-        ) and self._columns_all_equal_length(example_or_batch)
-
-        # Convert to a batch if not
-        if not is_batch:
-            batch = {k: [v] for k, v in example_or_batch.items()}
-        else:
-            batch = example_or_batch
-
-        return batch
-
-    @classmethod
-    def _merge_batch_and_output(cls, batch: Batch, output: Batch):
-        """Merge an output during .map() into a batch."""
-        combined = batch
-        for k in output.keys():
-            if k not in batch:
-                combined[k] = output[k]
-            else:
-                if isinstance(batch[k][0], dict) and isinstance(output[k][0], dict):
-                    combined[k] = [
-                        recmerge(b_i, o_i) for b_i, o_i in zip(batch[k], output[k])
-                    ]
-                else:
-                    combined[k] = output[k]
-        return combined
-
-    @classmethod
-    def _mask_batch(cls, batch: Batch, boolean_mask: List[bool]):
-        """Remove elements in `batch` that are masked by `boolean_mask`."""
-        return {
-            k: [e for i, e in enumerate(v) if boolean_mask[i]] for k, v in batch.items()
-        }
-
     @property
     def identifier(self):
         """Identifier."""
@@ -367,10 +366,12 @@ class DataPanel(
         )
 
         # Add the column
-        self._data[name] = column
+        self.data[name] = column
 
         if name not in self.all_columns:
             self.all_columns.append(name)
+
+        if self._visible_columns is not None:
             self.visible_columns.append(name)
 
         # Set features
@@ -383,20 +384,13 @@ class DataPanel(
         assert column in self.all_columns, f"Column `{column}` does not exist."
 
         # Remove the column
-        del self._data[column]
-        self.all_columns = [col for col in self.all_columns if col != column]
+        del self.data[column]
         self.visible_columns = [col for col in self.visible_columns if col != column]
 
         # Set features
         self._set_features()
 
         logger.info(f"Removed column `{column}`.")
-
-    def select_columns(self, columns: List[str]) -> Batch:
-        """Select a subset of columns."""
-        for col in columns:
-            assert col in self._data
-        return tz.keyfilter(lambda k: k in columns, self._data)
 
     @capture_provenance(capture_args=["axis"])
     def append(
@@ -434,7 +428,9 @@ class DataPanel(
             else:
                 data = {**dict(self.items()), **dict(dp.items())}
 
-            return self._clone(data=data)
+            col = self._clone(data=data)
+            col._visible_columns = None
+            return col
         else:
             raise ValueError("DataPanel `axis` must be either 0 or 1.")
 
@@ -481,67 +477,70 @@ class DataPanel(
         return Identifier(_name=_name, **kwargs)
 
     def _get(self, index, materialize: bool = False):
-        if isinstance(index, int):
+        if isinstance(index, str):
+            # str index => column selection (AbstractColumn)
+            if index in self.column_names:
+                return self.data[index]
+            raise AttributeError(f"Column {index} does not exist.")
+
+        elif isinstance(index, int):
             # int index => single row (dict)
             return {
-                k: self._data[k]._get(index, materialize=materialize)
+                k: self.data[k]._get(index, materialize=materialize)
                 for k in self.visible_columns
             }
 
-        elif isinstance(index, str):
-            # str index => column selection (AbstractColumn)
-            if index in self.column_names:
-                return self._data[index]
-            raise AttributeError(f"Column {index} does not exist.")
-
         # cases where `index` returns a datapanel
-        elif isinstance(index, slice):
+        index_type = None
+        if isinstance(index, slice):
             # slice index => multiple row selection (DataPanel)
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            index_type = "row"
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
             # tuple or list index => multiple row selection (DataPanel)
             if isinstance(index[0], str):
-                if not set(index).issubset(self.visible_columns):
-                    missing_cols = set(self.visible_columns) - set(index)
-                    raise ValueError(f"DataPanel does not have columns {missing_cols}")
-                dp = self.view()
-                dp.visible_columns = index
-                return dp
+                index_type = "column"
+            else:
+                index_type = "row"
 
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
                 raise ValueError(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
             # numpy array index => multiple row selection (DataPanel)
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            index_type = "row"
+
+        elif torch.is_tensor(index):
+            if len(index.shape) != 1:
+                raise ValueError(
+                    "Index must have 1 axis, not {}".format(len(index.shape))
+                )
+            # torch tensor index => multiple row selection (DataPanel)
+            index_type = "row"
+
+        elif isinstance(index, pd.Series):
+            index_type = "row"
+
         elif isinstance(index, AbstractColumn):
             # column index => multiple row selection (DataPanel)
-            return self._clone(
-                data={
-                    k: self._data[k]._get(index, materialize=materialize)
-                    for k in self.visible_columns
-                }
-            )
+            index_type = "row"
+
         else:
             raise TypeError("Invalid index type: {}".format(type(index)))
+
+        if index_type == "column":
+            if not set(index).issubset(self.visible_columns):
+                missing_cols = set(index) - set(self.visible_columns)
+                raise ValueError(f"DataPanel does not have columns {missing_cols}")
+
+            dp = self._clone(data=self.data[index])
+            dp.visible_columns = index
+            return dp
+        elif index_type == "row":
+            return self._clone(
+                data=self.data.apply("_get", index=index, materialize=materialize)
+            )
 
     # @capture_provenance(capture_args=[])
     def __getitem__(self, index):
@@ -563,20 +562,8 @@ class DataPanel(
         # Just return True if the dataset is empty
         return True
 
-    @classmethod
-    def uncached_batch(cls, batch: Batch, copy=True) -> Batch:
-        """Return batch with the "cache" and "slices" columns removed."""
-        return tz.keyfilter(
-            lambda k: k not in ["cache", "slices"], deepcopy(batch) if copy else batch
-        )
-
-    @classmethod
-    def uncached_example(cls, example: Dict, copy=True) -> Dict:
-        """Return example with the "cache" and "slices" columns removed."""
-        return tz.keyfilter(
-            lambda k: k not in ["cache", "slices"],
-            deepcopy(example) if copy else example,
-        )
+    def consolidate(self):
+        self.data.consolidate()
 
     @classmethod
     def from_huggingface(cls, *args, **kwargs):
@@ -692,6 +679,8 @@ class DataPanel(
         identifier: Identifier = None,
     ):
         """Create a Dataset from a pandas DataFrame."""
+        # column names must be str in meerkat
+        df = df.rename(mapper=str, axis="columns")
         return cls.from_batch(
             df.to_dict("series"),
             identifier=identifier,
@@ -740,8 +729,8 @@ class DataPanel(
                 writer.write(example)
 
     def _get_collate_fns(self, columns: Iterable[str] = None):
-        columns = self._data.keys() if columns is None else columns
-        return {name: self._data[name].collate for name in columns}
+        columns = self.data.keys() if columns is None else columns
+        return {name: self.data[name].collate for name in columns}
 
     def _collate(self, batch: List):
         batch = tz.merge_with(list, *batch)
@@ -751,6 +740,12 @@ class DataPanel(
             new_batch[name] = column_to_collate[name](values)
         dp = self._clone(data=new_batch)
         return dp
+
+    def _copy_data(self) -> object:
+        return {name: column.copy() for name, column in self.data.items()}
+
+    def _view_data(self) -> object:
+        return {name: column.view() for name, column in self.data.items()}
 
     @staticmethod
     def _convert_to_batch_fn(
@@ -817,7 +812,7 @@ class DataPanel(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield self._clone(data={**cell_batch._data, **batch_batch._data})
+                yield self._clone(data={**cell_batch.data, **batch_batch.data})
         elif batch_columns:
             for batch_batch in batch_dl:
                 yield batch_batch
@@ -890,7 +885,7 @@ class DataPanel(
         )
 
         # Add new columns for the update
-        for col, vals in output._data.items():
+        for col, vals in output.data.items():
             if col == "index":
                 continue
             new_dp.add_column(col, vals, overwrite=True)
@@ -986,11 +981,7 @@ class DataPanel(
         indices = np.where(outputs)[0]
 
         # filter returns a new datapanel
-        new_datapanel = self.view()
-        for column in new_datapanel._data.values():
-            column.visible_rows = indices
-
-        return new_datapanel
+        return self.lz[indices]
 
     def merge(
         self,
@@ -1021,14 +1012,14 @@ class DataPanel(
 
     def items(self):
         for name in self.visible_columns:
-            yield name, self._data[name]
+            yield name, self.data[name]
 
     def keys(self):
         return self.visible_columns
 
     def values(self):
         for name in self.visible_columns:
-            yield self._data[name]
+            yield self.data[name]
 
     @classmethod
     def read(
@@ -1045,55 +1036,46 @@ class DataPanel(
         )
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        dp = cls.__new__(cls)
+        dp._set_state(state)
 
-        # Load the columns
-        if not metadata["write_together"]:
+        # Load the the manager
+        mgr_dir = os.path.join(path, "mgr")
+        if os.path.exists(mgr_dir):
+            data = BlockManager.read(mgr_dir)
+        else:
+            # backwards compatability to pre-manager datapanels
             data = {
                 name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
                 for name, dtype in metadata["column_dtypes"].items()
             }
-            state["_data"] = data
 
-        # Create a DataPanel from the loaded state
-        datapanel = cls.from_state(state)
+        dp._set_data(data)
 
-        return datapanel
+        return dp
 
     def write(
         self,
         path: str,
-        write_together: bool = False,
     ) -> None:
         """Save a DataPanel to disk."""
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
         # Get the DataPanel state
-        state = self.get_state()
+        state = self._get_state()
 
         # Get the metadata
         metadata = {
             "dtype": type(self),
-            "column_dtypes": {name: type(col) for name, col in self._data.items()},
+            "column_dtypes": {name: type(col) for name, col in self.data.items()},
             "len": len(self),
-            "write_together": write_together,
         }
 
-        if not write_together:
-            if "_data" not in state:
-                raise ValueError(
-                    "DataPanel's state must include `_data` when using "
-                    "`write_together=False`."
-                )
-            del state["_data"]
-
-            # Create a directory for the columns at `path`
-            columns_path = os.path.join(path, "columns")
-            os.makedirs(columns_path, exist_ok=True)
-
-            # Save each column in the DataPanel separately
-            for name, column in self._data.items():
-                column.write(os.path.join(columns_path, name))
+        # write the block manager
+        mgr_dir = os.path.join(path, "mgr")
+        os.makedirs(mgr_dir, exist_ok=True)
+        self.data.write(mgr_dir)
 
         # Write the state
         state_path = os.path.join(path, "state.dill")
@@ -1115,32 +1097,7 @@ class DataPanel(
         """List of attributes that describe the state of the object."""
         return {
             "_identifier",
-            "_data",
-            "all_columns",
             "_visible_columns",
             "_info",
             "_split",
         }
-
-    def _clone_kwargs(self) -> Dict[str, Any]:
-        """Returns __init__ kwargs for instantiating new object.
-
-        This function returns the default parameters that should be plumbed
-        from the current instance to the new instance.
-
-        This is the API that should be used by subclasses of :class:`DataPanel`.
-
-        Returns:
-            Dict[str, Any]: The keyword arguments for initialization
-        """
-        # identifier, info, and split are not passed by default because they have
-        # not been plumbed so far.
-        return {}
-
-    def _clone(self, data=None, **kwargs):
-        default_kwargs = self._clone_kwargs()
-        if data is None:
-            data = kwargs.pop("data", self.data)
-        if kwargs:
-            default_kwargs.update(kwargs)
-        return self.__class__(data, **default_kwargs)
