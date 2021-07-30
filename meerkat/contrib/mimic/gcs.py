@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import io
-from meerkat.columns.pandas_column import PandasSeriesColumn
 import os
 import subprocess
 from typing import Sequence
@@ -11,6 +10,7 @@ import numpy as np
 from google.cloud import bigquery, bigquery_storage, storage
 
 from meerkat import ImageColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 
 
 class GCSImageColumn(ImageColumn):
@@ -84,10 +84,8 @@ class GCSImageColumn(ImageColumn):
         """List of attributes that describe the state of the object."""
         return super()._state_keys() | {"bucket_name", "project", "local_dir", "writer"}
 
-
     def _set_state(self, state: dict = None):
         if state is not None:
             self.__dict__.update(state)
         storage_client = storage.Client(project=self.project)
         self.bucket = storage_client.bucket(self.bucket_name, user_project=self.project)
-
