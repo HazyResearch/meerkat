@@ -20,7 +20,7 @@ class Model(torch.nn.Module):
         device: str = None,
     ):
 
-        # self.identifier = identifier
+        super(Model, self).__init__()
 
         self.model = model
 
