@@ -8,7 +8,7 @@ from typing import Dict, Sequence, Union
 import pandas as pd
 import yaml
 
-from meerkat.block.abstract import AbstractBlock
+from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
 
 from .ref import BlockRef
@@ -200,7 +200,7 @@ class BlockManager(MutableMapping):
                     **column._get_meta(),
                     "block": {
                         "block_dir": block_dir,
-                        "block_index": column._block_index,
+                        "block_index": _serialize_block_index(column._block_index),
                     },
                 }
                 column._write_state(column_dir)
@@ -251,7 +251,7 @@ class BlockManager(MutableMapping):
                 # read column, passing in a block_view
                 col = col_meta["dtype"].read(
                     column_dir,
-                    _data=block[block_meta["block_index"]],
+                    _data=block[_deserialize_block_index(block_meta["block_index"])],
                     _meta=col_meta,
                 )
                 mgr.add_column(col, name)
@@ -271,3 +271,17 @@ class BlockManager(MutableMapping):
                 cols -= set(block_ref.keys())
         dfs.append(pd.DataFrame({k: self[k]._repr_pandas_() for k in cols}))
         return pd.concat(objs=dfs, axis=1)
+
+
+def _serialize_block_index(index: BlockIndex) -> Union[Dict, str, int]:
+    if not isinstance(index, (int, str, slice)):
+        raise ValueError("Can only serialize `BlockIndex` objects.")
+    elif isinstance(index, slice):
+        return {"start": index.start, "stop": index.stop, "step": index.step}
+    return index
+
+
+def _deserialize_block_index(index: Union[Dict, int, str]) -> BlockIndex:
+    if isinstance(index, Dict):
+        return slice(index["start"], index["stop"], index["step"])
+    return index
