@@ -178,6 +178,12 @@ def test_row_index_multiple(tmpdir, index_type, consolidate):
         assert isinstance(rows["img"], ListColumn)
         assert (rows["a"].data == indices).all()
         assert (rows["b"].data == indices).all()
+        assert (rows["d"].data == torch.tensor(indices)).all()
+        assert (rows["e"].data.values == indices).all()
+        assert (rows["f"].data == 1).all()
+        assert len(rows["f"].shape) == 2
+        assert (rows["g"].data == 1).all()
+        assert len(rows["g"].shape) == 2
 
 
 def test_row_lz_index_single(tmpdir):
@@ -591,7 +597,7 @@ def test_lz_update(
         func, batch_size=4, is_batched_fn=False, num_workers=0, materialize=False
     )
     assert set(result.column_names) == set(
-        ["a", "b", "c", "d", "e", "x", "img", "index"]
+        ["a", "b", "c", "d", "e", "f", "g", "x", "img", "index"]
     )
     assert len(result["x"]) == len(visible_rows)
     assert result["x"].data == [test_bed.img_col.image_paths[i] for i in visible_rows]
@@ -688,7 +694,7 @@ def test_to_pandas(tmpdir, use_visible_columns):
         assert isinstance(df["img"][0], LambdaCell)
 
         assert isinstance(df["d"].values == dp["d"].numpy()).all()
-        assert isinstance(df["d"].values == dp["d"].numpy()).all()
+        assert isinstance(df["e"].values == dp["e"].numpy()).all()
 
 
 @pytest.mark.parametrize(

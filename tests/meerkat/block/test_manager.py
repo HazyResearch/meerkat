@@ -41,8 +41,10 @@ def test_consolidate():
     mgr.add_column(col5, "col5")
     col6 = mk.TensorColumn(torch.arange(10) * 6)
     mgr.add_column(col6, "col6")
+    col9 = mk.TensorColumn(torch.ones(10, 5).to(int) * 9)
+    mgr.add_column(col9, "col9")
 
-    assert len(mgr._block_refs) == 6
+    assert len(mgr._block_refs) == 7
     mgr.consolidate()
     assert len(mgr._block_refs) == 3
 
@@ -262,8 +264,10 @@ def test_io(tmpdir):
     mgr.add_column(col7, "col7")
     col8 = mk.ListColumn(list(range(10)))
     mgr.add_column(col8, "col8")
+    col9 = mk.TensorColumn(torch.ones(10, 5).to(int) * 9)
+    mgr.add_column(col9, "col9")
 
-    assert len(mgr._block_refs) == 6
+    assert len(mgr._block_refs) == 7
     mgr.write(tmpdir)
     new_mgr = BlockManager.read(tmpdir)
     assert len(new_mgr._block_refs) == 3
