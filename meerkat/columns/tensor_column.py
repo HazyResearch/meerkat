@@ -6,13 +6,13 @@ import logging
 import os
 from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
-import dill
 import numpy as np
 import pandas as pd
 import torch
-import yaml
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.tensor_block import TensorBlock
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
@@ -43,13 +43,21 @@ class TensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
     AbstractColumn,
 ):
+    block_class: type = TensorBlock
+
     def __init__(
         self,
         data: Sequence = None,
         *args,
         **kwargs,
     ):
-        if data is not None and not isinstance(data, TensorColumn):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, TensorBlock):
+                raise ValueError(
+                    "Cannot create `TensorColumn` from a `BlockView` not "
+                    "referencing a `TensorBlock`."
+                )
+        elif data is not None and not isinstance(data, TensorColumn):
             if (
                 isinstance(data, Sequence)
                 and len(data) > 0
@@ -111,8 +119,15 @@ class TensorColumn(
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data[indices]
+    def _get(self, index, materialize: bool = True):
+        index = self.block_class._convert_index(index)
+
+        data = self._data[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=data)
+        else:
+            return data
 
     def _set_batch(self, indices, values):
         self._data[indices] = values
@@ -131,68 +146,6 @@ class TensorColumn(
         else:
             return ConcatWriter(template=template, output_type=TensorColumn)
 
-    @classmethod
-    def read(
-        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> TensorColumn:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
-        # Load in the metadata: only available if the array was stored by meerkat
-        metadata_path = os.path.join(path, "meta.yaml")
-        if os.path.exists(metadata_path):
-            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-            assert metadata["dtype"] == cls
-
-        # If the path doesn't exist, assume that `path` points to the `.npy` file
-        data_path = os.path.join(path, "data.npy")
-        if not os.path.exists(data_path):
-            data_path = path
-
-        # Load in the data
-        if mmap:
-            # assert dtype is not None and shape is not None
-            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            # data = np.load(data_path, mmap_mode="r")
-        else:
-            data = np.load(data_path, allow_pickle=True)
-
-        col = cls(data)
-
-        state_path = os.path.join(path, "state.dill")
-        if os.path.exists(state_path):
-            state = dill.load(open(state_path, "rb"))
-            col.__dict__.update(state)
-        return col
-
-    def write(self, path: str, **kwargs) -> None:
-        # Make all the directories to the path
-        os.makedirs(path, exist_ok=True)
-
-        # Get the column state
-        state = self.get_state()
-        _data = state["_data"]
-
-        # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
-        metadata = {
-            "dtype": type(self),
-            "len": len(self),
-            **self.metadata,
-        }
-
-        # Get the paths where metadata and data should be stored
-        metadata_path = os.path.join(path, "meta.yaml")
-        state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.npy")
-
-        # Saving all cell data in a single pickle file
-        np.save(data_path, _data)
-
-        # Saving the metadata as a yaml
-        yaml.dump(metadata, open(metadata_path, "w"))
-        dill.dump(state, open(state_path, "wb"))
-
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:
             return pd.Series([f"torch.Tensor(shape={self.shape[1:]})"] * len(self))
@@ -206,3 +159,17 @@ class TensorColumn(
             return cls(data)
         else:
             return super(TensorColumn, cls).from_data(data)
+
+    def _copy_data(self) -> torch.Tensor:
+        return self._data.clone()
+
+    def _view_data(self) -> object:
+        return self._data
+
+    def _write_data(self, path: str) -> None:
+        # Saving all cell data in a single pickle file
+        torch.save(self.data, os.path.join(path, "data.pt"))
+
+    @staticmethod
+    def _read_data(path: str) -> torch.Tensor:
+        return torch.load(os.path.join(path, "data.pt"))

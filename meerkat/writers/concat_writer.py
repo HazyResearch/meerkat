@@ -20,6 +20,8 @@ class ConcatWriter(AbstractWriter):
     def write(self, data, **kwargs) -> None:
         # convert to Meerkat column if not already
         if self.template is not None:
+            if isinstance(data, AbstractColumn):
+                data = data.data
             data = self.template._clone(data=data)
         elif not isinstance(data, AbstractColumn):
             data = self.output_type(data)

@@ -5,6 +5,7 @@ import logging
 from typing import Sequence
 
 import cytoolz as tz
+import numpy as np
 import pandas as pd
 from yaml.representer import Representer
 
@@ -37,17 +38,6 @@ class ListColumn(AbstractColumn):
     def from_list(cls, data: Sequence):
         return cls(data=data)
 
-    @property
-    def data(self):
-        """Get the underlying data (excluding invisible rows).
-
-        To access underlying data with invisible rows, use `_data`.
-        """
-        if self.visible_rows is not None:
-            return [self._data[row] for row in self.visible_rows]
-        else:
-            return self._data
-
     def batch(
         self,
         batch_size: int = 1,
@@ -65,7 +55,18 @@ class ListColumn(AbstractColumn):
                 yield self[i : i + batch_size]
 
     def _repr_pandas_(self) -> pd.Series:
-        return pd.Series(map(repr, self))
+        if len(self) <= pd.options.display.max_rows:
+            return pd.Series(map(repr, self))
+        else:
+            # faster than creating a
+            series = pd.Series(np.empty(len(self)), copy=False)
+            series.iloc[: pd.options.display.min_rows] = list(
+                map(repr, self[: pd.options.display.min_rows])
+            )
+            series.iloc[-(pd.options.display.min_rows // 2 + 1) :] = list(
+                map(repr, self[-(pd.options.display.min_rows // 2 + 1) :])
+            )
+            return series
 
     @classmethod
     def concat(cls, columns: Sequence[ListColumn]):

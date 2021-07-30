@@ -58,30 +58,33 @@ def test_from_array():
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows,batched",
-    product(["float", "int"], [True, False], [True, False]),
+    "dtype,batched",
+    product(["float", "int"], [True, False]),
 )
-def test_map_return_single(dtype, use_visible_rows, batched):
+def test_map_return_single(dtype, batched):
     """`map`, single return,"""
-    col, array = _get_data(dtype=dtype, use_visible_rows=use_visible_rows)
+    col, array = _get_data(dtype=dtype)
 
     def func(x):
         out = x.mean(axis=-1)
         return out
 
     result = col.map(func, batch_size=4, is_batched_fn=batched)
+
     assert isinstance(result, NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))
     assert (result == array.mean(axis=-1)).all()
 
 
 @pytest.mark.parametrize(
-    "dtype,use_visible_rows, batched",
-    product(["float", "int"], [True, False], [True, False]),
+    "dtype, batched",
+    product(["float", "int"], [True, False]),
 )
-def test_map_return_multiple(dtype, use_visible_rows, batched):
+def test_map_return_multiple(dtype, batched):
     """`map`, multiple return."""
-    col, array = _get_data(dtype=dtype, use_visible_rows=use_visible_rows)
+    col, array = _get_data(
+        dtype=dtype,
+    )
 
     def func(x):
         return {"mean": x.mean(axis=-1), "std": x.std(axis=-1)}
@@ -96,12 +99,16 @@ def test_map_return_multiple(dtype, use_visible_rows, batched):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim,dtype",
+    product([True, False], ["float", "int"]),
 )
-def test_set_item_1(multiple_dim, dtype, use_visible_rows):
+def test_set_item_1(
+    multiple_dim,
+    dtype,
+):
     col, array = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+        multiple_dim=multiple_dim,
+        dtype=dtype,
     )
     index = [0, 3]
     not_index = [i for i in range(col.shape[0]) if i not in index]
@@ -112,12 +119,16 @@ def test_set_item_1(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim,dtype",
+    product([True, False], ["float", "int"]),
 )
-def test_set_item_2(multiple_dim, dtype, use_visible_rows):
+def test_set_item_2(
+    multiple_dim,
+    dtype,
+):
     col, array = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+        multiple_dim=multiple_dim,
+        dtype=dtype,
     )
     index = 0
     not_index = [i for i in range(col.shape[0]) if i != index]
@@ -128,13 +139,14 @@ def test_set_item_2(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "use_visible_rows,dtype,batched",
-    product([True, False], ["float", "int"], [True, False]),
+    "dtype,batched",
+    product(["float", "int"], [True, False]),
 )
-def test_filter_1(use_visible_rows, dtype, batched):
+def test_filter_1(dtype, batched):
     """multiple_dim=False."""
     col, array = _get_data(
-        multiple_dim=False, dtype=dtype, use_visible_rows=use_visible_rows
+        multiple_dim=False,
+        dtype=dtype,
     )
 
     def func(x):
@@ -146,14 +158,12 @@ def test_filter_1(use_visible_rows, dtype, batched):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim, dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim, dtype",
+    product([True, False], ["float", "int"]),
 )
-def test_pickle(multiple_dim, dtype, use_visible_rows):
+def test_pickle(multiple_dim, dtype):
     # important for dataloader
-    col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
-    )
+    col, _ = _get_data(multiple_dim=multiple_dim, dtype=dtype)
     buf = pickle.dumps(col)
     new_col = pickle.loads(buf)
 
@@ -162,15 +172,23 @@ def test_pickle(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim, dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim, dtype",
+    product(
+        [True, False],
+        ["float", "int"],
+    ),
 )
-def test_io(tmp_path, multiple_dim, dtype, use_visible_rows):
+def test_io(
+    tmp_path,
+    multiple_dim,
+    dtype,
+):
     # uses the tmp_path fixture which will provide a
     # temporary directory unique to the test invocation,
     # important for dataloader
     col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
+        multiple_dim=multiple_dim,
+        dtype=dtype,
     )
     path = os.path.join(tmp_path, "test")
     col.write(path)
@@ -182,13 +200,11 @@ def test_io(tmp_path, multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim,dtype",
+    product([True, False], ["float", "int"]),
 )
-def test_copy(multiple_dim, dtype, use_visible_rows):
-    col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
-    )
+def test_copy(multiple_dim, dtype):
+    col, _ = _get_data(multiple_dim=multiple_dim, dtype=dtype)
     col_copy = col.copy()
 
     assert isinstance(col_copy, NumpyArrayColumn)
@@ -196,13 +212,11 @@ def test_copy(multiple_dim, dtype, use_visible_rows):
 
 
 @pytest.mark.parametrize(
-    "multiple_dim,dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
+    "multiple_dim,dtype",
+    product([True, False], ["float", "int"]),
 )
-def test_to_tensor(multiple_dim, dtype, use_visible_rows):
-    col, _ = _get_data(
-        multiple_dim=multiple_dim, dtype=dtype, use_visible_rows=use_visible_rows
-    )
+def test_to_tensor(multiple_dim, dtype):
+    col, _ = _get_data(multiple_dim=multiple_dim, dtype=dtype)
     tensor = col.to_tensor()
 
     assert torch.is_tensor(tensor)

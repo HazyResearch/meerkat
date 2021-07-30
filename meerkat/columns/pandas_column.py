@@ -5,13 +5,11 @@ import functools
 import logging
 import numbers
 import os
-from typing import Any, Callable, Sequence
+from typing import Callable, Sequence
 
-import dill
 import numpy as np
 import pandas as pd
 import torch
-import yaml
 from pandas.core.accessor import CachedAccessor
 from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.dtypes.common import (
@@ -31,6 +29,8 @@ from pandas.core.indexes.accessors import (
 from pandas.core.strings.accessor import StringMethods
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
 
@@ -126,6 +126,8 @@ class PandasSeriesColumn(
     AbstractColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
+    block_class: type = PandasBlock
+
     def __init__(
         self,
         data: Sequence = None,
@@ -133,7 +135,13 @@ class PandasSeriesColumn(
         *args,
         **kwargs,
     ):
-        if isinstance(data, pd.Series):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, PandasBlock):
+                raise ValueError(
+                    "Cannot create `PandasSeriesColumn` from a `BlockView` not "
+                    "referencing a `PandasBlock`."
+                )
+        elif isinstance(data, pd.Series):
             data = data if dtype is None else data.astype(dtype)
         elif data is not None:
             data = pd.Series(data, dtype=dtype)
@@ -177,17 +185,6 @@ class PandasSeriesColumn(
             # one return value
             return type(self)(result)
 
-    @property
-    def data(self):
-        """Get the underlying data (excluding invisible rows).
-
-        To access underlying data with invisible rows, use `_data`.
-        """
-        if self.visible_rows is not None:
-            return self._data.iloc[self.visible_rows]
-        else:
-            return self._data
-
     def __getattr__(self, name):
         if name == "__getstate__" or name == "__setstate__":
             # for pickle, it's important to raise an attribute error if __getstate__
@@ -209,21 +206,15 @@ class PandasSeriesColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _get_cell(self, index: int, materialize: bool = True) -> Any:
-        """Get a single cell from the column.
+    def _get(self, index, materialize: bool = True):
+        index = self.block_class._convert_index(index)
 
-        Args:
-            index (int): This is an index into the ALL rows, not just visible rows. In
-                other words, we assume that the index passed in has already been
-                remapped via `_remap_index`, if `self.visible_rows` is not `None`.
-            materialize (bool, optional): Materialize and return the object. This
-                argument is used by subclasses of `AbstractColumn` that hold data in an
-                unmaterialized format. Defaults to False.
-        """
-        return self._data.iloc[index]
-
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data.iloc[indices]
+        data = self._data.iloc[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=data)
+        else:
+            return data
 
     def _set_cell(self, index, value):
         self._data[index] = value
@@ -238,62 +229,20 @@ class PandasSeriesColumn(
             return columns[0]._clone(data=data)
         return cls.from_array(data)
 
-    @classmethod
-    def read(
-        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> PandasSeriesColumn:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
+    def _write_data(self, path: str) -> None:
+        data_path = os.path.join(path, "data.pd")
+        self.data.to_pickle(data_path)
 
-        # Load in the metadata: only available if the array was stored by meerkat
-        metadata_path = os.path.join(path, "meta.yaml")
-        if os.path.exists(metadata_path):
-            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-            assert metadata["dtype"] == cls
-
-        # If the path doesn't exist, assume that `path` points to the `.npy` file
+    @staticmethod
+    def _read_data(
+        path: str,
+    ):
         data_path = os.path.join(path, "data.pd")
         if not os.path.exists(data_path):
             data_path = path
 
         # Load in the data
-        data = pd.read_pickle(data_path)
-
-        col = cls(data)
-
-        state_path = os.path.join(path, "state.dill")
-        if os.path.exists(state_path):
-            state = dill.load(open(state_path, "rb"))
-            col.__dict__.update(state)
-        return col
-
-    def write(self, path: str, **kwargs) -> None:
-        # Make all the directories to the path
-        os.makedirs(path, exist_ok=True)
-
-        # Get the column state
-        state = self.get_state()
-        _data = state["_data"]
-
-        # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
-        metadata = {
-            "dtype": type(self),
-            "len": len(self),
-            **self.metadata,
-        }
-
-        # Get the paths where metadata and data should be stored
-        metadata_path = os.path.join(path, "meta.yaml")
-        state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.pd")
-
-        # Saving all cell data in a single pickle file
-        _data.to_pickle(data_path)
-
-        # Saving the metadata as a yaml
-        yaml.dump(metadata, open(metadata_path, "w"))
-        dill.dump(state, open(state_path, "wb"))
+        return pd.read_pickle(data_path)
 
     def _repr_pandas_(self) -> pd.Series:
         return self.data
