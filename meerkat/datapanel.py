@@ -720,7 +720,12 @@ class DataPanel(
     @capture_provenance()
     def to_pandas(self) -> pd.DataFrame:
         """Convert a Dataset to a pandas DataFrame."""
-        return pd.DataFrame({name: column.to_pandas() for name, column in self.items()})
+        return pd.DataFrame(
+            {
+                name: column.to_pandas().reset_index(drop=True)
+                for name, column in self.items()
+            }
+        )
 
     def to_jsonl(self, path: str) -> None:
         """Save a Dataset to a jsonl file."""
