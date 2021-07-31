@@ -135,7 +135,7 @@ class HuggingfaceModel(Model):
         activations = tz.merge_with(lambda v: torch.cat(v), *activations)
         activation_col = activations[f"activation ({target_module})"]
 
-        dataset.add_column(f"activation ({target_module})", activation_col)
+        # dataset.add_column(f"activation ({target_module})", activation_col)
         return activation_col
 
     def summarization(
