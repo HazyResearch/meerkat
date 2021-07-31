@@ -52,7 +52,7 @@ class MappableMixin:
         if not is_batched_fn:
             # Convert to a batch function
             function = self._convert_to_batch_fn(
-                function, with_indices=with_indices, materialize=materialize
+                function, with_indices=with_indices, materialize=materialize, **kwargs
             )
             is_batched_fn = True
             logger.info(f"Converting `function` {function} to a batched function.")
@@ -87,6 +87,7 @@ class MappableMixin:
                     batch,
                     range(start_index, end_index),
                     materialize=materialize,
+                    **kwargs,
                 )
 
                 # Pull out information
@@ -130,9 +131,10 @@ class MappableMixin:
                     function(
                         batch,
                         range(i * batch_size, min(len(self), (i + 1) * batch_size)),
+                        **kwargs,
                     )
                     if with_indices
-                    else function(batch)
+                    else function(batch, **kwargs)
                 )
 
             # Append the output

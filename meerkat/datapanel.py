@@ -754,10 +754,13 @@ class DataPanel(
 
     @staticmethod
     def _convert_to_batch_fn(
-        function: Callable, with_indices: bool, materialize: bool = True
+        function: Callable, with_indices: bool, materialize: bool = True, **kwargs
     ) -> callable:
         return convert_to_batch_fn(
-            function=function, with_indices=with_indices, materialize=materialize
+            function=function,
+            with_indices=with_indices,
+            materialize=materialize,
+            **kwargs,
         )
 
     def batch(
@@ -857,7 +860,7 @@ class DataPanel(
         # Get some information about the function
         with self.format(input_columns):
             function_properties = self._inspect_function(
-                function, with_indices, is_batched_fn, materialize=materialize
+                function, with_indices, is_batched_fn, materialize=materialize, **kwargs
             )
             assert (
                 function_properties.dict_output
@@ -866,7 +869,7 @@ class DataPanel(
         if not is_batched_fn:
             # Convert to a batch function
             function = convert_to_batch_fn(
-                function, with_indices=with_indices, materialize=materialize
+                function, with_indices=with_indices, materialize=materialize, **kwargs
             )
             logger.info(f"Converting `function` {function} to batched function.")
 
@@ -887,6 +890,7 @@ class DataPanel(
             mmap=mmap,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
 
         # Add new columns for the update
@@ -967,6 +971,7 @@ class DataPanel(
                 with_indices,
                 is_batched_fn=is_batched_fn,
                 materialize=materialize,
+                **kwargs,
             )
             assert function_properties.bool_output, "function must return boolean."
 
@@ -982,6 +987,7 @@ class DataPanel(
             num_workers=num_workers,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
         indices = np.where(outputs)[0]
 

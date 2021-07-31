@@ -18,7 +18,7 @@ class CloneableMixin:
 
     @classmethod
     def _state_keys(cls) -> set:
-        """"""
+        """ """
         raise NotImplementedError()
 
     def copy(self, **kwargs) -> object:
