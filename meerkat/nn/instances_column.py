@@ -6,6 +6,7 @@ from typing import Sequence
 from tqdm import tqdm
 
 from meerkat.columns.list_column import ListColumn
+from meerkat.columns.tensor_column import TensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 ops = LazyLoader("torchvision.ops")
@@ -16,15 +17,19 @@ class InstancesColumn(ListColumn):
 
         super(InstancesColumn, self).__init__(data=data, *args, **kwargs)
 
-    def num_instances(self) -> ListColumn:
-        # Returns a column with the number of instances in each Instances object
+    def num_instances(self) -> TensorColumn:
+        """Returns the number of instances for each image."""
 
-        data_col = ListColumn([len(instance) for instance in self])
+        data_col = TensorColumn([len(instance) for instance in self])
 
         return data_col
 
     def get_field(self, field: str, batch_size: int = 32) -> ListColumn:
-        # Returns a column of the required field from each Instances object
+        """Returns a speific field of the Instances object.
+
+        Returns:
+            ListColumn: List of the specified field from Instances object.
+        """
 
         data = []
         for batch in tqdm(
@@ -42,20 +47,29 @@ class InstancesColumn(ListColumn):
         self,
         iou_threshold: float,
         batch_size: int = 32,
-    ) -> ListColumn:
-        # Returns ListColumn of tensors of indices given by torchvision.ops.nms
+    ) -> InstancesColumn:
+        """Returns the instances retained after NMS for each image.
+
+        Returns:
+            ListColumn: Contains tensors of shape (N,4) representing the boxes retained
+                        after NMS where N is the number of boxes.
+        """
 
         data = []
         for batch in tqdm(
             self.batch(batch_size),
             total=(len(self) // batch_size + int(len(self) % batch_size != 0)),
         ):
+
             batch_data = [
-                ops.nms(
-                    instance.get_fields()["pred_boxes"].tensor,
-                    instance.get_fields()["scores"],
-                    iou_threshold,
-                )
+                instance.get_fields()["pred_boxes"].tensor[
+                    ops.batched_nms(
+                        boxes=instance.get_fields()["pred_boxes"].tensor,
+                        scores=instance.get_fields()["scores"],
+                        idxs=instance.get_fields()["pred_classes"],
+                        iou_threshold=iou_threshold,
+                    )
+                ]
                 for instance in batch
             ]
             data = list(itertools.chain(data, batch_data))
