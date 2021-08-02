@@ -128,25 +128,6 @@ class PandasSeriesColumn(
 ):
     block_class: type = PandasBlock
 
-    def __init__(
-        self,
-        data: Sequence = None,
-        dtype: str = None,
-        *args,
-        **kwargs,
-    ):
-        if isinstance(data, BlockView):
-            if not isinstance(data.block, PandasBlock):
-                raise ValueError(
-                    "Cannot create `PandasSeriesColumn` from a `BlockView` not "
-                    "referencing a `PandasBlock`."
-                )
-        elif isinstance(data, pd.Series):
-            data = data if dtype is None else data.astype(dtype)
-        elif data is not None:
-            data = pd.Series(data, dtype=dtype)
-        super(PandasSeriesColumn, self).__init__(data=data, *args, **kwargs)
-
     _HANDLED_TYPES = (np.ndarray, numbers.Number, str)
 
     str = CachedAccessor("str", _MeerkatStringMethods)
@@ -154,6 +135,18 @@ class PandasSeriesColumn(
     cat = CachedAccessor("cat", _MeerkatCategoricalAccessor)
     # plot = CachedAccessor("plot", pandas.plotting.PlotAccessor)
     # sparse = CachedAccessor("sparse", SparseAccessor)
+
+    def _set_data(self, data: object):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, PandasBlock):
+                raise ValueError(
+                    "Cannot create `PandasSeriesColumn` from a `BlockView` not "
+                    "referencing a `PandasBlock`."
+                )
+        elif data is not None:
+            data = pd.Series(data)
+
+        super(PandasSeriesColumn, self)._set_data(data)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         out = kwargs.get("out", ())

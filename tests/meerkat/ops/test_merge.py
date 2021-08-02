@@ -316,6 +316,31 @@ def test_cell_merge(tmpdir):
     ]
 
 
+def test_cell_merge_names(tmpdir):
+    length = 16
+    img_col_test_bed = MockImageColumn(
+        length=length, tmpdir=tmpdir, use_cell_column=True
+    )
+    dp1 = DataPanel.from_batch(
+        {
+            "dicom_id": np.arange(length),
+            "dicom": img_col_test_bed.col,
+        }
+    )
+    rows = np.arange(4, 8)
+    dp2 = DataPanel.from_batch(
+        {
+            "dicom_id": rows,
+        }
+    )
+
+    out = dp1.merge(dp2, on="dicom_id", how="inner")
+    assert isinstance(out["dicom"], ImageCellColumn)
+    assert [str(cell.filepath) for cell in out["dicom"].data] == [
+        img_col_test_bed.image_paths[row] for row in rows
+    ]
+
+
 def test_check_merge_columns():
     length = 16
     # check dictionary not hashable
