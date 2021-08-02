@@ -29,16 +29,17 @@ def build_mimic_dp(
     cxr_jpg: bool = True,
     split: bool = True,
 ) -> mk.DataPanel:
-    """Builds a `DataPanel` for accessing data from the MIMIC-CXR Database
-    https://physionet.org/content/mimic-cxr/2.0.0/
-    The MIMIC-CXR database integrates chest X-ray imaging data with structured EHR data
-    from Beth Israel Deaconess Medical Center. The full database has an uncompressed
-    size of over 5 TB. This function quickly builds a `DataPanel` that can be used to
-    explore, slice and download the database. Building the DataPanel takes ~1 minute
-    (when not downloading the radiology reports). The large CXR DICOM and JPEG files are
-    not downloaded, but lazily pulled from Google Cloud Storage (GCS) only when they are
-    accessed. This makes it possible to inspect and explore that data without
-    downloading the full 5 TB.
+    """Builds a `DataPanel` for accessing data from the MIMIC-CXR database
+    https://physionet.org/content/mimic-cxr/2.0.0/ The MIMIC-CXR database
+    integrates chest X-ray imaging data with structured EHR data from Beth
+    Israel Deaconess Medical Center. The full database has an uncompressed size
+    of over 5 TB. This function quickly builds a `DataPanel` that can be used
+    to explore, slice and download the database. Building the DataPanel takes.
+
+    ~1 minute (when not downloading the radiology reports). The large CXR DICOM
+    and JPEG files are not downloaded, but lazily pulled from Google Cloud
+    Storage (GCS) only when they are accessed. This makes it possible to
+    inspect and explore that data without downloading the full 5 TB.
 
     Note: model training will likely bottleneck on the GCS downloads, so it is
     recommended that you cache the JPEG images locally bfore training. This can be
@@ -145,7 +146,7 @@ def build_mimic_dp(
             ON cxr_records.dicom_id = meta.dicom
         """
 
-    print(f"Querying MIMIC database with {gcp_project=} for {tables=}.")
+    print(f"Querying MIMIC database: `gcp_project`={gcp_project}, `tables`={tables}.")
     df = query_mimic_db(query_str, gcp_project=gcp_project)
 
     if "admit" in tables:
