@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Optional, Sequence
 
 
 def convert_to_batch_column_fn(
-    function: Callable, with_indices: bool, materialize: bool = True
+    function: Callable, with_indices: bool, materialize: bool = True, **kwargs
 ):
     """Batch a function that applies to an example."""
 

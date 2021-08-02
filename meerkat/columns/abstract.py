@@ -212,10 +212,13 @@ class AbstractColumn(
 
     @staticmethod
     def _convert_to_batch_fn(
-        function: Callable, with_indices: bool, materialize: bool = True
+        function: Callable, with_indices: bool, materialize: bool = True, **kwargs
     ) -> callable:
         return convert_to_batch_column_fn(
-            function=function, with_indices=with_indices, materialize=materialize
+            function=function,
+            with_indices=with_indices,
+            materialize=materialize,
+            **kwargs,
         )
 
     def __len__(self):
@@ -265,7 +268,11 @@ class AbstractColumn(
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function, with_indices, is_batched_fn=is_batched_fn, materialize=materialize
+            function,
+            with_indices,
+            is_batched_fn=is_batched_fn,
+            materialize=materialize,
+            **kwargs,
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -274,13 +281,14 @@ class AbstractColumn(
         outputs = self.map(
             function=function,
             with_indices=with_indices,
-            input_columns=input_columns,
+            # input_columns=input_columns,
             is_batched_fn=is_batched_fn,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
         indices = np.where(outputs)[0]
         return self.lz[indices]
