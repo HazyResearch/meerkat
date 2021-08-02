@@ -2,12 +2,9 @@ from __future__ import annotations
 
 import io
 import os
-import subprocess
 from typing import Sequence
 
-import google.auth
-import numpy as np
-from google.cloud import bigquery, bigquery_storage, storage
+from google.cloud import storage
 
 from meerkat import ImageColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
