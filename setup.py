@@ -97,7 +97,12 @@ EXTRAS = {
     "wilds": [
         "wilds>=1.1.0",
     ],
-    "medimg": ["dosma>=0.0.13", "kaggle"],
+    "medimg": [
+        "dosma>=0.0.13",
+        "kaggle",
+        "google-cloud-storage",
+        "google-cloud-bigquery[bqstorage,pandas]",
+    ],
 }
 
 # The rest you shouldn't have to touch too much :)

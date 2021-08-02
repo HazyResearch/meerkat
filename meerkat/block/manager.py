@@ -101,6 +101,8 @@ class BlockManager(MutableMapping):
             if len(block_ref) == 0:
                 self._block_refs.pop(self._column_to_block_id[name])
 
+            self._column_to_block_id.pop(name)
+
     def __getitem__(
         self, index: Union[str, Sequence[str]]
     ) -> Union[AbstractColumn, BlockManager]:
@@ -158,6 +160,9 @@ class BlockManager(MutableMapping):
     def add_column(self, col: AbstractColumn, name: str):
         """Convert data to a meerkat column using the appropriate Column
         type."""
+        if name in self._columns:
+            self.remove(name)
+
         if not col.is_blockable():
             col = col.view()
             self._columns[name] = col

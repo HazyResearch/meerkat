@@ -87,7 +87,11 @@ def merge(
         merged_dp.visible_columns = (
             merged_dp.visible_columns[-1:] + merged_dp.visible_columns[:-1]
         )
-    if not keep_indexes:
+    if (
+        not keep_indexes
+        and ("index" + suffixes[0]) in merged_dp
+        and ("index" + suffixes[1]) in merged_dp
+    ):
         merged_dp.remove_column("index" + suffixes[0])
         merged_dp.remove_column("index" + suffixes[1])
 
