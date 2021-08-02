@@ -24,3 +24,17 @@ MIMIC (Medical Information Mart for Intensive Care) is a large database of deide
         Forbidden: 403 Access Denied: Table physionet-data:mimic_core.patients: User does not have permission to query table physionet-data:mimic_core.patients.
         ```
 
+## Build a MIMIC DataPanel: `build_mimic_dp`
+This function builds a `DataPanel` for accessing data from the [MIMIC-CXR Database](https://physionet.org/content/mimic-cxr/2.0.0/). The MIMIC-CXR database integrates chest X-ray imaging data with structured EHR datafrom Beth Israel Deaconess Medical Center. The full database has an uncompressedsize of over 5 TB. This function quickly builds a `DataPanel` that can be used to explore, slice and download the database. Building the DataPanel takes ~1 minute (when not downloading the radiology reports). The large CXR DICOM and JPEG files are not downloaded, but lazily pulled from Google Cloud Storage (GCS) only when they are accessed. This makes it possible to inspect and explore that data without downloading the full 5 TB. 
+
+Note: model training will likely bottleneck on the GCS downloads, so it is recommended that you cache the JPEG images locally bfore training. This can be accomplished by setting a `writer` and running a map over the data. 
+```
+    dp["jpg_img].writer = lambda path, img: x.save(path, img)
+    dp["jpg_img].map(lambda x: True)
+```
+The images will be saved in `dataset_dir`. This will take several hours for the full dataset. You can also slice down to a subset of the dataset before running the map.
+
+Each row corresponds to a single chest X-ray image (stored in both DICOM format and JPEG in the MIMIC database). Each row is uniquely identified by the "dicom_id" column. Note that a single chest X-ray study (identified by "study_id" column) mayconsist of multiple images and a single patient (identified by "subject_id" column) may have multiple studies in the database. The columns in the DataPanel can be grouped into four categories:
+    1. (`PandasSeriesColumn`) Metadata and labels pulled from tables in the MIMIC-IV EHR database (e.g."pneumonia", "ethnicity", "view_position", "gender"). For more information on the tables see: https://mimic.mit.edu/docs/iv/modules/.For more information on the CheXpert labels see: https://physionet.org/content/mimic-cxr-jpg/2.0.0/
+    2. (`GCSImageColumn`) DICOM and JPEG image files of the chest xrays.These columns do not hold the images themselves, but lazily load from the GCP when they're accessed. 
+    3. (`ReportColumn`) The radiology reports for each exam are downloaded to disk,and lazily loaded when accessed.

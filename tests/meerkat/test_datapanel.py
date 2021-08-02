@@ -636,6 +636,27 @@ def test_filter_2(use_visible_columns, batched):
     assert result.visible_columns == dp.visible_columns
 
 
+def test_remove_column():
+    a = np.arange(16)
+    b = np.arange(16) * 2
+    dp = DataPanel.from_batch({"a": a, "b": b})
+    assert "a" in dp
+    dp.remove_column("a")
+    assert "a" not in dp
+
+
+def test_overwrite_column():
+    # make sure we remove the column when overwriting it
+    a = np.arange(16)
+    b = np.arange(16) * 2
+    dp = DataPanel.from_batch({"a": a, "b": b})
+    assert "a" in dp
+    assert dp[["a", "b"]]["a"]._data is a
+    # testing removal from block manager, so important to use non-blockable type here
+    dp["a"] = ListColumn(range(16))
+    assert dp[["a", "b"]]["a"]._data is not a
+
+
 @pytest.mark.parametrize("use_visible_columns", [True, False])
 def test_io(tmp_path, use_visible_columns):
     """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
