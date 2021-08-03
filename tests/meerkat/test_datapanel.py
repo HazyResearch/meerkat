@@ -328,7 +328,7 @@ def test_map_1(use_visible_columns, use_input_columns, num_workers):
 
     def func(x):
         if use_input_columns:
-            assert x.visible_columns == ["a", "b", "index"]
+            assert x.visible_columns == ["a", "b"]
         out = (x["a"] + np.array(x["b"])) * 2
         return out
 
@@ -381,16 +381,21 @@ def test_update_1(use_visible_columns, use_input_columns, batched):
     dp, visible_rows, visible_columns = _get_datapanel(
         use_visible_columns=use_visible_columns,
     )
+    input_columns = ["a", "b"] if use_input_columns else None
 
     # mixed datapanel (i.e. has multiple colummn types)
     def func(x):
+        if use_input_columns:
+            if batched:
+                assert set(x.all_columns) == set(input_columns)
+            else:
+                assert set(x.keys()) == set(input_columns)
         out = {"x": (x["a"] + np.array(x["b"])) * 2}
         return out
 
     if visible_rows is None:
         visible_rows = np.arange(16)
 
-    input_columns = ["a", "b"] if use_input_columns else None
     result = dp.update(
         func,
         batch_size=4,
