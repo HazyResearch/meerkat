@@ -76,7 +76,7 @@ new_col: mk.ImageColumn = dp["image"][10:20]
 **`DataPanel` supports `map`, `update` and `filter` operations.**  When training and evaluating our models, we often perform operations on each example in our dataset (*e.g.* compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them . The `DataPanel` makes it easy to perform these operations and produce new columns (via `DataPanel.map`), store the columns alongside the original data (via `DataPanel.update`), and extract an important subset of the datset (via `DataPanel.filter`). Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottleneck our computation. Consider the example below where we use update a `DataPanel` with two new columns holding model predictions and probabilities.  
 ```python
 # A simple evaluation loop using Meerkat 
-dp: DataPane = ... # get DataPane
+dp: DataPanel = ... # get DataPanel
 model: nn.Module = ... # get the model
 model.to(0).eval() # prepare the model for evaluation
 
