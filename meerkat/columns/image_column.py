@@ -63,7 +63,7 @@ class ImageColumn(LambdaColumn):
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
 
     def _repr_pandas_(self) -> pd.Series:
-        return "ImageCell(" + self.data.data + ")"
+        return "ImageCell(" + self.data.data.reset_index(drop=True) + ")"
 
 
 class ImageCellColumn(CellColumn):
