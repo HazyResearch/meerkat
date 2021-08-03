@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Mapping, Optional
+from typing import Callable, Dict, Mapping, Optional
 
 from tqdm.auto import tqdm
 
@@ -21,7 +21,7 @@ class MappableMixin:
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
-        output_type: type = None,
+        output_type: Dict[str, type] = None,
         mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
@@ -98,9 +98,10 @@ class MappableMixin:
                 for key, curr_output in output.items() if is_mapping else [(0, output)]:
                     curr_output_type = (
                         type(AbstractColumn.from_data(curr_output))
-                        if output_type is None
-                        else output_type
+                        if output_type is None or key not in output_type.keys()
+                        else output_type[key]
                     )
+
                     writer = curr_output_type.get_writer(
                         mmap=mmap,
                         template=(
