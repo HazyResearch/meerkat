@@ -44,7 +44,6 @@ class GCSImageColumn(ImageColumn):
             return super(GCSImageColumn, self).fn(
                 os.path.join(self.local_dir, str(blob_name))
             )
-
         # otherwise pull from GCP
         out = self.loader(
             io.BytesIO(self.bucket.blob(str(blob_name)).download_as_bytes())
@@ -81,8 +80,17 @@ class GCSImageColumn(ImageColumn):
         """List of attributes that describe the state of the object."""
         return super()._state_keys() | {"bucket_name", "project", "local_dir", "writer"}
 
+    classmethod
+
+    def _clone_keys(cls) -> set:
+        # need to avoid reaccessing bucket on clone, too slow
+        return {"bucket"}
+
     def _set_state(self, state: dict = None):
         if state is not None:
             self.__dict__.update(state)
-        storage_client = storage.Client(project=self.project)
-        self.bucket = storage_client.bucket(self.bucket_name, user_project=self.project)
+        if state is None or "bucket" not in state:
+            storage_client = storage.Client(project=self.project)
+            self.bucket = storage_client.bucket(
+                self.bucket_name, user_project=self.project
+            )
