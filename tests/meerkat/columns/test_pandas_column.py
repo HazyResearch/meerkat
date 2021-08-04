@@ -94,49 +94,63 @@ def test_ops(dtype):
 
 
 @pytest.mark.parametrize(
-    "dtype,batched",
-    product(["float", "int"], [True, False]),
+    "dtype,batched,use_kwargs",
+    product(["float", "int"], [True, False], [True, False]),
 )
-def test_map_return_single(dtype, batched):
+def test_map_return_single(dtype, batched, use_kwargs):
     """`map`, single return,"""
     testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
-    def func(x):
-        out = x + 1
+    def func(x, bias=1):
+        out = x + bias
         return out
 
+    bias = 2 if use_kwargs else 1
+    kwargs = {"bias": bias} if use_kwargs else {}
+
     result = col.map(
-        func, batch_size=2, is_batched_fn=batched, output_type=PandasSeriesColumn
+        func,
+        batch_size=2,
+        is_batched_fn=batched,
+        output_type=PandasSeriesColumn,
+        **kwargs,
     )
     assert isinstance(result, PandasSeriesColumn)
     assert len(result) == len(array[testbed.visible_rows])
-    assert (result.values == array[testbed.visible_rows] + 1).all()
+    assert (result.values == array[testbed.visible_rows] + bias).all()
 
 
 @pytest.mark.parametrize(
-    "dtype, batched",
-    product(["float", "int"], [True, False]),
+    "dtype, batched, use_kwargs",
+    product(["float", "int"], [True, False], [True, False]),
 )
-def test_map_return_multiple(dtype, batched):
+def test_map_return_multiple(dtype, batched, use_kwargs):
     """`map`, multiple return."""
     testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
-    def func(x):
-        return {"a": x + 1, "b": x - 1}
+    def func(x, bias=1):
+        return {"a": x + bias, "b": x - bias}
+
+    bias = 2 if use_kwargs else 1
+    kwargs = {"bias": bias} if use_kwargs else {}
 
     result = col.map(
-        func, batch_size=2, is_batched_fn=batched, output_type=PandasSeriesColumn
+        func,
+        batch_size=2,
+        is_batched_fn=batched,
+        output_type=PandasSeriesColumn,
+        **kwargs,
     )
     assert isinstance(result, DataPanel)
     assert len(result) == len(array[testbed.visible_rows])
 
     assert isinstance(result["a"], PandasSeriesColumn)
-    assert (result["a"].values == array[testbed.visible_rows] + 1).all()
+    assert (result["a"].values == array[testbed.visible_rows] + bias).all()
 
     assert isinstance(result["b"], PandasSeriesColumn)
-    assert (result["b"].values == array[testbed.visible_rows] - 1).all()
+    assert (result["b"].values == array[testbed.visible_rows] - bias).all()
 
 
 @pytest.mark.parametrize(
@@ -181,20 +195,23 @@ def test_set_item_2(dtype):
 
 
 @pytest.mark.parametrize(
-    "dtype,batched",
-    product(["float", "int"], [True, False]),
+    "dtype,batched,use_kwargs",
+    product(["float", "int"], [True, False], [True, False]),
 )
-def test_filter_1(dtype, batched):
+def test_filter_1(dtype, batched, use_kwargs):
     """multiple_dim=False."""
     testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
     col, array = testbed.col, testbed.array
 
-    def func(x):
-        return x > 10
+    def func(x, thresh=10):
+        return x > thresh
 
-    result = col.filter(func, batch_size=4, is_batched_fn=batched)
+    thresh = 5 if use_kwargs else 10
+    kwargs = {"thresh": thresh} if use_kwargs else {}
+
+    result = col.filter(func, batch_size=4, is_batched_fn=batched, **kwargs)
     assert isinstance(result, PandasSeriesColumn)
-    assert len(result) == (array[testbed.visible_rows] > 10).sum()
+    assert len(result) == (array[testbed.visible_rows] > thresh).sum()
 
 
 @pytest.mark.parametrize(

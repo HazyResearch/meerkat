@@ -69,42 +69,50 @@ def test_from_array():
 
 
 @NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [2]}, params={"batched": [True, False]}
+    config={"num_dims": [2]},
+    params={"batched": [True, False], "use_kwargs": [True, False]},
 )
-def test_map_return_single(config, batched):
+def test_map_return_single(config, batched, use_kwargs):
     """`map`, single return,"""
     testbed = NumpyArrayColumnTestBed(**config)
     col, array = testbed.col, testbed.data
 
-    def func(x):
-        out = x.mean(axis=-1)
+    def func(x, bias=0):
+        out = x.mean(axis=-1) + bias
         return out
 
-    result = col.map(func, batch_size=4, is_batched_fn=batched)
+    bias = 1 if use_kwargs else 0
+    kwargs = {"bias": bias} if use_kwargs else {}
+
+    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
 
     assert isinstance(result, NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))
-    assert (result == array.mean(axis=-1)).all()
+    assert (result == array.mean(axis=-1) + bias).all()
 
 
 @NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [2]}, params={"batched": [True, False]}
+    config={"num_dims": [2]},
+    params={"batched": [True, False], "use_kwargs": [True, False]},
 )
-def test_map_return_multiple(config, batched):
+def test_map_return_multiple(config, batched, use_kwargs):
     """`map`, multiple return."""
     testbed = NumpyArrayColumnTestBed(**config)
     col, array = testbed.col, testbed.data
 
-    def func(x):
-        return {"mean": x.mean(axis=-1), "std": x.std(axis=-1)}
+    def func(x, bias=0):
+        return {"mean": x.mean(axis=-1) + bias, "std": x.std(axis=-1) + bias}
 
-    result = col.map(func, batch_size=4, is_batched_fn=batched)
+    bias = 1 if use_kwargs else 0
+    kwargs = {"bias": bias} if use_kwargs else {}
+
+    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
     assert isinstance(result, DataPanel)
     assert isinstance(result["std"], NumpyArrayColumn)
     assert isinstance(result["mean"], NumpyArrayColumn)
     np_test.assert_equal(len(result), len(array))
-    assert (result["mean"] == array.mean(axis=-1)).all()
-    assert (result["std"] == array.std(axis=-1)).all()
+    assert (result["mean"] == array.mean(axis=-1) + bias).all()
+    assert (result["std"] == array.std(axis=-1) + bias).all()
 
 
 @NumpyArrayColumnTestBed.parametrize()
@@ -132,19 +140,23 @@ def test_set_item_2(config):
 
 
 @NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [1]}, params={"batched": [True, False]}
+    config={"num_dims": [1]},
+    params={"batched": [True, False], "use_kwargs": [True, False]},
 )
-def test_filter_1(config, batched):
+def test_filter_1(config, batched, use_kwargs):
     """multiple_dim=False."""
     testbed = NumpyArrayColumnTestBed(**config)
     col, array = testbed.col, testbed.data
 
-    def func(x):
-        return x > 20
+    def func(x, thresh=20):
+        return x > thresh
 
-    result = col.filter(func, batch_size=4, is_batched_fn=batched)
+    thresh = 10 if use_kwargs else 20
+    kwargs = {"thresh": thresh} if use_kwargs else {}
+
+    result = col.filter(func, batch_size=4, is_batched_fn=batched, **kwargs)
     assert isinstance(result, NumpyArrayColumn)
-    assert len(result) == (array > 20).sum()
+    assert len(result) == (array > thresh).sum()
 
 
 @NumpyArrayColumnTestBed.parametrize()
