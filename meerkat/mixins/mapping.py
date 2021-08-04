@@ -95,6 +95,12 @@ class MappableMixin:
                 dtype = function_properties.output_dtype
                 is_mapping = isinstance(output, Mapping)
                 is_type_mapping = isinstance(output_type, Mapping)
+
+                if not is_mapping and is_type_mapping:
+                    raise ValueError(
+                        "output_type is a mapping but function output is not a mapping"
+                    )
+
                 writers = {}
                 for key, curr_output in output.items() if is_mapping else [(0, output)]:
                     curr_output_type = (
