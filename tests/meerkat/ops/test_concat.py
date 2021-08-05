@@ -9,10 +9,10 @@ from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.prediction_column import ClassificationOutputColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
+from meerkat.nn.prediction_column import ClassificationOutputColumn
 
 from ...testbeds import MockColumn, MockDatapanel, MockImageColumn
 
