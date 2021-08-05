@@ -1,19 +1,16 @@
-"""Unittests for NumpyColumn."""
-import os
-import pickle
-from functools import wraps
-from itertools import product
-
 import numpy as np
 import numpy.testing as np_test
+import pandas as pd
 import pytest
 import torch
 
 from meerkat import NumpyArrayColumn
-from meerkat.datapanel import DataPanel
+from meerkat.block.tensor_block import TensorBlock
+
+from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 
-class NumpyArrayColumnTestBed:
+class NumpyArrayColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "num_dims": [1, 2, 3],
@@ -21,10 +18,32 @@ class NumpyArrayColumnTestBed:
         "dtype": ["float", "int"],
     }
 
+    MAP_SPECS = {
+        "map1": {
+            "fn": lambda x: x + 1,
+            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data + 1),
+        },
+        "map2": {
+            "fn": lambda x: x + 2,
+            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data + 2),
+        },
+        "bool": {
+            "fn": lambda x: x > 3,
+            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data > 3),
+        },
+    }
+
     def __init__(
-        self, length: int = 16, num_dims: int = True, dim_length: int = 5, dtype="float"
+        self,
+        length: int = 16,
+        num_dims: int = True,
+        dim_length: int = 5,
+        dtype="float",
+        seed: int = 123,
+        tmpdir: str = None,
     ):
-        np.random.seed(123)
+        self.dtype = dtype
+        np.random.seed(seed)
         array = (
             np.random.random((length, *[dim_length for _ in range(num_dims - 1)])) * 10
         )
@@ -33,177 +52,122 @@ class NumpyArrayColumnTestBed:
         self.col = NumpyArrayColumn.from_array(array)
         self.data = array
 
-    @classmethod
-    def get_params(cls, config: dict = None, params: dict = None):
-        updated_config = cls.DEFAULT_CONFIG.copy()
-        if config is not None:
-            updated_config.update(config)
-        configs = list(
-            map(
-                dict,
-                product(*[[(k, v) for v in vs] for k, vs in updated_config.items()]),
-            )
-        )
-        if params is None:
-            return "config", configs
+    def get_map_spec(self, key: str = "map1"):
+        return {
+            k: v if k != "expected_result" else v(self.col)
+            for k, v in self.MAP_SPECS[key].items()
+        }
+
+    def get_data(self, index):
+        return self.data[index]
+
+    @staticmethod
+    def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
+        assert (data1 == data2).all()
+
+
+@pytest.fixture
+def testbed(request, tmpdir):
+    testbed_class, config = request.param
+    return testbed_class(**config, tmpdir=tmpdir)
+
+
+class TestNumpyArrayColumn(TestAbstractColumn):
+
+    __test__ = True
+    testbed_class: type = NumpyArrayColumnTestBed
+    column_class: type = NumpyArrayColumn
+
+    def test_init_block(self):
+        block_view = TensorBlock(torch.zeros(10, 10))[0]
+        with pytest.raises(ValueError):
+            NumpyArrayColumn(block_view)
+
+    def _get_data_to_set(self, testbed, data_index):
+        return np.zeros_like(testbed.get_data(data_index))
+
+    @NumpyArrayColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_set_item(self, testbed, index_type: type):
+        return super().test_set_item(testbed, index_type=index_type)
+
+    @NumpyArrayColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_getitem(self, testbed, index_type: type):
+        return super().test_getitem(testbed, index_type=index_type)
+
+    @NumpyArrayColumnTestBed.parametrize(
+        config={"num_dims": [1], "dim_length": [1]}, params={"batched": [True, False]}
+    )
+    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_filter_1(testbed, batched)
+
+    @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_multiple(testbed, batched)
+
+    @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_single(testbed, batched)
+
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_copy(self, testbed: AbstractColumnTestBed):
+        return super().test_copy(testbed)
+
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_io(self, tmp_path, testbed):
+        super().test_io(tmp_path, testbed)
+
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_pickle(self, testbed):
+        super().test_pickle(testbed)
+
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_to_tensor(self, testbed):
+        col, _ = testbed.col, testbed.data
+
+        tensor = col.to_tensor()
+
+        assert torch.is_tensor(tensor)
+        assert (col == tensor.numpy()).all()
+
+    def test_from_array(self):
+        # Build a dataset from a batch
+        array = np.random.rand(10, 3, 3)
+        col = NumpyArrayColumn.from_array(array)
+
+        assert (col == array).all()
+        np_test.assert_equal(len(col), 10)
+
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_to_pandas(self, testbed):
+        series = testbed.col.to_pandas()
+
+        assert isinstance(series, pd.Series)
+
+        if testbed.col.shape == 1:
+            assert (series.values == testbed.col.data).all()
         else:
-            return "config," + ",".join(params.keys()), product(
-                configs, *params.values()
-            )
+            for idx in range(len(testbed.col)):
+                assert (series.iloc[idx] == testbed.col[idx]).all()
 
-    @classmethod
-    @wraps(pytest.mark.parametrize)
-    def parametrize(cls, config: dict = None, params: dict = None):
-        return pytest.mark.parametrize(
-            *NumpyArrayColumnTestBed.get_params(config=config, params=params)
-        )
+    @NumpyArrayColumnTestBed.parametrize()
+    def test_repr_pandas(self, testbed):
+        series = testbed.col.to_pandas()
+        assert isinstance(series, pd.Series)
 
+    def test_ufunc_out(self):
+        out = np.zeros(3)
+        a = NumpyArrayColumn([1, 2, 3])
+        b = NumpyArrayColumn([1, 2, 3])
+        result = np.add(a, b, out=out)
+        assert result.data is out
 
-def test_from_array():
-    # Build a dataset from a batch
-    array = np.random.rand(10, 3, 3)
-    col = NumpyArrayColumn.from_array(array)
+    def test_ufunc_at(self):
+        a = NumpyArrayColumn([1, 2, 3])
+        result = np.add.at(a, [0, 1, 1], 1)
+        assert result is None
+        assert a.is_equal(NumpyArrayColumn([2, 4, 3]))
 
-    assert (col == array).all()
-    np_test.assert_equal(len(col), 10)
-
-
-@NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [2]},
-    params={"batched": [True, False], "use_kwargs": [True, False]},
-)
-def test_map_return_single(config, batched, use_kwargs):
-    """`map`, single return,"""
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, array = testbed.col, testbed.data
-
-    def func(x, bias=0):
-        out = x.mean(axis=-1) + bias
-        return out
-
-    bias = 1 if use_kwargs else 0
-    kwargs = {"bias": bias} if use_kwargs else {}
-
-    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
-
-    assert isinstance(result, NumpyArrayColumn)
-    np_test.assert_equal(len(result), len(array))
-    assert (result == array.mean(axis=-1) + bias).all()
-
-
-@NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [2]},
-    params={"batched": [True, False], "use_kwargs": [True, False]},
-)
-def test_map_return_multiple(config, batched, use_kwargs):
-    """`map`, multiple return."""
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, array = testbed.col, testbed.data
-
-    def func(x, bias=0):
-        return {"mean": x.mean(axis=-1) + bias, "std": x.std(axis=-1) + bias}
-
-    bias = 1 if use_kwargs else 0
-    kwargs = {"bias": bias} if use_kwargs else {}
-
-    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
-    assert isinstance(result, DataPanel)
-    assert isinstance(result["std"], NumpyArrayColumn)
-    assert isinstance(result["mean"], NumpyArrayColumn)
-    np_test.assert_equal(len(result), len(array))
-    assert (result["mean"] == array.mean(axis=-1) + bias).all()
-    assert (result["std"] == array.std(axis=-1) + bias).all()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_set_item_1(config):
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, array = testbed.col, testbed.data
-    index = [0, 3]
-    not_index = [i for i in range(col.shape[0]) if i not in index]
-    col[index] = 0
-
-    assert (col[not_index] == array[not_index]).all()
-    assert (col[index] == 0).all()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_set_item_2(config):
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, array = testbed.col, testbed.data
-    index = 0
-    not_index = [i for i in range(col.shape[0]) if i != index]
-    col[index] = 0
-
-    assert (col[not_index] == array[not_index]).all()
-    assert (col[index] == 0).all()
-
-
-@NumpyArrayColumnTestBed.parametrize(
-    config={"num_dims": [1]},
-    params={"batched": [True, False], "use_kwargs": [True, False]},
-)
-def test_filter_1(config, batched, use_kwargs):
-    """multiple_dim=False."""
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, array = testbed.col, testbed.data
-
-    def func(x, thresh=20):
-        return x > thresh
-
-    thresh = 10 if use_kwargs else 20
-    kwargs = {"thresh": thresh} if use_kwargs else {}
-
-    result = col.filter(func, batch_size=4, is_batched_fn=batched, **kwargs)
-    assert isinstance(result, NumpyArrayColumn)
-    assert len(result) == (array > thresh).sum()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_pickle(config):
-    # important for dataloader
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, _ = testbed.col, testbed.data
-    buf = pickle.dumps(col)
-    new_col = pickle.loads(buf)
-
-    assert isinstance(new_col, NumpyArrayColumn)
-    assert (col == new_col).all()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_io(tmp_path, config):
-    # uses the tmp_path fixture which will provide a
-    # temporary directory unique to the test invocation,
-    # important for dataloader
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, _ = testbed.col, testbed.data
-
-    path = os.path.join(tmp_path, "test")
-    col.write(path)
-
-    new_col = NumpyArrayColumn.read(path)
-
-    assert isinstance(new_col, NumpyArrayColumn)
-    assert (col == new_col).all()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_copy(config):
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, _ = testbed.col, testbed.data
-    col_copy = col.copy()
-
-    assert isinstance(col_copy, NumpyArrayColumn)
-    assert (col == col_copy).all()
-
-
-@NumpyArrayColumnTestBed.parametrize()
-def test_to_tensor(config):
-    testbed = NumpyArrayColumnTestBed(**config)
-    col, _ = testbed.col, testbed.data
-
-    tensor = col.to_tensor()
-
-    assert torch.is_tensor(tensor)
-    assert (col == tensor.numpy()).all()
+    def test_ufunc_unhandled(self):
+        a = NumpyArrayColumn([1, 2, 3])
+        with pytest.raises(TypeError):
+            a == "a"

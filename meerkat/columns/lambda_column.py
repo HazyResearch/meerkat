@@ -141,6 +141,14 @@ class LambdaColumn(AbstractColumn):
         # TODO (Sabri): avoid redundant writes in dataframes
         return self.data.write(os.path.join(path, "data"))
 
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        if self.fn != other.fn:
+            return False
+
+        return self.data.is_equal(other.data)
+
     @staticmethod
     def _read_data(path: str):
         # TODO (Sabri): make this work for dataframes underlying the lambda column

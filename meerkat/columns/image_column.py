@@ -6,6 +6,7 @@ from typing import Collection, Sequence
 import pandas as pd
 
 from meerkat.cells.imagepath import ImagePath
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -64,6 +65,15 @@ class ImageColumn(LambdaColumn):
 
     def _repr_pandas_(self) -> pd.Series:
         return "ImageCell(" + self.data.data.reset_index(drop=True) + ")"
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        if self.loader != other.loader:
+            return False
+        if self.transform != other.transform:
+            return False
+        return self.data.is_equal(other.data)
 
 
 class ImageCellColumn(CellColumn):

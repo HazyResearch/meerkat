@@ -1,7 +1,9 @@
 """Unittests for Datasets."""
 import os
 import tempfile
+from functools import wraps
 from itertools import product
+from typing import Dict, Sequence
 
 import numpy as np
 import pandas as pd
@@ -20,6 +22,90 @@ from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
 from ..testbeds import MockDatapanel
+from .columns.test_numpy_column import NumpyArrayColumnTestBed
+from .columns.test_pandas_column import PandasSeriesColumnTestBed
+
+
+class DataPanelTestBed:
+
+    DEFAULT_CONFIG = {
+        "consolidated": [True, False],
+    }
+
+    DEFAULT_COLUMN_CONFIGS = {
+        "np": {"testbed_class": NumpyArrayColumnTestBed, "n": 2},
+        "pd": {"testbed_class": PandasSeriesColumnTestBed, "n": 2},
+    }
+
+    def __init__(
+        self,
+        column_configs: Dict[str, AbstractColumn],
+        consolidated: bool = True,
+        length: int = 16,
+    ):
+        self.column_testbeds = {}
+        for name, config in column_configs.items():
+            params = config["testbed_class"].get_params(**config.get("kwargs", {}))
+            self.column_testbeds.update(
+                {
+                    f"{name}_{col_id}_{idx}": config["testbed_class"](
+                        **col_config, seed=idx, length=length
+                    )
+                    for idx in range(config["n"])
+                    for col_config, col_id in zip(params["argvalues"], params["ids"])
+                }
+            )
+
+        self.columns = {
+            name: testbed.col for name, testbed in self.column_testbeds.items()
+        }
+        self.dp = DataPanel.from_batch(self.columns)
+
+        if consolidated:
+            self.dp.consolidate()
+
+    @classmethod
+    def get_params(
+        cls,
+        config: dict = None,
+        column_configs: Sequence[Dict] = None,
+        params: dict = None,
+    ):
+        # produce all combinations of the config
+        updated_config = cls.DEFAULT_CONFIG.copy()
+        if config is not None:
+            updated_config.update(config)
+        configs = list(
+            map(
+                dict,
+                product(*[[(k, v) for v in vs] for k, vs in updated_config.items()]),
+            )
+        )
+
+        # add the column_configs to every
+        if column_configs is None:
+            column_configs = cls.DEFAULT_COLUMN_CONFIGS.copy()
+        for config in configs:
+            config["column_configs"] = column_configs
+
+        if params is None:
+            return {
+                "argnames": "config",
+                "argvalues": configs,
+                "ids": [str(config) for config in configs],
+            }
+        else:
+            argvalues = list(product(configs, *params.values()))
+            return {
+                "argnames": "config," + ",".join(params.keys()),
+                "argvalues": argvalues,
+                "ids": [",".join(map(str, values)) for values in argvalues],
+            }
+
+    @classmethod
+    @wraps(pytest.mark.parametrize)
+    def parametrize(cls, config: dict = None, params: dict = None):
+        return pytest.mark.parametrize(**cls.get_params(config=config, params=params))
 
 
 def _get_datapanel(*args, **kwargs):
@@ -88,51 +174,43 @@ def test_from_csv():
         assert data_to_compare == data[k]
 
 
-def test_col_index_single(tmpdir):
+@DataPanelTestBed.parametrize()
+def test_col_index_single(tmpdir, config):
     length = 16
-    test_bed = MockDatapanel(
-        length=length,
-        include_image_column=True,
-        tmpdir=tmpdir,
-    )
-    dp = test_bed.dp
+    testbed = DataPanelTestBed(**config)
+    dp = testbed.dp
 
     # str index => single column ()
-    index = "a"
-    col = dp[index]
-    assert isinstance(col, AbstractColumn)
-    # enforce that a single column index returns a coreference
-    assert col is dp._data["a"]
+    for name in testbed.columns:
+        index = name
+        col = dp[index]
+        assert isinstance(col, AbstractColumn)
+        # enforce that a single column index returns a coreference
+        assert col is dp._data[index]
 
 
-def test_col_index_multiple(tmpdir):
-    length = 16
-    test_bed = MockDatapanel(
-        length=length,
-        include_image_column=True,
-        tmpdir=tmpdir,
-    )
-    dp = test_bed.dp
+@DataPanelTestBed.parametrize()
+def test_col_index_multiple(tmpdir, config):
+    testbed = DataPanelTestBed(**config)
+    dp = testbed.dp
 
     # str index => single column ()
-    index = ["a", "b"]
-    new_dp = dp[index]
-    assert isinstance(new_dp, DataPanel)
+    columns = list(testbed.columns)
+    for excluded_column in columns:
+        index = [c for c in columns if c != excluded_column]
+        new_dp = dp[index]
+        assert isinstance(new_dp, DataPanel)
 
-    # enforce that a column index multiple returns a view of the old datapanel
-    for col_name in index:
-        assert new_dp._data[col_name] is not dp._data[col_name]
-        assert new_dp._data[col_name].data is dp._data[col_name].data
+        # enforce that a column index multiple returns a view of the old datapanel
+        for col_name in index:
+            assert new_dp._data[col_name] is not dp._data[col_name]
+            assert new_dp._data[col_name].data is dp._data[col_name].data
 
 
-def test_row_index_single(tmpdir):
-    length = 16
-    test_bed = MockDatapanel(
-        length=length,
-        include_image_column=True,
-        tmpdir=tmpdir,
-    )
-    dp = test_bed.dp
+@DataPanelTestBed.parametrize()
+def test_row_index_single(tmpdir, config):
+    testbed = DataPanelTestBed(**config)
+    dp = testbed.dp
 
     # int index => single row (dict)
     index = 2

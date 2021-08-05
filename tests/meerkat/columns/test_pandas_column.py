@@ -1,272 +1,184 @@
 """Unittests for NumpyColumn."""
 import os
 import pickle
-from itertools import product
 
 import numpy as np
 import pandas as pd
 import pytest
+import torch
 
-from meerkat import NumpyArrayColumn, PandasSeriesColumn
+from meerkat import PandasSeriesColumn
+from meerkat.block.tensor_block import TensorBlock
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
-from ...testbeds import MockAnyColumn, MockColumn, MockStrColumn
+from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 
-def test_str_accessor():
-    testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    col = testbed.col
+class PandasSeriesColumnTestBed(AbstractColumnTestBed):
 
-    upper_col = col.str.upper()
-    assert isinstance(upper_col, PandasSeriesColumn)
-    assert (
-        upper_col.values == np.array([f"ROW_{idx}" for idx in testbed.visible_rows])
-    ).all()
+    DEFAULT_CONFIG = {
+        "contiguous_index": [True, False],
+        "dtype": ["float", "int", "str"],
+    }
 
+    def __init__(
+        self,
+        length: int = 16,
+        dtype="float",
+        contiguous_index: bool = True,
+        seed: int = 123,
+        tmpdir: str = None,
+    ):
+        self.dtype = dtype
+        np.random.seed(seed)
+        array = np.random.random(length) * 10
+        series = pd.Series(array).astype(dtype)
+        if not contiguous_index:
+            series.index = np.arange(1, 1 + 2 * length, 2)
 
-def test_dt_accessor():
-    testbed = MockAnyColumn(
-        data=[f"01/{idx+1}/2001" for idx in range(16)],
-        col_type=PandasSeriesColumn,
-    )
-    col = testbed.col
-    col = pd.to_datetime(col)
-    day_col = col.dt.day
-    assert isinstance(day_col, PandasSeriesColumn)
-    assert (day_col.values == np.array(testbed.visible_rows) + 1).all()
+        self.col = PandasSeriesColumn(series)
+        self.data = series
 
+    def get_map_spec(self, key: str = "map1"):
+        if key == "map1":
+            a = str(1) if self.dtype == "str" else 1
+            return {
+                "fn": lambda x: x + a,
+                "expected_result": PandasSeriesColumn(self.col.data + a),
+                "output_type": PandasSeriesColumn,
+            }
+        if key == "map2":
+            a = str(1) if self.dtype == "str" else 1
+            return {
+                "fn": lambda x: x + a,
+                "expected_result": PandasSeriesColumn(self.col.data + a),
+                "output_type": PandasSeriesColumn,
+            }
+        if key == "bool":
+            a = str(1) if self.dtype == "str" else 1
+            return {
+                "fn": lambda x: x > a,
+                "expected_result": PandasSeriesColumn(self.col.data > a),
+                "output_type": PandasSeriesColumn,
+            }
 
-def test_cat_accessor():
-    categories = ["a", "b", "c", "d"]
-    testbed = MockAnyColumn(
-        data=categories * 4,
-        col_type=PandasSeriesColumn,
-        use_visible_rows=False,
-    )
-    col = testbed.col.astype("category")
+    def get_data(self, index):
+        return self.data.iloc[index]
 
-    assert (np.array(categories) == col.cat.categories.values).all()
-
-
-@pytest.mark.parametrize(
-    "dtype,index_type",
-    product(
-        ["float", "int", "str"], [NumpyArrayColumn, PandasSeriesColumn, TensorColumn]
-    ),
-)
-def test_getitem(dtype, index_type):
-    """`map`, single return,"""
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-
-    col = testbed.col
-
-    assert testbed.array[testbed.visible_rows[1]] == col[1]
-
-    assert (testbed.array[testbed.visible_rows[2:4]] == col[2:4].values).all()
-
-    bool_index = (np.arange(len(col)) % 2).astype(bool)
-    bool_index_col = index_type(bool_index)
-    assert (testbed.array[bool_index] == col[bool_index_col].values).all()
-
-
-@pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
-)
-def test_ops(dtype):
-    """`map`, single return,"""
-    col = PandasSeriesColumn(["a", "b", "c", "d"])
-    col == "a"
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-
-    col = testbed.col
-
-    assert testbed.array[testbed.visible_rows[1]] == col[1]
-
-    assert (testbed.array[testbed.visible_rows[2:4]] == col[2:4].values).all()
+    @staticmethod
+    def assert_data_equal(data1: pd.Series, data2: np.ndarray):
+        if isinstance(data1, pd.Series):
+            assert (data1.values == data2.values).all()
+        else:
+            assert data1 == data2
 
 
-@pytest.mark.parametrize(
-    "dtype,batched,use_kwargs",
-    product(["float", "int"], [True, False], [True, False]),
-)
-def test_map_return_single(dtype, batched, use_kwargs):
-    """`map`, single return,"""
-    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-    col, array = testbed.col, testbed.array
-
-    def func(x, bias=1):
-        out = x + bias
-        return out
-
-    bias = 2 if use_kwargs else 1
-    kwargs = {"bias": bias} if use_kwargs else {}
-
-    result = col.map(
-        func,
-        batch_size=2,
-        is_batched_fn=batched,
-        output_type=PandasSeriesColumn,
-        **kwargs,
-    )
-    assert isinstance(result, PandasSeriesColumn)
-    assert len(result) == len(array[testbed.visible_rows])
-    assert (result.values == array[testbed.visible_rows] + bias).all()
+@pytest.fixture
+def testbed(request, tmpdir):
+    testbed_class, config = request.param
+    return testbed_class(**config, tmpdir=tmpdir)
 
 
-@pytest.mark.parametrize(
-    "dtype, batched, use_kwargs",
-    product(["float", "int"], [True, False], [True, False]),
-)
-def test_map_return_multiple(dtype, batched, use_kwargs):
-    """`map`, multiple return."""
-    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-    col, array = testbed.col, testbed.array
+class TestPandasSeriesColumn(TestAbstractColumn):
+    __test__ = True
+    testbed_class: type = PandasSeriesColumnTestBed
+    column_class: type = PandasSeriesColumn
 
-    def func(x, bias=1):
-        return {"a": x + bias, "b": x - bias}
+    @PandasSeriesColumnTestBed.parametrize({"dtype": ["str"]})
+    def test_str_accessor(self, testbed):
+        col = testbed.col
 
-    bias = 2 if use_kwargs else 1
-    kwargs = {"bias": bias} if use_kwargs else {}
+        new_col = col.str.split(".").str[0].astype(int)
+        assert isinstance(new_col, PandasSeriesColumn)
+        assert (new_col == testbed.data.astype(float).astype(int)).all()
 
-    result = col.map(
-        func,
-        batch_size=2,
-        is_batched_fn=batched,
-        output_type=PandasSeriesColumn,
-        **kwargs,
-    )
-    assert isinstance(result, DataPanel)
-    assert len(result) == len(array[testbed.visible_rows])
+    def test_dt_accessor(self):
+        col = PandasSeriesColumn(
+            data=[f"01/{idx+1}/2001" for idx in range(16)],
+        )
+        col = pd.to_datetime(col)
+        day_col = col.dt.day
+        assert isinstance(day_col, PandasSeriesColumn)
+        assert (day_col.values == np.arange(16) + 1).all()
 
-    assert isinstance(result["a"], PandasSeriesColumn)
-    assert (result["a"].values == array[testbed.visible_rows] + bias).all()
+    def test_cat_accessor(self):
+        categories = ["a", "b", "c", "d"]
+        col = PandasSeriesColumn(data=categories * 4)
+        col = col.astype("category")
 
-    assert isinstance(result["b"], PandasSeriesColumn)
-    assert (result["b"].values == array[testbed.visible_rows] - bias).all()
+        assert (np.array(categories) == col.cat.categories.values).all()
 
+    def test_init_block(self):
+        block_view = TensorBlock(torch.zeros(10, 10))[0]
+        with pytest.raises(ValueError):
+            PandasSeriesColumn(block_view)
 
-@pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
-)
-def test_set_item_1(dtype):
+    def _get_data_to_set(self, testbed, data_index):
+        if isinstance(data_index, int):
+            return 0
+        return pd.Series(np.zeros_like(testbed.get_data(data_index).values))
 
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
+    @PandasSeriesColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_set_item(self, testbed, index_type: type):
+        return super().test_set_item(testbed, index_type=index_type)
 
-    col = testbed.col
+    @PandasSeriesColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_getitem(self, testbed, index_type: type):
+        return super().test_getitem(testbed, index_type=index_type)
 
-    index = [0, 3]
-    not_index = [i for i in range(col.shape[0]) if i not in index]
-    col[index] = 0
-    assert (col[not_index] == testbed.array[testbed.visible_rows[not_index]]).all()
-    assert (col[index] == 0).all()
+    @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_filter_1(testbed, batched)
 
+    @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_multiple(testbed, batched)
 
-@pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
-)
-def test_set_item_2(dtype):
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
+    @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_single(testbed, batched)
 
-    col = testbed.col
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_copy(self, testbed: AbstractColumnTestBed):
+        return super().test_copy(testbed)
 
-    index = 1
-    not_index = [i for i in range(col.shape[0]) if i != index]
-    col[index] = 0
-    assert (
-        col[not_index].values == testbed.array[testbed.visible_rows[not_index]]
-    ).all()
-    assert col[index] == 0
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_io(self, tmp_path, testbed):
+        super().test_io(tmp_path, testbed)
 
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_pickle(self, testbed):
+        super().test_pickle(testbed)
 
-@pytest.mark.parametrize(
-    "dtype,batched,use_kwargs",
-    product(["float", "int"], [True, False], [True, False]),
-)
-def test_filter_1(dtype, batched, use_kwargs):
-    """multiple_dim=False."""
-    testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-    col, array = testbed.col, testbed.array
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_to_tensor(self, testbed):
+        col, _ = testbed.col, testbed.data
+        if testbed.dtype == "str":
+            with pytest.raises(ValueError):
+                col.to_tensor()
+        else:
+            tensor = col.to_tensor()
 
-    def func(x, thresh=10):
-        return x > thresh
+            assert torch.is_tensor(tensor)
+            assert (col == tensor.numpy()).all()
 
-    thresh = 5 if use_kwargs else 10
-    kwargs = {"thresh": thresh} if use_kwargs else {}
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_to_pandas(self, testbed):
+        col, _ = testbed.col, testbed.data
+        series = col.to_pandas()
+        assert isinstance(series, pd.Series)
+        assert (col.data.values == series.values).all()
 
-    result = col.filter(func, batch_size=4, is_batched_fn=batched, **kwargs)
-    assert isinstance(result, PandasSeriesColumn)
-    assert len(result) == (array[testbed.visible_rows] > thresh).sum()
+    @PandasSeriesColumnTestBed.parametrize()
+    def test_repr_pandas(self, testbed):
+        series = testbed.col.to_pandas()
+        assert isinstance(series, pd.Series)
 
-
-@pytest.mark.parametrize(
-    "multiple_dim, dtype,use_visible_rows",
-    product([True, False], ["float", "int"], [True, False]),
-)
-def test_pickle(multiple_dim, dtype, use_visible_rows):
-    # important for dataloader
-    testbed = MockColumn(
-        dtype=dtype, use_visible_rows=use_visible_rows, col_type=PandasSeriesColumn
-    )
-    col = testbed.col
-    buf = pickle.dumps(col)
-    new_col = pickle.loads(buf)
-
-    assert isinstance(new_col, PandasSeriesColumn)
-    assert (col.values == new_col.values).all()
-
-
-@pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
-)
-def test_io(
-    tmp_path,
-    dtype,
-):
-    # uses the tmp_path fixture which will provide a
-    # temporary directory unique to the test invocation,
-    # important for dataloader
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-    col = testbed.col
-    path = os.path.join(tmp_path, "test")
-    col.write(path)
-
-    new_col = PandasSeriesColumn.read(path)
-
-    assert isinstance(new_col, PandasSeriesColumn)
-    assert (col == new_col).all()
-
-
-@pytest.mark.parametrize(
-    "dtype",
-    ["float", "int", "str"],
-)
-def test_copy(dtype):
-    if dtype == "str":
-        testbed = MockStrColumn(col_type=PandasSeriesColumn)
-    else:
-        testbed = MockColumn(dtype=dtype, col_type=PandasSeriesColumn)
-    col = testbed.col
-    col_copy = col.copy()
-
-    assert isinstance(col_copy, PandasSeriesColumn)
-    assert (col == col_copy).all()
+    def test_ufunc_out(self):
+        out = np.zeros(3)
+        a = PandasSeriesColumn([1, 2, 3])
+        b = PandasSeriesColumn([1, 2, 3])
+        np.add(a, b, out=out)
+        assert (out == np.array([2, 4, 6])).all()

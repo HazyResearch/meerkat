@@ -73,9 +73,6 @@ class AbstractColumn(
     def streamlit(self):
         return self._repr_pandas_()
 
-    def _unpack_data(self, data):
-        return super(AbstractColumn, self)._unpack_data(data)
-
     def _set_data(self, data):
         if self.is_blockable():
             data = self._unpack_block_view(data)
@@ -225,10 +222,7 @@ class AbstractColumn(
         return self.full_length()
 
     def full_length(self):
-        # Length of the underlying data stored in the column
-        if self._data is not None:
-            return len(self._data)
-        return 0
+        return len(self._data)
 
     def _repr_pandas_(self) -> pd.Series:
         raise NotImplementedError
@@ -244,7 +238,7 @@ class AbstractColumn(
     @capture_provenance()
     def filter(
         self,
-        function: Optional[Callable] = None,
+        function: Callable,
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
         is_batched_fn: bool = False,
@@ -256,15 +250,11 @@ class AbstractColumn(
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
 
         # Return if `self` has no examples
         if not len(self):
-            logger.info("Dataset empty, returning None.")
-            return None
+            logger.info("Dataset empty, returning it .")
+            return self
 
         # Get some information about the function
         function_properties = self._inspect_function(
@@ -303,6 +293,14 @@ class AbstractColumn(
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        """Tests whether two columns
+
+        Args:
+            other (AbstractColumn): [description]
+        """
+        raise NotImplementedError()
 
     def batch(
         self,
