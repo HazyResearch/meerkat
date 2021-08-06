@@ -175,6 +175,4 @@ class TensorColumn(
         return torch.load(os.path.join(path, "data.pt"))
 
     def is_equal(self, other: AbstractColumn) -> bool:
-        if other.__class__ != self.__class__:
-            return False
-        return (self.data == other.data).all()
+        return (other.__class__ == self.__class__) and (self.data == other.data).all()

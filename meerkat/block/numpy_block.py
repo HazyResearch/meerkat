@@ -38,7 +38,7 @@ class NumpyBlock(AbstractBlock):
             dtype=self.data.dtype,
         )
 
-    def _get_data(self, index: BlockIndex) -> np.ndarray:
+    def _get_data(self, index: BlockIndex, materialize: bool = True) -> np.ndarray:
         return self.data[:, index]
 
     @classmethod
@@ -59,7 +59,7 @@ class NumpyBlock(AbstractBlock):
             data = np.expand_dims(data, axis=1)
             block_index = 0
         elif data.shape[1] == 1:
-            block_index = 0
+            block_index = slice(0, 1)
         else:
             block_index = slice(0, data.shape[1])
 

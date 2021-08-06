@@ -60,3 +60,10 @@ class CellColumn(AbstractColumn):
         return columns[0].__class__.from_cells(
             list(tz.concat([c.data for c in columns]))
         )
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        return (
+            (self.__class__ == other.__class__)
+            and (len(self) == len(other))
+            and all([self.lz[idx] == other.lz[idx] for idx in range(len(self))])
+        )

@@ -74,3 +74,6 @@ class ListColumn(AbstractColumn):
         if issubclass(cls, CloneableMixin):
             return columns[0]._clone(data=data)
         return cls.from_list(data)
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        return (self.__class__ == other.__class__) and self.data == other.data

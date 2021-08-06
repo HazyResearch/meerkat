@@ -64,7 +64,7 @@ class TensorBlock(AbstractBlock):
             data = torch.unsqueeze(data, dim=1)
             block_index = 0
         elif data.shape[1] == 1:
-            block_index = 0
+            block_index = slice(0, 1)
         else:
             block_index = slice(0, data.shape[1])
 

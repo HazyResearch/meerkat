@@ -4,6 +4,7 @@ from abc import abstractstaticmethod
 from functools import wraps
 from itertools import product
 
+import pandas as pd
 import numpy as np
 import pytest
 
@@ -60,8 +61,8 @@ class AbstractColumnTestBed:
         )
 
     @classmethod
-    def single(cls):
-        return cls(**cls.get_params(single=True)["argvalues"][0][1])
+    def single(cls, tmpdir):
+        return cls(**cls.get_params(single=True)["argvalues"][0][1], tmpdir=tmpdir)
 
     def get_map_spec(self, key: str = "default"):
         raise NotImplementedError()
@@ -93,7 +94,13 @@ class TestAbstractColumn:
             data = testbed.get_data(index)
             result = col[col_index]
             testbed.assert_data_equal(data, result.data)
-            assert col._clone(data=data).is_equal(result)
+
+            if type(result) == type(col):
+                # if the getitem returns a column of the same type, enforce that all the
+                # attributes were cloned over appropriately. We don't want to check this
+                # for columns that return columns of different type from getitem
+                # (e.g. LambdaColumn)
+                assert col._clone(data=data).is_equal(result)
 
     def _get_data_to_set(self, testbed, data_index):
         raise NotImplementedError
@@ -111,12 +118,6 @@ class TestAbstractColumn:
             data_to_set = self._get_data_to_set(testbed, index)
             col[col_index] = data_to_set
             testbed.assert_data_equal(data_to_set, testbed.get_data(index))
-
-    def test_repr_pandas(self):
-        raise NotImplementedError()
-
-    def test_to_pandas(self):
-        raise NotImplementedError()
 
     def test_map_return_single(
         self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
@@ -136,58 +137,56 @@ class TestAbstractColumn:
             func,
             batch_size=4,
             is_batched_fn=batched,
+            materialize=materialize,
             output_type=map_spec.get("output_type", None),
         )
         assert result.is_equal(map_spec["expected_result"])
 
-    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
+    def test_map_return_multiple(
+        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool = True
+    ):
         """`map`, single return,"""
         col = testbed.col
         map_specs = {
-            "map1": testbed.get_map_spec("map1"),
-            "map2": testbed.get_map_spec("map2"),
+            "map1": testbed.get_map_spec(
+                batched=batched, materialize=materialize, salt=1
+            ),
+            "map2": testbed.get_map_spec(
+                batched=batched, materialize=materialize, salt=2
+            ),
         }
 
         def func(x):
-            if batched:
-                assert isinstance(x, self.column_class)
-                out = {
-                    key: map_spec.get("batched_fn", map_spec["fn"])(x)
-                    for key, map_spec in map_specs.items()
-                }
-            else:
-                out = {
-                    key: map_spec.get("fn", map_spec["fn"])(x)
-                    for key, map_spec in map_specs.items()
-                }
+            out = {key: map_spec["fn"](x) for key, map_spec in map_specs.items()}
             return out
 
         result = col.map(
             func,
             batch_size=4,
             is_batched_fn=batched,
+            materialize=materialize,
             output_type=list(map_specs.values())[0].get("output_type", None),
         )
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
             assert result[key].is_equal(map_spec["expected_result"])
 
-    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
+    def test_filter_1(
+        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool = True
+    ):
         """multiple_dim=False."""
         col = testbed.col
-        map_spec = testbed.get_map_spec("bool")
+        filter_spec = testbed.get_filter_spec(batched=batched, materialize=materialize)
 
         def func(x):
-            if batched:
-                assert isinstance(x, self.column_class)
-                out = map_spec.get("batched_fn", map_spec["fn"])(x)
-            else:
-                out = map_spec["fn"](x)
+            out = filter_spec["fn"](x)
             return out
 
-        result = col.filter(func, batch_size=4, is_batched_fn=batched)
+        result = col.filter(
+            func, batch_size=4, is_batched_fn=batched, materialize=materialize
+        )
 
-        assert result.is_equal(col[map_spec["expected_result"]])
+        assert result.is_equal(filter_spec["expected_result"])
 
     def test_copy(self, testbed: AbstractColumnTestBed):
         col, _ = testbed.col, testbed.data
@@ -198,7 +197,7 @@ class TestAbstractColumn:
 
     def test_pickle(self, testbed):
         # important for dataloader
-        col, _ = testbed.col, testbed.data
+        col = testbed.col
         buf = pickle.dumps(col)
         new_col = pickle.loads(buf)
 
@@ -219,38 +218,48 @@ class TestAbstractColumn:
         assert isinstance(new_col, self.column_class)
         assert col.is_equal(new_col)
 
-    def test_head(self):
-        testbed = self.testbed_class.single()
+    def test_head(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         length = 10
         result = testbed.col.head(length)
         assert len(result) == length
         assert result.is_equal(testbed.col.lz[:length])
 
-    def test_tail(self):
-        testbed = self.testbed_class.single()
+    def test_tail(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         length = 10
         result = testbed.col.tail(length)
         assert len(result) == length
         assert result.is_equal(testbed.col.lz[-length:])
 
-    def test_repr_html(self):
-        testbed = self.testbed_class.single()
+    def test_repr_html(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         testbed.col._repr_html_()
 
-    def test_repr_html(self):
-        testbed = self.testbed_class.single()
+    def test_repr_html(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         testbed.col._repr_html_()
 
-    def test_str(self):
-        testbed = self.testbed_class.single()
+    def test_str(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         result = str(testbed.col)
         assert isinstance(result, str)
 
-    def test_repr(self):
-        testbed = self.testbed_class.single()
+    def test_repr(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
         result = repr(testbed.col)
         assert isinstance(result, str)
 
-    def test_streamlit(self):
-        testbed = self.testbed_class.single()
-        testbed.streamlit()
+    def test_streamlit(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
+        testbed.col.streamlit()
+
+    def test_repr_pandas(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
+        series = testbed.col._repr_pandas_()
+        assert isinstance(series, pd.Series)
+
+    def test_to_pandas(self, tmpdir):
+        testbed = self.testbed_class.single(tmpdir=tmpdir)
+        series = testbed.col.to_pandas()
+        assert isinstance(series, pd.Series)

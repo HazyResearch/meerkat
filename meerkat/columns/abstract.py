@@ -222,6 +222,8 @@ class AbstractColumn(
         return self.full_length()
 
     def full_length(self):
+        if self._data is None:
+            return 0
         return len(self._data)
 
     def _repr_pandas_(self) -> pd.Series:

@@ -18,21 +18,6 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         "dtype": ["float", "int"],
     }
 
-    MAP_SPECS = {
-        "map1": {
-            "fn": lambda x: x + 1,
-            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data + 1),
-        },
-        "map2": {
-            "fn": lambda x: x + 2,
-            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data + 2),
-        },
-        "bool": {
-            "fn": lambda x: x > 3,
-            "expected_result": lambda col: NumpyArrayColumn.from_array(col.data > 3),
-        },
-    }
-
     def __init__(
         self,
         length: int = 16,
@@ -52,13 +37,29 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         self.col = NumpyArrayColumn.from_array(array)
         self.data = array
 
-    def get_map_spec(self, key: str = "map1"):
+    def get_map_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+    ):
         return {
-            k: v if k != "expected_result" else v(self.col)
-            for k, v in self.MAP_SPECS[key].items()
+            "fn": lambda x: x + salt,
+            "expected_result": NumpyArrayColumn.from_array(self.col.data + salt),
         }
 
-    def get_data(self, index):
+    def get_filter_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+    ):
+        return {
+            "fn": lambda x: x > 3 + salt,
+            "expected_result": self.col[self.col.data > 3 + salt],
+        }
+
+    def get_data(self, index, materialize=True):
         return self.data[index]
 
     @staticmethod
@@ -98,15 +99,15 @@ class TestNumpyArrayColumn(TestAbstractColumn):
         config={"num_dims": [1], "dim_length": [1]}, params={"batched": [True, False]}
     )
     def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_filter_1(testbed, batched)
+        return super().test_filter_1(testbed, batched,materialize=True)
 
     @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_multiple(testbed, batched)
+        return super().test_map_return_multiple(testbed, batched, materialize=True)
 
     @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_single(testbed, batched)
+        return super().test_map_return_single(testbed, batched, materialize=True)
 
     @NumpyArrayColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):

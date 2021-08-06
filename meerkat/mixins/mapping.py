@@ -32,8 +32,7 @@ class MappableMixin:
         from meerkat.datapanel import DataPanel
 
         """Map a function over the elements of the column."""
-        # Check if need to materialize:
-        # TODO(karan): figure out if we need materialize=False
+
 
         # Just return if the function is None
         if function is None:

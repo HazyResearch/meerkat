@@ -41,30 +41,32 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
         self.col = PandasSeriesColumn(series)
         self.data = series
 
-    def get_map_spec(self, key: str = "map1"):
-        if key == "map1":
-            a = str(1) if self.dtype == "str" else 1
-            return {
-                "fn": lambda x: x + a,
-                "expected_result": PandasSeriesColumn(self.col.data + a),
-                "output_type": PandasSeriesColumn,
-            }
-        if key == "map2":
-            a = str(1) if self.dtype == "str" else 1
-            return {
-                "fn": lambda x: x + a,
-                "expected_result": PandasSeriesColumn(self.col.data + a),
-                "output_type": PandasSeriesColumn,
-            }
-        if key == "bool":
-            a = str(1) if self.dtype == "str" else 1
-            return {
-                "fn": lambda x: x > a,
-                "expected_result": PandasSeriesColumn(self.col.data > a),
-                "output_type": PandasSeriesColumn,
-            }
+    def get_map_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+    ):
+        salt = (salt if self.dtype != "str" else str(salt))
+        return {
+            "fn": lambda x: x + salt,
+            "expected_result": PandasSeriesColumn(self.col.data + salt),
+            "output_type": PandasSeriesColumn,
+        }
 
-    def get_data(self, index):
+    def get_filter_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+    ):
+        salt = (3 + salt if self.dtype != "str" else str(3 + salt))
+        return {
+            "fn": lambda x: x > salt,
+            "expected_result": self.col[self.col.data > salt],
+        }
+
+    def get_data(self, index, materialize: bool = True):
         return self.data.iloc[index]
 
     @staticmethod
@@ -130,15 +132,15 @@ class TestPandasSeriesColumn(TestAbstractColumn):
 
     @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_filter_1(testbed, batched)
+        return super().test_filter_1(testbed, batched, materialize=True)
 
     @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_multiple(testbed, batched)
+        return super().test_map_return_multiple(testbed, batched, materialize=True)
 
     @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_single(testbed, batched)
+        return super().test_map_return_single(testbed, batched, materialize=True)
 
     @PandasSeriesColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):
