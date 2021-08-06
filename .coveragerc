@@ -14,3 +14,4 @@ omit =
     tests/*
     meerkat/contrib/*
     meerkat/nn/*
+    setup.py
