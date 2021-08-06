@@ -289,6 +289,7 @@ class BlockManager(MutableMapping):
             mgr.add_column(col.copy(), name)
         return mgr
 
+
 def _serialize_block_index(index: BlockIndex) -> Union[Dict, str, int]:
     if not isinstance(index, (int, str, slice)):
         raise ValueError("Can only serialize `BlockIndex` objects.")

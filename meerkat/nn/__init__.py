@@ -1,4 +1,4 @@
-"""Import nn module classes"""
+"""Import nn module classes."""
 # flake8: noqa
 import warnings
 

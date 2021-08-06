@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import logging
 from typing import Collection, Sequence
-from PIL.Image import Image
 
 import pandas as pd
 
 from meerkat.cells.imagepath import ImagePath
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
-from meerkat.columns.lambda_column import LambdaColumn, LambdaCell
+from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.tools.lazy_loader import LazyLoader
 

@@ -33,7 +33,6 @@ class MappableMixin:
 
         """Map a function over the elements of the column."""
 
-
         # Just return if the function is None
         if function is None:
             logger.info("`function` None, returning None.")

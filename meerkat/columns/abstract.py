@@ -297,7 +297,7 @@ class AbstractColumn(
         raise NotImplementedError
 
     def is_equal(self, other: AbstractColumn) -> bool:
-        """Tests whether two columns
+        """Tests whether two columns.
 
         Args:
             other (AbstractColumn): [description]

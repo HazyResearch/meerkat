@@ -18,7 +18,7 @@ class CloneableMixin:
 
     @classmethod
     def _state_keys(cls) -> set:
-        """ """
+        """"""
         raise NotImplementedError()
 
     @classmethod
@@ -48,7 +48,7 @@ class CloneableMixin:
 
     def _copy_data(self) -> object:
         raise NotImplementedError
-    
+
     def _view_data(self) -> object:
         return self.data
 
