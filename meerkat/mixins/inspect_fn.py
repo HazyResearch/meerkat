@@ -17,6 +17,7 @@ class FunctionInspectorMixin:
         data=None,
         indices=None,
         materialize=True,
+        **kwargs
     ) -> SimpleNamespace:
 
         # Initialize variables to track
@@ -44,11 +45,11 @@ class FunctionInspectorMixin:
                 indices = 0
 
         if with_indices and is_batched_fn:
-            output = function(data, indices)
+            output = function(data, indices, **kwargs)
         elif with_indices and not is_batched_fn:
-            output = function(data, indices)
+            output = function(data, indices, **kwargs)
         else:
-            output = function(data)
+            output = function(data, **kwargs)
 
         # lazy import to avoid circular dependency
         from meerkat.columns.abstract import AbstractColumn

@@ -372,6 +372,43 @@ def test_map_2(num_workers):
     assert (result["y"] == np.ones(len(visible_rows)) * 2).all()
 
 
+@pytest.mark.parametrize("use_output_type", ([True, False]))
+def test_map_3(use_output_type):
+    """`map`, mixed datapanel, return multiple, `is_batched_fn=True`,
+    func has additional arguments, specify output types"""
+    dp, visible_rows, visible_columns = _get_datapanel(use_visible_columns=False)
+
+    # func has additional arguments
+    def func(x, factor):
+        out = {
+            "x": (x["a"] + np.array(x["b"])) * factor,
+            "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
+        }
+        return out
+
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+
+    # Specify output_types for returned columns
+    output_type = (
+        {"x": ListColumn, "y": PandasSeriesColumn} if use_output_type else None
+    )
+
+    result = dp.map(
+        func,
+        batch_size=4,
+        is_batched_fn=True,
+        num_workers=0,
+        output_type=output_type,
+        factor=2,
+    )
+    assert isinstance(result, DataPanel)
+    assert len(result["x"]) == len(visible_rows)
+    assert len(result["y"]) == len(visible_rows)
+    assert (result["x"] == np.array(visible_rows) * 4).all()
+    assert (result["y"] == np.ones(len(visible_rows)) * 2).all()
+
+
 @pytest.mark.parametrize(
     "use_visible_columns,use_input_columns,batched",
     product([True, False], [True, False], [True, False]),
@@ -483,6 +520,43 @@ def test_update_3(use_visible_columns, use_input_columns, batched):
     assert (result["y"] == np.array(visible_rows) * 6).all()
 
 
+@pytest.mark.parametrize("use_output_type", ([True, False]))
+def test_update_4(use_output_type):
+    """`update`, mixed datapanel, return multiple, `is_batched_fn=True`,
+    func has additional arguments, specify output types"""
+    dp, visible_rows, visible_columns = _get_datapanel(use_visible_columns=False)
+
+    # func has additional arguments
+    def func(x, factor):
+        out = {
+            "x": (x["a"] + np.array(x["b"])) * factor,
+            "y": np.array([x["c"][i]["a"] for i in range(len(x["c"]))]),
+        }
+        return out
+
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+
+    # Specify output_types for returned columns
+    output_type = (
+        {"x": ListColumn, "y": PandasSeriesColumn} if use_output_type else None
+    )
+
+    result = dp.update(
+        func,
+        batch_size=4,
+        is_batched_fn=True,
+        num_workers=0,
+        output_type=output_type,
+        factor=2,
+    )
+    assert isinstance(result, DataPanel)
+    assert len(result["x"]) == len(visible_rows)
+    assert len(result["y"]) == len(visible_rows)
+    assert (result["x"] == np.array(visible_rows) * 4).all()
+    assert (result["y"] == np.ones(len(visible_rows)) * 2).all()
+
+
 @pytest.mark.parametrize(
     "use_visible_columns,batched",
     product([True, False], [True, False]),
@@ -497,6 +571,41 @@ def test_filter_1(use_visible_columns, batched):
         return (x["a"] % 2) == 0
 
     result = dp.filter(func, batch_size=4, is_batched_fn=batched, num_workers=0)
+    if visible_rows is None:
+        visible_rows = np.arange(16)
+
+    assert isinstance(result, DataPanel)
+    new_len = (np.array(visible_rows) % 2 == 0).sum()
+    assert len(result) == new_len
+    for col in result._data.values():
+        assert len(col) == new_len
+
+    # old datapane unchanged
+    old_len = len(visible_rows)
+    assert len(dp) == old_len
+    for col in dp._data.values():
+        # important to check that the column lengths are correct as well
+        assert len(col) == old_len
+
+    assert result.visible_columns == dp.visible_columns
+
+
+@pytest.mark.parametrize(
+    "use_visible_columns,batched",
+    product([True, False], [True, False]),
+)
+def test_filter_kwargs(use_visible_columns, batched):
+    """`filter`, mixed datapanel, func has additional arguments"""
+    dp, visible_rows, visible_columns = _get_datapanel(
+        use_visible_columns=use_visible_columns
+    )
+
+    def func(x, factor):
+        return (x["a"] % factor) == 0
+
+    result = dp.filter(
+        func, batch_size=4, is_batched_fn=batched, num_workers=0, factor=2
+    )
     if visible_rows is None:
         visible_rows = np.arange(16)
 

@@ -58,50 +58,56 @@ def test_from_array():
 
 
 @pytest.mark.parametrize(
-    "dtype,batched",
-    product(["float", "int"], [True, False]),
+    "dtype,batched,use_kwargs",
+    product(["float", "int"], [True, False], [True, False]),
 )
-def test_map_return_single(dtype, batched):
+def test_map_return_single(dtype, batched, use_kwargs):
     """`map`, single return,"""
     col, array = _get_data(
         dtype=dtype,
     )
 
-    def func(x):
-        out = x.type(torch.FloatTensor).mean(axis=-1)
+    def func(x, bias=0):
+        out = x.type(torch.FloatTensor).mean(axis=-1) + bias
         return out
 
+    bias = 1 if use_kwargs else 0
+    kwargs = {"bias": bias} if use_kwargs else {}
+
     result = col.map(
-        func, batch_size=4, is_batched_fn=batched, output_type=TensorColumn
+        func, batch_size=4, is_batched_fn=batched, output_type=TensorColumn, **kwargs
     )
     assert isinstance(result, TensorColumn)
     np_test.assert_equal(len(result), len(array))
-    assert np.allclose(result.numpy(), array.mean(axis=-1))
+    assert np.allclose(result.numpy(), array.mean(axis=-1) + bias)
 
 
 @pytest.mark.parametrize(
-    "dtype, batched",
-    product(["float", "int"], [True, False]),
+    "dtype, batched, use_kwargs",
+    product(["float", "int"], [True, False], [True, False]),
 )
-def test_map_return_multiple(dtype, batched):
+def test_map_return_multiple(dtype, batched, use_kwargs):
     """`map`, multiple return."""
     col, array = _get_data(
         dtype=dtype,
     )
 
-    def func(x):
+    def func(x, bias=0):
         return {
-            "mean": x.type(torch.FloatTensor).mean(axis=-1),
-            "std": x.type(torch.FloatTensor).std(axis=-1),
+            "mean": x.type(torch.FloatTensor).mean(axis=-1) + bias,
+            "std": x.type(torch.FloatTensor).std(axis=-1) + bias,
         }
 
-    result = col.map(func, batch_size=4, is_batched_fn=batched)
+    bias = 1 if use_kwargs else 0
+    kwargs = {"bias": bias} if use_kwargs else {}
+
+    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
     assert isinstance(result, DataPanel)
     assert isinstance(result["std"], TensorColumn)
     assert isinstance(result["mean"], TensorColumn)
     np_test.assert_equal(len(result), len(array))
-    assert np.allclose(result["mean"].numpy(), array.mean(axis=-1))
-    assert np.allclose(result["std"].numpy(), array.std(axis=-1, ddof=1))
+    assert np.allclose(result["mean"].numpy(), array.mean(axis=-1) + bias)
+    assert np.allclose(result["std"].numpy(), array.std(axis=-1, ddof=1) + bias)
 
 
 @pytest.mark.parametrize(
