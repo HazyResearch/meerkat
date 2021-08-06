@@ -2,7 +2,7 @@
 import os
 from functools import wraps
 from itertools import product
-from typing import Dict, Sequence
+from typing import Sequence
 
 import numpy as np
 import pandas as pd
@@ -10,11 +10,9 @@ import pytest
 import torch
 from PIL import Image
 
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.image_column import ImageCellColumn, ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
-from meerkat.tools.identifier import Identifier
 
 
 class AbstractColumnTestBed:
