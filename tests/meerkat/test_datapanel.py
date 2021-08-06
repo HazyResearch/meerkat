@@ -10,21 +10,17 @@ import pandas as pd
 import pytest
 import torch
 import ujson as json
-from PIL.Image import Image
 
 from meerkat import NumpyArrayColumn
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
-from ..testbeds import MockDatapanel
+from .columns.test_image_column import ImageColumnTestBed
 from .columns.test_numpy_column import NumpyArrayColumnTestBed
 from .columns.test_pandas_column import PandasSeriesColumnTestBed
-from .columns.test_image_column import ImageColumnTestBed
 
 
 class DataPanelTestBed:
@@ -215,9 +211,9 @@ class TestDataPanel:
                 data = col_testbed.get_data(indices)
                 col_testbed.assert_data_equal(value.data, data)
 
-                if type(value) == type(dp[key]):
-                    # if the getitem returns a column of the same type, enforce that all the
-                    # attributes were cloned over appropriately. We don't want to check this
+                if value.__class__ == dp[key].__class__:
+                    # if the getitem returns a column of the same type, enforce that all
+                    # attributes were cloned over appropriately. We don't want to check
                     # for columns that return columns of different type from getitem
                     # (e.g. LambdaColumn)
                     assert dp[key]._clone(data=data).is_equal(value)
@@ -252,7 +248,7 @@ class TestDataPanel:
             ]
         }
     )
-    def test_row_index_multiple(self, testbed, index_type):
+    def test_row_lz_index_multiple(self, testbed, index_type):
         dp = testbed.dp
         rows = np.arange(len(dp))
 
@@ -278,11 +274,11 @@ class TestDataPanel:
                 data = col_testbed.get_data(indices, materialize=False)
                 col_testbed.assert_data_equal(value.data, data)
 
-                if type(value) == type(dp[key]):
-                    # if the getitem returns a column of the same type, enforce that all the
-                    # attributes were cloned over appropriately. We don't want to check this
-                    # for columns that return columns of different type from getitem
-                    # (e.g. LambdaColumn)
+                # if the getitem returns a column of the same type, enforce that all the
+                # attributes were cloned over appropriately. We don't want to check this
+                # for columns that return columns of different type from getitem
+                # (e.g. LambdaColumn)
+                if value.__class__ == dp[key].__class__:
                     assert dp[key]._clone(data=data).is_equal(value)
 
     @DataPanelTestBed.parametrize()
@@ -295,10 +291,10 @@ class TestDataPanel:
         for name in dp.columns:
             dp[name] is dp[name]
 
-        # Columns (2): Indexing multiple columns (i.e. with Sequence[str]) returns a view of
-        # the DataPanel holding views to the columns in the original DataPanel. This means
-        # the AbstractColumn objects held in the new DataPanel are the same AbstractColumn
-        # objects held in the original DataPanel.
+        # Columns (2): Indexing multiple columns (i.e. with Sequence[str]) returns a
+        # view of the DataPanel holding views to the columns in the original DataPanel.
+        # This means the AbstractColumn objects held in the new DataPanel are the same
+        # AbstractColumn objects held in the original DataPanel.
         columns = list(testbed.columns)
         for excluded_column in columns:
             index = [c for c in columns if c != excluded_column]
@@ -342,8 +338,8 @@ class TestDataPanel:
         assert isinstance(dp2[col], PandasSeriesColumn)
         assert dp[col] is not dp2[col]
         assert dp[col].data is not dp2[col].data
-        # TODO (sabri): Figure out pandas copying behavior, it's not clear how it works and
-        # this deserves a deeper investigation.
+        # TODO (sabri): Figure out pandas copying behavior, it's not clear how it works
+        # and this deserves a deeper investigation.
         # assert dp[col].data.values.base is dp2[col].data.values.base
 
         # slice index
@@ -391,16 +387,29 @@ class TestDataPanel:
             batch_size=4,
             is_batched_fn=batched,
             materialize=materialize,
+            output_type={
+                key: map_spec["output_type"]
+                for key, map_spec in map_specs.items()
+                if "output_type" in map_spec
+            },
         )
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
             assert result[key].is_equal(map_spec["expected_result"])
 
     @DataPanelTestBed.parametrize(
-        params={"batched": [True, False], "materialize": [True, False]}
+        params={
+            "batched": [True, False],
+            "materialize": [True, False],
+            "num_workers": [0],
+        }
     )
     def test_map_return_single(
-        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+        self,
+        testbed: DataPanelTestBed,
+        batched: bool,
+        materialize: bool,
+        num_workers: int,
     ):
         dp = testbed.dp
         name = list(testbed.column_testbeds.keys())[0]
@@ -417,9 +426,19 @@ class TestDataPanel:
             batch_size=4,
             is_batched_fn=batched,
             materialize=materialize,
+            num_workers=num_workers,
         )
         assert isinstance(result, AbstractColumn)
         assert result.is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(config={"consolidated": [True]})
+    def test_map_return_single_multi_worker(
+        self,
+        testbed: DataPanelTestBed,
+    ):
+        self.test_map_return_single(
+            testbed, batched=True, materialize=True, num_workers=2
+        )
 
     @DataPanelTestBed.parametrize(
         params={"batched": [True, False], "materialize": [True, False]}
@@ -447,6 +466,11 @@ class TestDataPanel:
             batch_size=4,
             is_batched_fn=batched,
             materialize=materialize,
+            output_type={
+                f"{key}_new": map_spec["output_type"]
+                for key, map_spec in map_specs.items()
+                if "output_type" in map_spec
+            },
         )
         assert set(result.columns) == set(dp.columns) | {
             f"{key}_new" for key in dp.columns if key != "index"
@@ -471,8 +495,7 @@ class TestDataPanel:
 
         def func(x):
             out = {
-                f"{key}": map_spec["fn"](x[key])
-                for key, map_spec in map_specs.items()
+                f"{key}": map_spec["fn"](x[key]) for key, map_spec in map_specs.items()
             }
             return out
 
@@ -481,9 +504,227 @@ class TestDataPanel:
             batch_size=4,
             is_batched_fn=batched,
             materialize=materialize,
+            output_type={
+                key: map_spec["output_type"]
+                for key, map_spec in map_specs.items()
+                if "output_type" in map_spec
+            },
         )
         assert set(result.columns) == set(dp.columns)
         assert result.data is not dp.data
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
             assert result[key].is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_filter(self, testbed: DataPanelTestBed, batched: bool, materialize: bool):
+        dp = testbed.dp
+        name = list(testbed.column_testbeds.keys())[0]
+        filter_spec = testbed.column_testbeds[name].get_filter_spec(
+            batched=batched, materialize=materialize, salt=1
+        )
+
+        def func(x):
+            out = filter_spec["fn"](x[name])
+            return out
+
+        result = dp.filter(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+        )
+        assert isinstance(result, DataPanel)
+        result[name].is_equal(filter_spec["expected_result"])
+
+    def test_remove_column(self):
+        a = np.arange(16)
+        b = np.arange(16) * 2
+        dp = DataPanel.from_batch({"a": a, "b": b})
+        assert "a" in dp
+        dp.remove_column("a")
+        assert "a" not in dp
+
+    def test_overwrite_column(self):
+        # make sure we remove the column when overwriting it
+        a = np.arange(16)
+        b = np.arange(16) * 2
+        dp = DataPanel.from_batch({"a": a, "b": b})
+        assert "a" in dp
+        assert dp[["a", "b"]]["a"]._data is a
+        # testing removal from block manager, so important to use non-blockable type
+        dp["a"] = ListColumn(range(16))
+        assert dp[["a", "b"]]["a"]._data is not a
+
+    @DataPanelTestBed.parametrize()
+    def test_io(self, testbed, tmp_path):
+        """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
+        dp = testbed.dp
+        path = os.path.join(tmp_path, "test")
+        dp.write(path)
+        new_dp = DataPanel.read(path)
+
+        assert isinstance(new_dp, DataPanel)
+        assert dp.columns == new_dp.columns
+        assert len(new_dp) == len(dp)
+        for name in dp.columns:
+            assert new_dp[name].is_equal(dp[name])
+
+    @DataPanelTestBed.parametrize()
+    def test_repr_html_(self, testbed):
+        testbed.dp._repr_html_()
+
+    def test_append_columns(self):
+        length = 16
+        batch = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+            "c": [{"a": 2}] * length,
+            "d": torch.arange(length),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            # test multidimensional
+            "f": np.ones((length, 5)).astype(int),
+            "g": torch.ones(length, 5).to(int),
+        }
+        dp = DataPanel.from_batch(batch)
+
+        out = dp.append(dp, axis="rows")
+
+        assert len(out) == len(dp) * 2
+        assert isinstance(out, DataPanel)
+        assert set(out.visible_columns) == set(dp.visible_columns)
+        assert (out["a"].data == np.concatenate([np.arange(length)] * 2)).all()
+        assert out["b"].data == list(np.concatenate([np.arange(length)] * 2))
+
+    @DataPanelTestBed.parametrize()
+    def test_tail(self, testbed):
+        dp = testbed.dp
+
+        new_dp = dp.tail(n=2)
+
+        assert isinstance(new_dp, DataPanel)
+        assert new_dp.visible_columns == dp.visible_columns
+        assert len(new_dp) == 2
+
+    @DataPanelTestBed.parametrize()
+    def test_head(self, testbed):
+        dp = testbed.dp
+
+        new_dp = dp.head(n=2)
+
+        assert isinstance(new_dp, DataPanel)
+        assert new_dp.visible_columns == dp.visible_columns
+        assert len(new_dp) == 2
+
+    class DataPanelSubclass(DataPanel):
+        """Mock class to test that ops on subclass returns subclass."""
+
+        pass
+
+    def test_subclass(self):
+        dp1 = self.DataPanelSubclass.from_dict(
+            {"a": np.arange(3), "b": ["may", "jun", "jul"]}
+        )
+        dp2 = self.DataPanelSubclass.from_dict(
+            {"c": np.arange(3), "d": ["2021", "2022", "2023"]}
+        )
+
+        assert isinstance(dp1.lz[np.asarray([0, 1])], self.DataPanelSubclass)
+        assert isinstance(dp1.lz[:2], self.DataPanelSubclass)
+        assert isinstance(dp1[:2], self.DataPanelSubclass)
+
+        assert isinstance(
+            dp1.merge(dp2, left_on="a", right_on="c"), self.DataPanelSubclass
+        )
+        assert isinstance(dp1.append(dp1), self.DataPanelSubclass)
+
+    def test_from_csv(self):
+        temp_f = tempfile.NamedTemporaryFile()
+        data = {
+            "a": [3.4, 2.3, 1.2],
+            "b": ["alpha", "beta", "gamma"],
+            "c": ["the walk", "the talk", "blah"],
+        }
+        pd.DataFrame(data).to_csv(temp_f.name)
+
+        dp_new = DataPanel.from_csv(temp_f.name)
+        assert dp_new.column_names == ["Unnamed: 0", "a", "b", "c", "index"]
+        # Skip index column
+        for k in data:
+            if isinstance(dp_new[k], PandasSeriesColumn):
+                data_to_compare = dp_new[k]._data.tolist()
+            else:
+                data_to_compare = dp_new[k]._data
+            assert data_to_compare == data[k]
+
+    def test_from_jsonl(self):
+        # Build jsonl file
+        temp_f = tempfile.NamedTemporaryFile()
+        data = {
+            "a": [3.4, 2.3, 1.2],
+            "b": [[7, 9], [4], [1, 2]],
+            "c": ["the walk", "the talk", "blah"],
+        }
+        with open(temp_f.name, "w") as out_f:
+            for idx in range(3):
+                to_write = {k: data[k][idx] for k in list(data.keys())}
+                out_f.write(json.dumps(to_write) + "\n")
+
+        dp_new = DataPanel.from_jsonl(temp_f.name)
+        assert dp_new.column_names == ["a", "b", "c", "index"]
+        # Skip index column
+        for k in data:
+            if isinstance(dp_new[k], NumpyArrayColumn):
+                data_to_compare = dp_new[k]._data.tolist()
+            else:
+                data_to_compare = dp_new[k]._data
+            assert data_to_compare == data[k]
+        temp_f.close()
+
+    def test_from_batch(self):
+        # Build a dataset from a batch
+        datapanel = DataPanel.from_batch(
+            {
+                "a": [1, 2, 3],
+                "b": [True, False, True],
+                "c": ["x", "y", "z"],
+                "d": [{"e": 2}, {"e": 3}, {"e": 4}],
+                "e": torch.ones(3),
+                "f": np.ones(3),
+            },
+        )
+        assert set(datapanel.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
+        assert len(datapanel) == 3
+
+    def test_to_pandas(self):
+        import pandas as pd
+
+        length = 16
+        batch = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+            "c": [{"a": 2}] * length,
+            "d": torch.arange(length),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            # test multidimensional
+            "f": np.ones((length, 5)).astype(int),
+            "g": torch.ones(length, 5).to(int),
+        }
+        dp = DataPanel.from_batch(batch)
+
+        df = dp.to_pandas()
+        assert isinstance(df, pd.DataFrame)
+        assert list(df.columns) == dp.visible_columns
+        assert len(df) == len(dp)
+
+        assert (df["a"].values == dp["a"].data).all()
+        assert list(df["b"]) == list(dp["b"].data)
+
+        assert isinstance(df["c"][0], dict)
+
+        assert (df["d"].values == dp["d"].numpy()).all()
+        assert (df["e"].values == dp["e"].values).all()

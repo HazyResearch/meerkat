@@ -53,8 +53,8 @@ class FunctionInspectorMixin:
 
         # lazy import to avoid circular dependency
         from meerkat.columns.abstract import AbstractColumn
-        from meerkat.columns.tensor_column import TensorColumn
         from meerkat.columns.numpy_column import NumpyArrayColumn
+        from meerkat.columns.tensor_column import TensorColumn
 
         if isinstance(output, Mapping):
             # `function` returns a dict output
@@ -79,7 +79,7 @@ class FunctionInspectorMixin:
             isinstance(output, (bool, np.bool_))
             or (
                 isinstance(output, (np.ndarray, NumpyArrayColumn))
-                and output.dtype == np.bool
+                and output.dtype == bool
             )
             or (
                 isinstance(output, (torch.Tensor, TensorColumn))

@@ -1,6 +1,5 @@
 """Unittests for NumpyColumn."""
-import os
-import pickle
+
 
 import numpy as np
 import pandas as pd
@@ -9,9 +8,6 @@ import torch
 
 from meerkat import PandasSeriesColumn
 from meerkat.block.tensor_block import TensorBlock
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
 
 from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
@@ -46,11 +42,13 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
         batched: bool = True,
         materialize: bool = False,
         salt: int = 1,
+        kwarg: int = 0,
     ):
-        salt = (salt if self.dtype != "str" else str(salt))
+        salt = salt if self.dtype != "str" else str(salt)
+        kwarg = kwarg if self.dtype != "str" else str(kwarg)
         return {
-            "fn": lambda x: x + salt,
-            "expected_result": PandasSeriesColumn(self.col.data + salt),
+            "fn": lambda x, k=0: x + salt + (k if self.dtype != "str" else str(k)),
+            "expected_result": PandasSeriesColumn(self.col.data + salt + kwarg),
             "output_type": PandasSeriesColumn,
         }
 
@@ -59,11 +57,13 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
         batched: bool = True,
         materialize: bool = False,
         salt: int = 1,
+        kwarg: int = 0,
     ):
-        salt = (3 + salt if self.dtype != "str" else str(3 + salt))
+        salt = 3 + salt if self.dtype != "str" else str(3 + salt)
+        kwarg = kwarg if self.dtype != "str" else str(kwarg)
         return {
-            "fn": lambda x: x > salt,
-            "expected_result": self.col[self.col.data > salt],
+            "fn": lambda x, k=0: x > salt + (k if self.dtype != "str" else str(k)),
+            "expected_result": self.col[self.col.data > salt + kwarg],
         }
 
     def get_data(self, index, materialize: bool = True):
@@ -141,6 +141,14 @@ class TestPandasSeriesColumn(TestAbstractColumn):
     @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
         return super().test_map_return_single(testbed, batched, materialize=True)
+
+    @PandasSeriesColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single_w_kwarg(
+        self, testbed: AbstractColumnTestBed, batched: bool
+    ):
+        return super().test_map_return_single_w_kwarg(
+            testbed, batched, materialize=True
+        )
 
     @PandasSeriesColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):

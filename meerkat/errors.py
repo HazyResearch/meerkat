@@ -8,3 +8,7 @@ class ConcatError(ValueError):
 
 class ConsolidationError(ValueError):
     pass
+
+
+class ExperimentalWarning(FutureWarning):
+    pass

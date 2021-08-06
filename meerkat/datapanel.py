@@ -1089,13 +1089,6 @@ class DataPanel(
         yaml.dump(metadata, open(metadata_path, "w"))
 
     @classmethod
-    def from_state(cls, state: Dict, *args, **kwargs) -> DataPanel:
-        datapanel = super(DataPanel, cls).from_state(state, *args, **kwargs)
-        datapanel._create_logdir()
-        datapanel._set_features()
-        return datapanel
-
-    @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
         return {

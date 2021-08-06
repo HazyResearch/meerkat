@@ -1,24 +1,23 @@
 """Unittests for NumpyColumn."""
 from __future__ import annotations
-from meerkat.columns.image_column import ImageCell
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.lambda_column import LambdaCell
 
 import os
 from typing import List, Union
-from _pytest.mark import param
 
 import numpy as np
 import pytest
 import torch
-from attr import s
+import torchvision.datasets.folder as folder
 from PIL import Image
 from torchvision.transforms.functional import to_tensor
 
 from meerkat import ImageColumn
-from meerkat.columns.list_column import ListColumn
-from meerkat.columns.tensor_column import TensorColumn
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.image_column import ImageCell
+from meerkat.columns.lambda_column import LambdaCell
+from meerkat.columns.list_column import ListColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.tensor_column import TensorColumn
 
 from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
@@ -51,50 +50,57 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         if transform is not None:
             self.data = torch.stack(self.data)
         self.transform = transform
-        self.col = ImageColumn.from_filepaths(self.image_paths, transform=transform)
+        self.col = ImageColumn.from_filepaths(
+            self.image_paths, transform=transform, loader=folder.default_loader
+        )
 
     def get_map_spec(
         self,
         batched: bool = True,
         materialize: bool = False,
+        kwarg: int = 0,
         salt: int = 1,
     ):
         if not materialize:
             if batched:
-                return {"fn": lambda x: x, "expected_result": self.col}
+                return {"fn": lambda x, k=0: x, "expected_result": self.col}
             else:
                 # can't check for cell column equivalence because the `fn` is a bound
                 # method of different objects (since we perform batching then convert)
                 # non-batched fns to batched functions, so we call get
                 if self.transform is None:
                     return {
-                        "fn": lambda x: x.get().rotate(45 + salt),
+                        "fn": lambda x, k=0: x.get().rotate(45 + salt + k),
                         "expected_result": ListColumn(
-                            [im.rotate(45 + salt) for im in self.ims]
+                            [im.rotate(45 + salt + kwarg) for im in self.ims]
                         ),
                     }
                 else:
                     return {
-                        "fn": lambda x: x.get() + salt,
+                        "fn": lambda x, k=0: x.get() + salt + k,
                         "expected_result": TensorColumn(
-                            torch.stack([self.transform(im) for im in self.ims]) + salt
+                            torch.stack([self.transform(im) for im in self.ims])
+                            + salt
+                            + kwarg
                         ),
                     }
         else:
             if self.transform is None:
                 return {
-                    "fn": (lambda x: [im.rotate(45 + salt) for im in x])
+                    "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
                     if batched
-                    else (lambda x: x.rotate(45 + salt)),
+                    else (lambda x, k=0: x.rotate(45 + salt + k)),
                     "expected_result": ListColumn(
-                        [im.rotate(45 + salt) for im in self.ims]
+                        [im.rotate(45 + salt + kwarg) for im in self.ims]
                     ),
                 }
             else:
                 return {
-                    "fn": lambda x: x + salt,
+                    "fn": lambda x, k=0: x + salt + k,
                     "expected_result": TensorColumn(
-                        torch.stack([self.transform(im) for im in self.ims]) + salt
+                        torch.stack([self.transform(im) for im in self.ims])
+                        + salt
+                        + kwarg
                     ),
                 }
 
@@ -103,45 +109,48 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         batched: bool = True,
         materialize: bool = False,
         salt: int = 1,
+        kwarg: int = 0,
     ):
         if not materialize:
             if batched:
                 return {
-                    "fn": lambda x: [
+                    "fn": lambda x, k=0: [
                         int(os.path.splitext(os.path.basename(cell.data))[0])
-                        < (4 + salt)
+                        < (4 + salt + k)
                         for cell in x.lz
                     ],
-                    "expected_result": self.col.lz[: 4 + salt],
+                    "expected_result": self.col.lz[: 4 + salt + kwarg],
                 }
             else:
                 return {
                     "fn": (
-                        lambda x: int(os.path.splitext(os.path.basename(x.data))[0])
-                        < (4 + salt)
+                        lambda x, k=0: int(
+                            os.path.splitext(os.path.basename(x.data))[0]
+                        )
+                        < (4 + salt + k)
                     ),
-                    "expected_result": self.col.lz[: 4 + salt],
+                    "expected_result": self.col.lz[: 4 + salt + kwarg],
                 }
         else:
             if self.transform is None:
                 return {
-                    "fn": (lambda x: [im.rotate(45 + salt) for im in x])
+                    "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
                     if batched
-                    else (lambda x: x.rotate(45 + salt)),
+                    else (lambda x, k=0: x.rotate(45 + salt + k)),
                     "expected_result": ListColumn(
-                        [im.rotate(45 + salt) for im in self.ims]
+                        [im.rotate(45 + salt + kwarg) for im in self.ims]
                     ),
                 }
             else:
                 return {
-                    "fn": lambda x: (
-                        (x.mean(dim=[1, 2, 3]) if batched else x.mean()) > salt
+                    "fn": lambda x, k=0: (
+                        (x.mean(dim=[1, 2, 3]) if batched else x.mean()) > salt + k
                     ).to(bool),
                     "expected_result": self.col.lz[
                         torch.stack([self.transform(im) for im in self.ims])
                         .mean(dim=[1, 2, 3])
                         .numpy()
-                        > salt
+                        > salt + kwarg
                     ],
                 }
 
@@ -236,6 +245,14 @@ class TestImageColumn(TestAbstractColumn):
     ):
         return super().test_map_return_single(testbed, batched, materialize)
 
+    @ImageColumnTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_map_return_single_w_kwarg(
+        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
+    ):
+        return super().test_map_return_single_w_kwarg(testbed, batched, materialize)
+
     @ImageColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):
         return super().test_copy(testbed)
@@ -253,7 +270,8 @@ class TestImageColumn(TestAbstractColumn):
         new_col = self.column_class.read(path)
 
         assert isinstance(new_col, self.column_class)
-        # can't check if the functions are the same since they point to different methods
+        # can't check if the functions are the same since they point to different
+        # methods
         assert col.data.is_equal(new_col.data)
 
     @ImageColumnTestBed.parametrize()

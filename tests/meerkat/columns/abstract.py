@@ -1,14 +1,12 @@
 import os
 import pickle
-from abc import abstractstaticmethod
 from functools import wraps
 from itertools import product
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
 
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
 
 
@@ -127,10 +125,30 @@ class TestAbstractColumn:
         map_spec = testbed.get_map_spec(batched=batched, materialize=materialize)
 
         def func(x):
-            if batched:
-                out = map_spec.get("batched_fn", map_spec["fn"])(x)
-            else:
-                out = map_spec["fn"](x)
+            out = map_spec["fn"](x)
+            return out
+
+        result = col.map(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+            output_type=map_spec.get("output_type", None),
+        )
+        assert result.is_equal(map_spec["expected_result"])
+
+    def test_map_return_single_w_kwarg(
+        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
+    ):
+        """`map`, single return,"""
+        col = testbed.col
+        k = 2
+        map_spec = testbed.get_map_spec(
+            batched=batched, materialize=materialize, kwarg=k
+        )
+
+        def func(x):
+            out = map_spec["fn"](x, k=k)
             return out
 
         result = col.map(
@@ -231,10 +249,6 @@ class TestAbstractColumn:
         result = testbed.col.tail(length)
         assert len(result) == length
         assert result.is_equal(testbed.col.lz[-length:])
-
-    def test_repr_html(self, tmpdir):
-        testbed = self.testbed_class.single(tmpdir=tmpdir)
-        testbed.col._repr_html_()
 
     def test_repr_html(self, tmpdir):
         testbed = self.testbed_class.single(tmpdir=tmpdir)
