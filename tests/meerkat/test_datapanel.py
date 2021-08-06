@@ -285,9 +285,8 @@ class TestDataPanel:
                     # (e.g. LambdaColumn)
                     assert dp[key]._clone(data=data).is_equal(value)
 
-
-    def test_col_indexing_view_copy_semantics(tmpdir):
-        testbed = MockDatapanel(length=16, include_image_column=True, tmpdir=tmpdir)
+    @DataPanelTestBed.parametrize()
+    def test_col_indexing_view_copy_semantics(self, testbed):
         dp = testbed.dp
 
         # Columns (1): Indexing a single column (i.e. with a str) returns the underlying
@@ -300,7 +299,191 @@ class TestDataPanel:
         # the DataPanel holding views to the columns in the original DataPanel. This means
         # the AbstractColumn objects held in the new DataPanel are the same AbstractColumn
         # objects held in the original DataPanel.
-        view_dp = dp[["a", "b"]]
-        for name in view_dp.columns:
-            dp[name] is not view_dp[name]
-            dp[name].data is dp[name].data
+        columns = list(testbed.columns)
+        for excluded_column in columns:
+            index = [c for c in columns if c != excluded_column]
+            view_dp = dp[index]
+            for name in view_dp.columns:
+                dp[name] is not view_dp[name]
+                dp[name].data is dp[name].data
+
+    def test_row_indexing_view_copy_semantics(self):
+        length = 16
+        batch = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+            "c": [{"a": 2}] * length,
+            "d": torch.arange(length),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            # test multidimensional
+            "f": np.ones((length, 5)).astype(int),
+            "g": torch.ones(length, 5).to(int),
+        }
+        dp = DataPanel.from_batch(batch)
+
+        # slice index
+        dp2 = dp[:8]
+        col = "a"
+        assert isinstance(dp2[col], NumpyArrayColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        assert dp[col].data is dp2[col].data.base
+
+        col = "d"
+        assert isinstance(dp2[col], TensorColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        # note `data_ptr` checks whether the tensors have the same memory address of the
+        # first element, so this would not work if the slice didn't start at 0
+        assert dp[col].data.data_ptr() == dp2[col].data.data_ptr()
+
+        col = "e"
+        assert isinstance(dp2[col], PandasSeriesColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        # TODO (sabri): Figure out pandas copying behavior, it's not clear how it works and
+        # this deserves a deeper investigation.
+        # assert dp[col].data.values.base is dp2[col].data.values.base
+
+        # slice index
+        dp2 = dp[np.array([0, 1, 2, 5])]
+        col = "a"
+        assert isinstance(dp2[col], NumpyArrayColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        assert dp[col].data is not dp2[col].data.base
+
+        col = "d"
+        assert isinstance(dp2[col], TensorColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        # note `data_ptr` checks whether the tensors have the same memory address of the
+        # first element, so this would not work if the slice didn't start at 0
+        assert dp[col].data.data_ptr() != dp2[col].data.data_ptr()
+
+        col = "e"
+        assert isinstance(dp2[col], PandasSeriesColumn)
+        assert dp[col] is not dp2[col]
+        assert dp[col].data is not dp2[col].data
+        assert dp[col].data.values is not dp2[col].data.values.base
+
+    @DataPanelTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_map_return_multiple(
+        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+    ):
+        dp = testbed.dp
+        map_specs = {
+            name: col_testbed.get_map_spec(
+                batched=batched, materialize=materialize, salt=1
+            )
+            for name, col_testbed in testbed.column_testbeds.items()
+        }
+
+        def func(x):
+            out = {key: map_spec["fn"](x[key]) for key, map_spec in map_specs.items()}
+            return out
+
+        result = dp.map(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+        )
+        assert isinstance(result, DataPanel)
+        for key, map_spec in map_specs.items():
+            assert result[key].is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_map_return_single(
+        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+    ):
+        dp = testbed.dp
+        name = list(testbed.column_testbeds.keys())[0]
+        map_spec = testbed.column_testbeds[name].get_map_spec(
+            batched=batched, materialize=materialize, salt=1
+        )
+
+        def func(x):
+            out = map_spec["fn"](x[name])
+            return out
+
+        result = dp.map(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+        )
+        assert isinstance(result, AbstractColumn)
+        assert result.is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_map_update_new(
+        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+    ):
+        dp = testbed.dp
+        map_specs = {
+            name: col_testbed.get_map_spec(
+                batched=batched, materialize=materialize, salt=1
+            )
+            for name, col_testbed in testbed.column_testbeds.items()
+        }
+
+        def func(x):
+            out = {
+                f"{key}_new": map_spec["fn"](x[key])
+                for key, map_spec in map_specs.items()
+            }
+            return out
+
+        result = dp.update(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+        )
+        assert set(result.columns) == set(dp.columns) | {
+            f"{key}_new" for key in dp.columns if key != "index"
+        }
+        assert isinstance(result, DataPanel)
+        for key, map_spec in map_specs.items():
+            assert result[f"{key}_new"].is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(
+        params={"batched": [True, False], "materialize": [True, False]}
+    )
+    def test_map_update_existing(
+        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+    ):
+        dp = testbed.dp
+        map_specs = {
+            name: col_testbed.get_map_spec(
+                batched=batched, materialize=materialize, salt=1
+            )
+            for name, col_testbed in testbed.column_testbeds.items()
+        }
+
+        def func(x):
+            out = {
+                f"{key}": map_spec["fn"](x[key])
+                for key, map_spec in map_specs.items()
+            }
+            return out
+
+        result = dp.update(
+            func,
+            batch_size=4,
+            is_batched_fn=batched,
+            materialize=materialize,
+        )
+        assert set(result.columns) == set(dp.columns)
+        assert result.data is not dp.data
+        assert isinstance(result, DataPanel)
+        for key, map_spec in map_specs.items():
+            assert result[key].is_equal(map_spec["expected_result"])

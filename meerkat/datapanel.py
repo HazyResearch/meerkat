@@ -368,11 +368,8 @@ class DataPanel(
         # Add the column
         self.data[name] = column
 
-        if name not in self.all_columns:
-            self.all_columns.append(name)
-
         if self._visible_columns is not None:
-            self.visible_columns.append(name)
+            self.visible_columns = self.visible_columns + [name]
 
         # Set features
         self._set_features()
@@ -746,12 +743,6 @@ class DataPanel(
         dp = self._clone(data=new_batch)
         return dp
 
-    def _copy_data(self) -> object:
-        return {name: column.copy() for name, column in self.data.items()}
-
-    def _view_data(self) -> object:
-        return {name: column.view() for name, column in self.data.items()}
-
     @staticmethod
     def _convert_to_batch_fn(
         function: Callable, with_indices: bool, materialize: bool = True, **kwargs
@@ -1113,3 +1104,9 @@ class DataPanel(
             "_info",
             "_split",
         }
+
+    def _view_data(self) -> object:
+        return self.data.view()
+
+    def _copy_data(self) -> object:
+        return self.data.copy()

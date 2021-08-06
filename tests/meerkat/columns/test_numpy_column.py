@@ -99,7 +99,7 @@ class TestNumpyArrayColumn(TestAbstractColumn):
         config={"num_dims": [1], "dim_length": [1]}, params={"batched": [True, False]}
     )
     def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_filter_1(testbed, batched,materialize=True)
+        return super().test_filter_1(testbed, batdched,materialize=True)
 
     @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
     def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
