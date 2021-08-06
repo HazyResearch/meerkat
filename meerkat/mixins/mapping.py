@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Mapping, Optional
+from typing import Callable, Dict, Mapping, Optional, Union
 
 from tqdm.auto import tqdm
 
@@ -21,7 +21,7 @@ class MappableMixin:
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
-        output_type: type = None,
+        output_type: Union[type, Dict[str, type]] = None,
         mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
@@ -52,7 +52,7 @@ class MappableMixin:
         if not is_batched_fn:
             # Convert to a batch function
             function = self._convert_to_batch_fn(
-                function, with_indices=with_indices, materialize=materialize
+                function, with_indices=with_indices, materialize=materialize, **kwargs
             )
             is_batched_fn = True
             logger.info(f"Converting `function` {function} to a batched function.")
@@ -87,19 +87,31 @@ class MappableMixin:
                     batch,
                     range(start_index, end_index),
                     materialize=materialize,
+                    **kwargs,
                 )
 
                 # Pull out information
                 output = function_properties.output
                 dtype = function_properties.output_dtype
                 is_mapping = isinstance(output, Mapping)
+                is_type_mapping = isinstance(output_type, Mapping)
+
+                if not is_mapping and is_type_mapping:
+                    raise ValueError(
+                        "output_type is a mapping but function output is not a mapping"
+                    )
+
                 writers = {}
                 for key, curr_output in output.items() if is_mapping else [(0, output)]:
                     curr_output_type = (
                         type(AbstractColumn.from_data(curr_output))
                         if output_type is None
+                        or (is_type_mapping and key not in output_type.keys())
+                        else output_type[key]
+                        if is_type_mapping
                         else output_type
                     )
+
                     writer = curr_output_type.get_writer(
                         mmap=mmap,
                         template=(
@@ -130,9 +142,10 @@ class MappableMixin:
                     function(
                         batch,
                         range(i * batch_size, min(len(self), (i + 1) * batch_size)),
+                        **kwargs,
                     )
                     if with_indices
-                    else function(batch)
+                    else function(batch, **kwargs)
                 )
 
             # Append the output

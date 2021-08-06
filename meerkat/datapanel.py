@@ -754,10 +754,13 @@ class DataPanel(
 
     @staticmethod
     def _convert_to_batch_fn(
-        function: Callable, with_indices: bool, materialize: bool = True
+        function: Callable, with_indices: bool, materialize: bool = True, **kwargs
     ) -> callable:
         return convert_to_batch_fn(
-            function=function, with_indices=with_indices, materialize=materialize
+            function=function,
+            with_indices=with_indices,
+            materialize=materialize,
+            **kwargs,
         )
 
     def batch(
@@ -835,6 +838,7 @@ class DataPanel(
         batch_size: Optional[int] = 1,
         remove_columns: Optional[List[str]] = None,
         num_workers: int = 0,
+        output_type: Union[type, Dict[str, type]] = None,
         mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
@@ -866,7 +870,7 @@ class DataPanel(
         if not is_batched_fn:
             # Convert to a batch function
             function = convert_to_batch_fn(
-                function, with_indices=with_indices, materialize=materialize
+                function, with_indices=with_indices, materialize=materialize, **kwargs
             )
             logger.info(f"Converting `function` {function} to batched function.")
 
@@ -883,10 +887,12 @@ class DataPanel(
             is_batched_fn=True,
             batch_size=batch_size,
             num_workers=num_workers,
+            output_type=output_type,
             input_columns=input_columns,
             mmap=mmap,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
 
         # Add new columns for the update
@@ -912,7 +918,7 @@ class DataPanel(
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: int = 0,
-        output_type: type = None,
+        output_type: Union[type, Dict[str, type]] = None,
         mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
@@ -982,6 +988,7 @@ class DataPanel(
             num_workers=num_workers,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
         indices = np.where(outputs)[0]
 
