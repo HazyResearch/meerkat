@@ -118,6 +118,8 @@ class PandasBlock(AbstractBlock):
         return pd.read_feather(os.path.join(path, "data.feather"))
 
     def _repr_pandas_(self, block_ref: BlockRef):
-        return self.data[[col._block_index for col in block_ref.values()]].rename(
-            columns={col._block_index: name for name, col in block_ref.items()}
+        return (
+            self.data[[col._block_index for col in block_ref.values()]]
+            .rename(columns={col._block_index: name for name, col in block_ref.items()})
+            .reset_index(drop=True)
         )

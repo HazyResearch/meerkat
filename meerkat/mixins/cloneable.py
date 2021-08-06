@@ -21,6 +21,10 @@ class CloneableMixin:
         """ """
         raise NotImplementedError()
 
+    @classmethod
+    def _clone_keys(cls) -> set:
+        return set()
+
     def copy(self, **kwargs) -> object:
         new_data = self._copy_data()
         return self._clone(data=new_data)
@@ -35,7 +39,7 @@ class CloneableMixin:
             else:
                 data = self.data
 
-        state = self._get_state()
+        state = self._get_state(clone=True)
 
         obj = self.__class__.__new__(self.__class__)
         obj._set_state(state)
@@ -45,8 +49,11 @@ class CloneableMixin:
     def _copy_data(self) -> object:
         raise NotImplementedError
 
-    def _get_state(self) -> dict:
-        return {key: getattr(self, key) for key in self._state_keys()}
+    def _get_state(self, clone: bool = False) -> dict:
+        state = {key: getattr(self, key) for key in self._state_keys()}
+        if clone:
+            state.update({key: getattr(self, key) for key in self._clone_keys()})
+        return state
 
     def _set_state(self, state: dict):
         self.__dict__.update(state)

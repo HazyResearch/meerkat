@@ -59,4 +59,4 @@ class ReportColumn(LambdaColumn):
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
 
     def _repr_pandas_(self) -> pd.Series:
-        return "ReportCell(" + self.data.data + ")"
+        return "ReportCell(" + self.data.data.reset_index(drop=True) + ")"

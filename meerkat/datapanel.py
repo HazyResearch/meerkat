@@ -859,13 +859,13 @@ class DataPanel(
             return self
 
         # Get some information about the function
-        with self.format(input_columns):
-            function_properties = self._inspect_function(
-                function, with_indices, is_batched_fn, materialize=materialize, **kwargs
-            )
-            assert (
-                function_properties.dict_output
-            ), f"`function` {function} must return dict."
+        dp = self[input_columns] if input_columns is not None else self
+        function_properties = dp._inspect_function(
+            function, with_indices, is_batched_fn, materialize=materialize
+        )
+        assert (
+            function_properties.dict_output
+        ), f"`function` {function} must return dict."
 
         if not is_batched_fn:
             # Convert to a batch function
@@ -925,20 +925,20 @@ class DataPanel(
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
         input_columns = self.visible_columns if input_columns is None else input_columns
-        with self.format(input_columns):
-            return super().map(
-                function=function,
-                with_indices=with_indices,
-                is_batched_fn=is_batched_fn,
-                batch_size=batch_size,
-                drop_last_batch=drop_last_batch,
-                num_workers=num_workers,
-                output_type=output_type,
-                mmap=mmap,
-                materialize=materialize,
-                pbar=pbar,
-                **kwargs,
-            )
+        dp = self[input_columns]
+        return super(DataPanel, dp).map(
+            function=function,
+            with_indices=with_indices,
+            is_batched_fn=is_batched_fn,
+            batch_size=batch_size,
+            drop_last_batch=drop_last_batch,
+            num_workers=num_workers,
+            output_type=output_type,
+            mmap=mmap,
+            materialize=materialize,
+            pbar=pbar,
+            **kwargs,
+        )
 
     @capture_provenance(capture_args=["function"])
     def filter(
@@ -967,15 +967,14 @@ class DataPanel(
             return None
 
         # Get some information about the function
-        with self.format(input_columns):
-            function_properties = self._inspect_function(
-                function,
-                with_indices,
-                is_batched_fn=is_batched_fn,
-                materialize=materialize,
-                **kwargs,
-            )
-            assert function_properties.bool_output, "function must return boolean."
+        dp = self[input_columns] if input_columns is not None else self
+        function_properties = dp._inspect_function(
+            function,
+            with_indices,
+            is_batched_fn=is_batched_fn,
+            materialize=materialize,
+        )
+        assert function_properties.bool_output, "function must return boolean."
 
         # Map to get the boolean outputs and indices
         logger.info("Running `filter`, a new DataPanel will be returned.")
