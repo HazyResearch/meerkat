@@ -2,14 +2,10 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-import cytoolz as tz
 import torch
-from tqdm import tqdm
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.activation import ActivationOp
-from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.instances_column import InstancesColumn
 from meerkat.nn.model import Model
 from meerkat.nn.segmentation_column import SegmentationOutputColumn
@@ -73,45 +69,6 @@ class TensorModel(Model):
             input_batch = batch[input_columns[0]].data.to(self.device)
 
         return input_batch
-
-    def activation(
-        self,
-        dataset: DataPanel,
-        target_module: str,  # TODO(Priya): Support multiple activation layers
-        input_columns: List[str],
-        batch_size=32,
-    ) -> EmbeddingColumn:  # TODO(Priya): Disable return?
-
-        # Get an activation operator
-        activation_op = ActivationOp(self.model, target_module, self.device)
-        activations = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-            # Process the batch
-            input_batch = self.process_batch(batch, input_columns)
-
-            # Forward pass
-            with torch.no_grad():
-                self.model(input_batch)
-
-            # Get activations for the batch
-            batch_activation = {
-                f"activation ({target_module})": EmbeddingColumn(
-                    activation_op.extractor.activation.cpu().detach()
-                )
-            }
-
-            # Append the activations
-            activations.append(batch_activation)
-
-        activations = tz.merge_with(lambda v: torch.cat(v), *activations)
-        activation_col = activations[f"activation ({target_module})"]
-
-        # dataset.add_column(f"activation ({target_module})", activation_col)
-        return activation_col
 
     def semantic_segmentation(
         self,

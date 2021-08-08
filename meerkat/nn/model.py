@@ -3,6 +3,8 @@ from typing import Dict, List
 import torch
 
 from meerkat.datapanel import DataPanel
+from meerkat.nn.activation import ActivationOp
+from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.metrics import compute_metric
 from meerkat.nn.prediction_column import ClassificationOutputColumn
 
@@ -51,6 +53,47 @@ class Model(torch.nn.Module):
         # Run forward pass
         prediction_dict = self.forward(input_batch)
         return prediction_dict
+
+    def _activation(self, batch, input_cols, activation_op):
+        # Use input_cols instead of input_columns to avoid naming conflict with map
+
+        # Process the batch
+        input_batch = self.process_batch(batch, input_cols)
+        # Run forward pass
+        _ = self.forward(input_batch)
+
+        activation_dict = {
+            f"activation_{activation_op.target_module}": EmbeddingColumn(
+                activation_op.extractor.activation.cpu().detach()
+            )
+        }
+
+        return activation_dict
+
+    def activation(
+        self,
+        dataset: DataPanel,
+        target_module: str,  # TODO(Priya): Support multiple activation layers
+        input_columns: List[str],
+        batch_size=32,
+    ) -> EmbeddingColumn:
+
+        # Get an activation operator
+        activation_op = ActivationOp(self.model, target_module, self.device)
+
+        activations = dataset.map(
+            function=self._activation,
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=EmbeddingColumn,
+            input_cols=input_columns,
+            activation_op=activation_op,
+        )
+
+        activation_col = activations[f"activation_{activation_op.target_module}"]
+
+        # dataset.add_column(f"activation ({target_module})", activation_col)
+        return activation_col
 
     def classification(
         self,
