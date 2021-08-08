@@ -142,12 +142,12 @@ class TestAbstractColumn:
     ):
         """`map`, single return,"""
         col = testbed.col
-        k = 2
+        kwarg = 2
         map_spec = testbed.get_map_spec(
-            batched=batched, materialize=materialize, kwarg=k
+            batched=batched, materialize=materialize, kwarg=kwarg
         )
 
-        def func(x):
+        def func(x, k=0):
             out = map_spec["fn"](x, k=k)
             return out
 
@@ -157,6 +157,7 @@ class TestAbstractColumn:
             is_batched_fn=batched,
             materialize=materialize,
             output_type=map_spec.get("output_type", None),
+            k=kwarg,
         )
         assert result.is_equal(map_spec["expected_result"])
 

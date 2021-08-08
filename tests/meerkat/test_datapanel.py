@@ -402,6 +402,7 @@ class TestDataPanel:
             "batched": [True, False],
             "materialize": [True, False],
             "num_workers": [0],
+            "use_kwargs": [True, False],
         }
     )
     def test_map_return_single(
@@ -410,15 +411,17 @@ class TestDataPanel:
         batched: bool,
         materialize: bool,
         num_workers: int,
+        use_kwargs: bool,
     ):
         dp = testbed.dp
+        kwargs = {"kwarg": 2} if use_kwargs else {}
         name = list(testbed.column_testbeds.keys())[0]
         map_spec = testbed.column_testbeds[name].get_map_spec(
-            batched=batched, materialize=materialize, salt=1
+            batched=batched, materialize=materialize, salt=1, **kwargs
         )
 
-        def func(x):
-            out = map_spec["fn"](x[name])
+        def func(x, kwarg=0):
+            out = map_spec["fn"](x[name], k=kwarg)
             return out
 
         result = dp.map(
@@ -427,6 +430,7 @@ class TestDataPanel:
             is_batched_fn=batched,
             materialize=materialize,
             num_workers=num_workers,
+            **kwargs,
         )
         assert isinstance(result, AbstractColumn)
         assert result.is_equal(map_spec["expected_result"])
@@ -437,7 +441,7 @@ class TestDataPanel:
         testbed: DataPanelTestBed,
     ):
         self.test_map_return_single(
-            testbed, batched=True, materialize=True, num_workers=2
+            testbed, batched=True, materialize=True, num_workers=2, use_kwargs=False
         )
 
     @DataPanelTestBed.parametrize(
