@@ -852,7 +852,7 @@ class DataPanel(
         # Get some information about the function
         dp = self[input_columns] if input_columns is not None else self
         function_properties = dp._inspect_function(
-            function, with_indices, is_batched_fn, materialize=materialize
+            function, with_indices, is_batched_fn, materialize=materialize, **kwargs
         )
         assert (
             function_properties.dict_output
@@ -964,6 +964,7 @@ class DataPanel(
             with_indices,
             is_batched_fn=is_batched_fn,
             materialize=materialize,
+            **kwargs,
         )
         assert function_properties.bool_output, "function must return boolean."
 
