@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Dict, List
 
 import cytoolz as tz
@@ -125,10 +124,11 @@ class TensorModel(Model):
         # Handles outputs for semantic_segmentation tasks
 
         predictions = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=SegmentationOutputColumn,
+            input_cols=input_columns,
         )
 
         # TODO(Priya): How to pass other args of SegmentationOutputColumn above?
@@ -157,10 +157,11 @@ class TensorModel(Model):
         # Handles outputs for timeseries
 
         output_dp = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=TensorColumn,
+            input_cols=input_columns,
         )
 
         dataset.add_column("preds", output_dp["preds"])
@@ -174,10 +175,11 @@ class TensorModel(Model):
         # Handles outputs for instance segmentation
 
         output_dp = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=InstancesColumn,
+            input_cols=input_columns,
         )
 
         dataset.add_column("preds", output_dp["preds"])

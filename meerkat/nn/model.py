@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Dict, List
 
 import torch
@@ -44,9 +43,11 @@ class Model(torch.nn.Module):
     def forward(self, input_batch: Dict) -> Dict:
         raise NotImplementedError
 
-    def _predict(self, batch, input_columns):
+    def _predict(self, batch, input_cols):
+        # Use input_cols instead of input_columns to avoid naming conflict with map
+
         # Process the batch to prepare input
-        input_batch = self.process_batch(batch, input_columns)
+        input_batch = self.process_batch(batch, input_cols)
         # Run forward pass
         prediction_dict = self.forward(input_batch)
         return prediction_dict
@@ -65,10 +66,11 @@ class Model(torch.nn.Module):
         # Handles outputs for classification tasks
 
         predictions = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=ClassificationOutputColumn,
+            input_cols=input_columns,
         )
 
         # TODO(Priya): How to pass other args of ClassificationOutputColumn above?

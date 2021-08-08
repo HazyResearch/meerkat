@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Dict, List, Optional
 
 import cytoolz as tz
@@ -143,10 +142,11 @@ class HuggingfaceModel(Model):
     ) -> DataPanel:
 
         output_dp = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=ListColumn,
+            input_cols=input_columns,
         )
 
         dataset.add_column("preds", output_dp["preds"])
