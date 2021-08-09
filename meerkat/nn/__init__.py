@@ -11,6 +11,7 @@ warnings.warn(
     )
 )
 
+from meerkat.nn.activation import ActivationOp
 from meerkat.nn.callbacks import ActivationCallback
 from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.huggingfacemodel import HuggingfaceModel
