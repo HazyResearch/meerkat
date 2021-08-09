@@ -84,6 +84,9 @@ class PandasBlock(AbstractBlock):
         if isinstance(index, TensorColumn):
             # need to convert to numpy for boolean indexing
             return index.data.numpy()
+        if isinstance(index, pd.Series):
+            # need to convert to numpy for boolean indexing
+            return index.values
         from meerkat.columns.pandas_column import PandasSeriesColumn
 
         if isinstance(index, PandasSeriesColumn):
