@@ -35,4 +35,6 @@ class ActivationCallback(pl.callbacks.Callback):
             batch_size=self.batch_size,
         )
 
-        self.val_dp.add_column(f"activation_{trainer.current_epoch}", activations)
+        self.val_dp.add_column(
+            f"activation_{trainer.current_epoch}", activations, overwrite=True
+        )
