@@ -18,7 +18,7 @@ class CloneableMixin:
 
     @classmethod
     def _state_keys(cls) -> set:
-        """ """
+        """"""
         raise NotImplementedError()
 
     @classmethod
@@ -37,7 +37,7 @@ class CloneableMixin:
             if isinstance(self, BlockableMixin) and self.is_blockable():
                 data = self._pack_block_view()
             else:
-                data = self.data
+                data = self._view_data()
 
         state = self._get_state(clone=True)
 
@@ -48,6 +48,9 @@ class CloneableMixin:
 
     def _copy_data(self) -> object:
         raise NotImplementedError
+
+    def _view_data(self) -> object:
+        return self.data
 
     def _get_state(self, clone: bool = False) -> dict:
         state = {key: getattr(self, key) for key in self._state_keys()}

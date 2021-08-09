@@ -1,232 +1,164 @@
-"""Unittests for NumpyColumn."""
-import os
-import pickle
-from itertools import product
-
 import numpy as np
-import numpy.testing as np_test
+import pandas as pd
 import pytest
 import torch
 
-from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
+from meerkat import TensorColumn
+from meerkat.block.numpy_block import NumpyBlock
+
+from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 
-def _get_data(multiple_dim: bool = True, dtype="float", use_visible_rows=False):
-    if multiple_dim:
-        array = np.array(
-            [
-                [
-                    [0.5565041, 1.51486395, 0],
-                    [123, 0.60526485, 0.7246723],
-                ],
-                [
-                    [0.3156991, 0.82733837, 45],
-                    [0.71086498, 0, 0],
-                ],
-                [
-                    [0, 0.17152445, 0.06989294],
-                    [0.59578079, 0.03738921, 0],
-                ],
-                [
-                    [0.49596023, 0, 0.56062833],
-                    [0.31457122, 0.19126629, 16],
-                ],
-            ]
-            * 4  # shape (16, 2, 3)
+class TensorColumnTestBed(AbstractColumnTestBed):
+
+    DEFAULT_CONFIG = {
+        "num_dims": [1, 2, 3],
+        "dim_length": [1, 5],
+        "dtype": ["float", "int"],
+    }
+
+    def __init__(
+        self,
+        length: int = 16,
+        num_dims: int = True,
+        dim_length: int = 5,
+        dtype="float",
+        seed: int = 123,
+        tmpdir: str = None,
+    ):
+        self.dtype = dtype
+        np.random.seed(seed)
+        array = (
+            np.random.random((length, *[dim_length for _ in range(num_dims - 1)])) * 10
         )
-    else:
-        array = np.array([0.3969655, 23.26084479, 0, 123] * 4)
-    array = array.astype(dtype)
-    col = TensorColumn(array)
+        array = torch.tensor(array).to({"int": torch.int, "float": torch.float}[dtype])
 
-    if use_visible_rows:
-        visible_rows = [0, 4, 6, 10]
-        col.visible_rows = visible_rows
-        array = array[visible_rows]
+        self.col = TensorColumn(array)
+        self.data = array
 
-    return col, array
-
-
-def test_from_array():
-    # Build a dataset from a batch
-    array = np.random.rand(10, 3, 3)
-    col = TensorColumn(array)
-
-    assert (col == array).all()
-    np_test.assert_equal(len(col), 10)
-
-
-@pytest.mark.parametrize(
-    "dtype,batched,use_kwargs",
-    product(["float", "int"], [True, False], [True, False]),
-)
-def test_map_return_single(dtype, batched, use_kwargs):
-    """`map`, single return,"""
-    col, array = _get_data(
-        dtype=dtype,
-    )
-
-    def func(x, bias=0):
-        out = x.type(torch.FloatTensor).mean(axis=-1) + bias
-        return out
-
-    bias = 1 if use_kwargs else 0
-    kwargs = {"bias": bias} if use_kwargs else {}
-
-    result = col.map(
-        func, batch_size=4, is_batched_fn=batched, output_type=TensorColumn, **kwargs
-    )
-    assert isinstance(result, TensorColumn)
-    np_test.assert_equal(len(result), len(array))
-    assert np.allclose(result.numpy(), array.mean(axis=-1) + bias)
-
-
-@pytest.mark.parametrize(
-    "dtype, batched, use_kwargs",
-    product(["float", "int"], [True, False], [True, False]),
-)
-def test_map_return_multiple(dtype, batched, use_kwargs):
-    """`map`, multiple return."""
-    col, array = _get_data(
-        dtype=dtype,
-    )
-
-    def func(x, bias=0):
+    def get_map_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+        kwarg: int = 0,
+    ):
         return {
-            "mean": x.type(torch.FloatTensor).mean(axis=-1) + bias,
-            "std": x.type(torch.FloatTensor).std(axis=-1) + bias,
+            "fn": lambda x, k=0: x + salt + k,
+            "expected_result": TensorColumn(self.col.data + salt + kwarg),
         }
 
-    bias = 1 if use_kwargs else 0
-    kwargs = {"bias": bias} if use_kwargs else {}
+    def get_filter_spec(
+        self,
+        batched: bool = True,
+        materialize: bool = False,
+        salt: int = 1,
+        kwarg: int = 0,
+    ):
+        return {
+            "fn": lambda x, k=0: (
+                (x > 3 + salt + k).to(dtype=bool) if batched else (x > 3 + salt + k)
+            ),
+            "expected_result": self.col[self.col.data > 3 + salt + kwarg],
+        }
 
-    result = col.map(func, batch_size=4, is_batched_fn=batched, **kwargs)
-    assert isinstance(result, DataPanel)
-    assert isinstance(result["std"], TensorColumn)
-    assert isinstance(result["mean"], TensorColumn)
-    np_test.assert_equal(len(result), len(array))
-    assert np.allclose(result["mean"].numpy(), array.mean(axis=-1) + bias)
-    assert np.allclose(result["std"].numpy(), array.std(axis=-1, ddof=1) + bias)
+    def get_data(self, index, materialize=True):
+        return self.data[index]
+
+    @staticmethod
+    def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
+        assert (data1 == data2).all()
 
 
-@pytest.mark.parametrize(
-    "multiple_dim,dtype",
-    product([True, False], ["float", "int"]),
-)
-def test_set_item_1(multiple_dim, dtype):
-    col, array = _get_data(
-        multiple_dim=multiple_dim,
-        dtype=dtype,
+@pytest.fixture
+def testbed(request, tmpdir):
+    testbed_class, config = request.param
+    return testbed_class(**config, tmpdir=tmpdir)
+
+
+class TestTensorColumn(TestAbstractColumn):
+
+    __test__ = True
+    testbed_class: type = TensorColumnTestBed
+    column_class: type = TensorColumn
+
+    def test_init_block(self):
+        block_view = NumpyBlock(np.zeros((10, 10)))[0]
+        with pytest.raises(ValueError):
+            TensorColumn(block_view)
+
+    def _get_data_to_set(self, testbed, data_index):
+        return torch.zeros_like(testbed.get_data(data_index))
+
+    @TensorColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_set_item(self, testbed, index_type: type):
+        return super().test_set_item(testbed, index_type=index_type)
+
+    @TensorColumnTestBed.parametrize(params={"index_type": [np.array]})
+    def test_getitem(self, testbed, index_type: type):
+        return super().test_getitem(testbed, index_type=index_type)
+
+    @TensorColumnTestBed.parametrize(
+        config={"num_dims": [1], "dim_length": [1]}, params={"batched": [True, False]}
     )
-    index = [0, 3]
-    not_index = [i for i in range(col.shape[0]) if i not in index]
-    col[index] = 0
+    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_filter_1(testbed, batched, materialize=True)
 
-    assert (col[not_index] == array[not_index]).all()
-    assert (col[index] == 0).all()
+    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_multiple(testbed, batched, materialize=True)
 
+    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
+        return super().test_map_return_single(testbed, batched, materialize=True)
 
-@pytest.mark.parametrize(
-    "multiple_dim,dtype",
-    product([True, False], ["float", "int"]),
-)
-def test_set_item_2(
-    multiple_dim,
-    dtype,
-):
-    col, array = _get_data(
-        multiple_dim=multiple_dim,
-        dtype=dtype,
-    )
-    index = 0
-    not_index = [i for i in range(col.shape[0]) if i != index]
-    col[index] = 0
+    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single_w_kwarg(
+        self, testbed: AbstractColumnTestBed, batched: bool
+    ):
+        return super().test_map_return_single_w_kwarg(
+            testbed, batched, materialize=True
+        )
 
-    assert (col[not_index] == array[not_index]).all()
-    assert (col[index] == 0).all()
+    @TensorColumnTestBed.parametrize()
+    def test_copy(self, testbed: AbstractColumnTestBed):
+        return super().test_copy(testbed)
 
+    @TensorColumnTestBed.parametrize()
+    def test_io(self, tmp_path, testbed):
+        super().test_io(tmp_path, testbed)
 
-@pytest.mark.parametrize(
-    "multiple_dim, dtype",
-    product([True, False], ["float", "int"]),
-)
-def test_pickle(
-    multiple_dim,
-    dtype,
-):
-    # important for dataloader
-    col, _ = _get_data(
-        multiple_dim=multiple_dim,
-        dtype=dtype,
-    )
-    buf = pickle.dumps(col)
-    new_col = pickle.loads(buf)
+    @TensorColumnTestBed.parametrize()
+    def test_pickle(self, testbed):
+        super().test_pickle(testbed)
 
-    assert isinstance(new_col, TensorColumn)
-    assert (col == new_col).all()
+    @TensorColumnTestBed.parametrize()
+    def test_to_tensor(self, testbed):
+        col, _ = testbed.col, testbed.data
 
+        tensor = col.to_tensor()
 
-@pytest.mark.parametrize(
-    "multiple_dim, dtype",
-    product([True, False], ["float", "int"]),
-)
-def test_io(
-    tmp_path,
-    multiple_dim,
-    dtype,
-):
-    # uses the tmp_path fixture which will provide a
-    # temporary directory unique to the test invocation,
-    # important for dataloader
-    col, _ = _get_data(
-        multiple_dim=multiple_dim,
-        dtype=dtype,
-    )
-    path = os.path.join(tmp_path, "test")
-    col.write(path)
+        assert torch.is_tensor(tensor)
+        assert (col == tensor.numpy()).all()
 
-    new_col = TensorColumn.read(path)
+    @TensorColumnTestBed.parametrize()
+    def test_to_pandas(self, testbed):
+        series = testbed.col.to_pandas()
 
-    assert isinstance(new_col, TensorColumn)
-    assert (col == new_col).all()
+        assert isinstance(series, pd.Series)
 
+        if testbed.col.shape == 1:
+            assert (series.values == testbed.col.data).all()
+        else:
+            for idx in range(len(testbed.col)):
+                assert (series.iloc[idx] == testbed.col[idx]).all()
 
-@pytest.mark.parametrize(
-    "multiple_dim,dtype",
-    product([True, False], ["float", "int"]),
-)
-def test_copy(
-    multiple_dim,
-    dtype,
-):
-    col, _ = _get_data(
-        multiple_dim=multiple_dim,
-        dtype=dtype,
-    )
-    col_copy = col.copy()
+    @TensorColumnTestBed.parametrize()
+    def test_repr_pandas(self, testbed):
+        series = testbed.col.to_pandas()
+        assert isinstance(series, pd.Series)
 
-    assert isinstance(col_copy, TensorColumn)
-    assert (col == col_copy).all()
-
-
-def test_tensor_ops():
-    """Test prototype tensor operations on tensor columns."""
-    col = TensorColumn(torch.ones(4, 3))
-
-    assert torch.all(torch.sum(col, dim=1) == 3)
-    assert torch.all(col.sum() == torch.sum(col))
-    assert torch.all(col.sum(dim=1) == torch.sum(col, dim=1))
-
-    assert torch.cat([col, col]).shape == (8, 3)
-    assert torch.vstack([col, col]).shape == (8, 3)
-    assert torch.cat([col, col, col], dim=1).shape == (4, 9)
-
-    assert torch.stack([col, col], dim=0).shape == (2, 4, 3)
-
-    chunk1, chunk2 = torch.chunk(col, chunks=2, dim=0)
-    assert chunk1.shape == (2, 3)
-    assert chunk2.shape == (2, 3)
-
-    col_nd = TensorColumn(torch.ones(4, 3, 5, 6))
-    assert col_nd.permute(3, 2, 1, 0).shape == col_nd.shape[::-1]
+    def test_ufunc_unhandled(self):
+        a = TensorColumn([1, 2, 3])
+        with pytest.raises(TypeError):
+            a == "a"

@@ -15,7 +15,6 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -44,7 +43,7 @@ class NumpyArrayColumn(
 
     def __init__(
         self,
-        data: Sequence = None,
+        data: Sequence,
         *args,
         **kwargs,
     ):
@@ -54,25 +53,30 @@ class NumpyArrayColumn(
                     "Cannot create `NumpyArrayColumn` from a `BlockView` not "
                     "referencing a `NumpyBlock`."
                 )
-        elif data is not None and not isinstance(data, np.memmap):
+        elif not isinstance(data, np.memmap):
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
     # TODO (sabri): need to support str here
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
-    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+    def __array_ufunc__(self, ufunc: np.ufunc, method, *inputs, **kwargs):
         out = kwargs.get("out", ())
         for x in inputs + out:
             # Only support operations with instances of _HANDLED_TYPES.
             # Use ArrayLike instead of type(self) for isinstance to
             # allow subclasses that don't override __array_ufunc__ to
             # handle ArrayLike objects.
-            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)):
+            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)) and not (
+                # support for at index
+                method == "at"
+                and isinstance(x, list)
+            ):
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
         inputs = tuple(x.data if isinstance(x, NumpyArrayColumn) else x for x in inputs)
+
         if out:
             kwargs["out"] = tuple(
                 x.data if isinstance(x, NumpyArrayColumn) else x for x in out
@@ -87,7 +91,7 @@ class NumpyArrayColumn(
             return None
         else:
             # one return value
-            return type(self)(data=result)
+            return self._clone(data=result)
 
     def __getattr__(self, name):
         try:
@@ -143,9 +147,12 @@ class NumpyArrayColumn(
     @classmethod
     def concat(cls, columns: Sequence[NumpyArrayColumn]):
         data = np.concatenate([c.data for c in columns])
-        if issubclass(cls, CloneableMixin):
-            return columns[0]._clone(data=data)
-        return cls.from_array(data)
+        return columns[0]._clone(data=data)
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        return (self.data == other.data).all()
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):

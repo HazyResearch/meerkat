@@ -32,7 +32,6 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.mixins.cloneable import CloneableMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -143,7 +142,7 @@ class PandasSeriesColumn(
                     "Cannot create `PandasSeriesColumn` from a `BlockView` not "
                     "referencing a `PandasBlock`."
                 )
-        elif data is not None:
+        elif not isinstance(data, pd.Series):
             data = pd.Series(data)
 
         super(PandasSeriesColumn, self)._set_data(data)
@@ -170,10 +169,10 @@ class PandasSeriesColumn(
 
         if type(result) is tuple:
             # multiple return values
-            return tuple(type(self)(x) for x in result)
+            return tuple(type(self)(x) for x in result)  # pragma: no cover
         elif method == "at":
             # no return value
-            return None
+            return None  # pragma: no cover
         else:
             # one return value
             return type(self)(result)
@@ -210,7 +209,7 @@ class PandasSeriesColumn(
             return data
 
     def _set_cell(self, index, value):
-        self._data[index] = value
+        self._data.iloc[index] = value
 
     def _set_batch(self, indices, values):
         self._data.iloc[indices] = values
@@ -218,9 +217,7 @@ class PandasSeriesColumn(
     @classmethod
     def concat(cls, columns: Sequence[PandasSeriesColumn]):
         data = pd.concat([c.data for c in columns])
-        if issubclass(cls, CloneableMixin):
-            return columns[0]._clone(data=data)
-        return cls.from_array(data)
+        return columns[0]._clone(data=data)
 
     def _write_data(self, path: str) -> None:
         data_path = os.path.join(path, "data.pd")
@@ -231,8 +228,6 @@ class PandasSeriesColumn(
         path: str,
     ):
         data_path = os.path.join(path, "data.pd")
-        if not os.path.exists(data_path):
-            data_path = path
 
         # Load in the data
         return pd.read_pickle(data_path)
@@ -243,8 +238,19 @@ class PandasSeriesColumn(
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
         very slow."""
+        dtype = self.data.values.dtype
+        if not np.issubdtype(dtype, np.number):
+            raise ValueError(
+                f"Cannot convert `PandasSeriesColumn` with dtype={dtype} to tensor."
+            )
+
         # TODO (Sabri): understand why `torch.tensor(column)` is so slow
-        return torch.tensor(self.data)
+        return torch.tensor(self.data.values)
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        return (self.data.values == other.data.values).all()
 
     def to_pandas(self) -> pd.Series:
         return self.data

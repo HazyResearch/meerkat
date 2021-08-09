@@ -277,6 +277,18 @@ class BlockManager(MutableMapping):
         dfs.append(pd.DataFrame({k: self[k]._repr_pandas_() for k in cols}))
         return pd.concat(objs=dfs, axis=1)
 
+    def view(self):
+        mgr = BlockManager()
+        for name, col in self._columns.items():
+            mgr.add_column(col.view(), name)
+        return mgr
+
+    def copy(self):
+        mgr = BlockManager()
+        for name, col in self._columns.items():
+            mgr.add_column(col.copy(), name)
+        return mgr
+
 
 def _serialize_block_index(index: BlockIndex) -> Union[Dict, str, int]:
     if not isinstance(index, (int, str, slice)):

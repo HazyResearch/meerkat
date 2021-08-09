@@ -9,7 +9,6 @@ from meerkat.logging.utils import (
 
 initialize_logging()
 
-from meerkat import nn
 from meerkat.cells.abstract import AbstractCell
 from meerkat.cells.imagepath import ImagePath
 from meerkat.cells.spacy import LazySpacyCell, SpacyCell

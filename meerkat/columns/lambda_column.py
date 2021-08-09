@@ -41,6 +41,13 @@ class LambdaCell(AbstractCell):
         else:
             return self.fn(self.data)
 
+    def __eq__(self, other):
+        return (
+            (other.__class__ == self.__class__)
+            and (self.data == other.data)
+            and (self.fn == other.fn)
+        )
+
 
 class LambdaColumn(AbstractColumn):
     def __init__(
@@ -56,29 +63,35 @@ class LambdaColumn(AbstractColumn):
             self.fn = fn
         self._output_type = output_type
 
-    def __getattr__(self, name):
-        if not self._output_type:
-            raise AttributeError(name)
+    # TODO (Sabri): reconsider whether this is important functionality. it's not clear
+    # to me that this is that useful.
+    # def __getattr__(self, name):
+    #     if not self._output_type:
+    #         raise AttributeError(name)
 
-        data = self[:2]
-        if not hasattr(data, name):
-            raise AttributeError(name)
+    #     data = self[:2]
+    #     if not hasattr(data, name):
+    #         raise AttributeError(name)
 
-        data = self[:]
-        return data.__getattr__(name)
+    #     data = self[:]
+    #     return data.__getattr__(name
+
+    def _set(self, index, value):
+        raise ValueError("Cannot setitem on a `LambdaColumn`.")
 
     def fn(self, data: object):
         """Subclasses like `ImageColumn` should be able to implement their own
         version."""
         raise NotImplementedError
 
+    def _create_cell(self, data: object) -> LambdaCell:
+        return LambdaCell(fn=self.fn, data=data)
+
     def _get_cell(self, index: int, materialize: bool = True):
         if materialize:
             return self.fn(self._data._get(index, materialize=True))
         else:
-            return LambdaCell(
-                fn=self.fn, data=self._data._get(index, materialize=False)
-            )
+            return self._create_cell(data=self._data._get(index, materialize=False))
 
     def _get_batch(self, indices: np.ndarray, materialize: bool = True):
         if materialize:
@@ -140,6 +153,14 @@ class LambdaColumn(AbstractColumn):
     def _write_data(self, path):
         # TODO (Sabri): avoid redundant writes in dataframes
         return self.data.write(os.path.join(path, "data"))
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        if self.fn != other.fn:
+            return False
+
+        return self.data.is_equal(other.data)
 
     @staticmethod
     def _read_data(path: str):

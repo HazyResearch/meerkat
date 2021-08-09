@@ -173,3 +173,9 @@ class TensorColumn(
     @staticmethod
     def _read_data(path: str) -> torch.Tensor:
         return torch.load(os.path.join(path, "data.pt"))
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        return (other.__class__ == self.__class__) and (self.data == other.data).all()
+
+    def to_tensor(self) -> torch.Tensor:
+        return self.data
