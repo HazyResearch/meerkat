@@ -561,6 +561,8 @@ class TestDataPanel:
         # testing removal from block manager, so important to use non-blockable type
         dp["a"] = ListColumn(range(16))
         assert dp[["a", "b"]]["a"]._data is not a
+        # check that there are no duplicate columns
+        assert set(dp.columns) == set(["a", "b", "index"])
 
     @DataPanelTestBed.parametrize()
     def test_io(self, testbed, tmp_path):

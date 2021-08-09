@@ -358,6 +358,9 @@ class DataPanel(
             f"set `overwrite=True` to overwrite."
         )
 
+        if name in self.all_columns:
+            self.remove_column(name)
+
         column = AbstractColumn.from_data(data)
 
         assert len(column) == len(self), (
