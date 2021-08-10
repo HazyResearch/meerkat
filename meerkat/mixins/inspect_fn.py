@@ -17,6 +17,7 @@ class FunctionInspectorMixin:
         data=None,
         indices=None,
         materialize=True,
+        **kwargs
     ) -> SimpleNamespace:
 
         # Initialize variables to track
@@ -44,14 +45,16 @@ class FunctionInspectorMixin:
                 indices = 0
 
         if with_indices and is_batched_fn:
-            output = function(data, indices)
+            output = function(data, indices, **kwargs)
         elif with_indices and not is_batched_fn:
-            output = function(data, indices)
+            output = function(data, indices, **kwargs)
         else:
-            output = function(data)
+            output = function(data, **kwargs)
 
         # lazy import to avoid circular dependency
         from meerkat.columns.abstract import AbstractColumn
+        from meerkat.columns.numpy_column import NumpyArrayColumn
+        from meerkat.columns.tensor_column import TensorColumn
 
         if isinstance(output, Mapping):
             # `function` returns a dict output
@@ -74,8 +77,14 @@ class FunctionInspectorMixin:
 
         elif (
             isinstance(output, (bool, np.bool_))
-            or (isinstance(output, np.ndarray) and output.dtype == np.bool)
-            or (isinstance(output, torch.Tensor) and output.dtype == torch.bool)
+            or (
+                isinstance(output, (np.ndarray, NumpyArrayColumn))
+                and output.dtype == bool
+            )
+            or (
+                isinstance(output, (torch.Tensor, TensorColumn))
+                and output.dtype == torch.bool
+            )
         ):
 
             # `function` returns a bool

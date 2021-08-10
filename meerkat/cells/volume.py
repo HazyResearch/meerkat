@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Callable, Dict, Sequence, Union
 
 from meerkat.cells.abstract import AbstractCell
+from meerkat.mixins.cloneable import StateClass
 from meerkat.mixins.file import PathLikeType, PathsMixin
-from meerkat.mixins.state import StateClass
 from meerkat.tools.lazy_loader import LazyLoader
 
 pydicom = LazyLoader("pydicom")

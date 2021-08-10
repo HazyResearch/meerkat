@@ -3,40 +3,40 @@ from __future__ import annotations
 import abc
 import logging
 import reprlib
+from copy import copy
 from typing import Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
 import torch
 
+from meerkat.mixins.blockable import BlockableMixin
+from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
-from meerkat.mixins.copying import ColumnCopyMixin
 from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
+from meerkat.mixins.io import ColumnIOMixin
+from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
-from meerkat.mixins.state import StateDictMixin
-from meerkat.mixins.storage import ColumnStorageMixin
-from meerkat.mixins.visibility import VisibilityMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
-from meerkat.writers.list_writer import ListWriter
 
 logger = logging.getLogger(__name__)
 
 
 class AbstractColumn(
+    BlockableMixin,
+    CloneableMixin,
     CollateMixin,
-    ColumnStorageMixin,
-    ColumnCopyMixin,
+    ColumnIOMixin,
     FunctionInspectorMixin,
     IdentifierMixin,
+    LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
-    StateDictMixin,
-    VisibilityMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
@@ -52,7 +52,7 @@ class AbstractColumn(
         **kwargs,
     ):
         # Assign to data
-        self._data = data
+        self._set_data(data)
 
         super(AbstractColumn, self).__init__(
             identifier=identifier,
@@ -65,8 +65,6 @@ class AbstractColumn(
         logger.info(f"Created `{self.__class__.__name__}` with {len(self)} rows.")
 
     def __repr__(self):
-        if self.visible_rows is not None:
-            return f"{self.__class__.__name__}View" f"({reprlib.repr(self.data)})"
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
     def __str__(self):
@@ -75,16 +73,19 @@ class AbstractColumn(
     def streamlit(self):
         return self._repr_pandas_()
 
+    def _set_data(self, data):
+        if self.is_blockable():
+            data = self._unpack_block_view(data)
+        self._data = data
+
     @property
     def data(self):
-        """Get the underlying data (excluding invisible rows).
+        """Get the underlying data."""
+        return self._data
 
-        To access underlying data with invisible rows, use `_data`.
-        """
-        if self.visible_rows is not None:
-            return self._data[self.visible_rows]
-        else:
-            return self._data
+    @data.setter
+    def data(self, value):
+        self._set_data(value)
 
     @property
     def metadata(self):
@@ -93,7 +94,7 @@ class AbstractColumn(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {"_collate_fn", "_data", "_visible_rows"}
+        return {"_collate_fn"}
 
     def _get_cell(self, index: int, materialize: bool = True) -> Any:
         """Get a single cell from the column.
@@ -122,20 +123,27 @@ class AbstractColumn(
                 unmaterialized format. Defaults to False.
         """
         if materialize:
-            return self.collate([self._get_cell(int(i)) for i in indices])
+            return self.collate(
+                [self._get_cell(int(i), materialize=materialize) for i in indices]
+            )
 
         else:
-            new_column = self.view()
-            new_column._visible_rows = indices
-            return new_column
+            return self.collate(
+                [self._get_cell(int(i), materialize=materialize) for i in indices]
+            )
 
-    def _get(self, index, materialize: bool = True):
+    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
         index = self._translate_index(index)
         if isinstance(index, int):
-            return self._get_cell(index, materialize=materialize)
+            if _data is None:
+                _data = self._get_cell(index, materialize=materialize)
+            return _data
+
         elif isinstance(index, np.ndarray):
-            batch = self._get_batch(index, materialize=materialize)
-            return self.__class__.from_data(batch)
+            # support for blocks
+            if _data is None:
+                _data = self._get_batch(index, materialize=materialize)
+            return self._clone(data=_data)
 
     # @capture_provenance()
     def __getitem__(self, index):
@@ -160,15 +168,16 @@ class AbstractColumn(
     def __setitem__(self, index, value):
         self._set(index, value)
 
-    def _translate_index(self, index):
-        if self.visible_rows is not None:
-            # Remap the index if only some rows are visible
-            index = self._remap_index(index)
-
-        # `index` should return a single element
+    def _is_batch_index(self, index):
         # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
         # so we match this behavior
-        if isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1):
+        return not (
+            isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1)
+        )
+
+    def _translate_index(self, index):
+        # `index` should return a single element
+        if not self._is_batch_index(index):
             return index
 
         # `index` should return a batch
@@ -200,24 +209,22 @@ class AbstractColumn(
 
     @staticmethod
     def _convert_to_batch_fn(
-        function: Callable, with_indices: bool, materialize: bool = True
+        function: Callable, with_indices: bool, materialize: bool = True, **kwargs
     ) -> callable:
         return convert_to_batch_column_fn(
-            function=function, with_indices=with_indices, materialize=materialize
+            function=function,
+            with_indices=with_indices,
+            materialize=materialize,
+            **kwargs,
         )
 
     def __len__(self):
-        # If only a subset of rows are visible
-        if self.visible_rows is not None:
-            return len(self.visible_rows)
-
         return self.full_length()
 
     def full_length(self):
-        # Length of the underlying data stored in the column
-        if self._data is not None:
-            return len(self._data)
-        return 0
+        if self._data is None:
+            return 0
+        return len(self._data)
 
     def _repr_pandas_(self) -> pd.Series:
         raise NotImplementedError
@@ -233,7 +240,7 @@ class AbstractColumn(
     @capture_provenance()
     def filter(
         self,
-        function: Optional[Callable] = None,
+        function: Callable,
         with_indices=False,
         input_columns: Optional[Union[str, List[str]]] = None,
         is_batched_fn: bool = False,
@@ -245,19 +252,19 @@ class AbstractColumn(
         **kwargs,
     ) -> Optional[AbstractColumn]:
         """Filter the elements of the column using a function."""
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
 
         # Return if `self` has no examples
         if not len(self):
-            logger.info("Dataset empty, returning None.")
-            return None
+            logger.info("Dataset empty, returning it .")
+            return self
 
         # Get some information about the function
         function_properties = self._inspect_function(
-            function, with_indices, is_batched_fn=is_batched_fn, materialize=materialize
+            function,
+            with_indices,
+            is_batched_fn=is_batched_fn,
+            materialize=materialize,
+            **kwargs,
         )
         assert function_properties.bool_output, "function must return boolean."
 
@@ -266,19 +273,17 @@ class AbstractColumn(
         outputs = self.map(
             function=function,
             with_indices=with_indices,
-            input_columns=input_columns,
+            # input_columns=input_columns,
             is_batched_fn=is_batched_fn,
             batch_size=batch_size,
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
             materialize=materialize,
             pbar=pbar,
+            **kwargs,
         )
         indices = np.where(outputs)[0]
-
-        new_column = self.view()
-        new_column.visible_rows = indices
-        return new_column
+        return self.lz[indices]
 
     def append(self, column: AbstractColumn) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
@@ -290,6 +295,14 @@ class AbstractColumn(
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        """Tests whether two columns.
+
+        Args:
+            other (AbstractColumn): [description]
+        """
+        raise NotImplementedError()
 
     def batch(
         self,
@@ -311,7 +324,10 @@ class AbstractColumn(
         Returns:
             batches of data
         """
-        if self._get_batch.__func__ == AbstractColumn._get_batch:
+        if (
+            self._get_batch.__func__ == AbstractColumn._get_batch
+            and self._get.__func__ == AbstractColumn._get
+        ):
             return torch.utils.data.DataLoader(
                 self if materialize else self.lz,
                 batch_size=batch_size,
@@ -338,27 +354,15 @@ class AbstractColumn(
                 *args,
                 **kwargs,
             )
-        # if self.materialize:
-        #     return torch.utils.data.DataLoader(
-        #         self,
-        #         batch_size=batch_size,
-        #         collate_fn=self.collate if collate else lambda x: x,
-        #         drop_last=drop_last_batch,
-        #         *args,
-        #         **kwargs,
-        #     )
-        # else:
-        #     for i in range(0, len(self), batch_size):
-        #         if drop_last_batch and i + batch_size > len(self):
-        #             continue
-        #         yield self[i : i + batch_size]
 
     @classmethod
-    def get_writer(cls, mmap: bool = False):
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+        from meerkat.writers.concat_writer import ConcatWriter
+
         if mmap:
             raise ValueError("Memmapping not supported with this column type.")
         else:
-            return ListWriter()
+            return ConcatWriter(output_type=cls, template=template)
 
     Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -368,7 +372,13 @@ class AbstractColumn(
         """Convert data to a meerkat column using the appropriate Column
         type."""
         if isinstance(data, AbstractColumn):
-            return data.view()
+            # TODO: Need ton make this view but should decide where to do it exactly
+            return data  # .view()
+
+        if isinstance(data, pd.Series):
+            from .pandas_column import PandasSeriesColumn
+
+            return PandasSeriesColumn(data)
 
         if torch.is_tensor(data):
             from .tensor_column import TensorColumn
@@ -379,17 +389,6 @@ class AbstractColumn(
             from .numpy_column import NumpyArrayColumn
 
             return NumpyArrayColumn(data)
-
-        if isinstance(data, pd.Series):
-            from .numpy_column import NumpyArrayColumn
-
-            if data.dtype != object or (len(data) > 0 and isinstance(data[0], str)):
-                # if first element in object series is str, still return a
-                # `NumpyArrayColumn`
-                return NumpyArrayColumn(data.values)
-            # otherwise, get the list of objects and proceed to `Sequence` case
-            # below (e.g. `pd.Series` of AbstractCells)
-            data: List = list(data.values)
 
         if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
@@ -414,7 +413,7 @@ class AbstractColumn(
             elif len(data) != 0 and torch.is_tensor(data[0]):
                 from .tensor_column import TensorColumn
 
-                return TensorColumn(torch.stack(data))
+                return TensorColumn(data)
 
             from .list_column import ListColumn
 
@@ -432,3 +431,9 @@ class AbstractColumn(
 
     def to_pandas(self) -> pd.Series:
         return pd.Series([self.lz[int(idx)] for idx in range(len(self))])
+
+    def _copy_data(self) -> object:
+        return copy(self._data)
+
+    def _view_data(self) -> object:
+        return self._data

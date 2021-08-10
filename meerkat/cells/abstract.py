@@ -1,22 +1,19 @@
 from __future__ import annotations
 
 import abc
-from abc import abstractmethod
 
 from yaml.representer import Representer
 
-from meerkat.mixins.state import StateDictMixin
-from meerkat.mixins.storage import CellStorageMixin
+from meerkat.mixins.io import CellIOMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 
-class AbstractCell(CellStorageMixin, StateDictMixin, abc.ABC):
+class AbstractCell(CellIOMixin, abc.ABC):
     def __init__(self, *args, **kwargs):
         super(AbstractCell, self).__init__(*args, **kwargs)
 
-    @abstractmethod
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> object:
         """Get me the thing that this cell exists for."""
         raise NotImplementedError("Must implement `get`.")
 
@@ -47,3 +44,6 @@ class AbstractCell(CellStorageMixin, StateDictMixin, abc.ABC):
 
     def __repr__(self):
         return f"{self.__class__.__name__}"
+
+    def __eq__(self, other):
+        raise NotImplementedError

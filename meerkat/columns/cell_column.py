@@ -40,7 +40,7 @@ class CellColumn(AbstractColumn):
             return self.collate([self._data[i].get() for i in indices])
 
         else:
-            return self.__class__([self._data[i] for i in indices])
+            return [self._data[i] for i in indices]
 
     @classmethod
     def from_cells(cls, cells: Sequence[AbstractCell], *args, **kwargs):
@@ -59,4 +59,11 @@ class CellColumn(AbstractColumn):
     def concat(columns: Sequence[CellColumn]):
         return columns[0].__class__.from_cells(
             list(tz.concat([c.data for c in columns]))
+        )
+
+    def is_equal(self, other: AbstractColumn) -> bool:
+        return (
+            (self.__class__ == other.__class__)
+            and (len(self) == len(other))
+            and all([self.lz[idx] == other.lz[idx] for idx in range(len(self))])
         )

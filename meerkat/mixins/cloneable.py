@@ -1,26 +1,62 @@
-from typing import Any, Dict
+from dataclasses import dataclass
+
+from meerkat.mixins.blockable import BlockableMixin
+
+
+@dataclass
+class StateClass:
+    """An internal class to store the state of an object alongside its
+    associated class."""
+
+    klass: type
+    state: object
 
 
 class CloneableMixin:
-    def _clone_kwargs(self) -> Dict[str, Any]:
-        """Returns __init__ kwargs for instantiating new object.
+    def __init__(self, *args, **kwargs):
+        super(CloneableMixin, self).__init__(*args, **kwargs)
 
-        This function returns the default parameters that should be plumbed
-        from the current instance to the new instance.
-
-        This is the API that should be used by DataPanel and AbstractColumn
-        subclasses that require unique protocols for instantiation.
-
-        Returns:
-            Dict[str, Any]: The keyword arguments for initialization.
-                These arguments will be used by :meth:`_clone`.
-        """
+    @classmethod
+    def _state_keys(cls) -> set:
+        """"""
         raise NotImplementedError()
 
-    def _clone(self, data=None, **kwargs):
-        default_kwargs = self._clone_kwargs()
+    @classmethod
+    def _clone_keys(cls) -> set:
+        return set()
+
+    def copy(self, **kwargs) -> object:
+        new_data = self._copy_data()
+        return self._clone(data=new_data)
+
+    def view(self) -> object:
+        return self._clone()
+
+    def _clone(self, data: object = None):
         if data is None:
-            data = kwargs.pop("data", self.data)
-        if kwargs:
-            default_kwargs.update(kwargs)
-        return self.__class__(data, **default_kwargs)
+            if isinstance(self, BlockableMixin) and self.is_blockable():
+                data = self._pack_block_view()
+            else:
+                data = self._view_data()
+
+        state = self._get_state(clone=True)
+
+        obj = self.__class__.__new__(self.__class__)
+        obj._set_state(state)
+        obj._set_data(data)
+        return obj
+
+    def _copy_data(self) -> object:
+        raise NotImplementedError
+
+    def _view_data(self) -> object:
+        return self.data
+
+    def _get_state(self, clone: bool = False) -> dict:
+        state = {key: getattr(self, key) for key in self._state_keys()}
+        if clone:
+            state.update({key: getattr(self, key) for key in self._clone_keys()})
+        return state
+
+    def _set_state(self, state: dict):
+        self.__dict__.update(state)

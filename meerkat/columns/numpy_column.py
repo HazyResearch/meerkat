@@ -7,15 +7,15 @@ import numbers
 import os
 from typing import Callable, Sequence
 
-import dill
 import numpy as np
 import pandas as pd
 import torch
-import yaml
 from yaml.representer import Representer
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.writers.numpy_writer import NumpyMemmapWriter, NumpyWriter
+from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -38,30 +38,45 @@ class NumpyArrayColumn(
     AbstractColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
+
+    block_class: type = NumpyBlock
+
     def __init__(
         self,
-        data: Sequence = None,
+        data: Sequence,
         *args,
         **kwargs,
     ):
-        if data is not None and not isinstance(data, np.memmap):
+        if isinstance(data, BlockView):
+            if not isinstance(data.block, NumpyBlock):
+                raise ValueError(
+                    "Cannot create `NumpyArrayColumn` from a `BlockView` not "
+                    "referencing a `NumpyBlock`."
+                )
+        elif not isinstance(data, np.memmap):
             data = np.asarray(data)
         super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
 
+    # TODO (sabri): need to support str here
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
-    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+    def __array_ufunc__(self, ufunc: np.ufunc, method, *inputs, **kwargs):
         out = kwargs.get("out", ())
         for x in inputs + out:
             # Only support operations with instances of _HANDLED_TYPES.
             # Use ArrayLike instead of type(self) for isinstance to
             # allow subclasses that don't override __array_ufunc__ to
             # handle ArrayLike objects.
-            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)):
+            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)) and not (
+                # support for at index
+                method == "at"
+                and isinstance(x, list)
+            ):
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
         inputs = tuple(x.data if isinstance(x, NumpyArrayColumn) else x for x in inputs)
+
         if out:
             kwargs["out"] = tuple(
                 x.data if isinstance(x, NumpyArrayColumn) else x for x in out
@@ -76,7 +91,7 @@ class NumpyArrayColumn(
             return None
         else:
             # one return value
-            return type(self)(result)
+            return self._clone(data=result)
 
     def __getattr__(self, name):
         try:
@@ -94,41 +109,32 @@ class NumpyArrayColumn(
     def from_array(cls, data: np.ndarray, *args, **kwargs):
         return cls(data=data, *args, **kwargs)
 
-    def _get_batch(self, indices, materialize: bool = True):
-        return self._data[indices]
-
     def _set_batch(self, indices, values):
         self._data[indices] = values
 
-    @staticmethod
-    def concat(columns: Sequence[NumpyArrayColumn]):
-        return NumpyArrayColumn.from_array(np.concatenate([c.data for c in columns]))
-
-    @classmethod
-    def get_writer(cls, mmap: bool = False):
-        if mmap:
-            return NumpyMemmapWriter()
+    def _get(self, index, materialize: bool = True):
+        data = self._data[index]
+        if self._is_batch_index(index):
+            # only create a numpy array column
+            return self._clone(data=data)
         else:
-            return NumpyWriter()
+            return data
 
-    @classmethod
-    def read(
-        cls, path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
+    def _copy_data(self) -> object:
+        return self._data.copy()
+
+    def _view_data(self) -> object:
+        return self._data
+
+    def _write_data(self, path: str) -> None:
+        # Saving all cell data in a single pickle file
+        np.save(os.path.join(path, "data.npy"), self.data)
+
+    @staticmethod
+    def _read_data(
+        path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
     ) -> NumpyArrayColumn:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
-        # Load in the metadata: only available if the array was stored by meerkat
-        metadata_path = os.path.join(path, "meta.yaml")
-        if os.path.exists(metadata_path):
-            metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-            assert metadata["dtype"] == cls
-
-        # If the path doesn't exist, assume that `path` points to the `.npy` file
         data_path = os.path.join(path, "data.npy")
-        if not os.path.exists(data_path):
-            data_path = path
-
         # Load in the data
         if mmap:
             # assert dtype is not None and shape is not None
@@ -136,42 +142,26 @@ class NumpyArrayColumn(
             # data = np.load(data_path, mmap_mode="r")
         else:
             data = np.load(data_path, allow_pickle=True)
+        return data
 
-        col = cls(data)
+    @classmethod
+    def concat(cls, columns: Sequence[NumpyArrayColumn]):
+        data = np.concatenate([c.data for c in columns])
+        return columns[0]._clone(data=data)
 
-        state_path = os.path.join(path, "state.dill")
-        if os.path.exists(state_path):
-            state = dill.load(open(state_path, "rb"))
-            col.__dict__.update(state)
-        return col
+    def is_equal(self, other: AbstractColumn) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        return (self.data == other.data).all()
 
-    def write(self, path: str, **kwargs) -> None:
-        # Make all the directories to the path
-        os.makedirs(path, exist_ok=True)
+    @classmethod
+    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+        if mmap:
+            from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
-        # Get the column state
-        state = self.get_state()
-        _data = state["_data"]
-
-        # Remove the data key and put the rest of `state` into a metadata dict
-        del state["_data"]
-        metadata = {
-            "dtype": type(self),
-            "len": len(self),
-            **self.metadata,
-        }
-
-        # Get the paths where metadata and data should be stored
-        metadata_path = os.path.join(path, "meta.yaml")
-        state_path = os.path.join(path, "state.dill")
-        data_path = os.path.join(path, "data.npy")
-
-        # Saving all cell data in a single pickle file
-        np.save(data_path, _data)
-
-        # Saving the metadata as a yaml
-        yaml.dump(metadata, open(metadata_path, "w"))
-        dill.dump(state, open(state_path, "wb"))
+            return NumpyMemmapWriter()
+        else:
+            return ConcatWriter(template=template, output_type=NumpyArrayColumn)
 
     def _repr_pandas_(self) -> pd.Series:
         if len(self.shape) > 1:

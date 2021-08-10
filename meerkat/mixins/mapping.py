@@ -1,11 +1,9 @@
 import logging
-from typing import Callable, Mapping, Optional
+from typing import Callable, Dict, Mapping, Optional, Union
 
 from tqdm.auto import tqdm
 
 from meerkat.provenance import capture_provenance
-
-from .cloneable import CloneableMixin
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +21,7 @@ class MappableMixin:
         batch_size: Optional[int] = 1,
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
-        output_type: type = None,
+        output_type: Union[type, Dict[str, type]] = None,
         mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
@@ -34,8 +32,6 @@ class MappableMixin:
         from meerkat.datapanel import DataPanel
 
         """Map a function over the elements of the column."""
-        # Check if need to materialize:
-        # TODO(karan): figure out if we need materialize=False
 
         # Just return if the function is None
         if function is None:
@@ -54,7 +50,7 @@ class MappableMixin:
         if not is_batched_fn:
             # Convert to a batch function
             function = self._convert_to_batch_fn(
-                function, with_indices=with_indices, materialize=materialize
+                function, with_indices=with_indices, materialize=materialize, **kwargs
             )
             is_batched_fn = True
             logger.info(f"Converting `function` {function} to a batched function.")
@@ -89,27 +85,39 @@ class MappableMixin:
                     batch,
                     range(start_index, end_index),
                     materialize=materialize,
+                    **kwargs,
                 )
 
                 # Pull out information
                 output = function_properties.output
                 dtype = function_properties.output_dtype
                 is_mapping = isinstance(output, Mapping)
-                writers, output_types, templates, mmap_info = {}, {}, {}, {}
+                is_type_mapping = isinstance(output_type, Mapping)
+
+                if not is_mapping and is_type_mapping:
+                    raise ValueError(
+                        "output_type is a mapping but function output is not a mapping"
+                    )
+
+                writers = {}
                 for key, curr_output in output.items() if is_mapping else [(0, output)]:
                     curr_output_type = (
                         type(AbstractColumn.from_data(curr_output))
                         if output_type is None
+                        or (is_type_mapping and key not in output_type.keys())
+                        else output_type[key]
+                        if is_type_mapping
                         else output_type
                     )
-                    output_types[key] = curr_output_type
-                    templates[key] = (
-                        curr_output.copy()
-                        if isinstance(curr_output, AbstractColumn)
-                        and isinstance(curr_output, CloneableMixin)
-                        else None
+
+                    writer = curr_output_type.get_writer(
+                        mmap=mmap,
+                        template=(
+                            curr_output.copy()
+                            if isinstance(curr_output, AbstractColumn)
+                            else None
+                        ),
                     )
-                    writer = curr_output_type.get_writer(mmap=mmap)
 
                     # Setup for writing to a certain output column
                     # TODO: support optionally memmapping only some columns
@@ -119,7 +127,6 @@ class MappableMixin:
                         # Construct the mmap file path
                         # TODO: how/where to store the files
                         path = self.logdir / f"{hash(function)}" / key
-                        mmap_info[key] = {"path": path, "shape": shape, "dtype": dtype}
                         # Open the output writer
                         writer.open(str(path), dtype, shape=shape)
                     else:
@@ -133,9 +140,10 @@ class MappableMixin:
                     function(
                         batch,
                         range(i * batch_size, min(len(self), (i + 1) * batch_size)),
+                        **kwargs,
                     )
                     if with_indices
-                    else function(batch)
+                    else function(batch, **kwargs)
                 )
 
             # Append the output
@@ -151,27 +159,7 @@ class MappableMixin:
                     writers[0].write(output)
 
         # Check if we are returning a special output type
-        outputs = {}
-        for key, writer in writers.items():
-            if mmap:
-                writer.flush()
-                # TODO: Writers should have correspondence to their own columns
-                out = output_types[key].read(
-                    path=str(mmap_info[key]["path"]),
-                    mmap=mmap,
-                    dtype=mmap_info[key]["dtype"],
-                    shape=mmap_info[key]["shape"],
-                )
-                if templates[key] is not None:
-                    out = templates[key]._clone(data=out.data)
-                outputs[key] = out
-            else:
-                data = writer.flush()
-                outputs[key] = (
-                    templates[key]._clone(data=data)
-                    if templates[key] is not None
-                    else output_types[key].from_data(data)
-                )
+        outputs = {key: writer.flush() for key, writer in writers.items()}
 
         if not is_mapping:
             outputs = outputs[0]
@@ -183,4 +171,5 @@ class MappableMixin:
                 if isinstance(self, DataPanel)
                 else DataPanel.from_batch(outputs)
             )
+            outputs._visible_columns = None
         return outputs
