@@ -71,7 +71,6 @@ class ActivationOp:
                 self.extractor.activation.cpu().detach()
             )
         }
-
         return activation_dict
 
     def activation(
@@ -99,6 +98,8 @@ class ActivationOp:
 
         """
         # Get an activation operator
+        # TODO (Priya): This won't work properly if forward is disabled
+        #   Maintain a list of activations if forward is disabled?
 
         if forward:
             assert isinstance(
