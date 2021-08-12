@@ -12,6 +12,7 @@ import torch
 import ujson as json
 
 from meerkat import NumpyArrayColumn
+from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -42,16 +43,30 @@ class DataPanelTestBed:
         length: int = 16,
         tmpdir: str = None,
     ):
-        self.column_testbeds = {}
+        self.column_testbeds = self._build_column_testbeds(
+            column_configs, length=length, tmpdir=tmpdir
+        )
 
+        self.columns = {
+            name: testbed.col for name, testbed in self.column_testbeds.items()
+        }
+        self.dp = DataPanel.from_batch(self.columns)
+
+        if consolidated:
+            self.dp.consolidate()
+
+    def _build_column_testbeds(
+        self, column_configs: Dict[str, AbstractColumn], length: int, tmpdir: str
+    ):
         def _get_tmpdir(name):
             path = os.path.join(tmpdir, name)
             os.makedirs(path)
             return path
 
+        column_testbeds = {}
         for name, config in column_configs.items():
             params = config["testbed_class"].get_params(**config.get("kwargs", {}))
-            self.column_testbeds.update(
+            column_testbeds.update(
                 {
                     f"{name}_{col_id}_{idx}": config["testbed_class"](
                         **col_config[1],
@@ -63,14 +78,7 @@ class DataPanelTestBed:
                     for col_config, col_id in zip(params["argvalues"], params["ids"])
                 }
             )
-
-        self.columns = {
-            name: testbed.col for name, testbed in self.column_testbeds.items()
-        }
-        self.dp = DataPanel.from_batch(self.columns)
-
-        if consolidated:
-            self.dp.consolidate()
+        return column_testbeds
 
     @classmethod
     def get_params(
@@ -601,7 +609,7 @@ class TestDataPanel:
 
         assert len(out) == len(dp) * 2
         assert isinstance(out, DataPanel)
-        assert set(out.visible_columns) == set(dp.visible_columns)
+        assert set(out.columns) == set(dp.columns)
         assert (out["a"].data == np.concatenate([np.arange(length)] * 2)).all()
         assert out["b"].data == list(np.concatenate([np.arange(length)] * 2))
 
@@ -612,7 +620,7 @@ class TestDataPanel:
         new_dp = dp.tail(n=2)
 
         assert isinstance(new_dp, DataPanel)
-        assert new_dp.visible_columns == dp.visible_columns
+        assert new_dp.columns == dp.columns
         assert len(new_dp) == 2
 
     @DataPanelTestBed.parametrize()
@@ -622,7 +630,7 @@ class TestDataPanel:
         new_dp = dp.head(n=2)
 
         assert isinstance(new_dp, DataPanel)
-        assert new_dp.visible_columns == dp.visible_columns
+        assert new_dp.columns == dp.columns
         assert len(new_dp) == 2
 
     class DataPanelSubclass(DataPanel):
@@ -657,7 +665,7 @@ class TestDataPanel:
         pd.DataFrame(data).to_csv(temp_f.name)
 
         dp_new = DataPanel.from_csv(temp_f.name)
-        assert dp_new.column_names == ["Unnamed: 0", "a", "b", "c", "index"]
+        assert dp_new.columns == ["Unnamed: 0", "a", "b", "c", "index"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], PandasSeriesColumn):
@@ -680,7 +688,7 @@ class TestDataPanel:
                 out_f.write(json.dumps(to_write) + "\n")
 
         dp_new = DataPanel.from_jsonl(temp_f.name)
-        assert dp_new.column_names == ["a", "b", "c", "index"]
+        assert dp_new.columns == ["a", "b", "c", "index"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], NumpyArrayColumn):
@@ -702,7 +710,7 @@ class TestDataPanel:
                 "f": np.ones(3),
             },
         )
-        assert set(datapanel.column_names) == {"a", "b", "c", "d", "e", "f", "index"}
+        assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f", "index"}
         assert len(datapanel) == 3
 
     def test_to_pandas(self):
@@ -724,7 +732,7 @@ class TestDataPanel:
 
         df = dp.to_pandas()
         assert isinstance(df, pd.DataFrame)
-        assert list(df.columns) == dp.visible_columns
+        assert list(df.columns) == dp.columns
         assert len(df) == len(dp)
 
         assert (df["a"].values == dp["a"].data).all()
@@ -734,3 +742,92 @@ class TestDataPanel:
 
         assert (df["d"].values == dp["d"].numpy()).all()
         assert (df["e"].values == dp["e"].values).all()
+
+    def test_constructo(self):
+        length = 16
+
+        # from dictionary
+        data = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+        }
+        dp = DataPanel(data=data)
+        assert len(dp) == length
+        assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+
+        # from BlockManager
+        mgr = BlockManager.from_dict(data)
+        dp = DataPanel(data=mgr)
+        assert len(dp) == length
+        assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+        assert dp.columns == ["a", "b", "index"]
+
+        # from list of dictionaries
+        data = [{"a": idx, "b": str(idx)} for idx in range(length)]
+        dp = DataPanel(data=data)
+        assert len(dp) == length
+        assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+        assert dp.columns == ["a", "b", "index"]
+
+        # from nothing
+        dp = DataPanel()
+        assert len(dp) == 0
+
+    def test_constructor_w_invalid_data(self):
+        with pytest.raises(
+            ValueError,
+            match=f"Cannot set DataPanel `data` to object of type {type(5)}.",
+        ):
+            DataPanel(data=5)
+
+    def test_constructor_w_invalid_sequence(self):
+        data = list(range(4))
+        with pytest.raises(
+            ValueError,
+            match="Cannot set DataPanel `data` to a Sequence containing object of "
+            f" type {type(data[0])}. Must be a Sequence of Mapping.",
+        ):
+            DataPanel(data=data)
+
+    def test_constructor_w_unequal_lengths(self):
+        length = 16
+        data = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length - 1)),
+        }
+        with pytest.raises(
+            ValueError,
+            match=(
+                f"Cannot add column 'b' with length {length - 1} to `BlockManager` "
+                f" with length {length} columns."
+            ),
+        ):
+            DataPanel(data=data)
+
+    def test_shape(self):
+        length = 16
+        data = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+        }
+        dp = DataPanel(data)
+        assert dp.shape == (16, 3)
+
+    @DataPanelTestBed.parametrize()
+    def test_streamlit(self, testbed):
+        testbed.dp.streamlit()
+
+    @DataPanelTestBed.parametrize()
+    def test_str(self, testbed):
+        result = str(testbed.dp)
+        assert isinstance(result, str)
+
+    @DataPanelTestBed.parametrize()
+    def test_repr(self, testbed):
+        result = repr(testbed.dp)
+        assert isinstance(result, str)
+
+    @DataPanelTestBed.parametrize()
+    def test_repr_pandas(self, testbed):
+        df = testbed.dp._repr_pandas_()
+        assert isinstance(df, pd.DataFrame)

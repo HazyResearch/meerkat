@@ -48,7 +48,7 @@ def test_datapanel_row_concat(use_visible_columns, n):
 
     assert len(out) == len(mock_dp.visible_rows) * n
     assert isinstance(out, DataPanel)
-    assert set(out.visible_columns) == set(mock_dp.visible_columns)
+    assert set(out.columns) == set(mock_dp.columns)
     assert (out["a"].data == np.concatenate([mock_dp.visible_rows] * n)).all()
     assert out["b"].data == list(np.concatenate([mock_dp.visible_rows] * n))
 
@@ -64,7 +64,7 @@ def test_datapanel_column_concat():
 
     assert len(out) == len(mock_dp.visible_rows)
     assert isinstance(out, DataPanel)
-    assert set(out.visible_columns) == {"a", "b", "index"}
+    assert set(out.columns) == {"a", "b", "index"}
     assert list(out["a"].data) == out["b"].data
 
 

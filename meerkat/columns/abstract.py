@@ -13,14 +13,12 @@ import torch
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
-from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
 
 logger = logging.getLogger(__name__)
@@ -32,7 +30,6 @@ class AbstractColumn(
     CollateMixin,
     ColumnIOMixin,
     FunctionInspectorMixin,
-    IdentifierMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
@@ -46,7 +43,6 @@ class AbstractColumn(
     def __init__(
         self,
         data: Sequence = None,
-        identifier: Identifier = None,
         collate_fn: Callable = None,
         *args,
         **kwargs,
@@ -55,7 +51,6 @@ class AbstractColumn(
         self._set_data(data)
 
         super(AbstractColumn, self).__init__(
-            identifier=identifier,
             collate_fn=collate_fn,
             *args,
             **kwargs,

@@ -3,10 +3,11 @@ from __future__ import annotations
 import os
 from collections import defaultdict
 from collections.abc import MutableMapping
-from typing import Dict, Sequence, Union
+from typing import Dict, Mapping, Sequence, Union
 
 import pandas as pd
 import yaml
+from torch._C import Value
 
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
@@ -18,16 +19,20 @@ class BlockManager(MutableMapping):
     """This manager manages all blocks."""
 
     def __init__(self) -> None:
-        self._columns: Dict[str, AbstractColumn] = {}
+        self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7
         self._column_to_block_id: Dict[str, int] = {}
         self._block_refs: Dict[int, BlockRef] = {}
 
     def update(self, block_ref: BlockRef):
         """data (): a single blockable object, potentially contains multiple
         columns."""
+        for name in block_ref:
+            if name in self:
+                self.remove(name)
+
         # although we can't have the same column living in multiple managers
         # we don't view here because it can lead to multiple calls to clone
-        self._columns.update({name: column for name, column in block_ref.items()})
+        self._columns.update(block_ref)
 
         block_id = id(block_ref.block)
         # check if there already is a block_ref in the manager for this block
@@ -66,9 +71,15 @@ class BlockManager(MutableMapping):
 
             results[name] = result
 
+        if isinstance(results, BlockManager):
+            results.reorder(self.keys())
         return results
 
     def consolidate(self):
+        column_order = list(
+            self._columns.keys()
+        )  # need to maintain order after consolidate
+
         block_ref_groups = defaultdict(list)
         for block_ref in self._block_refs.values():
             block_ref_groups[block_ref.block.signature].append(block_ref)
@@ -78,14 +89,12 @@ class BlockManager(MutableMapping):
                 # if there is only one block ref in the group, do not consolidate
                 continue
 
-            # remove old block_refs
-            for old_ref in block_refs:
-                self._block_refs.pop(id(old_ref.block))
-
             # consolidate group
             block_class = block_refs[0].block.__class__
             block_ref = block_class.consolidate(block_refs)
             self.update(block_ref)
+
+        self.reorder(column_order)
 
     def remove(self, name):
         if name not in self._columns:
@@ -102,6 +111,11 @@ class BlockManager(MutableMapping):
                 self._block_refs.pop(self._column_to_block_id[name])
 
             self._column_to_block_id.pop(name)
+
+    def reorder(self, order: Sequence[str]):
+        if set(order) != set(self._columns):
+            raise ValueError("Must include all columns when reordering a BlockManager.")
+        self._columns = {name: self._columns[name] for name in order}
 
     def __getitem__(
         self, index: Union[str, Sequence[str]]
@@ -128,6 +142,7 @@ class BlockManager(MutableMapping):
             for block_id, names in block_id_to_names.items():
                 block_ref = self._block_refs[block_id]
                 mgr.update(block_ref[names])
+            mgr.reorder(order=index)
             return mgr
         else:
             raise ValueError(
@@ -148,6 +163,14 @@ class BlockManager(MutableMapping):
     def __len__(self):
         return len(self._columns)
 
+    @property
+    def nrows(self):
+        return 0 if len(self) == 0 else len(next(iter(self._columns.values())))
+
+    @property
+    def ncols(self):
+        return len(self)
+
     def __contains__(self, value):
         return value in self._columns
 
@@ -160,8 +183,11 @@ class BlockManager(MutableMapping):
     def add_column(self, col: AbstractColumn, name: str):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        if name in self._columns:
-            self.remove(name)
+        if len(self) > 0 and len(col) != self.nrows:
+            raise ValueError(
+                f"Cannot add column '{name}' with length {len(col)} to `BlockManager` "
+                f" with length {self.nrows} columns."
+            )
 
         if not col.is_blockable():
             col = col.view()
@@ -172,7 +198,7 @@ class BlockManager(MutableMapping):
             self.update(BlockRef(columns={name: col}, block=col._block))
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: Mapping[str, object]):
         mgr = cls()
         for name, data in data.items():
             col = AbstractColumn.from_data(data)
@@ -180,7 +206,11 @@ class BlockManager(MutableMapping):
         return mgr
 
     def write(self, path: str):
-        meta = {"dtype": BlockManager, "columns": {}}
+        meta = {
+            "dtype": BlockManager,
+            "columns": {},
+            "_column_order": list(self.keys()),
+        }
 
         # prepare directories
         os.makedirs(path, exist_ok=True)
@@ -264,7 +294,7 @@ class BlockManager(MutableMapping):
                 mgr.add_column(
                     col_meta["dtype"].read(path=column_dir, _meta=col_meta), name
                 )
-
+        mgr.reorder(meta["_column_order"])
         return mgr
 
     def _repr_pandas_(self):
@@ -279,13 +309,13 @@ class BlockManager(MutableMapping):
 
     def view(self):
         mgr = BlockManager()
-        for name, col in self._columns.items():
+        for name, col in self.items():
             mgr.add_column(col.view(), name)
         return mgr
 
     def copy(self):
         mgr = BlockManager()
-        for name, col in self._columns.items():
+        for name, col in self.items():
             mgr.add_column(col.copy(), name)
         return mgr
 

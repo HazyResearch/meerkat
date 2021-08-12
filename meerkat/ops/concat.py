@@ -41,8 +41,8 @@ def concat(
     if isinstance(objs[0], DataPanel):
         if axis == 0 or axis == "rows":
             # append new rows
-            columns = set(objs[0].visible_columns)
-            if not all([set(dp.visible_columns) == columns for dp in objs]):
+            columns = set(objs[0].columns)
+            if not all([set(dp.columns) == columns for dp in objs]):
                 raise ConcatError(
                     "Can only concatenate DataPanels along axis 0 (rows) if they have "
                     " the same set of columns names."
@@ -59,7 +59,7 @@ def concat(
                     "have the same length."
                 )
 
-            columns = list(tz.concat((dp.visible_columns for dp in objs)))
+            columns = list(tz.concat((dp.columns for dp in objs)))
             if not tz.isdistinct(columns):
                 raise ConcatError(
                     "Can only concatenate DataPanels along axis 1 (columns) if they "

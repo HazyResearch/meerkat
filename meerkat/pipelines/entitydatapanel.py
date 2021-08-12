@@ -10,7 +10,6 @@ import torch
 
 from meerkat import DataPanel, ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.nn import EmbeddingColumn
-from meerkat.tools.identifier import Identifier
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,6 @@ class EntityDataPanel(DataPanel):
     def __init__(
         self,
         data: Union[dict, list, datasets.Dataset] = None,
-        identifier: Identifier = None,
         column_names: List[str] = None,
         embedding_columns: List[str] = None,
         index_column: str = None,
@@ -34,17 +32,12 @@ class EntityDataPanel(DataPanel):
         operations such as nearest neighbor search.
 
         Args:
-            identifier: identifier
             column_names: all column names
             embedding_columns: embedding columns in all columns
             index_column: index column
         """
         super().__init__(
             data=data,
-            identifier=identifier,
-            column_names=column_names,
-            info=None,
-            split=None,
             **kwargs,
         )
         if len(self.column_names) > 0:
@@ -66,6 +59,10 @@ class EntityDataPanel(DataPanel):
             self._embedding_columns = []
             self._index_column = None
             self._index_to_rowid = {}
+
+    def _check_columns_unique(self, columns: List[str]):
+        """Checks that all columns are unique."""
+        assert len(columns) == len(set(columns))
 
     @classmethod
     def from_datapanel(

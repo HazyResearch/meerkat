@@ -79,6 +79,23 @@ def test_consolidate_multiple_types():
     assert len(mgr._block_refs) == 3
 
 
+def test_consolidate_preserves_order():
+    mgr = BlockManager()
+
+    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    mgr.add_column(col1, "col1")
+    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    mgr.add_column(col2, "col2")
+    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    mgr.add_column(col3, "col3")
+
+    order = ["col2", "col3", "col1"]
+    mgr.reorder(order)
+    assert list(mgr.keys()) == order
+    mgr.consolidate()
+    assert list(mgr.keys()) == order
+
+
 @pytest.mark.parametrize(
     "num_blocks, consolidated",
     product([1, 2, 3], [True, False]),
