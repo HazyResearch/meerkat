@@ -150,6 +150,10 @@ class TestPandasSeriesColumn(TestAbstractColumn):
             testbed, batched, materialize=True
         )
 
+    @PandasSeriesColumnTestBed.parametrize(params={"n": [1, 2, 3]})
+    def test_concat(self, testbed: AbstractColumnTestBed, n: int):
+        return super().test_concat(testbed, n=n)
+
     @PandasSeriesColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):
         return super().test_copy(testbed)

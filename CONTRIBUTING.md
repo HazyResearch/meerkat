@@ -186,9 +186,9 @@ Note: in order to pass the full test suite (step 5), you'll need to install all 
 
 ### Tests
 
-An extensive test suite is included to test the library behavior and several examples. 
+An extensive test suite is included to test the library behavior. 
 Library tests can be found in the 
-[tests folder](https://github.com/robustness-gym/robustness-gym/tree/main/tests).
+[tests folder](https://github.com/robustness-gym/meerkat/tree/main/tests).
 
 From the root of the
 repository, here's how to run tests with `pytest` for the library:
@@ -200,15 +200,13 @@ $ make test
 You can specify a smaller set of tests in order to test only the feature
 you're working on.
 
-Meerkat uses `pytest` as a test runner only. It doesn't use any
-`pytest`-specific features in the test suite itself.
-
-This means `unittest` is fully supported. Here's how to run tests with
-`unittest`:
-
-```bash
-$ python -m unittest discover -s tests -t . -v
+Per the checklist above, all PRs should include high-coverage tests. 
+To produce a code coverage report, run the following `pytest`
 ```
+pytest --cov-report term-missing,html --cov=meerkat .
+```
+This will populate a directory `htmlcov` with an HTML report. 
+Open `htmlcov/index.html` in a browser to view the report. 
 
 
 ### Style guide

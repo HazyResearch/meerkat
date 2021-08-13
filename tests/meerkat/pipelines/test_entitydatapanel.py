@@ -118,7 +118,7 @@ def test_find_similar(k):
     sim = ent.most_similar("x", k)
     assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
-    assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index"]
+    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g", "index"]
 
 
 @pytest.mark.parametrize(
@@ -150,7 +150,7 @@ def test_find_similar_multiple_columns(k):
     )
     assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
-    assert sim.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]
+    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]
 
 
 def test_convert_entities_to_ids():
@@ -202,7 +202,7 @@ def test_append_entities():
         "g": data["g"],
         "h": [3, 4, 5],
     }
-    assert ent3.column_names == ["a", "b", "c", "d", "e", "f", "g", "index", "h"]
+    assert ent3.columns == ["a", "b", "c", "d", "e", "f", "index", "g", "h"]
     assert ent3["h"].tolist() == gold_data["h"]
     assert ent3["c"]._data == gold_data["c"]
     assert ent3._index_column == "c"
@@ -273,8 +273,8 @@ def test_merge_entities():
         "g_y": data["g"],
         "h": [3, 4, 5],
     }
-    # import pdb; pdb.set_trace()
-    assert set(ent3.all_columns) == set(
+
+    assert set(ent3.columns) == set(
         [
             "a",
             "b",
@@ -316,20 +316,22 @@ def test_merge_entities():
         "g_y": data["g"],
         "h": ["x", "y", "z"],
     }
-    # import pdb; pdb.set_trace()
-    assert ent3.column_names == [
-        "c_x",
-        "h",
-        "g_x",
-        "a",
-        "b",
-        "c_y",
-        "d",
-        "e",
-        "f",
-        "g_y",
-        "index",
-    ]
+
+    assert set(ent3.columns) == set(
+        [
+            "c_x",
+            "h",
+            "index",
+            "g_x",
+            "a",
+            "b",
+            "c_y",
+            "d",
+            "e",
+            "f",
+            "g_y",
+        ]
+    )
     assert ent3._index_column == "c_x"
     assert ent3._embedding_columns == ["g_x", "g_y"]
     for c in ["a", "b", "c_x", "c_y", "d", "e", "f", "g_x", "g_y", "h"]:
@@ -359,20 +361,22 @@ def test_merge_entities():
         "g_y": data["g"],
         "h": [3, 4, 5],
     }
-    # import pdb; pdb.set_trace()
-    assert ent3.column_names == [
-        "a",
-        "b",
-        "c",
-        "d_x",
-        "e",
-        "f",
-        "g_x",
-        "d_y",
-        "h",
-        "g_y",
-        "index",
-    ]
+
+    assert set(ent3.columns) == set(
+        [
+            "a",
+            "b",
+            "c",
+            "d_x",
+            "e",
+            "f",
+            "g_x",
+            "d_y",
+            "h",
+            "g_y",
+            "index",
+        ]
+    )
     assert ent3._index_column == "c"
     assert ent3._embedding_columns == ["g_x", "g_y"]
     for c in ["a", "b", "c", "d_x", "d_y", "e", "f", "g_x", "g_y", "h"]:
@@ -406,19 +410,21 @@ def test_merge_entities():
         ),
         "c_y": [3, 5],
     }
-    assert ent3.column_names == [
-        "a",
-        "b",
-        "c_x",
-        "d_x",
-        "e",
-        "f",
-        "g",
-        "d_y",
-        "c_y",
-        "i",
-        "index",
-    ]
+    assert set(ent3.columns) == set(
+        [
+            "a",
+            "b",
+            "c_x",
+            "d_x",
+            "e",
+            "f",
+            "g",
+            "d_y",
+            "c_y",
+            "i",
+            "index",
+        ]
+    )
     assert ent3._index_column == "c_x"
     assert ent3._embedding_columns == ["g", "i"]
     for c in ["a", "b", "c_x", "c_y", "d_x", "d_y", "e", "f", "g", "i"]:

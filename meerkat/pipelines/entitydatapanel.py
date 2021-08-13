@@ -10,7 +10,6 @@ import torch
 
 from meerkat import DataPanel, ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.nn import EmbeddingColumn
-from meerkat.tools.identifier import Identifier
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +18,7 @@ class EntityDataPanel(DataPanel):
     def __init__(
         self,
         data: Union[dict, list, datasets.Dataset] = None,
-        identifier: Identifier = None,
-        column_names: List[str] = None,
+        columns: List[str] = None,
         embedding_columns: List[str] = None,
         index_column: str = None,
         **kwargs,
@@ -34,20 +32,15 @@ class EntityDataPanel(DataPanel):
         operations such as nearest neighbor search.
 
         Args:
-            identifier: identifier
-            column_names: all column names
+            columns: all column names
             embedding_columns: embedding columns in all columns
             index_column: index column
         """
         super().__init__(
             data=data,
-            identifier=identifier,
-            column_names=column_names,
-            info=None,
-            split=None,
             **kwargs,
         )
-        if len(self.column_names) > 0:
+        if len(self.columns) > 0:
             self._embedding_columns = embedding_columns if embedding_columns else []
 
             self._check_columns_unique(self._embedding_columns)
@@ -66,6 +59,15 @@ class EntityDataPanel(DataPanel):
             self._embedding_columns = []
             self._index_column = None
             self._index_to_rowid = {}
+
+    def _check_columns_exist(self, columns: List[str]):
+        """Check that every column in `columns` exists."""
+        for col in columns:
+            assert col in self.columns, f"{col} is not a valid column."
+
+    def _check_columns_unique(self, columns: List[str]):
+        """Checks that all columns are unique."""
+        assert len(columns) == len(set(columns))
 
     @classmethod
     def from_datapanel(
@@ -96,7 +98,7 @@ class EntityDataPanel(DataPanel):
             klass = DataPanel
         elif not issubclass(klass, DataPanel):
             raise ValueError("`klass` must be a subclass of DataPanel")
-        return klass.from_batch({k: self[k] for k in self.visible_columns})
+        return klass.from_batch({k: self[k] for k in self.columns})
 
     @property
     def index(self):
@@ -106,7 +108,7 @@ class EntityDataPanel(DataPanel):
     @property
     def embedding_columns(self):
         """Returns _visible_ embedding columns."""
-        return [e for e in self._embedding_columns if e in self.visible_columns]
+        return [e for e in self._embedding_columns if e in self.columns]
 
     @property
     def index_column(self):
@@ -214,7 +216,7 @@ class EntityDataPanel(DataPanel):
             )
             # Save the new index column for saving EntityDataPanel
             new_index_column = self.index_column
-            if self.index_column in dp.column_names and not overwrite:
+            if self.index_column in dp.columns and not overwrite:
                 new_index_column += suffixes[0]
             ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
             ret._embedding_columns = new_embedding_cols
@@ -247,7 +249,7 @@ class EntityDataPanel(DataPanel):
         # the joining column, then the index column will change to
         # have a suffix
         new_index_column = self.index_column
-        if self.index_column in right.column_names:
+        if self.index_column in right.columns:
             # Column will stay the same if it's the joining
             # column of both left and right
             if not (
@@ -372,8 +374,6 @@ class EntityDataPanel(DataPanel):
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
         return {
-            "_visible_columns",
-            "_identifier",
             "_embedding_columns",
             "_index_column",
         }

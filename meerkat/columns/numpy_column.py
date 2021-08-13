@@ -113,6 +113,7 @@ class NumpyArrayColumn(
         self._data[indices] = values
 
     def _get(self, index, materialize: bool = True):
+        index = NumpyBlock._convert_index(index)
         data = self._data[index]
         if self._is_batch_index(index):
             # only create a numpy array column

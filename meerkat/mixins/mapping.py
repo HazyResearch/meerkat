@@ -33,15 +33,6 @@ class MappableMixin:
 
         """Map a function over the elements of the column."""
 
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
-
-        # Ensure that num_workers is not None
-        if num_workers is None:
-            num_workers = 0
-
         # Return if `self` has no examples
         if not len(self):
             logger.info("Dataset empty, returning None.")

@@ -4,8 +4,6 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
-from contextlib import contextmanager
-from copy import copy
 from typing import (
     Callable,
     Dict,
@@ -26,8 +24,6 @@ import pandas as pd
 import torch
 import ujson as json
 import yaml
-from datasets import DatasetInfo, NamedSplit
-from datasets.arrow_dataset import DatasetInfoMixin
 from jsonlines import jsonlines
 
 import meerkat
@@ -40,7 +36,6 @@ from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_fn
 
 logger = logging.getLogger(__name__)
@@ -57,7 +52,6 @@ class DataPanel(
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
-    DatasetInfoMixin,  # this should be the last in order of mixins
 ):
     """Meerkat DataPanel class."""
 
@@ -70,100 +64,25 @@ class DataPanel(
     def __init__(
         self,
         data: Union[dict, list, datasets.Dataset] = None,
-        identifier: Identifier = None,
-        column_names: List[str] = None,
-        info: DatasetInfo = None,
-        split: Optional[NamedSplit] = None,
         *args,
         **kwargs,
     ):
         super(DataPanel, self).__init__(
-            info=info,
-            split=split,
             *args,
             **kwargs,
         )
-
-        # TODO(karan, sabri): copy columns when they're passed in and prevent users
-        #  from setting visible_rows inside columns that belong to a datapanel
         logger.debug("Creating DataPanel.")
 
-        if data is not None:
-            assert column_names is None, "Don't pass in column_names."
-            # The data is passed in
-
-            # `data` is a dictionary
-            if isinstance(data, dict) and len(data):
-                data = self._create_columns(data)
-                self._assert_columns_all_equal_length(data)
-                self.data = data
-
-            # `data` is a list
-            elif isinstance(data, list) and len(data):
-                # Transpose the list of dicts to a dict of lists i.e. a batch
-                data = tz.merge_with(list, *data)
-                # Assert all columns are the same length
-                data = self._create_columns(data)
-                self._assert_columns_all_equal_length(data)
-                self.data = data
-
-            # `data` is a datasets.Dataset
-            elif isinstance(data, datasets.Dataset):
-                self.data = self._create_columns(data[:])
-                info, split = data.info, data.split
-            elif isinstance(data, BlockManager):
-                self.data = data
-
-        else:
-            if column_names:
-                # Use column_names to setup the manager
-                self._check_columns_unique(column_names)
-                self.data = {k: [] for k in column_names}
-            else:
-                self.data = {}
-
-        # Setup the DatasetInfo
-        info = info.copy() if info is not None else DatasetInfo()
-        DatasetInfoMixin.__init__(self, info=info, split=split)
-
-        # Create attributes for all columns and visible columns
-        self._visible_columns = None
-
-        # Create an identifier
-        # TODO(Sabri): make _autobuild_identifier more informative
-        self._identifier = Identifier(
-            self._autobuild_identifier() if not identifier else identifier
-        )
-
-        # Create logging directory
-        self._create_logdir()
-
-        self._initialize_state()
+        self.data = data
 
         # TODO(Sabri): fix add_index for new datset
         # Add an index to the dataset
         if not self.has_index:
             self._add_index()
 
-    @classmethod
-    def _create_columns(cls, name_to_data: Dict[str, AbstractColumn.Columnable]):
-        new_data = {}
-        for column_name, data in name_to_data.items():
-            new_data[column_name] = AbstractColumn.from_data(data=data)
-
-        return new_data
-
     def _repr_pandas_(self):
-        return self.data._repr_pandas_()[self.column_names].rename(
+        return self.data._repr_pandas_()[self.columns].rename(
             columns={k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
-        )
-
-    def old_repr(self):
-        return pd.DataFrame(
-            {
-                f"{k} ({v.__class__.__name__})": v._repr_pandas_()
-                for k, v in self.items()
-            }
         )
 
     def _repr_html_(self):
@@ -173,16 +92,15 @@ class DataPanel(
         return self._repr_pandas_()
 
     def __repr__(self):
-        return f"{self.__class__.__name__}" f"(num_rows: {self.num_rows})"
+        return (
+            f"{self.__class__.__name__}" f"(nrows: {self.nrows}, ncols: {self.ncols})"
+        )
 
     def __len__(self):
-        # If only a subset of rows are visible
-        if len(self.visible_columns) == 0:
-            return 0
-        return len(self[self.visible_columns[0]])
+        return self.nrows
 
     def __contains__(self, item):
-        return item in self.visible_columns
+        return item in self.columns
 
     @property
     def data(self) -> BlockManager:
@@ -197,168 +115,61 @@ class DataPanel(
             self._data = value
         elif isinstance(value, Mapping):
             self._data = BlockManager.from_dict(value)
+        elif isinstance(value, Sequence):
+            if not isinstance(value[0], Mapping):
+                raise ValueError(
+                    "Cannot set DataPanel `data` to a Sequence containing object of "
+                    f" type {type(value[0])}. Must be a Sequence of Mapping."
+                )
+            self._data = BlockManager.from_dict(tz.merge_with(list, *value))
         elif value is None:
             self._data = BlockManager()
         else:
             raise ValueError(
-                f"Cannot set DataPanel data to object of type {type(value)}"
+                f"Cannot set DataPanel `data` to object of type {type(value)}."
             )
 
     @data.setter
     def data(self, value):
         self._set_data(value)
 
-    def full_length(self):
-        # If there are columns, full_length of any column, since they must be same size
-        if self.column_names:
-            return self.data[self.column_names[0]].full_length()
-        return 0
-
-    @property
-    def column_names(self):
-        """Column names in the dataset."""
-        return self.visible_columns
-
     @property
     def columns(self):
-        """Column names in the dataset."""
-        return self.visible_columns
-
-    @property
-    def num_rows(self):
-        """Number of rows in the dataset."""
-        return len(self)
-
-    @property
-    def shape(self):
-        """Shape of the dataset (num_rows, num_columns)."""
-        return self.num_rows, len(self.columns)
-
-    @classmethod
-    def _assert_columns_all_equal_length(cls, batch: Batch):
-        """Check that all columns have the same length so that the data is
-        tabular."""
-        assert cls._columns_all_equal_length(
-            batch
-        ), "All columns must have equal length."
-
-    @classmethod
-    def _columns_all_equal_length(cls, batch: Batch):
-        """Check that all columns have the same length so that the data is
-        tabular."""
-        if len(set([len(v) for k, v in batch.items()])) == 1:
-            return True
-        return False
-
-    def _check_columns_exist(self, columns: List[str]):
-        """Check that every column in `columns` exists."""
-        for col in columns:
-            assert col in self.all_columns, f"{col} is not a valid column."
-
-    def _check_columns_unique(self, columns: List[str]):
-        """Checks that all columns are unique."""
-        assert len(columns) == len(set(columns))
-
-    def _initialize_state(self):
-        """Dataset state initialization."""
-        # Show all columns by default
-        self.visible_columns = copy(self.all_columns)
-
-        # Set the features
-        self._set_features()
-
-    @property
-    def all_columns(self):
+        """Column names in the DataPanel."""
         return list(self.data.keys())
 
     @property
-    def visible_columns(self):
-        if self._visible_columns is None:
-            return self.all_columns
-        return self._visible_columns
-
-    @visible_columns.setter
-    def visible_columns(self, columns: Optional[Sequence[str]] = None):
-        if columns is None:
-            # do nothing, keep old visible columns
-            return
-        for c in columns:
-            if c not in self.all_columns:
-                raise ValueError(f"Trying to set nonexistant column {c} to visible.")
-
-        self._visible_columns = copy(columns)
-        if "index" not in self._visible_columns and "index" in self.all_columns:
-            self._visible_columns.append("index")
-
-    @contextmanager
-    def format(self, columns: List[str] = None):
-        """Context where only `columns` will be visible."""
-        # Get the current format
-        current_format = self.get_format()
-
-        if columns:
-            # View only `columns`
-            self.set_format(columns)
-        else:
-            # Use all columns
-            self.set_format(self.column_names)
-        try:
-            yield
-        finally:
-            # Reset the format back
-            self.set_format(current_format)
-
-    def get_format(self) -> List[str]:
-        """Get the dataset format."""
-        return self.visible_columns
-
-    def set_format(self, columns: List[str]):
-        """Set the dataset format.
-
-        Only `columns` are visible after set_format is invoked.
-        """
-        # Check that the columns exist
-        self._check_columns_exist(columns)
-        # Set visible columns
-        self.visible_columns = columns
-
-    def reset_format(self):
-        """Reset the dataset format.
-
-        All columns are visible.
-        """
-        # All columns are visible
-        self.visible_columns = self.all_columns
+    def nrows(self):
+        """Number of rows in the DataPanel."""
+        if self.ncols == 0:
+            return 0
+        return self.data.nrows
 
     @property
-    def identifier(self):
-        """Identifier."""
-        return self._identifier
+    def ncols(self):
+        """Number of rows in the DataPanel."""
+        return self.data.ncols
 
-    def _set_features(self):
-        """Set the features of the dataset."""
-        with self.format():
-            self.info.features = None  # Features.from_arrow_schema(
-            #     pa.Table.from_pydict(
-            #         self[:1],
-            #     ).schema
-            # )
+    @property
+    def shape(self):
+        """Shape of the DataPanel (num_rows, num_columns)."""
+        return self.nrows, self.ncols
 
     def add_column(
         self, name: str, data: AbstractColumn.Columnable, overwrite=False
     ) -> None:
-        """Add a column to the dataset."""
+        """Add a column to the DataPanel."""
 
         assert isinstance(
             name, str
         ), f"Column name must of type `str`, not `{type(name)}`."
 
-        assert (name not in self.all_columns) or overwrite, (
+        assert (name not in self.columns) or overwrite, (
             f"Column with name `{name}` already exists, "
             f"set `overwrite=True` to overwrite."
         )
 
-        if name in self.all_columns:
+        if name in self.columns:
             self.remove_column(name)
 
         column = AbstractColumn.from_data(data)
@@ -371,24 +182,14 @@ class DataPanel(
         # Add the column
         self.data[name] = column
 
-        if self._visible_columns is not None:
-            self.visible_columns = self.visible_columns + [name]
-
-        # Set features
-        self._set_features()
-
         logger.info(f"Added column `{name}` with length `{len(column)}`.")
 
     def remove_column(self, column: str) -> None:
         """Remove a column from the dataset."""
-        assert column in self.all_columns, f"Column `{column}` does not exist."
+        assert column in self.columns, f"Column `{column}` does not exist."
 
         # Remove the column
         del self.data[column]
-        self.visible_columns = [col for col in self.visible_columns if col != column]
-
-        # Set features
-        self._set_features()
 
         logger.info(f"Removed column `{column}`.")
 
@@ -405,34 +206,9 @@ class DataPanel(
         `example_or_batch` must have the same columns as the dataset
         (regardless of what columns are visible).
         """
-        if axis == 0 or axis == "rows":
-            # append new rows
-            return meerkat.concat([self, dp], axis="rows")
-        elif axis == 1 or axis == "columns":
-            # append new columns
-            if len(dp) != len(self):
-                raise ValueError(
-                    "Can only append DataPanels along axis 1 (columns) if they have the"
-                    f"same length. {len(self)} != {len(dp)}"
-                )
-
-            shared = set(dp.visible_columns).intersection(set(self.visible_columns))
-            if not overwrite and shared:
-                if suffixes is None:
-                    raise ValueError()
-                left_suf, right_suf = suffixes
-                data = {
-                    **{k + left_suf if k in shared else k: v for k, v in self.items()},
-                    **{k + right_suf if k in shared else k: v for k, v in dp.items()},
-                }
-            else:
-                data = {**dict(self.items()), **dict(dp.items())}
-
-            col = self._clone(data=data)
-            col._visible_columns = None
-            return col
-        else:
-            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+        return meerkat.concat(
+            [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
+        )
 
     def _add_index(self):
         """Add an index to the dataset."""
@@ -446,48 +222,18 @@ class DataPanel(
         """Get the last `n` examples of the DataPanel."""
         return self.lz[-n:]
 
-    def _create_logdir(self):
-        """Create and assign a directory for logging this dataset's files."""
-        if self.identifier.name == "RGDataset":
-            # TODO(karan): handle temporarily constructed datasets differently
-            self.logdir /= str(self.identifier)
-            self.logdir.mkdir(parents=True, exist_ok=True)
-        else:
-            self.logdir /= str(self.identifier)
-            self.logdir.mkdir(parents=True, exist_ok=True)
-
-    def _autobuild_identifier(self) -> Identifier:
-        """Automatically build an identifier for the dataset using available
-        information."""
-        # Look for a name, otherwise assign a default
-        _name = self.info.builder_name if self.info.builder_name else "RGDataset"
-
-        # Check for split, version information
-        split = str(self.split) if self.split else None
-        version = str(self.version) if self.version else None
-
-        # Add all available information to kwargs dict
-        kwargs = {}
-        if split:
-            kwargs["split"] = split
-        if version:
-            kwargs["version"] = version
-
-        # Create identifier
-        return Identifier(_name=_name, **kwargs)
-
     def _get(self, index, materialize: bool = False):
         if isinstance(index, str):
             # str index => column selection (AbstractColumn)
-            if index in self.column_names:
+            if index in self.columns:
                 return self.data[index]
-            raise AttributeError(f"Column {index} does not exist.")
+            raise KeyError(f"Column `{index}` does not exist.")
 
         elif isinstance(index, int):
             # int index => single row (dict)
             return {
                 k: self.data[k]._get(index, materialize=materialize)
-                for k in self.visible_columns
+                for k in self.columns
             }
 
         # cases where `index` returns a datapanel
@@ -530,14 +276,13 @@ class DataPanel(
             raise TypeError("Invalid index type: {}".format(type(index)))
 
         if index_type == "column":
-            if not set(index).issubset(self.visible_columns):
-                missing_cols = set(index) - set(self.visible_columns)
-                raise ValueError(f"DataPanel does not have columns {missing_cols}")
+            if not set(index).issubset(self.columns):
+                missing_cols = set(index) - set(self.columns)
+                raise KeyError(f"DataPanel does not have columns {missing_cols}")
 
             dp = self._clone(data=self.data[index])
-            dp.visible_columns = index
             return dp
-        elif index_type == "row":
+        elif index_type == "row":  # pragma: no cover
             return self._clone(
                 data=self.data.apply("_get", index=index, materialize=materialize)
             )
@@ -546,19 +291,14 @@ class DataPanel(
     def __getitem__(self, index):
         return self._get(index, materialize=True)
 
-    def get(self, column, value=None):
-        if column in self:
-            return self[column]
-        return value
-
     def __setitem__(self, index, value):
         self.add_column(name=index, data=value, overwrite=True)
 
     @property
     def has_index(self) -> bool:
         """Check if the dataset has an index column."""
-        if self.column_names:
-            return "index" in self.column_names
+        if self.columns:
+            return "index" in self.columns
         # Just return True if the dataset is empty
         return True
 
@@ -592,23 +332,9 @@ class DataPanel(
 
     @classmethod
     @capture_provenance()
-    def from_columns(
-        cls,
-        columns: Dict[str, AbstractColumn],
-        identifier: Identifier = None,
-    ) -> DataPanel:
-        """Create a Dataset from a dict of columns."""
-        return cls(
-            columns,
-            identifier=identifier,
-        )
-
-    @classmethod
-    @capture_provenance()
     def from_jsonl(
         cls,
         json_path: str,
-        identifier: Identifier = None,
     ) -> DataPanel:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
@@ -622,28 +348,23 @@ class DataPanel(
                     data[k].append(line[k])
 
         return cls(
-            data,
-            identifier=identifier
-            if identifier
-            else Identifier("Jsonl", jsonl=json_path),
+            data=data,
         )
 
     @classmethod
-    # @capture_provenance()
+    @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
-        identifier: Identifier = None,
     ) -> DataPanel:
         """Convert a batch to a Dataset."""
-        return cls(batch, identifier=identifier)
+        return cls(batch)
 
     @classmethod
     @capture_provenance()
     def from_batches(
         cls,
         batches: Sequence[Batch],
-        identifier: Identifier = None,
     ) -> DataPanel:
         """Convert a list of batches to a dataset."""
 
@@ -652,7 +373,6 @@ class DataPanel(
                 tz.compose(list, tz.concat),
                 *batches,
             ),
-            identifier=identifier,
         )
 
     @classmethod
@@ -660,7 +380,6 @@ class DataPanel(
     def from_dict(
         cls,
         d: Dict,
-        identifier: Identifier = None,
     ) -> DataPanel:
         """Convert a dictionary to a dataset.
 
@@ -668,7 +387,6 @@ class DataPanel(
         """
         return cls.from_batch(
             batch=d,
-            identifier=identifier,
         )
 
     @classmethod
@@ -676,14 +394,12 @@ class DataPanel(
     def from_pandas(
         cls,
         df: pd.DataFrame,
-        identifier: Identifier = None,
     ):
         """Create a Dataset from a pandas DataFrame."""
         # column names must be str in meerkat
         df = df.rename(mapper=str, axis="columns")
         return cls.from_batch(
             df.to_dict("series"),
-            identifier=identifier,
         )
 
     @classmethod
@@ -707,14 +423,10 @@ class DataPanel(
     def from_feather(
         cls,
         path: str,
-        identifier: Identifier = None,
     ):
         """Create a Dataset from a feather file."""
         return cls.from_batch(
             pd.read_feather(path).to_dict("list"),
-            identifier=Identifier("Feather", path=path)
-            if not identifier
-            else identifier,
         )
 
     @capture_provenance()
@@ -777,8 +489,10 @@ class DataPanel(
             batches of data
         """
         cell_columns, batch_columns = [], []
+        from meerkat.columns.lambda_column import LambdaColumn
+
         for name, column in self.items():
-            if isinstance(column, CellColumn):
+            if isinstance(column, (CellColumn, LambdaColumn)) and materialize:
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)
@@ -842,11 +556,6 @@ class DataPanel(
         # TODO(karan): make this fn go faster
         # most of the time is spent on the merge, speed it up further
 
-        # Return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return self
-
         # Return if `self` has no examples
         if not len(self):
             logger.info("Dataset empty, returning None.")
@@ -903,6 +612,7 @@ class DataPanel(
 
         return new_dp
 
+    @capture_provenance()
     def map(
         self,
         function: Optional[Callable] = None,
@@ -918,7 +628,7 @@ class DataPanel(
         pbar: bool = False,
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
-        input_columns = self.visible_columns if input_columns is None else input_columns
+        input_columns = self.columns if input_columns is None else input_columns
         dp = self[input_columns]
         return super(DataPanel, dp).map(
             function=function,
@@ -949,11 +659,6 @@ class DataPanel(
         **kwargs,
     ) -> Optional[DataPanel]:
         """Filter operation on the DataPanel."""
-
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
 
         # Return if `self` has no examples
         if not len(self):
@@ -1018,14 +723,14 @@ class DataPanel(
         )
 
     def items(self):
-        for name in self.visible_columns:
+        for name in self.columns:
             yield name, self.data[name]
 
     def keys(self):
-        return self.visible_columns
+        return self.columns
 
     def values(self):
-        for name in self.visible_columns:
+        for name in self.columns:
             yield self.data[name]
 
     @classmethod
@@ -1095,12 +800,7 @@ class DataPanel(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {
-            "_identifier",
-            "_visible_columns",
-            "_info",
-            "_split",
-        }
+        return {}
 
     def _view_data(self) -> object:
         return self.data.view()
