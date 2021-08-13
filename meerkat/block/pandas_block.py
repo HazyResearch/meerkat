@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
 import pandas as pd
+import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.numpy_column import NumpyArrayColumn
@@ -79,6 +80,9 @@ class PandasBlock(AbstractBlock):
 
     @staticmethod
     def _convert_index(index):
+        if torch.is_tensor(index):
+            # need to convert to numpy for boolean indexing
+            return index.numpy()
         if isinstance(index, NumpyArrayColumn):
             return index.data
         if isinstance(index, TensorColumn):

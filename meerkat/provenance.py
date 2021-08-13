@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 import weakref
 from copy import copy
 from functools import wraps
@@ -7,6 +8,7 @@ from inspect import getcallargs
 from typing import Any, Dict, List, Mapping, Sequence, Tuple, Union
 
 import meerkat as mk
+from meerkat.errors import ExperimentalWarning
 
 _provenance_enabled = False
 
@@ -47,6 +49,9 @@ def is_provenance_enabled():
 class ProvenanceMixin:
     def __init__(self, *args, **kwargs):
         super(ProvenanceMixin, self).__init__(*args, **kwargs)
+        self._init_node()
+
+    def _init_node(self):
         self._node = ProvenanceObjNode(self)
 
     @property
@@ -246,18 +251,25 @@ def visualize_provenance(
     show_columns: bool = False,
     last_parent_only: bool = False,
 ):
-    try:
+
+    warnings.warn(  # pragma: no cover
+        ExperimentalWarning(
+            "The function `meerkat.provenance.visualize_provenance` is experimental and"
+            " has limited test coverage. Proceed with caution."
+        )
+    )
+    try:  # pragma: no cover
         import cyjupyter
-    except ImportError:
+    except ImportError:  # pragma: no cover
         raise ImportError(
             "`visualize_provenance` requires the `cyjupyter` dependency."
             "See https://github.com/cytoscape/cytoscape-jupyter-widget"
         )
 
-    nodes, edges = obj.get_provenance(
+    nodes, edges = obj.get_provenance(  # pragma: no cover
         include_columns=show_columns, last_parent_only=last_parent_only
     )
-    cy_nodes = [
+    cy_nodes = [  # pragma: no cover
         {
             "data": {
                 "id": id(node),
@@ -267,7 +279,7 @@ def visualize_provenance(
         }
         for node in nodes
     ]
-    cy_edges = [
+    cy_edges = [  # pragma: no cover
         {
             "data": {
                 "source": id(edge[0]),
@@ -278,9 +290,9 @@ def visualize_provenance(
         for edge in edges
     ]
 
-    cy_data = {"elements": {"nodes": cy_nodes, "edges": cy_edges}}
+    cy_data = {"elements": {"nodes": cy_nodes, "edges": cy_edges}}  # pragma: no cover
 
-    style = [
+    style = [  # pragma: no cover
         {
             "selector": "node",
             "css": {
@@ -318,6 +330,6 @@ def visualize_provenance(
             },
         },
     ]
-    return cyjupyter.Cytoscape(
+    return cyjupyter.Cytoscape(  # pragma: no cover
         data=cy_data, visual_style=style, layout_name="breadthfirst"
     )

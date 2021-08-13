@@ -1,4 +1,5 @@
-from typing import Sequence, Union
+from itertools import combinations
+from typing import Sequence, Tuple, Union
 
 import cytoolz as tz
 
@@ -12,6 +13,8 @@ from meerkat.provenance import capture_provenance
 def concat(
     objs: Union[Sequence[DataPanel], Sequence[AbstractColumn]],
     axis: Union[str, int] = "rows",
+    suffixes: Tuple[str] = None,
+    overwrite: bool = False,
 ) -> Union[DataPanel, AbstractColumn]:
     """Concatenate a sequence of columns or a sequence of `DataPanel`s. If
     sequence is empty, returns an empty `DataPanel`.
@@ -59,15 +62,27 @@ def concat(
                     "have the same length."
                 )
 
-            columns = list(tz.concat((dp.columns for dp in objs)))
-            if not tz.isdistinct(columns):
-                raise ConcatError(
-                    "Can only concatenate DataPanels along axis 1 (columns) if they "
-                    "have distinct column names."
-                )
+            # get all column names that appear in more than one DataPanel
+            shared = set()
+            for dp1, dp2 in combinations(objs, 2):
+                shared |= set(dp1.columns) & set(dp2.columns)
 
-            data = tz.merge(*(dict(dp.items()) for dp in objs))
-            return objs[0].from_batch(data)
+            # TODO (sabri): I removed the index column for now to address
+            # https://github.com/robustness-gym/meerkat/issues/65, but when we refactor
+            # index with https://github.com/robustness-gym/meerkat/issues/117 we should
+            # take this out
+            shared -= {"index"}
+            if shared and not overwrite:
+                if suffixes is None:
+                    raise ConcatError("Must ")
+                data = tz.merge(
+                    {k + suffixes[idx] if k in shared else k: v for k, v in dp.items()}
+                    for idx, dp in enumerate(objs)
+                )
+            else:
+                data = tz.merge(dict(dp.items()) for dp in objs)
+
+            return objs[0]._clone(data=data)
         else:
             raise ConcatError(f"Invalid axis `{axis}` passed to concat.")
     elif isinstance(objs[0], AbstractColumn):

@@ -7,7 +7,6 @@ from typing import Dict, Mapping, Sequence, Union
 
 import pandas as pd
 import yaml
-from torch._C import Value
 
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn

@@ -22,6 +22,7 @@ from meerkat.datapanel import DataPanel
 from .columns.test_image_column import ImageColumnTestBed
 from .columns.test_numpy_column import NumpyArrayColumnTestBed
 from .columns.test_pandas_column import PandasSeriesColumnTestBed
+from .columns.test_tensor_column import TensorColumnTestBed
 
 
 class DataPanelTestBed:
@@ -33,6 +34,7 @@ class DataPanelTestBed:
     DEFAULT_COLUMN_CONFIGS = {
         "np": {"testbed_class": NumpyArrayColumnTestBed, "n": 2},
         "pd": {"testbed_class": PandasSeriesColumnTestBed, "n": 2},
+        "torch": {"testbed_class": TensorColumnTestBed, "n": 2},
         "img": {"testbed_class": ImageColumnTestBed, "n": 2},
     }
 
@@ -120,9 +122,17 @@ class DataPanelTestBed:
 
     @classmethod
     @wraps(pytest.mark.parametrize)
-    def parametrize(cls, config: dict = None, params: dict = None):
+    def parametrize(
+        cls,
+        config: dict = None,
+        column_configs: Sequence[Dict] = None,
+        params: dict = None,
+    ):
         return pytest.mark.parametrize(
-            **cls.get_params(config=config, params=params), indirect=["testbed"]
+            **cls.get_params(
+                config=config, params=params, column_configs=column_configs
+            ),
+            indirect=["testbed"],
         )
 
 
@@ -185,8 +195,8 @@ class TestDataPanel:
         params={
             "index_type": [
                 np.array,
-                # pd.Series,
-                # torch.Tensor,
+                pd.Series,
+                torch.Tensor,
                 NumpyArrayColumn,
                 PandasSeriesColumn,
                 TensorColumn,
@@ -197,16 +207,32 @@ class TestDataPanel:
         dp = testbed.dp
         rows = np.arange(len(dp))
 
+        def convert_to_index_type(index, dtype):
+            index = index_type(index)
+            if index_type == torch.Tensor:
+                return index.to(dtype)
+            return index
+
         # slice index => multiple row selection (DataPanel)
         # tuple or list index => multiple row selection (DataPanel)
         # np.array indeex => multiple row selection (DataPanel)
         for rows, indices in (
             (dp[1:3], rows[1:3]),
             (dp[[0, 2]], rows[[0, 2]]),
-            (dp[index_type(np.array((0,)))], rows[np.array((0,))]),
-            (dp[index_type(np.array((1, 1)))], rows[np.array((1, 1))]),
             (
-                dp[index_type(np.array((True, False) * (len(dp) // 2)))],
+                dp[convert_to_index_type(np.array((0,)), dtype=int)],
+                rows[np.array((0,))],
+            ),
+            (
+                dp[convert_to_index_type(np.array((1, 1)), dtype=int)],
+                rows[np.array((1, 1))],
+            ),
+            (
+                dp[
+                    convert_to_index_type(
+                        np.array((True, False) * (len(dp) // 2)), dtype=bool
+                    )
+                ],
                 rows[np.array((True, False) * (len(dp) // 2))],
             ),
         ):
@@ -248,8 +274,8 @@ class TestDataPanel:
         params={
             "index_type": [
                 np.array,
-                # pd.Series,
-                # torch.Tensor,
+                pd.Series,
+                torch.Tensor,
                 NumpyArrayColumn,
                 PandasSeriesColumn,
                 TensorColumn,
@@ -260,16 +286,32 @@ class TestDataPanel:
         dp = testbed.dp
         rows = np.arange(len(dp))
 
+        def convert_to_index_type(index, dtype):
+            index = index_type(index)
+            if index_type == torch.Tensor:
+                return index.to(dtype)
+            return index
+
         # slice index => multiple row selection (DataPanel)
         # tuple or list index => multiple row selection (DataPanel)
         # np.array indeex => multiple row selection (DataPanel)
         for rows, indices in (
             (dp.lz[1:3], rows[1:3]),
             (dp.lz[[0, 2]], rows[[0, 2]]),
-            (dp.lz[index_type(np.array((0,)))], rows[np.array((0,))]),
-            (dp.lz[index_type(np.array((1, 1)))], rows[np.array((1, 1))]),
             (
-                dp.lz[index_type(np.array((True, False) * (len(dp) // 2)))],
+                dp.lz[convert_to_index_type(np.array((0,)), dtype=int)],
+                rows[np.array((0,))],
+            ),
+            (
+                dp.lz[convert_to_index_type(np.array((1, 1)), dtype=int)],
+                rows[np.array((1, 1))],
+            ),
+            (
+                dp.lz[
+                    convert_to_index_type(
+                        np.array((True, False) * (len(dp) // 2)), dtype=bool
+                    )
+                ],
                 rows[np.array((True, False) * (len(dp) // 2))],
             ),
         ):
@@ -288,6 +330,42 @@ class TestDataPanel:
                 # (e.g. LambdaColumn)
                 if value.__class__ == dp[key].__class__:
                     assert dp[key]._clone(data=data).is_equal(value)
+
+    @DataPanelTestBed.parametrize()
+    def test_invalid_indices(self, testbed):
+        dp = testbed.dp
+        index = ["nonexistent_column"]
+        missing_cols = set(index) - set(dp.columns)
+        with pytest.raises(
+            KeyError, match=f"DataPanel does not have columns {missing_cols}"
+        ):
+            dp[index]
+
+        dp = testbed.dp
+        index = "nonexistent_column"
+        with pytest.raises(KeyError, match=f"Column `{index}` does not exist."):
+            dp[index]
+
+        dp = testbed.dp
+        index = np.zeros((len(dp), 10))
+        with pytest.raises(
+            ValueError, match="Index must have 1 axis, not {}".format(len(index.shape))
+        ):
+            dp[index]
+
+        dp = testbed.dp
+        index = torch.zeros((len(dp), 10))
+        with pytest.raises(
+            ValueError, match="Index must have 1 axis, not {}".format(len(index.shape))
+        ):
+            dp[index]
+
+        dp = testbed.dp
+        index = {"a": 1}
+        with pytest.raises(
+            TypeError, match="Invalid index type: {}".format(type(index))
+        ):
+            dp[index]
 
     @DataPanelTestBed.parametrize()
     def test_col_indexing_view_copy_semantics(self, testbed):
@@ -404,6 +482,18 @@ class TestDataPanel:
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
             assert result[key].is_equal(map_spec["expected_result"])
+
+    @DataPanelTestBed.parametrize(
+        column_configs={"img": {"testbed_class": ImageColumnTestBed, "n": 2}},
+        params={"batched": [True, False], "materialize": [True, False]},
+    )
+    def test_map_return_multiple_img_only(
+        self, testbed: DataPanelTestBed, batched: bool, materialize: bool
+    ):
+        testbed.dp.remove_column("index")
+        self.test_map_return_multiple(
+            testbed=testbed, batched=batched, materialize=materialize
+        )
 
     @DataPanelTestBed.parametrize(
         params={

@@ -4,8 +4,6 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
-from contextlib import contextmanager
-from copy import copy
 from typing import (
     Callable,
     Dict,
@@ -208,33 +206,9 @@ class DataPanel(
         `example_or_batch` must have the same columns as the dataset
         (regardless of what columns are visible).
         """
-        if axis == 0 or axis == "rows":
-            # append new rows
-            return meerkat.concat([self, dp], axis="rows")
-        elif axis == 1 or axis == "columns":
-            # append new columns
-            if len(dp) != len(self):
-                raise ValueError(
-                    "Can only append DataPanels along axis 1 (columns) if they have the"
-                    f"same length. {len(self)} != {len(dp)}"
-                )
-
-            shared = set(dp.columns).intersection(set(self.columns))
-            if not overwrite and shared:
-                if suffixes is None:
-                    raise ValueError()
-                left_suf, right_suf = suffixes
-                data = {
-                    **{k + left_suf if k in shared else k: v for k, v in self.items()},
-                    **{k + right_suf if k in shared else k: v for k, v in dp.items()},
-                }
-            else:
-                data = {**dict(self.items()), **dict(dp.items())}
-
-            col = self._clone(data=data)
-            return col
-        else:
-            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+        return meerkat.concat(
+            [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
+        )
 
     def _add_index(self):
         """Add an index to the dataset."""
@@ -253,7 +227,7 @@ class DataPanel(
             # str index => column selection (AbstractColumn)
             if index in self.columns:
                 return self.data[index]
-            raise AttributeError(f"Column {index} does not exist.")
+            raise KeyError(f"Column `{index}` does not exist.")
 
         elif isinstance(index, int):
             # int index => single row (dict)
@@ -304,11 +278,11 @@ class DataPanel(
         if index_type == "column":
             if not set(index).issubset(self.columns):
                 missing_cols = set(index) - set(self.columns)
-                raise ValueError(f"DataPanel does not have columns {missing_cols}")
+                raise KeyError(f"DataPanel does not have columns {missing_cols}")
 
             dp = self._clone(data=self.data[index])
             return dp
-        elif index_type == "row":
+        elif index_type == "row":  # pragma: no cover
             return self._clone(
                 data=self.data.apply("_get", index=index, materialize=materialize)
             )
@@ -316,11 +290,6 @@ class DataPanel(
     # @capture_provenance(capture_args=[])
     def __getitem__(self, index):
         return self._get(index, materialize=True)
-
-    def get(self, column, value=None):
-        if column in self:
-            return self[column]
-        return value
 
     def __setitem__(self, index, value):
         self.add_column(name=index, data=value, overwrite=True)
@@ -363,17 +332,6 @@ class DataPanel(
 
     @classmethod
     @capture_provenance()
-    def from_columns(
-        cls,
-        columns: Dict[str, AbstractColumn],
-    ) -> DataPanel:
-        """Create a Dataset from a dict of columns."""
-        return cls(
-            columns,
-        )
-
-    @classmethod
-    @capture_provenance()
     def from_jsonl(
         cls,
         json_path: str,
@@ -394,7 +352,7 @@ class DataPanel(
         )
 
     @classmethod
-    # @capture_provenance()
+    @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
@@ -531,8 +489,10 @@ class DataPanel(
             batches of data
         """
         cell_columns, batch_columns = [], []
+        from meerkat.columns.lambda_column import LambdaColumn
+
         for name, column in self.items():
-            if isinstance(column, CellColumn):
+            if isinstance(column, (CellColumn, LambdaColumn)) and materialize:
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)
@@ -596,11 +556,6 @@ class DataPanel(
         # TODO(karan): make this fn go faster
         # most of the time is spent on the merge, speed it up further
 
-        # Return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return self
-
         # Return if `self` has no examples
         if not len(self):
             logger.info("Dataset empty, returning None.")
@@ -657,6 +612,7 @@ class DataPanel(
 
         return new_dp
 
+    @capture_provenance()
     def map(
         self,
         function: Optional[Callable] = None,
@@ -703,11 +659,6 @@ class DataPanel(
         **kwargs,
     ) -> Optional[DataPanel]:
         """Filter operation on the DataPanel."""
-
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
 
         # Return if `self` has no examples
         if not len(self):

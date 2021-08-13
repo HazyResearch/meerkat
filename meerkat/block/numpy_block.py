@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
 import numpy as np
+import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.errors import ConsolidationError
@@ -109,9 +110,17 @@ class NumpyBlock(AbstractBlock):
         }
         return BlockRef(block=block, columns=new_columns)
 
+    @staticmethod
+    def _convert_index(index):
+        if torch.is_tensor(index):
+            # need to convert to numpy for boolean indexing
+            return index.numpy()
+        return index
+
     def _get(
         self, index, block_ref: BlockRef, materialize: bool = True
     ) -> Union[BlockRef, dict]:
+        index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]
         if isinstance(index, int):

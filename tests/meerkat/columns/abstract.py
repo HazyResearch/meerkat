@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 
 from meerkat.datapanel import DataPanel
+from meerkat.ops.concat import concat
 
 
 @pytest.fixture
@@ -206,6 +207,15 @@ class TestAbstractColumn:
         )
 
         assert result.is_equal(filter_spec["expected_result"])
+
+    def test_concat(self, testbed: AbstractColumnTestBed, n: int = 2):
+        col = testbed.col
+        out = concat([col] * n)
+
+        assert len(out) == len(col) * n
+        assert isinstance(out, type(col))
+        for i in range(n):
+            assert out.lz[i * len(col) : (i + 1) * len(col)].is_equal(col)
 
     def test_copy(self, testbed: AbstractColumnTestBed):
         col, _ = testbed.col, testbed.data

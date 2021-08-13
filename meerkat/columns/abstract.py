@@ -175,6 +175,12 @@ class AbstractColumn(
         if not self._is_batch_index(index):
             return index
 
+        if isinstance(index, pd.Series):
+            index = index.values
+
+        if torch.is_tensor(index):
+            index = index.numpy()
+
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing

@@ -1,6 +1,5 @@
 """Unittests for Datasets."""
 import os
-from itertools import product
 from typing import Dict
 
 import numpy as np
@@ -9,7 +8,6 @@ import torch
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.image_column import ImageCellColumn, ImageColumn
-from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
@@ -40,6 +38,9 @@ class MergeTestBed(DataPanelTestBed):
     ):
         self.side_to_dp = {}
         if simple:
+            # TODO (Sabri): do away with the simple testbed, and replace with the full
+            # one after updating support for missing values
+            # https://github.com/robustness-gym/meerkat/issues/123
             np.random.seed(1)
             self.side_to_dp["left"] = DataPanel.from_batch(
                 {
@@ -49,14 +50,16 @@ class MergeTestBed(DataPanelTestBed):
                     "d": (torch.arange(lengths["left"]) % 3),
                     "e": [f"1_{i}" for i in np.arange(lengths["left"])],
                 }
-            ).lz[np.random.permutation(np.arange(len(lengths["left"])))]
+            ).lz[np.random.permutation(np.arange(lengths["left"]))]
 
-            self.side_to_dp["right"] = {
-                "key": np.arange(lengths["right"]),
-                "b": list(np.arange(lengths["right"])),
-                "e": [f"1_{i}" for i in np.arange(lengths["right"])],
-                "f": (np.arange(lengths["right"]) % 2),
-            }
+            self.side_to_dp["right"] = DataPanel.from_batch(
+                {
+                    "key": np.arange(lengths["right"]),
+                    "b": list(np.arange(lengths["right"])),
+                    "e": [f"1_{i}" for i in np.arange(lengths["right"])],
+                    "f": (np.arange(lengths["right"]) % 2),
+                }
+            )
         else:
             for side in ["left", "right"]:
                 side_tmpdir = os.path.join(tmpdir, side)
@@ -145,17 +148,17 @@ class TestMerge:
         assert len(out) == len(a1 | a2)
 
         # check columns
-        expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f", "index"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
         if sort:
-            assert np.all(np.diff(out["a"]) >= 0)
+            assert np.all(np.diff(out["key"]) >= 0)
 
         # check for `None` at unmatched rows
-        mask_both = np.where([val in (a1 & a2) for val in out["a"]])[0]
-        mask_1 = np.where([val in (a1 - a2) for val in out["a"]])[0]
-        mask_2 = np.where([val in (a2 - a1) for val in out["a"]])[0]
+        mask_both = np.where([val in (a1 & a2) for val in out["key"]])[0]
+        mask_1 = np.where([val in (a1 - a2) for val in out["key"]])[0]
+        mask_2 = np.where([val in (a2 - a1) for val in out["key"]])[0]
         # check for equality at matched rows
         assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
         # check for `values` at unmatched rows
@@ -172,42 +175,38 @@ class TestMerge:
         assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
         assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
 
-    @MergeTestBed.parametrize(params={"sort": [True, False]})
+    @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_left(self, testbed, sort):
-        dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
-            length1=16,
-            length2=12,
-            use_visible_columns=use_visible_columns,
+        dp1, dp2 = (
+            testbed.side_to_dp["left"],
+            testbed.side_to_dp["right"],
         )
         out = dp1.merge(
             dp2,
-            on="a",
+            on="key",
             how="left",
             keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
 
-        a1 = set(shuffle1)
-        a2 = set(shuffle2)
+        a1 = set(dp1["key"])
+        a2 = set(dp2["key"])
 
         assert isinstance(out, DataPanel)
         assert len(out) == len(a1)
 
         # check columns
-        if use_visible_columns:
-            expected_columns = ["a", "b_1", "b_2", "c"]
-        else:
-            expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "index", "f"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
         if sort:
-            assert np.all(np.diff(out["a"]) >= 0)
+            assert np.all(np.diff(out["key"]) >= 0)
 
         # check for `None` at unmatched rows
-        mask_both = np.where([val in (a1 & a2) for val in out["a"]])[0]
-        mask_1 = np.where([val in (a1 - a2) for val in out["a"]])[0]
+        mask_both = np.where([val in (a1 & a2) for val in out["key"]])[0]
+        mask_1 = np.where([val in (a1 - a2) for val in out["key"]])[0]
 
         # check for equality at matched rows
         assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
@@ -216,48 +215,43 @@ class TestMerge:
         # check for `None` at unmatched rows
         assert list(out.lz[mask_1]["b_2"]) == [None] * len(mask_1)
 
-        if not use_visible_columns:
-            # check for `values` at unmatched rows
-            assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
-            # check for equality at matched rows
-            assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
+        # check for `values` at unmatched rows
+        assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
+        # check for equality at matched rows
+        assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
 
-    @MergeTestBed.parametrize(params={"sort": [True, False]})
+    @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_right(self, testbed, sort):
-        dp1, dp2, visible_columns, shuffle1, shuffle2 = get_dps(
-            length1=16,
-            length2=12,
-            use_visible_columns=use_visible_columns,
+        dp1, dp2 = (
+            testbed.side_to_dp["left"],
+            testbed.side_to_dp["right"],
         )
         out = dp1.merge(
             dp2,
-            on="a",
+            on="key",
             how="right",
             keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
 
-        a1 = set(shuffle1)
-        a2 = set(shuffle2)
+        a1 = set(dp1["key"])
+        a2 = set(dp2["key"])
 
         assert isinstance(out, DataPanel)
         assert len(out) == len(a2)
 
         # check columns
-        if use_visible_columns:
-            expected_columns = ["a", "b_1", "b_2", "c"]
-        else:
-            expected_columns = ["a", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f", "index"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
         if sort:
-            assert np.all(np.diff(out["a"]) >= 0)
+            assert np.all(np.diff(out["key"]) >= 0)
 
         # check for `None` at unmatched rows
-        mask_both = np.where([val in (a1 & a2) for val in out["a"]])[0]
-        mask_2 = np.where([val in (a2 - a1) for val in out["a"]])[0]
+        mask_both = np.where([val in (a1 & a2) for val in out["key"]])[0]
+        mask_2 = np.where([val in (a2 - a1) for val in out["key"]])[0]
         # check for equality at matched rows
         assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
         # check for `values` at unmatched rows
@@ -265,13 +259,12 @@ class TestMerge:
         # check for `None` at unmatched rows
         assert list(out.lz[mask_2]["b_1"]) == [None] * len(mask_2)
 
-        if not use_visible_columns:
-            # check for `values` at unmatched rows
-            assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
-            # check for equality at matched rows
-            assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
+        # check for `values` at unmatched rows
+        assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
+        # check for equality at matched rows
+        assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
 
-    def test_merge_output_column_types():
+    def test_merge_output_column_types(self):
         dp1 = DataPanel.from_batch(
             {"a": np.arange(3), "b": ListColumn(["1", "2", "3"])}
         )
@@ -280,7 +273,7 @@ class TestMerge:
         out = dp1.merge(dp2, on="b", how="inner")
         assert isinstance(out["b"], ListColumn)
 
-    def test_image_merge(tmpdir):
+    def test_image_merge(self, tmpdir):
         length = 16
         img_col_test_bed = MockImageColumn(length=length, tmpdir=tmpdir)
         dp1 = DataPanel.from_batch(
@@ -302,7 +295,7 @@ class TestMerge:
             img_col_test_bed.image_paths[row] for row in rows
         ]
 
-    def test_cell_merge(tmpdir):
+    def test_cell_merge(self, tmpdir):
         length = 16
         img_col_test_bed = MockImageColumn(
             length=length, tmpdir=tmpdir, use_cell_column=True
@@ -326,7 +319,7 @@ class TestMerge:
             img_col_test_bed.image_paths[row] for row in rows
         ]
 
-    def test_cell_merge_names(tmpdir):
+    def test_cell_merge_names(self, tmpdir):
         length = 16
         img_col_test_bed = MockImageColumn(
             length=length, tmpdir=tmpdir, use_cell_column=True
@@ -363,7 +356,7 @@ class TestMerge:
         with pytest.raises(MergeError):
             dp1.merge(dp2)
 
-    def test_check_merge_columns():
+    def test_check_merge_columns(self):
         length = 16
         # check dictionary not hashable
         dp1 = DataPanel.from_batch(
