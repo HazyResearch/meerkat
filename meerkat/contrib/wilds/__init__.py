@@ -201,7 +201,7 @@ class WILDSInputColumn(AbstractColumn):
     def get_metadata_columns(self):
         return self.metadata_columns
 
-    def _get_cell(self, index: int):
+    def _get_cell(self, index: int, materialize: bool = True):
         # only get input (not y and meta)
         return self.data[index][0]
 
