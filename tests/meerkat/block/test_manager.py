@@ -1,3 +1,4 @@
+import os
 from itertools import product
 
 import numpy as np
@@ -263,6 +264,7 @@ def test_len(num_blocks, consolidated):
 
 
 def test_io(tmpdir):
+    tmpdir = os.path.join(tmpdir, "test")
     mgr = BlockManager()
 
     col1 = mk.NumpyArrayColumn(data=np.arange(10))
@@ -294,3 +296,32 @@ def test_io(tmpdir):
 
     for idx in range(7, 8):
         assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data
+
+    # test overwriting
+    col1 = mk.NumpyArrayColumn(data=np.arange(10) * 100)
+    mgr.add_column(col1, "col1")
+    mgr.remove("col9")
+    assert os.path.exists(os.path.join(tmpdir, "columns", "col9"))
+    mgr.write(tmpdir)
+    # make sure the old column was removed
+    assert not os.path.exists(os.path.join(tmpdir, "columns", "col9"))
+    new_mgr = BlockManager.read(tmpdir)
+    assert len(new_mgr._block_refs) == 3
+
+    for idx in range(1, 7):
+        assert (mgr[f"col{idx}"] == new_mgr[f"col{idx}"]).all()
+
+    for idx in range(7, 8):
+        assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data
+
+
+def test_io_no_overwrite(tmpdir):
+    new_dir = os.path.join(tmpdir, "test")
+    os.mkdir(new_dir)
+    mgr = BlockManager()
+
+    with pytest.raises(
+        IsADirectoryError,
+        match=f"Cannot write `BlockManager`. {new_dir} is a directory.",
+    ):
+        mgr.write(new_dir)

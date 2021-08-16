@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, Mapping, Sequence, Union
@@ -212,17 +213,35 @@ class BlockManager(MutableMapping):
         }
 
         # prepare directories
-        os.makedirs(path, exist_ok=True)
-        block_dirs = os.path.join(path, "blocks")
-        os.makedirs(block_dirs)
         columns_dir = os.path.join(path, "columns")
+        blocks_dir = os.path.join(path, "blocks")
+        meta_path = os.path.join(path, "meta.yaml")
+        if os.path.isdir(path):
+            if (
+                os.path.exists(meta_path)
+                and os.path.exists(columns_dir)
+                and os.path.exists(blocks_dir)
+            ):
+                # if overwriting, ensure that old columns are removed
+                shutil.rmtree(columns_dir)
+                shutil.rmtree(blocks_dir)
+            else:
+                # if path already points to a dir that wasn't previously holding a
+                # block manager, do not overwrite it. We'd like to protect against
+                # situation in which user accidentally puts in an important directory
+                raise IsADirectoryError(
+                    f"Cannot write `BlockManager`. {path} is a directory."
+                )
+
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(blocks_dir)
         os.makedirs(columns_dir)
 
         # consolidate before writing
         self.consolidate()
         for block_id, block_ref in self._block_refs.items():
             block: AbstractBlock = block_ref.block
-            block_dir = os.path.join(block_dirs, str(block_id))
+            block_dir = os.path.join(blocks_dir, str(block_id))
             block.write(block_dir)
 
             for name, column in block_ref.items():
@@ -247,7 +266,6 @@ class BlockManager(MutableMapping):
             column.write(os.path.join(columns_dir, name))
 
         # Save the metadata as a yaml file
-        meta_path = os.path.join(path, "meta.yaml")
         yaml.dump(meta, open(meta_path, "w"))
 
     @classmethod

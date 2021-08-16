@@ -786,7 +786,6 @@ class DataPanel(
 
         # write the block manager
         mgr_dir = os.path.join(path, "mgr")
-        os.makedirs(mgr_dir, exist_ok=True)
         self.data.write(mgr_dir)
 
         # Write the state
