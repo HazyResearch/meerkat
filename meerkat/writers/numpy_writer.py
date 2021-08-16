@@ -53,6 +53,7 @@ class NumpyMemmapWriter(AbstractWriter):
         # Open the file as a memmap
         self.file = np.memmap(path, dtype=dtype, mode=mode, shape=shape)
         self._pointer = 0
+        self.path = path
 
     def write(self, arr, **kwargs) -> None:
         self.file[self._pointer : self._pointer + len(arr)] = arr
