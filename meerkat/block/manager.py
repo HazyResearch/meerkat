@@ -214,9 +214,9 @@ class BlockManager(MutableMapping):
         # prepare directories
         os.makedirs(path, exist_ok=True)
         block_dirs = os.path.join(path, "blocks")
-        os.makedirs(block_dirs)
+        os.makedirs(block_dirs, exist_ok=True)
         columns_dir = os.path.join(path, "columns")
-        os.makedirs(columns_dir)
+        os.makedirs(columns_dir, exist_ok=True)
 
         # consolidate before writing
         self.consolidate()

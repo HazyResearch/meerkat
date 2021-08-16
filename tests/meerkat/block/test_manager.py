@@ -294,3 +294,17 @@ def test_io(tmpdir):
 
     for idx in range(7, 8):
         assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data
+
+    col1 = mk.NumpyArrayColumn(data=np.arange(10) * 100)
+    mgr.add_column(col1, "col1")
+
+    # test overwriting
+    mgr.write(tmpdir)
+    new_mgr = BlockManager.read(tmpdir)
+    assert len(new_mgr._block_refs) == 3
+
+    for idx in range(1, 7):
+        assert (mgr[f"col{idx}"] == new_mgr[f"col{idx}"]).all()
+
+    for idx in range(7, 8):
+        assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data
