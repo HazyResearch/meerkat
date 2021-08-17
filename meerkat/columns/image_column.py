@@ -25,9 +25,7 @@ class ImageColumn(LambdaColumn):
         *args,
         **kwargs,
     ):
-        super(ImageColumn, self).__init__(
-            PandasSeriesColumn.from_data(data), *args, **kwargs
-        )
+        super(ImageColumn, self).__init__(PandasSeriesColumn(data), *args, **kwargs)
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
 
