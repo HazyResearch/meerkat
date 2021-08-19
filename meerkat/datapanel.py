@@ -25,6 +25,7 @@ import torch
 import ujson as json
 import yaml
 from jsonlines import jsonlines
+from pandas._libs import lib
 
 import meerkat
 from meerkat.block.manager import BlockManager
@@ -121,7 +122,12 @@ class DataPanel(
                     "Cannot set DataPanel `data` to a Sequence containing object of "
                     f" type {type(value[0])}. Must be a Sequence of Mapping."
                 )
-            self._data = BlockManager.from_dict(tz.merge_with(list, *value))
+            gen = (list(x.keys()) for x in value)
+            columns = lib.fast_unique_multiple_list_gen(gen)
+            data = lib.dicts_to_array(value, columns=columns)
+            # Assert all columns are the same length
+            data = {column: list(data[:, idx]) for idx, column in enumerate(columns)}
+            self._data = BlockManager.from_dict(data)
         elif value is None:
             self._data = BlockManager()
         else:

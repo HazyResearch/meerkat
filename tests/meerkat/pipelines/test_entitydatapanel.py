@@ -204,7 +204,7 @@ def test_append_entities():
     }
     assert ent3.columns == ["a", "b", "c", "d", "e", "f", "index", "g", "h"]
     assert ent3["h"].tolist() == gold_data["h"]
-    assert ent3["c"]._data == gold_data["c"]
+    assert (ent3["c"]._data == gold_data["c"]).all()
     assert ent3._index_column == "c"
     assert ent3._embedding_columns == ["g"]
 

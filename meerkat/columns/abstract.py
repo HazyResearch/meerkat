@@ -411,7 +411,13 @@ class AbstractColumn(
                 from .numpy_column import NumpyArrayColumn
 
                 return NumpyArrayColumn(data)
-            elif len(data) != 0 and torch.is_tensor(data[0]):
+
+            if len(data) != 0 and isinstance(data[0], str):
+                from .pandas_column import PandasSeriesColumn
+
+                return PandasSeriesColumn(data)
+
+            if len(data) != 0 and torch.is_tensor(data[0]):
                 from .tensor_column import TensorColumn
 
                 return TensorColumn(data)

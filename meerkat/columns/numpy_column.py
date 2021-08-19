@@ -153,7 +153,7 @@ class NumpyArrayColumn(
     def is_equal(self, other: AbstractColumn) -> bool:
         if other.__class__ != self.__class__:
             return False
-        return (self.data == other.data).all()
+        return np.array_equal(self.data, other.data, equal_nan=True)
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):

@@ -207,7 +207,7 @@ class EntityDataPanel(DataPanel):
         elif axis == 1 or axis == "columns":
             # append new columns; must make sure the entities are in the same order
             # data property takes `visible_rows` into account
-            if self.index.data != dp.index.data:
+            if not (self.index.data == dp.index.data).all():
                 raise ValueError(
                     "Can only append along axis 1 (columns) if the entity indexes match"
                 )
