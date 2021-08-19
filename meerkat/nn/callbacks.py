@@ -1,3 +1,5 @@
+import warnings
+
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 from meerkat.nn.activation import ActivationOp
@@ -10,13 +12,20 @@ class ActivationCallback(pl.callbacks.Callback):
     def __init__(
         self,
         target_module: str,
-        log_dir: str,  # TODO(Priya): Use trainer.log_dir?
+        val_len: int,
+        logdir: str,  # TODO(Priya): Use trainer.log_dir?
         mmap: bool = False,
     ):
         super().__init__()
         self.target_module = target_module
-        self.log_dir = log_dir
-        self.mmap = mmap  # TODO(Priya): Raise Warning
+        self.val_len = val_len
+        self.logdir = logdir
+        self.mmap = mmap
+
+        if self.mmap:
+            warnings.warn(
+                "Activations will be stored as numpy array when using memmapping."
+            )
 
     def on_validation_epoch_start(self, trainer, pl_module):
         if not trainer.running_sanity_check:
@@ -29,14 +38,16 @@ class ActivationCallback(pl.callbacks.Callback):
         self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx
     ):
         if not trainer.running_sanity_check:
-
             activations = self.activation_op.extractor.activation.cpu().detach()
 
             # Use the first batch for setup
             if batch_idx == 0:
                 if self.mmap:
-                    shape = (len(batch), *activations.shape[1:])
-                    path = f"{self.log_dir}/activation_{self.target_module}"
+                    shape = (self.val_len, *activations.shape[1:])
+
+                    # TODO(Priya): File name format
+                    file = f"activations_{self.target_module}_{trainer.current_epoch}"
+                    path = f"{self.logdir}/{file}"
                     self.writer.open(str(path), shape=shape)
 
                 else:
@@ -48,4 +59,7 @@ class ActivationCallback(pl.callbacks.Callback):
             activations = {f"activation_{self.target_module}": self.writer.flush()}
             activations = DataPanel.from_batch(activations)
 
-        # TODO(Priya): Store the datapanels, write to disk, or log
+            if not self.mmap:
+                file = f"activations_{self.target_module}_{trainer.current_epoch}"
+                path = f"{self.logdir}/{file}"
+                activations.write(path)
