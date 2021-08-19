@@ -785,7 +785,10 @@ class TestDataPanel:
                 data_to_compare = dp_new[k]._data.tolist()
             else:
                 data_to_compare = dp_new[k]._data
-            assert data_to_compare == data[k]
+            if k == "d":
+                assert data_to_compare == data[k]
+            else:
+                assert (data_to_compare == np.array(data[k])).all()
         temp_f.close()
 
     def test_from_batch(self):
@@ -833,7 +836,7 @@ class TestDataPanel:
         assert (df["d"].values == dp["d"].numpy()).all()
         assert (df["e"].values == dp["e"].values).all()
 
-    def test_constructo(self):
+    def test_constructor(self):
         length = 16
 
         # from dictionary
@@ -853,11 +856,27 @@ class TestDataPanel:
         assert dp.columns == ["a", "b", "index"]
 
         # from list of dictionaries
-        data = [{"a": idx, "b": str(idx)} for idx in range(length)]
+        data = [{"a": idx, "b": str(idx), "c": {"test": idx}} for idx in range(length)]
         dp = DataPanel(data=data)
         assert len(dp) == length
         assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
-        assert dp.columns == ["a", "b", "index"]
+        assert isinstance(dp["c"], ListColumn)
+        assert dp.columns == ["a", "b", "c", "index"]
+
+        # from list of dictionaries, missing values
+        data = [
+            {"a": idx, "b": str(idx)}
+            if (idx % 2 == 0)
+            else {"a": idx, "b": str(idx), "c": idx}
+            for idx in range(length)
+        ]
+        dp = DataPanel(data=data)
+        assert len(dp) == length
+        assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+        assert dp["c"].is_equal(
+            NumpyArrayColumn([np.nan if idx % 2 == 0 else idx for idx in range(length)])
+        )
+        assert dp.columns == ["a", "b", "c", "index"]
 
         # from nothing
         dp = DataPanel()
