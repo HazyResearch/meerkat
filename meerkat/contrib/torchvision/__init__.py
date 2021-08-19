@@ -45,8 +45,8 @@ def get_cifar10(download_dir, is_train=True, frac_val=0.0, transforms=None):
         """Convert to PIL image and then apply the transforms."""
         x = Image.fromarray(x)
         if transforms:
-            return x
-        return transforms(x)
+            return transforms(x)
+        return x
 
     dp["image"] = mk.LambdaColumn(dp["raw_image"], _transform)
     dp["split"] = np.array(["train"] * len(dp))
