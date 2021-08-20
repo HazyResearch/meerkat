@@ -50,7 +50,9 @@ class ImageColumn(LambdaColumn):
         *args,
         **kwargs,
     ):
-        super(ImageColumn, self).__init__(PandasSeriesColumn(data), *args, **kwargs)
+        if not isinstance(data, PandasSeriesColumn):
+            data = PandasSeriesColumn(data)
+        super(ImageColumn, self).__init__(data, *args, **kwargs)
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
 
