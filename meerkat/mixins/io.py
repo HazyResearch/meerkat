@@ -4,53 +4,6 @@ import dill
 import yaml
 
 
-class CellIOMixin:
-    def write(self, path: str) -> None:
-        """Write a cell to disk."""
-
-        # Create the paths
-        os.makedirs(path, exist_ok=True)
-        data_path = os.path.join(path, "data.dill")
-        metadata_path = os.path.join(path, "meta.yaml")
-
-        # Get the object state
-        state = self.get_state()
-
-        # Store the metadata
-        yaml.dump(
-            {
-                "dtype": type(self),
-                **self.metadata,
-            },
-            open(metadata_path, "w"),
-        )
-
-        # Store the data
-        dill.dump(state, open(data_path, "wb"))
-
-    @classmethod
-    def read(cls, path: str, *args, **kwargs) -> object:
-        """Read the cell from disk."""
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
-        # Create the paths
-        data_path = os.path.join(path, "data.dill")
-        metadata_path = os.path.join(path, "meta.yaml")
-
-        # Load the metadata in
-        metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
-        return metadata["dtype"].from_state(
-            dill.load(open(data_path, "rb")), *args, **kwargs
-        )
-
-    @classmethod
-    def read_metadata(cls, path: str) -> dict:
-        """Lightweight alternative to full read."""
-        meta_path = os.path.join(path, "meta.yaml")
-        return dict(yaml.load(open(meta_path, "r"), Loader=yaml.FullLoader))
-
-
 class ColumnIOMixin:
     def write(self, path: str, *args, **kwargs) -> None:
         assert hasattr(self, "_data"), f"{self.__class__.__name__} requires `self.data`"
