@@ -19,6 +19,7 @@ from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
+from .columns.test_cell_column import CellColumnTestBed
 from .columns.test_image_column import ImageColumnTestBed
 from .columns.test_numpy_column import NumpyArrayColumnTestBed
 from .columns.test_pandas_column import PandasSeriesColumnTestBed
@@ -36,6 +37,7 @@ class DataPanelTestBed:
         "pd": {"testbed_class": PandasSeriesColumnTestBed, "n": 2},
         "torch": {"testbed_class": TensorColumnTestBed, "n": 2},
         "img": {"testbed_class": ImageColumnTestBed, "n": 2},
+        "cell": {"testbed_class": CellColumnTestBed, "n": 2},
     }
 
     def __init__(
@@ -662,12 +664,16 @@ class TestDataPanel:
         # check that there are no duplicate columns
         assert set(dp.columns) == set(["a", "b", "index"])
 
-    @DataPanelTestBed.parametrize()
-    def test_io(self, testbed, tmp_path):
+    @DataPanelTestBed.parametrize(params={"move": [True, False]})
+    def test_io(self, testbed, tmp_path, move):
         """`map`, mixed datapanel, return multiple, `is_batched_fn=True`"""
         dp = testbed.dp
         path = os.path.join(tmp_path, "test")
         dp.write(path)
+        if move:
+            new_path = os.path.join(tmp_path, "new_test")
+            os.rename(path, new_path)
+            path = new_path
         new_dp = DataPanel.read(path)
 
         assert isinstance(new_dp, DataPanel)

@@ -5,9 +5,7 @@ from typing import Collection, Sequence
 
 import pandas as pd
 
-from meerkat.cells.imagepath import ImagePath
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.tools.lazy_loader import LazyLoader
@@ -99,26 +97,4 @@ class ImageColumn(LambdaColumn):
             and (self.loader == other.loader)
             and (self.transform == other.transform)
             and self.data.is_equal(other.data)
-        )
-
-
-class ImageCellColumn(CellColumn):
-    def __init__(self, *args, **kwargs):
-        super(ImageCellColumn, self).__init__(*args, **kwargs)
-
-    @classmethod
-    def from_filepaths(
-        cls,
-        filepaths: Sequence[str] = None,
-        loader: callable = None,
-        transform: callable = None,
-        *args,
-        **kwargs,
-    ):
-        cells = [ImagePath(fp, transform=transform, loader=loader) for fp in filepaths]
-
-        return cls(
-            cells=cells,
-            *args,
-            **kwargs,
         )

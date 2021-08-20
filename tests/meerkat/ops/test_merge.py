@@ -7,7 +7,7 @@ import pytest
 import torch
 
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.image_column import ImageCellColumn, ImageColumn
+from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
@@ -295,54 +295,6 @@ class TestMerge:
             img_col_test_bed.image_paths[row] for row in rows
         ]
 
-    def test_cell_merge(self, tmpdir):
-        length = 16
-        img_col_test_bed = MockImageColumn(
-            length=length, tmpdir=tmpdir, use_cell_column=True
-        )
-        dp1 = DataPanel.from_batch(
-            {
-                "a": np.arange(length),
-                "img": img_col_test_bed.col,
-            }
-        )
-        rows = np.arange(4, 8)
-        dp2 = DataPanel.from_batch(
-            {
-                "a": rows,
-            }
-        )
-
-        out = dp1.merge(dp2, on="a", how="inner")
-        assert isinstance(out["img"], ImageCellColumn)
-        assert [str(cell.filepath) for cell in out["img"].data] == [
-            img_col_test_bed.image_paths[row] for row in rows
-        ]
-
-    def test_cell_merge_names(self, tmpdir):
-        length = 16
-        img_col_test_bed = MockImageColumn(
-            length=length, tmpdir=tmpdir, use_cell_column=True
-        )
-        dp1 = DataPanel.from_batch(
-            {
-                "dicom_id": np.arange(length),
-                "dicom": img_col_test_bed.col,
-            }
-        )
-        rows = np.arange(4, 8)
-        dp2 = DataPanel.from_batch(
-            {
-                "dicom_id": rows,
-            }
-        )
-
-        out = dp1.merge(dp2, on="dicom_id", how="inner")
-        assert isinstance(out["dicom"], ImageCellColumn)
-        assert [str(cell.filepath) for cell in out["dicom"].data] == [
-            img_col_test_bed.image_paths[row] for row in rows
-        ]
-
     def test_no_on(self):
         length = 16
         # check dictionary not hashable
@@ -409,7 +361,7 @@ class TestMerge:
         # checks if Cells in cell columns are NOT hashable
         dp1 = DataPanel.from_batch(
             {
-                "a": ImageCellColumn.from_filepaths(["a"] * length),
+                "a": ImageColumn.from_filepaths(["a"] * length),
                 "b": list(np.arange(length)),
             }
         )

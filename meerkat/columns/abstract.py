@@ -393,12 +393,6 @@ class AbstractColumn(
 
         if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
-            from ..cells.imagepath import ImagePath
-
-            if len(data) != 0 and isinstance(data[0], ImagePath):
-                from .image_column import ImageColumn
-
-                return ImageColumn.from_cells(data)
 
             if len(data) != 0 and isinstance(data[0], AbstractCell):
                 from .cell_column import CellColumn

@@ -104,7 +104,9 @@ class CellColumnTestBed(AbstractColumnTestBed):
         else:
             if batched:
                 return {
-                    "fn": lambda x, k=0: np.array([cell.data for cell in x]) + salt + k,
+                    "fn": lambda x, k=0: np.array([cell.data for cell in x.data])
+                    + salt
+                    + k,
                     "expected_result": NumpyArrayColumn.from_array(
                         self.data + salt + kwarg
                     ),
@@ -121,7 +123,11 @@ class CellColumnTestBed(AbstractColumnTestBed):
         if materialize:
             return self.data[index] + 1
         else:
-            return self.cells[index]
+            if isinstance(index, int):
+                return self.cells[index]
+            else:
+                index = np.arange(len(self.cells))[index]
+                return [self.cells[idx] for idx in index]
 
     @staticmethod
     def assert_data_equal(

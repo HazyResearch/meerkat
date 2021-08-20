@@ -10,7 +10,7 @@ import pytest
 import torch
 from PIL import Image
 
-from meerkat.columns.image_column import ImageCellColumn, ImageColumn
+from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
 
@@ -137,7 +137,7 @@ class MockAnyColumn:
 
 
 class MockImageColumn:
-    def __init__(self, length: int, tmpdir: str, use_cell_column: bool = False):
+    def __init__(self, length: int, tmpdir: str):
         """[summary]
 
         Args:
@@ -158,7 +158,4 @@ class MockImageColumn:
             im = Image.fromarray(self.image_arrays[-1])
             im.save(self.image_paths[-1])
 
-        if use_cell_column:
-            self.col = ImageCellColumn.from_filepaths(self.image_paths)
-        else:
-            self.col = ImageColumn.from_filepaths(self.image_paths)
+        self.col = ImageColumn.from_filepaths(self.image_paths)

@@ -10,7 +10,6 @@ from meerkat.logging.utils import (
 initialize_logging()
 
 from meerkat.cells.abstract import AbstractCell
-from meerkat.cells.imagepath import ImagePath
 from meerkat.cells.spacy import LazySpacyCell, SpacyCell
 from meerkat.cells.volume import MedicalVolumeCell
 from meerkat.columns.abstract import AbstractColumn
