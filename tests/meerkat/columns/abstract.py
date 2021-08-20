@@ -116,7 +116,10 @@ class TestAbstractColumn:
             col_index = index_type(index) if isinstance(index, np.ndarray) else index
             data_to_set = self._get_data_to_set(testbed, index)
             col[col_index] = data_to_set
-            testbed.assert_data_equal(data_to_set, testbed.get_data(index))
+            if isinstance(index, int):
+                testbed.assert_data_equal(data_to_set, col.lz[col_index])
+            else:
+                testbed.assert_data_equal(data_to_set, col.lz[col_index].data)
 
     def test_map_return_single(
         self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
