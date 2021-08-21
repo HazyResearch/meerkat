@@ -6,6 +6,7 @@ from typing import Collection, Mapping, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
@@ -164,5 +165,11 @@ class LambdaColumn(AbstractColumn):
 
     @staticmethod
     def _read_data(path: str):
-        # TODO (Sabri): make this work for dataframes underlying the lambda column
-        return AbstractColumn.read(os.path.join(path, "data"))
+        meta = yaml.load(
+            open(os.path.join(path, "data", "meta.yaml")),
+            Loader=yaml.FullLoader,
+        )
+        if issubclass(meta["dtype"], AbstractColumn):
+            return AbstractColumn.read(os.path.join(path, "data"))
+        else:
+            return DataPanel.read(os.path.join(path, "data"))
