@@ -81,13 +81,24 @@ class DataPanel(
         if not self.has_index:
             self._add_index()
 
-    def _repr_pandas_(self):
-        return self.data._repr_pandas_()[self.columns].rename(
-            columns={k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
+    def _repr_pandas_(self, max_rows: int = None):
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        df, formatters = self.data._repr_pandas_(max_rows=max_rows)
+        rename = {k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
+        return (
+            df[self.columns].rename(columns=rename),
+            {rename[k]: v for k, v in formatters.items()},
         )
 
-    def _repr_html_(self):
-        return self._repr_pandas_()._repr_html_()
+    def _repr_html_(self, max_rows: int = None):
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        df, formatters = self._repr_pandas_(max_rows=max_rows)
+
+        return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
 
     def streamlit(self):
         return self._repr_pandas_()

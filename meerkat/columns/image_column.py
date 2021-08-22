@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Collection, Sequence
 
-import pandas as pd
-
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -39,6 +37,12 @@ class ImageCell(LambdaCell):
             and (self.transform == other.transform)
             and (self.loader == other.loader)
         )
+
+    def __repr__(self):
+        transform = getattr(self.transform, "__qualname__", repr(self.transform))
+        dirs = self.data.split("/")
+        short_path = ("" if len(dirs) <= 2 else ".../") + "/".join(dirs[-2:])
+        return f"ImageCell({short_path}, transform={transform})"
 
 
 class ImageColumn(LambdaColumn):
@@ -89,9 +93,6 @@ class ImageColumn(LambdaColumn):
     @classmethod
     def _state_keys(cls) -> Collection:
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
-
-    def _repr_pandas_(self) -> pd.Series:
-        return "ImageCell(" + self.data.data.reset_index(drop=True) + ")"
 
     def is_equal(self, other: AbstractColumn) -> bool:
         return (

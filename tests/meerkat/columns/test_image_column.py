@@ -5,12 +5,14 @@ import os
 from typing import List, Union
 
 import numpy as np
+import pandas as pd
 import pytest
 import torch
 import torchvision.datasets.folder as folder
 from PIL import Image
 from torchvision.transforms.functional import to_tensor
 
+import meerkat
 from meerkat import ImageColumn
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.image_column import ImageCell
@@ -281,3 +283,17 @@ class TestImageColumn(TestAbstractColumn):
     @ImageColumnTestBed.parametrize()
     def test_pickle(self, testbed):
         super().test_pickle(testbed)
+
+    @ImageColumnTestBed.parametrize(
+        params={"show_images": [True, False], "max_rows": [6, 16, 20]}
+    )
+    def test_repr_pandas(self, testbed, show_images, max_rows):
+        meerkat.config.DisplayOptions.max_rows = max_rows
+        meerkat.config.DisplayOptions.show_images = show_images
+        series, formatter = testbed.col._repr_pandas_()
+        assert isinstance(series, pd.Series)
+        assert len(series) == min(len(series), max_rows + 1)
+        if show_images:
+            assert callable(formatter)
+        else:
+            assert formatter is None

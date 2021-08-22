@@ -164,11 +164,11 @@ class NumpyArrayColumn(
         else:
             return ConcatWriter(template=template, output_type=NumpyArrayColumn)
 
-    def _repr_pandas_(self) -> pd.Series:
+    def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
-            return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
+            return f"np.ndarray(shape={self.shape[1:]})"
         else:
-            return pd.Series(self.data)
+            return self[index]
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is

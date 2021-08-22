@@ -5,8 +5,6 @@ import logging
 from typing import Sequence
 
 import cytoolz as tz
-import numpy as np
-import pandas as pd
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
@@ -54,19 +52,8 @@ class ListColumn(AbstractColumn):
             else:
                 yield self[i : i + batch_size]
 
-    def _repr_pandas_(self) -> pd.Series:
-        if len(self) <= pd.options.display.max_rows:
-            return pd.Series(map(repr, self))
-        else:
-            # faster than creating a
-            series = pd.Series(np.empty(len(self)), copy=False)
-            series.iloc[: pd.options.display.min_rows] = list(
-                map(repr, self[: pd.options.display.min_rows])
-            )
-            series.iloc[-(pd.options.display.min_rows // 2 + 1) :] = list(
-                map(repr, self[-(pd.options.display.min_rows // 2 + 1) :])
-            )
-            return series
+    def _repr_cell(self, index) -> object:
+        return self[index]
 
     @classmethod
     def concat(cls, columns: Sequence[ListColumn]):

@@ -6,9 +6,11 @@ from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, Mapping, Sequence, Union
 
+import numpy as np
 import pandas as pd
 import yaml
 
+import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
 
@@ -314,15 +316,27 @@ class BlockManager(MutableMapping):
         mgr.reorder(meta["_column_order"])
         return mgr
 
-    def _repr_pandas_(self):
-        dfs = []
-        cols = set(self._columns.keys())
-        for _, block_ref in self._block_refs.items():
-            if hasattr(block_ref.block, "_repr_pandas_"):
-                dfs.append(block_ref.block._repr_pandas_(block_ref))
-                cols -= set(block_ref.keys())
-        dfs.append(pd.DataFrame({k: self[k]._repr_pandas_() for k in cols}))
-        return pd.concat(objs=dfs, axis=1)
+    def _repr_pandas_(self, max_rows: int = None):
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+        cols = {}
+        formatters = {}
+        for name, column in self._columns.items():
+            cols[name], formatters[name] = column._repr_pandas_(max_rows=max_rows)
+        if self.nrows > max_rows:
+            pd_index = np.concatenate(
+                (
+                    np.arange(max_rows // 2),
+                    np.zeros(1),
+                    np.arange(self.nrows - max_rows // 2, self.nrows),
+                ),
+            )
+        else:
+            pd_index = np.arange(self.nrows)
+
+        df = pd.DataFrame(cols)
+        df = df.set_index(pd_index.astype(int))
+        return df, formatters
 
     def view(self):
         mgr = BlockManager()
