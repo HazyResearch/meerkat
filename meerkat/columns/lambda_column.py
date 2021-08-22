@@ -7,13 +7,16 @@ from io import BytesIO
 from typing import Collection, Mapping, Sequence, Union
 
 import numpy as np
-import PIL
 import yaml
 
 import meerkat as mk
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
+from meerkat.tools.lazy_loader import LazyLoader
+
+PIL = LazyLoader("PIL")
+
 
 logger = logging.getLogger(__name__)
 
