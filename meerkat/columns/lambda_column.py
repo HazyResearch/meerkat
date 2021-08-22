@@ -1,16 +1,22 @@
 from __future__ import annotations
 
+import base64
 import logging
 import os
+from io import BytesIO
 from typing import Collection, Mapping, Sequence, Union
 
 import numpy as np
-import pandas as pd
 import yaml
 
+import meerkat as mk
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
+from meerkat.tools.lazy_loader import LazyLoader
+
+PIL = LazyLoader("PIL")
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +54,10 @@ class LambdaCell(AbstractCell):
             and (self.data == other.data)
             and (self.fn == other.fn)
         )
+
+    def __repr__(self):
+        name = getattr(self.fn, "__qualname__", repr(self.fn))
+        return f"LambdaCell(fn={name})"
 
 
 class LambdaColumn(AbstractColumn):
@@ -127,21 +137,6 @@ class LambdaColumn(AbstractColumn):
     def _clone_kwargs(self):
         return {"fn": self.fn, "data": self._data}
 
-    def _repr_pandas_(self) -> pd.Series:
-        cell_repr = self._repr_cell_()
-        if len(self) <= pd.options.display.max_rows:
-            return pd.Series([cell_repr] * len(self))
-        else:
-            # faster than creating a full pandas series
-            series = pd.Series(np.empty(len(self)), copy=False)
-            series.iloc[: pd.options.display.min_rows] = cell_repr
-            series.iloc[-pd.options.display.min_rows :] = cell_repr
-            return series
-
-    def _repr_cell_(self):
-        name = getattr(self.fn, "__qualname__", repr(self.fn))
-        return f"LambdaCell(fn={name})"
-
     @classmethod
     def _state_keys(cls) -> Collection:
         return super()._state_keys() | {"fn", "_output_type"}
@@ -173,3 +168,28 @@ class LambdaColumn(AbstractColumn):
             return AbstractColumn.read(os.path.join(path, "data"))
         else:
             return DataPanel.read(os.path.join(path, "data"))
+
+    def _repr_cell(self, idx):
+        return self.lz[idx]
+
+    def _get_formatter(self) -> callable:
+        if not mk.config.DisplayOptions.show_images:
+            return None
+
+        max_image_width = mk.config.DisplayOptions.max_image_width
+        max_image_height = mk.config.DisplayOptions.max_image_height
+
+        def _image_base64(im):
+            with BytesIO() as buffer:
+                im.save(buffer, "jpeg")
+                return base64.b64encode(buffer.getvalue()).decode()
+
+        def _image_formatter(cell):
+            im = cell.get()
+            if isinstance(im, PIL.Image.Image):
+                im.thumbnail((max_image_width, max_image_height))
+                return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
+            else:
+                return repr(cell)
+
+        return _image_formatter

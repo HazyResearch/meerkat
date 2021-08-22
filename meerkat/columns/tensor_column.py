@@ -146,11 +146,11 @@ class TensorColumn(
         else:
             return ConcatWriter(template=template, output_type=TensorColumn)
 
-    def _repr_pandas_(self) -> pd.Series:
+    def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
-            return pd.Series([f"torch.Tensor(shape={self.shape[1:]})"] * len(self))
+            return f"torch.Tensor(shape={self.shape[1:]})"
         else:
-            return pd.Series(self.data)
+            return self[index]
 
     @classmethod
     def from_data(cls, data: Union[Columnable, AbstractColumn]):

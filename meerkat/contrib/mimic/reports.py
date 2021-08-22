@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Collection, Sequence
 
-import pandas as pd
-
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 
@@ -57,6 +55,3 @@ class ReportColumn(LambdaColumn):
     @classmethod
     def _state_keys(cls) -> Collection:
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
-
-    def _repr_pandas_(self) -> pd.Series:
-        return "ReportCell(" + self.data.data.reset_index(drop=True) + ")"

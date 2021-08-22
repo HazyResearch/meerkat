@@ -90,10 +90,7 @@ EXTRAS = {
         "spacy",
         "fastBPE>=0.1.0",
     ],
-    "vision": [
-        "torchvision>=0.9.0",
-        "opencv-python",
-    ],
+    "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
     "wilds": [
         "wilds>=1.1.0",
     ],

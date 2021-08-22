@@ -232,8 +232,8 @@ class PandasSeriesColumn(
         # Load in the data
         return pd.read_pickle(data_path)
 
-    def _repr_pandas_(self) -> pd.Series:
-        return self.data
+    def _repr_cell(self, index) -> object:
+        return self[index]
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is

@@ -11,6 +11,7 @@ import pytest
 import torch
 import ujson as json
 
+import meerkat
 from meerkat import NumpyArrayColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
@@ -942,7 +943,9 @@ class TestDataPanel:
         result = repr(testbed.dp)
         assert isinstance(result, str)
 
-    @DataPanelTestBed.parametrize()
-    def test_repr_pandas(self, testbed):
-        df = testbed.dp._repr_pandas_()
+    @DataPanelTestBed.parametrize(params={"max_rows": [6, 16, 20]})
+    def test_repr_pandas(self, testbed, max_rows: int):
+        meerkat.config.DisplayOptions.max_rows = max_rows
+        df, _ = testbed.dp._repr_pandas_()
         assert isinstance(df, pd.DataFrame)
+        assert len(df) == min(len(df), max_rows + 1)

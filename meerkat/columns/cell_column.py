@@ -5,7 +5,6 @@ from typing import Sequence
 
 import cytoolz as tz
 import numpy as np
-import pandas as pd
 
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
@@ -67,10 +66,8 @@ class CellColumn(AbstractColumn):
     def cells(self):
         return self.data
 
-    def _repr_pandas_(
-        self,
-    ) -> pd.Series:
-        return pd.Series([cell.__repr__() for cell in self.cells])
+    def _repr_cell(self, index) -> object:
+        return self.lz[index].__repr__()
 
     @staticmethod
     def concat(columns: Sequence[CellColumn]):

@@ -284,7 +284,7 @@ class TestAbstractColumn:
 
     def test_repr_pandas(self, tmpdir):
         testbed = self.testbed_class.single(tmpdir=tmpdir)
-        series = testbed.col._repr_pandas_()
+        series, _ = testbed.col._repr_pandas_()
         assert isinstance(series, pd.Series)
 
     def test_to_pandas(self, tmpdir):

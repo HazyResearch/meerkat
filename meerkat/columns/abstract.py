@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import torch
 
+import meerkat.config
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
@@ -227,15 +228,55 @@ class AbstractColumn(
             return 0
         return len(self._data)
 
-    def _repr_pandas_(self) -> pd.Series:
+    def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
-    def _repr_html_(self):
+    def _get_formatter(self) -> callable:
+        return None
+
+    def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        if len(self) > max_rows:
+            col = pd.Series(
+                [self._repr_cell(idx) for idx in range(max_rows // 2)]
+                + [None]
+                + [
+                    self._repr_cell(idx)
+                    for idx in range(len(self) - max_rows // 2, len(self))
+                ]
+            )
+        else:
+            col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
+
+        formatter = self._get_formatter()
+        return col, formatter
+
+    def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_
-        return (
-            self._repr_pandas_()
-            .to_frame(name=f"({self.__class__.__name__})")
-            ._repr_html_()
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        if len(self) > max_rows:
+            pd_index = np.concatenate(
+                (
+                    np.arange(max_rows // 2),
+                    np.zeros(1),
+                    np.arange(len(self) - max_rows // 2, len(self)),
+                ),
+            )
+        else:
+            pd_index = np.arange(len(self))
+
+        col_name = f"({self.__class__.__name__})"
+        col, formatter = self._repr_pandas_(max_rows=max_rows)
+        df = col.to_frame(name=col_name)
+        df = df.set_index(pd_index.astype(int))
+        return df.to_html(
+            max_rows=max_rows,
+            formatters={col_name: formatter},
+            escape=False,
         )
 
     @capture_provenance()
