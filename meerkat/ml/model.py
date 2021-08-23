@@ -3,9 +3,9 @@ from typing import Dict, List
 import torch
 
 from meerkat.datapanel import DataPanel
-from meerkat.nn.embedding_column import EmbeddingColumn
-from meerkat.nn.metrics import compute_metric
-from meerkat.nn.prediction_column import ClassificationOutputColumn
+from meerkat.ml.embedding_column import EmbeddingColumn
+from meerkat.ml.metrics import compute_metric
+from meerkat.ml.prediction_column import ClassificationOutputColumn
 
 
 # TODO(Priya): Move some general functions here
@@ -89,7 +89,7 @@ class Model(torch.nn.Module):
         """
 
         # To avoid circular dependency for now.
-        from meerkat.nn.activation import ActivationOp
+        from meerkat.ml.activation import ActivationOp
 
         # Get an activation operator
         activation_op = ActivationOp(self.model, target_module, self.device)

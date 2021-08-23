@@ -9,7 +9,7 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
-from meerkat.nn.prediction_column import ClassificationOutputColumn
+from meerkat.ml.prediction_column import ClassificationOutputColumn
 
 from ...testbeds import MockDatapanel
 

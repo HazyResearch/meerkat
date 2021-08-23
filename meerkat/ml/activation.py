@@ -3,7 +3,7 @@ from typing import Union
 
 import torch
 
-from meerkat.nn.model import Model
+from meerkat.ml.model import Model
 
 
 class ActivationExtractor:

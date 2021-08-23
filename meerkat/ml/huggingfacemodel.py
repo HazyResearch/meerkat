@@ -7,7 +7,7 @@ import torch
 
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.model import Model
+from meerkat.ml.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
 
 AutoTokenizer = LazyLoader("transformers.AutoTokenizer")

@@ -2,7 +2,7 @@ import warnings
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.activation import ActivationOp
+from meerkat.ml.activation import ActivationOp
 from meerkat.tools.lazy_loader import LazyLoader
 
 pl = LazyLoader("pytorch_lightning")

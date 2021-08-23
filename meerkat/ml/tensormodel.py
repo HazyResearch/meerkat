@@ -6,9 +6,9 @@ import torch
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.instances_column import InstancesColumn
-from meerkat.nn.model import Model
-from meerkat.nn.segmentation_column import SegmentationOutputColumn
+from meerkat.ml.instances_column import InstancesColumn
+from meerkat.ml.model import Model
+from meerkat.ml.segmentation_column import SegmentationOutputColumn
 
 
 class TensorModel(Model):
