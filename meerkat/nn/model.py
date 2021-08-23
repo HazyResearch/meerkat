@@ -3,7 +3,6 @@ from typing import Dict, List
 import torch
 
 from meerkat.datapanel import DataPanel
-from meerkat.nn.activation import ActivationOp
 from meerkat.nn.embedding_column import EmbeddingColumn
 from meerkat.nn.metrics import compute_metric
 from meerkat.nn.prediction_column import ClassificationOutputColumn
@@ -88,6 +87,9 @@ class Model(torch.nn.Module):
                 `ActivationCachedOp(model, "block4.conv")`).
             input_columns (str): Column containing model inputs
         """
+
+        # To avoid circular dependency for now.
+        from meerkat.nn.activation import ActivationOp
 
         # Get an activation operator
         activation_op = ActivationOp(self.model, target_module, self.device)
