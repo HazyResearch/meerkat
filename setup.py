@@ -100,6 +100,9 @@ EXTRAS = {
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
+    "ml":[
+        "pytorch_lightning"
+    ]
 }
 
 # The rest you shouldn't have to touch too much :)
