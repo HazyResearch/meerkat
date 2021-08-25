@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
 import pyarrow as pa
+import pandas as pd 
 import pyarrow.feather as feather
 import torch
 
