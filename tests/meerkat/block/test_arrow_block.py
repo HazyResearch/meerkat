@@ -1,4 +1,3 @@
-from meerkat.columns.arrow_column import ArrowArrayColumn
 import numpy as np
 import pandas as pd
 import pyarrow as pa
@@ -8,6 +7,7 @@ from meerkat import PandasSeriesColumn
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.ref import BlockRef
+from meerkat.columns.arrow_column import ArrowArrayColumn
 from meerkat.errors import ConsolidationError
 
 
@@ -55,8 +55,8 @@ def test_consolidate_1(num_blocks):
     for ref in block_refs:
         block = ref.block
         for name, col in ref.items():
-            assert (
-                block.data[col._block_index].equals(block_ref.block.data[block_ref[name]._block_index])
+            assert block.data[col._block_index].equals(
+                block_ref.block.data[block_ref[name]._block_index]
             )
 
 

@@ -4,8 +4,8 @@ import os
 from dataclasses import dataclass
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
+import pandas as pd
 import pyarrow as pa
-import pandas as pd 
 import pyarrow.feather as feather
 import torch
 
@@ -122,8 +122,6 @@ class ArrowBlock(AbstractBlock):
     def _write_data(self, path: str):
         feather.write_feather(self.data, os.path.join(path, "data.feather"))
 
-
     @staticmethod
     def _read_data(path: str):
         return feather.read_table(os.path.join(path, "data.feather"))
-

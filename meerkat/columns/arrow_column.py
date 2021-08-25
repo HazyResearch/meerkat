@@ -1,11 +1,13 @@
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from typing import Sequence
+
 import pyarrow as pa
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.abstract import BlockView
-from typing import Sequence
+from meerkat.block.arrow_block import ArrowBlock
+from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
+
 
 class ArrowArrayColumn(
     AbstractColumn,
@@ -15,11 +17,11 @@ class ArrowArrayColumn(
 
     def __init__(formatter=NumpyArrayColumn):
         """
-        Initialize a new ArrowArrayColumn.        
+        Initialize a new ArrowArrayColumn.
         """
-        
-        pass 
-        
+
+        pass
+
     def __init__(
         self,
         data: Sequence,
@@ -34,11 +36,11 @@ class ArrowArrayColumn(
                 )
         elif not isinstance(data, pa.Array):
             data = pa.array(data)
-            
+
         super(ArrowArrayColumn, self).__init__(data=data, *args, **kwargs)
-        
+
         self._formatter = formatter
-    
+
     def _get(self, index, materialize: bool = True):
         index = ArrowBlock._convert_index(index)
         data = self._data[index]
@@ -53,8 +55,6 @@ class ArrowArrayColumn(
                 raise ValueError(f"Formatter '{self._formatter}' not supported.")
         else:
             return data
-            
+
     def _set(self, index, value):
         raise NotImplementedError("ArrowArrayColumn is immutable.")
-         
-    
