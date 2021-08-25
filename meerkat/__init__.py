@@ -13,6 +13,7 @@ from meerkat.cells.abstract import AbstractCell
 from meerkat.cells.spacy import LazySpacyCell, SpacyCell
 from meerkat.cells.volume import MedicalVolumeCell
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.arrow_column import ArrowArrayColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
