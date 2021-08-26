@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Set
 
 import pyarrow as pa
 
@@ -14,13 +14,6 @@ class ArrowArrayColumn(
 ):
 
     block_class: type = ArrowBlock
-
-    def __init__(formatter=NumpyArrayColumn):
-        """
-        Initialize a new ArrowArrayColumn.
-        """
-
-        pass
 
     def __init__(
         self,
@@ -58,3 +51,10 @@ class ArrowArrayColumn(
 
     def _set(self, index, value):
         raise NotImplementedError("ArrowArrayColumn is immutable.")
+
+    def _repr_cell(self, index) -> object:
+        return self.data[index]
+
+    @classmethod
+    def _state_keys(cls) -> Set:
+        return super()._state_keys() | {"_formatter"}
