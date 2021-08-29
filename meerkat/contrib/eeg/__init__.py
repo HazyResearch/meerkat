@@ -3,7 +3,7 @@ import os
 
 import meerkat as mk
 
-from meerkat.contrib.eeg.data_utils import computeSliceMatrix
+from .data_utils import computeSliceMatrix
 
 logger = logging.getLogger(__name__)
 from tqdm import tqdm
