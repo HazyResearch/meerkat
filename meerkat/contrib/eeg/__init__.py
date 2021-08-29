@@ -1,7 +1,6 @@
 import logging
 import os
 
-import pandas as pd
 import meerkat as mk
 
 from meerkat.contrib.eeg.data_utils import computeSliceMatrix
