@@ -1,12 +1,13 @@
 import logging
 import os
 
+from tqdm import tqdm
+
 import meerkat as mk
 
 from .data_utils import computeSliceMatrix
 
 logger = logging.getLogger(__name__)
-from tqdm import tqdm
 
 
 def build_eeg_dp(
@@ -23,11 +24,14 @@ def build_eeg_dp(
     Future TODO: integrating stanford dataset with weak seq-seq labels
 
     Args:
-        dataset_dir (str): A local directory where the preprocessed (h5) EEG data are stored.
-        raw_dataset_dir (str): A local directory where the original (edf) EEG data are stored.
+        dataset_dir (str): A local directory where the preprocessed
+            (h5) EEG data are stored
+        raw_dataset_dir (str): A local directory where the original
+            (edf) EEG data are stored
         clip_len (int): Number of seconds in an EEG clip
         step_size (int): Number of seconds in a single 'step'
-        stride (int):  Number of seconds in the stride when extracting clips from signals
+        stride (int):  Number of seconds in the stride when extracting
+            clips from signals
     """
 
     # retrieve paths of all edf files in the raw_dataset_dir

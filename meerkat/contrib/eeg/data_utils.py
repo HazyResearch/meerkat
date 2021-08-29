@@ -23,9 +23,9 @@ def computeSliceMatrix(
         clip_len: sliding window size or EEG clip length, in seconds, int
         stride: stride size, by how many seconds the sliding window moves, int
     Returns:
-        eeg_clip: EEG clip, shape (clip_len//time_step_size, num_channels, time_step_size*freq)
-        seizure_labels: per-time-step seizure labels, shape (clip_len//time_step_size,)
-        is_seizure: overall label, 1 if at least one seizure within this clip, otherwise 0
+        eeg_clip: EEG clip
+        seizure_labels: per-time-step seizure labels
+        is_seizure: overall label, 1 if at least one seizure in clip
     """
 
     physical_clip_len = int(FREQUENCY * clip_len)
