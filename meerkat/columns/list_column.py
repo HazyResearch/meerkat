@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 import abc
+import base64
 import logging
+from io import BytesIO
 from typing import Sequence
 
 import cytoolz as tz
 from yaml.representer import Representer
 
+import meerkat as mk
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.tools.lazy_loader import LazyLoader
+
+PIL = LazyLoader("PIL")
+
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -54,6 +61,28 @@ class ListColumn(AbstractColumn):
 
     def _repr_cell(self, index) -> object:
         return self[index]
+
+    def _get_formatter(self) -> callable:
+        if not mk.config.DisplayOptions.show_images:
+            return None
+
+        max_image_width = mk.config.DisplayOptions.max_image_width
+        max_image_height = mk.config.DisplayOptions.max_image_height
+
+        def _image_base64(im):
+            with BytesIO() as buffer:
+                im.save(buffer, "jpeg")
+                return base64.b64encode(buffer.getvalue()).decode()
+
+        def _image_formatter(cell):
+            im = cell
+            if isinstance(im, PIL.Image.Image):
+                im.thumbnail((max_image_width, max_image_height))
+                return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
+            else:
+                return repr(cell)
+
+        return _image_formatter
 
     @classmethod
     def concat(cls, columns: Sequence[ListColumn]):
