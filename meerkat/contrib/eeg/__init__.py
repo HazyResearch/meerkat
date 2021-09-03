@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 import meerkat as mk
 
-from .data_utils import computeSliceMatrix
+from .data_utils import compute_slice_matrix, compute_file_tuples
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def build_eeg_dp(
     dataset_dir: str,
     raw_dataset_dir: str,
+    splits=["train", "dev"],
     clip_len: int = 60,
     step_size: int = 1,
     stride: int = 60,
@@ -42,26 +43,17 @@ def build_eeg_dp(
                 edf_files.append(os.path.join(path, name))
 
     data = []
-    dirname = os.path.dirname(__file__)
-    for split in ["train", "dev", "test"]:
-        fm_name = split + "_cliplen" + str(clip_len) + "_stride" + str(stride)
-        if split == "train":
-            fm_name += "_balanced"
-        file_marker = os.path.join(
-            os.path.join(dirname, "file_markers"),
-            fm_name + ".txt",
+    for split in splits:
+        file_tuples = compute_file_tuples(
+            raw_dataset_dir, dataset_dir, split, clip_len, stride
         )
-
-        with open(file_marker, "r") as f:
-            file_str = f.readlines()
-        file_tuples = [curr_str.strip("\n").split(",") for curr_str in file_str]
 
         for (edf_fn, clip_idx, _) in tqdm(file_tuples, total=len(file_tuples)):
             filepath = [file for file in edf_files if edf_fn in file]
             filepath = filepath[0]
             file_id = edf_fn.split(".edf")[0]
 
-            eeg, sequence_sz, binary_sz = computeSliceMatrix(
+            eeg, sequence_sz, binary_sz = compute_slice_matrix(
                 h5_fn=os.path.join(dataset_dir, edf_fn.split(".edf")[0] + ".h5"),
                 edf_fn=filepath,
                 clip_idx=int(clip_idx),

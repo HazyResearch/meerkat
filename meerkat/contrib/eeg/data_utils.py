@@ -1,10 +1,76 @@
 import h5py
 import numpy as np
+import os
 
 FREQUENCY = 200
 
 
-def computeSliceMatrix(
+def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
+    """
+    Args:
+        dataset_dir (str): location where resampled signals are
+        split (str): whether train, dev, test
+        clip_len(int): length of each clip in the input eeg segments
+        stride (int): how to sample clips from eeg signal
+
+    Returns (file_name, clip_idx, seizure_label) tuples
+            for the given split, clip_len, and stride
+    The clip_idx indicates which clip (i.e. segment of EEG signal with clip_len seconds)
+    The stride determines how to sample clips from the eeg signal
+            (e.g. if stride=clip_len we have no overlapping clips)
+    """
+
+    # retrieve paths of all edf files in the dataset_dir for given split
+    edf_files = []
+    edf_fullfiles = []
+    for path, _, files in os.walk(os.path.join(raw_dataset_dir, split)):
+        for name in files:
+            if ".edf" in name:
+                edf_fullfiles.append(os.path.join(path, name))
+                edf_files.append(name)
+
+    resampled_files = os.listdir(dataset_dir)
+    file_tuples = []
+
+    for h5_fn in resampled_files:
+        edf_fn = h5_fn.split(".h5")[0] + ".edf"
+        if edf_fn not in edf_files:
+            continue
+        edf_fn_full = [file for file in edf_fullfiles if edf_fn in file]
+        if len(edf_fn_full) != 1:
+            print(f"{edf_fn} found {len(edf_fn_full)} times!")
+            print(edf_fn_full)
+
+        edf_fn_full = edf_fn_full[0]
+        seizure_times = get_seizure_times(edf_fn_full.split(".edf")[0])
+
+        h5_fn_full = os.path.join(dataset_dir, h5_fn)
+        with h5py.File(h5_fn_full, "r") as hf:
+            resampled_sig = hf["resampled_signal"][()]
+
+        num_clips = (resampled_sig.shape[-1] - clip_len * FREQUENCY) // (
+            stride * FREQUENCY
+        ) + 1
+
+        for i in range(num_clips):
+            start_window = i * FREQUENCY * stride
+            end_window = np.minimum(
+                start_window + FREQUENCY * clip_len, resampled_sig.shape[-1]
+            )
+
+            is_seizure = 0
+            for t in seizure_times:
+                start_t = int(t[0] * FREQUENCY)
+                end_t = int(t[1] * FREQUENCY)
+                if not ((end_window < start_t) or (start_window > end_t)):
+                    is_seizure = 1
+                    break
+            file_tuples.append((edf_fn, i, is_seizure))
+
+    return file_tuples
+
+
+def compute_slice_matrix(
     edf_fn,
     clip_idx,
     h5_fn=None,
@@ -13,7 +79,7 @@ def computeSliceMatrix(
     stride=60,
 ):
     """
-    Comvert entire EEG sequence into clips of length clip_len
+    Convert entire EEG sequence into clips of length clip_len
     Args:
         edf_fn: edf/eeghdf file name, full path
         channel_names: list of channel names
@@ -57,7 +123,7 @@ def computeSliceMatrix(
 
     # get seizure times, take min_sz_len into account
     if ".edf" in edf_fn:
-        seizure_times = getSeizureTimes(edf_fn.split(".edf")[0])
+        seizure_times = get_seizure_times(edf_fn.split(".edf")[0])
     else:
         raise NotImplementedError
 
@@ -88,7 +154,7 @@ def computeSliceMatrix(
     return eeg_clip, seizure_labels, is_seizure
 
 
-def getSeizureTimes(file_name):
+def get_seizure_times(file_name):
     """
     Args:
         file_name: file name of .edf file etc.
