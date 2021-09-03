@@ -76,3 +76,23 @@ def build_eeg_dp(
     dp = mk.DataPanel(data)
 
     return dp
+
+
+def download_tusz(download_dir, version="1.5.2"):
+    """
+    Downloads the EEG Seizure TUH dataset (TUSZ)
+
+    REQUIRED:
+        1. Need to first registed at https://www.isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml (very quick)
+        2. run download_tusz from python script or simply run the provided rsync command below in your terminal
+        3. enter the provided password sent to your email after step (1)
+
+    Args:
+        download_dir (str): The directory path to save to.
+        version (str, optional): Which version to download
+    """
+
+    src_pth = f"nedc@www.isip.piconepress.com:data/tuh_eeg_seizure/v{version}/"
+    rsync_command = f"rsync -auxvL {src_pth} {download_dir}"
+    print("Executing rsync command")
+    os.system(rsync_command)

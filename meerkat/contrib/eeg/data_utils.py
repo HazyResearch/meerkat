@@ -1,8 +1,33 @@
 import h5py
 import numpy as np
 import os
+from scipy.signal import resample
+import pyedflib
+from tqdm import tqdm
+
 
 FREQUENCY = 200
+INCLUDED_CHANNELS = [
+    "EEG FP1",
+    "EEG FP2",
+    "EEG F3",
+    "EEG F4",
+    "EEG C3",
+    "EEG C4",
+    "EEG P3",
+    "EEG P4",
+    "EEG O1",
+    "EEG O2",
+    "EEG F7",
+    "EEG F8",
+    "EEG T3",
+    "EEG T4",
+    "EEG T5",
+    "EEG T6",
+    "EEG FZ",
+    "EEG CZ",
+    "EEG PZ",
+]
 
 
 def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
@@ -175,3 +200,114 @@ def get_seizure_times(file_name):
                     ]
                 )
     return seizure_times
+
+
+def get_ordered_channels(
+    file_name,
+    labels_object,
+    channel_names=INCLUDED_CHANNELS,
+    verbose=False,
+):
+    """
+    Reads channel names and returns consistent ordering
+    Args:
+        file_name (str): name of edf file
+        labels_object: extracted from edf signal using f.getSignalLabels()
+        channel_names (List(str)): list of channel names
+        verbose (bool): whether to be verbose
+    Returns:
+        list of channel indices in ordered form
+    """
+
+    labels = list(labels_object)
+    for i in range(len(labels)):
+        labels[i] = labels[i].split("-")[0]
+
+    ordered_channels = []
+    for ch in channel_names:
+        try:
+            ordered_channels.append(labels.index(ch))
+        except:
+            if verbose:
+                print(file_name + " failed to get channel " + ch)
+            raise Exception("channel not match")
+    return ordered_channels
+
+
+def get_edf_signals(edf):
+    """
+    Get EEG signal in edf file
+    Args:
+        edf: edf object
+    Returns:
+        signals: shape (num_channels, num_data_points)
+    """
+    n = edf.signals_in_file
+    samples = edf.getNSamples()[0]
+    signals = np.zeros((n, samples))
+    for i in range(n):
+        try:
+            signals[i, :] = edf.readSignal(i)
+        except:
+            pass
+    return signals
+
+
+def resample_data(signals, to_freq=200, window_size=4):
+    """
+    Resample signals from its original sampling freq to another freq
+    Args:
+        signals: EEG signal slice, (num_channels, num_data_points)
+        to_freq: Re-sampled frequency in Hz
+        window_size: time window in seconds
+    Returns:
+        resampled: (num_channels, resampled_data_points)
+    """
+    num = int(to_freq * window_size)
+    resampled = resample(signals, num=num, axis=1)
+    return resampled
+
+
+def resample_files(raw_edf_dir, save_dir):
+    """
+    Resamples edf files to FREQUENCY and saves them in specified dir
+
+    Args:
+        raw_edf_dir (str): location where original edf files are located
+        save_dir (str): location to save resampled signals
+    """
+
+    edf_files = []
+    for path, subdirs, files in os.walk(raw_edf_dir):
+        for name in files:
+            if ".edf" in name:
+                edf_files.append(os.path.join(path, name))
+
+    failed_files = []
+    for idx in tqdm(range(len(edf_files))):
+        edf_fn = edf_files[idx]
+
+        save_fn = os.path.join(save_dir, edf_fn.split("/")[-1].split(".edf")[0] + ".h5")
+        if os.path.exists(save_fn):
+            continue
+        try:
+            f = pyedflib.EdfReader(edf_fn)
+        except BaseException:
+            failed_files.append(edf_fn)
+
+        orderedChannels = get_ordered_channels(edf_fn, f.getSignalLabels())
+        signals = get_edf_signals(f)
+        signal_array = np.array(signals[orderedChannels, :])
+        sample_freq = f.getSampleFrequency(0)
+        if sample_freq != FREQUENCY:
+            signal_array = resample_data(
+                signal_array,
+                to_freq=FREQUENCY,
+                window_size=int(signal_array.shape[1] / sample_freq),
+            )
+
+        with h5py.File(save_fn, "w") as hf:
+            hf.create_dataset("resampled_signal", data=signal_array)
+            hf.create_dataset("resample_freq", data=FREQUENCY)
+
+    print("DONE. {} files failed.".format(len(failed_files)))
