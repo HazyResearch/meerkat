@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 import meerkat as mk
 
-from .data_utils import compute_slice_matrix, compute_file_tuples
+from .data_utils import compute_file_tuples, compute_slice_matrix
 
 logger = logging.getLogger(__name__)
 

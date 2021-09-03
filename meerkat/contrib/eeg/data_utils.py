@@ -1,10 +1,10 @@
+import os
+
 import h5py
 import numpy as np
-import os
-from scipy.signal import resample
 import pyedflib
+from scipy.signal import resample
 from tqdm import tqdm
-
 
 FREQUENCY = 200
 INCLUDED_CHANNELS = [
