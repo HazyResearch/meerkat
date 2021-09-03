@@ -492,6 +492,7 @@ class DataPanel(
         drop_last_batch: bool = False,
         num_workers: int = 0,
         materialize: bool = True,
+        shuffle: bool = False,
         *args,
         **kwargs,
     ):
@@ -514,9 +515,13 @@ class DataPanel(
             else:
                 batch_columns.append(name)
 
+        indices = np.arange(len(self))
+
+        if shuffle:
+            indices = np.random.permutation(indices)
+
         if batch_columns:
             batch_indices = []
-            indices = np.arange(len(self))
             for i in range(0, len(self), batch_size):
                 if drop_last_batch and i + batch_size > len(self):
                     continue
@@ -533,8 +538,9 @@ class DataPanel(
             )
 
         if cell_columns:
+            dp = self[cell_columns] if not shuffle else self[cell_columns].lz[indices]
             cell_dl = torch.utils.data.DataLoader(
-                self[cell_columns] if materialize else self[cell_columns].lz,
+                dp if materialize else dp.lz,
                 batch_size=batch_size,
                 collate_fn=self._collate,
                 drop_last=drop_last_batch,

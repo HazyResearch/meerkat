@@ -710,6 +710,31 @@ class TestDataPanel:
         assert (out["a"].data == np.concatenate([np.arange(length)] * 2)).all()
         assert out["b"].data == list(np.concatenate([np.arange(length)] * 2))
 
+    @DataPanelTestBed.parametrize(
+        params={
+            "shuffle": [True, False],
+            "batch_size": [1, 4],
+            "materialize": [True, False],
+        }
+    )
+    def test_batch(self, testbed, shuffle: bool, batch_size: int, materialize: bool):
+        dp = testbed.dp
+        dp["idx"] = np.arange(len(dp))
+        order = []
+        for batch in dp.batch(batch_size=batch_size, shuffle=shuffle):
+            order.append(batch["idx"].data)
+            for name, col in batch.items():
+                if materialize:
+                    col.is_equal(dp[batch["idx"]][name])
+                else:
+                    col.is_equal(dp.lz[batch["idx"]][name])
+        order = np.array(order).flatten()
+
+        if shuffle:
+            assert (order != np.arange(len(dp))).any()
+        else:
+            assert (order == np.arange(len(dp))).all()
+
     @DataPanelTestBed.parametrize()
     def test_tail(self, testbed):
         dp = testbed.dp
