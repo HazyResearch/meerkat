@@ -227,7 +227,7 @@ def get_ordered_channels(
     for ch in channel_names:
         try:
             ordered_channels.append(labels.index(ch))
-        except:
+        except IndexError:
             if verbose:
                 print(file_name + " failed to get channel " + ch)
             raise Exception("channel not match")
@@ -248,7 +248,7 @@ def get_edf_signals(edf):
     for i in range(n):
         try:
             signals[i, :] = edf.readSignal(i)
-        except:
+        except IndexError:
             pass
     return signals
 

@@ -83,8 +83,10 @@ def download_tusz(download_dir, version="1.5.2"):
     Downloads the EEG Seizure TUH dataset (TUSZ)
 
     REQUIRED:
-        1. Need to first registed at https://www.isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml (very quick)
-        2. run download_tusz from python script or simply run the provided rsync command below in your terminal
+        1. Need to first registed at
+            https://www.isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml
+        2. run download_tusz from python script or simply run the provided rsync
+             command below in your terminal
         3. enter the provided password sent to your email after step (1)
 
     Args:
