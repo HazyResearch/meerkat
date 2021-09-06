@@ -364,25 +364,31 @@ def resample_files(raw_edf_dir, save_dir):
     print("DONE. {} files failed.".format(len(failed_files)))
 
 
-def compute_stanford_file_tuples(stanford_dataset_dir, lpch_dataset_dir, splits):
+def compute_stanford_file_tuples(
+    stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
+):
     """
-    Given the splits, processes file tuples from filemarkers
+    Given the splits, processes file tuples form filemarkers
     file tuple: (eeg filename, location of sz or -1 if no sz, split)
+
+    Args:
+        stanford_dataset_dir (str): data dir for stanford EEG files
+        lpch_dataset_dir (str): data dir for lpc EEG files
+        file_marker_dir (str): dir where file markers are stored
+        splits (List[str]): which splits to process
     """
 
     file_tuples = []
-    curr_dir = os.path.dirname(os.path.realpath(__file__))
     for split in splits:
         for hospital in ["lpch", "stanford"]:
             data_dir = (
                 stanford_dataset_dir if hospital == "stanford" else lpch_dataset_dir
             )
             for sz_type in ["non_sz", "sz"]:
-                filemarker_dir = (
-                    f"{curr_dir}/file_markers/"
-                    + f"file_markers_{hospital}/{sz_type}_{split}.txt"
+                fm_dir = (
+                    f"{file_marker_dir}/file_markers_{hospital}/{sz_type}_{split}.txt"
                 )
-                filemarker_contents = open(filemarker_dir, "r").readlines()
+                filemarker_contents = open(fm_dir, "r").readlines()
                 for fm in filemarker_contents:
                     fm_tuple = fm.strip("\n").split(",")
                     filepath = os.path.join(data_dir, fm_tuple[0])
