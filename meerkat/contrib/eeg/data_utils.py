@@ -435,7 +435,7 @@ def stanford_eeg_loader(input_dict, clip_len=60):
         ).T
 
     diff = FREQUENCY * clip_len - eeg_slice.shape[1]
-    ## padding zeros
+    # padding zeros
     if diff > 0:
         zeros = np.zeros((eeg_slice.shape[0], diff))
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
