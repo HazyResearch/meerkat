@@ -10,11 +10,10 @@ import meerkat as mk
 from .data_utils import (
     compute_file_tuples,
     compute_slice_matrix,
-    get_sz_labels,
     compute_stanford_file_tuples,
+    get_sz_labels,
     stanford_eeg_loader,
 )
-
 
 logger = logging.getLogger(__name__)
 
