@@ -110,6 +110,7 @@ def download_tusz(download_dir, version="1.5.2"):
 def build_stanford_eeg_dp(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
+    file_marker_dir: str,
     splits=["train", "dev"],
     reports_pth=None,
     clip_len: int = 60,
@@ -118,11 +119,14 @@ def build_stanford_eeg_dp(
     Builds a `DataPanel` for accessing EEG data.
 
     This is for accessing private stanford data.
+    The stanford data is limited to specific researchers on IRB.
     No public directions on how to download them yet.
+    Contact ksaab@stanford.edu for more information.
 
     Args:
         stanford_dataset_dir (str): A local dir where stanford EEG are stored
         lpch_dataset_dir (str): A local dir where the lpch EEG are stored
+        file_marker_dir (str): A local dir where file markers are stored
         splits (list[str]): List of splits to load
         reports_pth (str): if not None, will load reports
         clip_len (int): Number of seconds in an EEG clip
@@ -131,7 +135,7 @@ def build_stanford_eeg_dp(
     # retrieve file tuples which is a list of
     # (eeg filepath, location of sz or -1 if no sz, split)
     file_tuples = compute_stanford_file_tuples(
-        stanford_dataset_dir, lpch_dataset_dir, splits
+        stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
     )
     data = []
 
