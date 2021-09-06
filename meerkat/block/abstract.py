@@ -65,6 +65,10 @@ class AbstractBlock:
     def _get(self, index, block_ref: BlockRef) -> Union[BlockRef, dict]:
         raise NotImplementedError
 
+    @property
+    def is_mmap(self):
+        return False
+
     def write(self, path: str, *args, **kwargs):
         os.makedirs(path, exist_ok=True)
         self._write_data(path, *args, **kwargs)

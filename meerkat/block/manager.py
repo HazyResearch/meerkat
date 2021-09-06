@@ -256,6 +256,7 @@ class BlockManager(MutableMapping):
                     "block": {
                         "block_dir": os.path.relpath(block_dir, path),
                         "block_index": _serialize_block_index(column._block_index),
+                        "mmap": block.is_mmap,
                     },
                 }
                 column._write_state(column_dir)
@@ -298,7 +299,8 @@ class BlockManager(MutableMapping):
                 block_meta = col_meta["block"]
                 if block_meta["block_dir"] not in blocks:
                     blocks[block_meta["block_dir"]] = AbstractBlock.read(
-                        os.path.join(path, block_meta["block_dir"])
+                        os.path.join(path, block_meta["block_dir"]),
+                        mmap=block_meta.get("mmap", False),
                     )
                 block = blocks[block_meta["block_dir"]]
 
