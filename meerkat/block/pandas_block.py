@@ -121,5 +121,5 @@ class PandasBlock(AbstractBlock):
         self.data.reset_index(drop=True).to_feather(os.path.join(path, "data.feather"))
 
     @staticmethod
-    def _read_data(path: str):
+    def _read_data(path: str, mmap: bool = False):
         return pd.read_feather(os.path.join(path, "data.feather"))

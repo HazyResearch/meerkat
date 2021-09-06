@@ -6,7 +6,7 @@ class ConcatWriter(AbstractWriter):
     def __init__(
         self,
         output_type: type = AbstractColumn,
-        template: AbstractColumn = False,
+        template: AbstractColumn = None,
         *args,
         **kwargs,
     ):
@@ -28,13 +28,13 @@ class ConcatWriter(AbstractWriter):
 
         self.outputs.append(data)
 
-    def flush(self, *args, **kwargs):
-        from meerkat.ops.concat import concat
-
-        return concat(self.outputs)
+    def flush(self):
+        pass
 
     def close(self, *args, **kwargs):
         pass
 
     def finalize(self, *args, **kwargs) -> None:
-        pass
+        from meerkat.ops.concat import concat
+
+        return concat(self.outputs)

@@ -5,6 +5,8 @@ import functools
 import logging
 import numbers
 import os
+import shutil
+from mmap import mmap
 from typing import Callable, Sequence
 
 import numpy as np
@@ -127,23 +129,31 @@ class NumpyArrayColumn(
     def _view_data(self) -> object:
         return self._data
 
-    def _write_data(self, path: str) -> None:
-        # Saving all cell data in a single pickle file
-        np.save(os.path.join(path, "data.npy"), self.data)
+    @property
+    def is_mmap(self):
+        # important to check if .base is a python mmap object, since a view of a mmap
+        # is also a memmap object, but should not be symlinked or copied
+        return isinstance(self.data, np.memmap) and isinstance(self.data.base, mmap)
+
+    def _write_data(self, path: str, link: bool = True) -> None:
+        path = os.path.join(path, "data.npy")
+        # important to check if .base is a python mmap object, since a view of a mmap
+        # is also a memmap object, but should not be symlinked
+        if self.is_mmap:
+            if link:
+                os.symlink(self.data.filename, path)
+            else:
+                shutil.copy(self.data.filename, path)
+        else:
+            np.save(path, self.data)
 
     @staticmethod
-    def _read_data(
-        path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> NumpyArrayColumn:
+    def _read_data(path: str, mmap=False, *args, **kwargs) -> NumpyArrayColumn:
         data_path = os.path.join(path, "data.npy")
-        # Load in the data
+
         if mmap:
-            # assert dtype is not None and shape is not None
-            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            # data = np.load(data_path, mmap_mode="r")
-        else:
-            data = np.load(data_path, allow_pickle=True)
-        return data
+            return np.load(data_path, mmap_mode="r")
+        return np.load(data_path)
 
     @classmethod
     def concat(cls, columns: Sequence[NumpyArrayColumn]):

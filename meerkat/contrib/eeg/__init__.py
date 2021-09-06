@@ -10,9 +10,11 @@ import meerkat as mk
 from .data_utils import (
     compute_file_tuples,
     compute_slice_matrix,
+    get_sz_labels,
     compute_stanford_file_tuples,
     stanford_eeg_loader,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +62,7 @@ def build_eeg_dp(
             filepath = filepath[0]
             file_id = edf_fn.split(".edf")[0]
 
-            eeg, sequence_sz, binary_sz = compute_slice_matrix(
-                h5_fn=os.path.join(dataset_dir, edf_fn.split(".edf")[0] + ".h5"),
+            sequence_sz, binary_sz = get_sz_labels(
                 edf_fn=filepath,
                 clip_idx=int(clip_idx),
                 time_step_size=step_size,
@@ -72,15 +73,28 @@ def build_eeg_dp(
             row_df = {
                 "filepath": filepath,
                 "file_id": file_id,
-                "eeg": eeg,
                 "sequence_sz": sequence_sz,
                 "binary_sz": binary_sz,
+                "clip_idx": int(clip_idx),
+                "h5_fn": os.path.join(dataset_dir, edf_fn.split(".edf")[0] + ".h5"),
                 "split": split,
             }
 
             data.append(row_df)
 
     dp = mk.DataPanel(data)
+
+    eeg_loader = partial(
+        compute_slice_matrix, time_step_size=step_size, clip_len=clip_len, stride=stride
+    )
+
+    eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
+
+    dp.add_column(
+        "eeg_input",
+        eeg_input_col,
+        overwrite=True,
+    )
 
     return dp
 
