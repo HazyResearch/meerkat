@@ -353,7 +353,10 @@ def compute_stanford_file_tuples(stanford_dataset_dir, lpch_dataset_dir, splits)
                 stanford_dataset_dir if hospital == "stanford" else lpch_dataset_dir
             )
             for sz_type in ["non_sz", "sz"]:
-                filemarker_dir = f"{curr_dir}/file_markers/file_markers_{hospital}/{sz_type}_{split}.txt"
+                filemarker_dir = (
+                    f"{curr_dir}/file_markers/"
+                    + f"file_markers_{hospital}/{sz_type}_{split}.txt"
+                )
                 filemarker_contents = open(filemarker_dir, "r").readlines()
                 for fm in filemarker_contents:
                     fm_tuple = fm.strip("\n").split(",")
@@ -368,7 +371,7 @@ def get_stanford_sz_times(eegf):
     df = eegf.edf_annotations_df
     seizure_df = df[df.text.str.contains("|".join(SEIZURE_STRINGS), case=False)]
     seizure_df = seizure_df[
-        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) == False
+        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) is False
     ]
 
     seizure_times = seizure_df["starts_sec"].tolist()
