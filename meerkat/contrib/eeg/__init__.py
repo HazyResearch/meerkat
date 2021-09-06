@@ -1,11 +1,18 @@
 import logging
 import os
+import pickle
+from functools import partial
 
 from tqdm import tqdm
 
 import meerkat as mk
 
-from .data_utils import compute_file_tuples, compute_slice_matrix
+from .data_utils import (
+    compute_file_tuples,
+    compute_slice_matrix,
+    compute_stanford_file_tuples,
+    stanford_eeg_loader,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -98,3 +105,75 @@ def download_tusz(download_dir, version="1.5.2"):
     rsync_command = f"rsync -auxvL {src_pth} {download_dir}"
     print("Executing rsync command")
     os.system(rsync_command)
+
+
+def build_stanford_eeg_dp(
+    stanford_dataset_dir: str,
+    lpch_dataset_dir: str,
+    splits=["train", "dev"],
+    reports_pth=None,
+    clip_len: int = 60,
+):
+    """
+    Builds a `DataPanel` for accessing EEG data.
+
+    This is for accessing private stanford data. No public directions on how to download them yet.
+
+    Args:
+        stanford_dataset_dir (str): A local directory where the stanford EEG data are stored
+        lpch_dataset_dir (str): A local directory where the lpch EEG data are stored
+        splits (list[str]): List of splits to load
+        reports_pth (str): if not None, will load the reports as well using the path
+        clip_len (int): Number of seconds in an EEG clip
+    """
+
+    # retrieve file tuples which is a list of (eeg filepath, location of sz or -1 if no sz, split)
+    file_tuples = compute_stanford_file_tuples(
+        stanford_dataset_dir, lpch_dataset_dir, splits
+    )
+    data = []
+
+    for (filepath, sz_loc, split) in file_tuples:
+        row_df = {
+            "filepath": filepath,
+            "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
+            "binary_sz": sz_loc != -1,
+            "sz_start_index": sz_loc,
+            "split": split,
+        }
+        data.append(row_df)
+
+    dp = mk.DataPanel(data)
+
+    eeg_input_col = dp[["sz_start_index", "filepath", "split"]].to_lambda(
+        fn=partial(stanford_eeg_loader, clip_len=clip_len)
+    )
+
+    dp.add_column(
+        "eeg_input",
+        eeg_input_col,
+        overwrite=True,
+    )
+
+    if reports_pth:
+        raw_reports_pth = os.path.join(reports_pth, "reports_unique_for_hl_mm.txt")
+        raw_reports_dp = mk.DataPanel.from_csv(raw_reports_pth, sep="\t")
+
+        parsed_reports_pth = os.path.join(reports_pth, "parsed_eeg_notes.dill")
+        with open(parsed_reports_pth, "rb") as dill_f:
+            parsed_reports = pickle.load(dill_f)
+
+        doc_data = []
+        for doc in parsed_reports:
+            uuid = doc.doc_id
+            mask_id = raw_reports_dp["note_uuid"] == uuid
+            if mask_id.sum() == 1 and "findings" in doc.sections:
+                file_id = raw_reports_dp[mask_id]["edf_file_name"][0].split(".edf")[0]
+                findings = doc.sections["findings"]["text"]
+                row_df = {"file_id": file_id, "findings": findings}
+                doc_data.append(row_df)
+        reports_dp = mk.DataPanel(doc_data)
+
+        dp = dp.merge(reports_dp, how="left", on="file_id")
+
+    return dp
