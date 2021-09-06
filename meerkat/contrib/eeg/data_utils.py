@@ -364,31 +364,22 @@ def resample_files(raw_edf_dir, save_dir):
     print("DONE. {} files failed.".format(len(failed_files)))
 
 
-def compute_stanford_file_tuples(
-    stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
-):
+def compute_stanford_file_tuples(stanford_dataset_dir, lpch_dataset_dir, splits):
     """
-    Given the splits, processes file tuples form filemarkers
+    Given the splits, processes file tuples from filemarkers
     file tuple: (eeg filename, location of sz or -1 if no sz, split)
-
-    Args:
-        stanford_dataset_dir (str): data dir for stanford EEG files
-        lpch_dataset_dir (str): data dir for lpc EEG files
-        file_marker_dir (str): dir where file markers are stored
-        splits (List[str]): which splits to process
     """
 
     file_tuples = []
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
     for split in splits:
         for hospital in ["lpch", "stanford"]:
             data_dir = (
                 stanford_dataset_dir if hospital == "stanford" else lpch_dataset_dir
             )
             for sz_type in ["non_sz", "sz"]:
-                fm_dir = (
-                    f"{file_marker_dir}/file_markers_{hospital}/{sz_type}_{split}.txt"
-                )
-                filemarker_contents = open(fm_dir, "r").readlines()
+                filemarker_dir = f"{curr_dir}/file_markers/file_markers_{hospital}/{sz_type}_{split}.txt"
+                filemarker_contents = open(filemarker_dir, "r").readlines()
                 for fm in filemarker_contents:
                     fm_tuple = fm.strip("\n").split(",")
                     filepath = os.path.join(data_dir, fm_tuple[0])
@@ -402,7 +393,7 @@ def get_stanford_sz_times(eegf):
     df = eegf.edf_annotations_df
     seizure_df = df[df.text.str.contains("|".join(SEIZURE_STRINGS), case=False)]
     seizure_df = seizure_df[
-        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) is False
+        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) == False
     ]
 
     seizure_times = seizure_df["starts_sec"].tolist()
@@ -466,7 +457,7 @@ def stanford_eeg_loader(input_dict, clip_len=60):
         ).T
 
     diff = FREQUENCY * clip_len - eeg_slice.shape[1]
-    # padding zeros
+    ## padding zeros
     if diff > 0:
         zeros = np.zeros((eeg_slice.shape[0], diff))
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
