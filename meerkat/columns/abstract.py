@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
+import pathlib
 import reprlib
 from copy import copy
 from typing import Any, Callable, List, Optional, Sequence, Union
@@ -40,6 +41,12 @@ class AbstractColumn(
     """An abstract class for Meerkat columns."""
 
     _data: Sequence = None
+
+    # Path to a log directory
+    logdir: pathlib.Path = pathlib.Path.home() / "meerkat/"
+
+    # Create a directory
+    logdir.mkdir(parents=True, exist_ok=True)
 
     def __init__(
         self,
@@ -479,3 +486,7 @@ class AbstractColumn(
 
     def _view_data(self) -> object:
         return self._data
+
+    @property
+    def is_mmap(self):
+        return False

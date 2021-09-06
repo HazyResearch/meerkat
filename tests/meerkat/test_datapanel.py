@@ -681,6 +681,10 @@ class TestDataPanel:
         assert dp.columns == new_dp.columns
         assert len(new_dp) == len(dp)
         for name in dp.columns:
+            # check that the mmap status is preserved across dp loads
+            assert isinstance(new_dp[name], np.memmap) == isinstance(
+                dp[name], np.memmap
+            )
             assert new_dp[name].is_equal(dp[name])
 
     @DataPanelTestBed.parametrize()

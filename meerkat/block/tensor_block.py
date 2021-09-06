@@ -164,5 +164,5 @@ class TensorBlock(AbstractBlock):
         torch.save(self.data, os.path.join(path, "data.pt"))
 
     @staticmethod
-    def _read_data(path: str):
+    def _read_data(path: str, mmap: bool = False):
         return torch.load(os.path.join(path, "data.pt"))
