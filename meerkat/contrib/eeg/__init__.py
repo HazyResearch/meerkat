@@ -129,17 +129,19 @@ def build_stanford_eeg_dp(
     """
     Builds a `DataPanel` for accessing EEG data.
 
-    This is for accessing private stanford data. No public directions on how to download them yet.
+    This is for accessing private stanford data.
+    No public directions on how to download them yet.
 
     Args:
-        stanford_dataset_dir (str): A local directory where the stanford EEG data are stored
-        lpch_dataset_dir (str): A local directory where the lpch EEG data are stored
+        stanford_dataset_dir (str): A local dir where stanford EEG are stored
+        lpch_dataset_dir (str): A local dir where the lpch EEG are stored
         splits (list[str]): List of splits to load
-        reports_pth (str): if not None, will load the reports as well using the path
+        reports_pth (str): if not None, will load reports
         clip_len (int): Number of seconds in an EEG clip
     """
 
-    # retrieve file tuples which is a list of (eeg filepath, location of sz or -1 if no sz, split)
+    # retrieve file tuples which is a list of
+    # (eeg filepath, location of sz or -1 if no sz, split)
     file_tuples = compute_stanford_file_tuples(
         stanford_dataset_dir, lpch_dataset_dir, splits
     )
