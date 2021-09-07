@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import logging
 import os
+import warnings
 from io import BytesIO
 from typing import Collection, Mapping, Sequence, Union
 
@@ -13,7 +14,7 @@ import meerkat as mk
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
-from meerkat.errors import ConcatError
+from meerkat.errors import ConcatWarning
 from meerkat.tools.lazy_loader import LazyLoader
 
 PIL = LazyLoader("PIL")
@@ -143,7 +144,10 @@ class LambdaColumn(AbstractColumn):
     def concat(columns: Sequence[LambdaColumn]):
         for c in columns:
             if c.fn != columns[0].fn:
-                raise ConcatError("Cannot concat LambdaColumns with different `fn`.")
+                warnings.warn(
+                    ConcatWarning("Concatenating LambdaColumns with different `fn`.")
+                )
+                break
 
         return columns[0]._clone(mk.concat([c._data for c in columns]))
 

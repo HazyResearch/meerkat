@@ -6,7 +6,7 @@ import pytest
 
 import meerkat as mk
 from meerkat import LambdaColumn, ListColumn, NumpyArrayColumn, TensorColumn
-from meerkat.errors import ConcatError
+from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
 
@@ -74,7 +74,7 @@ def test_dp_concat():
 
     col_a = dp.to_lambda(fn)
     col_b = dp.to_lambda(lambda x: x["a"])
-    with pytest.raises(ConcatError):
+    with pytest.warns(ConcatWarning):
         out = mk.concat([col_a, col_b])
 
 
@@ -97,5 +97,5 @@ def test_col_concat(col_type):
 
     col_a = col.to_lambda(fn)
     col_b = col.to_lambda(lambda x: x)
-    with pytest.raises(ConcatError):
+    with pytest.warns(ConcatWarning):
         out = mk.concat([col_a, col_b])

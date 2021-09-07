@@ -6,6 +6,10 @@ class ConcatError(ValueError):
     pass
 
 
+class ConcatWarning(RuntimeWarning):
+    pass
+
+
 class ConsolidationError(ValueError):
     pass
 
