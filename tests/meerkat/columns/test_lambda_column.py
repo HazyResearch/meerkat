@@ -4,7 +4,9 @@ from typing import Type
 import numpy as np
 import pytest
 
+import meerkat as mk
 from meerkat import LambdaColumn, ListColumn, NumpyArrayColumn, TensorColumn
+from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
 
@@ -52,3 +54,48 @@ def test_composed_lambda_columns(col_type: Type):
     lambda_col = lambda_col.to_lambda(lambda x: x + 1)
 
     assert (lambda_col[:] == testbed.array[testbed.visible_rows] + 2).all()
+
+
+def test_dp_concat():
+    length = 16
+    testbed = MockDatapanel(length=length)
+    dp = testbed.dp
+
+    def fn(x):
+        return x["a"] + 1
+
+    col_a = dp.to_lambda(fn)
+    col_b = dp.to_lambda(fn)
+
+    out = mk.concat([col_a, col_b])
+
+    assert isinstance(out, LambdaColumn)
+    assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
+
+    col_a = dp.to_lambda(fn)
+    col_b = dp.to_lambda(lambda x: x["a"])
+    with pytest.warns(ConcatWarning):
+        out = mk.concat([col_a, col_b])
+
+
+@pytest.mark.parametrize("col_type", [NumpyArrayColumn, ListColumn])
+def test_col_concat(col_type):
+    testbed = MockColumn(col_type=col_type)
+    col = testbed.col
+    length = len(col)
+
+    def fn(x):
+        return x + 1
+
+    col_a = col.to_lambda(fn)
+    col_b = col.to_lambda(fn)
+
+    out = mk.concat([col_a, col_b])
+
+    assert isinstance(out, LambdaColumn)
+    assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
+
+    col_a = col.to_lambda(fn)
+    col_b = col.to_lambda(lambda x: x)
+    with pytest.warns(ConcatWarning):
+        out = mk.concat([col_a, col_b])
