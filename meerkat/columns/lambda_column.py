@@ -13,6 +13,7 @@ import meerkat as mk
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
+from meerkat.errors import ConcatError
 from meerkat.tools.lazy_loader import LazyLoader
 
 PIL = LazyLoader("PIL")
@@ -134,17 +135,17 @@ class LambdaColumn(AbstractColumn):
             else:
                 return self._clone(data=_data)
 
-    def _clone_kwargs(self):
-        return {"fn": self.fn, "data": self._data}
-
     @classmethod
     def _state_keys(cls) -> Collection:
         return super()._state_keys() | {"fn", "_output_type"}
 
     @staticmethod
     def concat(columns: Sequence[LambdaColumn]):
-        # TODO: raise a warning if the functions don't match
-        return columns[0]._clone(columns[0]._data.concat([c._data for c in columns]))
+        for c in columns:
+            if c.fn != columns[0].fn:
+                raise ConcatError("Cannot concat LambdaColumns with different `fn`.")
+
+        return columns[0]._clone(mk.concat([c._data for c in columns]))
 
     def _write_data(self, path):
         # TODO (Sabri): avoid redundant writes in dataframes
