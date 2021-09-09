@@ -473,3 +473,21 @@ def stanford_eeg_loader(input_dict, clip_len=60):
     eeg_slice = eeg_slice.T
 
     return eeg_slice
+
+
+def eeg_metadata_loader(input_dict):
+    """
+    given filepath of an eeg, pulls relevant metadata
+    right now only supports pulling age
+    """
+    filepath = input_dict["filepath"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+
+    metadata = {
+        "age": eegf.age_years,
+        "eeg_duration": eegf.duration_seconds,
+    }
+
+    return metadata

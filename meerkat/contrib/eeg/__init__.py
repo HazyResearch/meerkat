@@ -11,6 +11,7 @@ from .data_utils import (
     compute_file_tuples,
     compute_slice_matrix,
     compute_stanford_file_tuples,
+    eeg_metadata_loader,
     get_sz_labels,
     stanford_eeg_loader,
 )
@@ -171,6 +172,13 @@ def build_stanford_eeg_dp(
     dp.add_column(
         "eeg_input",
         eeg_input_col,
+        overwrite=True,
+    )
+
+    eeg_metadata_col = dp[["filepath"]].to_lambda(fn=eeg_metadata_loader)
+    dp.add_column(
+        "eeg_metadata",
+        eeg_metadata_col,
         overwrite=True,
     )
 
