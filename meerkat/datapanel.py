@@ -832,3 +832,6 @@ class DataPanel(
 
     def _copy_data(self) -> object:
         return self.data.copy()
+
+    def __finalize__(self, *args, **kwargs):
+        return self

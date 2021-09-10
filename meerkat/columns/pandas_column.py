@@ -44,6 +44,12 @@ def getattr_decorator(fn: Callable):
         out = fn(*args, **kwargs)
         if isinstance(out, pd.Series):
             return PandasSeriesColumn(out)
+        elif isinstance(out, pd.DataFrame):
+            from meerkat import DataPanel
+
+            # column names must be str in meerkat
+            out = out.rename(mapper=str, axis="columns")
+            return DataPanel.from_pandas(out)
         else:
             return out
 
@@ -58,6 +64,10 @@ class _ReturnColumnMixin:
                 return getattr_decorator(attr)
             elif isinstance(attr, pd.Series):
                 return PandasSeriesColumn(attr)
+            elif isinstance(attr, pd.DataFrame):
+                from meerkat import DataPanel
+
+                return DataPanel.from_pandas(attr)
             else:
                 return attr
         except AttributeError:
