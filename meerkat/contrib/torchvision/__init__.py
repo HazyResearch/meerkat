@@ -1,7 +1,7 @@
 import random
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from PIL import Image
 from torchvision.datasets.cifar import CIFAR10
 
@@ -18,11 +18,11 @@ def get_torchvision_dataset(dataset_name, download_dir, is_train):
 
 
 def get_all_cifar10_splits(
-    download_dir, 
-    frac_val=0.0, 
+    download_dir,
+    frac_val=0.0,
     transforms=None,
     seed=42,
-    ):
+):
     """
     Load a CIFAR10 split as a Meerkat DataPanel.
 
@@ -33,7 +33,7 @@ def get_all_cifar10_splits(
         seed: random seed
 
     Returns:
-        DataPanels for train, val and test containing columns 
+        DataPanels for train, val and test containing columns
             `raw_image`, `image` and `label`
     """
     # Validation fraction should  be between 0 and 1
@@ -59,7 +59,7 @@ def get_all_cifar10_splits(
             "label": mk.TensorColumn(train_dataset.targets),
         }
     )
-    train_dp["split"] = np.array(['train'] * len(train_dp))
+    train_dp["split"] = np.array(["train"] * len(train_dp))
 
     test_dp = mk.DataPanel(
         {
@@ -67,7 +67,7 @@ def get_all_cifar10_splits(
             "label": mk.TensorColumn(test_dataset.targets),
         }
     )
-    test_dp["split"] = np.array(['test'] * len(test_dp))
+    test_dp["split"] = np.array(["test"] * len(test_dp))
 
     if frac_val > 1e-4:
         # sample indices for splitting off val
@@ -84,8 +84,8 @@ def get_all_cifar10_splits(
         )
 
     # Split up the train dataset into train and val
-    val_dp = train_dp.lz[train_dp['split'] == "val"]
-    train_dp = train_dp.lz[train_dp['split'] != "val"]
+    val_dp = train_dp.lz[train_dp["split"] == "val"]
+    train_dp = train_dp.lz[train_dp["split"] != "val"]
 
     def _transform(x):
         """Convert to PIL image and then apply the transforms."""
@@ -103,7 +103,6 @@ def get_all_cifar10_splits(
         "val": val_dp,
         "test": test_dp,
     }
-
 
 
 def get_cifar10(download_dir, is_train=True, frac_val=0.0, transforms=None):
