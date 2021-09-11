@@ -13,28 +13,38 @@
 
 Meerkat provides fast and flexible data structures for working with complex machine learning datasets. 
 
-[**Getting Started**](#getting-started)
-| [**What is Meerkat?**](#what-is-meerkat)
-| [**Supported Columns**](#supported-columns)
+[**Getting Started**](⚡️-Quickstart)
+| [**What is Meerkat?**](💡-what-is-Meerkat)
 | [**Docs**](https://meerkat.readthedocs.io/en/latest/index.html)
 | [**Contributing**](CONTRIBUTING.md)
-| [**About**](#about)
+| [**Blogpost**](https://www.notion.so/sabrieyuboglu/Meerkat-DataPanels-for-Machine-Learning-64891aca2c584f1889eb0129bb747863)
+| [**About**](✉️-About)
 
 
-## Getting started
+## ⚡️ Quickstart
 ```bash
 pip install meerkat-ml
 ``` 
-> Note: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install meerkat-ml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
+> _Optional_: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install meerkat-ml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
+
+> _Installing from dev_: `pip install "meerkat-ml[text] @ git+https://github.com/robustness-gym/meerkat@dev"`
  
-Load your dataset into a `DataPanel` and get going!
+Load a dataset into a `DataPanel` and get going!
 ```python
 import meerkat as mk
-dp = mk.DataPanel.from_csv("...")
+from meerkat.contrib.imagenette import download_imagenette
+
+download_imagenette(".")
+dp = mk.DataPanel.from_csv("imagenette2-160/imagenette.csv")
+dp["img"] = mk.ImageColumn.from_filepaths(fdp["img_path"])
+dp[["label", "split", "img"]].lz[:3]
 ```
+<img width="500" alt="readme_figure" src="https://user-images.githubusercontent.com/32822771/132963373-b4ae2f22-ee89-483c-b131-12e2fa3c9284.png">
 
+To learn more, continue following along in our tutorial:  
+[![Open intro](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/15kPD6Kym0MOpICafHgO1pCt8T2N_xevM#scrollTo=03nX_l19B5Zt&uniqifier=1) 
 
-## What is Meerkat?
+## 💡 What is Meerkat?
 Meerkat makes it easier for ML practitioners to interact with high-dimensional, multi-modal data. It provides simple abstractions for data inspection, model evaluation and model training supported by efficient and robust IO under the hood.  
 
 Meerkat's core contribution is the `DataPanel`, a simple columnar data abstraction. The Meerkat `DataPanel` can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs. 
@@ -90,53 +100,5 @@ def predict(batch: dict):
 updated_dp: mk.DataPanel = dp.update(function=predict, batch_size=128, is_batched_fn=True)
 ```
 
-**`DataPanel` is extendable.** Meerkat makes it easy for you to make custom column types for our data. The easiest way to do this is by subclassing `AbstractCell`. Subclasses of `AbstractCell` are meant to represent one element in one column of a `DataPanel`. For example, say we want our `DataPanel` to include a column of videos we have stored on disk. We want these videos to be lazily loaded using [scikit-video](http://www.scikit-video.org/stable/index.html), so we implement a `VideoCell` class as follows: 
-```python
-import meerkat as mk
-import skvideo.io
-
-class VideoCell(mk.AbstractCell):
-    
-    # What information will we eventually  need to materialize the cell? 
-    def __init__(filepath: str):
-        super().__init__()
-        self.filepath = filepath
-    
-    # How do we actually materialize the cell?
-    def get(self):
-        return skvideo.io.vread(self.filepath)
-    
-    # What attributes should be written to disk on `VideoCell.write`?
-    @classmethod
-    def _state_keys(cls) -> Collection:
-        return {"filepath"}
-
-# We don't need to define a `VideoColumn` class and can instead just
-# create a CellColumn fro a list of `VideoCell`
-vid_column = mk.CellColumn(map(VideoCell, ["vid1.mp4", "vid2.mp4", "vid3.mp4"]))
-```
-## Supported Columns
-Meerkat ships with a number of core column types and the list is growing.
-#### Core Columns
-| Column             |Description                                                  |
-|--------------------|--------------------------------------------------------------|
-| `ListColumn`       | Flexible and can hold any type of data.                      |
-| `NumpyArrayColumn` | [`np.ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html) behavior for vectorized operations.               |
-| `TensorColumn`     | [`torch.tensor`](https://pytorch.org/docs/stable/tensors.html) behavior for vectorized operations on the GPU.    |
-| `ImageColumn`      | Holds images stored on disk (*e.g.* as PNG or JPEG)                              |
-| `VideoColumn`      | Holds videos stored on disk (*e.g.* as MP4)                              |
-| `MedicalVolumeColumn` |Optimized for medical images stored DICOM or NIFTI format.|
-| `SpacyColumn`      | Holds processed text in spaCy Doc objects.                         |
-| `EmbeddingColumn`  | Holds embeddings and provides utility methods like `umap` and `build_faiss_index`.|
-| `ClassificationOutputColumn` | Holds classifier predictions.|
-| `CellColumn`       | Like `ListColumn`, but optimized for `AbstractCell` objects. |
-
-
-#### Contributed Columns
-| Column             | Supported | Description                                                  |
-|--------------------|-----------|--------------------------------------------------------------|
-| `WILDSInputColumn`       | Yes       | Build `DataPanel`s for the [WILDS benchmark](https://wilds.stanford.edu/).|
-
-
-## About
+## ✉️ About
 Meerkat is being developed at Stanford's Hazy Research Lab. Please reach out to `kgoel [at] cs [dot] stanford [dot] edu` if you would like to use or contribute to Meerkat.
