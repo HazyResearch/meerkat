@@ -36,7 +36,8 @@ from meerkat.contrib.imagenette import download_imagenette
 
 download_imagenette(".")
 dp = mk.DataPanel.from_csv("imagenette2-160/imagenette.csv")
-dp["img"] = mk.ImageColumn.from_filepaths(fdp["img_path"])
+dp["img"] = mk.ImageColumn.from_filepaths(dp["img_path"])
+
 dp[["label", "split", "img"]].lz[:3]
 ```
 <img width="500" alt="readme_figure" src="https://user-images.githubusercontent.com/32822771/132963373-b4ae2f22-ee89-483c-b131-12e2fa3c9284.png">
