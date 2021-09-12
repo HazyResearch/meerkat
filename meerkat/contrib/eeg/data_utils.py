@@ -1,5 +1,5 @@
 import os
-
+import torch
 import eeghdf
 import h5py
 import numpy as np
@@ -402,7 +402,7 @@ def get_stanford_sz_times(eegf):
     df = eegf.edf_annotations_df
     seizure_df = df[df.text.str.contains("|".join(SEIZURE_STRINGS), case=False)]
     seizure_df = seizure_df[
-        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) is False
+        seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) == False
     ]
 
     seizure_times = seizure_df["starts_sec"].tolist()
@@ -472,22 +472,29 @@ def stanford_eeg_loader(input_dict, clip_len=60):
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
     eeg_slice = eeg_slice.T
 
-    return eeg_slice
+    return torch.FloatTensor(eeg_slice)
 
 
-def eeg_metadata_loader(input_dict):
+def eeg_age_loader(filepath):
     """
     given filepath of an eeg, pulls relevant metadata
     right now only supports pulling age
     """
-    filepath = input_dict["filepath"]
+    # filepath = input_dict["filepath"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+    return eegf.age_years
+
+
+def eeg_duration_loader(filepath):
+    """
+    given filepath of an eeg, pulls relevant metadata
+    right now only supports pulling age
+    """
+    # filepath = input_dict["filepath"]
 
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
 
-    metadata = {
-        "age": eegf.age_years,
-        "eeg_duration": eegf.duration_seconds,
-    }
-
-    return metadata
+    return eegf.duration_seconds
