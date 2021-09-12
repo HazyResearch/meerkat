@@ -76,19 +76,6 @@ class LambdaColumn(AbstractColumn):
             self.fn = fn
         self._output_type = output_type
 
-    # TODO (Sabri): reconsider whether this is important functionality. it's not clear
-    # to me that this is that useful.
-    # def __getattr__(self, name):
-    #     if not self._output_type:
-    #         raise AttributeError(name)
-
-    #     data = self[:2]
-    #     if not hasattr(data, name):
-    #         raise AttributeError(name)
-
-    #     data = self[:]
-    #     return data.__getattr__(name
-
     def _set(self, index, value):
         raise ValueError("Cannot setitem on a `LambdaColumn`.")
 

@@ -5,11 +5,13 @@ MIMIC (Medical Information Mart for Intensive Care) is a large database of deide
 ## Prerequisites
 
 1. Access to MIMIC is limited to credentialed users. Researchers seeking to use the database must follow the instructions [here](https://mimic.mit.edu/docs/gettingstarted/).
+    - Ensure that you have requested Google BigQuery access to **both** [MIMIC-IV](https://physionet.org/content/mimiciv/1.0/) and [MIMIC-CXR](https://physionet.org/content/mimic-cxr/2.0.0/) by clicking "Request access" at the bottom of both pages ([here](https://physionet.org/content/mimiciv/1.0/) and [here](https://physionet.org/content/mimic-cxr/2.0.0/)).
+    - Ensure that you have requested Google Cloud Storage access to [MIMIC-CXR](https://physionet.org/content/mimic-cxr/2.0.0/) by clicking "Request access" at the bottom of the page [here](https://physionet.org/content/mimic-cxr/2.0.0/).
 
 2. This integration accesses MIMIC data through the [Google Cloud Platform](https://cloud.google.com/gcp) API (via BigQuery and Google Cloud Storage). You must have:
 
-    - A valid Google account. This should be the same email address as your credentialed user account on [physionet](https://physionet.org/content/mimic-cxr/2.0.0/) (prerequisite 1). 
-    - A GCP project that can be billed for data transfer. MIMIC data is "Requester Pays" on GCP. 
+    1. A valid Google account. This should be the same email address as your credentialed user account on [physionet](https://physionet.org/content/mimic-cxr/2.0.0/) (prerequisite 1). 
+    2. A GCP project that can be billed for data transfer. MIMIC data is "Requester Pays" on GCP. 
 
 
 ## Getting Started

@@ -7,7 +7,40 @@ from typing import Sequence
 from google.cloud import storage
 
 from meerkat import ImageColumn
+from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
+
+
+class GCSImageCell(LambdaCell):
+    def __init__(
+        self,
+        transform: callable = None,
+        loader: callable = None,
+        data: str = None,
+    ):
+        self.loader = self.default_loader if loader is None else loader
+        self.transform = transform
+        self._data = data
+
+    def fn(self, filepath: str):
+        image = self.loader(filepath)
+        if self.transform is not None:
+            image = self.transform(image)
+        return image
+
+    def __eq__(self, other):
+        return (
+            (other.__class__ == self.__class__)
+            and (self.data == other.data)
+            and (self.transform == other.transform)
+            and (self.loader == other.loader)
+        )
+
+    def __repr__(self):
+        transform = getattr(self.transform, "__qualname__", repr(self.transform))
+        dirs = self.data.split("/")
+        short_path = ("" if len(dirs) <= 2 else ".../") + "/".join(dirs[-2:])
+        return f"ImageCell({short_path}, transform={transform})"
 
 
 class GCSImageColumn(ImageColumn):
@@ -35,6 +68,15 @@ class GCSImageColumn(ImageColumn):
         self.loader = (lambda x: x) if loader is None else loader
         self.writer = writer
         self.local_dir = local_dir
+
+    def _get_formatter(self) -> callable:
+        # downloading the images from gcp for every visualization is probably not
+        # what we want as it makes datapanel visualization very slow
+        return None
+
+    def _create_cell(self, data: object) -> LambdaCell:
+        # don't want to create a lambda
+        return LambdaColumn._create_cell(self, data)
 
     def fn(self, blob_name: str):
         if self.local_dir is not None and os.path.exists(
@@ -80,8 +122,7 @@ class GCSImageColumn(ImageColumn):
         """List of attributes that describe the state of the object."""
         return super()._state_keys() | {"bucket_name", "project", "local_dir", "writer"}
 
-    classmethod
-
+    @classmethod
     def _clone_keys(cls) -> set:
         # need to avoid reaccessing bucket on clone, too slow
         return {"bucket"}
