@@ -2,16 +2,18 @@ import logging
 import os
 import pickle
 from functools import partial
+import numpy as np
 
 from tqdm import tqdm
-
+import terra
 import meerkat as mk
 
 from .data_utils import (
     compute_file_tuples,
     compute_slice_matrix,
     compute_stanford_file_tuples,
-    eeg_metadata_loader,
+    eeg_age_loader,
+    eeg_duration_loader,
     get_sz_labels,
     stanford_eeg_loader,
 )
@@ -121,12 +123,14 @@ def download_tusz(download_dir, version="1.5.2"):
     os.system(rsync_command)
 
 
+@terra.Task
 def build_stanford_eeg_dp(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
     file_marker_dir: str,
     splits=["train", "dev"],
     reports_pth=None,
+    restrict_to_reports=False,
     clip_len: int = 60,
 ):
     """
@@ -143,6 +147,7 @@ def build_stanford_eeg_dp(
         file_marker_dir (str): A local dir where file markers are stored
         splits (list[str]): List of splits to load
         reports_pth (str): if not None, will load reports
+        restrict_to_reports (bool): If true, only considers eegs with report
         clip_len (int): Number of seconds in an EEG clip
     """
 
@@ -175,10 +180,16 @@ def build_stanford_eeg_dp(
         overwrite=True,
     )
 
-    eeg_metadata_col = dp[["filepath"]].to_lambda(fn=eeg_metadata_loader)
+    age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "eeg_metadata",
-        eeg_metadata_col,
+        "age",
+        age_col,
+        overwrite=True,
+    )
+    duration_col = dp["filepath"].map(function=eeg_duration_loader)
+    dp.add_column(
+        "duration",
+        duration_col,
         overwrite=True,
     )
 
@@ -201,6 +212,9 @@ def build_stanford_eeg_dp(
                 doc_data.append(row_df)
         reports_dp = mk.DataPanel(doc_data)
 
-        dp = dp.merge(reports_dp, how="left", on="file_id")
+        if restrict_to_reports:
+            dp = dp.merge(reports_dp, how="inner", on="file_id")
+        else:
+            dp = dp.merge(reports_dp, how="left", on="file_id")
 
     return dp
