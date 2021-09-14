@@ -53,6 +53,7 @@ class GCSImageColumn(ImageColumn):
         loader: callable = None,
         writer: callable = None,
         local_dir: str = None,
+        _skip_cache: bool = False,
         *args,
         **kwargs,
     ):
@@ -68,6 +69,7 @@ class GCSImageColumn(ImageColumn):
         self.loader = (lambda x: x) if loader is None else loader
         self.writer = writer
         self.local_dir = local_dir
+        self._skip_cache = _skip_cache
 
     def _get_formatter(self) -> callable:
         # downloading the images from gcp for every visualization is probably not
@@ -79,8 +81,10 @@ class GCSImageColumn(ImageColumn):
         return LambdaColumn._create_cell(self, data)
 
     def fn(self, blob_name: str):
-        if self.local_dir is not None and os.path.exists(
-            os.path.join(self.local_dir, str(blob_name))
+        if (
+            self.local_dir is not None
+            and os.path.exists(os.path.join(self.local_dir, str(blob_name)))
+            and not self._skip_cache
         ):
             # fetch locally if it's been cached locally
             return super(GCSImageColumn, self).fn(
@@ -120,7 +124,13 @@ class GCSImageColumn(ImageColumn):
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return super()._state_keys() | {"bucket_name", "project", "local_dir", "writer"}
+        return super()._state_keys() | {
+            "bucket_name",
+            "project",
+            "local_dir",
+            "writer",
+            "_skip_cache",
+        }
 
     @classmethod
     def _clone_keys(cls) -> set:

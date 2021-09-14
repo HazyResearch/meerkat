@@ -29,12 +29,7 @@ MIMIC (Medical Information Mart for Intensive Care) is a large database of deide
 ## Build a MIMIC DataPanel: `build_mimic_dp`
 This function builds a `DataPanel` for accessing data from the [MIMIC-CXR Database](https://physionet.org/content/mimic-cxr/2.0.0/). The MIMIC-CXR database integrates chest X-ray imaging data with structured EHR datafrom Beth Israel Deaconess Medical Center. The full database has an uncompressedsize of over 5 TB. This function quickly builds a `DataPanel` that can be used to explore, slice and download the database. Building the DataPanel takes ~1 minute (when not downloading the radiology reports). The large CXR DICOM and JPEG files are not downloaded, but lazily pulled from Google Cloud Storage (GCS) only when they are accessed. This makes it possible to inspect and explore that data without downloading the full 5 TB. 
 
-Note: model training will likely bottleneck on the GCS downloads, so it is recommended that you cache the JPEG images locally bfore training. This can be accomplished by setting a `writer` and running a map over the data. 
-```
-    dp["jpg_img].writer = lambda path, img: x.save(path, img)
-    dp["jpg_img].map(lambda x: True)
-```
-The images will be saved in `dataset_dir`. This will take several hours for the full dataset. You can also slice down to a subset of the dataset before running the map.
+Note: model training will likely bottleneck on the GCS downloads, so it is recommended that you cache the JPEG images locally bfore training. This can be accomplished by passing `download_jpg=True` to `build_mimic_dp`. The images will be saved in `dataset_dir`. This will take several hours for the full dataset. It's recommended that you save resized versions of the images (_e.g._ (512,512)). To do so, pass `download_resize=(512,512)`. 
 
 Each row corresponds to a single chest X-ray image (stored in both DICOM format and JPEG in the MIMIC database). Each row is uniquely identified by the "dicom_id" column. Note that a single chest X-ray study (identified by "study_id" column) mayconsist of multiple images and a single patient (identified by "subject_id" column) may have multiple studies in the database. The columns in the DataPanel can be grouped into four categories:
     
