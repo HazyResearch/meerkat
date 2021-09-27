@@ -10,7 +10,7 @@ warnings.warn(
         "Proceed with caution."
     )
 )
-
+from meerkat.ml.activation import ActivationOp
 from meerkat.ml.callbacks import ActivationCallback
 from meerkat.ml.embedding_column import EmbeddingColumn
 from meerkat.ml.huggingfacemodel import HuggingfaceModel
