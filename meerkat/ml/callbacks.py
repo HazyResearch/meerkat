@@ -1,5 +1,8 @@
 import os
 import warnings
+from typing import List
+
+import numpy as np
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
@@ -77,3 +80,50 @@ class ActivationCallback(pl.callbacks.Callback):
             if not self.mmap:
                 file = f"activations_{self.target_module}_{trainer.current_epoch}"
                 activations.write(os.path.join(self.logdir, file))
+
+
+def load_activations(
+    target_module: str,
+    logdir: str,
+    epochs: List,
+    mmap: bool = False,
+    shape: tuple = None,
+) -> DataPanel:
+
+    if mmap and shape is None:
+        raise ValueError(
+            "Shape of activations is required to load memmapped activations."
+        )
+
+    activations_dp = None
+
+    for epoch in epochs:
+        path = os.path.join(logdir, f"activations_{target_module}_{epoch}")
+        if not os.path.exists(path):
+            raise ValueError(f"{path} does not exist.")
+
+        if mmap:
+            activations = np.memmap(path, mode="r", shape=shape)
+
+            if activations_dp is None:
+                activations_dp = DataPanel(
+                    {f"activation_{target_module}_{epoch}": activations}
+                )
+
+            else:
+                activations_dp.add_column(
+                    f"activation_{target_module}_{epoch}", activations
+                )
+
+        else:
+            if activations_dp is None:
+                # TODO(Priya): How to rename column?
+                activations_dp = DataPanel.read(path)
+
+            else:
+                activations_dp.add_column(
+                    name=f"activation_{target_module}_{epoch}",
+                    data=DataPanel.read(path)[f"activation_{target_module}"],
+                )
+
+    return activations_dp
