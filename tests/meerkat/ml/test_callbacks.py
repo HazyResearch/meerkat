@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from meerkat import DataPanel
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.ml import ActivationCallback
+from meerkat.ml import ActivationCallback, load_activations
 from meerkat.tools.lazy_loader import LazyLoader
 
 pl = LazyLoader("pytorch_lightning")
@@ -99,7 +99,7 @@ def train(
     "target_module,num_inputs,mmap,max_epochs",
     product(["linear"], [10, 20], [True, False], [1, 2]),
 )
-def test_train(target_module, num_inputs, mmap, max_epochs):
+def test_callback(target_module, num_inputs, mmap, max_epochs):
     tempdir = tempfile.TemporaryDirectory()
     model, act_callback = train(
         num_inputs=num_inputs, mmap=mmap, max_epochs=max_epochs, logdir=tempdir.name
@@ -109,7 +109,6 @@ def test_train(target_module, num_inputs, mmap, max_epochs):
         path = os.path.join(tempdir.name, f"activations_{target_module}_{epoch}")
         assert os.path.exists(path)
 
-        # TODO(Priya): Utility functions to access these stored files/datapanels
         if mmap:
             activations = {
                 f"activation_{target_module}": np.memmap(
@@ -128,3 +127,28 @@ def test_train(target_module, num_inputs, mmap, max_epochs):
         else:
             activations = DataPanel.read(path)
             assert isinstance(activations[f"activation_{target_module}"], TensorColumn)
+
+
+@pytest.mark.parametrize(
+    "target_module,num_inputs,mmap,max_epochs",
+    product(["linear"], [10, 20], [True, False], [1, 2]),
+)
+def test_load_acivations(target_module, num_inputs, mmap, max_epochs):
+    # TODO(Priya): Tests for non-continuous epochs
+    tempdir = tempfile.TemporaryDirectory()
+    model, act_callback = train(
+        num_inputs=num_inputs, mmap=mmap, max_epochs=max_epochs, logdir=tempdir.name
+    )
+
+    activations_dp = load_activations(
+        target_module=target_module,
+        logdir=tempdir.name,
+        epochs=[*range(max_epochs)],
+        mmap=mmap,
+        shape=act_callback.shape,
+    )
+
+    columns = [f"activation_{target_module}_{epoch}" for epoch in range(max_epochs)]
+    columns.append("index")
+
+    assert set(columns) == set(activations_dp.columns)

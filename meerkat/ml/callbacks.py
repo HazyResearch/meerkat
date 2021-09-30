@@ -88,6 +88,8 @@ def load_activations(
     epochs: List,
     mmap: bool = False,
     shape: tuple = None,
+    dtype: str = "float32",
+    mmap_mode: str = "r",
 ) -> DataPanel:
 
     if mmap and shape is None:
@@ -103,27 +105,17 @@ def load_activations(
             raise ValueError(f"{path} does not exist.")
 
         if mmap:
-            activations = np.memmap(path, mode="r", shape=shape)
-
-            if activations_dp is None:
-                activations_dp = DataPanel(
-                    {f"activation_{target_module}_{epoch}": activations}
-                )
-
-            else:
-                activations_dp.add_column(
-                    f"activation_{target_module}_{epoch}", activations
-                )
-
+            activations = np.memmap(path, dtype=dtype, mode=mmap_mode, shape=shape)
         else:
-            if activations_dp is None:
-                # TODO(Priya): How to rename column?
-                activations_dp = DataPanel.read(path)
+            activations = DataPanel.read(path)[f"activation_{target_module}"]
 
-            else:
-                activations_dp.add_column(
-                    name=f"activation_{target_module}_{epoch}",
-                    data=DataPanel.read(path)[f"activation_{target_module}"],
-                )
+        if activations_dp is None:
+            activations_dp = DataPanel(
+                {f"activation_{target_module}_{epoch}": activations}
+            )
+        else:
+            activations_dp.add_column(
+                f"activation_{target_module}_{epoch}", activations
+            )
 
     return activations_dp

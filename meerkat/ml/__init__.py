@@ -1,4 +1,4 @@
-"""Import nn module classes."""
+"""Import ml module classes."""
 # flake8: noqa
 import warnings
 
@@ -11,7 +11,7 @@ warnings.warn(
     )
 )
 from meerkat.ml.activation import ActivationOp
-from meerkat.ml.callbacks import ActivationCallback
+from meerkat.ml.callbacks import ActivationCallback, load_activations
 from meerkat.ml.embedding_column import EmbeddingColumn
 from meerkat.ml.huggingfacemodel import HuggingfaceModel
 from meerkat.ml.instances_column import InstancesColumn
