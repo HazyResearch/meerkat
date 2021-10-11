@@ -74,7 +74,7 @@ class ActivationCallback(pl.callbacks.Callback):
 
     def on_validation_epoch_end(self, trainer, pl_module):
         if not trainer.running_sanity_check:
-            activations = {f"activation_{self.target_module}": self.writer.flush()}
+            activations = {f"activation_{self.target_module}": self.writer.finalize()}
             activations = DataPanel.from_batch(activations)
 
             if not self.mmap:
