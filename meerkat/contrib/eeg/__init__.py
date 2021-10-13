@@ -13,7 +13,7 @@ from .data_utils import (
     compute_slice_matrix,
     compute_stanford_file_tuples,
     eeg_age_loader,
-    eeg_duration_loader,
+    eeg_male_loader,
     get_sz_labels,
     stanford_eeg_loader,
 )
@@ -74,9 +74,9 @@ def build_eeg_dp(
 
             row_df = {
                 "filepath": filepath,
-                "file_id": file_id,
+                "id": file_id,
                 "sequence_sz": sequence_sz,
-                "binary_sz": binary_sz,
+                "target": binary_sz,
                 "clip_idx": int(clip_idx),
                 "h5_fn": os.path.join(dataset_dir, edf_fn.split(".edf")[0] + ".h5"),
                 "split": split,
@@ -93,7 +93,7 @@ def build_eeg_dp(
     eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
 
     dp.add_column(
-        "eeg_input",
+        "input",
         eeg_input_col,
         overwrite=True,
     )
@@ -153,6 +153,7 @@ def build_stanford_eeg_dp(
 
     # retrieve file tuples which is a list of
     # (eeg filepath, location of sz or -1 if no sz, split)
+
     file_tuples = compute_stanford_file_tuples(
         stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
     )
@@ -162,34 +163,22 @@ def build_stanford_eeg_dp(
         row_df = {
             "filepath": filepath,
             "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
-            "binary_sz": sz_loc != -1,
+            "id": filepath.split("/")[-1].split(".eeghdf")[0] + f"_{sz_loc}",
+            "target": sz_loc != -1,
             "sz_start_index": sz_loc,
-            "split": split,
+            "fm_split": split,
         }
         data.append(row_df)
 
     dp = mk.DataPanel(data)
 
-    eeg_input_col = dp[["sz_start_index", "filepath", "split"]].to_lambda(
+    eeg_input_col = dp[["sz_start_index", "filepath", "fm_split"]].to_lambda(
         fn=partial(stanford_eeg_loader, clip_len=clip_len)
     )
 
     dp.add_column(
-        "eeg_input",
+        "input",
         eeg_input_col,
-        overwrite=True,
-    )
-
-    age_col = dp["filepath"].map(function=eeg_age_loader)
-    dp.add_column(
-        "age",
-        age_col,
-        overwrite=True,
-    )
-    duration_col = dp["filepath"].map(function=eeg_duration_loader)
-    dp.add_column(
-        "duration",
-        duration_col,
         overwrite=True,
     )
 
@@ -208,7 +197,16 @@ def build_stanford_eeg_dp(
             if mask_id.sum() == 1 and "findings" in doc.sections:
                 file_id = raw_reports_dp[mask_id]["edf_file_name"][0].split(".edf")[0]
                 findings = doc.sections["findings"]["text"]
-                row_df = {"file_id": file_id, "findings": findings}
+                narrative = "none"
+                if "narrative" in doc.sections:
+                    narrative = doc.sections["narrative"]["text"]
+                mrn = raw_reports_dp[mask_id]["mrn"][0]
+                row_df = {
+                    "file_id": file_id,
+                    "findings": findings,
+                    "narrative": narrative,
+                    "patient_id": mrn,
+                }
                 doc_data.append(row_df)
         reports_dp = mk.DataPanel(doc_data)
 
@@ -216,5 +214,22 @@ def build_stanford_eeg_dp(
             dp = dp.merge(reports_dp, how="inner", on="file_id")
         else:
             dp = dp.merge(reports_dp, how="left", on="file_id")
+
+    # Add metadata
+    age_col = dp["filepath"].map(function=eeg_age_loader)
+    dp.add_column(
+        "age",
+        age_col,
+        overwrite=True,
+    )
+    male_col = dp["filepath"].map(function=eeg_male_loader)
+    dp.add_column(
+        "male",
+        male_col,
+        overwrite=True,
+    )
+
+    # remove duplicate ID rows
+    dp = dp.lz[~dp["id"].duplicated()]
 
     return dp

@@ -424,14 +424,14 @@ def is_increasing(channel_indices):
     return True
 
 
-def stanford_eeg_loader(input_dict, clip_len=60):
+def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
 
     """
     filepath = input_dict["filepath"]
     sz_start_idx = input_dict["sz_start_index"]
-    split = input_dict["split"]
+    split = input_dict["fm_split"]
 
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
@@ -472,7 +472,39 @@ def stanford_eeg_loader(input_dict, clip_len=60):
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
     eeg_slice = eeg_slice.T
 
+    if augmentation:
+        eeg_slice = random_augmentation(eeg_slice)
+
     return torch.FloatTensor(eeg_slice)
+
+
+def get_swap_pairs(channels):
+    """
+    Swap select adjacenet channels
+    Returns: list of tuples, each a pair of channel indices being swapped
+    """
+    f12 = (channels.index("EEG Fp1"), channels.index("EEG Fp2"))
+    f34 = (channels.index("EEG F3"), channels.index("EEG F4"))
+    f78 = (channels.index("EEG F7"), channels.index("EEG F8"))
+    c34 = (channels.index("EEG C3"), channels.index("EEG C4"))
+    t34 = (channels.index("EEG T3"), channels.index("EEG T4"))
+    t56 = (channels.index("EEG T5"), channels.index("EEG T6"))
+    o12 = (channels.index("EEG O1"), channels.index("EEG O2"))
+    return [f12, f34, f78, c34, t34, t56, o12]
+
+
+def random_augmentation(signals):
+    """
+    Augment the data by randomly deciding whether to swap some channel pairs,
+    and independently, whether to slightly shrink the amplitude of the signals
+    Returns: the processed (augmented or not) signals
+    """
+    for pair in get_swap_pairs(STANFORD_INCLUDED_CHANNELS):
+        if np.random.choice([True, False]):
+            signals[:, [pair[0], pair[1]]] = signals[:, [pair[1], pair[0]]]
+    if np.random.choice([True, False]):
+        signals = signals * np.random.uniform(0.8, 1.2)
+    return signals
 
 
 def eeg_age_loader(filepath):
@@ -485,6 +517,18 @@ def eeg_age_loader(filepath):
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
     return eegf.age_years
+
+
+def eeg_male_loader(filepath):
+    """
+    given filepath of an eeg, pulls relevant metadata
+    right now only supports pulling age
+    """
+    # filepath = input_dict["filepath"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+    return eegf.patient["gender"] == "Male"
 
 
 def eeg_duration_loader(filepath):
