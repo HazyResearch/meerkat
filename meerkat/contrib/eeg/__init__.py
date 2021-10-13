@@ -153,7 +153,6 @@ def build_stanford_eeg_dp(
 
     # retrieve file tuples which is a list of
     # (eeg filepath, location of sz or -1 if no sz, split)
-
     file_tuples = compute_stanford_file_tuples(
         stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
     )
