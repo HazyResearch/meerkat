@@ -2,10 +2,11 @@ import logging
 import os
 import pickle
 from functools import partial
-import numpy as np
 
-from tqdm import tqdm
+import numpy as np
 import terra
+from tqdm import tqdm
+
 import meerkat as mk
 
 from .data_utils import (

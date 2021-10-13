@@ -1,9 +1,10 @@
 import os
-import torch
+
 import eeghdf
 import h5py
 import numpy as np
 import pyedflib
+import torch
 from scipy.signal import resample
 from tqdm import tqdm
 
