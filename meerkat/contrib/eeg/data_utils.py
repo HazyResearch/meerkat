@@ -402,9 +402,9 @@ def compute_stanford_file_tuples(
 def get_stanford_sz_times(eegf):
     df = eegf.edf_annotations_df
     seizure_df = df[df.text.str.contains("|".join(SEIZURE_STRINGS), case=False)]
-    seizure_df = seizure_df[
+    seizure_df = seizure_df[  # noqa: E712
         seizure_df.text.str.contains("|".join(FILTER_SZ_STRINGS), case=False) == False
-    ]  # noqa: E712
+    ]
 
     seizure_times = seizure_df["starts_sec"].tolist()
     return seizure_times
