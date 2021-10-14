@@ -3,7 +3,6 @@ import os
 import pickle
 from functools import partial
 
-import numpy as np
 import terra
 from tqdm import tqdm
 
