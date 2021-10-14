@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import abc
+import base64
 import logging
+from io import BytesIO
 from typing import Sequence
 
 import cytoolz as tz
-import numpy as np
-import pandas as pd
 from yaml.representer import Representer
 
+import meerkat as mk
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.tools.lazy_loader import LazyLoader
+
+PIL = LazyLoader("PIL")
+
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -54,19 +59,30 @@ class ListColumn(AbstractColumn):
             else:
                 yield self[i : i + batch_size]
 
-    def _repr_pandas_(self) -> pd.Series:
-        if len(self) <= pd.options.display.max_rows:
-            return pd.Series(map(repr, self))
-        else:
-            # faster than creating a
-            series = pd.Series(np.empty(len(self)), copy=False)
-            series.iloc[: pd.options.display.min_rows] = list(
-                map(repr, self[: pd.options.display.min_rows])
-            )
-            series.iloc[-(pd.options.display.min_rows // 2 + 1) :] = list(
-                map(repr, self[-(pd.options.display.min_rows // 2 + 1) :])
-            )
-            return series
+    def _repr_cell(self, index) -> object:
+        return self[index]
+
+    def _get_formatter(self) -> callable:
+        if not mk.config.DisplayOptions.show_images:
+            return None
+
+        max_image_width = mk.config.DisplayOptions.max_image_width
+        max_image_height = mk.config.DisplayOptions.max_image_height
+
+        def _image_base64(im):
+            with BytesIO() as buffer:
+                im.save(buffer, "jpeg")
+                return base64.b64encode(buffer.getvalue()).decode()
+
+        def _image_formatter(cell):
+            im = cell
+            if isinstance(im, PIL.Image.Image):
+                im.thumbnail((max_image_width, max_image_height))
+                return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
+            else:
+                return repr(cell)
+
+        return _image_formatter
 
     @classmethod
     def concat(cls, columns: Sequence[ListColumn]):

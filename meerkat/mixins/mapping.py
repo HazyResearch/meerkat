@@ -1,6 +1,7 @@
 import logging
 from typing import Callable, Dict, Mapping, Optional, Union
 
+import numpy as np
 from tqdm.auto import tqdm
 
 from meerkat.provenance import capture_provenance
@@ -22,9 +23,11 @@ class MappableMixin:
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
         output_type: Union[type, Dict[str, type]] = None,
-        mmap: bool = False,
         materialize: bool = True,
         pbar: bool = False,
+        mmap: bool = False,
+        mmap_path: str = None,
+        flush_size: int = None,
         **kwargs,
     ):
         # TODO (sabri): add materialize?
@@ -32,15 +35,6 @@ class MappableMixin:
         from meerkat.datapanel import DataPanel
 
         """Map a function over the elements of the column."""
-
-        # Just return if the function is None
-        if function is None:
-            logger.info("`function` None, returning None.")
-            return None
-
-        # Ensure that num_workers is not None
-        if num_workers is None:
-            num_workers = 0
 
         # Return if `self` has no examples
         if not len(self):
@@ -100,7 +94,9 @@ class MappableMixin:
                     )
 
                 writers = {}
-                for key, curr_output in output.items() if is_mapping else [(0, output)]:
+                for key, curr_output in (
+                    output.items() if is_mapping else [("0", output)]
+                ):
                     curr_output_type = (
                         type(AbstractColumn.from_data(curr_output))
                         if output_type is None
@@ -122,13 +118,17 @@ class MappableMixin:
                     # Setup for writing to a certain output column
                     # TODO: support optionally memmapping only some columns
                     if mmap:
+                        if not hasattr(curr_output, "shape"):
+                            curr_output = np.array(curr_output)
+
                         # Assumes first dimension of output is the batch dimension.
                         shape = (len(self), *curr_output.shape[1:])
+
                         # Construct the mmap file path
-                        # TODO: how/where to store the files
-                        path = self.logdir / f"{hash(function)}" / key
+                        if mmap_path is None:
+                            mmap_path = self.logdir / f"{hash(function)}" / key
                         # Open the output writer
-                        writer.open(str(path), dtype, shape=shape)
+                        writer.open(str(mmap_path), dtype, shape=shape)
                     else:
                         # Create an empty dict or list for the outputs
                         writer.open()
@@ -156,13 +156,18 @@ class MappableMixin:
                     for k, writer in writers.items():
                         writer.write(output[k])
                 else:
-                    writers[0].write(output)
+                    writers["0"].write(output)
+
+            # intermittently flush
+            if flush_size is not None and ((i + 1) % flush_size == 0):
+                for writer in writers.values():
+                    writer.flush()
 
         # Check if we are returning a special output type
-        outputs = {key: writer.flush() for key, writer in writers.items()}
+        outputs = {key: writer.finalize() for key, writer in writers.items()}
 
         if not is_mapping:
-            outputs = outputs[0]
+            outputs = outputs["0"]
         else:
             # TODO (arjundd): This is duck type. We should probably make this
             # class signature explicit.

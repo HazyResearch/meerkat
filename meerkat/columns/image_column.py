@@ -3,11 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Collection, Sequence
 
-import pandas as pd
-
-from meerkat.cells.imagepath import ImagePath
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.tools.lazy_loader import LazyLoader
@@ -42,6 +38,12 @@ class ImageCell(LambdaCell):
             and (self.loader == other.loader)
         )
 
+    def __repr__(self):
+        transform = getattr(self.transform, "__qualname__", repr(self.transform))
+        dirs = self.data.split("/")
+        short_path = ("" if len(dirs) <= 2 else ".../") + "/".join(dirs[-2:])
+        return f"ImageCell({short_path}, transform={transform})"
+
 
 class ImageColumn(LambdaColumn):
     def __init__(
@@ -52,7 +54,9 @@ class ImageColumn(LambdaColumn):
         *args,
         **kwargs,
     ):
-        super(ImageColumn, self).__init__(PandasSeriesColumn(data), *args, **kwargs)
+        if not isinstance(data, PandasSeriesColumn):
+            data = PandasSeriesColumn(data)
+        super(ImageColumn, self).__init__(data, *args, **kwargs)
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
 
@@ -90,35 +94,10 @@ class ImageColumn(LambdaColumn):
     def _state_keys(cls) -> Collection:
         return (super()._state_keys() | {"transform", "loader"}) - {"fn"}
 
-    def _repr_pandas_(self) -> pd.Series:
-        return "ImageCell(" + self.data.data.reset_index(drop=True) + ")"
-
     def is_equal(self, other: AbstractColumn) -> bool:
         return (
             (other.__class__ == self.__class__)
             and (self.loader == other.loader)
             and (self.transform == other.transform)
             and self.data.is_equal(other.data)
-        )
-
-
-class ImageCellColumn(CellColumn):
-    def __init__(self, *args, **kwargs):
-        super(ImageCellColumn, self).__init__(*args, **kwargs)
-
-    @classmethod
-    def from_filepaths(
-        cls,
-        filepaths: Sequence[str] = None,
-        loader: callable = None,
-        transform: callable = None,
-        *args,
-        **kwargs,
-    ):
-        cells = [ImagePath(fp, transform=transform, loader=loader) for fp in filepaths]
-
-        return cls(
-            cells=cells,
-            *args,
-            **kwargs,
         )

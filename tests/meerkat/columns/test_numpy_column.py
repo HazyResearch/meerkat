@@ -1,8 +1,11 @@
+import os
+
 import numpy as np
 import numpy.testing as np_test
 import pandas as pd
 import pytest
 import torch
+from numpy.lib.format import open_memmap
 
 from meerkat import NumpyArrayColumn
 from meerkat.block.tensor_block import TensorBlock
@@ -16,6 +19,7 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         "num_dims": [1, 2, 3],
         "dim_length": [1, 5],
         "dtype": ["float", "int"],
+        "mmap": [True, False],
     }
 
     def __init__(
@@ -24,6 +28,7 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         num_dims: int = True,
         dim_length: int = 5,
         dtype="float",
+        mmap: bool = False,
         seed: int = 123,
         tmpdir: str = None,
     ):
@@ -33,8 +38,17 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
             np.random.random((length, *[dim_length for _ in range(num_dims - 1)])) * 10
         )
         array = array.astype(dtype)
-
-        self.col = NumpyArrayColumn.from_array(array)
+        if mmap:
+            mmap = open_memmap(
+                filename=os.path.join(tmpdir, "mmap"),
+                dtype=array.dtype,
+                shape=array.shape,
+                mode="w+",
+            )
+            mmap[:] = array
+            self.col = NumpyArrayColumn.from_array(mmap)
+        else:
+            self.col = NumpyArrayColumn.from_array(array)
         self.data = array
 
     def get_map_spec(
@@ -121,6 +135,35 @@ class TestNumpyArrayColumn(TestAbstractColumn):
             testbed, batched, materialize=True
         )
 
+    @NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
+    def test_map_return_single_mmap(
+        self, tmpdir, testbed: AbstractColumnTestBed, batched: bool
+    ):
+        col = testbed.col
+        map_spec = testbed.get_map_spec(batched=batched)
+
+        def func(x):
+            out = map_spec["fn"](x)
+            return out
+
+        mmap_path = os.path.join(tmpdir, "mmap_path")
+        result = col.map(
+            func,
+            batch_size=4,
+            mmap=True,
+            mmap_path=mmap_path,
+            is_batched_fn=batched,
+            output_type=map_spec.get("output_type", None),
+        )
+        assert result.is_equal(map_spec["expected_result"])
+
+        assert isinstance(result.data, np.memmap)
+        assert result.data.filename == mmap_path
+
+    @NumpyArrayColumnTestBed.parametrize(params={"n": [1, 2, 3]})
+    def test_concat(self, testbed: AbstractColumnTestBed, n: int):
+        return super().test_concat(testbed, n=n)
+
     @NumpyArrayColumnTestBed.parametrize()
     def test_copy(self, testbed: AbstractColumnTestBed):
         return super().test_copy(testbed)
@@ -128,6 +171,23 @@ class TestNumpyArrayColumn(TestAbstractColumn):
     @NumpyArrayColumnTestBed.parametrize()
     def test_io(self, tmp_path, testbed):
         super().test_io(tmp_path, testbed)
+
+    @NumpyArrayColumnTestBed.parametrize(
+        params={"link": [True, False], "mmap": [True, False]}
+    )
+    def test_io_mmap(self, tmp_path, testbed, link, mmap):
+        col = testbed.col
+
+        path = os.path.join(tmp_path, "test")
+        col.write(path, link=link)
+
+        assert os.path.islink(os.path.join(path, "data.npy")) == (link and col.is_mmap)
+
+        new_col = self.column_class.read(path, mmap=mmap)
+
+        assert isinstance(new_col, self.column_class)
+        assert col.is_equal(new_col)
+        assert new_col.is_mmap == mmap
 
     @NumpyArrayColumnTestBed.parametrize()
     def test_pickle(self, testbed):

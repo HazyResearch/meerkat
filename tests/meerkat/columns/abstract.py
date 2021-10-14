@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 
 from meerkat.datapanel import DataPanel
+from meerkat.ops.concat import concat
 
 
 @pytest.fixture
@@ -115,7 +116,10 @@ class TestAbstractColumn:
             col_index = index_type(index) if isinstance(index, np.ndarray) else index
             data_to_set = self._get_data_to_set(testbed, index)
             col[col_index] = data_to_set
-            testbed.assert_data_equal(data_to_set, testbed.get_data(index))
+            if isinstance(index, int):
+                testbed.assert_data_equal(data_to_set, col.lz[col_index])
+            else:
+                testbed.assert_data_equal(data_to_set, col.lz[col_index].data)
 
     def test_map_return_single(
         self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
@@ -207,6 +211,15 @@ class TestAbstractColumn:
 
         assert result.is_equal(filter_spec["expected_result"])
 
+    def test_concat(self, testbed: AbstractColumnTestBed, n: int = 2):
+        col = testbed.col
+        out = concat([col] * n)
+
+        assert len(out) == len(col) * n
+        assert isinstance(out, type(col))
+        for i in range(n):
+            assert out.lz[i * len(col) : (i + 1) * len(col)].is_equal(col)
+
     def test_copy(self, testbed: AbstractColumnTestBed):
         col, _ = testbed.col, testbed.data
         col_copy = col.copy()
@@ -271,7 +284,7 @@ class TestAbstractColumn:
 
     def test_repr_pandas(self, tmpdir):
         testbed = self.testbed_class.single(tmpdir=tmpdir)
-        series = testbed.col._repr_pandas_()
+        series, _ = testbed.col._repr_pandas_()
         assert isinstance(series, pd.Series)
 
     def test_to_pandas(self, tmpdir):

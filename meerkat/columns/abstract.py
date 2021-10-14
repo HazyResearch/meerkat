@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
+import pathlib
 import reprlib
 from copy import copy
 from typing import Any, Callable, List, Optional, Sequence, Union
@@ -10,17 +11,16 @@ import numpy as np
 import pandas as pd
 import torch
 
+import meerkat.config
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
-from meerkat.mixins.identifier import IdentifierMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.identifier import Identifier
 from meerkat.tools.utils import convert_to_batch_column_fn
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,6 @@ class AbstractColumn(
     CollateMixin,
     ColumnIOMixin,
     FunctionInspectorMixin,
-    IdentifierMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
@@ -43,10 +42,15 @@ class AbstractColumn(
 
     _data: Sequence = None
 
+    # Path to a log directory
+    logdir: pathlib.Path = pathlib.Path.home() / "meerkat/"
+
+    # Create a directory
+    logdir.mkdir(parents=True, exist_ok=True)
+
     def __init__(
         self,
         data: Sequence = None,
-        identifier: Identifier = None,
         collate_fn: Callable = None,
         *args,
         **kwargs,
@@ -55,7 +59,6 @@ class AbstractColumn(
         self._set_data(data)
 
         super(AbstractColumn, self).__init__(
-            identifier=identifier,
             collate_fn=collate_fn,
             *args,
             **kwargs,
@@ -180,6 +183,12 @@ class AbstractColumn(
         if not self._is_batch_index(index):
             return index
 
+        if isinstance(index, pd.Series):
+            index = index.values
+
+        if torch.is_tensor(index):
+            index = index.numpy()
+
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
@@ -226,15 +235,55 @@ class AbstractColumn(
             return 0
         return len(self._data)
 
-    def _repr_pandas_(self) -> pd.Series:
+    def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
-    def _repr_html_(self):
+    def _get_formatter(self) -> callable:
+        return None
+
+    def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        if len(self) > max_rows:
+            col = pd.Series(
+                [self._repr_cell(idx) for idx in range(max_rows // 2)]
+                + [None]
+                + [
+                    self._repr_cell(idx)
+                    for idx in range(len(self) - max_rows // 2, len(self))
+                ]
+            )
+        else:
+            col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
+
+        formatter = self._get_formatter()
+        return col, formatter
+
+    def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_
-        return (
-            self._repr_pandas_()
-            .to_frame(name=f"({self.__class__.__name__})")
-            ._repr_html_()
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+
+        if len(self) > max_rows:
+            pd_index = np.concatenate(
+                (
+                    np.arange(max_rows // 2),
+                    np.zeros(1),
+                    np.arange(len(self) - max_rows // 2, len(self)),
+                ),
+            )
+        else:
+            pd_index = np.arange(len(self))
+
+        col_name = f"({self.__class__.__name__})"
+        col, formatter = self._repr_pandas_(max_rows=max_rows)
+        df = col.to_frame(name=col_name)
+        df = df.set_index(pd_index.astype(int))
+        return df.to_html(
+            max_rows=max_rows,
+            formatters={col_name: formatter},
+            escape=False,
         )
 
     @capture_provenance()
@@ -392,12 +441,6 @@ class AbstractColumn(
 
         if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
-            from ..cells.imagepath import ImagePath
-
-            if len(data) != 0 and isinstance(data[0], ImagePath):
-                from .image_column import ImageColumn
-
-                return ImageColumn.from_cells(data)
 
             if len(data) != 0 and isinstance(data[0], AbstractCell):
                 from .cell_column import CellColumn
@@ -410,7 +453,13 @@ class AbstractColumn(
                 from .numpy_column import NumpyArrayColumn
 
                 return NumpyArrayColumn(data)
-            elif len(data) != 0 and torch.is_tensor(data[0]):
+
+            if len(data) != 0 and isinstance(data[0], str):
+                from .pandas_column import PandasSeriesColumn
+
+                return PandasSeriesColumn(data)
+
+            if len(data) != 0 and torch.is_tensor(data[0]):
                 from .tensor_column import TensorColumn
 
                 return TensorColumn(data)
@@ -437,3 +486,7 @@ class AbstractColumn(
 
     def _view_data(self) -> object:
         return self._data
+
+    @property
+    def is_mmap(self):
+        return False

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import os
+import shutil
 from dataclasses import dataclass
+from mmap import mmap
 from typing import Hashable, Mapping, Sequence, Tuple, Union
 
 import numpy as np
+import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.errors import ConsolidationError
@@ -19,6 +22,7 @@ class NumpyBlock(AbstractBlock):
         nrows: int
         shape: Tuple[int]
         klass: type
+        mmap: Union[bool, int]
 
     def __init__(self, data, *args, **kwargs):
         super(NumpyBlock, self).__init__(*args, **kwargs)
@@ -32,7 +36,8 @@ class NumpyBlock(AbstractBlock):
     def signature(self) -> Hashable:
         return self.Signature(
             klass=NumpyBlock,
-            # we don't
+            # don't want to consolidate any mmaped blocks
+            mmap=id(self) if isinstance(self.data, np.memmap) else False,
             nrows=self.data.shape[0],
             shape=self.data.shape[2:],
             dtype=self.data.dtype,
@@ -109,9 +114,17 @@ class NumpyBlock(AbstractBlock):
         }
         return BlockRef(block=block, columns=new_columns)
 
+    @staticmethod
+    def _convert_index(index):
+        if torch.is_tensor(index):
+            # need to convert to numpy for boolean indexing
+            return index.numpy()
+        return index
+
     def _get(
         self, index, block_ref: BlockRef, materialize: bool = True
     ) -> Union[BlockRef, dict]:
+        index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]
         if isinstance(index, int):
@@ -127,10 +140,26 @@ class NumpyBlock(AbstractBlock):
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
 
-    def _write_data(self, path: str):
-        np.save(os.path.join(path, "data.npy"), self.data)
+    @property
+    def is_mmap(self):
+        # important to check if .base is a python mmap object, since a view of a mmap
+        # is also a memmap object, but should not be symlinked or copied
+        return isinstance(self.data, np.memmap) and isinstance(self.data.base, mmap)
+
+    def _write_data(self, path: str, link: bool = True):
+        path = os.path.join(path, "data.npy")
+        if self.is_mmap:
+            if link:
+                os.symlink(self.data.filename, path)
+            else:
+                shutil.copy(self.data.filename, path)
+        else:
+            np.save(path, self.data)
 
     @staticmethod
-    def _read_data(path: str):
-        # TODO: support memmapping
-        return np.load(os.path.join(path, "data.npy"))
+    def _read_data(path: str, mmap: bool = False):
+        data_path = os.path.join(path, "data.npy")
+
+        if mmap:
+            return np.load(data_path, mmap_mode="r")
+        return np.load(data_path)

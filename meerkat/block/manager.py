@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import os
+import shutil
 from collections import defaultdict
 from collections.abc import MutableMapping
-from typing import Dict, Sequence, Union
+from typing import Dict, Mapping, Sequence, Union
 
+import numpy as np
 import pandas as pd
 import yaml
 
+import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
 
@@ -18,16 +21,20 @@ class BlockManager(MutableMapping):
     """This manager manages all blocks."""
 
     def __init__(self) -> None:
-        self._columns: Dict[str, AbstractColumn] = {}
+        self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7
         self._column_to_block_id: Dict[str, int] = {}
         self._block_refs: Dict[int, BlockRef] = {}
 
     def update(self, block_ref: BlockRef):
         """data (): a single blockable object, potentially contains multiple
         columns."""
+        for name in block_ref:
+            if name in self:
+                self.remove(name)
+
         # although we can't have the same column living in multiple managers
         # we don't view here because it can lead to multiple calls to clone
-        self._columns.update({name: column for name, column in block_ref.items()})
+        self._columns.update(block_ref)
 
         block_id = id(block_ref.block)
         # check if there already is a block_ref in the manager for this block
@@ -66,9 +73,15 @@ class BlockManager(MutableMapping):
 
             results[name] = result
 
+        if isinstance(results, BlockManager):
+            results.reorder(self.keys())
         return results
 
     def consolidate(self):
+        column_order = list(
+            self._columns.keys()
+        )  # need to maintain order after consolidate
+
         block_ref_groups = defaultdict(list)
         for block_ref in self._block_refs.values():
             block_ref_groups[block_ref.block.signature].append(block_ref)
@@ -78,14 +91,12 @@ class BlockManager(MutableMapping):
                 # if there is only one block ref in the group, do not consolidate
                 continue
 
-            # remove old block_refs
-            for old_ref in block_refs:
-                self._block_refs.pop(id(old_ref.block))
-
             # consolidate group
             block_class = block_refs[0].block.__class__
             block_ref = block_class.consolidate(block_refs)
             self.update(block_ref)
+
+        self.reorder(column_order)
 
     def remove(self, name):
         if name not in self._columns:
@@ -102,6 +113,11 @@ class BlockManager(MutableMapping):
                 self._block_refs.pop(self._column_to_block_id[name])
 
             self._column_to_block_id.pop(name)
+
+    def reorder(self, order: Sequence[str]):
+        if set(order) != set(self._columns):
+            raise ValueError("Must include all columns when reordering a BlockManager.")
+        self._columns = {name: self._columns[name] for name in order}
 
     def __getitem__(
         self, index: Union[str, Sequence[str]]
@@ -128,6 +144,7 @@ class BlockManager(MutableMapping):
             for block_id, names in block_id_to_names.items():
                 block_ref = self._block_refs[block_id]
                 mgr.update(block_ref[names])
+            mgr.reorder(order=index)
             return mgr
         else:
             raise ValueError(
@@ -148,6 +165,14 @@ class BlockManager(MutableMapping):
     def __len__(self):
         return len(self._columns)
 
+    @property
+    def nrows(self):
+        return 0 if len(self) == 0 else len(next(iter(self._columns.values())))
+
+    @property
+    def ncols(self):
+        return len(self)
+
     def __contains__(self, value):
         return value in self._columns
 
@@ -160,8 +185,11 @@ class BlockManager(MutableMapping):
     def add_column(self, col: AbstractColumn, name: str):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        if name in self._columns:
-            self.remove(name)
+        if len(self) > 0 and len(col) != self.nrows:
+            raise ValueError(
+                f"Cannot add column '{name}' with length {len(col)} to `BlockManager` "
+                f" with length {self.nrows} columns."
+            )
 
         if not col.is_blockable():
             col = col.view()
@@ -172,7 +200,7 @@ class BlockManager(MutableMapping):
             self.update(BlockRef(columns={name: col}, block=col._block))
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: Mapping[str, object]):
         mgr = cls()
         for name, data in data.items():
             col = AbstractColumn.from_data(data)
@@ -180,20 +208,42 @@ class BlockManager(MutableMapping):
         return mgr
 
     def write(self, path: str):
-        meta = {"dtype": BlockManager, "columns": {}}
+        meta = {
+            "dtype": BlockManager,
+            "columns": {},
+            "_column_order": list(self.keys()),
+        }
 
         # prepare directories
-        os.makedirs(path, exist_ok=True)
-        block_dirs = os.path.join(path, "blocks")
-        os.makedirs(block_dirs)
         columns_dir = os.path.join(path, "columns")
+        blocks_dir = os.path.join(path, "blocks")
+        meta_path = os.path.join(path, "meta.yaml")
+        if os.path.isdir(path):
+            if (
+                os.path.exists(meta_path)
+                and os.path.exists(columns_dir)
+                and os.path.exists(blocks_dir)
+            ):
+                # if overwriting, ensure that old columns are removed
+                shutil.rmtree(columns_dir)
+                shutil.rmtree(blocks_dir)
+            else:
+                # if path already points to a dir that wasn't previously holding a
+                # block manager, do not overwrite it. We'd like to protect against
+                # situation in which user accidentally puts in an important directory
+                raise IsADirectoryError(
+                    f"Cannot write `BlockManager`. {path} is a directory."
+                )
+
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(blocks_dir)
         os.makedirs(columns_dir)
 
         # consolidate before writing
         self.consolidate()
         for block_id, block_ref in self._block_refs.items():
             block: AbstractBlock = block_ref.block
-            block_dir = os.path.join(block_dirs, str(block_id))
+            block_dir = os.path.join(blocks_dir, str(block_id))
             block.write(block_dir)
 
             for name, column in block_ref.items():
@@ -204,8 +254,9 @@ class BlockManager(MutableMapping):
                 meta["columns"][name] = {
                     **column._get_meta(),
                     "block": {
-                        "block_dir": block_dir,
+                        "block_dir": os.path.relpath(block_dir, path),
                         "block_index": _serialize_block_index(column._block_index),
+                        "mmap": block.is_mmap,
                     },
                 }
                 column._write_state(column_dir)
@@ -218,7 +269,6 @@ class BlockManager(MutableMapping):
             column.write(os.path.join(columns_dir, name))
 
         # Save the metadata as a yaml file
-        meta_path = os.path.join(path, "meta.yaml")
         yaml.dump(meta, open(meta_path, "w"))
 
     @classmethod
@@ -249,7 +299,8 @@ class BlockManager(MutableMapping):
                 block_meta = col_meta["block"]
                 if block_meta["block_dir"] not in blocks:
                     blocks[block_meta["block_dir"]] = AbstractBlock.read(
-                        block_meta["block_dir"]
+                        os.path.join(path, block_meta["block_dir"]),
+                        mmap=block_meta.get("mmap", False),
                     )
                 block = blocks[block_meta["block_dir"]]
 
@@ -264,28 +315,40 @@ class BlockManager(MutableMapping):
                 mgr.add_column(
                     col_meta["dtype"].read(path=column_dir, _meta=col_meta), name
                 )
-
+        mgr.reorder(meta["_column_order"])
         return mgr
 
-    def _repr_pandas_(self):
-        dfs = []
-        cols = set(self._columns.keys())
-        for _, block_ref in self._block_refs.items():
-            if hasattr(block_ref.block, "_repr_pandas_"):
-                dfs.append(block_ref.block._repr_pandas_(block_ref))
-                cols -= set(block_ref.keys())
-        dfs.append(pd.DataFrame({k: self[k]._repr_pandas_() for k in cols}))
-        return pd.concat(objs=dfs, axis=1)
+    def _repr_pandas_(self, max_rows: int = None):
+        if max_rows is None:
+            max_rows = meerkat.config.DisplayOptions.max_rows
+        cols = {}
+        formatters = {}
+        for name, column in self._columns.items():
+            cols[name], formatters[name] = column._repr_pandas_(max_rows=max_rows)
+        if self.nrows > max_rows:
+            pd_index = np.concatenate(
+                (
+                    np.arange(max_rows // 2),
+                    np.zeros(1),
+                    np.arange(self.nrows - max_rows // 2, self.nrows),
+                ),
+            )
+        else:
+            pd_index = np.arange(self.nrows)
+
+        df = pd.DataFrame(cols)
+        df = df.set_index(pd_index.astype(int))
+        return df, formatters
 
     def view(self):
         mgr = BlockManager()
-        for name, col in self._columns.items():
+        for name, col in self.items():
             mgr.add_column(col.view(), name)
         return mgr
 
     def copy(self):
         mgr = BlockManager()
-        for name, col in self._columns.items():
+        for name, col in self.items():
             mgr.add_column(col.copy(), name)
         return mgr
 

@@ -5,6 +5,8 @@ import functools
 import logging
 import numbers
 import os
+import shutil
+from mmap import mmap
 from typing import Callable, Sequence
 
 import numpy as np
@@ -113,6 +115,7 @@ class NumpyArrayColumn(
         self._data[indices] = values
 
     def _get(self, index, materialize: bool = True):
+        index = NumpyBlock._convert_index(index)
         data = self._data[index]
         if self._is_batch_index(index):
             # only create a numpy array column
@@ -126,23 +129,31 @@ class NumpyArrayColumn(
     def _view_data(self) -> object:
         return self._data
 
-    def _write_data(self, path: str) -> None:
-        # Saving all cell data in a single pickle file
-        np.save(os.path.join(path, "data.npy"), self.data)
+    @property
+    def is_mmap(self):
+        # important to check if .base is a python mmap object, since a view of a mmap
+        # is also a memmap object, but should not be symlinked or copied
+        return isinstance(self.data, np.memmap) and isinstance(self.data.base, mmap)
+
+    def _write_data(self, path: str, link: bool = True) -> None:
+        path = os.path.join(path, "data.npy")
+        # important to check if .base is a python mmap object, since a view of a mmap
+        # is also a memmap object, but should not be symlinked
+        if self.is_mmap:
+            if link:
+                os.symlink(self.data.filename, path)
+            else:
+                shutil.copy(self.data.filename, path)
+        else:
+            np.save(path, self.data)
 
     @staticmethod
-    def _read_data(
-        path: str, mmap=False, dtype=None, shape=None, *args, **kwargs
-    ) -> NumpyArrayColumn:
+    def _read_data(path: str, mmap=False, *args, **kwargs) -> NumpyArrayColumn:
         data_path = os.path.join(path, "data.npy")
-        # Load in the data
+
         if mmap:
-            # assert dtype is not None and shape is not None
-            data = np.memmap(data_path, dtype=dtype, mode="r", shape=shape)
-            # data = np.load(data_path, mmap_mode="r")
-        else:
-            data = np.load(data_path, allow_pickle=True)
-        return data
+            return np.load(data_path, mmap_mode="r")
+        return np.load(data_path)
 
     @classmethod
     def concat(cls, columns: Sequence[NumpyArrayColumn]):
@@ -152,7 +163,7 @@ class NumpyArrayColumn(
     def is_equal(self, other: AbstractColumn) -> bool:
         if other.__class__ != self.__class__:
             return False
-        return (self.data == other.data).all()
+        return np.array_equal(self.data, other.data, equal_nan=True)
 
     @classmethod
     def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
@@ -163,11 +174,11 @@ class NumpyArrayColumn(
         else:
             return ConcatWriter(template=template, output_type=NumpyArrayColumn)
 
-    def _repr_pandas_(self) -> pd.Series:
+    def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
-            return pd.Series([f"np.ndarray(shape={self.shape[1:]})"] * len(self))
+            return f"np.ndarray(shape={self.shape[1:]})"
         else:
-            return pd.Series(self.data)
+            return self[index]
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is

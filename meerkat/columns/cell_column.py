@@ -5,7 +5,6 @@ from typing import Sequence
 
 import cytoolz as tz
 import numpy as np
-import pandas as pd
 
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
@@ -42,6 +41,23 @@ class CellColumn(AbstractColumn):
         else:
             return [self._data[i] for i in indices]
 
+    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
+        index = self._translate_index(index)
+        if isinstance(index, int):
+            if _data is None:
+                _data = self._get_cell(index, materialize=materialize)
+            return _data
+
+        elif isinstance(index, np.ndarray):
+            # support for blocks
+            if _data is None:
+                _data = self._get_batch(index, materialize=materialize)
+            if materialize:
+                # materialize could change the data in unknown ways, cannot clone
+                return self.__class__.from_data(data=_data)
+            else:
+                return self._clone(data=_data)
+
     @classmethod
     def from_cells(cls, cells: Sequence[AbstractCell], *args, **kwargs):
         return cls(cells=cells, *args, **kwargs)
@@ -50,10 +66,8 @@ class CellColumn(AbstractColumn):
     def cells(self):
         return self.data
 
-    def _repr_pandas_(
-        self,
-    ) -> pd.Series:
-        return pd.Series([cell.__repr__() for cell in self.cells])
+    def _repr_cell(self, index) -> object:
+        return self.lz[index].__repr__()
 
     @staticmethod
     def concat(columns: Sequence[CellColumn]):

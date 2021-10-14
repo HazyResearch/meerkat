@@ -5,6 +5,7 @@ import numpy as np
 
 from meerkat import DataPanel, ListColumn
 from meerkat.columns.cell_column import CellColumn
+from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.errors import MergeError
@@ -84,9 +85,7 @@ def merge(
     # add columns in both `left_on` and `right_on`, casting to the column type in left
     for name, column in merged_df.iteritems():
         merged_dp.add_column(name, left[name]._clone(data=column.values))
-        merged_dp.visible_columns = (
-            merged_dp.visible_columns[-1:] + merged_dp.visible_columns[:-1]
-        )
+        merged_dp.data.reorder(merged_dp.columns[-1:] + merged_dp.columns[:-1])
     if (
         not keep_indexes
         and ("index" + suffixes[0]) in merged_dp
@@ -133,7 +132,7 @@ def _check_merge_columns(dp: DataPanel, on: List[str]):
                     f"Cannot merge on column `{name}`, contains unhashable objects."
                 )
 
-        elif isinstance(column, CellColumn):
+        elif isinstance(column, CellColumn) or isinstance(column, LambdaColumn):
             if not all(
                 [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
             ):
