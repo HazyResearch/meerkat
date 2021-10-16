@@ -2,7 +2,7 @@ import os
 import warnings
 from typing import List
 
-import numpy as np
+from numpy.lib.format import open_memmap
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
@@ -17,7 +17,7 @@ class ActivationCallback(pl.callbacks.Callback):
         self,
         target_module: str,
         val_len: int,
-        logdir: str,  # TODO(Priya): Use trainer.log_dir?
+        logdir: None,
         mmap: bool = False,
     ):
         """Callback to store model activations during validation step
@@ -28,7 +28,8 @@ class ActivationCallback(pl.callbacks.Callback):
                 For nested submodules, specify a path separated by "." (e.g.
                 `ActivationCachedOp(model, "block4.conv")`).
             val_len (int): Number of inputs in the validation dataset
-            logdir (str): Directory to store the activation datapanels
+            logdir (str): Directory to store the activation datapanels.
+                Not required if trainer.log_dir is to be used
             mmap (bool): If true, activations are stored as memmapped numpy arrays
         """
 
@@ -43,6 +44,10 @@ class ActivationCallback(pl.callbacks.Callback):
             warnings.warn(
                 "Activations will be stored as numpy array when using memmapping."
             )
+
+    def on_init_start(self, trainer):
+        if self.logdir is None:
+            self.logdir = trainer.log_dir
 
     def on_validation_epoch_start(self, trainer, pl_module):
         if not trainer.running_sanity_check:
@@ -78,34 +83,31 @@ class ActivationCallback(pl.callbacks.Callback):
             activations = DataPanel.from_batch(activations)
 
             if not self.mmap:
-                file = f"activations_{self.target_module}_{trainer.current_epoch}"
+                file = f"activations_{self.target_module}_{trainer.current_epoch}.mk"
                 activations.write(os.path.join(self.logdir, file))
 
 
 def load_activations(
     target_module: str,
     logdir: str,
-    epochs: List,
+    epochs: List[int],
     mmap: bool = False,
-    shape: tuple = None,
-    dtype: str = "float32",
     mmap_mode: str = "r",
 ) -> DataPanel:
-
-    if mmap and shape is None:
-        raise ValueError(
-            "Shape of activations is required to load memmapped activations."
-        )
 
     activations_dp = None
 
     for epoch in epochs:
+
         path = os.path.join(logdir, f"activations_{target_module}_{epoch}")
+        if not mmap:
+            path += ".mk"
+
         if not os.path.exists(path):
             raise ValueError(f"{path} does not exist.")
 
         if mmap:
-            activations = np.memmap(path, dtype=dtype, mode=mmap_mode, shape=shape)
+            activations = open_memmap(path, mode=mmap_mode)
         else:
             activations = DataPanel.read(path)[f"activation_{target_module}"]
 
