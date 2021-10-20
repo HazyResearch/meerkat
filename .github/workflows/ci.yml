@@ -122,7 +122,7 @@ jobs:
     
             -   name: Install Dependencies
                 run: |
-                    pip install -e ".[dev, text, vision, tabular, embeddings-linux, medimg]"
+                    pip install -e ".[dev, text, vision, tabular, embeddings-linux, medimg, ml]"
                     
             -   name: Test with pytest
                 run: |

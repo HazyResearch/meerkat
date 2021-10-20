@@ -1,11 +1,11 @@
-from functools import partial
 from typing import Dict, List
 
 import torch
 
 from meerkat.datapanel import DataPanel
-from meerkat.nn.metrics import compute_metric
-from meerkat.nn.prediction_column import ClassificationOutputColumn
+from meerkat.ml.embedding_column import EmbeddingColumn
+from meerkat.ml.metrics import compute_metric
+from meerkat.ml.prediction_column import ClassificationOutputColumn
 
 
 # TODO(Priya): Move some general functions here
@@ -44,12 +44,69 @@ class Model(torch.nn.Module):
     def forward(self, input_batch: Dict) -> Dict:
         raise NotImplementedError
 
-    def _predict(self, batch, input_columns):
+    def _predict(self, batch, input_cols):
+        # Use input_cols instead of input_columns to avoid naming conflict with map
+
         # Process the batch to prepare input
-        input_batch = self.process_batch(batch, input_columns)
+        input_batch = self.process_batch(batch, input_cols)
         # Run forward pass
         prediction_dict = self.forward(input_batch)
         return prediction_dict
+
+    def _activation(self, batch, input_cols, activation_op):
+        # Use input_cols instead of input_columns to avoid naming conflict with map
+
+        # Process the batch
+        input_batch = self.process_batch(batch, input_cols)
+        # Run forward pass
+        _ = self.forward(input_batch)
+
+        activation_dict = {
+            f"activation_{activation_op.target_module}": EmbeddingColumn(
+                activation_op.extractor.activation.cpu().detach()
+            )
+        }
+
+        return activation_dict
+
+    def activation(
+        self,
+        dataset: DataPanel,
+        target_module: str,  # TODO(Priya): Support multiple activation layers
+        input_columns: List[str],
+        batch_size=32,
+    ) -> EmbeddingColumn:
+
+        """An Operation that stores model activations in a new Embedding column.
+
+        Args:
+            dataset (DataPanel): the meerkat DataPanel containing the model inputs.
+            target_module (str): the name of the submodule of `model` (i.e. an
+                intermediate layer) that outputs the activations we'd like to extract.
+                For nested submodules, specify a path separated by "." (e.g.
+                `ActivationCachedOp(model, "block4.conv")`).
+            input_columns (str): Column containing model inputs
+        """
+
+        # To avoid circular dependency for now.
+        from meerkat.ml.activation import ActivationOp
+
+        # Get an activation operator
+        activation_op = ActivationOp(self.model, target_module, self.device)
+
+        activations = dataset.map(
+            function=self._activation,
+            is_batched_fn=True,
+            batch_size=batch_size,
+            output_type=EmbeddingColumn,
+            input_cols=input_columns,
+            activation_op=activation_op,
+        )
+
+        activation_col = activations[f"activation_{activation_op.target_module}"]
+
+        # dataset.add_column(f"activation ({target_module})", activation_col)
+        return activation_col
 
     def classification(
         self,
@@ -65,10 +122,11 @@ class Model(torch.nn.Module):
         # Handles outputs for classification tasks
 
         predictions = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=ClassificationOutputColumn,
+            input_cols=input_columns,
         )
 
         # TODO(Priya): How to pass other args of ClassificationOutputColumn above?
