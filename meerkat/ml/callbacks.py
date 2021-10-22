@@ -20,7 +20,7 @@ class ActivationCallback(pl.callbacks.Callback):
         logdir: None,
         mmap: bool = False,
     ):
-        """Callback to store model activations during validation step
+        """Callback to store model activations during validation step.
 
         Args:
             target_module (str): the name of the submodule of `model` (i.e. an

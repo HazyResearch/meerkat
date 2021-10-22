@@ -320,8 +320,7 @@ def resample_data(signals, to_freq=200, window_size=4):
 
 
 def resample_files(raw_edf_dir, save_dir):
-    """
-    Resamples edf files to FREQUENCY and saves them in specified dir
+    """Resamples edf files to FREQUENCY and saves them in specified dir.
 
     Args:
         raw_edf_dir (str): location where original edf files are located
@@ -367,9 +366,8 @@ def resample_files(raw_edf_dir, save_dir):
 def compute_stanford_file_tuples(
     stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
 ):
-    """
-    Given the splits, processes file tuples form filemarkers
-    file tuple: (eeg filename, location of sz or -1 if no sz, split)
+    """Given the splits, processes file tuples form filemarkers file tuple:
+    (eeg filename, location of sz or -1 if no sz, split)
 
     Args:
         stanford_dataset_dir (str): data dir for stanford EEG files
@@ -410,8 +408,8 @@ def get_stanford_sz_times(eegf):
 
 
 def is_increasing(channel_indices):
-    """
-    Check if a list of indices is sorted in ascending order.
+    """Check if a list of indices is sorted in ascending order.
+
     If not, we will have to convert it to a numpy array before slicing,
     which is a rather expensive operation
     Returns: bool
@@ -425,10 +423,7 @@ def is_increasing(channel_indices):
 
 
 def stanford_eeg_loader(input_dict, clip_len=60):
-    """
-    given filepath and sz_start, extracts EEG clip of length 60 sec
-
-    """
+    """given filepath and sz_start, extracts EEG clip of length 60 sec."""
     filepath = input_dict["filepath"]
     sz_start_idx = input_dict["sz_start_index"]
     split = input_dict["split"]

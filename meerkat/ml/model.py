@@ -77,7 +77,8 @@ class Model(torch.nn.Module):
         batch_size=32,
     ) -> EmbeddingColumn:
 
-        """An Operation that stores model activations in a new Embedding column.
+        """An Operation that stores model activations in a new Embedding
+        column.
 
         Args:
             dataset (DataPanel): the meerkat DataPanel containing the model inputs.

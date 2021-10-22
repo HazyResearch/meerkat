@@ -23,8 +23,7 @@ def get_all_cifar10_splits(
     transforms=None,
     seed=42,
 ):
-    """
-    Load a CIFAR10 split as a Meerkat DataPanel.
+    """Load a CIFAR10 split as a Meerkat DataPanel.
 
     Args:
         download_dir: download directory

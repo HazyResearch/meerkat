@@ -15,7 +15,7 @@ from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 
 def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
-    """ For non-chunked arrays, need to pass zero_copy_only=False"""
+    """For non-chunked arrays, need to pass zero_copy_only=False."""
     if isinstance(array, pa.ChunkedArray):
         return array.to_numpy()
     return array.to_numpy(zero_copy_only=False)
