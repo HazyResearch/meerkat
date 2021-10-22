@@ -148,7 +148,7 @@ class NumpyArrayColumn(
             np.save(path, self.data)
 
     @staticmethod
-    def _read_data(path: str, mmap=False, *args, **kwargs) -> NumpyArrayColumn:
+    def _read_data(path: str, mmap=False, *args, **kwargs) -> np.ndarray:
         data_path = os.path.join(path, "data.npy")
 
         if mmap:

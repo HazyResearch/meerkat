@@ -18,9 +18,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class BlockView:
-    data: object
     block_index: BlockIndex
     block: AbstractBlock
+
+    @property
+    def data(self):
+        return self.block._get_data(self.block_index)
 
 
 class AbstractBlock:
@@ -28,7 +31,7 @@ class AbstractBlock:
         super(AbstractBlock, self).__init__(*args, **kwargs)
 
     def __getitem__(self, index: BlockIndex) -> BlockView:
-        return BlockView(data=self._get_data(index), block_index=index, block=self)
+        return BlockView(block_index=index, block=self)
 
     def _get_data(self, index: BlockIndex) -> object:
         """Must return view of the underlying data."""
@@ -39,9 +42,11 @@ class AbstractBlock:
         raise NotImplementedError
 
     @classmethod
-    def from_data(
-        cls, data: object, names: Sequence[str]
-    ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
+    def from_column_data(cls, data: object) -> Tuple[AbstractBlock, BlockView]:
+        raise NotImplementedError()
+
+    @classmethod
+    def from_block_data(cls, data: object) -> Tuple[AbstractBlock, BlockView]:
         raise NotImplementedError()
 
     @classmethod

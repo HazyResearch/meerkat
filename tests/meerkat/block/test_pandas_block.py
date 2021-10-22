@@ -38,7 +38,6 @@ def test_consolidate_1(num_blocks):
         {
             str(slc): PandasSeriesColumn(
                 data=BlockView(
-                    data=blocks[idx].data[slc],
                     block=blocks[idx],
                     block_index=slc,
                 )
@@ -78,7 +77,6 @@ def test_consolidate_mismatched_signature():
         {
             str(slc): PandasSeriesColumn(
                 data=BlockView(
-                    data=blocks[block_idx].data[slc],
                     block=blocks[block_idx],
                     block_index=slc,
                 )

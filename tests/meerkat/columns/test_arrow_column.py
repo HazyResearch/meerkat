@@ -1,5 +1,5 @@
 """Unittests for NumpyColumn."""
-
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -9,8 +9,16 @@ import torch
 
 from meerkat import ArrowArrayColumn
 from meerkat.block.tensor_block import TensorBlock
+from meerkat.errors import ImmutableError
 
 from .abstract import AbstractColumnTestBed, TestAbstractColumn
+
+
+def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
+    """ For non-chunked arrays, need to pass zero_copy_only=False"""
+    if isinstance(array, pa.ChunkedArray):
+        return array.to_numpy()
+    return array.to_numpy(zero_copy_only=False)
 
 
 class ArrowArrayColumnTestBed(AbstractColumnTestBed):
@@ -55,19 +63,21 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
         if batched:
             return {
                 "fn": lambda x, k=0: pa.array(
-                    x.data.to_numpy() + salt + (k if self.dtype != "str" else str(k))
+                    to_numpy(x.data) + salt + (k if self.dtype != "str" else str(k))
                 ),
                 "expected_result": ArrowArrayColumn(
-                    self.col.data.to_numpy(zero_copy_only=False) + salt + kwarg
+                    to_numpy(self.col.data) + salt + kwarg
                 ),
                 "output_type": ArrowArrayColumn,
             }
 
         else:
             return {
-                "fn": lambda x, k=0: x + salt + (k if self.dtype != "str" else str(k)),
+                "fn": lambda x, k=0: x.as_py()
+                + salt
+                + (k if self.dtype != "str" else str(k)),
                 "expected_result": ArrowArrayColumn(
-                    self.col.data.to_numpy(zero_copy_only=False) + salt + kwarg
+                    to_numpy(self.col.data) + salt + kwarg
                 ),
                 "output_type": ArrowArrayColumn,
             }
@@ -81,19 +91,33 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
     ):
         salt = 3 + salt if self.dtype != "str" else str(3 + salt)
         kwarg = kwarg if self.dtype != "str" else str(kwarg)
-        return {
-            "fn": lambda x, k=0: x.to_numpy()
-            > salt + (k if self.dtype != "str" else str(k)),
-            "expected_result": self.col[self.col.data > salt + kwarg],
-        }
+        if batched:
+            return {
+                "fn": lambda x, k=0: to_numpy(x.data)
+                > salt + (k if self.dtype != "str" else str(k)),
+                "expected_result": self.col[to_numpy(self.col.data) > salt + kwarg],
+            }
+
+        else:
+            return {
+                "fn": lambda x, k=0: x.as_py()
+                > salt + (k if self.dtype != "str" else str(k)),
+                "expected_result": self.col[to_numpy(self.col.data) > salt + kwarg],
+            }
 
     def get_data(self, index, materialize: bool = True):
-        return self.data[index]
+        if isinstance(index, slice) or isinstance(index, int):
+            data = self.data[index]
+        elif index.dtype == bool:
+            data = self.data.filter(pa.array(index))
+        else:
+            data = self.data.take(index)
+        return data
 
     @staticmethod
     def assert_data_equal(data1: pa.Array, data2: pa.Array):
         if isinstance(data1, (pa.Array, pa.ChunkedArray)):
-            assert data1.equals(data2)
+            assert (to_numpy(data1) == to_numpy(data2)).all()
         else:
             assert data1 == data2
 
@@ -117,11 +141,22 @@ class TestArrowArrayColumn(TestAbstractColumn):
     def _get_data_to_set(self, testbed, data_index):
         if isinstance(data_index, int):
             return 0
-        return pd.Series(np.zeros_like(testbed.get_data(data_index).values))
+        return pd.Series(np.zeros(len(testbed.data)))
 
     @ArrowArrayColumnTestBed.parametrize(params={"index_type": [np.array]})
     def test_set_item(self, testbed, index_type: type):
-        return super().test_set_item(testbed, index_type=index_type)
+        col = testbed.col
+
+        for index in [
+            1,
+            slice(2, 4, 1),
+            (np.arange(len(col)) % 2).astype(bool),
+            np.array([0, 3, 5, 6]),
+        ]:
+            col_index = index_type(index) if isinstance(index, np.ndarray) else index
+            data_to_set = self._get_data_to_set(testbed, index)
+            with pytest.raises(ImmutableError):
+                col[col_index] = data_to_set
 
     @ArrowArrayColumnTestBed.parametrize(params={"index_type": [np.array]})
     def test_getitem(self, testbed, index_type: type):
@@ -164,6 +199,14 @@ class TestArrowArrayColumn(TestAbstractColumn):
         super().test_pickle(testbed)
 
     @ArrowArrayColumnTestBed.parametrize()
+    def test_to_numpy(self, testbed):
+        col, _ = testbed.col, testbed.data
+        array = col.to_numpy()
+
+        assert isinstance(array, np.ndarray)
+        assert (col.data.to_numpy(zero_copy_only=False) == array).all()
+
+    @ArrowArrayColumnTestBed.parametrize()
     def test_to_tensor(self, testbed):
         col, _ = testbed.col, testbed.data
         if testbed.dtype == "str":
@@ -173,23 +216,16 @@ class TestArrowArrayColumn(TestAbstractColumn):
             tensor = col.to_tensor()
 
             assert torch.is_tensor(tensor)
-            assert (col == tensor.numpy()).all()
+            assert (col.data.to_numpy() == tensor.numpy()).all()
 
     @ArrowArrayColumnTestBed.parametrize()
     def test_to_pandas(self, testbed):
         col, _ = testbed.col, testbed.data
         series = col.to_pandas()
         assert isinstance(series, pd.Series)
-        assert (col.data.values == series.values).all()
+        assert (col.data.to_pandas() == series.values).all()
 
     @ArrowArrayColumnTestBed.parametrize()
     def test_repr_pandas(self, testbed):
         series = testbed.col.to_pandas()
         assert isinstance(series, pd.Series)
-
-    def test_ufunc_out(self):
-        out = np.zeros(3)
-        a = ArrowArrayColumn([1, 2, 3])
-        b = ArrowArrayColumn([1, 2, 3])
-        np.add(a, b, out=out)
-        assert (out == np.array([2, 4, 6])).all()

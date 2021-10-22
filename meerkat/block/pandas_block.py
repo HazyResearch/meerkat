@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, Mapping, Sequence, Tuple, Union
+from typing import Hashable, Sequence, Tuple, Union
 
 import pandas as pd
 import torch
@@ -11,7 +11,7 @@ from meerkat.block.ref import BlockRef
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 
-from .abstract import AbstractBlock, BlockIndex
+from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
 class PandasBlock(AbstractBlock):
@@ -36,7 +36,7 @@ class PandasBlock(AbstractBlock):
         return self.data[index]
 
     @classmethod
-    def from_data(cls, data: pd.Series) -> Tuple[PandasBlock, Mapping[str, BlockIndex]]:
+    def from_column_data(cls, data: pd.Series) -> Tuple[PandasBlock, BlockView]:
         """[summary]
 
         Args:
@@ -50,8 +50,8 @@ class PandasBlock(AbstractBlock):
             Tuple[PandasBlock, Mapping[str, BlockIndex]]: [description]
         """
         data = pd.DataFrame({"col": data})
-        block_index = "col"
-        return cls(data), block_index
+        block = cls(data)
+        return BlockView(block_index="col", block=block)
 
     @classmethod
     def _consolidate(

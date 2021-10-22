@@ -21,6 +21,7 @@ import datasets
 import dill
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 import ujson as json
 import yaml
@@ -417,6 +418,21 @@ class DataPanel(
         df = df.rename(mapper=str, axis="columns")
         return cls.from_batch(
             df.to_dict("series"),
+        )
+
+    @classmethod
+    @capture_provenance()
+    def from_arrow(
+        cls,
+        table: pa.Table,
+    ):
+        """Create a Dataset from a pandas DataFrame."""
+        from meerkat.block.arrow_block import ArrowBlock
+        from meerkat.columns.arrow_column import ArrowArrayColumn
+
+        block_views = ArrowBlock.from_block_data(table)
+        return cls.from_batch(
+            {view.block_index: ArrowArrayColumn(view) for view in block_views}
         )
 
     @classmethod

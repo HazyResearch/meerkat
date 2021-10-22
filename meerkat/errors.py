@@ -14,5 +14,9 @@ class ConsolidationError(ValueError):
     pass
 
 
+class ImmutableError(ValueError):
+    pass
+
+
 class ExperimentalWarning(FutureWarning):
     pass

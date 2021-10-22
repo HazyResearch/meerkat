@@ -1,9 +1,7 @@
 import numpy as np
-import pandas as pd
 import pyarrow as pa
 import pytest
 
-from meerkat import PandasSeriesColumn
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.ref import BlockRef
@@ -39,7 +37,6 @@ def test_consolidate_1(num_blocks):
         {
             str(slc): ArrowArrayColumn(
                 data=BlockView(
-                    data=blocks[idx].data[slc],
                     block=blocks[idx],
                     block_index=slc,
                 )
@@ -78,7 +75,6 @@ def test_consolidate_mismatched_signature():
         {
             str(slc): ArrowArrayColumn(
                 data=BlockView(
-                    data=blocks[block_idx].data[slc],
                     block=blocks[block_idx],
                     block_index=slc,
                 )

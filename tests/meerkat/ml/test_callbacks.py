@@ -85,6 +85,7 @@ def train(
         log_every_n_steps=1,
         callbacks=[activation_callback],
         progress_bar_refresh_rate=None,
+        default_root_dir=logdir,
     )
 
     train_dl = DataLoader(train_dp, batch_size=batch_size, num_workers=num_workers)
