@@ -23,8 +23,8 @@ class ActivationOp:
         target_module: str,  # TODO(Priya): Support multiple extraction layers
         device: int = None,
     ):
-        """Registers a forward hook on the target layer to facilitate extracting
-        model activations
+        """Registers a forward hook on the target layer to facilitate
+        extracting model activations.
 
         Args:
             model (nn.Module): the torch model from which activations are extracted

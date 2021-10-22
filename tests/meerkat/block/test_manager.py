@@ -196,7 +196,7 @@ def test_getitem():
     # check that manager holds view of original column, but returns a coreference
     assert mgr["a"] is not a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data is a.data
+    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,
@@ -207,7 +207,7 @@ def test_getitem():
     out = mgr[["a", "b"]]
     assert isinstance(out, BlockManager)
     # check that manager holds view of original column, but returns a coreference
-    assert mgr["a"].data is out["a"].data
+    assert mgr["a"].data.base is out["a"].data.base
     assert mgr["a"] is not out["a"]
     assert out["a"] is out["a"]
 
@@ -225,7 +225,7 @@ def test_setitem():
     # check that manager holds view of original column, but returns a coreference
     assert mgr["a"] is not a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data is a.data
+    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,

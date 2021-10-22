@@ -61,7 +61,6 @@ def test_consolidate_1(num_blocks):
         {
             str(slc): TensorColumn(
                 data=BlockView(
-                    data=blocks[block_idx].data[slc],
                     block=blocks[block_idx],
                     block_index=slc,
                 )
@@ -100,7 +99,6 @@ def test_consolidate_mismatched_signature():
         {
             str(slc): TensorColumn(
                 data=BlockView(
-                    data=blocks[block_idx].data[slc],
                     block=blocks[block_idx],
                     block_index=slc,
                 )

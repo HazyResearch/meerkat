@@ -18,7 +18,7 @@ from .ref import BlockRef
 
 
 class BlockManager(MutableMapping):
-    """This manager manages all blocks."""
+    """Manages all blocks in a DataPanel."""
 
     def __init__(self) -> None:
         self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7

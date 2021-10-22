@@ -26,8 +26,7 @@ def build_eeg_dp(
     step_size: int = 1,
     stride: int = 60,
 ):
-    """
-    Builds a `DataPanel` for accessing EEG data.
+    """Builds a `DataPanel` for accessing EEG data.
 
     Currently only supports TUH dataset for seq-seq prediction.
     Future TODO: integrating stanford dataset with weak seq-seq labels
@@ -99,8 +98,7 @@ def build_eeg_dp(
 
 
 def download_tusz(download_dir, version="1.5.2"):
-    """
-    Downloads the EEG Seizure TUH dataset (TUSZ)
+    """Downloads the EEG Seizure TUH dataset (TUSZ)
 
     REQUIRED:
         1. Need to first registed at
@@ -128,8 +126,7 @@ def build_stanford_eeg_dp(
     reports_pth=None,
     clip_len: int = 60,
 ):
-    """
-    Builds a `DataPanel` for accessing EEG data.
+    """Builds a `DataPanel` for accessing EEG data.
 
     This is for accessing private stanford data.
     The stanford data is limited to specific researchers on IRB.

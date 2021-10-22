@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, Sequence, Tuple, Union
+from typing import Hashable, List, Sequence, Union
 
+import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 
 from meerkat.block.ref import BlockRef
@@ -14,59 +16,51 @@ from meerkat.columns.tensor_column import TensorColumn
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
-class PandasBlock(AbstractBlock):
+class ArrowBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
         nrows: int
         klass: type
+        # mmap: bool
 
-    def __init__(self, data: pd.DataFrame, *args, **kwargs):
-        super(PandasBlock, self).__init__(*args, **kwargs)
+    def __init__(self, data: pa.Table, *args, **kwargs):
+        super(ArrowBlock, self).__init__(*args, **kwargs)
         self.data = data
 
     @property
     def signature(self) -> Hashable:
-        return self.Signature(
-            klass=PandasBlock,
-            # we don't
-            nrows=len(self.data),
-        )
+        return self.Signature(klass=ArrowBlock, nrows=len(self.data))
 
-    def _get_data(self, index: BlockIndex) -> pd.Series:
+    def _get_data(self, index: BlockIndex) -> pa.Array:
         return self.data[index]
 
     @classmethod
-    def from_column_data(cls, data: pd.Series) -> Tuple[PandasBlock, BlockView]:
-        """[summary]
-
-        Args:
-            data (np.ndarray): [description]
-            names (Sequence[str]): [description]
-
-        Raises:
-            ValueError: [description]
-
-        Returns:
-            Tuple[PandasBlock, Mapping[str, BlockIndex]]: [description]
-        """
-        data = pd.DataFrame({"col": data})
+    def from_column_data(cls, data: pa.Array) -> BlockView:
+        data = pa.Table.from_pydict({"col": data})
         block = cls(data)
-        return BlockView(block_index="col", block=block)
+        return BlockView(block=block, block_index="col")
+
+    @classmethod
+    def from_block_data(cls, data: pa.Table) -> List[BlockView]:
+        block = cls(data)
+        return [
+            BlockView(block=block, block_index=column) for column in data.column_names
+        ]
 
     @classmethod
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
     ) -> BlockRef:
-        df = pd.DataFrame(
+        table = pa.Table.from_pydict(
             # need to ignore index when concatenating
             {
-                name: ref.block.data[col._block_index].reset_index(drop=True)
+                name: ref.block.data[col._block_index]
                 for ref in block_refs
                 for name, col in ref.items()
             }
         )
-        block = cls(df)
+        block = cls(table)
 
         # pull out the block columns from all the block_refs
         columns = {}
@@ -80,6 +74,8 @@ class PandasBlock(AbstractBlock):
 
     @staticmethod
     def _convert_index(index):
+        if isinstance(index, list):
+            return np.array(index)
         if torch.is_tensor(index):
             # need to convert to numpy for boolean indexing
             return index.numpy()
@@ -95,6 +91,7 @@ class PandasBlock(AbstractBlock):
 
         if isinstance(index, PandasSeriesColumn):
             return index.data.values
+
         return index
 
     def _get(
@@ -102,7 +99,14 @@ class PandasBlock(AbstractBlock):
     ) -> Union[BlockRef, dict]:
         index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
-        data = self.data.iloc[index]
+
+        if isinstance(index, slice) or isinstance(index, int):
+            data = self.data[index]
+        elif index.dtype == bool:
+            data = self.data.filter(pa.array(index))
+        else:
+            data = self.data.take(index)
+
         if isinstance(index, int):
             # if indexing a single row, we do not return a block manager, just a dict
             return {
@@ -117,9 +121,27 @@ class PandasBlock(AbstractBlock):
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
 
+    @staticmethod
+    def _write_table(path: str, table: pa.Table):
+        # noqa E501, source: huggingface implementation https://github.com/huggingface/datasets/blob/92304b42cf0cc6edafc97832c07de767b81306a6/src/datasets/table.py#L50
+        with open(path, "wb") as sink:
+            writer = pa.RecordBatchStreamWriter(sink=sink, schema=table.schema)
+            batches: List[pa.RecordBatch] = table.to_batches()
+            for batch in batches:
+                writer.write_batch(batch)
+            writer.close()
+            return sum(batch.nbytes for batch in batches)
+
+    @staticmethod
+    def _read_table(path: str, mmap: bool = False):
+        if mmap:
+            return pa.ipc.open_stream(pa.memory_map(path)).read_all()
+        else:
+            return pa.ipc.open_stream(pa.input_stream(path)).read_all()
+
     def _write_data(self, path: str):
-        self.data.reset_index(drop=True).to_feather(os.path.join(path, "data.feather"))
+        self._write_table(os.path.join(path, "data.arrow"), self.data)
 
     @staticmethod
     def _read_data(path: str, mmap: bool = False):
-        return pd.read_feather(os.path.join(path, "data.feather"))
+        return ArrowBlock._read_table(os.path.join(path, "data.arrow"), mmap=mmap)

@@ -17,10 +17,9 @@ class BlockableMixin:
             self._block_index = data.block_index
             data = data.data
         else:
-            self._block, self._block_index = self.block_class.from_data(data)
+            block_view: BlockView = self.block_class.from_column_data(data)
+            self._block, self._block_index = block_view.block, block_view.block_index
         return data
 
     def _pack_block_view(self):
-        return BlockView(
-            data=self.data, block_index=self._block_index, block=self._block
-        )
+        return BlockView(block_index=self._block_index, block=self._block)

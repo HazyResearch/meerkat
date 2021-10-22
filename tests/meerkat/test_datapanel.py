@@ -7,6 +7,7 @@ from typing import Dict, Sequence
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import pytest
 import torch
 import ujson as json
@@ -15,11 +16,13 @@ import meerkat
 from meerkat import NumpyArrayColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.arrow_column import ArrowArrayColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
 
+from .columns.test_arrow_column import ArrowArrayColumnTestBed
 from .columns.test_cell_column import CellColumnTestBed
 from .columns.test_image_column import ImageColumnTestBed
 from .columns.test_numpy_column import NumpyArrayColumnTestBed
@@ -39,6 +42,7 @@ class DataPanelTestBed:
         "torch": {"testbed_class": TensorColumnTestBed, "n": 2},
         "img": {"testbed_class": ImageColumnTestBed, "n": 2},
         "cell": {"testbed_class": CellColumnTestBed, "n": 2},
+        "arrow": {"testbed_class": ArrowArrayColumnTestBed, "n": 2},
     }
 
     def __init__(
@@ -176,7 +180,8 @@ class TestDataPanel:
             # enforce that a column index multiple returns a view of the old datapanel
             for col_name in index:
                 assert new_dp._data[col_name] is not dp._data[col_name]
-                assert new_dp._data[col_name].data is dp._data[col_name].data
+
+    #                assert new_dp._data[col_name].data is dp._data[col_name].data
 
     @DataPanelTestBed.parametrize()
     def test_row_index_single(self, testbed):
@@ -413,7 +418,7 @@ class TestDataPanel:
         assert isinstance(dp2[col], NumpyArrayColumn)
         assert dp[col] is not dp2[col]
         assert dp[col].data is not dp2[col].data
-        assert dp[col].data is dp2[col].data.base
+        assert dp[col].data.base is dp2[col].data.base
 
         col = "d"
         assert isinstance(dp2[col], TensorColumn)
@@ -437,7 +442,7 @@ class TestDataPanel:
         assert isinstance(dp2[col], NumpyArrayColumn)
         assert dp[col] is not dp2[col]
         assert dp[col].data is not dp2[col].data
-        assert dp[col].data is not dp2[col].data.base
+        assert dp[col].data.base is not dp2[col].data.base
 
         col = "d"
         assert isinstance(dp2[col], TensorColumn)
@@ -451,7 +456,7 @@ class TestDataPanel:
         assert isinstance(dp2[col], PandasSeriesColumn)
         assert dp[col] is not dp2[col]
         assert dp[col].data is not dp2[col].data
-        assert dp[col].data.values is not dp2[col].data.values.base
+        assert dp[col].data.values.base is not dp2[col].data.values.base
 
     @DataPanelTestBed.parametrize(
         params={"batched": [True, False], "materialize": [True, False]}
@@ -658,7 +663,7 @@ class TestDataPanel:
         b = np.arange(16) * 2
         dp = DataPanel.from_batch({"a": a, "b": b})
         assert "a" in dp
-        assert dp[["a", "b"]]["a"]._data is a
+        assert dp[["a", "b"]]["a"]._data.base is a
         # testing removal from block manager, so important to use non-blockable type
         dp["a"] = ListColumn(range(16))
         assert dp[["a", "b"]]["a"]._data is not a
@@ -841,6 +846,26 @@ class TestDataPanel:
         )
         assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f", "index"}
         assert len(datapanel) == 3
+
+    def test_from_arrow(self):
+        table = pa.Table.from_arrays(
+            [
+                pa.array(np.arange(0, 100)),
+                pa.array(np.arange(0, 100).astype(float)),
+                pa.array(map(str, np.arange(0, 100))),
+            ],
+            names=["a", "b", "c"],
+        )
+        dp = DataPanel.from_arrow(table)
+
+        # check that the underlying block is the same object as the pyarrow table
+        dp["a"]._block is table
+        dp["a"]._block is dp["b"]._block
+        dp["a"]._block is dp["c"]._block
+
+        for col in ["a", "b", "c"]:
+            assert isinstance(dp[col], ArrowArrayColumn)
+            assert pa.compute.equal(dp[col].data, table[col])
 
     def test_to_pandas(self):
         import pandas as pd
