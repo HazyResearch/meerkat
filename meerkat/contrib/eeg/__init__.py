@@ -16,6 +16,7 @@ from .data_utils import (
     eeg_male_loader,
     get_sz_labels,
     stanford_eeg_loader,
+    eeg_patientid_loader,
 )
 
 logger = logging.getLogger(__name__)
@@ -225,6 +226,13 @@ def build_stanford_eeg_dp(
     dp.add_column(
         "male",
         male_col,
+        overwrite=True,
+    )
+
+    patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
+    dp.add_column(
+        "patient_id",
+        patientid_col,
         overwrite=True,
     )
 

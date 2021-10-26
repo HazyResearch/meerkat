@@ -521,6 +521,19 @@ def eeg_age_loader(filepath):
     return eegf.age_years
 
 
+def eeg_patientid_loader(filepath):
+    """
+    given filepath of an eeg, pulls relevant metadata
+    right now only supports pulling age
+    """
+    # filepath = input_dict["filepath"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+
+    return eegf.patient["patientcode"]
+
+
 def eeg_male_loader(filepath):
     """
     given filepath of an eeg, pulls relevant metadata
