@@ -47,6 +47,7 @@ REQUIRED = [
     "semver>=2.13.0",
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
+    "fvcore",
 ]
 
 # What packages are optional?
@@ -100,9 +101,7 @@ EXTRAS = {
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
-    "ml":[
-        "pytorch_lightning"
-    ]
+    "ml": ["pytorch_lightning"],
 }
 
 # The rest you shouldn't have to touch too much :)

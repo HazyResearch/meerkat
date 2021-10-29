@@ -104,7 +104,9 @@ def get_all_cifar10_splits(
     }
 
 
-def get_cifar10(download_dir, is_train=True, frac_val=0.0, transforms=None):
+def get_cifar10(
+    download_dir, is_train=True, frac_val=0.0, transforms=None, download: bool = True
+):
     """Load CIFAR10 as a Meerkat DataPanel.
 
     Args:
@@ -119,7 +121,7 @@ def get_cifar10(download_dir, is_train=True, frac_val=0.0, transforms=None):
     dataset = CIFAR10(
         root=download_dir,
         train=is_train,
-        download=True,
+        download=download,
     )
 
     dp = mk.DataPanel(

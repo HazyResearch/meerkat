@@ -1,8 +1,9 @@
-import hashlib
 import os
 
 import pandas as pd
 from torchvision.datasets import CelebA
+
+import meerkat as mk
 
 ATTRIBUTES = [
     "5_o_clock_shadow",
@@ -48,13 +49,24 @@ ATTRIBUTES = [
 ]
 
 
+def get_celeba(dataset_dir: str, download: bool = False):
+    """Build the dataframe by joining on the attribute, split and identity
+    CelebA CSVs."""
+    if download:
+        download_celeba(dataset_dir=dataset_dir)
+    df = build_celeba_df(dataset_dir=dataset_dir, save_csv=False)
+    dp = mk.DataPanel.from_pandas(df)
+    dp["image"] = mk.ImageColumn.from_filepaths(filepaths=dp["img_path"])
+    return dp
+
+
 def download_celeba(dataset_dir: str):
     if not os.path.exists(dataset_dir):
         CelebA(os.path.split(dataset_dir)[:-1], download=True)
     build_celeba_df(dataset_dir)
 
 
-def build_celeba_df(dataset_dir: str, save_csv: bool = True):
+def build_celeba_df(dataset_dir: str):
     """Build the dataframe by joining on the attribute, split and identity
     CelebA CSVs."""
     identity_df = pd.read_csv(
@@ -84,13 +96,4 @@ def build_celeba_df(dataset_dir: str, save_csv: bool = True):
     celeb_df = celeb_df.merge(
         split_df[["image_id", "split"]], left_on="file", right_on="image_id"
     )
-    if save_csv:
-        celeb_df.to_csv(os.path.join(dataset_dir, "celeba.csv"), index=False)
     return celeb_df
-
-
-def _hash_for_split(example_id: str, salt=""):
-    GRANULARITY = 100000
-    hashed = hashlib.sha256((str(example_id) + salt).encode())
-    hashed = int(hashed.hexdigest().encode(), 16) % GRANULARITY + 1
-    return hashed / float(GRANULARITY)
