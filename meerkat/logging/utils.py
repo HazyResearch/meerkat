@@ -3,13 +3,14 @@ import os
 import tempfile
 import uuid
 from datetime import datetime
+from pathlib import Path
 from typing import Union
 
 logger = logging.getLogger(__name__)
 
 
 def initialize_logging(
-    log_dir: str = tempfile.gettempdir(),
+    log_dir: str = None,
     log_name: str = "meerkat.log",
     format: str = "[%(asctime)s][%(levelname)s][%(name)s:%(lineno)s] :: %(message)s",
     level: int = logging.WARNING,
@@ -20,10 +21,34 @@ def initialize_logging(
     date = datetime.now().strftime("%Y_%m_%d")
     time = datetime.now().strftime("%H_%M_%S")
     uid = str(uuid.uuid4())[:8]
-    log_path = os.path.join(log_dir, date, time, uid)
 
-    # Make the logdir
-    os.makedirs(log_path, exist_ok=True)
+    if log_dir is None:
+        log_dir = os.environ.get("MEERKAT_LOG_DIR")
+
+    if log_dir is None:
+        success = False
+        # try potential logging directories until we find one with adequate permissions
+        for log_dir in [
+            tempfile.gettempdir(),
+            os.path.join(Path.home(), ".meerkat"),
+        ]:
+            try:
+                log_path = os.path.join(log_dir, "log", date, time, uid)
+                os.makedirs(log_path, exist_ok=True)
+                success = True
+            except PermissionError:
+                pass
+        if not success:
+            raise PermissionError(
+                "Permission denied in all of Meerkat's default logging directories. "
+                "Set environment variable `MEERKAT_LOG_DIR` to specify a directory for "
+                "Meerkat logging."
+            )
+
+    else:
+        log_path = os.path.join(log_dir, "log", date, time, uid)
+        # Make the logdir
+        os.makedirs(log_path, exist_ok=True)
 
     # Initialize logging
     logging.basicConfig(
@@ -37,7 +62,7 @@ def initialize_logging(
 
     # Set logging levels for dependencies
     set_logging_level_for_imports()
-
+    print(log_path)
     logger.info("Logging initialized.")
 
 
