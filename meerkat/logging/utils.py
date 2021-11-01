@@ -62,7 +62,6 @@ def initialize_logging(
 
     # Set logging levels for dependencies
     set_logging_level_for_imports()
-    print(log_path)
     logger.info("Logging initialized.")
 
 
