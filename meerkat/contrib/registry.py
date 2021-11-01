@@ -1,11 +1,12 @@
 import functools
 import os
-from typing import Any, Optional, Sequence
+from typing import Any, List, Optional, Sequence
 
 from fvcore.common.registry import Registry as _Registry
 from tabulate import tabulate
 
 from meerkat.config import ContribOptions
+from meerkat.datapanel import DataPanel
 
 
 class Registry(_Registry):
@@ -69,6 +70,14 @@ class Registry(_Registry):
     def _do_register(self, name: str, obj: Any, **kwargs) -> None:
         self._metadata_map[name] = {"name": name, "description": obj.__doc__, **kwargs}
         return super()._do_register(name, obj)
+
+    @property
+    def names(self) -> List[str]:
+        return list(self._obj_map.keys())
+
+    @property
+    def catalog(self) -> DataPanel:
+        return DataPanel(data=list(self._metadata_map.values()))
 
     def __repr__(self) -> str:
         table = tabulate(self._metadata_map.values(), tablefmt="fancy_grid")
