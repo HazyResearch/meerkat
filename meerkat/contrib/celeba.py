@@ -62,7 +62,7 @@ def get_celeba(dataset_dir: str, download: bool = False):
 
 def download_celeba(dataset_dir: str):
     if not os.path.exists(dataset_dir):
-        CelebA(os.path.split(dataset_dir)[:-1], download=True)
+        CelebA(os.path.split(dataset_dir)[:-1][0], download=True)
     build_celeba_df(dataset_dir)
 
 

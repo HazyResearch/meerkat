@@ -5,16 +5,6 @@ from typing import Dict
 import pandas as pd
 
 import meerkat as mk
-from meerkat.config import ContribOptions
-
-from .registry import DATASET_REGISTRY
-
-
-@DATASET_REGISTRY.register()
-def imagenet(dataset_dir: str = None, download: bool = False):
-    if dataset_dir is None:
-        dataset_dir = os.path.join(ContribOptions.download_dir, "imagenet")
-    return build_imagenet_dps(dataset_dir=dataset_dir, download=download)
 
 
 def build_imagenet_dps(
@@ -23,6 +13,7 @@ def build_imagenet_dps(
 
     if download:
         curr_dir = os.getcwd()
+        os.makedirs(dataset_dir, exist_ok=True)
         os.chdir(dataset_dir)
         subprocess.run(
             args=[
