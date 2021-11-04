@@ -5,6 +5,8 @@ from functools import partial
 
 import terra
 from tqdm import tqdm
+import numpy as np
+
 
 import meerkat as mk
 
@@ -17,6 +19,8 @@ from .data_utils import (
     get_sz_labels,
     stanford_eeg_loader,
     eeg_patientid_loader,
+    split_dp,
+    merge_in_split,
 )
 
 logger = logging.getLogger(__name__)
@@ -129,10 +133,13 @@ def build_stanford_eeg_dp(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
     file_marker_dir: str,
-    splits=["train", "dev"],
     reports_pth=None,
     restrict_to_reports=False,
     clip_len: int = 60,
+    seed: int = 123,
+    train_frac: float = 0.8,
+    valid_frac: float = 0.1,
+    test_frac: float = 0.1,
 ):
     """
     Builds a `DataPanel` for accessing EEG data.
@@ -155,24 +162,43 @@ def build_stanford_eeg_dp(
     # retrieve file tuples which is a list of
     # (eeg filepath, location of sz or -1 if no sz, split)
     file_tuples = compute_stanford_file_tuples(
-        stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, splits
+        stanford_dataset_dir, lpch_dataset_dir, file_marker_dir, ["train"]
     )
     data = []
 
-    for (filepath, sz_loc, split) in file_tuples:
+    np.random.seed(seed)
+
+    for (filepath, sz_loc, fm_split) in file_tuples:
+
         row_df = {
             "filepath": filepath,
             "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
             "id": filepath.split("/")[-1].split(".eeghdf")[0] + f"_{sz_loc}",
             "target": sz_loc != -1,
             "sz_start_index": sz_loc,
-            "fm_split": split,
+            "fm_split": fm_split,
         }
         data.append(row_df)
 
     dp = mk.DataPanel(data)
 
-    eeg_input_col = dp[["sz_start_index", "filepath", "fm_split"]].to_lambda(
+    patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
+    dp.add_column(
+        "patient_id",
+        patientid_col,
+        overwrite=True,
+    )
+
+    dp_split = split_dp(
+        dp,
+        split_on="patient_id",
+        train_frac=train_frac,
+        valid_frac=valid_frac,
+        test_frac=test_frac,
+    )
+    dp = merge_in_split(dp, dp_split)
+
+    eeg_input_col = dp[["sz_start_index", "filepath", "fm_split", "split"]].to_lambda(
         fn=partial(stanford_eeg_loader, clip_len=clip_len)
     )
 
@@ -226,13 +252,6 @@ def build_stanford_eeg_dp(
     dp.add_column(
         "male",
         male_col,
-        overwrite=True,
-    )
-
-    patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
-    dp.add_column(
-        "patient_id",
-        patientid_col,
         overwrite=True,
     )
 

@@ -1,5 +1,5 @@
 import os
-
+import meerkat as mk
 import eeghdf
 import h5py
 import numpy as np
@@ -7,6 +7,11 @@ import pyedflib
 import torch
 from scipy.signal import resample
 from tqdm import tqdm
+from functools import partial
+import hashlib
+import math
+import pandas as pd
+
 
 FREQUENCY = 200
 INCLUDED_CHANNELS = [
@@ -55,6 +60,53 @@ STANFORD_INCLUDED_CHANNELS = [
 
 SEIZURE_STRINGS = ["sz", "seizure", "absence", "spasm"]
 FILTER_SZ_STRINGS = ["@sz", "@seizure"]
+
+EEG_MEANS = np.array(
+    [
+        -0.5984,
+        -0.2472,
+        -0.6126,
+        -0.5510,
+        -0.6367,
+        -0.6069,
+        -0.0117,
+        -0.0703,
+        -0.1345,
+        -0.3937,
+        -1.6548,
+        -1.6683,
+        -1.4646,
+        -1.3756,
+        -0.8673,
+        -0.9610,
+        -0.5203,
+        -0.3437,
+        0.0175,
+    ]
+)
+EEG_STDS = np.array(
+    [
+        244.10924185,
+        240.52975195,
+        165.48532864,
+        165.96979748,
+        82.23935837,
+        81.51823183,
+        159.74918782,
+        165.79969442,
+        173.39542554,
+        172.15047675,
+        214.96174016,
+        212.43146653,
+        139.07166002,
+        138.3382818,
+        163.11562014,
+        166.22150418,
+        136.93211929,
+        148.61830207,
+        151.21653098,
+    ]
+)
 
 
 def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
@@ -426,14 +478,15 @@ def is_increasing(channel_indices):
     return True
 
 
-def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True):
+def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True, nomalize=True):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
 
     """
     filepath = input_dict["filepath"]
     sz_start_idx = input_dict["sz_start_index"]
-    split = input_dict["fm_split"]
+    fm_split = input_dict["fm_split"]
+    split = input_dict["split"]
 
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
@@ -443,7 +496,7 @@ def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True):
     phys_signals = eegf.phys_signals
 
     # get seizure time
-    if sz_start_idx == -1 or split != "train":
+    if sz_start_idx == -1 or fm_split != "train":
         sz_start = sz_start_idx
     else:
         sz_times = get_stanford_sz_times(eegf)
@@ -452,6 +505,10 @@ def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True):
     # extract clip
     if sz_start == -1:
         max_start = max(phys_signals.shape[1] - FREQUENCY * clip_len, 0)
+        # if split == "train":
+        #     sz_start = np.randint(0,max_start)
+        # else:
+        #     sz_start = int(max_start / 2)
         sz_start = int(max_start / 2)
         sz_start /= FREQUENCY
 
@@ -474,10 +531,77 @@ def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True):
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
     eeg_slice = eeg_slice.T
 
-    if augmentation:
+    if augmentation and split == "train":
         eeg_slice = random_augmentation(eeg_slice)
 
+    # if nomalize:
+    #     eeg_slice = eeg_slice - EEG_MEANS
+    #     eeg_slice = eeg_slice / EEG_STDS
+
     return torch.FloatTensor(eeg_slice)
+
+
+def split_dp(
+    dp: mk.DataPanel,
+    split_on: str,
+    train_frac: float = 0.7,
+    valid_frac: float = 0.1,
+    test_frac: float = 0.2,
+    other_splits: dict = None,
+    salt: str = "",
+):
+    dp = dp.view()
+    other_splits = {} if other_splits is None else other_splits
+    splits = {
+        "train": train_frac,
+        "valid": valid_frac,
+        "test": test_frac,
+        **other_splits,
+    }
+
+    if not math.isclose(sum(splits.values()), 1):
+        raise ValueError("Split fractions must sum to 1.")
+
+    dp["split_hash"] = dp[split_on].apply(partial(hash_for_split, salt=salt))
+    start = 0
+    split_column = np.array(["unassigned"] * len(dp))
+    for split, frac in splits.items():
+        end = start + frac
+        split_column[
+            np.array(((start < dp["split_hash"]) & (dp["split_hash"] <= end)).data)
+        ] = split
+        start = end
+
+    # need to drop duplicates, since split_on might not be unique
+    df = pd.DataFrame({split_on: dp[split_on], "split": split_column}).drop_duplicates()
+    return mk.DataPanel.from_pandas(df)
+
+
+def hash_for_split(example_id: str, salt=""):
+    GRANULARITY = 100000
+    hashed = hashlib.sha256((str(example_id) + salt).encode())
+    hashed = int(hashed.hexdigest().encode(), 16) % GRANULARITY + 1
+    return hashed / float(GRANULARITY)
+
+
+def merge_in_split(dp: mk.DataPanel, split_dp: mk.DataPanel):
+    split_dp.columns
+    if "split" in dp:
+        dp.remove_column("split")
+    split_on = [col for col in split_dp.columns if (col != "split") and col != "index"]
+    assert len(split_on) == 1
+    split_on = split_on[0]
+
+    if split_dp[split_on].duplicated().any():
+        # convert the datapanel to one row per split_on id
+        df = split_dp[[split_on, "split"]].to_pandas()
+        gb = df.groupby(split_on)
+
+        # cannot have multiple splits per `split_on` id
+        assert (gb["split"].nunique() == 1).all()
+        split_dp = mk.DataPanel.from_pandas(gb["split"].first().reset_index())
+
+    return dp.merge(split_dp, on=split_on)
 
 
 def get_swap_pairs(channels):
