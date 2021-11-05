@@ -534,9 +534,9 @@ def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True, nomalize=Tru
     if augmentation and split == "train":
         eeg_slice = random_augmentation(eeg_slice)
 
-    # if nomalize:
-    #     eeg_slice = eeg_slice - EEG_MEANS
-    #     eeg_slice = eeg_slice / EEG_STDS
+    if nomalize:
+        eeg_slice = eeg_slice - EEG_MEANS
+        eeg_slice = eeg_slice / EEG_STDS
 
     return torch.FloatTensor(eeg_slice)
 
