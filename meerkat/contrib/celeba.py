@@ -1,7 +1,7 @@
 import os
+import subprocess
 
 import pandas as pd
-from torchvision.datasets import CelebA
 
 import meerkat as mk
 
@@ -54,16 +54,27 @@ def get_celeba(dataset_dir: str, download: bool = False):
     CelebA CSVs."""
     if download:
         download_celeba(dataset_dir=dataset_dir)
-    df = build_celeba_df(dataset_dir=dataset_dir, save_csv=False)
+    df = build_celeba_df(dataset_dir=dataset_dir)
     dp = mk.DataPanel.from_pandas(df)
     dp["image"] = mk.ImageColumn.from_filepaths(filepaths=dp["img_path"])
     return dp
 
 
 def download_celeba(dataset_dir: str):
-    if not os.path.exists(dataset_dir):
-        CelebA(os.path.split(dataset_dir)[:-1][0], download=True)
-    build_celeba_df(dataset_dir)
+    # if not os.path.exists(dataset_dir):
+    #     CelebA(os.path.split(dataset_dir)[:-1][0], download=True)
+    if os.path.exists(dataset_dir):
+        return
+    curr_dir = os.getcwd()
+    os.makedirs(dataset_dir, exist_ok=True)
+    os.chdir(dataset_dir)
+    subprocess.run(
+        args=["kaggle datasets download " "-d jessicali9530/celeba-dataset"],
+        shell=True,
+        check=True,
+    )
+    subprocess.run(["unzip", "-q", "celeba-dataset.zip"])
+    os.chdir(curr_dir)
 
 
 def build_celeba_df(dataset_dir: str):
@@ -76,9 +87,8 @@ def build_celeba_df(dataset_dir: str):
         names=["file", "identity"],
     )
     attr_df = pd.read_csv(
-        os.path.join(dataset_dir, "list_attr_celeba.txt"),
-        delim_whitespace=True,
-        header=1,
+        os.path.join(dataset_dir, "list_attr_celeba.csv"),
+        index_col=0,
     )
     attr_df.columns = pd.Series(attr_df.columns).apply(lambda x: x.lower())
     attr_df = ((attr_df + 1) // 2).rename_axis("file").reset_index()
@@ -86,7 +96,7 @@ def build_celeba_df(dataset_dir: str):
     celeb_df = identity_df.merge(attr_df, on="file", validate="one_to_one")
 
     celeb_df["img_path"] = celeb_df.file.apply(
-        lambda x: os.path.join(dataset_dir, "img_align_celeba", x)
+        lambda x: os.path.join(dataset_dir, "img_align_celeba/img_align_celeba", x)
     )
 
     split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))
