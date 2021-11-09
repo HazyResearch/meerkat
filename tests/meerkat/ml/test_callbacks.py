@@ -3,6 +3,7 @@ from itertools import product
 
 import numpy as np
 import pytest
+import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
 from numpy.lib.format import open_memmap
@@ -13,9 +14,6 @@ from meerkat import DataPanel
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.ml import ActivationCallback, load_activations
-from meerkat.tools.lazy_loader import LazyLoader
-
-pl = LazyLoader("pytorch_lightning")
 
 
 class MockModel(pl.LightningModule):

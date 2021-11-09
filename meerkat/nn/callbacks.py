@@ -50,7 +50,7 @@ class ActivationCallback(pl.callbacks.Callback):
             self.logdir = trainer.log_dir
 
     def on_validation_epoch_start(self, trainer, pl_module):
-        if not trainer.sanity_checking:
+        if not trainer.running_sanity_check:
             self.activation_op = ActivationOp(
                 pl_module, self.target_module, pl_module.device
             )
@@ -60,7 +60,7 @@ class ActivationCallback(pl.callbacks.Callback):
         self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx
     ):
         # TODO(Priya): Check if skipping sanity check is fine
-        if not trainer.sanity_checking:
+        if not trainer.running_sanity_check:
             activations = self.activation_op.extractor.activation.cpu().detach()
 
             # Use the first batch for setup
@@ -78,7 +78,7 @@ class ActivationCallback(pl.callbacks.Callback):
             self.writer.write(activations)
 
     def on_validation_epoch_end(self, trainer, pl_module):
-        if not trainer.sanity_checking:
+        if not trainer.running_sanity_check:
             activations = {f"activation_{self.target_module}": self.writer.finalize()}
             activations = DataPanel.from_batch(activations)
 
