@@ -43,7 +43,7 @@ class ActivationOp:
             target_module = _nested_getattr(
                 model.model if isinstance(model, Model) else model, target_module
             )
-        except torch.nn.modules.module.ModuleAttributeError:
+        except AttributeError:
             raise ValueError(f"`model` does not have a submodule {target_module}")
 
         self.extractor = ActivationExtractor()
