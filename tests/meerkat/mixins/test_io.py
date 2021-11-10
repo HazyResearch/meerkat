@@ -12,3 +12,4 @@ def test_meerkat_loader(tmpdir):
     col.write(path)
     del sys.modules["meerkat.columns.numpy_column"]
     mk.AbstractColumn.read(path)
+    __import__("meerkat.columns.numpy_column")
