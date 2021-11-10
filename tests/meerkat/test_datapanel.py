@@ -49,7 +49,7 @@ class DataPanelTestBed:
         self,
         column_configs: Dict[str, AbstractColumn],
         consolidated: bool = True,
-        length: int = 16,
+        length: int = 4,
         tmpdir: str = None,
     ):
         self.column_testbeds = self._build_column_testbeds(
