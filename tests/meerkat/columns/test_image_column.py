@@ -26,13 +26,14 @@ from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 class ImageColumnTestBed(AbstractColumnTestBed):
 
-    DEFAULT_CONFIG = {"transform": [True, False]}
+    DEFAULT_CONFIG = {"transform": [True, False], "use_base_dir": [True, False]}
 
     def __init__(
         self,
         tmpdir: str,
         length: int = 16,
         transform: bool = False,
+        use_base_dir: bool = False,
         seed: int = 123,
     ):
         self.image_paths = []
@@ -42,18 +43,28 @@ class ImageColumnTestBed(AbstractColumnTestBed):
 
         transform = to_tensor if transform else None
 
+        self.base_dir = tmpdir if use_base_dir else None
+
         for i in range(0, length):
-            self.image_paths.append(os.path.join(tmpdir, "{}.png".format(i)))
             self.image_arrays.append((i * np.ones((4, 4, 3))).astype(np.uint8))
             im = Image.fromarray(self.image_arrays[-1])
             self.ims.append(im)
             self.data.append(transform(im) if transform else im)
-            im.save(self.image_paths[-1])
+            filename = "{}.png".format(i)
+            im.save(os.path.join(tmpdir, filename))
+            if use_base_dir:
+                self.image_paths.append(filename)
+            else:
+                self.image_paths.append(os.path.join(tmpdir, filename))
+
         if transform is not None:
             self.data = torch.stack(self.data)
         self.transform = transform
         self.col = ImageColumn.from_filepaths(
-            self.image_paths, transform=transform, loader=folder.default_loader
+            self.image_paths,
+            transform=transform,
+            loader=folder.default_loader,
+            base_dir=self.base_dir,
         )
 
     def get_map_spec(
@@ -172,6 +183,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     data=self.image_paths[index],
                     loader=self.col.loader,
                     transform=self.col.transform,
+                    base_dir=self.base_dir,
                 )
             index = np.arange(len(self.data))[index]
             return PandasSeriesColumn([self.image_paths[idx] for idx in index])
