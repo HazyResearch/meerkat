@@ -56,7 +56,9 @@ def get_celeba(dataset_dir: str, download: bool = False):
         download_celeba(dataset_dir=dataset_dir)
     df = build_celeba_df(dataset_dir=dataset_dir)
     dp = mk.DataPanel.from_pandas(df)
-    dp["image"] = mk.ImageColumn.from_filepaths(filepaths=dp["img_path"])
+    dp["image"] = mk.ImageColumn.from_filepaths(
+        filepaths=dp["img_path"], base_dir=dataset_dir
+    )
     return dp
 
 
@@ -96,7 +98,7 @@ def build_celeba_df(dataset_dir: str):
     celeb_df = identity_df.merge(attr_df, on="file", validate="one_to_one")
 
     celeb_df["img_path"] = celeb_df.file.apply(
-        lambda x: os.path.join(dataset_dir, "img_align_celeba/img_align_celeba", x)
+        lambda x: os.path.join("img_align_celeba/img_align_celeba", x)
     )
 
     split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))

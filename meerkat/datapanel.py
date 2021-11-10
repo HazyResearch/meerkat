@@ -38,7 +38,7 @@ from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.utils import convert_to_batch_fn
+from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
 
 logger = logging.getLogger(__name__)
 
@@ -786,7 +786,7 @@ class DataPanel(
 
         # Load the metadata
         metadata = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
         )
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))

@@ -3,6 +3,8 @@ import os
 import dill
 import yaml
 
+from meerkat.tools.utils import MeerkatLoader
+
 
 class ColumnIOMixin:
     def write(self, path: str, *args, **kwargs) -> None:
@@ -51,7 +53,7 @@ class ColumnIOMixin:
             dict(
                 yaml.load(
                     open(os.path.join(path, "meta.yaml")),
-                    Loader=yaml.FullLoader,
+                    Loader=MeerkatLoader,
                 )
             )
             if _meta is None

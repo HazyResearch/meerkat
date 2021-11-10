@@ -1,6 +1,40 @@
 from collections import defaultdict
 from typing import Callable, Dict, List, Optional, Sequence
 
+import yaml
+from yaml.constructor import ConstructorError
+
+
+class MeerkatLoader(yaml.FullLoader):
+    """PyYaml does not load unimported modules for safety reasons. We want to allow
+    importing only meerkat modules
+    """
+
+    def find_python_module(self, name: str, mark, unsafe=False):
+        try:
+            return super().find_python_module(name=name, mark=mark, unsafe=unsafe)
+        except ConstructorError as e:
+            if name.startswith("meerkat."):
+                __import__(name)
+            else:
+                raise e
+            return super().find_python_module(name=name, mark=mark, unsafe=unsafe)
+
+    def find_python_name(self, name, mark, unsafe=False):
+        if "." in name:
+            module_name, _ = name.rsplit(".", 1)
+        else:
+            module_name = "builtins"
+
+        try:
+            return super().find_python_name(name=name, mark=mark, unsafe=unsafe)
+        except ConstructorError as e:
+            if name.startswith("meerkat."):
+                __import__(module_name)
+            else:
+                raise e
+            return super().find_python_name(name=name, mark=mark, unsafe=unsafe)
+
 
 def convert_to_batch_column_fn(
     function: Callable, with_indices: bool, materialize: bool = True, **kwargs
