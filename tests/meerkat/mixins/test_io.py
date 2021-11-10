@@ -10,6 +10,6 @@ def test_meerkat_loader(tmpdir):
     col = mk.NumpyArrayColumn(np.arange(10))
     path = os.path.join(tmpdir, "col.mk")
     col.write(path)
-    del sys.modules["meerkat.columns.numpy_column"]
+    module = sys.modules.pop("meerkat.columns.numpy_column")
     mk.AbstractColumn.read(path)
-    __import__("meerkat.columns.numpy_column")
+    sys.modules["meerkat.columns.numpy_column"] = module
