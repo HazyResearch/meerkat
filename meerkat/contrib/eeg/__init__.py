@@ -6,6 +6,7 @@ from functools import partial
 import terra
 from tqdm import tqdm
 import numpy as np
+import eeghdf
 
 
 import meerkat as mk
@@ -98,9 +99,7 @@ def build_eeg_dp(
     eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
 
     dp.add_column(
-        "input",
-        eeg_input_col,
-        overwrite=True,
+        "input", eeg_input_col, overwrite=True,
     )
 
     return dp
@@ -136,6 +135,7 @@ def build_stanford_eeg_dp(
     reports_pth=None,
     restrict_to_reports=False,
     clip_len: int = 60,
+    offset: int = 0,
     seed: int = 123,
     train_frac: float = 0.8,
     valid_frac: float = 0.1,
@@ -167,9 +167,9 @@ def build_stanford_eeg_dp(
     data = []
 
     np.random.seed(seed)
+    corrupt_files = []
 
-    for (filepath, sz_loc, fm_split) in file_tuples:
-
+    for (filepath, sz_loc, fm_split) in tqdm(file_tuples, total=len(file_tuples)):
         row_df = {
             "filepath": filepath,
             "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
@@ -180,13 +180,22 @@ def build_stanford_eeg_dp(
         }
         data.append(row_df)
 
+        # check to see if can open file
+        # try:
+        #     row_df_ = row_df.copy()
+        #     row_df_["split"] = "train"
+        #     eeg_clip = stanford_eeg_loader(row_df_)
+        # except:
+        #     corrupt_files.append(filepath)
+
+    # print(corrupt_files)
+    # breakpoint()
+
     dp = mk.DataPanel(data)
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id",
-        patientid_col,
-        overwrite=True,
+        "patient_id", patientid_col, overwrite=True,
     )
 
     dp_split = split_dp(
@@ -199,13 +208,11 @@ def build_stanford_eeg_dp(
     dp = merge_in_split(dp, dp_split)
 
     eeg_input_col = dp[["sz_start_index", "filepath", "fm_split", "split"]].to_lambda(
-        fn=partial(stanford_eeg_loader, clip_len=clip_len)
+        fn=partial(stanford_eeg_loader, clip_len=clip_len, offset=offset)
     )
 
     dp.add_column(
-        "input",
-        eeg_input_col,
-        overwrite=True,
+        "input", eeg_input_col, overwrite=True,
     )
 
     if reports_pth:
@@ -244,15 +251,11 @@ def build_stanford_eeg_dp(
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age",
-        age_col,
-        overwrite=True,
+        "age", age_col, overwrite=True,
     )
     male_col = dp["filepath"].map(function=eeg_male_loader)
     dp.add_column(
-        "male",
-        male_col,
-        overwrite=True,
+        "male", male_col, overwrite=True,
     )
 
     # remove duplicate ID rows

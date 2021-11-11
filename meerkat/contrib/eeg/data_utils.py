@@ -175,11 +175,7 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
 
 
 def get_sz_labels(
-    edf_fn,
-    clip_idx,
-    time_step_size=1,
-    clip_len=60,
-    stride=60,
+    edf_fn, clip_idx, time_step_size=1, clip_len=60, stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -233,10 +229,7 @@ def get_sz_labels(
 
 
 def compute_slice_matrix(
-    input_dict,
-    time_step_size=1,
-    clip_len=60,
-    stride=60,
+    input_dict, time_step_size=1, clip_len=60, stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -307,10 +300,7 @@ def get_seizure_times(file_name):
 
 
 def get_ordered_channels(
-    file_name,
-    labels_object,
-    channel_names=INCLUDED_CHANNELS,
-    verbose=False,
+    file_name, labels_object, channel_names=INCLUDED_CHANNELS, verbose=False,
 ):
     """
     Reads channel names and returns consistent ordering
@@ -478,7 +468,9 @@ def is_increasing(channel_indices):
     return True
 
 
-def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True, nomalize=True):
+def stanford_eeg_loader(
+    input_dict, clip_len=60, augmentation=True, nomalize=True, offset=0
+):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
 
@@ -506,11 +498,16 @@ def stanford_eeg_loader(input_dict, clip_len=60, augmentation=True, nomalize=Tru
     if sz_start == -1:
         max_start = max(phys_signals.shape[1] - FREQUENCY * clip_len, 0)
         # if split == "train":
-        #     sz_start = np.randint(0,max_start)
+        #     if max_start == 0:
+        #         sz_start = 0
+        #     else:
+        #         sz_start = np.random.randint(0, max_start)
         # else:
         #     sz_start = int(max_start / 2)
         sz_start = int(max_start / 2)
         sz_start /= FREQUENCY
+
+    sz_start -= offset
 
     start_time = int(FREQUENCY * max(0, sz_start))
     end_time = start_time + int(FREQUENCY * clip_len)
