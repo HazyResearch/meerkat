@@ -248,7 +248,7 @@ class AbstractColumn(
         if len(self) > max_rows:
             col = pd.Series(
                 [self._repr_cell(idx) for idx in range(max_rows // 2)]
-                + [None]
+                + [self._repr_cell(0)]
                 + [
                     self._repr_cell(idx)
                     for idx in range(len(self) - max_rows // 2, len(self))
