@@ -796,7 +796,7 @@ class DataPanel(
         # Load the the manager
         mgr_dir = os.path.join(path, "mgr")
         if os.path.exists(mgr_dir):
-            data = BlockManager.read(mgr_dir)
+            data = BlockManager.read(mgr_dir, **kwargs)
         else:
             # backwards compatability to pre-manager datapanels
             data = {

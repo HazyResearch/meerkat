@@ -88,7 +88,7 @@ EXTRAS = {
     ],
     "text": [
         "transformers",
-        "spacy",
+        "spacy>=3.0.0",
         "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
