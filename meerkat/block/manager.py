@@ -309,11 +309,13 @@ class BlockManager(MutableMapping):
                     column_dir,
                     _data=block[_deserialize_block_index(block_meta["block_index"])],
                     _meta=col_meta,
+                    **kwargs,
                 )
                 mgr.add_column(col, name)
             else:
                 mgr.add_column(
-                    col_meta["dtype"].read(path=column_dir, _meta=col_meta), name
+                    col_meta["dtype"].read(path=column_dir, _meta=col_meta, **kwargs),
+                    name,
                 )
         mgr.reorder(meta["_column_order"])
         return mgr

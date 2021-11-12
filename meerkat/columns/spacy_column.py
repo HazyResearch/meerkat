@@ -84,8 +84,8 @@ class SpacyColumn(ListColumn):
 
     def write(self, path: str, **kwargs) -> None:
         # Construct the metadata
-        state = self.get_state()
-        del state["_data"]
+        state = self._get_state()
+
         metadata = {
             "dtype": type(self),
             "len": len(self),
