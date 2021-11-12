@@ -148,7 +148,7 @@ class NumpyArrayColumn(
             np.save(path, self.data)
 
     @staticmethod
-    def _read_data(path: str, mmap=False, *args, **kwargs) -> NumpyArrayColumn:
+    def _read_data(path: str, mmap=False, *args, **kwargs) -> np.ndarray:
         data_path = os.path.join(path, "data.npy")
 
         if mmap:
@@ -192,3 +192,21 @@ class NumpyArrayColumn(
         else:
             # can only create a 1-D series
             return super().to_pandas()
+
+    @classmethod
+    def from_npy(
+        cls,
+        path,
+        mmap_mode=None,
+        allow_pickle=False,
+        fix_imports=True,
+        encoding="ASCII",
+    ):
+        data = np.load(
+            path,
+            mmap_mode=mmap_mode,
+            allow_pickle=allow_pickle,
+            fix_imports=fix_imports,
+            encoding=encoding,
+        )
+        return cls(data)

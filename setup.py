@@ -47,6 +47,7 @@ REQUIRED = [
     "semver>=2.13.0",
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
+    "fvcore",
 ]
 
 # What packages are optional?
@@ -87,7 +88,7 @@ EXTRAS = {
     ],
     "text": [
         "transformers",
-        "spacy",
+        "spacy>=3.0.0",
         "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
@@ -100,6 +101,7 @@ EXTRAS = {
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
+    "ml": ["pytorch_lightning"],
 }
 
 # The rest you shouldn't have to touch too much :)

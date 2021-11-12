@@ -1,8 +1,9 @@
-import hashlib
 import os
+import subprocess
 
 import pandas as pd
-from torchvision.datasets import CelebA
+
+import meerkat as mk
 
 ATTRIBUTES = [
     "5_o_clock_shadow",
@@ -48,13 +49,37 @@ ATTRIBUTES = [
 ]
 
 
+def get_celeba(dataset_dir: str, download: bool = False):
+    """Build the dataframe by joining on the attribute, split and identity
+    CelebA CSVs."""
+    if download:
+        download_celeba(dataset_dir=dataset_dir)
+    df = build_celeba_df(dataset_dir=dataset_dir)
+    dp = mk.DataPanel.from_pandas(df)
+    dp["image"] = mk.ImageColumn.from_filepaths(
+        filepaths=dp["img_path"], base_dir=dataset_dir
+    )
+    return dp
+
+
 def download_celeba(dataset_dir: str):
-    if not os.path.exists(dataset_dir):
-        CelebA(os.path.split(dataset_dir)[:-1], download=True)
-    build_celeba_df(dataset_dir)
+    # if not os.path.exists(dataset_dir):
+    #     CelebA(os.path.split(dataset_dir)[:-1][0], download=True)
+    if os.path.exists(dataset_dir):
+        return
+    curr_dir = os.getcwd()
+    os.makedirs(dataset_dir, exist_ok=True)
+    os.chdir(dataset_dir)
+    subprocess.run(
+        args=["kaggle datasets download " "-d jessicali9530/celeba-dataset"],
+        shell=True,
+        check=True,
+    )
+    subprocess.run(["unzip", "-q", "celeba-dataset.zip"])
+    os.chdir(curr_dir)
 
 
-def build_celeba_df(dataset_dir: str, save_csv: bool = True):
+def build_celeba_df(dataset_dir: str):
     """Build the dataframe by joining on the attribute, split and identity
     CelebA CSVs."""
     identity_df = pd.read_csv(
@@ -64,9 +89,8 @@ def build_celeba_df(dataset_dir: str, save_csv: bool = True):
         names=["file", "identity"],
     )
     attr_df = pd.read_csv(
-        os.path.join(dataset_dir, "list_attr_celeba.txt"),
-        delim_whitespace=True,
-        header=1,
+        os.path.join(dataset_dir, "list_attr_celeba.csv"),
+        index_col=0,
     )
     attr_df.columns = pd.Series(attr_df.columns).apply(lambda x: x.lower())
     attr_df = ((attr_df + 1) // 2).rename_axis("file").reset_index()
@@ -74,7 +98,7 @@ def build_celeba_df(dataset_dir: str, save_csv: bool = True):
     celeb_df = identity_df.merge(attr_df, on="file", validate="one_to_one")
 
     celeb_df["img_path"] = celeb_df.file.apply(
-        lambda x: os.path.join(dataset_dir, "img_align_celeba", x)
+        lambda x: os.path.join("img_align_celeba/img_align_celeba", x)
     )
 
     split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))
@@ -84,13 +108,4 @@ def build_celeba_df(dataset_dir: str, save_csv: bool = True):
     celeb_df = celeb_df.merge(
         split_df[["image_id", "split"]], left_on="file", right_on="image_id"
     )
-    if save_csv:
-        celeb_df.to_csv(os.path.join(dataset_dir, "celeba.csv"), index=False)
     return celeb_df
-
-
-def _hash_for_split(example_id: str, salt=""):
-    GRANULARITY = 100000
-    hashed = hashlib.sha256((str(example_id) + salt).encode())
-    hashed = int(hashed.hexdigest().encode(), 16) % GRANULARITY + 1
-    return hashed / float(GRANULARITY)

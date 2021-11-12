@@ -13,5 +13,5 @@ ignore_errors = True
 omit =
     tests/*
     meerkat/contrib/*
-    meerkat/nn/*
+    meerkat/ml/*
     setup.py

@@ -92,8 +92,8 @@ def download_imagenette(
 
 def build_imagenette_dp(
     dataset_dir: str,
+    download: bool = False,
     version: str = "160px",
-    overwrite: bool = False,
 ) -> mk.DataPanel:
     """Build DataPanel for the Imagenette dataset.
 
@@ -109,7 +109,16 @@ def build_imagenette_dp(
     References:
         https://github.com/fastai/imagenette
     """
-    df: pd.DataFrame = download_imagenette(
-        dataset_dir, version=version, overwrite=overwrite, return_df=True
-    )
-    return mk.DataPanel.from_pandas(df)
+    if download:
+        df: pd.DataFrame = download_imagenette(
+            dataset_dir, version=version, overwrite=False, return_df=True
+        )
+    else:
+        csv_path = os.path.join(dataset_dir, "imagenette.csv")
+        if not os.path.isfile(csv_path):
+            raise ValueError("Imagenette is not downloaded. Pass `download=True`.")
+        df = pd.read_csv(csv_path)
+
+    dp = mk.DataPanel.from_pandas(df)
+    dp["img"] = mk.ImageColumn.from_filepaths(dp["img_path"])
+    return dp
