@@ -104,9 +104,7 @@ def get_all_cifar10_splits(
     }
 
 
-def get_cifar10(
-    download_dir, is_train=True, frac_val=0.0, transforms=None, download: bool = True
-):
+def get_cifar10(download_dir, frac_val=0.0, transforms=None, download: bool = True):
     """Load CIFAR10 as a Meerkat DataPanel.
 
     Args:
@@ -118,18 +116,35 @@ def get_cifar10(
     Returns:
         a DataPanel containing columns `raw_image`, `image` and `label`
     """
-    dataset = CIFAR10(
-        root=download_dir,
-        train=is_train,
-        download=download,
-    )
+    dps = []
+    for split in ["train", "test"]:
+        dataset = CIFAR10(
+            root=download_dir,
+            train=split == "train",
+            download=download,
+        )
 
-    dp = mk.DataPanel(
-        {
-            "raw_image": dataset.data,
-            "label": mk.TensorColumn(dataset.targets),
-        }
-    )
+        dp = mk.DataPanel(
+            {
+                "raw_image": dataset.data,
+                "label": mk.TensorColumn(dataset.targets),
+                "split": [split] * len(dataset),
+            }
+        )
+        if split == "train" and frac_val > 1e-4:
+            # sample indices for splitting off val
+            val_indices = set(
+                random.sample(
+                    range(len(dp)),
+                    int(frac_val * len(dp)),
+                )
+            )
+
+            dp["split"] = np.array(
+                ["train" if i not in val_indices else "val" for i in range(len(dp))]
+            )
+        dps.append(dp)
+    dp = mk.concat(dps)
 
     def _transform(x):
         """Convert to PIL image and then apply the transforms."""
@@ -139,19 +154,5 @@ def get_cifar10(
         return x
 
     dp["image"] = mk.LambdaColumn(dp["raw_image"], _transform)
-    dp["split"] = np.array(["train"] * len(dp))
-
-    if is_train and frac_val > 1e-4:
-        # sample indices for splitting off val
-        val_indices = set(
-            random.sample(
-                range(len(dp)),
-                int(frac_val * len(dp)),
-            )
-        )
-
-        dp["split"] = np.array(
-            ["train" if i not in val_indices else "val" for i in range(len(dp))]
-        )
 
     return dp

@@ -89,29 +89,29 @@ datasets.__doc__ = """Registry for datasets in meerkat"""
 
 
 @datasets.register()
-def cifar10(dataset_dir: str = None, download: bool = True):
+def cifar10(dataset_dir: str = None, download: bool = True, **kwargs):
     """[summary]"""
     from .torchvision import get_cifar10
 
-    return get_cifar10(download_dir=dataset_dir, download=download)
+    return get_cifar10(download_dir=dataset_dir, download=download, **kwargs)
 
 
 @datasets.register()
-def imagenet(dataset_dir: str = None, download: bool = True):
+def imagenet(dataset_dir: str = None, download: bool = True, **kwargs):
     from .imagenet import build_imagenet_dps
 
-    return build_imagenet_dps(dataset_dir=dataset_dir, download=download)
+    return build_imagenet_dps(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
 @datasets.register()
-def imagenette(dataset_dir: str = None, download: bool = True):
+def imagenette(dataset_dir: str = None, download: bool = True, **kwargs):
     from .imagenette import build_imagenette_dp
 
-    return build_imagenette_dp(dataset_dir=dataset_dir, download=download)
+    return build_imagenette_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
 @datasets.register()
-def celeba(dataset_dir: str = None, download: bool = True):
+def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
     from .celeba import get_celeba
 
-    return get_celeba(dataset_dir=dataset_dir, download=download)
+    return get_celeba(dataset_dir=dataset_dir, download=download, **kwargs)
