@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Hashable, Sequence, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
@@ -120,6 +121,9 @@ class TensorBlock(AbstractBlock):
             # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
             # to be interpreted as an index
             return torch.as_tensor(index.data)
+
+        if isinstance(index, pd.Series):
+            return torch.as_tensor(index.values)
 
         from meerkat.columns.pandas_column import PandasSeriesColumn
 
