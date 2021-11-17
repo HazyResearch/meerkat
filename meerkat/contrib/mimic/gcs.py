@@ -139,7 +139,9 @@ class GCSImageColumn(ImageColumn):
 
     def _set_state(self, state: dict = None):
         if state is not None:
+            state["base_dir"] = state.get("base_dir", None)  # backwards compatibility
             self.__dict__.update(state)
+
         if state is None or "bucket" not in state:
             storage_client = storage.Client(project=self.project)
             self.bucket = storage_client.bucket(
