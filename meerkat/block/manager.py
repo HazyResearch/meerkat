@@ -13,6 +13,7 @@ import yaml
 import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.tools.utils import MeerkatLoader
 
 from .ref import BlockRef
 
@@ -283,7 +284,7 @@ class BlockManager(MutableMapping):
 
         # Load the metadata
         meta = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
         )
 
         blocks = {}
