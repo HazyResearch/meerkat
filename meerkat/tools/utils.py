@@ -20,7 +20,11 @@ class MeerkatLoader(yaml.FullLoader):
                 raise e
             return super().find_python_module(name=name, mark=mark, unsafe=unsafe)
 
-    def find_python_name(self, name, mark, unsafe=False):
+    def find_python_name(self, name: str, mark, unsafe=False):
+        if "meerkat.nn" in name:
+            # backwards compatibility with old name
+            name = name.replace("meerkat.nn", "meerkat.ml")
+
         if "." in name:
             module_name, _ = name.rsplit(".", 1)
         else:
