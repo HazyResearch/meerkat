@@ -11,7 +11,9 @@ from functools import partial
 import hashlib
 import math
 import pandas as pd
-
+import json
+import yaml
+from scipy.fftpack import fft
 
 FREQUENCY = 200
 INCLUDED_CHANNELS = [
@@ -441,6 +443,56 @@ def compute_stanford_file_tuples(
     return file_tuples
 
 
+def compute_streaming_file_tuples(
+    stanford_dataset_dir,
+    lpch_dataset_dir,
+    annotations_dir,
+    clip_len,
+    stride,
+    sz_label_sensitivity,
+):
+
+    file_tuples = []
+    # read all json files in annotations_dir
+    for root, dirs, files in os.walk(annotations_dir):
+        for name in files:
+            if name.endswith((".json")) and "checkpoint" not in name:
+                # read json
+                annot_path = os.path.join(root, name)
+                annot_dict = json.load(open(annot_path))
+                sz_times = annot_dict["time"]
+
+                # read eeg file
+                file_id = name.split("-annot")[0]
+                if "lpch" in root:
+                    filepath = os.path.join(lpch_dataset_dir, file_id + ".eeghdf")
+                else:
+                    filepath = os.path.join(stanford_dataset_dir, file_id + ".eeghdf")
+
+                eegf = eeghdf.Eeghdf(filepath)
+                phys_signals = eegf.phys_signals
+                signal_len = phys_signals.shape[1] // FREQUENCY
+
+                clip_start = 0
+                while clip_start + clip_len <= signal_len:
+                    sz_label = 0
+                    # check if there is a seizure anywhere in [clip_start,clip_end]
+                    # needs to overlap by at least sz_label_sensitivity
+
+                    for (sz_start, sz_len) in sz_times:
+                        sz_end = sz_start + sz_len
+                        clip_end = clip_start + clip_len
+                        sz_overlap = min(clip_end, sz_end) - max(clip_start, sz_start)
+                        if sz_overlap > sz_label_sensitivity:
+                            sz_label = 1
+
+                    ftup = (filepath, clip_start, sz_label)
+                    file_tuples.append(ftup)
+                    clip_start += stride
+
+    return file_tuples
+
+
 def get_stanford_sz_times(eegf):
     df = eegf.edf_annotations_df
     seizure_df = df[df.text.str.contains("|".join(SEIZURE_STRINGS), case=False)]
@@ -538,6 +590,49 @@ def stanford_eeg_loader(
     return torch.FloatTensor(eeg_slice)
 
 
+def streaming_eeg_loader(
+    input_dict, clip_len=60, nomalize=True,
+):
+    """
+    given filepath and sz_start, extracts EEG clip of length 60 sec
+
+    """
+    filepath = input_dict["filepath"]
+    clip_start = input_dict["clip_start"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+    ordered_channels = get_ordered_channels(
+        filepath, eegf.electrode_labels, channel_names=STANFORD_INCLUDED_CHANNELS
+    )
+    phys_signals = eegf.phys_signals
+
+    start_time = int(FREQUENCY * max(0, clip_start))
+    end_time = start_time + int(FREQUENCY * clip_len)
+
+    if not is_increasing(ordered_channels):
+        eeg_slice = phys_signals[:, start_time:end_time]
+        eeg_slice = eeg_slice[ordered_channels, :]
+    else:
+        eeg_slice = (
+            phys_signals.s2u[ordered_channels]
+            * phys_signals.data[ordered_channels, start_time:end_time].T
+        ).T
+
+    diff = FREQUENCY * clip_len - eeg_slice.shape[1]
+    # padding zeros
+    if diff > 0:
+        zeros = np.zeros((eeg_slice.shape[0], diff))
+        eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
+    eeg_slice = eeg_slice.T
+
+    if nomalize:
+        eeg_slice = eeg_slice - EEG_MEANS
+        eeg_slice = eeg_slice / EEG_STDS
+
+    return torch.FloatTensor(eeg_slice)
+
+
 def split_dp(
     dp: mk.DataPanel,
     split_on: str,
@@ -601,6 +696,51 @@ def merge_in_split(dp: mk.DataPanel, split_dp: mk.DataPanel):
     return dp.merge(split_dp, on=split_on)
 
 
+def computeFFT(signals, n):
+    """
+    Args:
+        signals: EEG signals, (number of channels, number of data points)
+        n: length of positive frequency terms of fourier transform
+    Returns:
+        FT: log amplitude of FFT of signals, (number of channels, number of data points)
+        P: phase spectrum of FFT of signals, (number of channels, number of data points)
+    """
+    # fourier transform
+    fourier_signal = fft(signals, n=n, axis=-1)  # FFT on the last dimension
+
+    # only take the positive freq part
+    idx_pos = int(np.floor(n / 2))
+    fourier_signal = fourier_signal[:, :idx_pos]
+    amp = np.abs(fourier_signal)
+    amp[amp == 0.0] = 1e-8  # avoid log of 0
+
+    FT = np.log(amp)
+    P = np.angle(fourier_signal)
+
+    return FT, P
+
+
+def fft_eeg_loader(
+    input_dict, clip_len=60, augmentation=True, nomalize=True, offset=0, time_step=1
+):
+    """
+    given filepath and sz_start, extracts EEG clip of length 60 sec
+
+    """
+    eeg_slice = stanford_eeg_loader(
+        input_dict, clip_len, augmentation, nomalize, offset
+    ).T
+    fft_clips = []
+    for st in np.arange(0, clip_len, time_step):
+        curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
+        curr_eeg_clip, _ = computeFFT(curr_eeg_clip.numpy(), n=time_step * FREQUENCY)
+        fft_clips.append(curr_eeg_clip)
+
+    fft_slice = np.stack(fft_clips, axis=0)
+
+    return torch.FloatTensor(fft_slice).view(clip_len, -1)
+
+
 def get_swap_pairs(channels):
     """
     Swap select adjacenet channels
@@ -628,6 +768,50 @@ def random_augmentation(signals):
     if np.random.choice([True, False]):
         signals = signals * np.random.uniform(0.8, 1.2)
     return signals
+
+
+def unit_string_to_days(timestring: str):
+    """
+    timestring : <number> <days|weeks|months|years>
+    return age in days as float
+    """
+    (val, unit) = timestring.split()
+    floatval = float(val)
+    if unit in "days":
+        rel = float
+    elif unit in "weeks":
+        rel = 7 * floatval
+    elif unit in "months":
+        rel = 40 * 7 + 30 * floatval  # average value
+    elif unit in "years":
+        rel = 365.25 * floatval
+
+    return rel
+
+
+with open(
+    "/home/ksaab/Documents/meerkat/meerkat/contrib/eeg/eeg_maturation_ages.yaml"
+) as fp:
+    PMA_AGES = yaml.safe_load(fp)["PMA ages"]
+PMA_AGES_DAYS = [unit_string_to_days(xx) for xx in PMA_AGES]
+PMA_AGES_DAYS_ARR = np.array(PMA_AGES_DAYS)
+NORMALIZED_AGE_TIMES = np.linspace(0.0, 1.0, num=len(PMA_AGES_DAYS_ARR))
+
+
+def eeg_logage_loader(filepath):
+    """
+    given filepath of an eeg, pulls relevant metadata
+    right now only supports pulling age
+    """
+    # filepath = input_dict["filepath"]
+
+    # load EEG signal
+    eegf = eeghdf.Eeghdf(filepath)
+    age_years = min(eegf.age_years, 119)
+    indx = np.searchsorted(PMA_AGES_DAYS_ARR, age_years * 365.25)
+    normalized_age = NORMALIZED_AGE_TIMES[indx]
+
+    return normalized_age
 
 
 def eeg_age_loader(filepath):

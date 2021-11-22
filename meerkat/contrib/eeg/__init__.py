@@ -15,11 +15,15 @@ from .data_utils import (
     compute_file_tuples,
     compute_slice_matrix,
     compute_stanford_file_tuples,
+    compute_streaming_file_tuples,
     eeg_age_loader,
     eeg_male_loader,
     get_sz_labels,
     stanford_eeg_loader,
+    streaming_eeg_loader,
+    fft_eeg_loader,
     eeg_patientid_loader,
+    eeg_logage_loader,
     split_dp,
     merge_in_split,
 )
@@ -153,7 +157,6 @@ def build_stanford_eeg_dp(
         stanford_dataset_dir (str): A local dir where stanford EEG are stored
         lpch_dataset_dir (str): A local dir where the lpch EEG are stored
         file_marker_dir (str): A local dir where file markers are stored
-        splits (list[str]): List of splits to load
         reports_pth (str): if not None, will load reports
         restrict_to_reports (bool): If true, only considers eegs with report
         clip_len (int): Number of seconds in an EEG clip
@@ -215,6 +218,16 @@ def build_stanford_eeg_dp(
         "input", eeg_input_col, overwrite=True,
     )
 
+    eeg_fftinput_col = dp[
+        ["sz_start_index", "filepath", "fm_split", "split"]
+    ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
+
+    breakpoint()
+
+    dp.add_column(
+        "fft_input", eeg_fftinput_col, overwrite=True,
+    )
+
     if reports_pth:
         raw_reports_pth = os.path.join(reports_pth, "reports_unique_for_hl_mm.txt")
         raw_reports_dp = mk.DataPanel.from_csv(raw_reports_pth, sep="\t")
@@ -253,9 +266,104 @@ def build_stanford_eeg_dp(
     dp.add_column(
         "age", age_col, overwrite=True,
     )
+    logage_col = dp["filepath"].map(function=eeg_logage_loader)
+    dp.add_column(
+        "logage", logage_col, overwrite=True,
+    )
+
     male_col = dp["filepath"].map(function=eeg_male_loader)
     dp.add_column(
         "male", male_col, overwrite=True,
+    )
+
+    # remove duplicate ID rows
+    dp = dp.lz[~dp["id"].duplicated()]
+
+    return dp
+
+
+@terra.Task
+def build_streaming_stanford_eeg_dp(
+    stanford_dataset_dir: str,
+    lpch_dataset_dir: str,
+    annotations_dir: str,
+    clip_len: int = 60,
+    stride: int = 60,
+    sz_label_sensitivity: int = 20,
+    seed: int = 123,
+    train_frac: float = 0.8,
+    valid_frac: float = 0.1,
+    test_frac: float = 0.1,
+):
+    """
+    Builds a `DataPanel` for accessing EEG data in streaming setting.
+
+    This is for accessing private stanford data.
+    The stanford data is limited to specific researchers on IRB.
+    No public directions on how to download them yet.
+    Contact ksaab@stanford.edu for more information.
+
+    Args:
+        stanford_dataset_dir (str): A local dir where stanford EEG are stored
+        lpch_dataset_dir (str): A local dir where the lpch EEG are stored
+        annotations_dir (str): A local dir where the fine grained annotations are stores
+        clip_len (int): length of eeg input in seconds
+        stride (int): stride for moving window to define clips 
+        sz_label_sensitivity (int): how many seconds of seizure in the clip to be considered a seizure
+    """
+
+    # retrieve file tuples which is a list of
+    # (eeg filepath, clip_st, sz_label)
+    file_tuples = compute_streaming_file_tuples(
+        stanford_dataset_dir,
+        lpch_dataset_dir,
+        annotations_dir,
+        clip_len,
+        stride,
+        sz_label_sensitivity,
+    )
+    data = []
+
+    np.random.seed(seed)
+
+    for (filepath, clip_st, sz_label) in tqdm(file_tuples, total=len(file_tuples)):
+        row_df = {
+            "filepath": filepath,
+            "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
+            "id": filepath.split("/")[-1].split(".eeghdf")[0] + f"_{clip_st}",
+            "target": sz_label,
+            "clip_start": clip_st,
+        }
+        data.append(row_df)
+
+    dp = mk.DataPanel(data)
+
+    patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
+    dp.add_column(
+        "patient_id", patientid_col, overwrite=True,
+    )
+
+    dp_split = split_dp(
+        dp,
+        split_on="patient_id",
+        train_frac=train_frac,
+        valid_frac=valid_frac,
+        test_frac=test_frac,
+    )
+    dp = merge_in_split(dp, dp_split)
+
+    eeg_input_col = dp[["clip_start", "filepath"]].to_lambda(
+        fn=partial(streaming_eeg_loader, clip_len=clip_len)
+    )
+
+    dp.add_column(
+        "input", eeg_input_col, overwrite=True,
+    )
+
+    # Add metadata
+    age_col = dp["filepath"].map(function=eeg_age_loader)
+    dp.add_column(
+        "age", age_col, overwrite=True,
     )
 
     # remove duplicate ID rows
