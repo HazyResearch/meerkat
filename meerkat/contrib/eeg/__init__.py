@@ -222,8 +222,6 @@ def build_stanford_eeg_dp(
         ["sz_start_index", "filepath", "fm_split", "split"]
     ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
 
-    breakpoint()
-
     dp.add_column(
         "fft_input", eeg_fftinput_col, overwrite=True,
     )
