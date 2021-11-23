@@ -273,9 +273,26 @@ def compute_slice_matrix(
         time_steps.append(curr_time_step)
         start_time_step = end_time_step
 
-    eeg_clip = np.stack(time_steps, axis=0)
+    eeg_clip = np.stack(time_steps, axis=0).transpose(0, 2, 1).reshape(-1, 19)
 
-    return eeg_clip
+    return torch.FloatTensor(eeg_clip)
+
+
+def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60):
+    """
+    given filepath and sz_start, extracts EEG clip of length 60 sec
+
+    """
+    eeg_slice = compute_slice_matrix(input_dict, time_step, clip_len, stride,).T
+    fft_clips = []
+    for st in np.arange(0, clip_len, time_step):
+        curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
+        curr_eeg_clip, _ = computeFFT(curr_eeg_clip.numpy(), n=time_step * FREQUENCY)
+        fft_clips.append(curr_eeg_clip)
+
+    fft_slice = np.stack(fft_clips, axis=0)
+
+    return torch.FloatTensor(fft_slice).view(clip_len, -1)
 
 
 def get_seizure_times(file_name):
