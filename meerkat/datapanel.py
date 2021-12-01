@@ -341,12 +341,12 @@ class DataPanel(
         if isinstance(dataset, dict):
             return dict(
                 map(
-                    lambda t: (t[0], cls(t[1])),
+                    lambda t: (t[0], cls.from_arrow(t[1]._data)),
                     dataset.items(),
                 )
             )
         else:
-            return cls(dataset)
+            return cls.from_arrow(dataset._data)
 
     @classmethod
     @capture_provenance()

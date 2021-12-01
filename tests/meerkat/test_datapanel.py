@@ -805,6 +805,24 @@ class TestDataPanel:
                 data_to_compare = dp_new[k]._data
             assert data_to_compare == data[k]
 
+    def test_from_huggingface(self, tmpdir: str):
+        # Returns a dataset dict
+        dp = DataPanel.from_huggingface(
+            "hf-internal-testing/fixtures_ade20k",
+            cache_dir=tmpdir,
+        )["test"]
+        assert len(dp) == 4
+        assert len(dp.columns) == 3
+
+        # Returns a dataset
+        dp = DataPanel.from_huggingface(
+            "hf-internal-testing/fixtures_ade20k",
+            cache_dir=tmpdir,
+            split="test",
+        )
+        assert len(dp) == 4
+        assert len(dp.columns) == 3
+
     def test_from_jsonl(self):
         # Build jsonl file
         temp_f = tempfile.NamedTemporaryFile()
