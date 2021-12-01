@@ -85,5 +85,5 @@ class ColumnIOMixin:
             return dill.loads(dill_str)
 
     @staticmethod
-    def _read_data(path: str):
+    def _read_data(path: str, *args, **kwargs):
         return dill.load(open(os.path.join(path, "data.dill"), "rb"))
