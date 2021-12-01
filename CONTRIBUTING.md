@@ -22,9 +22,9 @@ request. It will make it easier for us to give feedback and move your request fo
 ### Bugs
 
 First, we would really appreciate it if you could **make sure the bug was not
-already reported** (use the search bar on Github under Issues).
+already reported** (use the search bar on GitHub under Issues).
 
-If you didn't find anything, please use the bug issue template to file a Github issue.  
+If you didn't find anything, please use the bug issue template to file a GitHub issue.  
 
 
 ### Features
@@ -59,38 +59,35 @@ Git](https://git-scm.com/book/en/v2) is a very good reference.
 
 Follow these steps to start contributing:
 
-1. Fork the [repository](https://github.com/robustness-gym/robustness-gym) by
+1. Fork the [repository](https://github.com/meerkat/meerkat) by
    clicking on the 'Fork' button on the repository's page. 
    This creates a copy of the code under your GitHub user account.
 
 2. Clone your fork to your local disk, and add the base repository as a remote:
 
    ```bash
-   $ git clone git@github.com:<your Github handle>/robustness-gym.git
-   $ cd robustness-gym
-   $ git remote add upstream https://github.com/robustness-gym/robustness-gym.git
+   $ git clone git@github.com:<your GitHub handle>/meerkat.git
+   $ cd meerkat
+   $ git remote add upstream https://github.com/robustness-gym/meerkat.git
    ```
+   
 
-3. Create a new branch to hold your development changes:
+3. Create a new branch off of the `dev` branch to hold your development changes:
 
    ```bash
-   $ git checkout -b a-descriptive-name-for-my-changes
+   $ git fetch upstream
+   $ git checkout -b a-descriptive-name-for-my-changes upstream/dev
    ```
+   **Do not** work directly on the `main` or `dev`  branches.
 
-   **Do not** work on the `main` branch.
-
-4. Meerkat manages dependencies using [`poetry`](https://python-poetry.org). 
-Set up a development environment with `poetry` by running the following command in
- a virtual environment:
+4. Meerkat manages dependencies using [`setuptools`](https://packaging.python.org/guides/distributing-packages-using-setuptools/). From the base of the `meerkat` repo, install the project in editable mode with all the extra dependencies with 
 
    ```bash
-   $ pip install poetry
-   $ poetry install
+   $ pip install -e ".[all]"
    ```
-Note: in order to pass the full test suite (step 5), you'll need to install all extra in addition. 
-```bash
-   $ poetry install --extras "adversarial augmentation summarization text vision"
-```
+   If meerkat was already installed in the virtual environment, remove it with `pip uninstall meerkat-ml` before reinstalling it in editable mode with the above command.
+
+
 5. Develop features on your branch.
 
    As you work on the features, you should make sure that the test suite
@@ -124,6 +121,15 @@ Note: in order to pass the full test suite (step 5), you'll need to install all 
    $ make docs
    ```
 
+   You can use `pre-commit` to make sure you don't forget to format your code properly, 
+   the dependency should already be made available by `setuptools`.
+   
+   Just install `pre-commit` from the base of the `meerkat` directory with
+   
+   ```bash
+   $ pre-commit install
+   ```
+
    Once you're happy with your changes, add changed files using `git add` and
    make a commit with `git commit` to record your changes locally:
 
@@ -139,7 +145,7 @@ Note: in order to pass the full test suite (step 5), you'll need to install all 
 
    ```bash
    $ git fetch upstream
-   $ git rebase upstream/main
+   $ git rebase upstream/dev
    ```
 
    Push the changes to your account using:
@@ -147,19 +153,14 @@ Note: in order to pass the full test suite (step 5), you'll need to install all 
    ```bash
    $ git push -u origin a-descriptive-name-for-my-changes
    ```
-   
-   You can use `pre-commit` to make sure you don't forget to format your code properly, 
-   the dependency should already be made available by `poetry`.
-   
-   Just install `pre-commit` for the `robustness-gym` directory,
-   
-   ```bash
-   $ pre-commit install
-   ```
 
 6. Once you are satisfied (**and the checklist below is happy too**), go to the
    webpage of your fork on GitHub. Click on 'Pull request' to send your changes
-   to the project maintainers for review.
+   to the project maintainers for review. 
+
+   **Important**:  Ensure that the you create a pull request onto meerkat's `dev` branch. The drop down menus at the top of the "Open a pull request page" should look
+   >base repository: **robustness-gym/meerkat**  base: **dev** <- head repository: **\<your GitHub handle\>/meerkat**  compare: **\<your branch name\>** 
+   
 
 7. It's ok if maintainers ask you for changes. It happens to core contributors
    too! So everyone can see the changes in the Pull request, work in your local
