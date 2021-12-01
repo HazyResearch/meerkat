@@ -103,6 +103,7 @@ EXTRAS = {
     ],
     "ml": ["pytorch_lightning"],
 }
+EXTRAS["all"] = list(set(sum(EXTRAS.values(), [])))
 
 # The rest you shouldn't have to touch too much :)
 # ------------------------------------------------
