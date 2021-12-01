@@ -810,7 +810,6 @@ class TestDataPanel:
         dp = DataPanel.from_huggingface(
             "hf-internal-testing/fixtures_ade20k",
             cache_dir=tmpdir,
-            revision="ddd1a5c",
         )["test"]
         assert len(dp) == 4
         assert len(dp.columns) == 3
@@ -819,7 +818,6 @@ class TestDataPanel:
         dp = DataPanel.from_huggingface(
             "hf-internal-testing/fixtures_ade20k",
             cache_dir=tmpdir,
-            revision="ddd1a5c",
             split="test",
         )
         assert len(dp) == 4
