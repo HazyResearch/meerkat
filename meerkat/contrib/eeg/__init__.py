@@ -23,7 +23,6 @@ from .data_utils import (
     streaming_eeg_loader,
     fft_eeg_loader,
     eeg_patientid_loader,
-    eeg_logage_loader,
     split_dp,
     merge_in_split,
 )
@@ -103,7 +102,9 @@ def build_eeg_dp(
     eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     return dp
@@ -198,7 +199,9 @@ def build_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id", patientid_col, overwrite=True,
+        "patient_id",
+        patientid_col,
+        overwrite=True,
     )
 
     dp_split = split_dp(
@@ -215,7 +218,9 @@ def build_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     eeg_fftinput_col = dp[
@@ -223,7 +228,9 @@ def build_stanford_eeg_dp(
     ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
 
     dp.add_column(
-        "fft_input", eeg_fftinput_col, overwrite=True,
+        "fft_input",
+        eeg_fftinput_col,
+        overwrite=True,
     )
 
     if reports_pth:
@@ -262,16 +269,20 @@ def build_stanford_eeg_dp(
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age", age_col, overwrite=True,
+        "age",
+        age_col,
+        overwrite=True,
     )
-    logage_col = dp["filepath"].map(function=eeg_logage_loader)
-    dp.add_column(
-        "logage", logage_col, overwrite=True,
-    )
+    # logage_col = dp["filepath"].map(function=eeg_logage_loader)
+    # dp.add_column(
+    #     "logage", logage_col, overwrite=True,
+    # )
 
     male_col = dp["filepath"].map(function=eeg_male_loader)
     dp.add_column(
-        "male", male_col, overwrite=True,
+        "male",
+        male_col,
+        overwrite=True,
     )
 
     # remove duplicate ID rows
@@ -306,7 +317,7 @@ def build_streaming_stanford_eeg_dp(
         lpch_dataset_dir (str): A local dir where the lpch EEG are stored
         annotations_dir (str): A local dir where the fine grained annotations are stores
         clip_len (int): length of eeg input in seconds
-        stride (int): stride for moving window to define clips 
+        stride (int): stride for moving window to define clips
         sz_label_sensitivity (int): how many seconds of seizure in the clip to be considered a seizure
     """
 
@@ -338,7 +349,9 @@ def build_streaming_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id", patientid_col, overwrite=True,
+        "patient_id",
+        patientid_col,
+        overwrite=True,
     )
 
     dp_split = split_dp(
@@ -355,13 +368,17 @@ def build_streaming_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age", age_col, overwrite=True,
+        "age",
+        age_col,
+        overwrite=True,
     )
 
     # remove duplicate ID rows

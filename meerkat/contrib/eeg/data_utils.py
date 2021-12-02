@@ -177,7 +177,11 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
 
 
 def get_sz_labels(
-    edf_fn, clip_idx, time_step_size=1, clip_len=60, stride=60,
+    edf_fn,
+    clip_idx,
+    time_step_size=1,
+    clip_len=60,
+    stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -231,7 +235,10 @@ def get_sz_labels(
 
 
 def compute_slice_matrix(
-    input_dict, time_step_size=1, clip_len=60, stride=60,
+    input_dict,
+    time_step_size=1,
+    clip_len=60,
+    stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -302,7 +309,10 @@ def get_seizure_times(file_name):
 
 
 def get_ordered_channels(
-    file_name, labels_object, channel_names=INCLUDED_CHANNELS, verbose=False,
+    file_name,
+    labels_object,
+    channel_names=INCLUDED_CHANNELS,
+    verbose=False,
 ):
     """
     Reads channel names and returns consistent ordering
@@ -591,7 +601,9 @@ def stanford_eeg_loader(
 
 
 def streaming_eeg_loader(
-    input_dict, clip_len=60, nomalize=True,
+    input_dict,
+    clip_len=60,
+    nomalize=True,
 ):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
@@ -789,29 +801,29 @@ def unit_string_to_days(timestring: str):
     return rel
 
 
-with open(
-    "/home/ksaab/Documents/meerkat/meerkat/contrib/eeg/eeg_maturation_ages.yaml"
-) as fp:
-    PMA_AGES = yaml.safe_load(fp)["PMA ages"]
-PMA_AGES_DAYS = [unit_string_to_days(xx) for xx in PMA_AGES]
-PMA_AGES_DAYS_ARR = np.array(PMA_AGES_DAYS)
-NORMALIZED_AGE_TIMES = np.linspace(0.0, 1.0, num=len(PMA_AGES_DAYS_ARR))
+# with open(
+#     "/home/ksaab/Documents/meerkat/meerkat/contrib/eeg/eeg_maturation_ages.yaml"
+# ) as fp:
+#     PMA_AGES = yaml.safe_load(fp)["PMA ages"]
+# PMA_AGES_DAYS = [unit_string_to_days(xx) for xx in PMA_AGES]
+# PMA_AGES_DAYS_ARR = np.array(PMA_AGES_DAYS)
+# NORMALIZED_AGE_TIMES = np.linspace(0.0, 1.0, num=len(PMA_AGES_DAYS_ARR))
 
 
-def eeg_logage_loader(filepath):
-    """
-    given filepath of an eeg, pulls relevant metadata
-    right now only supports pulling age
-    """
-    # filepath = input_dict["filepath"]
+# def eeg_logage_loader(filepath):
+#     """
+#     given filepath of an eeg, pulls relevant metadata
+#     right now only supports pulling age
+#     """
+#     # filepath = input_dict["filepath"]
 
-    # load EEG signal
-    eegf = eeghdf.Eeghdf(filepath)
-    age_years = min(eegf.age_years, 119)
-    indx = np.searchsorted(PMA_AGES_DAYS_ARR, age_years * 365.25)
-    normalized_age = NORMALIZED_AGE_TIMES[indx]
+#     # load EEG signal
+#     eegf = eeghdf.Eeghdf(filepath)
+#     age_years = min(eegf.age_years, 119)
+#     indx = np.searchsorted(PMA_AGES_DAYS_ARR, age_years * 365.25)
+#     normalized_age = NORMALIZED_AGE_TIMES[indx]
 
-    return normalized_age
+#     return normalized_age
 
 
 def eeg_age_loader(filepath):
