@@ -38,6 +38,7 @@ def build_tuh_eeg_dp(
     raw_dataset_dir: str,
     splits=["train", "dev"],
     clip_len: int = 60,
+    offset: int = 0,
     step_size: int = 1,
     stride: int = 60,
     train_frac: float = 0.9,
@@ -119,7 +120,11 @@ def build_tuh_eeg_dp(
     dp = dp_train.append(dp_test)
 
     eeg_loader = partial(
-        compute_slice_matrix, time_step_size=step_size, clip_len=clip_len, stride=stride
+        compute_slice_matrix,
+        time_step_size=step_size,
+        clip_len=clip_len,
+        stride=stride,
+        offset=offset,
     )
 
     eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
@@ -130,7 +135,11 @@ def build_tuh_eeg_dp(
 
     eeg_fftinput_col = dp[["clip_idx", "h5_fn"]].to_lambda(
         fn=partial(
-            fft_tuh_eeg_loader, time_step=step_size, clip_len=clip_len, stride=stride
+            fft_tuh_eeg_loader,
+            time_step=step_size,
+            clip_len=clip_len,
+            stride=stride,
+            offset=offset,
         )
     )
 
