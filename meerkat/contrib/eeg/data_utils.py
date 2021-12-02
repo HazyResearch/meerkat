@@ -148,6 +148,7 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
             print(edf_fn_full)
 
         edf_fn_full = edf_fn_full[0]
+        patient_id = edf_fn_full.split("/")[-3]
         seizure_times = get_seizure_times(edf_fn_full.split(".edf")[0])
 
         h5_fn_full = os.path.join(dataset_dir, h5_fn)
@@ -171,7 +172,7 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
                 if not ((end_window < start_t) or (start_window > end_t)):
                     is_seizure = 1
                     break
-            file_tuples.append((edf_fn, i, is_seizure))
+            file_tuples.append((edf_fn, patient_id, i, is_seizure))
 
     return file_tuples
 
