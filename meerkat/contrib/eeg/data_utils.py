@@ -110,6 +110,54 @@ EEG_STDS = np.array(
     ]
 )
 
+TUH_EEG_MEANS = np.array(
+    [
+        -10.5187,
+        -8.6126,
+        -10.7719,
+        -12.7746,
+        -13.3394,
+        -15.3364,
+        -13.3333,
+        -14.6708,
+        -10.4807,
+        -7.7543,
+        -13.7053,
+        -10.1221,
+        -11.6965,
+        -13.5834,
+        -14.4518,
+        -10.0639,
+        -12.1372,
+        -9.9625,
+        -10.2223,
+    ]
+)
+
+TUH_EEG_STDS = np.array(
+    [
+        293.5294,
+        267.9896,
+        291.9434,
+        312.8902,
+        274.3873,
+        353.7668,
+        342.4909,
+        304.0491,
+        312.6968,
+        279.8322,
+        286.1863,
+        258.3522,
+        282.8169,
+        275.4195,
+        273.7004,
+        268.8392,
+        300.3167,
+        330.4046,
+        395.5132,
+    ]
+)
+
 
 def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
     """
@@ -148,6 +196,7 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
             print(edf_fn_full)
 
         edf_fn_full = edf_fn_full[0]
+        patient_id = edf_fn_full.split("/")[-3]
         seizure_times = get_seizure_times(edf_fn_full.split(".edf")[0])
 
         h5_fn_full = os.path.join(dataset_dir, h5_fn)
@@ -171,7 +220,7 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
                 if not ((end_window < start_t) or (start_window > end_t)):
                     is_seizure = 1
                     break
-            file_tuples.append((edf_fn, i, is_seizure))
+            file_tuples.append((edf_fn, patient_id, i, is_seizure))
 
     return file_tuples
 
@@ -235,10 +284,7 @@ def get_sz_labels(
 
 
 def compute_slice_matrix(
-    input_dict,
-    time_step_size=1,
-    clip_len=60,
-    stride=60,
+    input_dict, time_step_size=1, clip_len=60, stride=60, offset=0, normalize=True
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -257,7 +303,7 @@ def compute_slice_matrix(
 
     physical_clip_len = int(FREQUENCY * clip_len)
 
-    start_window = clip_idx * FREQUENCY * stride
+    start_window = max((clip_idx * FREQUENCY * stride) - offset * FREQUENCY, 0)
 
     with h5py.File(h5_fn, "r") as f:
         signal_array = f["resampled_signal"][()]
@@ -266,7 +312,7 @@ def compute_slice_matrix(
 
     # (num_channels, physical_clip_len)
 
-    end_window = np.minimum(signal_array.shape[-1], start_window + physical_clip_len)
+    end_window = min(signal_array.shape[-1], start_window + physical_clip_len)
     curr_slc = signal_array[:, start_window:end_window]  # (num_channels, FREQ*clip_len)
     physical_time_step_size = int(FREQUENCY * time_step_size)
 
@@ -280,9 +326,30 @@ def compute_slice_matrix(
         time_steps.append(curr_time_step)
         start_time_step = end_time_step
 
-    eeg_clip = np.stack(time_steps, axis=0)
+    eeg_clip = np.stack(time_steps, axis=0).transpose(0, 2, 1).reshape(-1, 19)
 
-    return eeg_clip
+    if normalize:
+        eeg_clip = eeg_clip - TUH_EEG_MEANS
+        eeg_clip = eeg_clip / TUH_EEG_STDS
+
+    return torch.FloatTensor(eeg_clip)
+
+
+def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0):
+    """
+    given filepath and sz_start, extracts EEG clip of length 60 sec
+
+    """
+    eeg_slice = compute_slice_matrix(input_dict, time_step, clip_len, stride, offset).T
+    fft_clips = []
+    for st in np.arange(0, clip_len, time_step):
+        curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
+        curr_eeg_clip, _ = computeFFT(curr_eeg_clip.numpy(), n=time_step * FREQUENCY)
+        fft_clips.append(curr_eeg_clip)
+
+    fft_slice = np.stack(fft_clips, axis=0)
+
+    return torch.FloatTensor(fft_slice).view(clip_len, -1)
 
 
 def get_seizure_times(file_name):

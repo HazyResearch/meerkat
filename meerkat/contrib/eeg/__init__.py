@@ -22,6 +22,7 @@ from .data_utils import (
     stanford_eeg_loader,
     streaming_eeg_loader,
     fft_eeg_loader,
+    fft_tuh_eeg_loader,
     eeg_patientid_loader,
     split_dp,
     merge_in_split,
@@ -30,13 +31,17 @@ from .data_utils import (
 logger = logging.getLogger(__name__)
 
 
-def build_eeg_dp(
+@terra.Task
+def build_tuh_eeg_dp(
     dataset_dir: str,
     raw_dataset_dir: str,
     splits=["train", "dev"],
     clip_len: int = 60,
+    offset: int = 0,
     step_size: int = 1,
     stride: int = 60,
+    train_frac: float = 0.9,
+    valid_frac: float = 0.1,
 ):
     """
     Builds a `DataPanel` for accessing EEG data.
@@ -68,7 +73,9 @@ def build_eeg_dp(
             raw_dataset_dir, dataset_dir, split, clip_len, stride
         )
 
-        for (edf_fn, clip_idx, _) in tqdm(file_tuples, total=len(file_tuples)):
+        for (edf_fn, paitent_id, clip_idx, _) in tqdm(
+            file_tuples, total=len(file_tuples)
+        ):
             filepath = [file for file in edf_files if edf_fn in file]
             filepath = filepath[0]
             file_id = edf_fn.split(".edf")[0]
@@ -84,19 +91,39 @@ def build_eeg_dp(
             row_df = {
                 "filepath": filepath,
                 "id": file_id,
+                "paitent_id": paitent_id,
                 "sequence_sz": sequence_sz,
                 "target": binary_sz,
                 "clip_idx": int(clip_idx),
                 "h5_fn": os.path.join(dataset_dir, edf_fn.split(".edf")[0] + ".h5"),
-                "split": split,
+                "split": "test" if split == "dev" else "train",
+                "age": -1,
             }
 
             data.append(row_df)
 
     dp = mk.DataPanel(data)
 
+    train_mask = np.array(dp["split"] == "train")
+    dp_train = dp.lz[train_mask]
+    dp_test = dp.lz[~train_mask]
+
+    dp_train_split = split_dp(
+        dp_train,
+        split_on="paitent_id",
+        train_frac=train_frac,
+        valid_frac=valid_frac,
+        test_frac=0,
+    )
+    dp_train = merge_in_split(dp_train, dp_train_split)
+    dp = dp_train.append(dp_test)
+
     eeg_loader = partial(
-        compute_slice_matrix, time_step_size=step_size, clip_len=clip_len, stride=stride
+        compute_slice_matrix,
+        time_step_size=step_size,
+        clip_len=clip_len,
+        stride=stride,
+        offset=offset,
     )
 
     eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
@@ -107,6 +134,19 @@ def build_eeg_dp(
         overwrite=True,
     )
 
+    eeg_fftinput_col = dp[["clip_idx", "h5_fn"]].to_lambda(
+        fn=partial(
+            fft_tuh_eeg_loader,
+            time_step=step_size,
+            clip_len=clip_len,
+            stride=stride,
+            offset=offset,
+        )
+    )
+
+    dp.add_column(
+        "fft_input", eeg_fftinput_col, overwrite=True,
+    )
     return dp
 
 
@@ -223,6 +263,9 @@ def build_stanford_eeg_dp(
         overwrite=True,
     )
 
+    # eeg_fftinput_col = dp[
+    #     ["sz_start_index", "filepath", "fm_split", "split"]
+    # ].map(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset),mmap=True,mmap_path="")
     eeg_fftinput_col = dp[
         ["sz_start_index", "filepath", "fm_split", "split"]
     ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
