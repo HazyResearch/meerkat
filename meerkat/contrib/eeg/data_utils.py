@@ -1,44 +1,22 @@
 import os
 import meerkat as mk
 import eeghdf
-import h5py
 import numpy as np
-import pyedflib
 import torch
-from scipy.signal import resample
-from tqdm import tqdm
 from functools import partial
 import hashlib
 import math
 import pandas as pd
 import json
-import yaml
 from scipy.fftpack import fft
+import pickle
+from scipy.sparse import linalg
+import scipy.sparse as sp
+
 
 FREQUENCY = 200
-INCLUDED_CHANNELS = [
-    "EEG FP1",
-    "EEG FP2",
-    "EEG F3",
-    "EEG F4",
-    "EEG C3",
-    "EEG C4",
-    "EEG P3",
-    "EEG P4",
-    "EEG O1",
-    "EEG O2",
-    "EEG F7",
-    "EEG F8",
-    "EEG T3",
-    "EEG T4",
-    "EEG T5",
-    "EEG T6",
-    "EEG FZ",
-    "EEG CZ",
-    "EEG PZ",
-]
 
-STANFORD_INCLUDED_CHANNELS = [
+INCLUDED_CHANNELS = [
     "EEG Fp1",
     "EEG Fp2",
     "EEG F3",
@@ -110,276 +88,9 @@ EEG_STDS = np.array(
     ]
 )
 
-TUH_EEG_MEANS = np.array(
-    [
-        -10.5187,
-        -8.6126,
-        -10.7719,
-        -12.7746,
-        -13.3394,
-        -15.3364,
-        -13.3333,
-        -14.6708,
-        -10.4807,
-        -7.7543,
-        -13.7053,
-        -10.1221,
-        -11.6965,
-        -13.5834,
-        -14.4518,
-        -10.0639,
-        -12.1372,
-        -9.9625,
-        -10.2223,
-    ]
-)
-
-TUH_EEG_STDS = np.array(
-    [
-        293.5294,
-        267.9896,
-        291.9434,
-        312.8902,
-        274.3873,
-        353.7668,
-        342.4909,
-        304.0491,
-        312.6968,
-        279.8322,
-        286.1863,
-        258.3522,
-        282.8169,
-        275.4195,
-        273.7004,
-        268.8392,
-        300.3167,
-        330.4046,
-        395.5132,
-    ]
-)
-
-
-def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
-    """
-    Args:
-        dataset_dir (str): location where resampled signals are
-        split (str): whether train, dev, test
-        clip_len(int): length of each clip in the input eeg segments
-        stride (int): how to sample clips from eeg signal
-
-    Returns (file_name, clip_idx, seizure_label) tuples
-            for the given split, clip_len, and stride
-    The clip_idx indicates which clip (i.e. segment of EEG signal with clip_len seconds)
-    The stride determines how to sample clips from the eeg signal
-            (e.g. if stride=clip_len we have no overlapping clips)
-    """
-
-    # retrieve paths of all edf files in the dataset_dir for given split
-    edf_files = []
-    edf_fullfiles = []
-    for path, _, files in os.walk(os.path.join(raw_dataset_dir, split)):
-        for name in files:
-            if ".edf" in name:
-                edf_fullfiles.append(os.path.join(path, name))
-                edf_files.append(name)
-
-    resampled_files = os.listdir(dataset_dir)
-    file_tuples = []
-
-    for h5_fn in resampled_files:
-        edf_fn = h5_fn.split(".h5")[0] + ".edf"
-        if edf_fn not in edf_files:
-            continue
-        edf_fn_full = [file for file in edf_fullfiles if edf_fn in file]
-        if len(edf_fn_full) != 1:
-            print(f"{edf_fn} found {len(edf_fn_full)} times!")
-            print(edf_fn_full)
-
-        edf_fn_full = edf_fn_full[0]
-        patient_id = edf_fn_full.split("/")[-3]
-        seizure_times = get_seizure_times(edf_fn_full.split(".edf")[0])
-
-        h5_fn_full = os.path.join(dataset_dir, h5_fn)
-        with h5py.File(h5_fn_full, "r") as hf:
-            resampled_sig = hf["resampled_signal"][()]
-
-        num_clips = (resampled_sig.shape[-1] - clip_len * FREQUENCY) // (
-            stride * FREQUENCY
-        ) + 1
-
-        for i in range(num_clips):
-            start_window = i * FREQUENCY * stride
-            end_window = np.minimum(
-                start_window + FREQUENCY * clip_len, resampled_sig.shape[-1]
-            )
-
-            is_seizure = 0
-            for t in seizure_times:
-                start_t = int(t[0] * FREQUENCY)
-                end_t = int(t[1] * FREQUENCY)
-                if not ((end_window < start_t) or (start_window > end_t)):
-                    is_seizure = 1
-                    break
-            file_tuples.append((edf_fn, patient_id, i, is_seizure))
-
-    return file_tuples
-
-
-def get_sz_labels(
-    edf_fn,
-    clip_idx,
-    time_step_size=1,
-    clip_len=60,
-    stride=60,
-):
-    """
-    Convert entire EEG sequence into clips of length clip_len
-    Args:
-        edf_fn: edf/eeghdf file name, full path
-        channel_names: list of channel names
-        clip_idx: index of current clip/sliding window, int
-        time_step_size: length of each time step, in seconds, int
-        clip_len: sliding window size or EEG clip length, in seconds, int
-        stride: stride size, by how many seconds the sliding window moves, int
-    Returns:
-        seizure_labels: per-time-step seizure labels
-        is_seizure: overall label, 1 if at least one seizure in clip
-    """
-
-    physical_clip_len = int(FREQUENCY * clip_len)
-    start_window = clip_idx * FREQUENCY * stride
-    end_window = start_window + physical_clip_len
-
-    # get seizure times, take min_sz_len into account
-    if ".edf" in edf_fn:
-        seizure_times = get_seizure_times(edf_fn.split(".edf")[0])
-    else:
-        raise NotImplementedError
-
-    # get per-time-step seizure labels
-    num_time_steps = int(clip_len / time_step_size)
-    seizure_labels = np.zeros((num_time_steps)).astype(int)
-    is_seizure = 0
-    for t in seizure_times:
-        start_t = int(t[0] * FREQUENCY)
-        end_t = int(t[1] * FREQUENCY)
-        if not ((end_window < start_t) or (start_window > end_t)):
-            is_seizure = 1
-
-            start_t_sec = int(t[0])  # start of seizure in int seconds
-            end_t_sec = int(t[1])  # end of seizure in int seconds
-
-            # shift start_t_sec and end_t_sec so that they start at current clip
-            start_t_sec = np.maximum(0, start_t_sec - int(start_window / FREQUENCY))
-            end_t_sec = np.minimum(clip_len, end_t_sec - int(start_window / FREQUENCY))
-            # print("start_t_sec: {}; end_t_sec: {}".format(start_t_sec, end_t_sec))
-
-            # time step size may not be 1-sec
-            start_time_step = int(np.floor(start_t_sec / time_step_size))
-            end_time_step = int(np.ceil(end_t_sec / time_step_size))
-
-            seizure_labels[start_time_step:end_time_step] = 1
-
-    return seizure_labels, is_seizure
-
-
-def compute_slice_matrix(
-    input_dict, time_step_size=1, clip_len=60, stride=60, offset=0, normalize=True
-):
-    """
-    Convert entire EEG sequence into clips of length clip_len
-    Args:
-        channel_names: list of channel names
-        clip_idx: index of current clip/sliding window, int
-        h5_fn: file name of resampled signal h5 file (full path)
-        time_step_size: length of each time step, in seconds, int
-        clip_len: sliding window size or EEG clip length, in seconds, int
-        stride: stride size, by how many seconds the sliding window moves, int
-    Returns:
-        eeg_clip: EEG clip
-    """
-    clip_idx = input_dict["clip_idx"]
-    h5_fn = input_dict["h5_fn"]
-
-    physical_clip_len = int(FREQUENCY * clip_len)
-
-    start_window = max((clip_idx * FREQUENCY * stride) - offset * FREQUENCY, 0)
-
-    with h5py.File(h5_fn, "r") as f:
-        signal_array = f["resampled_signal"][()]
-        resampled_freq = f["resample_freq"][()]
-        assert resampled_freq == FREQUENCY
-
-    # (num_channels, physical_clip_len)
-
-    end_window = min(signal_array.shape[-1], start_window + physical_clip_len)
-    curr_slc = signal_array[:, start_window:end_window]  # (num_channels, FREQ*clip_len)
-    physical_time_step_size = int(FREQUENCY * time_step_size)
-
-    start_time_step = 0
-    time_steps = []
-    while start_time_step <= curr_slc.shape[1] - physical_time_step_size:
-        end_time_step = start_time_step + physical_time_step_size
-        # (num_channels, physical_time_step_size)
-        curr_time_step = curr_slc[:, start_time_step:end_time_step]
-
-        time_steps.append(curr_time_step)
-        start_time_step = end_time_step
-
-    eeg_clip = np.stack(time_steps, axis=0).transpose(0, 2, 1).reshape(-1, 19)
-
-    if normalize:
-        eeg_clip = eeg_clip - TUH_EEG_MEANS
-        eeg_clip = eeg_clip / TUH_EEG_STDS
-
-    return torch.FloatTensor(eeg_clip)
-
-
-def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0):
-    """
-    given filepath and sz_start, extracts EEG clip of length 60 sec
-
-    """
-    eeg_slice = compute_slice_matrix(input_dict, time_step, clip_len, stride, offset).T
-    fft_clips = []
-    for st in np.arange(0, clip_len, time_step):
-        curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
-        curr_eeg_clip, _ = computeFFT(curr_eeg_clip.numpy(), n=time_step * FREQUENCY)
-        fft_clips.append(curr_eeg_clip)
-
-    fft_slice = np.stack(fft_clips, axis=0)
-
-    return torch.FloatTensor(fft_slice).view(clip_len, -1)
-
-
-def get_seizure_times(file_name):
-    """
-    Args:
-        file_name: file name of .edf file etc.
-    Returns:
-        seizure_times: list of times of seizure onset in seconds
-    """
-    tse_file = file_name.split(".edf")[0] + ".tse_bi"
-
-    seizure_times = []
-    with open(tse_file) as f:
-        for line in f.readlines():
-            if "seiz" in line:  # if seizure
-                # seizure start and end time
-                seizure_times.append(
-                    [
-                        float(line.strip().split(" ")[0]),
-                        float(line.strip().split(" ")[1]),
-                    ]
-                )
-    return seizure_times
-
 
 def get_ordered_channels(
-    file_name,
-    labels_object,
-    channel_names=INCLUDED_CHANNELS,
-    verbose=False,
+    file_name, labels_object, channel_names=INCLUDED_CHANNELS, verbose=False,
 ):
     """
     Reads channel names and returns consistent ordering
@@ -405,85 +116,6 @@ def get_ordered_channels(
                 print(file_name + " failed to get channel " + ch)
             raise Exception("channel not match")
     return ordered_channels
-
-
-def get_edf_signals(edf):
-    """
-    Get EEG signal in edf file
-    Args:
-        edf: edf object
-    Returns:
-        signals: shape (num_channels, num_data_points)
-    """
-    n = edf.signals_in_file
-    samples = edf.getNSamples()[0]
-    signals = np.zeros((n, samples))
-    for i in range(n):
-        try:
-            signals[i, :] = edf.readSignal(i)
-        except IndexError:
-            pass
-    return signals
-
-
-def resample_data(signals, to_freq=200, window_size=4):
-    """
-    Resample signals from its original sampling freq to another freq
-    Args:
-        signals: EEG signal slice, (num_channels, num_data_points)
-        to_freq: Re-sampled frequency in Hz
-        window_size: time window in seconds
-    Returns:
-        resampled: (num_channels, resampled_data_points)
-    """
-    num = int(to_freq * window_size)
-    resampled = resample(signals, num=num, axis=1)
-    return resampled
-
-
-def resample_files(raw_edf_dir, save_dir):
-    """
-    Resamples edf files to FREQUENCY and saves them in specified dir
-
-    Args:
-        raw_edf_dir (str): location where original edf files are located
-        save_dir (str): location to save resampled signals
-    """
-
-    edf_files = []
-    for path, subdirs, files in os.walk(raw_edf_dir):
-        for name in files:
-            if ".edf" in name:
-                edf_files.append(os.path.join(path, name))
-
-    failed_files = []
-    for idx in tqdm(range(len(edf_files))):
-        edf_fn = edf_files[idx]
-
-        save_fn = os.path.join(save_dir, edf_fn.split("/")[-1].split(".edf")[0] + ".h5")
-        if os.path.exists(save_fn):
-            continue
-        try:
-            f = pyedflib.EdfReader(edf_fn)
-        except BaseException:
-            failed_files.append(edf_fn)
-
-        orderedChannels = get_ordered_channels(edf_fn, f.getSignalLabels())
-        signals = get_edf_signals(f)
-        signal_array = np.array(signals[orderedChannels, :])
-        sample_freq = f.getSampleFrequency(0)
-        if sample_freq != FREQUENCY:
-            signal_array = resample_data(
-                signal_array,
-                to_freq=FREQUENCY,
-                window_size=int(signal_array.shape[1] / sample_freq),
-            )
-
-        with h5py.File(save_fn, "w") as hf:
-            hf.create_dataset("resampled_signal", data=signal_array)
-            hf.create_dataset("resample_freq", data=FREQUENCY)
-
-    print("DONE. {} files failed.".format(len(failed_files)))
 
 
 def compute_stanford_file_tuples(
@@ -611,9 +243,7 @@ def stanford_eeg_loader(
 
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
-    ordered_channels = get_ordered_channels(
-        filepath, eegf.electrode_labels, channel_names=STANFORD_INCLUDED_CHANNELS
-    )
+    ordered_channels = get_ordered_channels(filepath, eegf.electrode_labels)
     phys_signals = eegf.phys_signals
 
     # get seizure time
@@ -657,20 +287,20 @@ def stanford_eeg_loader(
         eeg_slice = np.concatenate((eeg_slice, zeros), axis=1)
     eeg_slice = eeg_slice.T
 
+    swapped_pairs = None
     if augmentation and split == "train":
-        eeg_slice = random_augmentation(eeg_slice)
+        eeg_slice, swapped_pairs = random_augmentation(eeg_slice)
+    gnn_support = get_gnn_support(swapped_pairs)
 
     if nomalize:
         eeg_slice = eeg_slice - EEG_MEANS
         eeg_slice = eeg_slice / EEG_STDS
 
-    return torch.FloatTensor(eeg_slice)
+    return torch.FloatTensor(eeg_slice), gnn_support
 
 
 def streaming_eeg_loader(
-    input_dict,
-    clip_len=60,
-    nomalize=True,
+    input_dict, clip_len=60, nomalize=True,
 ):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
@@ -681,9 +311,7 @@ def streaming_eeg_loader(
 
     # load EEG signal
     eegf = eeghdf.Eeghdf(filepath)
-    ordered_channels = get_ordered_channels(
-        filepath, eegf.electrode_labels, channel_names=STANFORD_INCLUDED_CHANNELS
-    )
+    ordered_channels = get_ordered_channels(filepath, eegf.electrode_labels)
     phys_signals = eegf.phys_signals
 
     start_time = int(FREQUENCY * max(0, clip_start))
@@ -806,9 +434,10 @@ def fft_eeg_loader(
     given filepath and sz_start, extracts EEG clip of length 60 sec
 
     """
-    eeg_slice = stanford_eeg_loader(
+    eeg_slice, gnn_support = stanford_eeg_loader(
         input_dict, clip_len, augmentation, nomalize, offset
-    ).T
+    )
+    eeg_slice = eeg_slice.T
     fft_clips = []
     for st in np.arange(0, clip_len, time_step):
         curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
@@ -817,7 +446,7 @@ def fft_eeg_loader(
 
     fft_slice = np.stack(fft_clips, axis=0)
 
-    return torch.FloatTensor(fft_slice).view(clip_len, -1)
+    return torch.FloatTensor(fft_slice).view(clip_len, -1), gnn_support
 
 
 def get_swap_pairs(channels):
@@ -835,18 +464,20 @@ def get_swap_pairs(channels):
     return [f12, f34, f78, c34, t34, t56, o12]
 
 
-def random_augmentation(signals):
+def random_augmentation(signals, included_channels=INCLUDED_CHANNELS):
     """
     Augment the data by randomly deciding whether to swap some channel pairs,
     and independently, whether to slightly shrink the amplitude of the signals
     Returns: the processed (augmented or not) signals
     """
-    for pair in get_swap_pairs(STANFORD_INCLUDED_CHANNELS):
-        if np.random.choice([True, False]):
+    swapped_pairs = None
+    if np.random.choice([True, False]):
+        swapped_pairs = get_swap_pairs(included_channels)
+        for pair in swapped_pairs:
             signals[:, [pair[0], pair[1]]] = signals[:, [pair[1], pair[0]]]
     if np.random.choice([True, False]):
         signals = signals * np.random.uniform(0.8, 1.2)
-    return signals
+    return signals, swapped_pairs
 
 
 def unit_string_to_days(timestring: str):
@@ -918,26 +549,104 @@ def eeg_patientid_loader(filepath):
     return eegf.patient["patientcode"]
 
 
-def eeg_male_loader(filepath):
+# def eeg_male_loader(filepath):
+#     """
+#     given filepath of an eeg, pulls relevant metadata
+#     right now only supports pulling age
+#     """
+#     # filepath = input_dict["filepath"]
+
+#     # load EEG signal
+#     eegf = eeghdf.Eeghdf(filepath)
+#     return eegf.patient["gender"] == "Male"
+
+
+# def eeg_duration_loader(filepath):
+#     """
+#     given filepath of an eeg, pulls relevant metadata
+#     right now only supports pulling age
+#     """
+#     # filepath = input_dict["filepath"]
+
+#     # load EEG signal
+#     eegf = eeghdf.Eeghdf(filepath)
+
+#     return eegf.duration_seconds
+
+
+def get_gnn_support(swap_pairs):
+    # currently only for dist graph
+
+    adj_mat = get_combined_graph(swap_pairs)
+    support = calculate_scaled_laplacian(adj_mat, lambda_max=None)
+
+    return torch.FloatTensor(support)
+
+
+def get_combined_graph(
+    swap_nodes=None,
+    adj_mat_dir="/home/ksaab/Documents/meerkat/meerkat/contrib/eeg/adj_mx_3d.pkl",
+):
     """
-    given filepath of an eeg, pulls relevant metadata
-    right now only supports pulling age
+    Get adjacency matrix for pre-computed distance graph
+    Returns:
+        adj_mat_new: adjacency matrix, shape (num_nodes, num_nodes)
     """
-    # filepath = input_dict["filepath"]
+    with open(adj_mat_dir, "rb") as pf:
+        adj_mat = pickle.load(pf)
+        adj_mat = adj_mat[-1]
 
-    # load EEG signal
-    eegf = eeghdf.Eeghdf(filepath)
-    return eegf.patient["gender"] == "Male"
+    adj_mat_new = adj_mat.copy()
+    if swap_nodes is not None:
+        for node_pair in swap_nodes:
+            for i in range(adj_mat.shape[0]):
+                adj_mat_new[node_pair[0], i] = adj_mat[node_pair[1], i]
+                adj_mat_new[node_pair[1], i] = adj_mat[node_pair[0], i]
+                adj_mat_new[i, node_pair[0]] = adj_mat[i, node_pair[1]]
+                adj_mat_new[i, node_pair[1]] = adj_mat[i, node_pair[0]]
+                adj_mat_new[i, i] = 1
+            adj_mat_new[node_pair[0], node_pair[1]] = adj_mat[
+                node_pair[1], node_pair[0]
+            ]
+            adj_mat_new[node_pair[1], node_pair[0]] = adj_mat[
+                node_pair[0], node_pair[1]
+            ]
+
+    return adj_mat_new
 
 
-def eeg_duration_loader(filepath):
+def calculate_normalized_laplacian(adj):
     """
-    given filepath of an eeg, pulls relevant metadata
-    right now only supports pulling age
+    # L = D^-1/2 (D-A) D^-1/2 = I - D^-1/2 A D^-1/2
+    # D = diag(A 1)
     """
-    # filepath = input_dict["filepath"]
+    # adj = sp.coo_matrix(adj)
+    d = np.array(adj.sum(1))
+    d_inv_sqrt = np.power(d, -0.5).flatten()
+    d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.0
+    d_mat_inv_sqrt = np.diag(d_inv_sqrt)
+    normalized_laplacian = np.eye(adj.shape[0]) - adj.dot(
+        d_mat_inv_sqrt
+    ).transpose().dot(
+        d_mat_inv_sqrt
+    )  # .tocoo()
+    return normalized_laplacian
 
-    # load EEG signal
-    eegf = eeghdf.Eeghdf(filepath)
 
-    return eegf.duration_seconds
+def calculate_scaled_laplacian(adj_mx, lambda_max=2, undirected=True):
+    """
+    Scaled Laplacian for ChebNet graph convolution
+    """
+    if undirected:
+        adj_mx = np.maximum.reduce([adj_mx, adj_mx.T])
+    L = calculate_normalized_laplacian(adj_mx)  # L is coo matrix
+    if lambda_max is None:
+        lambda_max, _ = linalg.eigsh(L, 1, which="LM")
+        lambda_max = lambda_max[0]
+    # L = sp.csr_matrix(L)
+    M, _ = L.shape
+    I = np.identity(M, dtype=L.dtype)  # np.identity(M, format="coo", dtype=L.dtype)
+    L = (2 / lambda_max * L) - I
+    # return L.astype(np.float32)
+    return L  # .tocoo()
+
