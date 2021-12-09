@@ -325,6 +325,21 @@ def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0
     return torch.FloatTensor(fft_slice).view(clip_len, -1), gnn_support
 
 
+def ss_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0):
+    """
+    self-supervised EEG loader
+
+    """
+    eeg_slice, gnn_support = tuh_eeg_loader(
+        input_dict, time_step, clip_len, stride, offset
+    )
+    eeg_slice = eeg_slice.T
+
+    fft_slice, _ = computeFFT(eeg_slice.numpy(), n=clip_len * FREQUENCY)
+
+    return torch.FloatTensor(fft_slice), gnn_support
+
+
 def get_seizure_times(file_name):
     """
     Args:

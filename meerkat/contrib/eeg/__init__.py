@@ -27,6 +27,7 @@ from .data_utils_tuh import (
     tuh_eeg_loader,
     get_sz_labels,
     fft_tuh_eeg_loader,
+    ss_tuh_eeg_loader,
 )
 
 logger = logging.getLogger(__name__)
@@ -39,6 +40,8 @@ def build_tuh_eeg_dp(
     splits=["train", "dev"],
     clip_len: int = 60,
     offset: int = 0,
+    ss_clip_len: int = 0,
+    ss_offset: int = 0,
     step_size: int = 1,
     stride: int = 60,
     train_frac: float = 0.9,
@@ -146,6 +149,23 @@ def build_tuh_eeg_dp(
     dp.add_column(
         "fft_input", eeg_fftinput_col, overwrite=True,
     )
+
+    breakpoint()
+    if ss_clip_len != 0:
+        eeg_ss_output_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
+            fn=partial(
+                ss_tuh_eeg_loader,
+                time_step=step_size,
+                clip_len=ss_clip_len,
+                stride=stride,
+                offset=-(clip_len + ss_offset),
+            )
+        )
+        dp.add_column(
+            "ss_output", eeg_ss_output_col, overwrite=True,
+        )
+        breakpoint()
+
     return dp
 
 
