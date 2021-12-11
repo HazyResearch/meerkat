@@ -74,7 +74,13 @@ def build_tuh_eeg_dp(
     data = []
     for split in splits:
         file_tuples = compute_file_tuples(
-            raw_dataset_dir, dataset_dir, split, clip_len, stride
+            raw_dataset_dir,
+            dataset_dir,
+            split,
+            clip_len,
+            stride,
+            ss_clip_len,
+            ss_offset,
         )
 
         for (edf_fn, paitent_id, clip_idx, _) in tqdm(
@@ -133,7 +139,9 @@ def build_tuh_eeg_dp(
     eeg_input_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(fn=eeg_loader)
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     eeg_fftinput_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
@@ -147,10 +155,11 @@ def build_tuh_eeg_dp(
     )
 
     dp.add_column(
-        "fft_input", eeg_fftinput_col, overwrite=True,
+        "fft_input",
+        eeg_fftinput_col,
+        overwrite=True,
     )
 
-    breakpoint()
     if ss_clip_len != 0:
         eeg_ss_output_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
             fn=partial(
@@ -162,9 +171,10 @@ def build_tuh_eeg_dp(
             )
         )
         dp.add_column(
-            "ss_output", eeg_ss_output_col, overwrite=True,
+            "ss_output",
+            eeg_ss_output_col,
+            overwrite=True,
         )
-        breakpoint()
 
     return dp
 
@@ -258,7 +268,9 @@ def build_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id", patientid_col, overwrite=True,
+        "patient_id",
+        patientid_col,
+        overwrite=True,
     )
 
     dp_split = split_dp(
@@ -275,7 +287,9 @@ def build_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     # eeg_fftinput_col = dp[
@@ -286,7 +300,9 @@ def build_stanford_eeg_dp(
     ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
 
     dp.add_column(
-        "fft_input", eeg_fftinput_col, overwrite=True,
+        "fft_input",
+        eeg_fftinput_col,
+        overwrite=True,
     )
 
     if reports_pth:
@@ -325,7 +341,9 @@ def build_stanford_eeg_dp(
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age", age_col, overwrite=True,
+        "age",
+        age_col,
+        overwrite=True,
     )
     # logage_col = dp["filepath"].map(function=eeg_logage_loader)
     # dp.add_column(
@@ -401,7 +419,9 @@ def build_streaming_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id", patientid_col, overwrite=True,
+        "patient_id",
+        patientid_col,
+        overwrite=True,
     )
 
     dp_split = split_dp(
@@ -418,13 +438,17 @@ def build_streaming_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input", eeg_input_col, overwrite=True,
+        "input",
+        eeg_input_col,
+        overwrite=True,
     )
 
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age", age_col, overwrite=True,
+        "age",
+        age_col,
+        overwrite=True,
     )
 
     # remove duplicate ID rows

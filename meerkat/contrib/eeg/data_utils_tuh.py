@@ -88,7 +88,9 @@ TUH_EEG_STDS = np.array(
 )
 
 
-def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
+def compute_file_tuples(
+    raw_dataset_dir, dataset_dir, split, clip_len, stride, ss_clip_len, ss_offset
+):
     """
     Args:
         dataset_dir (str): location where resampled signals are
@@ -132,9 +134,9 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
         with h5py.File(h5_fn_full, "r") as hf:
             resampled_sig = hf["resampled_signal"][()]
 
-        num_clips = (resampled_sig.shape[-1] - clip_len * FREQUENCY) // (
-            stride * FREQUENCY
-        ) + 1
+        num_clips = (
+            resampled_sig.shape[-1] - (clip_len + ss_offset + ss_clip_len) * FREQUENCY
+        ) // (stride * FREQUENCY) + 1
 
         for i in range(num_clips):
             start_window = i * FREQUENCY * stride
@@ -155,7 +157,11 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
 
 
 def get_sz_labels(
-    edf_fn, clip_idx, time_step_size=1, clip_len=60, stride=60,
+    edf_fn,
+    clip_idx,
+    time_step_size=1,
+    clip_len=60,
+    stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -330,14 +336,16 @@ def ss_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0)
     self-supervised EEG loader
 
     """
-    eeg_slice, gnn_support = tuh_eeg_loader(
-        input_dict, time_step, clip_len, stride, offset
-    )
+    eeg_slice, _ = tuh_eeg_loader(input_dict, time_step, clip_len, stride, offset)
     eeg_slice = eeg_slice.T
 
     fft_slice, _ = computeFFT(eeg_slice.numpy(), n=clip_len * FREQUENCY)
 
-    return torch.FloatTensor(fft_slice), gnn_support
+    # choose random channel
+    # fft_slice = fft_slice[np.random.randint(fft_slice.shape[0]), :]
+    fft_slice = fft_slice.mean(0)
+
+    return torch.FloatTensor(fft_slice)
 
 
 def get_seizure_times(file_name):
@@ -442,4 +450,3 @@ def resample_files(raw_edf_dir, save_dir):
             hf.create_dataset("resample_freq", data=FREQUENCY)
 
     print("DONE. {} files failed.".format(len(failed_files)))
-
