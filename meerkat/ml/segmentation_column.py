@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.prediction_column import (
+from meerkat.ml.prediction_column import (
     ClassificationOutputColumn,
     _ClassifierOutputType,
 )

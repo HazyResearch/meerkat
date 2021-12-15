@@ -13,6 +13,7 @@ def build_imagenet_dps(
 
     if download:
         curr_dir = os.getcwd()
+        os.makedirs(dataset_dir, exist_ok=True)
         os.chdir(dataset_dir)
         subprocess.run(
             args=[

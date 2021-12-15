@@ -6,7 +6,7 @@ import pytest
 import torch
 
 from meerkat import DataPanel, ListColumn, NumpyArrayColumn
-from meerkat.nn import EmbeddingColumn
+from meerkat.ml import EmbeddingColumn
 from meerkat.pipelines.entitydatapanel import EntityDataPanel
 
 

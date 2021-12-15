@@ -28,6 +28,9 @@ def build_mimic_dp(
     cxr_dicom: bool = True,
     cxr_jpg: bool = True,
     split: bool = True,
+    download_jpg: bool = False,
+    download_resize: int = None,
+    write: bool = False,
 ) -> mk.DataPanel:
     """Builds a `DataPanel` for accessing data from the MIMIC-CXR database
     https://physionet.org/content/mimic-cxr/2.0.0/ The MIMIC-CXR database
@@ -92,6 +95,11 @@ def build_mimic_dp(
             DataPanel for the JPEG files for each image. Defaults to True.
         split (bool, optional): Add a "split" column with "train", "validate" and "test"
             splits. Defaults to True.
+        download_jpg (bool, optional): Download jpegs for all the scans in the dataset
+            to `dataset_dir`. Expect this to take several hours. Defaults to False.
+        download_resize (bool, optional): Resize the images before saving them to disk.
+            Defaults to None, in which case the images are not resized.
+        write (bool, optiional): Write the datapanel to the directory.
 
     Returns:
         DataPanel: The MIMIC `DataPanel` with columns
@@ -260,6 +268,13 @@ def build_mimic_dp(
             how="left",
             on="dicom_id",
         )
+
+    if download_jpg:
+        dp = download_mimic_dp(dp, resize=download_resize)
+
+    if write:
+        dp.write(os.path.join(dataset_dir, "mimic.mk"))
+
     return dp
 
 
@@ -282,3 +297,33 @@ def query_mimic_db(query_str: str, gcp_project: str) -> pd.DataFrame:
     )
 
     return df
+
+
+def download_mimic_dp(mimic_dp: mk.DataPanel, resize: int = None, **kwargs):
+    col = mimic_dp["cxr_jpg"].view()
+    dataset_dir = col.local_dir
+    paths = mimic_dp["jpg_path"]
+    if resize:
+        paths = paths.apply(
+            lambda x: os.path.join(
+                dataset_dir, os.path.splitext(x)[0] + f"_{resize}" + ".jpg"
+            )
+        )
+
+    def _write_resized(path, img):
+        if resize is not None:
+            img.thumbnail((resize, resize))
+            root, ext = os.path.splitext(path)
+            path = root + f"_{resize}" + ext
+        img.save(path)
+
+    col._skip_cache = True
+    col.writer = _write_resized
+    col.map(
+        lambda x: True,
+        num_workers=6,
+        pbar=True,
+    )
+
+    mimic_dp[f"cxr_jpg_{resize}"] = mk.ImageColumn.from_filepaths(paths)
+    return mimic_dp

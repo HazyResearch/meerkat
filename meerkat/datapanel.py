@@ -21,6 +21,7 @@ import datasets
 import dill
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 import ujson as json
 import yaml
@@ -37,7 +38,7 @@ from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.utils import convert_to_batch_fn
+from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
 
 logger = logging.getLogger(__name__)
 
@@ -340,12 +341,12 @@ class DataPanel(
         if isinstance(dataset, dict):
             return dict(
                 map(
-                    lambda t: (t[0], cls(t[1])),
+                    lambda t: (t[0], cls.from_arrow(t[1]._data)),
                     dataset.items(),
                 )
             )
         else:
-            return cls(dataset)
+            return cls.from_arrow(dataset._data)
 
     @classmethod
     @capture_provenance()
@@ -417,6 +418,21 @@ class DataPanel(
         df = df.rename(mapper=str, axis="columns")
         return cls.from_batch(
             df.to_dict("series"),
+        )
+
+    @classmethod
+    @capture_provenance()
+    def from_arrow(
+        cls,
+        table: pa.Table,
+    ):
+        """Create a Dataset from a pandas DataFrame."""
+        from meerkat.block.arrow_block import ArrowBlock
+        from meerkat.columns.arrow_column import ArrowArrayColumn
+
+        block_views = ArrowBlock.from_block_data(table)
+        return cls.from_batch(
+            {view.block_index: ArrowArrayColumn(view) for view in block_views}
         )
 
     @classmethod
@@ -770,7 +786,7 @@ class DataPanel(
 
         # Load the metadata
         metadata = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
         )
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
@@ -780,7 +796,7 @@ class DataPanel(
         # Load the the manager
         mgr_dir = os.path.join(path, "mgr")
         if os.path.exists(mgr_dir):
-            data = BlockManager.read(mgr_dir)
+            data = BlockManager.read(mgr_dir, **kwargs)
         else:
             # backwards compatability to pre-manager datapanels
             data = {

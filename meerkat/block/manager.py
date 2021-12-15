@@ -13,12 +13,13 @@ import yaml
 import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.tools.utils import MeerkatLoader
 
 from .ref import BlockRef
 
 
 class BlockManager(MutableMapping):
-    """This manager manages all blocks."""
+    """Manages all blocks in a DataPanel."""
 
     def __init__(self) -> None:
         self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7
@@ -283,7 +284,7 @@ class BlockManager(MutableMapping):
 
         # Load the metadata
         meta = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=yaml.FullLoader)
+            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
         )
 
         blocks = {}
@@ -309,11 +310,13 @@ class BlockManager(MutableMapping):
                     column_dir,
                     _data=block[_deserialize_block_index(block_meta["block_index"])],
                     _meta=col_meta,
+                    **kwargs,
                 )
                 mgr.add_column(col, name)
             else:
                 mgr.add_column(
-                    col_meta["dtype"].read(path=column_dir, _meta=col_meta), name
+                    col_meta["dtype"].read(path=column_dir, _meta=col_meta, **kwargs),
+                    name,
                 )
         mgr.reorder(meta["_column_order"])
         return mgr

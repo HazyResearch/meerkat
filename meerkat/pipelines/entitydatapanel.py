@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 from meerkat import DataPanel, ListColumn, NumpyArrayColumn, TensorColumn
-from meerkat.nn import EmbeddingColumn
+from meerkat.ml import EmbeddingColumn
 
 logger = logging.getLogger(__name__)
 

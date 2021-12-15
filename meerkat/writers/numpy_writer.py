@@ -54,15 +54,14 @@ class NumpyMemmapWriter(AbstractWriter):
         self.file = open_memmap(path, dtype=dtype, mode=mode, shape=shape)
         self._pointer = 0
         self.path = path
+        self.shape = shape
 
     def write(self, arr, **kwargs) -> None:
         self.file[self._pointer : self._pointer + len(arr)] = arr
         self._pointer += len(arr)
 
     def flush(self):
-        """
-        Close the mmap file and reopen to release memory.
-        """
+        """Close the mmap file and reopen to release memory."""
         self.file.flush()
         self.file.base.close()
         # ‘r+’ Open existing file for reading and writing.

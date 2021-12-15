@@ -4,7 +4,7 @@ import os
 import shutil
 from dataclasses import dataclass
 from mmap import mmap
-from typing import Hashable, Mapping, Sequence, Tuple, Union
+from typing import Hashable, Sequence, Tuple, Union
 
 import numpy as np
 import torch
@@ -12,7 +12,7 @@ import torch
 from meerkat.block.ref import BlockRef
 from meerkat.errors import ConsolidationError
 
-from .abstract import AbstractBlock, BlockIndex
+from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
 class NumpyBlock(AbstractBlock):
@@ -47,7 +47,7 @@ class NumpyBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_data(cls, data: np.ndarray) -> Tuple[NumpyBlock, Mapping[str, BlockIndex]]:
+    def from_column_data(cls, data: np.ndarray) -> Tuple[NumpyBlock, BlockView]:
         """[summary]
 
         Args:
@@ -68,7 +68,8 @@ class NumpyBlock(AbstractBlock):
         else:
             block_index = slice(0, data.shape[1])
 
-        return cls(data), block_index
+        block = cls(data)
+        return BlockView(block=block, block_index=block_index)
 
     @classmethod
     def _consolidate(

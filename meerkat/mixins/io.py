@@ -3,6 +3,8 @@ import os
 import dill
 import yaml
 
+from meerkat.tools.utils import MeerkatLoader
+
 
 class ColumnIOMixin:
     def write(self, path: str, *args, **kwargs) -> None:
@@ -51,7 +53,7 @@ class ColumnIOMixin:
             dict(
                 yaml.load(
                     open(os.path.join(path, "meta.yaml")),
-                    Loader=yaml.FullLoader,
+                    Loader=MeerkatLoader,
                 )
             )
             if _meta is None
@@ -71,8 +73,17 @@ class ColumnIOMixin:
 
     @staticmethod
     def _read_state(path: str):
-        return dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        try:
+            return dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        except ModuleNotFoundError:
+            dill_str = open(os.path.join(path, "state.dill"), "rb").read()
+
+            if b"meerkat.nn" in dill_str:
+                # backwards compatibility
+                # TODO (Sabri): remove this in a future release
+                dill_str = dill_str.replace(b"meerkat.nn", b"meerkat.ml")
+            return dill.loads(dill_str)
 
     @staticmethod
-    def _read_data(path: str):
+    def _read_data(path: str, *args, **kwargs):
         return dill.load(open(os.path.join(path, "data.dill"), "rb"))

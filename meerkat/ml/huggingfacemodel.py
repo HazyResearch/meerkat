@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Dict, List, Optional
 
 import cytoolz as tz
 import torch
-from tqdm import tqdm
 
 from meerkat.columns.list_column import ListColumn
 from meerkat.datapanel import DataPanel
-from meerkat.nn.activation import ActivationOp
-from meerkat.nn.embedding_column import EmbeddingColumn
-from meerkat.nn.model import Model
+from meerkat.ml.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
 
 AutoTokenizer = LazyLoader("transformers.AutoTokenizer")
@@ -99,54 +95,16 @@ class HuggingfaceModel(Model):
         # Return the converted batch
         return input_batch
 
-    def activation(
-        self,
-        dataset: DataPanel,
-        target_module: str,  # TODO(Priya): Support multiple activation layers
-        input_columns: List[str],
-        batch_size=32,
-    ) -> EmbeddingColumn:  # TODO(Priya): Disable return?
-
-        # Get an activation operator
-        activation_op = ActivationOp(self.model, target_module, self.device)
-        activations = []
-
-        for batch in tqdm(
-            dataset.batch(batch_size),
-            total=(len(dataset) // batch_size + int(len(dataset) % batch_size != 0)),
-        ):
-            # Process the batch
-            input_batch = self.process_batch(batch, input_columns)
-
-            # Forward pass
-            with torch.no_grad():
-                self.model(**input_batch)
-
-            # Get activations for the batch
-            batch_activation = {
-                f"activation ({target_module})": EmbeddingColumn(
-                    activation_op.extractor.activation.cpu().detach()
-                )
-            }
-
-            # Append the activations
-            activations.append(batch_activation)
-
-        activations = tz.merge_with(lambda v: torch.cat(v), *activations)
-        activation_col = activations[f"activation ({target_module})"]
-
-        # dataset.add_column(f"activation ({target_module})", activation_col)
-        return activation_col
-
     def summarization(
         self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
     ) -> DataPanel:
 
         output_dp = dataset.map(
-            function=partial(self._predict, input_columns=input_columns),
+            function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
             output_type=ListColumn,
+            input_cols=input_columns,
         )
 
         dataset.add_column("preds", output_dp["preds"])

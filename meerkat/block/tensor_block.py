@@ -2,16 +2,17 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, Mapping, Sequence, Tuple, Union
+from typing import Hashable, Sequence, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.errors import ConsolidationError
 
-from .abstract import AbstractBlock, BlockIndex
+from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
 class TensorBlock(AbstractBlock):
@@ -45,9 +46,7 @@ class TensorBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_data(
-        cls, data: torch.Tensor
-    ) -> Tuple[TensorBlock, Mapping[str, BlockIndex]]:
+    def from_column_data(cls, data: torch.Tensor) -> Tuple[TensorBlock, BlockView]:
         """[summary]
 
         Args:
@@ -68,7 +67,8 @@ class TensorBlock(AbstractBlock):
         else:
             block_index = slice(0, data.shape[1])
 
-        return cls(data), block_index
+        block = cls(data)
+        return BlockView(block_index=block_index, block=block)
 
     @classmethod
     def _consolidate(
@@ -121,6 +121,9 @@ class TensorBlock(AbstractBlock):
             # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
             # to be interpreted as an index
             return torch.as_tensor(index.data)
+
+        if isinstance(index, pd.Series):
+            return torch.as_tensor(index.values)
 
         from meerkat.columns.pandas_column import PandasSeriesColumn
 
