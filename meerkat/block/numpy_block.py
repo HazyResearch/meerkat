@@ -163,4 +163,4 @@ class NumpyBlock(AbstractBlock):
 
         if mmap:
             return np.load(data_path, mmap_mode="r")
-        return np.load(data_path)
+        return np.load(data_path, allow_pickle=True)
