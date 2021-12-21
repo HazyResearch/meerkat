@@ -54,7 +54,7 @@ def test_concat_same_columns():
     b = DataPanel.from_batch({"a": [2, 3, 4]})
 
     out = concat([a, b], axis="columns", suffixes=["_a", "_b"])
-    assert out.columns == ["a_a", "index", "a_b"]
+    assert out.columns == ["a_a", "a_b"]
     assert list(out["a_a"].data) == [1, 2, 3]
     assert list(out["a_b"].data) == [2, 3, 4]
 

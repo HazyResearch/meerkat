@@ -77,11 +77,6 @@ class DataPanel(
 
         self.data = data
 
-        # TODO(Sabri): fix add_index for new datset
-        # Add an index to the dataset
-        if not self.has_index:
-            self._add_index()
-
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.DisplayOptions.max_rows
@@ -192,7 +187,7 @@ class DataPanel(
 
         column = AbstractColumn.from_data(data)
 
-        assert len(column) == len(self), (
+        assert len(column) == len(self) or len(self.columns) == 0, (
             f"`add_column` failed. "
             f"Values length {len(column)} != dataset length {len(self)}."
         )
@@ -227,10 +222,6 @@ class DataPanel(
         return meerkat.concat(
             [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
-
-    def _add_index(self):
-        """Add an index to the dataset."""
-        self.add_column("index", [str(i) for i in range(len(self))])
 
     def head(self, n: int = 5) -> DataPanel:
         """Get the first `n` examples of the DataPanel."""
@@ -311,14 +302,6 @@ class DataPanel(
 
     def __setitem__(self, index, value):
         self.add_column(name=index, data=value, overwrite=True)
-
-    @property
-    def has_index(self) -> bool:
-        """Check if the dataset has an index column."""
-        if self.columns:
-            return "index" in self.columns
-        # Just return True if the dataset is empty
-        return True
 
     def consolidate(self):
         self.data.consolidate()
@@ -641,8 +624,6 @@ class DataPanel(
 
         # Add new columns for the update
         for col, vals in output.data.items():
-            if col == "index":
-                continue
             new_dp.add_column(col, vals, overwrite=True)
 
         # Remove columns
@@ -747,7 +728,6 @@ class DataPanel(
         sort: bool = False,
         suffixes: Sequence[str] = ("_x", "_y"),
         validate=None,
-        keep_indexes: bool = False,
     ):
         from meerkat import merge
 
@@ -761,7 +741,6 @@ class DataPanel(
             sort=sort,
             suffixes=suffixes,
             validate=validate,
-            keep_indexes=keep_indexes,
         )
 
     def items(self):

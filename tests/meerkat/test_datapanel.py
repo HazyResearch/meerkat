@@ -193,9 +193,6 @@ class TestDataPanel:
         assert isinstance(row, dict)
 
         for key, value in row.items():
-            if key == "index":
-                # TODO(Sabri): remove this when  we change the index functionality
-                continue
             col_testbed = testbed.column_testbeds[key]
             col_testbed.assert_data_equal(value, col_testbed.get_data(index))
 
@@ -246,9 +243,6 @@ class TestDataPanel:
         ):
             assert isinstance(rows, DataPanel)
             for key, value in rows.items():
-                if key == "index":
-                    # TODO(Sabri): remove this when  we change the index functionality
-                    continue
                 col_testbed = testbed.column_testbeds[key]
                 data = col_testbed.get_data(indices)
                 col_testbed.assert_data_equal(value.data, data)
@@ -270,9 +264,6 @@ class TestDataPanel:
         assert isinstance(row, dict)
 
         for key, value in row.items():
-            if key == "index":
-                # TODO(Sabri): remove this when  we change the index functionality
-                continue
             col_testbed = testbed.column_testbeds[key]
             col_testbed.assert_data_equal(
                 value, col_testbed.get_data(index, materialize=False)
@@ -325,9 +316,6 @@ class TestDataPanel:
         ):
             assert isinstance(rows, DataPanel)
             for key, value in rows.items():
-                if key == "index":
-                    # TODO(Sabri): remove this when  we change the index functionality
-                    continue
                 col_testbed = testbed.column_testbeds[key]
                 data = col_testbed.get_data(indices, materialize=False)
                 col_testbed.assert_data_equal(value.data, data)
@@ -498,7 +486,6 @@ class TestDataPanel:
     def test_map_return_multiple_img_only(
         self, testbed: DataPanelTestBed, batched: bool, materialize: bool
     ):
-        testbed.dp.remove_column("index")
         self.test_map_return_multiple(
             testbed=testbed, batched=batched, materialize=materialize
         )
@@ -583,7 +570,7 @@ class TestDataPanel:
             },
         )
         assert set(result.columns) == set(dp.columns) | {
-            f"{key}_new" for key in dp.columns if key != "index"
+            f"{key}_new" for key in dp.columns
         }
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
@@ -668,7 +655,7 @@ class TestDataPanel:
         dp["a"] = ListColumn(range(16))
         assert dp[["a", "b"]]["a"]._data is not a
         # check that there are no duplicate columns
-        assert set(dp.columns) == set(["a", "b", "index"])
+        assert set(dp.columns) == set(["a", "b"])
 
     @DataPanelTestBed.parametrize(params={"move": [True, False]})
     def test_io(self, testbed, tmp_path, move):
@@ -796,7 +783,7 @@ class TestDataPanel:
         pd.DataFrame(data).to_csv(temp_f.name)
 
         dp_new = DataPanel.from_csv(temp_f.name)
-        assert dp_new.columns == ["Unnamed: 0", "a", "b", "c", "index"]
+        assert dp_new.columns == ["Unnamed: 0", "a", "b", "c"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], PandasSeriesColumn):
@@ -812,7 +799,7 @@ class TestDataPanel:
             cache_dir=tmpdir,
         )["test"]
         assert len(dp) == 4
-        assert len(dp.columns) == 3
+        assert len(dp.columns) == 2
 
         # Returns a dataset
         dp = DataPanel.from_huggingface(
@@ -837,7 +824,7 @@ class TestDataPanel:
                 out_f.write(json.dumps(to_write) + "\n")
 
         dp_new = DataPanel.from_jsonl(temp_f.name)
-        assert dp_new.columns == ["a", "b", "c", "index"]
+        assert dp_new.columns == ["a", "b", "c"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], NumpyArrayColumn):
@@ -862,7 +849,7 @@ class TestDataPanel:
                 "f": np.ones(3),
             },
         )
-        assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f", "index"}
+        assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f"}
         assert len(datapanel) == 3
 
     def test_from_arrow(self):
@@ -932,7 +919,7 @@ class TestDataPanel:
         dp = DataPanel(data=mgr)
         assert len(dp) == length
         assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
-        assert dp.columns == ["a", "b", "index"]
+        assert dp.columns == ["a", "b"]
 
         # from list of dictionaries
         data = [{"a": idx, "b": str(idx), "c": {"test": idx}} for idx in range(length)]
@@ -940,7 +927,7 @@ class TestDataPanel:
         assert len(dp) == length
         assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
         assert isinstance(dp["c"], ListColumn)
-        assert dp.columns == ["a", "b", "c", "index"]
+        assert dp.columns == ["a", "b", "c"]
 
         # from list of dictionaries, missing values
         data = [
@@ -955,7 +942,7 @@ class TestDataPanel:
         assert dp["c"].is_equal(
             NumpyArrayColumn([np.nan if idx % 2 == 0 else idx for idx in range(length)])
         )
-        assert dp.columns == ["a", "b", "c", "index"]
+        assert dp.columns == ["a", "b", "c"]
 
         # from nothing
         dp = DataPanel()
@@ -999,7 +986,7 @@ class TestDataPanel:
             "b": ListColumn(np.arange(length)),
         }
         dp = DataPanel(data)
-        assert dp.shape == (16, 3)
+        assert dp.shape == (16, 2)
 
     @DataPanelTestBed.parametrize()
     def test_streamlit(self, testbed):

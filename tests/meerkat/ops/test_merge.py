@@ -101,7 +101,6 @@ class TestMerge:
             dp2,
             on="key",
             how="inner",
-            keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
@@ -115,7 +114,7 @@ class TestMerge:
 
         # assert set(out.columns) == set(expected_columns)
         for name in dp1.columns:
-            if name in ["key", "index"]:
+            if name in ["key"]:
                 continue
 
             if isinstance(out[f"{name}_1"], ImageColumn):
@@ -136,7 +135,6 @@ class TestMerge:
             dp2,
             on="key",
             how="outer",
-            keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
@@ -148,7 +146,7 @@ class TestMerge:
         assert len(out) == len(a1 | a2)
 
         # check columns
-        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f", "index"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
@@ -185,7 +183,6 @@ class TestMerge:
             dp2,
             on="key",
             how="left",
-            keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
@@ -197,7 +194,7 @@ class TestMerge:
         assert len(out) == len(a1)
 
         # check columns
-        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "index", "f"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
@@ -230,7 +227,6 @@ class TestMerge:
             dp2,
             on="key",
             how="right",
-            keep_indexes=False,
             suffixes=("_1", "_2"),
             sort=sort,
         )
@@ -242,7 +238,7 @@ class TestMerge:
         assert len(out) == len(a2)
 
         # check columns
-        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f", "index"]
+        expected_columns = ["key", "b_1", "b_2", "c", "d", "e_1", "e_2", "f"]
         assert set(out.columns) == set(expected_columns)
 
         # check sorted
@@ -294,6 +290,56 @@ class TestMerge:
         assert [str(fp) for fp in out["img"].data] == [
             img_col_test_bed.image_paths[row] for row in rows
         ]
+
+    def test_no_columns(tmpdir):
+        length = 16
+        dp1 = DataPanel.from_batch(
+            {
+                "a": np.arange(length),
+            }
+        )
+        rows = np.arange(4, 8)
+        dp2 = DataPanel.from_batch(
+            {
+                "a": rows,
+            }
+        )
+        out = dp1.merge(dp2, on="a", how="inner")
+
+        assert "a" in out.columns
+
+    def test_no_columns_in_left(tmpdir):
+        length = 16
+        dp1 = DataPanel.from_batch(
+            {
+                "a": np.arange(length),
+            }
+        )
+        rows = np.arange(4, 8)
+        dp2 = DataPanel.from_batch({"a": rows, "b": rows})
+        out = dp1.merge(dp2, on="a", how="inner")
+
+        assert "a" in out.columns
+        assert "b" in out.columns
+
+    def test_no_columns_in_right(tmpdir):
+        length = 16
+        dp1 = DataPanel.from_batch(
+            {
+                "a": np.arange(length),
+                "b": np.arange(length),
+            }
+        )
+        rows = np.arange(4, 8)
+        dp2 = DataPanel.from_batch(
+            {
+                "a": rows,
+            }
+        )
+        out = dp1.merge(dp2, on="a", how="inner")
+
+        assert "a" in out.columns
+        assert "b" in out.columns
 
     def test_no_on(self):
         length = 16

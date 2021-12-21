@@ -67,11 +67,6 @@ def concat(
             for dp1, dp2 in combinations(objs, 2):
                 shared |= set(dp1.columns) & set(dp2.columns)
 
-            # TODO (sabri): I removed the index column for now to address
-            # https://github.com/robustness-gym/meerkat/issues/65, but when we refactor
-            # index with https://github.com/robustness-gym/meerkat/issues/117 we should
-            # take this out
-            shared -= {"index"}
             if shared and not overwrite:
                 if suffixes is None:
                     raise ConcatError("Must ")

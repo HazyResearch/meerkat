@@ -23,7 +23,6 @@ def merge(
     sort: bool = False,
     suffixes: Sequence[str] = ("_x", "_y"),
     validate=None,
-    keep_indexes: bool = False,
 ):
     if how == "cross":
         raise ValueError("DataPanel does not support cross merges.")  # pragma: no cover
@@ -76,23 +75,38 @@ def merge(
         # `merged_df` for these
         return [k for k in dp.keys() if k not in (set(left_on) & set(right_on))]
 
-    new_left = _construct_from_indices(left[_cols_to_construct(left)], left_indices)
-    new_right = _construct_from_indices(right[_cols_to_construct(right)], right_indices)
+    left_cols_to_construct = _cols_to_construct(left)
+    right_cols_to_construct = _cols_to_construct(right)
+    new_left = (
+        _construct_from_indices(left[left_cols_to_construct], left_indices)
+        # need to check for special case where there are no columns other than those in
+        # the intersection of `left_on` and `right_on`
+        if len(left_cols_to_construct) > 0
+        else None
+    )
+    new_right = (
+        _construct_from_indices(right[right_cols_to_construct], right_indices)
+        # need to check for special case where there are no columns other than those in
+        # the intersection of `left_on` and `right_on`
+        if len(right_cols_to_construct) > 0
+        else None
+    )
 
-    # concatenate the two new datapanels
-    merged_dp = new_left.append(new_right, axis="columns", suffixes=suffixes)
+    if new_left is None and new_right is not None:
+        merged_dp = new_right
+    elif new_left is not None and new_right is None:
+        merged_dp = new_left
+    elif new_left is not None and new_right is not None:
+        # concatenate the two new datapanels if both have columns, this should be by
+        # far the most common case
+        merged_dp = new_left.append(new_right, axis="columns", suffixes=suffixes)
+    else:
+        merged_dp = DataPanel()
 
     # add columns in both `left_on` and `right_on`, casting to the column type in left
     for name, column in merged_df.iteritems():
         merged_dp.add_column(name, left[name]._clone(data=column.values))
         merged_dp.data.reorder(merged_dp.columns[-1:] + merged_dp.columns[:-1])
-    if (
-        not keep_indexes
-        and ("index" + suffixes[0]) in merged_dp
-        and ("index" + suffixes[1]) in merged_dp
-    ):
-        merged_dp.remove_column("index" + suffixes[0])
-        merged_dp.remove_column("index" + suffixes[1])
 
     return merged_dp
 
