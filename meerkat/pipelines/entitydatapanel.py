@@ -233,7 +233,6 @@ class EntityDataPanel(DataPanel):
         sort: bool = False,
         suffixes: Sequence[str] = ("_x", "_y"),
         validate=None,
-        keep_indexes: bool = False,
     ):
         """Perform merge of two EntityDPs.
 
@@ -272,7 +271,6 @@ class EntityDataPanel(DataPanel):
             sort=sort,
             suffixes=suffixes,
             validate=validate,
-            keep_indexes=False,
         )
         return EntityDataPanel.from_datapanel(
             datapanel=ret,

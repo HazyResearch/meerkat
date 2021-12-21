@@ -45,6 +45,7 @@ def generate_input(num_inputs, input_size: tuple, output_size: tuple):
     dp = DataPanel(
         {
             "input": torch.randn(num_inputs, *input_size),
+            "index": np.arange(num_inputs),
             "target": np.random.randint(*output_size, size=num_inputs),
         }
     )
@@ -157,12 +158,9 @@ def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
     )
 
     columns = [f"activation_{target_module}_{epoch}" for epoch in range(max_epochs)]
-    columns.append("index")
     assert set(columns) == set(activations_dp.columns)
 
     for col in columns:
-        if col == "index":
-            continue
         if mmap:
             assert (
                 torch.from_numpy(activations_dp[col].data) == true_activations

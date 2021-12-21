@@ -118,7 +118,7 @@ def test_find_similar(k):
     sim = ent.most_similar("x", k)
     assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
-    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g", "index"]
+    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g"]
 
 
 @pytest.mark.parametrize(
@@ -150,7 +150,7 @@ def test_find_similar_multiple_columns(k):
     )
     assert isinstance(sim, EntityDataPanel)
     assert len(sim) == k
-    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g", "index", "embs2"]
+    assert sim.columns == ["a", "b", "c", "d", "e", "f", "g", "embs2"]
 
 
 def test_convert_entities_to_ids():
@@ -202,7 +202,7 @@ def test_append_entities():
         "g": data["g"],
         "h": [3, 4, 5],
     }
-    assert ent3.columns == ["a", "b", "c", "d", "e", "f", "index", "g", "h"]
+    assert ent3.columns == ["a", "b", "c", "d", "e", "f", "g", "h"]
     assert ent3["h"].tolist() == gold_data["h"]
     assert (ent3["c"]._data == gold_data["c"]).all()
     assert ent3._index_column == "c"
@@ -284,7 +284,6 @@ def test_merge_entities():
             "g_x",
             "h",
             "g_y",
-            "index",
             "c",
         ]
     )
@@ -321,7 +320,6 @@ def test_merge_entities():
         [
             "c_x",
             "h",
-            "index",
             "g_x",
             "a",
             "b",
@@ -374,7 +372,6 @@ def test_merge_entities():
             "d_y",
             "h",
             "g_y",
-            "index",
         ]
     )
     assert ent3._index_column == "c"
@@ -422,7 +419,6 @@ def test_merge_entities():
             "d_y",
             "c_y",
             "i",
-            "index",
         ]
     )
     assert ent3._index_column == "c_x"
