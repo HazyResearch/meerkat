@@ -808,7 +808,7 @@ class TestDataPanel:
             split="test",
         )
         assert len(dp) == 4
-        assert len(dp.columns) == 3
+        assert len(dp.columns) == 2
 
     def test_from_jsonl(self):
         # Build jsonl file
