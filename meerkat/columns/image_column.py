@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import logging
 import os
+import urllib.request
 from typing import Collection, Sequence
+from urllib.error import HTTPError
+from urllib.parse import urlparse
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
@@ -16,9 +19,13 @@ logger = logging.getLogger(__name__)
 
 class ImageLoaderMixin:
     def fn(self, filepath: str):
-        if self.base_dir is not None:
-            filepath = os.path.join(self.base_dir, filepath)
-        image = self.loader(filepath)
+        absolute_path = (
+            os.path.join(self.base_dir, filepath)
+            if self.base_dir is not None
+            else filepath
+        )
+        image = self.loader(absolute_path)
+
         if self.transform is not None:
             image = self.transform(image)
         return image
@@ -53,6 +60,35 @@ class ImageCell(ImageLoaderMixin, LambdaCell):
 
 
 class ImageColumn(ImageLoaderMixin, LambdaColumn):
+    """A column where each cell represents an image stored on disk. The underlying data
+    is a `PandasSeriesColumn` of strings, where each string is the path to an image.
+    The column materializes the images into memory when indexed. If the column is
+    lazy indexed with the ``lz`` indexer, the images are not materialized and an
+    ``ImageCell`` or an ``ImageColumn`` is returned instead.
+
+    Args:
+        data (Sequence[str]): A list of filepaths to images.
+        transform (callable): A function that transforms the image (e.g.
+            ``torchvision.transforms.functional.center_crop``).
+
+            .. warning::
+                In order for the column to be serializable, the transform function must
+                be pickleable.
+
+
+        loader (callable): A callable with signature ``def loader(filepath: str) ->
+            PIL.Image:``. Defaults to ``torchvision.datasets.folder.default_loader``.
+
+            .. warning::
+                In order for the column to be serializable with ``write()``, the loader
+                function must be pickleable.
+
+        base_dir (str): A base directory that the paths in ``data`` are relative to. If
+            ``None``, the paths are assumed to be absolute.
+
+
+    """
+
     def __init__(
         self,
         data: Sequence[str] = None,
@@ -62,6 +98,7 @@ class ImageColumn(ImageLoaderMixin, LambdaColumn):
         *args,
         **kwargs,
     ):
+
         if not isinstance(data, PandasSeriesColumn):
             data = PandasSeriesColumn(data)
         super(ImageColumn, self).__init__(data, *args, **kwargs)
@@ -115,3 +152,34 @@ class ImageColumn(ImageLoaderMixin, LambdaColumn):
             and (self.transform == other.transform)
             and self.data.is_equal(other.data)
         )
+
+
+def download_image(url: str, cache_dir: str):
+    parse = urlparse(url)
+    local_path = os.path.join(cache_dir, parse.netloc + parse.path)
+    if not os.path.exists(local_path):
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        try:
+            urllib.request.urlretrieve(url, local_path)
+        except HTTPError:
+            logger.warning(f"Could not download {url}. Skipping.")
+            return None
+
+    return folder.default_loader(local_path)
+
+
+class Downloader:
+    def __init__(
+        self,
+        cache_dir: str,
+        downloader: callable = None,
+    ):
+        self.cache_dir = cache_dir
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+
+        if downloader is None:
+            self.downloader = download_image
+
+    def __call__(self, url: str):
+        return self.downloader(url, self.cache_dir)
