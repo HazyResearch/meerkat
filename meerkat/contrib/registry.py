@@ -115,3 +115,31 @@ def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
     from .celeba import get_celeba
 
     return get_celeba(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def dew(dataset_dir: str = None, download: bool = True, **kwargs):
+    """Data Estimation in the Wild Dataset (DEW) [1]_
+
+    Columns:
+        - ``image`` (``ImageColumn``): Image ID
+        - ``img_id`` (``SeriesColumn``): Unique Flickr image id in the dataset.
+        - ``GT`` (``SeriesColumn``): Ground truth acquisition year
+        - ``date_taken`` (``SeriesColumn``): The time at which the photo has taken
+          according to Flickr.
+        - ``date_granularity`` (``SeriesColumn``): Accuracy to which we know the date to
+          be accurate per Flickr https://www.flickr.com/services/api/misc.dates.html
+        - ``url`` (``SeriesColumn``): Weblink for the image.
+        - ``username`` (``SeriesColumn``): Flickr username of the author
+        - ``title`` (``SeriesColumn``): Image title on Flickr
+        - ``licence`` (``SeriesColumn``): Image license according to Flickr
+        - ``licence_url`` (``SeriesColumn``): Weblink for the license (if available)
+
+
+    [1] Müller, Eric; Springstein, Matthias; Ewerth, Ralph (2017): Date Estimation in
+    the Wild Dataset. Müller, Eric; Springstein, Matthias; Ewerth, Ralph. DOI:
+    10.22000/43
+    """
+    from .dew import build_dew_dp
+
+    return build_dew_dp(dataset_dir=dataset_dir, download=download, **kwargs)

@@ -1,4 +1,5 @@
 import os
+import sys
 from itertools import product
 
 import numpy as np
@@ -102,6 +103,7 @@ def train(
     "target_module,num_inputs,mmap,max_epochs",
     product(["identity"], [10, 20], [True, False], [1, 2]),
 )
+@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="crashes on darwin")
 def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
     model, act_callback, true_activations = train(
         num_inputs=num_inputs, mmap=mmap, max_epochs=max_epochs, logdir=tmpdir
@@ -144,6 +146,7 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
     "target_module,num_inputs,mmap,max_epochs",
     product(["identity"], [10, 20], [True, False], [1, 2]),
 )
+@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="crashes on darwin")
 def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
     # TODO(Priya): Tests for non-continuous epochs
     model, act_callback, true_activations = train(
