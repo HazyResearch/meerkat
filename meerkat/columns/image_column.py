@@ -161,7 +161,7 @@ def download_image(url: str, cache_dir: str):
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
         try:
             urllib.request.urlretrieve(url, local_path)
-        except HTTPError:
+        except (HTTPError, ConnectionResetError):
             logger.warning(f"Could not download {url}. Skipping.")
             return None
 
