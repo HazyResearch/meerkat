@@ -25,3 +25,7 @@ from meerkat.datapanel import DataPanel
 from meerkat.ops.concat import concat
 from meerkat.ops.merge import merge
 from meerkat.provenance import provenance
+
+# aliases for core column types
+ArrayColumn = NumpyArrayColumn
+SeriesColumn = PandasSeriesColumn
