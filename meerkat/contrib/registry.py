@@ -123,7 +123,7 @@ def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> Dat
 
     Columns:
         - ``image`` (``ImageColumn``): The image
-        - ``id`` (``SeriesColumn``): Unique image id
+        - ``image_id`` (``SeriesColumn``): Unique image id
         - ``date`` (``SeriesColumn``): The time at which the photo has taken.
         - ``latitude`` (``SeriesColumn``): Latitude at which the photo was taken
         - ``longitude`` (``SeriesColumn``): Longitude at which the photo was taken

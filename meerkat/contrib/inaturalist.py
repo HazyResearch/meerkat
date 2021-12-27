@@ -50,8 +50,30 @@ def build_inaturalist_dp(
             info = json.load(f)
             dp = mk.DataPanel(info["images"])
 
-            dp["date"] = pd.to_datetime(dp["date"])
+            # need to rename "id" so there aren't conflicts with the "id" in other
+            # datapanels (see annotations below)
+            dp["image_id"] = dp["id"]
+            dp.remove_column("id")
+
+            # add image column
             dp["image"] = mk.ImageColumn(dp["file_name"], base_dir=dataset_dir)
             dps.append(dp)
 
-    return mk.concat(dps)
+            dp["date"] = pd.to_datetime(dp["date"])
+
+            # add annotations for each image
+            if split != "test":  # no annotations for test set
+                annotation_dp = mk.DataPanel(info["annotations"])
+                annotation_dp["annotation_id"] = annotation_dp["id"]
+                annotation_dp.remove_column("id")
+                dp = dp.merge(annotation_dp, on="image_id")
+
+                # join on the category table to get the category name
+                category_dp = mk.DataPanel(info["categories"])
+                category_dp["category_id"] = category_dp["id"]
+                category_dp.remove_column("id")
+                dp = dp.merge(category_dp, on="category_id")
+
+            dps.append(dp)
+
+    return mk.concat(dps) if len(dps) > 1 else dps[0]
