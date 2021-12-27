@@ -118,11 +118,38 @@ def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
 
 
 @datasets.register()
-def dew(dataset_dir: str = None, download: bool = True, **kwargs):
-    """Data Estimation in the Wild Dataset (DEW) [1]_
+def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
+    """iNaturalist 2021 Dataset [1]_
 
     Columns:
-        - ``image`` (``ImageColumn``): Image ID
+        - ``image`` (``ImageColumn``): The image
+        - ``image_id`` (``SeriesColumn``): Unique image id
+        - ``date`` (``SeriesColumn``): The time at which the photo has taken.
+        - ``latitude`` (``SeriesColumn``): Latitude at which the photo was taken
+        - ``longitude`` (``SeriesColumn``): Longitude at which the photo was taken
+        - ``location_uncertainty`` (``SeriesColumn``): Uncertainty in the location
+        - ``license`` (``SeriesColumn``): License of the photo
+        - ``rights_holder`` (``SeriesColumn``): Rights holder of the photo
+        - ``width`` (``SeriesColumn``): Width of the image
+        - ``height`` (``SeriesColumn``): Height of the image
+        - ``file_name`` (``SeriesColumn``): Filepath relative to ``dataset_dir`` where
+          the image is stored.
+
+
+
+    [1] https://github.com/visipedia/inat_comp/tree/master/2021
+    """
+    from .inaturalist import build_inaturalist_dp
+
+    return build_inaturalist_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def dew(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
+    """Date Estimation in the Wild Dataset (DEW) [1]_
+
+    Columns:
+        - ``image`` (``ImageColumn``):The image
         - ``img_id`` (``SeriesColumn``): Unique Flickr image id in the dataset.
         - ``GT`` (``SeriesColumn``): Ground truth acquisition year
         - ``date_taken`` (``SeriesColumn``): The time at which the photo has taken
