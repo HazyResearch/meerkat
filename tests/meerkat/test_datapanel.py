@@ -902,6 +902,33 @@ class TestDataPanel:
         assert (df["d"].values == dp["d"].numpy()).all()
         assert (df["e"].values == dp["e"].values).all()
 
+    def test_to_jsonl(self, tmpdir: str):
+        length = 16
+        batch = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+            "d": torch.arange(length),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            "f": ArrowArrayColumn(np.arange(length)),
+        }
+        dp = DataPanel.from_batch(batch)
+
+        dp.to_jsonl(os.path.join(tmpdir, "test.jsonl"))
+        df = pd.read_json(
+            os.path.join(tmpdir, "test.jsonl"), lines=True, orient="records"
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        assert list(df.columns) == dp.columns
+        assert len(df) == len(dp)
+
+        assert (df["a"].values == dp["a"].data).all()
+        assert list(df["b"]) == list(dp["b"].data)
+        assert (df["d"].values == dp["d"].numpy()).all()
+        assert (df["e"].values == dp["e"].values).all()
+        assert (df["f"] == dp["f"].to_pandas()).all()
+
     def test_constructor(self):
         length = 16
 

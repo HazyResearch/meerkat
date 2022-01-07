@@ -179,3 +179,10 @@ class TensorColumn(
 
     def to_tensor(self) -> torch.Tensor:
         return self.data
+
+    def to_pandas(self) -> pd.Series:
+        if len(self.shape) == 1:
+            return pd.Series(self.data)
+        else:
+            # can only create a 1-D series
+            return super().to_pandas()
