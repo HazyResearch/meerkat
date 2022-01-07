@@ -1,5 +1,5 @@
-meerkat
-=======
+API Docs
+========
 
 .. toctree::
    :maxdepth: 4

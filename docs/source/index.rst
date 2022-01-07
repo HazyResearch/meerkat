@@ -108,17 +108,17 @@ You can get started by going to the installation_ page.
 .. _installation: getting-started/install.md
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
-   :caption: Getting Started
 
-   getting-started/install.md
-   getting-started/nutshell.md
-   getting-started/quickstart.md
+   overview.md
+   guide/guide.md
+   datasets/datasets.md
 
 
 .. toctree::
+    :hidden:
     :maxdepth: 2
-    :caption: API Docs
 
     apidocs/meerkat
 

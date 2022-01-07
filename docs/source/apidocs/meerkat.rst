@@ -7,17 +7,28 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   meerkat.block
    meerkat.cells
    meerkat.columns
    meerkat.contrib
    meerkat.logging
    meerkat.mixins
+   meerkat.ml
+   meerkat.ops
    meerkat.pipelines
    meerkat.tools
    meerkat.writers
 
 Submodules
 ----------
+
+meerkat.config module
+---------------------
+
+.. automodule:: meerkat.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 meerkat.datapanel module
 ------------------------

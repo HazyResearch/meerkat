@@ -12,22 +12,6 @@ meerkat.cells.abstract module
    :undoc-members:
    :show-inheritance:
 
-meerkat.cells.cell module
--------------------------
-
-.. automodule:: meerkat.cells.cell
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-meerkat.cells.imagepath module
-------------------------------
-
-.. automodule:: meerkat.cells.imagepath
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 meerkat.cells.spacy module
 --------------------------
 
@@ -36,10 +20,10 @@ meerkat.cells.spacy module
    :undoc-members:
    :show-inheritance:
 
-meerkat.cells.timestamp module
-------------------------------
+meerkat.cells.video module
+--------------------------
 
-.. automodule:: meerkat.cells.timestamp
+.. automodule:: meerkat.cells.video
    :members:
    :undoc-members:
    :show-inheritance:

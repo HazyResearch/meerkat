@@ -12,10 +12,10 @@ meerkat.writers.abstract module
    :undoc-members:
    :show-inheritance:
 
-meerkat.writers.list\_writer module
------------------------------------
+meerkat.writers.concat\_writer module
+-------------------------------------
 
-.. automodule:: meerkat.writers.list_writer
+.. automodule:: meerkat.writers.concat_writer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -24,14 +24,6 @@ meerkat.writers.numpy\_writer module
 ------------------------------------
 
 .. automodule:: meerkat.writers.numpy_writer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-meerkat.writers.torch\_writer module
-------------------------------------
-
-.. automodule:: meerkat.writers.torch_writer
    :members:
    :undoc-members:
    :show-inheritance:
