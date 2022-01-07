@@ -37,7 +37,6 @@ REQUIRED = [
     "numpy>=1.18.0",
     "cytoolz",
     "ujson",
-    "jsonlines>=1.2.0",
     "torch>=1.8.0",
     "tqdm>=4.49.0",
     "datasets>=1.4.1",

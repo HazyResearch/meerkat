@@ -23,9 +23,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import torch
-import ujson as json
 import yaml
-from jsonlines import jsonlines
 from pandas._libs import lib
 
 import meerkat
@@ -339,18 +337,7 @@ class DataPanel(
     ) -> DataPanel:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
-        with open(json_path) as f:
-            data = {k: [] for k in json.loads(f.readline())}
-        # Load the .jsonl file
-        with open(json_path) as f:
-            for line in f:
-                line = json.loads(line)
-                for k in data:
-                    data[k].append(line[k])
-
-        return cls(
-            data=data,
-        )
+        return cls.from_pandas(pd.read_json(json_path, orient="records", lines=True))
 
     @classmethod
     @capture_provenance()
@@ -457,9 +444,7 @@ class DataPanel(
 
     def to_jsonl(self, path: str) -> None:
         """Save a Dataset to a jsonl file."""
-        with jsonlines.open(path, mode="w") as writer:
-            for example in self:
-                writer.write(example)
+        self.to_pandas().to_json(path, lines=True, orient="records")
 
     def _get_collate_fns(self, columns: Iterable[str] = None):
         columns = self.data.keys() if columns is None else columns
