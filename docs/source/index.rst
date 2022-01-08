@@ -5,13 +5,14 @@
 
 Welcome to Meerkat
 ==========================================
-Meerkat provides fast and flexible data structures for working with complex machine learning datasets. 
+Meerkat provides fast and flexible data structures for working with complex machine 
+learning datasets. It is designed to house your data across the machine learning 
+lifecycle – along the way enabling interactive data exploration, cross-modal training, and 
+fine-grained error analysis. 
 
-..
-    Read more about [Meerkat]().
 
 Installation
-^^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 .. tabbed:: Main
 
@@ -96,16 +97,27 @@ Installation
 
 
 
+Next Steps
+~~~~~~~~~~~~
 
-Meerkat is *under active development* so expect rough edges.
-Feedback and contributions are welcomed and appreciated.
-You can submit bugs and feature suggestions on Github Issues_
-and submit contributions using a pull request.
+.. panels::
 
-You can get started by going to the installation_ page.
+    Get started with Meerkat by following along on Google Colab. 
+
+    .. link-button:: https://drive.google.com/file/d/15kPD6Kym0MOpICafHgO1pCt8T2N_xevM/view?usp=sharing 
+        :classes: btn-primary btn-block stretched-link
+        :text: Walkthrough Notebook
+    ---
+
+    Learn more about the motivation behind Meerkat and what it enables. 
+
+    .. link-button:: https://www.notion.so/sabrieyuboglu/Meerkat-DataPanels-for-Machine-Learning-64891aca2c584f1889eb0129bb747863
+        :classes: btn-primary btn-block stretched-link
+        :text: Introductory Blog Post 
+
 
 .. _Issues: https://github.com/robustness-gym/meerkat/issues/
-.. _installation: getting-started/install.md
+
 
 .. toctree::
    :hidden:

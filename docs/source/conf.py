@@ -76,3 +76,9 @@ add_module_names = False
 
 # Sort members by group
 autodoc_member_order = "groupwise"
+
+# Color Scheme
+panels_css_variables = {
+    "tabs-color-label-active": "rgb(108,72,232)",
+    "tabs-color-label-inactive": "rgba(108,72,232,0.5)",
+}
