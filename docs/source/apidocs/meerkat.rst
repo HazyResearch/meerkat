@@ -1,23 +1,39 @@
 meerkat package
 ===============
 
+.. automodule:: meerkat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
 .. toctree::
    :maxdepth: 4
 
+   meerkat.block
    meerkat.cells
    meerkat.columns
    meerkat.contrib
    meerkat.logging
    meerkat.mixins
+   meerkat.ml
+   meerkat.ops
    meerkat.pipelines
    meerkat.tools
    meerkat.writers
 
 Submodules
 ----------
+
+meerkat.config module
+---------------------
+
+.. automodule:: meerkat.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 meerkat.datapanel module
 ------------------------
@@ -47,14 +63,6 @@ meerkat.version module
 ----------------------
 
 .. automodule:: meerkat.version
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat
    :members:
    :undoc-members:
    :show-inheritance:

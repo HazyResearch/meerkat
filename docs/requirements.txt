@@ -3,3 +3,6 @@ sphinx_autodoc_typehints
 nbsphinx
 recommonmark
 toml
+pydata_sphinx_theme
+ipython
+sphinx-panels

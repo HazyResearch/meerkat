@@ -12,7 +12,6 @@ from torch.utils.data._utils.collate import default_collate
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
-from meerkat.tools.identifier import Identifier
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform
@@ -30,7 +29,6 @@ def get_wilds_datapanel(
     dataset_name: str,
     root_dir: str,
     version: str = None,
-    identifier: Identifier = None,
     column_names: List[str] = None,
     info: DatasetInfo = None,
     split: str = None,
@@ -44,7 +42,7 @@ def get_wilds_datapanel(
     Run inference on the dataset and store predictions alongside the data.
     .. code-block:: python
 
-        dp = get_wilds_datapane("fmow", root_dir="/datasets/", split="test")
+        dp = get_wilds_datapanel("fmow", root_dir="/datasets/", split="test")
         model = ... # get the model
         model.to(0).eval()
 
@@ -67,7 +65,6 @@ def get_wilds_datapanel(
         split (str, optional): see . Defaults to None.
         use_transform (bool, optional): Whether to apply the transform from the
             WILDS example directory on load. Defaults to True.
-        identifier (Identifier, optional): [description]. Defaults to None.
         column_names (List[str], optional): [description]. Defaults to None.
         info (DatasetInfo, optional): [description]. Defaults to None.
         use_transform (bool, optional): [description]. Defaults to True.
@@ -100,7 +97,6 @@ def get_wilds_datapanel(
 
     return DataPanel(
         data,
-        identifier=identifier,
         column_names=column_names,
         info=info,
         split=split,

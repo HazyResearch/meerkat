@@ -1,9 +1,10 @@
 import os
 
-import eeghdf
+# import eeghdf
 import h5py
 import numpy as np
-import pyedflib
+
+# import pyedflib
 from scipy.signal import resample
 from tqdm import tqdm
 
@@ -64,11 +65,11 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
         clip_len(int): length of each clip in the input eeg segments
         stride (int): how to sample clips from eeg signal
 
-    Returns (file_name, clip_idx, seizure_label) tuples
-            for the given split, clip_len, and stride
-    The clip_idx indicates which clip (i.e. segment of EEG signal with clip_len seconds)
-    The stride determines how to sample clips from the eeg signal
-            (e.g. if stride=clip_len we have no overlapping clips)
+    Returns:
+        (file_name, clip_idx, seizure_label) tuples for the given split, clip_len, and
+        stride. The clip_idx indicates which clip (i.e. segment of EEG signal with
+        clip_len seconds). The stride determines how to sample clips from the eeg signal
+        (e.g. if stride=clip_len we have no overlapping clips)
     """
 
     # retrieve paths of all edf files in the dataset_dir for given split
@@ -341,7 +342,7 @@ def resample_files(raw_edf_dir, save_dir):
         if os.path.exists(save_fn):
             continue
         try:
-            f = pyedflib.EdfReader(edf_fn)
+            f = None  # pyedflib.EdfReader(edf_fn)
         except BaseException:
             failed_files.append(edf_fn)
 
@@ -429,7 +430,7 @@ def stanford_eeg_loader(input_dict, clip_len=60):
     split = input_dict["split"]
 
     # load EEG signal
-    eegf = eeghdf.Eeghdf(filepath)
+    eegf = None  # eeghdf.Eeghdf(filepath)
     ordered_channels = get_ordered_channels(
         filepath, eegf.electrode_labels, channel_names=STANFORD_INCLUDED_CHANNELS
     )

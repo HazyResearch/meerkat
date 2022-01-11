@@ -1,4 +1,4 @@
-"""Import common classes."""
+"""Meerkat."""
 # flake8: noqa
 
 from meerkat.logging.utils import initialize_logging
@@ -6,7 +6,6 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 from meerkat.cells.abstract import AbstractCell
-from meerkat.cells.spacy import LazySpacyCell, SpacyCell
 from meerkat.cells.volume import MedicalVolumeCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.arrow_column import ArrowArrayColumn
@@ -29,3 +28,27 @@ from meerkat.provenance import provenance
 # aliases for core column types
 ArrayColumn = NumpyArrayColumn
 SeriesColumn = PandasSeriesColumn
+
+
+__all__ = [
+    "DataPanel",
+    "AbstractColumn",
+    "LambdaColumn",
+    "CellColumn",
+    "ListColumn",
+    "NumpyArrayColumn",
+    "PandasSeriesColumn",
+    "TensorColumn",
+    "ArrowArrayColumn",
+    "ImageColumn",
+    "VideoColumn",
+    "SpacyColumn",
+    "MedicalVolumeColumn",
+    "AbstractCell",
+    "LambdaCell",
+    "MedicalVolumeCell",
+    "datasets",
+    "concat",
+    "merge",
+    "provenance",
+]
