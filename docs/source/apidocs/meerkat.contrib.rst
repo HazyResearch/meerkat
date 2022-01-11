@@ -1,6 +1,11 @@
 meerkat.contrib package
 =======================
 
+.. automodule:: meerkat.contrib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -70,14 +75,6 @@ meerkat.contrib.visual\_genome module
 -------------------------------------
 
 .. automodule:: meerkat.contrib.visual_genome
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.contrib
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,6 +1,11 @@
 meerkat.contrib.mimic package
 =============================
 
+.. automodule:: meerkat.contrib.mimic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -24,14 +29,6 @@ meerkat.contrib.mimic.reports module
 ------------------------------------
 
 .. automodule:: meerkat.contrib.mimic.reports
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.contrib.mimic
    :members:
    :undoc-members:
    :show-inheritance:

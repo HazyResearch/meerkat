@@ -1,6 +1,11 @@
 meerkat.block package
 =====================
 
+.. automodule:: meerkat.block
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -56,14 +61,6 @@ meerkat.block.tensor\_block module
 ----------------------------------
 
 .. automodule:: meerkat.block.tensor_block
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.block
    :members:
    :undoc-members:
    :show-inheritance:

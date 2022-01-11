@@ -1,6 +1,11 @@
 meerkat.columns package
 =======================
 
+.. automodule:: meerkat.columns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -96,14 +101,6 @@ meerkat.columns.volume\_column module
 -------------------------------------
 
 .. automodule:: meerkat.columns.volume_column
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.columns
    :members:
    :undoc-members:
    :show-inheritance:

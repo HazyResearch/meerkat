@@ -1,6 +1,11 @@
 meerkat package
 ===============
 
+.. automodule:: meerkat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -58,14 +63,6 @@ meerkat.version module
 ----------------------
 
 .. automodule:: meerkat.version
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat
    :members:
    :undoc-members:
    :show-inheritance:

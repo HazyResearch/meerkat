@@ -6,7 +6,7 @@
 Welcome to Meerkat
 ==========================================
 Meerkat provides fast and flexible data structures for working with complex machine 
-learning datasets. It is designed to house your data across the machine learning 
+learning datasets. It is designed to house your data throughout the machine learning 
 lifecycle – along the way enabling interactive data exploration, cross-modal training, and 
 fine-grained error analysis. 
 

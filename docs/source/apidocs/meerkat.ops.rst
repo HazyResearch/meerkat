@@ -1,6 +1,11 @@
 meerkat.ops package
 ===================
 
+.. automodule:: meerkat.ops
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -16,14 +21,6 @@ meerkat.ops.merge module
 ------------------------
 
 .. automodule:: meerkat.ops.merge
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.ops
    :members:
    :undoc-members:
    :show-inheritance:

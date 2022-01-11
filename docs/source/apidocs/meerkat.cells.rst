@@ -1,6 +1,11 @@
 meerkat.cells package
 =====================
 
+.. automodule:: meerkat.cells
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -32,14 +37,6 @@ meerkat.cells.volume module
 ---------------------------
 
 .. automodule:: meerkat.cells.volume
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.cells
    :members:
    :undoc-members:
    :show-inheritance:
