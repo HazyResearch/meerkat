@@ -170,3 +170,10 @@ def dew(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
     from .dew import build_dew_dp
 
     return build_dew_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def enron(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .enron import build_enron_dp
+
+    return build_enron_dp(dataset_dir=dataset_dir, download=download, **kwargs)
