@@ -17,7 +17,7 @@ from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatWarning
 from meerkat.tools.lazy_loader import LazyLoader
 
-PIL = LazyLoader("PIL")
+Image = LazyLoader("PIL.Image")
 
 
 logger = logging.getLogger(__name__)
@@ -178,7 +178,7 @@ class LambdaColumn(AbstractColumn):
 
         def _image_formatter(cell):
             im = cell.get()
-            if isinstance(im, PIL.Image.Image):
+            if isinstance(im, Image.Image):
                 im.thumbnail((max_image_width, max_image_height))
                 return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
             else:
