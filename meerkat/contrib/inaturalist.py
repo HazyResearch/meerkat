@@ -57,7 +57,6 @@ def build_inaturalist_dp(
 
             # add image column
             dp["image"] = mk.ImageColumn(dp["file_name"], base_dir=dataset_dir)
-            dps.append(dp)
 
             dp["date"] = pd.to_datetime(dp["date"])
 
