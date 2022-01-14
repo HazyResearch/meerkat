@@ -14,7 +14,7 @@ from meerkat.columns.abstract import AbstractColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.tools.lazy_loader import LazyLoader
 
-PIL = LazyLoader("PIL")
+Image = LazyLoader("PIL.Image")
 
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -76,7 +76,7 @@ class ListColumn(AbstractColumn):
 
         def _image_formatter(cell):
             im = cell
-            if isinstance(im, PIL.Image.Image):
+            if isinstance(im, Image.Image):
                 im.thumbnail((max_image_width, max_image_height))
                 return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
             else:
