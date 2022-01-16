@@ -647,6 +647,7 @@ class DataPanel(
             num_workers=num_workers,
             output_type=output_type,
             mmap=mmap,
+            mmap_path=mmap_path,
             materialize=materialize,
             pbar=pbar,
             **kwargs,
