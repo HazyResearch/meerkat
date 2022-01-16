@@ -88,9 +88,7 @@ TUH_EEG_STDS = np.array(
 )
 
 
-def compute_file_tuples(
-    raw_dataset_dir, dataset_dir, split, clip_len, stride, ss_clip_len, ss_offset
-):
+def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
     """
     Args:
         dataset_dir (str): location where resampled signals are
@@ -134,9 +132,9 @@ def compute_file_tuples(
         with h5py.File(h5_fn_full, "r") as hf:
             resampled_sig = hf["resampled_signal"][()]
 
-        num_clips = (
-            resampled_sig.shape[-1] - (clip_len + ss_offset + ss_clip_len) * FREQUENCY
-        ) // (stride * FREQUENCY) + 1
+        num_clips = (resampled_sig.shape[-1] - (clip_len) * FREQUENCY) // (
+            stride * FREQUENCY
+        ) + 1
 
         for i in range(num_clips):
             start_window = i * FREQUENCY * stride
@@ -157,11 +155,7 @@ def compute_file_tuples(
 
 
 def get_sz_labels(
-    edf_fn,
-    clip_idx,
-    time_step_size=1,
-    clip_len=60,
-    stride=60,
+    edf_fn, clip_idx, time_step_size=1, clip_len=60, stride=60,
 ):
     """
     Convert entire EEG sequence into clips of length clip_len
@@ -267,7 +261,7 @@ def tuh_eeg_loader(
     eeg_clip = np.stack(time_steps, axis=0).transpose(0, 2, 1).reshape(-1, 19)
 
     swapped_pairs = None
-    if augmentation and split == "train":
+    if augmentation and split == "train":  # and ss_clip_len == 0:
         eeg_clip, swapped_pairs = random_augmentation(
             eeg_clip, included_channels=TUH_INCLUDED_CHANNELS
         )
@@ -277,7 +271,9 @@ def tuh_eeg_loader(
         eeg_clip = eeg_clip - TUH_EEG_MEANS
         eeg_clip = eeg_clip / TUH_EEG_STDS
 
-    return torch.FloatTensor(eeg_clip), gnn_support
+    eeg_clip = torch.FloatTensor(eeg_clip)
+
+    return eeg_clip, gnn_support
 
 
 def get_swap_pairs(channels):
@@ -323,29 +319,16 @@ def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0
     fft_clips = []
     for st in np.arange(0, clip_len, time_step):
         curr_eeg_clip = eeg_slice[:, st * FREQUENCY : (st + time_step) * FREQUENCY]
-        curr_eeg_clip, _ = computeFFT(curr_eeg_clip.numpy(), n=time_step * FREQUENCY)
+        curr_eeg_clip = computeFFT(curr_eeg_clip, n=time_step * FREQUENCY)
         fft_clips.append(curr_eeg_clip)
 
-    fft_slice = np.stack(fft_clips, axis=0)
+    fft_slice = torch.cat(fft_clips)
 
-    return torch.FloatTensor(fft_slice).view(clip_len, -1), gnn_support
-
-
-def ss_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0):
-    """
-    self-supervised EEG loader
-
-    """
-    eeg_slice, _ = tuh_eeg_loader(input_dict, time_step, clip_len, stride, offset)
-    eeg_slice = eeg_slice.T
-
-    fft_slice, _ = computeFFT(eeg_slice.numpy(), n=clip_len * FREQUENCY)
-
-    # choose random channel
-    # fft_slice = fft_slice[np.random.randint(fft_slice.shape[0]), :]
-    fft_slice = fft_slice.mean(0)
-
-    return torch.FloatTensor(fft_slice)
+    # return {
+    #     "fft_input": fft_slice.view(clip_len, -1).numpy(),
+    #     "gnn_support": gnn_support.numpy(),
+    # }
+    return fft_slice.view(clip_len, -1), gnn_support  # .numpy()
 
 
 def get_seizure_times(file_name):

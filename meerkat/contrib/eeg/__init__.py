@@ -14,6 +14,7 @@ from .data_utils import (
     compute_stanford_file_tuples,
     compute_streaming_file_tuples,
     eeg_age_loader,
+    get_ordered_channels,
     stanford_eeg_loader,
     streaming_eeg_loader,
     fft_eeg_loader,
@@ -27,7 +28,6 @@ from .data_utils_tuh import (
     tuh_eeg_loader,
     get_sz_labels,
     fft_tuh_eeg_loader,
-    ss_tuh_eeg_loader,
 )
 
 logger = logging.getLogger(__name__)
@@ -40,8 +40,6 @@ def build_tuh_eeg_dp(
     splits=["train", "dev"],
     clip_len: int = 60,
     offset: int = 0,
-    ss_clip_len: int = 0,
-    ss_offset: int = 0,
     step_size: int = 1,
     stride: int = 60,
     train_frac: float = 0.9,
@@ -74,13 +72,7 @@ def build_tuh_eeg_dp(
     data = []
     for split in splits:
         file_tuples = compute_file_tuples(
-            raw_dataset_dir,
-            dataset_dir,
-            split,
-            clip_len,
-            stride,
-            ss_clip_len,
-            ss_offset,
+            raw_dataset_dir, dataset_dir, split, clip_len, stride,
         )
 
         for (edf_fn, paitent_id, clip_idx, _) in tqdm(
@@ -136,45 +128,22 @@ def build_tuh_eeg_dp(
         offset=offset,
     )
 
-    eeg_input_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(fn=eeg_loader)
+    dp["input"] = dp[["clip_idx", "h5_fn", "split"]].to_lambda(fn=eeg_loader)
 
-    dp.add_column(
-        "input",
-        eeg_input_col,
-        overwrite=True,
-    )
+    # dp.add_column(
+    #     "input", eeg_input_col, overwrite=True,
+    # )
 
-    eeg_fftinput_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
-        fn=partial(
+    dp["fft_input"] = dp[["clip_idx", "h5_fn", "split"]].map(
+        function=partial(
             fft_tuh_eeg_loader,
             time_step=step_size,
             clip_len=clip_len,
             stride=stride,
             offset=offset,
-        )
+        ),
+        pbar=True,
     )
-
-    dp.add_column(
-        "fft_input",
-        eeg_fftinput_col,
-        overwrite=True,
-    )
-
-    if ss_clip_len != 0:
-        eeg_ss_output_col = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
-            fn=partial(
-                ss_tuh_eeg_loader,
-                time_step=step_size,
-                clip_len=ss_clip_len,
-                stride=stride,
-                offset=-(clip_len + ss_offset),
-            )
-        )
-        dp.add_column(
-            "ss_output",
-            eeg_ss_output_col,
-            overwrite=True,
-        )
 
     return dp
 
@@ -268,9 +237,7 @@ def build_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id",
-        patientid_col,
-        overwrite=True,
+        "patient_id", patientid_col, overwrite=True,
     )
 
     dp_split = split_dp(
@@ -287,9 +254,7 @@ def build_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input",
-        eeg_input_col,
-        overwrite=True,
+        "input", eeg_input_col, overwrite=True,
     )
 
     # eeg_fftinput_col = dp[
@@ -300,9 +265,7 @@ def build_stanford_eeg_dp(
     ].to_lambda(fn=partial(fft_eeg_loader, clip_len=clip_len, offset=offset))
 
     dp.add_column(
-        "fft_input",
-        eeg_fftinput_col,
-        overwrite=True,
+        "fft_input", eeg_fftinput_col, overwrite=True,
     )
 
     if reports_pth:
@@ -341,9 +304,7 @@ def build_stanford_eeg_dp(
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age",
-        age_col,
-        overwrite=True,
+        "age", age_col, overwrite=True,
     )
     # logage_col = dp["filepath"].map(function=eeg_logage_loader)
     # dp.add_column(
@@ -419,9 +380,7 @@ def build_streaming_stanford_eeg_dp(
 
     patientid_col = dp["filepath"].map(function=eeg_patientid_loader)
     dp.add_column(
-        "patient_id",
-        patientid_col,
-        overwrite=True,
+        "patient_id", patientid_col, overwrite=True,
     )
 
     dp_split = split_dp(
@@ -438,17 +397,13 @@ def build_streaming_stanford_eeg_dp(
     )
 
     dp.add_column(
-        "input",
-        eeg_input_col,
-        overwrite=True,
+        "input", eeg_input_col, overwrite=True,
     )
 
     # Add metadata
     age_col = dp["filepath"].map(function=eeg_age_loader)
     dp.add_column(
-        "age",
-        age_col,
-        overwrite=True,
+        "age", age_col, overwrite=True,
     )
 
     # remove duplicate ID rows

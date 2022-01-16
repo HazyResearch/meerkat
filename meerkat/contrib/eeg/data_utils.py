@@ -412,19 +412,31 @@ def computeFFT(signals, n):
         FT: log amplitude of FFT of signals, (number of channels, number of data points)
         P: phase spectrum of FFT of signals, (number of channels, number of data points)
     """
+    # # fourier transform
+    # fourier_signal = fft(signals, n=n, axis=-1)  # FFT on the last dimension
+
+    # # only take the positive freq part
+    # idx_pos = int(np.floor(n / 2))
+    # fourier_signal = fourier_signal[:, :idx_pos]
+    # amp = np.abs(fourier_signal)
+    # amp[amp == 0.0] = 1e-8  # avoid log of 0
+
+    # FT = np.log(amp)
+    # P = np.angle(fourier_signal)
+
     # fourier transform
-    fourier_signal = fft(signals, n=n, axis=-1)  # FFT on the last dimension
+    fourier_signal = torch.fft.rfft(signals, n=n, axis=-1)  # FFT on the last dimension
 
     # only take the positive freq part
     idx_pos = int(np.floor(n / 2))
     fourier_signal = fourier_signal[:, :idx_pos]
-    amp = np.abs(fourier_signal)
+    amp = torch.abs(fourier_signal)
     amp[amp == 0.0] = 1e-8  # avoid log of 0
 
-    FT = np.log(amp)
-    P = np.angle(fourier_signal)
+    FT = torch.log(amp)
+    # P = np.angle(fourier_signal)
 
-    return FT, P
+    return FT
 
 
 def fft_eeg_loader(
