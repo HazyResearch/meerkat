@@ -37,7 +37,7 @@ REQUIRED = [
     "numpy>=1.18.0",
     "cytoolz",
     "ujson",
-    "torch>=1.8.0",
+    "torch>=1.7.0",
     "tqdm>=4.49.0",
     "datasets>=1.4.1",
     "PyYAML>=5.4.1",
