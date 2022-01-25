@@ -3,7 +3,7 @@ import os
 import tempfile
 from functools import wraps
 from itertools import product
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Set
 
 import numpy as np
 import pandas as pd
@@ -754,7 +754,12 @@ class TestDataPanel:
     class DataPanelSubclass(DataPanel):
         """Mock class to test that ops on subclass returns subclass."""
 
-        pass
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.name = "subclass"
+
+        def _state_keys(cls) -> Set[str]:
+            return super()._state_keys().union({"name"})
 
     def test_subclass(self):
         dp1 = self.DataPanelSubclass.from_dict(
@@ -772,6 +777,9 @@ class TestDataPanel:
             dp1.merge(dp2, left_on="a", right_on="c"), self.DataPanelSubclass
         )
         assert isinstance(dp1.append(dp1), self.DataPanelSubclass)
+
+        assert dp1._state_keys() == set(["name"])
+        assert dp1._get_state() == {"name": "subclass"}
 
     def test_from_csv(self):
         temp_f = tempfile.NamedTemporaryFile()
