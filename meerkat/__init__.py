@@ -9,6 +9,7 @@ from meerkat.cells.abstract import AbstractCell
 from meerkat.cells.volume import MedicalVolumeCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.arrow_column import ArrowArrayColumn
+from meerkat.columns.audio_column import AudioColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
@@ -41,6 +42,7 @@ __all__ = [
     "TensorColumn",
     "ArrowArrayColumn",
     "ImageColumn",
+    "AudioColumn",
     "VideoColumn",
     "SpacyColumn",
     "MedicalVolumeColumn",

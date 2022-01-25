@@ -44,6 +44,14 @@ class ImageCell(ImageLoaderMixin, LambdaCell):
         self._data = data
         self.base_dir = base_dir
 
+    @property
+    def absolute_path(self):
+        return (
+            os.path.join(self.base_dir, self.data)
+            if self.base_dir is not None
+            else self.data
+        )
+
     def __eq__(self, other):
         return (
             (other.__class__ == self.__class__)

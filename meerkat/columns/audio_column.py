@@ -20,7 +20,7 @@ class AudioColumn(ImageColumn):
             return None
 
         def _audio_formatter(cell):
-            return Audio(filename=cell.data)._repr_html_()
+            return Audio(filename=cell.absolute_path)._repr_html_()
 
         return _audio_formatter
 

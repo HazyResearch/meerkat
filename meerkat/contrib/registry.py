@@ -30,6 +30,7 @@ class Registry(_Registry):
             )
         if dataset_dir is None:
             dataset_dir = os.path.join(ContribOptions.download_dir, name)
+            os.makedirs(dataset_dir, exist_ok=True)
         return ret(dataset_dir=dataset_dir, download=download, *args, **kwargs)
 
     def _get_aliases(self, obj_func_or_class):
@@ -177,3 +178,10 @@ def enron(dataset_dir: str = None, download: bool = True, **kwargs):
     from .enron import build_enron_dp
 
     return build_enron_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def yesno(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .torchaudio import get_yesno
+
+    return get_yesno(dataset_dir=dataset_dir, download=download, **kwargs)
