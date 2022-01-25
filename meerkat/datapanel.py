@@ -12,6 +12,7 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Union,
 )
@@ -804,9 +805,9 @@ class DataPanel(
         yaml.dump(metadata, open(metadata_path, "w"))
 
     @classmethod
-    def _state_keys(cls) -> set:
+    def _state_keys(cls) -> Set[str]:
         """List of attributes that describe the state of the object."""
-        return {}
+        return set()
 
     def _view_data(self) -> object:
         return self.data.view()
