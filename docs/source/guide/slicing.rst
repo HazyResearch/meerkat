@@ -1,2 +1,0 @@
-Slicing and Selecting Data
-===========================
