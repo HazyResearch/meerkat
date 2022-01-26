@@ -7,6 +7,7 @@ Meerkat Basics
    :maxdepth: 2
 
    data_structures
+   slicing
 
 Advanced Topics
 ---------------- 
