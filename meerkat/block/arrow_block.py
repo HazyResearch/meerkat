@@ -100,18 +100,28 @@ class ArrowBlock(AbstractBlock):
         index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
 
-        if isinstance(index, slice) or isinstance(index, int):
+        if isinstance(index, int):
+            # if indexing a single row, we do not return a block manager, just a dict
+            return {
+                name: self.data[col._block_index][index]
+                for name, col in block_ref.columns.items()
+            }
+
+        if isinstance(index, slice):
             data = self.data[index]
         elif index.dtype == bool:
             data = self.data.filter(pa.array(index))
         else:
-            data = self.data.take(index)
+            # we do not want to use ``data = self.data.take(index)``
+            # because it can't handle ChunkedArrays that don't fit in an Array
+            # https://issues.apache.org/jira/browse/ARROW-9773
+            # TODO (Sabri): Huggingface gets around this in a similar manner but
+            # applies the slices to the record batches, because this allows them to do
+            # the batch lookup in numpy, which is faster than pure python, which is
+            # presumably why Table.slice does
+            # noqa E501, https://github.com/huggingface/datasets/blob/491dad8507792f6f51077867e22412af7cd5c2f1/src/datasets/table.py#L110
+            data = pa.concat_tables(self.data.slice(i, 1) for i in index)
 
-        if isinstance(index, int):
-            # if indexing a single row, we do not return a block manager, just a dict
-            return {
-                name: data[col._block_index] for name, col in block_ref.columns.items()
-            }
         block = self.__class__(data)
 
         columns = {
