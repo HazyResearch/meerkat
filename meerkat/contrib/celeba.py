@@ -98,7 +98,7 @@ def build_celeba_df(dataset_dir: str):
     celeb_df = identity_df.merge(attr_df, on="file", validate="one_to_one")
 
     celeb_df["img_path"] = celeb_df.file.apply(
-        lambda x: os.path.join("img_align_celeba/img_align_celeba", x)
+        lambda x: os.path.join("img_align_celeba", x)
     )
 
     split_df = pd.read_csv(os.path.join(dataset_dir, "list_eval_partition.csv"))
