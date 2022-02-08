@@ -189,13 +189,14 @@ class AbstractColumn(
         if torch.is_tensor(index):
             index = index.numpy()
 
+        if isinstance(index, tuple) or isinstance(index, list):
+            index = np.array(index)
+
         # `index` should return a batch
         if isinstance(index, slice):
             # int or slice index => standard list slicing
             # TODO (sabri): get rid of the np.arange here, very slow for large columns
             indices = np.arange(self.full_length())[index]
-        elif isinstance(index, tuple) or isinstance(index, list):
-            indices = np.array(index)
         elif isinstance(index, np.ndarray):
             if len(index.shape) != 1:
                 raise TypeError(

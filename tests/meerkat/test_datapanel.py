@@ -205,6 +205,7 @@ class TestDataPanel:
                 NumpyArrayColumn,
                 PandasSeriesColumn,
                 TensorColumn,
+                list,
             ]
         }
     )
