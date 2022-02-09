@@ -91,6 +91,7 @@ EXTRAS = {
         "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
+    "audio": ["torchaudio"],
     "wilds": [
         "wilds>=1.1.0",
     ],

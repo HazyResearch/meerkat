@@ -1,10 +1,12 @@
 from typing import Callable
 
 import torch
-import torchaudio
 
 from ..display import audio_file_formatter
+from ..tools.lazy_loader import LazyLoader
 from .file_column import FileColumn
+
+torchaudio = LazyLoader("torchaudio")
 
 
 class AudioColumn(FileColumn):
