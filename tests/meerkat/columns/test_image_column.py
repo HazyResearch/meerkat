@@ -4,7 +4,6 @@ from __future__ import annotations
 import os
 from typing import List, Union
 
-import dill
 import numpy as np
 import pandas as pd
 import pytest
@@ -16,7 +15,7 @@ from torchvision.transforms.functional import to_tensor
 import meerkat
 from meerkat import ImageColumn
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.image_column import Downloader, ImageCell
+from meerkat.columns.file_column import FileCell
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -183,7 +182,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 return [self.data[idx] for idx in index]
         else:
             if isinstance(index, int):
-                return ImageCell(
+                return FileCell(
                     data=self.image_paths[index],
                     loader=self.col.loader,
                     transform=self.col.transform,
@@ -300,73 +299,9 @@ class TestImageColumn(TestAbstractColumn):
     def test_pickle(self, testbed):
         super().test_pickle(testbed)
 
-    @ImageColumnTestBed.parametrize(
-        params={"show_images": [True, False], "max_rows": [6, 16, 20]}
-    )
-    def test_repr_pandas(self, testbed, show_images, max_rows):
+    @ImageColumnTestBed.parametrize(params={"max_rows": [6, 16, 20]})
+    def test_repr_pandas(self, testbed, max_rows):
         meerkat.config.DisplayOptions.max_rows = max_rows
-        meerkat.config.DisplayOptions.show_images = show_images
-        series, formatter = testbed.col._repr_pandas_()
+        series, _ = testbed.col._repr_pandas_()
         assert isinstance(series, pd.Series)
         assert len(series) == min(len(series), max_rows + 1)
-        if show_images:
-            assert callable(formatter)
-        else:
-            assert formatter is None
-
-
-def test_downloader(monkeypatch, tmpdir):
-    import urllib
-
-    ims = []
-
-    def patched_urlretrieve(url, filename):
-        img_array = np.ones((4, 4, 3)).astype(np.uint8)
-        im = Image.fromarray(img_array)
-        ims.append(im)
-        im.save(filename)
-
-    monkeypatch.setattr(urllib.request, "urlretrieve", patched_urlretrieve)
-
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
-
-    out = downloader("https://test.com/dir/2.jpg")
-
-    assert os.path.exists(os.path.join(tmpdir, "cache", "test.com/dir/2.jpg"))
-    assert (np.array(out) == np.array(ims[0])).all()
-
-    out = downloader("https://test.com/dir/2.jpg")
-    assert len(ims) == 1
-
-    out = downloader("https://test.com/dir/3.jpg")
-    assert len(ims) == 2
-
-    dill.dump(downloader, open(os.path.join(tmpdir, "cache", "downloader.pkl"), "wb"))
-    downloader = dill.load(open(os.path.join(tmpdir, "cache", "downloader.pkl"), "rb"))
-
-    # reload
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
-
-
-def test_unsuccessful_download(monkeypatch, tmpdir):
-    import urllib
-
-    def patched_urlretrieve(url, filename):
-        raise urllib.error.HTTPError(url, 404, "Not found", None, None)
-
-    monkeypatch.setattr(urllib.request, "urlretrieve", patched_urlretrieve)
-
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
-
-    out = downloader("https://test.com/dir/2.jpg")
-    assert out is None
-
-
-def test_serialize_downloader(tmpdir):
-    downloader = Downloader(cache_dir="cache")
-
-    dill.dump(downloader, open(os.path.join(tmpdir, "downloader.pkl"), "wb"))
-
-    downloader = dill.load(open(os.path.join(tmpdir, "downloader.pkl"), "rb"))
-
-    assert downloader.cache_dir == "cache"

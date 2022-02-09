@@ -1,28 +1,52 @@
+from typing import Callable
+
 import torch
 import torchaudio
-from IPython.display import Audio
 
-import meerkat as mk
-
-from .image_column import ImageColumn
+from ..display import audio_file_formatter
+from .file_column import FileColumn
 
 
-class AudioColumn(ImageColumn):
+class AudioColumn(FileColumn):
+    """A lambda column where each cell represents an audio file on disk. The underlying
+    data is a `PandasSeriesColumn` of strings, where each string is the path to an
+    image. The column materializes the images into memory when indexed. If the column
+    is lazy indexed with the ``lz`` indexer, the images are not materialized and an
+    ``FileCell`` or an ``AudioColumn`` is returned instead.
+
+    Args:
+        data (Sequence[str]): A list of filepaths to images.
+        transform (callable): A function that transforms the image (e.g.
+            ``torchvision.transforms.functional.center_crop``).
+
+            .. warning::
+                In order for the column to be serializable, the transform function must
+                be pickleable.
+
+
+        loader (callable): A callable with signature ``def loader(filepath: str) ->
+            PIL.Image:``. Defaults to ``torchvision.datasets.folder.default_loader``.
+
+            .. warning::
+                In order for the column to be serializable with ``write()``, the loader
+                function must be pickleable.
+
+        base_dir (str): A base directory that the paths in ``data`` are relative to. If
+            ``None``, the paths are assumed to be absolute.
+
+
+    """
+
+    @staticmethod
+    def _get_default_formatter() -> Callable:
+        return audio_file_formatter
+
     @classmethod
     def default_loader(cls, *args, **kwargs):
         return torchaudio.load(*args, **kwargs)[0]
 
     def _repr_cell(self, idx):
         return self.lz[idx]
-
-    def _get_formatter(self) -> callable:
-        if not mk.config.DisplayOptions.show_audio:
-            return None
-
-        def _audio_formatter(cell):
-            return Audio(filename=cell.absolute_path)._repr_html_()
-
-        return _audio_formatter
 
     def collate(self, batch):
         tensors = [b.t() for b in batch]
