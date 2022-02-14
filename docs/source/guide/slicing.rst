@@ -73,7 +73,7 @@ Selecting Rows
 
 In Meerkat, the rows of a DataPanel or Column are ordered. This means that rows are 
 uniquely identified by their position in the DataPanel or Column (similar to how the 
-elements of a `Python List https://www.w3schools.com/python/python_lists.asp`_ are 
+elements of a `Python List <https://www.w3schools.com/python/python_lists.asp>`_ are 
 uniquely identified by their position in the list).
 
 Row indices range from 0 to the number of rows in the DataPanel or Column minus one. To
@@ -99,6 +99,15 @@ see how many rows a DataPanel or a column has we can use ``len()``. For example,
         row
 
     Passing an ``int`` that is less than ``0`` or greater than ``len(dp)`` will raise an ``IndexError``.  
+
+
+.. admonition:: For Pandas Users: ``.iloc`` and ``.loc`` 
+
+    Pandas users are likely familiar with ``.iloc`` and ``.loc`` properties of DataFrames and Series.
+    These properties are used to select data by integer position and by label in the index, respectively.
+
+    In Meerkat, DataPanels and Columns do **not** have a designated index object as do DataFrames and Series.
+    In meerkat, the primary way to select rows in Meerkat is by integer position or boolean mask, so there is no need for distinct ``.iloc`` and ``loc`` indexers. 
 
 Above we mentioned how a DataPanel could be viewed as a dictionary mapping column names 
 to columns. Equivalently, it also may be helpful to think of a DataPanel as a list of 
@@ -129,8 +138,7 @@ as fast as possible.
     ``dp["label"][2]``. In general, you should index the column first and then the row. Doing it in the reverse order
     could be wasteful, since the other cells in the row would be loaded for no reason.  
 
-There are a few different ways to select a subset of rows from a DataPanel.
-
+There are a few different ways to select a subset of rows from a DataPanel. 
 .. panels::
     :column: col-lg-12 p-2
 
@@ -152,7 +160,7 @@ There are a few different ways to select a subset of rows from a DataPanel.
         new_dp = dp[0:100:10]
         new_dp
     
-Note that Python lists share this same slicing syntax. However, unlike with Python lists, there are other ways to select a subset of rows from a DataPanel.
+Note that Python lists share this same slicing syntax. However, unlike a Python list, a DataPanel's rows can be selected in a few other ways.
 
 
 .. panels::
@@ -205,13 +213,14 @@ Note that Python lists share this same slicing syntax. However, unlike with Pyth
 
     This is very useful for quickly filtering DataPanels. 
 
-.. admonition:: For Pandas Users: ``.iloc`` and ``.loc`` 
 
-    Pandas users are likely familiar with ``.iloc`` and ``.loc`` properties of DataFrames and Series.
-    These properties are used to select data by integer position and by label in the index, respectively.
 
-    In Meerkat, DataPanels and Columns do **not** have a designated index object as do DataFrames and Series.
-    In meerkat, the primary way to select rows in Meerkat is by integer position or boolean mask, so there is no need for distinct ``.iloc`` and ``loc`` indexers. 
+.. admonition:: Copy vs. Reference
+
+    See :doc:`copying` for more information.
+    
+    You may be wondering whether the rows returned by indexing are copies of the rows in the original DataPanel. 
+    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (**e.g.** PandasSeriesColumn)
 
 
 
