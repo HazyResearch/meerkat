@@ -47,6 +47,8 @@ REQUIRED = [
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
     "fvcore",
+    "ipywidgets>=7.6.2",
+    "IPython",
 ]
 
 # What packages are optional?
@@ -64,10 +66,6 @@ EXTRAS = {
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
         "twine",
-    ],
-    "jupyter": [
-        "ipywidgets>=7.6.2",
-        "jupyterlab>=3.0.0",
     ],
     "interactive": [
         "plotly",
@@ -91,6 +89,7 @@ EXTRAS = {
         "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
+    "audio": ["torchaudio"],
     "wilds": [
         "wilds>=1.1.0",
     ],
