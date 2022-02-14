@@ -73,7 +73,7 @@ Selecting Rows
 
 In Meerkat, the rows of a DataPanel or Column are ordered. This means that rows are 
 uniquely identified by their position in the DataPanel or Column (similar to how the 
-elements of a `Python List https://www.w3schools.com/python/python_lists.asp_` are 
+elements of a `Python List https://www.w3schools.com/python/python_lists.asp`_ are 
 uniquely identified by their position in the list).
 
 Row indices range from 0 to the number of rows in the DataPanel or Column minus one. To
@@ -122,14 +122,14 @@ as fast as possible.
 
     Passing an ``int`` that is less than ``0`` or greater than ``len(dp["label"])`` will raise an ``IndexError``.  
 
-.. admonition:: Pandas Users: indexing cells
+.. admonition:: For Pandas Users: Indexing Cells
 
     In Pandas, it's possible to select a cell directly from a DataFrame with a single index like ``df.loc[2, "label"]``. 
     This is **not** supported in Meerkat. Instead you should chain the indexing operators together. For example,
     ``dp["label"][2]``. In general, you should index the column first and then the row. Doing it in the reverse order
     could be wasteful, since the other cells in the row would be loaded for no reason.  
 
-There are multiple ways to select a subset of rows from a DataPanel.
+There are a few different ways to select a subset of rows from a DataPanel.
 
 .. panels::
     :column: col-lg-12 p-2
