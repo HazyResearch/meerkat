@@ -35,8 +35,6 @@ class AudioColumn(FileColumn):
 
         base_dir (str): A base directory that the paths in ``data`` are relative to. If
             ``None``, the paths are assumed to be absolute.
-
-
     """
 
     @staticmethod
