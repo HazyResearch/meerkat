@@ -185,3 +185,10 @@ def yesno(dataset_dir: str = None, download: bool = True, **kwargs):
     from .torchaudio import get_yesno
 
     return get_yesno(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def waterbirds(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .waterbirds import build_waterbirds_dp
+
+    return build_waterbirds_dp(dataset_dir=dataset_dir, download=download, **kwargs)
