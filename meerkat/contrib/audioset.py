@@ -8,8 +8,8 @@ import meerkat as mk
 def build_audioset_dp(
     dataset_dir: str,
     splits: List[str] = ["eval_segments"],
-    num_workers=8,
-    filter_missing_audio=False,
+    batch_size=32,
+    num_workers: int = 8,
 ):
     """
     Build a DataPanel from the audioset dataset
@@ -43,16 +43,19 @@ def build_audioset_dp(
                 ),
             ),
             pbar=True,
-            num_workers=8,
+            batch_size=batch_size,
+            num_workers=num_workers,
         )
 
-        if filter_missing_audio:
-            dp = dp.filter(
-                lambda x: False if os.path.exists(x["audio_path"]) else True,
-                pbar=True,
-                num_workers=8,
-            )
-        # TODO: Add AudioColumn
+        # Filter missing audio
+        dp = dp.filter(
+            lambda x: True if os.path.exists(x["audio_path"]) else False,
+            pbar=True,
+            batch_size=batch_size,
+            num_workers=num_workers,
+        )
+
+        dp["audio"] = mk.AudioColumn(dp["audio_path"])
 
         dps.append(dp)
 
