@@ -3,7 +3,7 @@ Introduction to Data Structures
 ================================
 
 Meerkat provides two data structures, the column and the datapanel, that together help 
-machine learning practitioners wrangle their data. Everything you do with Meerkat will 
+you  wrangle their data. Everything you do with Meerkat will 
 involve one or both of these data structures, so we begin this user guide with their
 high-level introduction. 
 

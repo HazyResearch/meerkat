@@ -8,6 +8,7 @@ Meerkat Basics
 
    data_structures
    slicing
+   lambda
 
 Advanced Topics
 ---------------- 
