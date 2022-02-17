@@ -30,6 +30,7 @@ class Registry(_Registry):
             )
         if dataset_dir is None:
             dataset_dir = os.path.join(ContribOptions.download_dir, name)
+            os.makedirs(dataset_dir, exist_ok=True)
         return ret(dataset_dir=dataset_dir, download=download, *args, **kwargs)
 
     def _get_aliases(self, obj_func_or_class):
@@ -115,3 +116,79 @@ def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
     from .celeba import get_celeba
 
     return get_celeba(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
+    """iNaturalist 2021 Dataset [1]_
+
+    Columns:
+        - ``image`` (``ImageColumn``): The image
+        - ``image_id`` (``SeriesColumn``): Unique image id
+        - ``date`` (``SeriesColumn``): The time at which the photo has taken.
+        - ``latitude`` (``SeriesColumn``): Latitude at which the photo was taken
+        - ``longitude`` (``SeriesColumn``): Longitude at which the photo was taken
+        - ``location_uncertainty`` (``SeriesColumn``): Uncertainty in the location
+        - ``license`` (``SeriesColumn``): License of the photo
+        - ``rights_holder`` (``SeriesColumn``): Rights holder of the photo
+        - ``width`` (``SeriesColumn``): Width of the image
+        - ``height`` (``SeriesColumn``): Height of the image
+        - ``file_name`` (``SeriesColumn``): Filepath relative to ``dataset_dir`` where
+          the image is stored.
+
+
+
+    [1] https://github.com/visipedia/inat_comp/tree/master/2021
+    """
+    from .inaturalist import build_inaturalist_dp
+
+    return build_inaturalist_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def dew(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
+    """Date Estimation in the Wild Dataset (DEW) [1]_
+
+    Columns:
+        - ``image`` (``ImageColumn``):The image
+        - ``img_id`` (``SeriesColumn``): Unique Flickr image id in the dataset.
+        - ``GT`` (``SeriesColumn``): Ground truth acquisition year
+        - ``date_taken`` (``SeriesColumn``): The time at which the photo has taken
+          according to Flickr.
+        - ``date_granularity`` (``SeriesColumn``): Accuracy to which we know the date to
+          be accurate per Flickr https://www.flickr.com/services/api/misc.dates.html
+        - ``url`` (``SeriesColumn``): Weblink for the image.
+        - ``username`` (``SeriesColumn``): Flickr username of the author
+        - ``title`` (``SeriesColumn``): Image title on Flickr
+        - ``licence`` (``SeriesColumn``): Image license according to Flickr
+        - ``licence_url`` (``SeriesColumn``): Weblink for the license (if available)
+
+
+    [1] Müller, Eric; Springstein, Matthias; Ewerth, Ralph (2017): Date Estimation in
+    the Wild Dataset. Müller, Eric; Springstein, Matthias; Ewerth, Ralph. DOI:
+    10.22000/43
+    """
+    from .dew import build_dew_dp
+
+    return build_dew_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def enron(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .enron import build_enron_dp
+
+    return build_enron_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def yesno(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .torchaudio import get_yesno
+
+    return get_yesno(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def waterbirds(dataset_dir: str = None, download: bool = True, **kwargs):
+    from .waterbirds import build_waterbirds_dp
+
+    return build_waterbirds_dp(dataset_dir=dataset_dir, download=download, **kwargs)

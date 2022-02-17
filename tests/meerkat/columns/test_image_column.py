@@ -15,7 +15,7 @@ from torchvision.transforms.functional import to_tensor
 import meerkat
 from meerkat import ImageColumn
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.image_column import ImageCell
+from meerkat.columns.file_column import FileCell
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -26,7 +26,10 @@ from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 class ImageColumnTestBed(AbstractColumnTestBed):
 
-    DEFAULT_CONFIG = {"transform": [True, False], "use_base_dir": [True, False]}
+    DEFAULT_CONFIG = {
+        "transform": [True, False],
+        "use_base_dir": [True, False],
+    }
 
     def __init__(
         self,
@@ -179,7 +182,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 return [self.data[idx] for idx in index]
         else:
             if isinstance(index, int):
-                return ImageCell(
+                return FileCell(
                     data=self.image_paths[index],
                     loader=self.col.loader,
                     transform=self.col.transform,
@@ -296,16 +299,9 @@ class TestImageColumn(TestAbstractColumn):
     def test_pickle(self, testbed):
         super().test_pickle(testbed)
 
-    @ImageColumnTestBed.parametrize(
-        params={"show_images": [True, False], "max_rows": [6, 16, 20]}
-    )
-    def test_repr_pandas(self, testbed, show_images, max_rows):
+    @ImageColumnTestBed.parametrize(params={"max_rows": [6, 16, 20]})
+    def test_repr_pandas(self, testbed, max_rows):
         meerkat.config.DisplayOptions.max_rows = max_rows
-        meerkat.config.DisplayOptions.show_images = show_images
-        series, formatter = testbed.col._repr_pandas_()
+        series, _ = testbed.col._repr_pandas_()
         assert isinstance(series, pd.Series)
         assert len(series) == min(len(series), max_rows + 1)
-        if show_images:
-            assert callable(formatter)
-        else:
-            assert formatter is None

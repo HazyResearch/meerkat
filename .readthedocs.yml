@@ -17,6 +17,6 @@ python:
   version: 3.8
   install:
     - requirements: docs/requirements.txt
-#    - method: pip
-#      path: .
-#  system_packages: true
+    - method: pip
+      path: .[vision]
+  system_packages: true

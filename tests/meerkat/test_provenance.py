@@ -116,16 +116,16 @@ def test_get_provenance():
     assert len(edges) == 5
 
     nodes, edges = dp3.get_provenance(include_columns=True, last_parent_only=True)
-    assert len(nodes) == 10
-    assert sum([isinstance(node, ProvenanceObjNode) for node in nodes]) == 7
+    assert len(nodes) == 8
+    assert sum([isinstance(node, ProvenanceObjNode) for node in nodes]) == 5
     assert sum([isinstance(node, ProvenanceOpNode) for node in nodes]) == 3
-    assert len(edges) == 13
+    assert len(edges) == 9
 
     nodes, edges = dp3.get_provenance(include_columns=True, last_parent_only=False)
-    assert len(nodes) == 11
-    assert sum([isinstance(node, ProvenanceObjNode) for node in nodes]) == 7
+    assert len(nodes) == 9
+    assert sum([isinstance(node, ProvenanceObjNode) for node in nodes]) == 5
     assert sum([isinstance(node, ProvenanceOpNode) for node in nodes]) == 4
-    assert len(edges) == 20
+    assert len(edges) == 14
 
 
 def test_repr():
@@ -143,6 +143,6 @@ def test_repr():
         d, _ = custom_fn(dp1, dp2, x="abc")
         dp3 = d["dp"]
 
-    assert repr(dp1) == "DataPanel(nrows: 4, ncols: 2)"
-    assert repr(dp2) == "DataPanel(nrows: 4, ncols: 2)"
-    assert repr(dp3) == "DataPanel(nrows: 4, ncols: 3)"
+    assert repr(dp1) == "DataPanel(nrows: 4, ncols: 1)"
+    assert repr(dp2) == "DataPanel(nrows: 4, ncols: 1)"
+    assert repr(dp3) == "DataPanel(nrows: 4, ncols: 2)"

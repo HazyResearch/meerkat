@@ -1,6 +1,11 @@
 meerkat.columns package
 =======================
 
+.. automodule:: meerkat.columns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -8,6 +13,14 @@ meerkat.columns.abstract module
 -------------------------------
 
 .. automodule:: meerkat.columns.abstract
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.columns.arrow\_column module
+------------------------------------
+
+.. automodule:: meerkat.columns.arrow_column
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,18 +33,18 @@ meerkat.columns.cell\_column module
    :undoc-members:
    :show-inheritance:
 
-meerkat.columns.embedding\_column module
-----------------------------------------
-
-.. automodule:: meerkat.columns.embedding_column
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 meerkat.columns.image\_column module
 ------------------------------------
 
 .. automodule:: meerkat.columns.image_column
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.columns.lambda\_column module
+-------------------------------------
+
+.. automodule:: meerkat.columns.lambda_column
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,18 +65,10 @@ meerkat.columns.numpy\_column module
    :undoc-members:
    :show-inheritance:
 
-meerkat.columns.prediction\_column module
------------------------------------------
+meerkat.columns.pandas\_column module
+-------------------------------------
 
-.. automodule:: meerkat.columns.prediction_column
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-meerkat.columns.softmax\_column module
---------------------------------------
-
-.. automodule:: meerkat.columns.softmax_column
+.. automodule:: meerkat.columns.pandas_column
    :members:
    :undoc-members:
    :show-inheritance:
@@ -84,10 +89,18 @@ meerkat.columns.tensor\_column module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+meerkat.columns.video\_column module
+------------------------------------
 
-.. automodule:: meerkat.columns
+.. automodule:: meerkat.columns.video_column
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.columns.volume\_column module
+-------------------------------------
+
+.. automodule:: meerkat.columns.volume_column
    :members:
    :undoc-members:
    :show-inheritance:

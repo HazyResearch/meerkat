@@ -1,31 +1,20 @@
 from __future__ import annotations
 
 import abc
-import base64
 import logging
-from io import BytesIO
-from typing import Sequence
+from typing import Callable, Sequence
 
 import cytoolz as tz
 from yaml.representer import Representer
 
-import meerkat as mk
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.display import auto_formatter
 from meerkat.mixins.cloneable import CloneableMixin
-from meerkat.tools.lazy_loader import LazyLoader
-
-PIL = LazyLoader("PIL")
-
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 
 logger = logging.getLogger(__name__)
-
-
-# Q. how to handle collate and materialize here? Always materialized but only sometimes
-# may want to collate (because collate=True should return a batch-style object, while
-# collate=False should return a Column style object).
 
 
 class ListColumn(AbstractColumn):
@@ -38,6 +27,8 @@ class ListColumn(AbstractColumn):
         if data is not None:
             data = list(data)
         super(ListColumn, self).__init__(data=data, *args, **kwargs)
+
+    default_formatter: Callable = auto_formatter
 
     @classmethod
     def from_list(cls, data: Sequence):
@@ -59,31 +50,6 @@ class ListColumn(AbstractColumn):
             else:
                 yield self[i : i + batch_size]
 
-    def _repr_cell(self, index) -> object:
-        return self[index]
-
-    def _get_formatter(self) -> callable:
-        if not mk.config.DisplayOptions.show_images:
-            return None
-
-        max_image_width = mk.config.DisplayOptions.max_image_width
-        max_image_height = mk.config.DisplayOptions.max_image_height
-
-        def _image_base64(im):
-            with BytesIO() as buffer:
-                im.save(buffer, "jpeg")
-                return base64.b64encode(buffer.getvalue()).decode()
-
-        def _image_formatter(cell):
-            im = cell
-            if isinstance(im, PIL.Image.Image):
-                im.thumbnail((max_image_width, max_image_height))
-                return f'<img src="data:image/jpeg;base64,{_image_base64(im)}">'
-            else:
-                return repr(cell)
-
-        return _image_formatter
-
     @classmethod
     def concat(cls, columns: Sequence[ListColumn]):
         data = list(tz.concat([c.data for c in columns]))
@@ -93,3 +59,10 @@ class ListColumn(AbstractColumn):
 
     def is_equal(self, other: AbstractColumn) -> bool:
         return (self.__class__ == other.__class__) and self.data == other.data
+
+    def _repr_cell(self, index) -> object:
+        return self[index]
+
+    @staticmethod
+    def _get_default_formatter() -> Callable:
+        return auto_formatter

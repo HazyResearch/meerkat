@@ -3,7 +3,7 @@ import os
 import tempfile
 from functools import wraps
 from itertools import product
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Set
 
 import numpy as np
 import pandas as pd
@@ -193,9 +193,6 @@ class TestDataPanel:
         assert isinstance(row, dict)
 
         for key, value in row.items():
-            if key == "index":
-                # TODO(Sabri): remove this when  we change the index functionality
-                continue
             col_testbed = testbed.column_testbeds[key]
             col_testbed.assert_data_equal(value, col_testbed.get_data(index))
 
@@ -208,6 +205,7 @@ class TestDataPanel:
                 NumpyArrayColumn,
                 PandasSeriesColumn,
                 TensorColumn,
+                list,
             ]
         }
     )
@@ -246,9 +244,6 @@ class TestDataPanel:
         ):
             assert isinstance(rows, DataPanel)
             for key, value in rows.items():
-                if key == "index":
-                    # TODO(Sabri): remove this when  we change the index functionality
-                    continue
                 col_testbed = testbed.column_testbeds[key]
                 data = col_testbed.get_data(indices)
                 col_testbed.assert_data_equal(value.data, data)
@@ -270,9 +265,6 @@ class TestDataPanel:
         assert isinstance(row, dict)
 
         for key, value in row.items():
-            if key == "index":
-                # TODO(Sabri): remove this when  we change the index functionality
-                continue
             col_testbed = testbed.column_testbeds[key]
             col_testbed.assert_data_equal(
                 value, col_testbed.get_data(index, materialize=False)
@@ -325,9 +317,6 @@ class TestDataPanel:
         ):
             assert isinstance(rows, DataPanel)
             for key, value in rows.items():
-                if key == "index":
-                    # TODO(Sabri): remove this when  we change the index functionality
-                    continue
                 col_testbed = testbed.column_testbeds[key]
                 data = col_testbed.get_data(indices, materialize=False)
                 col_testbed.assert_data_equal(value.data, data)
@@ -498,7 +487,6 @@ class TestDataPanel:
     def test_map_return_multiple_img_only(
         self, testbed: DataPanelTestBed, batched: bool, materialize: bool
     ):
-        testbed.dp.remove_column("index")
         self.test_map_return_multiple(
             testbed=testbed, batched=batched, materialize=materialize
         )
@@ -583,7 +571,7 @@ class TestDataPanel:
             },
         )
         assert set(result.columns) == set(dp.columns) | {
-            f"{key}_new" for key in dp.columns if key != "index"
+            f"{key}_new" for key in dp.columns
         }
         assert isinstance(result, DataPanel)
         for key, map_spec in map_specs.items():
@@ -668,7 +656,7 @@ class TestDataPanel:
         dp["a"] = ListColumn(range(16))
         assert dp[["a", "b"]]["a"]._data is not a
         # check that there are no duplicate columns
-        assert set(dp.columns) == set(["a", "b", "index"])
+        assert set(dp.columns) == set(["a", "b"])
 
     @DataPanelTestBed.parametrize(params={"move": [True, False]})
     def test_io(self, testbed, tmp_path, move):
@@ -767,7 +755,12 @@ class TestDataPanel:
     class DataPanelSubclass(DataPanel):
         """Mock class to test that ops on subclass returns subclass."""
 
-        pass
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.name = "subclass"
+
+        def _state_keys(cls) -> Set[str]:
+            return super()._state_keys().union({"name"})
 
     def test_subclass(self):
         dp1 = self.DataPanelSubclass.from_dict(
@@ -786,6 +779,9 @@ class TestDataPanel:
         )
         assert isinstance(dp1.append(dp1), self.DataPanelSubclass)
 
+        assert dp1._state_keys() == set(["name"])
+        assert dp1._get_state() == {"name": "subclass"}
+
     def test_from_csv(self):
         temp_f = tempfile.NamedTemporaryFile()
         data = {
@@ -796,7 +792,7 @@ class TestDataPanel:
         pd.DataFrame(data).to_csv(temp_f.name)
 
         dp_new = DataPanel.from_csv(temp_f.name)
-        assert dp_new.columns == ["Unnamed: 0", "a", "b", "c", "index"]
+        assert dp_new.columns == ["Unnamed: 0", "a", "b", "c"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], PandasSeriesColumn):
@@ -804,6 +800,24 @@ class TestDataPanel:
             else:
                 data_to_compare = dp_new[k]._data
             assert data_to_compare == data[k]
+
+    def test_from_huggingface(self, tmpdir: str):
+        # Returns a dataset dict
+        dp = DataPanel.from_huggingface(
+            "hf-internal-testing/fixtures_ade20k",
+            cache_dir=tmpdir,
+        )["test"]
+        assert len(dp) == 4
+        assert len(dp.columns) == 2
+
+        # Returns a dataset
+        dp = DataPanel.from_huggingface(
+            "hf-internal-testing/fixtures_ade20k",
+            cache_dir=tmpdir,
+            split="test",
+        )
+        assert len(dp) == 4
+        assert len(dp.columns) == 2
 
     def test_from_jsonl(self):
         # Build jsonl file
@@ -819,7 +833,7 @@ class TestDataPanel:
                 out_f.write(json.dumps(to_write) + "\n")
 
         dp_new = DataPanel.from_jsonl(temp_f.name)
-        assert dp_new.columns == ["a", "b", "c", "index"]
+        assert dp_new.columns == ["a", "b", "c"]
         # Skip index column
         for k in data:
             if isinstance(dp_new[k], NumpyArrayColumn):
@@ -844,7 +858,7 @@ class TestDataPanel:
                 "f": np.ones(3),
             },
         )
-        assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f", "index"}
+        assert set(datapanel.columns) == {"a", "b", "c", "d", "e", "f"}
         assert len(datapanel) == 3
 
     def test_from_arrow(self):
@@ -897,6 +911,33 @@ class TestDataPanel:
         assert (df["d"].values == dp["d"].numpy()).all()
         assert (df["e"].values == dp["e"].values).all()
 
+    def test_to_jsonl(self, tmpdir: str):
+        length = 16
+        batch = {
+            "a": np.arange(length),
+            "b": ListColumn(np.arange(length)),
+            "d": torch.arange(length),
+            # offset the index to test robustness to nonstandard indices
+            "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
+            "f": ArrowArrayColumn(np.arange(length)),
+        }
+        dp = DataPanel.from_batch(batch)
+
+        dp.to_jsonl(os.path.join(tmpdir, "test.jsonl"))
+        df = pd.read_json(
+            os.path.join(tmpdir, "test.jsonl"), lines=True, orient="records"
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        assert list(df.columns) == dp.columns
+        assert len(df) == len(dp)
+
+        assert (df["a"].values == dp["a"].data).all()
+        assert list(df["b"]) == list(dp["b"].data)
+        assert (df["d"].values == dp["d"].numpy()).all()
+        assert (df["e"].values == dp["e"].values).all()
+        assert (df["f"] == dp["f"].to_pandas()).all()
+
     def test_constructor(self):
         length = 16
 
@@ -914,7 +955,7 @@ class TestDataPanel:
         dp = DataPanel(data=mgr)
         assert len(dp) == length
         assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
-        assert dp.columns == ["a", "b", "index"]
+        assert dp.columns == ["a", "b"]
 
         # from list of dictionaries
         data = [{"a": idx, "b": str(idx), "c": {"test": idx}} for idx in range(length)]
@@ -922,7 +963,7 @@ class TestDataPanel:
         assert len(dp) == length
         assert dp["a"].is_equal(NumpyArrayColumn(np.arange(length)))
         assert isinstance(dp["c"], ListColumn)
-        assert dp.columns == ["a", "b", "c", "index"]
+        assert dp.columns == ["a", "b", "c"]
 
         # from list of dictionaries, missing values
         data = [
@@ -937,7 +978,7 @@ class TestDataPanel:
         assert dp["c"].is_equal(
             NumpyArrayColumn([np.nan if idx % 2 == 0 else idx for idx in range(length)])
         )
-        assert dp.columns == ["a", "b", "c", "index"]
+        assert dp.columns == ["a", "b", "c"]
 
         # from nothing
         dp = DataPanel()
@@ -981,7 +1022,7 @@ class TestDataPanel:
             "b": ListColumn(np.arange(length)),
         }
         dp = DataPanel(data)
-        assert dp.shape == (16, 3)
+        assert dp.shape == (16, 2)
 
     @DataPanelTestBed.parametrize()
     def test_streamlit(self, testbed):

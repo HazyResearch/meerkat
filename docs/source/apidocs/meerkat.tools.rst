@@ -1,16 +1,13 @@
 meerkat.tools package
 =====================
 
-Submodules
-----------
-
-meerkat.tools.identifier module
--------------------------------
-
-.. automodule:: meerkat.tools.identifier
+.. automodule:: meerkat.tools
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
 
 meerkat.tools.lazy\_loader module
 ---------------------------------
@@ -24,14 +21,6 @@ meerkat.tools.utils module
 --------------------------
 
 .. automodule:: meerkat.tools.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: meerkat.tools
    :members:
    :undoc-members:
    :show-inheritance:

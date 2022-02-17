@@ -1,4 +1,5 @@
 import os
+import sys
 from itertools import product
 
 import numpy as np
@@ -45,6 +46,7 @@ def generate_input(num_inputs, input_size: tuple, output_size: tuple):
     dp = DataPanel(
         {
             "input": torch.randn(num_inputs, *input_size),
+            "index": np.arange(num_inputs),
             "target": np.random.randint(*output_size, size=num_inputs),
         }
     )
@@ -101,6 +103,7 @@ def train(
     "target_module,num_inputs,mmap,max_epochs",
     product(["identity"], [10, 20], [True, False], [1, 2]),
 )
+@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="crashes on darwin")
 def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
     model, act_callback, true_activations = train(
         num_inputs=num_inputs, mmap=mmap, max_epochs=max_epochs, logdir=tmpdir
@@ -143,6 +146,7 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
     "target_module,num_inputs,mmap,max_epochs",
     product(["identity"], [10, 20], [True, False], [1, 2]),
 )
+@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="crashes on darwin")
 def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
     # TODO(Priya): Tests for non-continuous epochs
     model, act_callback, true_activations = train(
@@ -157,12 +161,9 @@ def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
     )
 
     columns = [f"activation_{target_module}_{epoch}" for epoch in range(max_epochs)]
-    columns.append("index")
     assert set(columns) == set(activations_dp.columns)
 
     for col in columns:
-        if col == "index":
-            continue
         if mmap:
             assert (
                 torch.from_numpy(activations_dp[col].data) == true_activations
