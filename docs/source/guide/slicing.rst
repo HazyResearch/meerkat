@@ -234,7 +234,8 @@ There are three different ways to select a subset of rows from a DataPanel: via 
     the ``"label"`` column. We could do this using the following code:
 
     .. ipython:: python
-
+        :okwarning:
+        
         small_dp.lz[small_dp["label"] == "parachute"]
     
 
