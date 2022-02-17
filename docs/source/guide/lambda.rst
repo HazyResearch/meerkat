@@ -27,7 +27,7 @@ Consider the following example, where we create a simple Meerkat column...
     lambda_col[1]  # the function is only called at this point!
 
 
-Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a `~meerkat.LambdaColumn` that lazily loads images...
+Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.LambdaColumn` that lazily loads images...
 
 .. ipython:: python
     :verbatim:
@@ -40,3 +40,7 @@ An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.LambdaColumn` like
 
 Lazy Selection
 --------------
+
+.. todo::
+
+    Fill in this stub.

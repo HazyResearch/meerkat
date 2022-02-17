@@ -7,14 +7,17 @@ Throughout, we'll be selecting data from the following DataPanel, which holds th
 
 .. ipython:: python
 
-   import os
-   print(os.getcwd())
    import meerkat as mk
    dp = mk.datasets.get("imagenette")
-   dp._repr_html_()
+   dp
+
+   @suppress
+   from display import display_dp 
+   @suppress
+   display_dp(dp.head()[["img", "label", "label_id", "label_idx", "split", "img_path"]], "imagenette_head")
 
 .. raw:: html
-   :file: dp.html
+   :file: ../html/display/imagenette_head.html
 
 Selecting Columns
 ------------------
@@ -123,14 +126,15 @@ Instead, images are only loaded into memory at the moment they are selected.
         row
     
     Notice that instead of holding the image in memory, ``row`` holds a :class:`~meerkat.FileCell` object. 
-    This object knows how to load the image into memory, but stops just short of doing so. Later on, when we want to access the image, we can use the :py:method:``~meerkat.FileCell.get()`` method on the cell. For example,
+    This object knows how to load the image into memory, but stops just short of doing so. Later on, when we want to access the image, we can use the :meth:``~meerkat.FileCell.get` method on the cell. For example,
 
     .. ipython:: python
 
         row["img"].get()
 
      
-    Lazy selection is critical . It is discussed in more detail in the guide on :doc:`lambda`.
+    Lazy selection is critical for manipulating and managing DataPanels in Meerkat. 
+    It is discussed in more detail in the guide on :doc:`lambda`.
     
 
 

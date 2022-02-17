@@ -9,6 +9,23 @@ Meerkat Basics
    data_structures
    slicing
    lambda
+   column_types
+   io
+   map
+   ops
+   visualization
+   patterns
+
+Common Use Cases
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   dataset_creation
+   model_training
+   model_evaluation
+   error_analysis
 
 Advanced Topics
 ---------------- 
@@ -17,3 +34,4 @@ Advanced Topics
    :maxdepth: 2
 
    copying
+   subclass
