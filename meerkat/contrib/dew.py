@@ -1,7 +1,7 @@
 import os
 
 import meerkat as mk
-from meerkat.columns.image_column import Downloader
+from meerkat.columns.file_column import Downloader
 
 DATASET_URL = "https://www.radar-service.eu/radar/en/dataset/tJzxrsYUkvPklBOw"
 
