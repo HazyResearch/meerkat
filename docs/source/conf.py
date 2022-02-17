@@ -44,10 +44,14 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx.ext.todo",
     "sphinx_rtd_theme",
     "nbsphinx",
     "recommonmark",
     "sphinx_panels",
+    "IPython.sphinxext.ipython_directive",
+    "IPython.sphinxext.ipython_console_highlighting",
+    "jupyter_sphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -65,6 +69,7 @@ exclude_patterns = []
 #
 html_theme = "pydata_sphinx_theme"
 html_logo = "../assets/meerkat_banner_padded.svg"
+html_favicon = "../assets/meerkat_logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -82,3 +87,5 @@ panels_css_variables = {
     "tabs-color-label-active": "rgb(108,72,232)",
     "tabs-color-label-inactive": "rgba(108,72,232,0.5)",
 }
+
+todo_include_todos = True

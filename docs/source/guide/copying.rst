@@ -236,7 +236,7 @@ copies of the the columns in ``dp2``
    ``EntityDataPanel``) Same as “View” above.
 
 Behavior when Indexing
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Indexing rows
 --------------

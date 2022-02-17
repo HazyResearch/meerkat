@@ -11,6 +11,7 @@ from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.arrow_column import ArrowArrayColumn
 from meerkat.columns.audio_column import AudioColumn
 from meerkat.columns.cell_column import CellColumn
+from meerkat.columns.file_column import FileCell, FileColumn
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.list_column import ListColumn
@@ -36,6 +37,7 @@ __all__ = [
     "AbstractColumn",
     "LambdaColumn",
     "CellColumn",
+    "FileColumn",
     "ListColumn",
     "NumpyArrayColumn",
     "PandasSeriesColumn",
@@ -48,6 +50,7 @@ __all__ = [
     "MedicalVolumeColumn",
     "AbstractCell",
     "LambdaCell",
+    "FileCell",
     "MedicalVolumeCell",
     "datasets",
     "concat",

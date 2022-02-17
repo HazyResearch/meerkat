@@ -62,7 +62,7 @@ def download_imagenette(
     dir_path = os.path.splitext(tar_path)[0]
     csv_path = os.path.join(dir_path, "imagenette.csv")
     if not overwrite and os.path.isfile(csv_path):
-        return pd.read_csv(csv_path) if return_df else dir_path
+        return (pd.read_csv(csv_path), dir_path) if return_df else dir_path
 
     if overwrite or not os.path.exists(dir_path):
         download_url(
@@ -83,11 +83,11 @@ def download_imagenette(
     df["label"] = df["label_id"].replace(ID_TO_WORDS)
     df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
     df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
-    df["img_path"] = df.path.apply(lambda x: os.path.join(dir_path, x))
+    df["img_path"] = df.path
     df[["img_path", "label", "label_id", "label_idx", "split"]].to_csv(
         csv_path, index=False
     )
-    return df if return_df else dir_path
+    return (df, dir_path) if return_df else dir_path
 
 
 def build_imagenette_dp(
@@ -110,7 +110,7 @@ def build_imagenette_dp(
         https://github.com/fastai/imagenette
     """
     if download:
-        df: pd.DataFrame = download_imagenette(
+        df, dir_path = download_imagenette(
             dataset_dir, version=version, overwrite=False, return_df=True
         )
     else:
@@ -120,5 +120,5 @@ def build_imagenette_dp(
         df = pd.read_csv(csv_path)
 
     dp = mk.DataPanel.from_pandas(df)
-    dp["img"] = mk.ImageColumn.from_filepaths(dp["img_path"])
+    dp["img"] = mk.ImageColumn.from_filepaths(dp["img_path"], base_dir=dir_path)
     return dp
