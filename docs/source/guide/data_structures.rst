@@ -19,11 +19,14 @@ we simply pass filepaths to the :class:`~meerkat.ImageColumn` constructor.
 
 .. ipython:: python
 
+    @suppress
     import os
     import meerkat as mk
+    @suppress
+    abs_path_to_img_dir = os.path.join(os.path.dirname(os.path.dirname(mk.__file__)), "docs/assets/guide/data_structures")
     img_col = mk.ImageColumn(
         ["img_0.jpg", "img_1.jpg", "img_2.jpg"], 
-        base_dir="assets/guide/data_structures"
+        base_dir=abs_path_to_img_dir
     )
     img_col
 
