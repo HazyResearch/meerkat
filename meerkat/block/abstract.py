@@ -90,3 +90,10 @@ class AbstractBlock:
         block_class = metadata["klass"]
         data = block_class._read_data(path, *args, **kwargs)
         return block_class(data)
+
+    def _write_data(self, path: str, *args, **kwargs):
+        raise NotImplementedError
+
+    @staticmethod
+    def _read_data(path: str, *args, **kwargs) -> object:
+        raise NotImplementedError

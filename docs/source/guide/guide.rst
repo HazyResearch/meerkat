@@ -35,3 +35,12 @@ Advanced Topics
 
    copying
    subclass
+
+
+Meerkat Internals
+------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   blocks

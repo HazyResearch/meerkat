@@ -17,7 +17,7 @@ class BlockRef(Mapping):
             return self.columns[index]
         else:
             return self.__class__(
-                columns={col: self.columns[col].view() for col in index},
+                columns={col: self.columns[col] for col in index},
                 block=self.block,
             )
 

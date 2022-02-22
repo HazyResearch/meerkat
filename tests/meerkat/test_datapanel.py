@@ -179,7 +179,7 @@ class TestDataPanel:
 
             # enforce that a column index multiple returns a view of the old datapanel
             for col_name in index:
-                assert new_dp._data[col_name] is not dp._data[col_name]
+                assert new_dp._data[col_name] is dp._data[col_name]
 
     #                assert new_dp._data[col_name].data is dp._data[col_name].data
 
@@ -383,7 +383,7 @@ class TestDataPanel:
             index = [c for c in columns if c != excluded_column]
             view_dp = dp[index]
             for name in view_dp.columns:
-                dp[name] is not view_dp[name]
+                dp[name] is view_dp[name]
                 dp[name].data is dp[name].data
 
     def test_row_indexing_view_copy_semantics(self):
@@ -407,7 +407,7 @@ class TestDataPanel:
         assert isinstance(dp2[col], NumpyArrayColumn)
         assert dp[col] is not dp2[col]
         assert dp[col].data is not dp2[col].data
-        assert dp[col].data.base is dp2[col].data.base
+        assert dp[col].data is dp2[col].data.base
 
         col = "d"
         assert isinstance(dp2[col], TensorColumn)
@@ -651,7 +651,7 @@ class TestDataPanel:
         b = np.arange(16) * 2
         dp = DataPanel.from_batch({"a": a, "b": b})
         assert "a" in dp
-        assert dp[["a", "b"]]["a"]._data.base is a
+        assert dp[["a", "b"]]["a"]._data is a
         # testing removal from block manager, so important to use non-blockable type
         dp["a"] = ListColumn(range(16))
         assert dp[["a", "b"]]["a"]._data is not a

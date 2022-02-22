@@ -47,16 +47,20 @@ class BlockManager(MutableMapping):
         self._column_to_block_id.update({name: block_id for name in block_ref.keys()})
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
-        """[summary]
+        """ """
+        from .lambda_block import LambdaBlock
+        from ..columns.lambda_column import LambdaColumn
 
-        Args:
-            fn (str): a function that is applied to a block and column_spec and
-                returns a new block and column_spec.
-        Returns:
-            [type]: [description]
-        """
         results = None
+        lambda_block_refs = []
         for block_ref in self._block_refs.values():
+
+            if isinstance(lambda_block_refs, LambdaBlock):
+                # defer computation of lambda columns, since they may be functions of
+                # the other columns
+                lambda_block_refs.append(block_ref)
+                continue
+
             result = block_ref.apply(method_name=method_name, *args, **kwargs)
             if results is None:
                 results = BlockManager() if isinstance(result, BlockRef) else {}
@@ -64,7 +68,11 @@ class BlockManager(MutableMapping):
 
         # apply method to columns not stored in block
         for name, col in self._columns.items():
-            if results is not None and name in results:
+            if (results is not None and name in results) or isinstance(
+                col, LambdaColumn
+            ):
+                # defer computation of lambda columns, since they may be functions of 
+                # other columns 
                 continue
 
             result = getattr(col, method_name)(*args, **kwargs)
@@ -73,6 +81,9 @@ class BlockManager(MutableMapping):
                 results = BlockManager() if isinstance(result, AbstractColumn) else {}
 
             results[name] = result
+        
+        for block_ref in lambda_block_refs:
+            pass
 
         if isinstance(results, BlockManager):
             results.reorder(self.keys())
@@ -191,13 +202,10 @@ class BlockManager(MutableMapping):
                 f"Cannot add column '{name}' with length {len(col)} to `BlockManager` "
                 f" with length {self.nrows} columns."
             )
-
+        # col = col.view()
         if not col.is_blockable():
-            col = col.view()
             self._columns[name] = col
-
         else:
-            col = col.view()
             self.update(BlockRef(columns={name: col}, block=col._block))
 
     @classmethod

@@ -193,10 +193,9 @@ def test_getitem():
     b = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(b, "b")
 
-    # check that manager holds view of original column, but returns a coreference
-    assert mgr["a"] is not a
+    # check that manager holds coreference of original column, but returns a coreference
+    assert mgr["a"] is a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,
@@ -206,9 +205,9 @@ def test_getitem():
 
     out = mgr[["a", "b"]]
     assert isinstance(out, BlockManager)
-    # check that manager holds view of original column, but returns a coreference
+    # check that manager holds reference of original column, and returns a coreference
     assert mgr["a"].data.base is out["a"].data.base
-    assert mgr["a"] is not out["a"]
+    assert mgr["a"] is out["a"]
     assert out["a"] is out["a"]
 
     with pytest.raises(ValueError, match="`BlockManager` does not contain column 'c'."):
@@ -222,10 +221,9 @@ def test_setitem():
     b = mk.NumpyArrayColumn(np.arange(10)) * 2
     mgr["b"] = b
 
-    # check that manager holds view of original column, but returns a coreference
-    assert mgr["a"] is not a
+    # check that manager holds coreference of original column, and returns a coreference
+    assert mgr["a"] is a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,

@@ -1,14 +1,18 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
 import logging
 import os
 import warnings
 from typing import Callable, Collection, Mapping, Sequence, Union
+from libcst import Lambda
 
 import numpy as np
 import yaml
 
 import meerkat as mk
+from meerkat.block.abstract import BlockView
+from meerkat.block.lambda_block import LambdaBlock, LambdaOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
@@ -62,17 +66,18 @@ class LambdaCell(AbstractCell):
 
 
 class LambdaColumn(AbstractColumn):
+
+    block_class: type = LambdaBlock
+
     def __init__(
         self,
-        data: Union[DataPanel, AbstractColumn],
-        fn: callable = None,
+        data: Union[LambdaOp, BlockView],
         output_type: type = None,
         *args,
         **kwargs,
-    ):
-        super(LambdaColumn, self).__init__(data.view(), *args, **kwargs)
-        if fn is not None:
-            self.fn = fn
+    ):      
+        super(LambdaColumn, self).__init__(data, *args, **kwargs)
+
         self._output_type = output_type
 
     def _set(self, index, value):
