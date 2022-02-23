@@ -240,7 +240,7 @@ class DataPanel(
         elif isinstance(index, int):
             # int index => single row (dict)
             return {
-                k: self.data[k]._get(index, materialize=materialize)
+                k: self.data.apply("_get", index=index, materialize=materialize)[k]
                 for k in self.columns
             }
 

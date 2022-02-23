@@ -1,9 +1,9 @@
 from collections import defaultdict
 from typing import Callable, Dict, List, Optional, Sequence
+
+import numpy as np
 import pandas as pd
 import torch
-import numpy as np
-
 import yaml
 from yaml.constructor import ConstructorError
 
@@ -149,7 +149,7 @@ def convert_to_batch_fn(
 
 
 def translate_index(index, length: int):
-    def _is_batch_index(self, index):
+    def _is_batch_index(index):
         # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
         # so we match this behavior
         return not (

@@ -4,7 +4,7 @@ import os
 import shutil
 from collections import defaultdict
 from collections.abc import MutableMapping
-from typing import Dict, Mapping, Sequence, Union
+from typing import Dict, List, Mapping, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -48,8 +48,8 @@ class BlockManager(MutableMapping):
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """ """
-        from .lambda_block import LambdaBlock
         from ..columns.lambda_column import LambdaColumn
+        from .lambda_block import LambdaBlock
 
         results = None
         lambda_block_refs = []
@@ -59,20 +59,27 @@ class BlockManager(MutableMapping):
                 # defer computation of lambda columns, since they may be functions of
                 # the other columns
                 lambda_block_refs.append(block_ref)
-                continue
+                #continue
 
             result = block_ref.apply(method_name=method_name, *args, **kwargs)
+
             if results is None:
-                results = BlockManager() if isinstance(result, BlockRef) else {}
-            results.update(result)
+                # apply returns one of BlockRef, List[BlockRef], dict
+                results = BlockManager() if isinstance(result, (BlockRef, List)) else {}
+            
+            if isinstance(result, List):
+                for ref in result:
+                    results.update(ref)
+            else:    
+                results.update(result)
 
         # apply method to columns not stored in block
         for name, col in self._columns.items():
             if (results is not None and name in results) or isinstance(
                 col, LambdaColumn
             ):
-                # defer computation of lambda columns, since they may be functions of 
-                # other columns 
+                # defer computation of lambda columns, since they may be functions of
+                # other columns
                 continue
 
             result = getattr(col, method_name)(*args, **kwargs)
@@ -81,7 +88,7 @@ class BlockManager(MutableMapping):
                 results = BlockManager() if isinstance(result, AbstractColumn) else {}
 
             results[name] = result
-        
+
         for block_ref in lambda_block_refs:
             pass
 

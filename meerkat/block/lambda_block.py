@@ -1,64 +1,121 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from multiprocessing.sharedctypes import Value
 from typing import Dict, Hashable, List, Sequence, Tuple, Union
-import numpy as np
 
+import numpy as np
 from cytoolz import merge_with
 
-from meerkat.block.ref import BlockRef
 import meerkat as mk
+from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.tools.utils import translate_index
+
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
-#
+@dataclass
+class LambdaCellOp:
+    args: List[any]
+    kwargs: Dict[str, any]
+    fn: callable
+    is_batched_fn: bool
+
+    def get(self):
+        from ..columns.lambda_column import AbstractCell
+
+        args = [
+            arg.get() if isinstance(arg, AbstractCell) else arg for arg in self.args
+        ]
+        kwargs = {
+            kw: arg.get() if isinstance(arg, AbstractCell) else arg
+            for kw, arg in self.kwargs.items()
+        }
+        return self.fn(*args, **kwargs)
 
 
 @dataclass
 class LambdaOp:
-    inputs: Dict[Union[str, int], mk.AbstractColumn]
+    args: List[mk.AbstractColumn]
+    kwargs: Dict[str, mk.AbstractColumn]
     fn: callable
     is_batched_fn: bool
+    batch_size: int
+    return_format: type = None
 
-    def _get(self, index: Union[int, np.ndarray], indexed_inputs: dict):
+    def _get(
+        self,
+        index: Union[int, np.ndarray],
+        indexed_inputs: dict = None,
+        materialize: bool = True,
+    ):
 
-        # TODO: support batchuing
+        # TODO: support batching
+        if indexed_inputs is None:
+            indexed_inputs = {}
 
         # we pass results from other columns
         # prepare inputs
-        if isinstance(self.inputs, dict):
-            # multiple inputs into the function
-            use_kwargs = True
-            kwargs = {
-                # if column has already been indexed
-                kwarg: indexed_inputs.get(
-                    id(column), column._get(index, materialize=True)
-                )
-                for kwarg, column in self.inputs.items()
-            }
-        elif isinstance(self.inputs, AbstractColumn):
-            # single input into the function
-            use_kwargs = False
-            arg = indexed_inputs.get(
-                id(self.inputs), self.inputs._get(index, materialize=True)
+        kwargs = {
+            # if column has already been indexed
+            kwarg: indexed_inputs.get(
+                id(column), column._get(index, materialize=materialize)
             )
-        else:
-            raise ValueError
+            for kwarg, column in self.kwargs.items()
+        }
 
-        #
+        args = [
+            indexed_inputs.get(id(column), column._get(index, materialize=materialize))
+            for column in self.args
+        ]
+
         if isinstance(index, int):
-            outputs = self.fn(**kwargs) if use_kwargs else self.fn(arg)
-        elif isinstance(index, np.ndarray):
-            outputs = [
-                (
-                    self.fn(**{kwarg: column[i] for kwarg, column in kwargs.items()})
-                    if use_kwargs
-                    else self.fn(arg[i])
+            if materialize:
+                return self.fn(*args, **kwargs)
+            else:
+                return LambdaCellOp(
+                    fn=self.fn,
+                    args=args,
+                    kwargs=kwargs,
+                    is_batched_fn=self.is_batched_fn,
                 )
-                for i in range(len(index))
-            ]
+
+        elif isinstance(index, np.ndarray):
+            if materialize:
+                outputs = [
+                    (
+                        self.fn(
+                            *[arg[i] for arg in args],
+                            **{kwarg: column[i] for kwarg, column in kwargs.items()}
+                        )
+                    )
+                    for i in range(len(index))
+                ]
+
+                if self.return_format is dict:
+                    return merge_with(list, outputs)
+                elif self.return_format is tuple:
+                    return tuple(zip(*outputs))
+                else:
+                    return outputs
+
+            else:
+                return LambdaOp(
+                    fn=self.fn,
+                    args=args,
+                    kwargs=kwargs,
+                    is_batched_fn=self.is_batched_fn,
+                    batch_size=self.batch_size,
+                )
+
+    def __len__(self):
+        if len(self.args) > 0:
+            return len(self.args[0])
+        else:
+            for col in self.kwargs.values():
+                return len(col)
+        return 0
 
 
 class LambdaBlock(AbstractBlock):
@@ -79,84 +136,82 @@ class LambdaBlock(AbstractBlock):
             nrows=self.data.shape[0],
         )
 
-    def __init__(self, data):
-        data = None
+    def __init__(self, data: LambdaOp):
+
+        self.data = data
 
     @classmethod
     def from_column_data(cls, data: LambdaOp) -> Tuple[LambdaBlock, BlockView]:
-
-        pass
+        block = cls(data=data)
+        return BlockView(block=block, block_index=None)
 
     @classmethod
     def from_block_data(cls, data: LambdaOp) -> Tuple[AbstractBlock, BlockView]:
-
-        return super().from_block_data(data)
+        return cls(data=data)
 
     @classmethod
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
         pass
 
     def _convert_index(self, index):
-        return translate_index(index, length=len())  # TODO
+        return translate_index(index, length=len(self.data))  # TODO
 
-    def _get(self, index, block_ref: BlockRef, inputs: dict) -> Union[BlockRef, dict]:
+    def _get(
+        self,
+        index,
+        block_ref: BlockRef,
+        indexed_inputs: dict = None,
+        materialize: bool = True,
+    ) -> Union[BlockRef, dict]:
+        if indexed_inputs is None:
+            indexed_inputs = {}
+        index = self._convert_index(index)
 
-        index = self._convert_index()
-        if not materialize:
-            pass
-            return
+        outputs = self.data._get(
+            index=index, indexed_inputs=indexed_inputs, materialize=materialize
+        )
 
-        self.data._get(index=index, inputs=inputs)
-
-        # we pass results from other columns
-        # prepare inputs
-        if isinstance(data.inputs, dict):
-            # multiple inputs into the function
-            use_kwargs = True
-            kwargs = {
-                # if column has already been indexed
-                kwarg: results.get(id(column), self._data._get(index, materialize=True))
-                for kwarg, column in op.inputs.items()
-            }
-        elif isinstance(op.inputs, AbstractColumn):
-            # single input into the function
-            use_kwargs = False
-            arg = results.get(id(op.inputs), self._data._get(index, materialize=True))
-        else:
-            raise ValueError
-
-        #
+        # convert raw outputs into columns
         if isinstance(index, int):
-            outputs = op.fn(**kwargs) if use_kwargs else op.fn(arg)
-        elif isinstance(index, np.ndarray):
-            outputs = [
-                (
-                    op.fn(**{kwarg: column[i] for kwarg, column in kwargs.items()})
-                    if use_kwargs
-                    else op.fn(arg[i])
-                )
-                for i in range(len(index))
-            ]
-            if isinstance(op.outputs, dict):
-                outputs = merge_with(list, outputs)
-
-                # TODO: apply output type
-                # apply correct collate and convert to columns
-                results = {
-                    op.outputs[kwout].from_data(op.outputs[kwout].collate(out))
-                    for kwout, out in outputs.items()
+            if materialize:
+                return {
+                    name: outputs
+                    if (col._block_index is None)
+                    else outputs[col._block_index]
+                    for name, col in block_ref.columns.items()
                 }
-
-            elif isinstance(op.outputs, AbstractColumn):
-                outputs = op.outputs.from_data(op.outputs.collate(outputs))
-                results.update({id(op.outputs): outputs})
             else:
-                raise ValueError
+                pass
 
-        return
+        else:
+            if materialize:
+                outputs = {
+                    name: col.from_data(
+                        col.collate(
+                            outputs
+                            if (col._block_index is None)
+                            else outputs[col._block_index]
+                        )
+                    )
+                    for name, col in block_ref.columns.items()
+                }
+                return [
+                    BlockRef(columns={name: col}, block=col._block)
+                    for name, col in outputs.items()
+                ]
+            else:
+                block = self.from_block_data(outputs)
+                columns = {
+                    name: col._clone(
+                        data=BlockView(block=block, block_index=col._block_index)
+                    )
+                    for name, col in block_ref.columns.items()
+                }
+                return BlockRef(block=block, columns=columns)
 
     def _get_data(self, index: BlockIndex) -> object:
-        pass
+        # TODO: consider returning a special version with the output index
+        return self.data
 
     def _write_data(self, path: str, *args, **kwargs):
         return super()._write_data(path, *args, **kwargs)

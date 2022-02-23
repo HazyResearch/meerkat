@@ -1,18 +1,18 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
 import logging
 import os
 import warnings
+from dataclasses import dataclass
 from typing import Callable, Collection, Mapping, Sequence, Union
-from libcst import Lambda
 
 import numpy as np
 import yaml
+from libcst import Lambda
 
 import meerkat as mk
 from meerkat.block.abstract import BlockView
-from meerkat.block.lambda_block import LambdaBlock, LambdaOp
+from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
@@ -27,12 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class LambdaCell(AbstractCell):
-    def __init__(
-        self,
-        fn: callable = None,
-        data: any = None,
-    ):
-        self.fn = fn
+    def __init__(self, data: LambdaCellOp, output_key: Union[None, str, int] = None):
         self._data = data
 
     @property
@@ -41,27 +36,13 @@ class LambdaCell(AbstractCell):
         return self._data
 
     def get(self, *args, **kwargs):
-        if isinstance(self.data, AbstractCell):
-            return self.fn(self.data.get())
-        elif isinstance(self.data, Mapping):
-            return self.fn(
-                {
-                    k: v.get() if isinstance(v, AbstractCell) else v
-                    for k, v in self.data.items()
-                }
-            )
-        else:
-            return self.fn(self.data)
+        return self.data.get()
 
     def __eq__(self, other):
-        return (
-            (other.__class__ == self.__class__)
-            and (self.data == other.data)
-            and (self.fn == other.fn)
-        )
+        return (other.__class__ == self.__class__) and (self.data == other.data)
 
     def __repr__(self):
-        name = getattr(self.fn, "__qualname__", repr(self.fn))
+        name = getattr(self.data.fn, "__qualname__", repr(self.data.fn))
         return f"LambdaCell(fn={name})"
 
 
@@ -75,7 +56,7 @@ class LambdaColumn(AbstractColumn):
         output_type: type = None,
         *args,
         **kwargs,
-    ):      
+    ):
         super(LambdaColumn, self).__init__(data, *args, **kwargs)
 
         self._output_type = output_type
@@ -112,20 +93,20 @@ class LambdaColumn(AbstractColumn):
 
     def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
         index = self._translate_index(index)
+        data = self.data._get(index=index, materialize=materialize)
         if isinstance(index, int):
-            if _data is None:
-                _data = self._get_cell(index, materialize=materialize)
-            return _data
+            if materialize:
+                return data
+            else:
+                return LambdaCell(data=data)
 
         elif isinstance(index, np.ndarray):
             # support for blocks
-            if _data is None:
-                _data = self._get_batch(index, materialize=materialize)
             if materialize:
                 # materialize could change the data in unknown ways, cannot clone
-                return self.__class__.from_data(data=_data)
+                return self.__class__.from_data(data=self.collate(data))
             else:
-                return self._clone(data=_data)
+                return self._clone(data=data)
 
     @classmethod
     def _state_keys(cls) -> Collection:

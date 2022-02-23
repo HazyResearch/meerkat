@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, List, Mapping, Sequence, Union
 
 if TYPE_CHECKING:
     from meerkat.block.abstract import AbstractBlock
@@ -37,7 +37,9 @@ class BlockRef(Mapping):
     def block_indices(self):
         return {name: col._block_index for name, col in self.columns.items()}
 
-    def apply(self, method_name: str = "_get", *args, **kwargs):
+    def apply(
+        self, method_name: str = "_get", *args, **kwargs
+    ) -> Union[BlockRef, List[BlockRef], dict]:
         # apply method to the block
         return getattr(self.block, method_name)(*args, **kwargs, block_ref=self)
 
