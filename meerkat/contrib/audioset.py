@@ -10,6 +10,8 @@ def build_audioset_dp(
     splits: List[str] = ["eval_segments"],
     batch_size=32,
     num_workers: int = 8,
+    pbar: bool = True,
+    audio_column: bool = True,
 ):
     """
     Build a DataPanel from the audioset dataset
@@ -50,12 +52,20 @@ def build_audioset_dp(
         # Filter missing audio
         dp = dp.filter(
             lambda x: True if os.path.exists(x["audio_path"]) else False,
-            pbar=True,
+            pbar=pbar,
+            batch_size=batch_size,
+            num_workers=num_workers,
+        )
+        # TODO(Priya): Filter out empty files
+        dp["positive_labels"] = dp["positive_labels"].map(
+            lambda labels: labels.split(","),
+            pbar=pbar,
             batch_size=batch_size,
             num_workers=num_workers,
         )
 
-        dp["audio"] = mk.AudioColumn(dp["audio_path"])
+        if audio_column:
+            dp["audio"] = mk.AudioColumn(dp["audio_path"])
 
         dps.append(dp)
 
