@@ -1,7 +1,7 @@
 import json
 import os
 from typing import List, Union
-
+import torchaudio
 import meerkat as mk
 
 
@@ -57,8 +57,15 @@ def build_audioset_dp(
             num_workers=num_workers,
         )
         # TODO(Priya): Filter out empty files
+        # dp = dp.filter(
+        #     lambda x: True if torchaudio.info(x["audio_path"]).num_frames else False,
+        #     pbar=pbar,
+        #     batch_size=batch_size,
+        #     num_workers=num_workers,
+        # )
+
         dp["positive_labels"] = dp["positive_labels"].map(
-            lambda labels: labels.split(","),
+            lambda labels: labels[1:-1].split(","),
             pbar=pbar,
             batch_size=batch_size,
             num_workers=num_workers,
