@@ -36,7 +36,7 @@ class LambdaCell(AbstractCell):
         return self._data
 
     def get(self, *args, **kwargs):
-        return self.data.get()
+        return self.data._get()
 
     def __eq__(self, other):
         return (other.__class__ == self.__class__) and (self.data == other.data)
@@ -70,35 +70,17 @@ class LambdaColumn(AbstractColumn):
         raise NotImplementedError
 
     def _create_cell(self, data: object) -> LambdaCell:
-        return LambdaCell(fn=self.fn, data=data)
-
-    def _get_cell(self, index: int, materialize: bool = True):
-        if materialize:
-            return self.fn(self._data._get(index, materialize=True))
-        else:
-            return self._create_cell(data=self._data._get(index, materialize=False))
-
-    def _get_batch(self, indices: np.ndarray, materialize: bool = True):
-        if materialize:
-            # if materializing, return a batch (by default, a list of objects returned
-            # by `.get`, otherwise the batch format specified by `self.collate`)
-            data = self.collate(
-                [self._get_cell(int(i), materialize=True) for i in indices]
-            )
-            if self._output_type is not None:
-                data = self._output_type(data)
-            return data
-        else:
-            return self._data.lz[indices]
+        return LambdaCell(data=data)
 
     def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
         index = self._translate_index(index)
         data = self.data._get(index=index, materialize=materialize)
+
         if isinstance(index, int):
             if materialize:
                 return data
             else:
-                return LambdaCell(data=data)
+                return self._create_cell(data=data)
 
         elif isinstance(index, np.ndarray):
             # support for blocks
@@ -110,7 +92,7 @@ class LambdaColumn(AbstractColumn):
 
     @classmethod
     def _state_keys(cls) -> Collection:
-        return super()._state_keys() | {"fn", "_output_type"}
+        return super()._state_keys() | { "_output_type"}
 
     @staticmethod
     def concat(columns: Sequence[LambdaColumn]):
@@ -152,3 +134,4 @@ class LambdaColumn(AbstractColumn):
 
     def _repr_cell(self, idx):
         return self.lz[idx]
+        

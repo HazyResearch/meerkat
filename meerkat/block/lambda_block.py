@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import copy
 
 from dataclasses import dataclass
 from multiprocessing.sharedctypes import Value
@@ -21,18 +22,36 @@ class LambdaCellOp:
     kwargs: Dict[str, any]
     fn: callable
     is_batched_fn: bool
+    return_index: Union[str, int] = None
 
-    def get(self):
+    @staticmethod
+    def prepare_arg(arg):
         from ..columns.lambda_column import AbstractCell
 
-        args = [
-            arg.get() if isinstance(arg, AbstractCell) else arg for arg in self.args
-        ]
-        kwargs = {
-            kw: arg.get() if isinstance(arg, AbstractCell) else arg
-            for kw, arg in self.kwargs.items()
-        }
-        return self.fn(*args, **kwargs)
+        if isinstance(arg, AbstractCell):
+            return arg.get()
+        elif isinstance(arg, AbstractColumn):
+            return arg[:]
+        return arg
+
+    def _get(self):
+
+        args = [self.prepare_arg(arg) for arg in self.args]
+        kwargs = {kw: self.prepare_arg(arg) for kw, arg in self.kwargs.items()}
+        out = self.fn(*args, **kwargs)
+
+        if self.return_index is not None:
+            return out[self.return_index]
+
+        if self.is_batched_fn:
+            return out[0]
+
+        return out
+
+    def with_return_index(self, index: Union[str, int]):
+        op = copy(self)
+        op.return_index = index
+        return op
 
 
 @dataclass
@@ -43,6 +62,7 @@ class LambdaOp:
     is_batched_fn: bool
     batch_size: int
     return_format: type = None
+    return_index: Union[str, int] = None
 
     def _get(
         self,
@@ -50,10 +70,14 @@ class LambdaOp:
         indexed_inputs: dict = None,
         materialize: bool = True,
     ):
-
-        # TODO: support batching
         if indexed_inputs is None:
             indexed_inputs = {}
+
+        # if function is batched, but the index is singular, we need to turn the
+        # single index into a batch index, and then later unpack the result
+        single_on_batched = self.is_batched_fn and isinstance(index, int)
+        if single_on_batched:
+            index = np.array([index])
 
         # we pass results from other columns
         # prepare inputs
@@ -72,35 +96,66 @@ class LambdaOp:
 
         if isinstance(index, int):
             if materialize:
-                return self.fn(*args, **kwargs)
+                output = self.fn(*args, **kwargs)
+                if self.return_index is not None:
+                    output = output[self.return_index]
+                return output
             else:
                 return LambdaCellOp(
                     fn=self.fn,
                     args=args,
                     kwargs=kwargs,
                     is_batched_fn=self.is_batched_fn,
+                    return_index=self.return_index,
                 )
 
         elif isinstance(index, np.ndarray):
             if materialize:
-                outputs = [
-                    (
-                        self.fn(
+                if self.is_batched_fn:
+                    output = self.fn(*args, **kwargs)
+
+                    if self.return_index is not None:
+                        output = output[self.return_index]
+
+                    if single_on_batched:
+                        if (self.return_format is dict) and (self.return_index is None):
+                            return {k: v[0] for k, v in output.items()}
+                        elif (self.return_format is tuple) and (
+                            self.return_index is None
+                        ):
+                            return [v[0] for v in output]
+                        else:
+                            return output[0]
+                    return output
+
+                else:
+                    outputs = []
+                    for i in range(len(index)):
+                        output = self.fn(
                             *[arg[i] for arg in args],
                             **{kwarg: column[i] for kwarg, column in kwargs.items()}
                         )
-                    )
-                    for i in range(len(index))
-                ]
 
-                if self.return_format is dict:
-                    return merge_with(list, outputs)
-                elif self.return_format is tuple:
-                    return tuple(zip(*outputs))
-                else:
-                    return outputs
+                        if self.return_index is not None:
+                            output = output[self.return_index]
+                        outputs.append(output)
+
+                    if (self.return_format is dict) and (self.return_index is None):
+                        return merge_with(list, outputs)
+                    elif (self.return_format is tuple) and (self.return_index is None):
+                        return tuple(zip(*outputs))
+                    else:
+                        return outputs
 
             else:
+                if single_on_batched:
+                    return LambdaCellOp(
+                        fn=self.fn,
+                        args=args,
+                        kwargs=kwargs,
+                        is_batched_fn=self.is_batched_fn,
+                        return_index=self.return_index,
+                    )
                 return LambdaOp(
                     fn=self.fn,
                     args=args,
@@ -116,6 +171,12 @@ class LambdaOp:
             for col in self.kwargs.values():
                 return len(col)
         return 0
+    
+    def with_return_index(self, index: Union[str, int]):
+        """Return a copy of the operation with a new return index."""
+        op: LambdaOp = copy(self)
+        op.return_index = index
+        return op
 
 
 class LambdaBlock(AbstractBlock):
@@ -142,8 +203,10 @@ class LambdaBlock(AbstractBlock):
 
     @classmethod
     def from_column_data(cls, data: LambdaOp) -> Tuple[LambdaBlock, BlockView]:
+        block_index = data.return_index
+        data = data.with_return_index(None)
         block = cls(data=data)
-        return BlockView(block=block, block_index=None)
+        return BlockView(block=block, block_index=block_index)
 
     @classmethod
     def from_block_data(cls, data: LambdaOp) -> Tuple[AbstractBlock, BlockView]:
@@ -181,7 +244,11 @@ class LambdaBlock(AbstractBlock):
                     for name, col in block_ref.columns.items()
                 }
             else:
-                pass
+                # outputs is a
+                return {
+                    name: col._create_cell(outputs.with_return_index(col._block_index))
+                    for name, col in block_ref.columns.items()
+                }
 
         else:
             if materialize:
@@ -210,8 +277,7 @@ class LambdaBlock(AbstractBlock):
                 return BlockRef(block=block, columns=columns)
 
     def _get_data(self, index: BlockIndex) -> object:
-        # TODO: consider returning a special version with the output index
-        return self.data
+        return self.data.with_return_index(index)
 
     def _write_data(self, path: str, *args, **kwargs):
         return super()._write_data(path, *args, **kwargs)
