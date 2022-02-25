@@ -1,6 +1,6 @@
 import logging
 from multiprocessing.sharedctypes import Value
-from typing import Callable, Mapping, Sequence, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Mapping, Sequence, Union
 
 from meerkat.block.abstract import BlockView
 
@@ -50,10 +50,10 @@ class LambdaMixin:
         Returns:
             _type_: _description_
         """
+        from meerkat import LambdaColumn
+        from meerkat.block.lambda_block import LambdaBlock, LambdaOp
         from meerkat.columns.abstract import AbstractColumn
         from meerkat.datapanel import DataPanel
-        from meerkat import LambdaColumn
-        from meerkat.block.lambda_block import LambdaOp, LambdaBlock
 
         # prepare arguments for LambdaOp
         if isinstance(self, AbstractColumn):

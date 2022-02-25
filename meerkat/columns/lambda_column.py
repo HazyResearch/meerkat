@@ -92,7 +92,7 @@ class LambdaColumn(AbstractColumn):
 
     @classmethod
     def _state_keys(cls) -> Collection:
-        return super()._state_keys() | { "_output_type"}
+        return super()._state_keys() | {"_output_type"}
 
     @staticmethod
     def concat(columns: Sequence[LambdaColumn]):
@@ -134,4 +134,3 @@ class LambdaColumn(AbstractColumn):
 
     def _repr_cell(self, idx):
         return self.lz[idx]
-        

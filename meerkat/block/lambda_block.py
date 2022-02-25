@@ -1,6 +1,6 @@
 from __future__ import annotations
-from copy import copy
 
+from copy import copy
 from dataclasses import dataclass
 from multiprocessing.sharedctypes import Value
 from typing import Dict, Hashable, List, Sequence, Tuple, Union
@@ -171,7 +171,7 @@ class LambdaOp:
             for col in self.kwargs.values():
                 return len(col)
         return 0
-    
+
     def with_return_index(self, index: Union[str, int]):
         """Return a copy of the operation with a new return index."""
         op: LambdaOp = copy(self)
