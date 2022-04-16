@@ -8,7 +8,6 @@ from typing import Callable, Collection, Mapping, Sequence, Union
 
 import numpy as np
 import yaml
-from libcst import Lambda
 
 import meerkat as mk
 from meerkat.block.abstract import BlockView
@@ -24,6 +23,8 @@ Image = LazyLoader("PIL.Image")
 
 
 logger = logging.getLogger(__name__)
+
+
 
 
 class LambdaCell(AbstractCell):
@@ -57,6 +58,7 @@ class LambdaColumn(AbstractColumn):
         *args,
         **kwargs,
     ):
+
         super(LambdaColumn, self).__init__(data, *args, **kwargs)
 
         self._output_type = output_type

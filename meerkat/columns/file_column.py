@@ -6,6 +6,7 @@ import urllib.request
 from typing import Collection, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlparse
+from meerkat.block.lambda_block import LambdaOp
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
@@ -105,13 +106,22 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
         *args,
         **kwargs,
     ):
-
-        if not isinstance(data, PandasSeriesColumn):
-            data = PandasSeriesColumn(data)
-        super(FileColumn, self).__init__(data, *args, **kwargs)
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
         self.base_dir = base_dir
+
+        if not isinstance(data, PandasSeriesColumn):
+            data = PandasSeriesColumn(data)
+
+        data = LambdaOp(
+            data=data,
+            fn=self.fn,
+            args=args,
+            kwargs=kwargs,
+            is_batched_fn=False,
+        )
+
+        super(FileColumn, self).__init__(data, *args, **kwargs)
 
     def _create_cell(self, data: object) -> FileCell:
         return FileCell(
