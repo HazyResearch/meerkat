@@ -729,6 +729,33 @@ class DataPanel(
             suffixes=suffixes,
             validate=validate,
         )
+    
+    def sort(
+        self,
+        by: Union[str, List[str]],
+        ascending: Union[bool, List[bool]] = True,
+        kind: str = "quicksort",
+    ) -> DataPanel:
+        """ 
+        Sort the DataPanel by the values in the specified columns. Similar to 
+        ``sort_values`` in pandas.
+
+        TODO(Hannah): Implement this method – should likely just wrap 
+        meerkat.ops.sort.sort. 
+
+        Args:
+            by (Union[str, List[str]]): The columns to sort by.
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+                descending order. If a list, must be the same length as `by`.Defaults 
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+
+        Return:
+            DataPanel: A sorted view of DataPanel.
+        """
+        raise NotImplementedError
+
 
     def items(self):
         for name in self.columns:
