@@ -52,16 +52,18 @@ def groupby(
     dtype = group_by_column.dtype
 
     # for object types, check if first element is a string, use it if so.
+    # set default.
+    dtype = int
     if dtype == object:
-        type_first_element = group_by_column[0]
-        dtype = type(type_first_element)
+        if len(group_by_column) > 0:
+            type_first_element = group_by_column[0]
+            dtype = type(type_first_element)
     
     if dtype == int:
         return DataPanelGroupBy(data.to_pandas().groupby(by))
     elif dtype == str:
         return DataPanelGroupBy(data.to_pandas().groupby(by))
     else:
-
         raise NotImplementedError(f"Supported dtypes are ints, and strings, you passed in a {dtype}")
     
 
