@@ -1,6 +1,7 @@
 from __future__ import annotations
 from meerkat import DataPanel
 from typing import Union, List, Sequence
+import pandas as pd
 
 from meerkat.columns.abstract import AbstractColumn
 
@@ -45,14 +46,36 @@ def groupby(
     Returns:
         Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
-    raise NotImplementedError
+
+    group_by_column = data[by]
+
+    dtype = group_by_column.dtype
+
+    # for object types, check if first element is a string, use it if so.
+    if dtype == object:
+        type_first_element = group_by_column[0]
+        dtype = type(type_first_element)
+    
+    if dtype == int:
+        return DataPanelGroupBy(data.to_pandas().groupby(by))
+    elif dtype == str:
+        return DataPanelGroupBy(data.to_pandas().groupby(by))
+    else:
+
+        raise NotImplementedError(f"Supported dtypes are ints, and strings, you passed in a {dtype}")
+    
+
 
 
 class DataPanelGroupBy:
+
+    def __init__(self, pd_gb) -> None:
+        self._group_by = pd_gb
+
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        raise NotImplementedError
+        return self._group_by[key]
 
 
 class AbstractColumnGroupBy:
