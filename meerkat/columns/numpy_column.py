@@ -7,7 +7,7 @@ import numbers
 import os
 import shutil
 from mmap import mmap
-from typing import Callable, Sequence
+from typing import Callable, Sequence, Union, List
 
 import numpy as np
 import pandas as pd
@@ -179,6 +179,46 @@ class NumpyArrayColumn(
             return f"np.ndarray(shape={self.shape[1:]})"
         else:
             return self[index]
+
+
+    def sort(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
+        """ 
+        Return a sorted view of the column. 
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+                descending order. If a list, must be the same length as `by`. Defaults 
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
+
+        """
+        # calls argsort() function to retrieve ordered indices
+        sorted_index = self.argsort(ascending=ascending, axis=-1, kind=kind, order=order)
+        return self[sorted_index]
+    
+    def argsort(self, ascending: Union[bool, List[bool]]=True, axis: int=0, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
+        """ 
+        Return indices that would sorted the column. 
+
+        self :  Input array.
+        axis : [int or None] Axis along which to sort. If None, the array is flattened before sorting. The default is -1, which sorts along the last axis.
+        kind : [quicksort, mergesort, heapsort] Selection algorithm. Default is quicksort.
+        order : [str or list of str] When arr is an array with fields defined, this argument specifies which fields to compare first, second, etc.
+
+        Return : [index_array, ndarray] Array of indices that sort arr along the specified axis.If arr is one-dimensional then arr[index_array] returns a sorted arr.
+  If array has shape of more than  one dimension, raise error 
+  check for number of elements, num_el, size, should be length of array
+
+  import numpy as _np
+  self.data
+  """
+        if not ascending:
+            return np.argsort(-1*self.data, axis=axis, kind=kind, order=order)
+
+        return np.argsort(self.data, axis=axis, kind=kind, order=order)
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is

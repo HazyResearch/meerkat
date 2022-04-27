@@ -753,6 +753,10 @@ class DataPanel(
 
         Return:
             DataPanel: A sorted view of DataPanel.
+
+            raise not implemented if multiple columns
+            how do you break ties? in pandas
+            
         """
         raise NotImplementedError
 

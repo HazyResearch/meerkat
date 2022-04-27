@@ -174,6 +174,40 @@ class TensorColumn(
     def _read_data(path: str) -> torch.Tensor:
         return torch.load(os.path.join(path, "data.pt"))
 
+    # def sort(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> TensorColumn:
+    #         """ 
+    #         Return a sorted view of the column. 
+
+    #         Args:
+    #             ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+    #                 descending order. If a list, must be the same length as `by`. Defaults 
+    #                 to True.
+    #             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+    #                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+    #         Return:
+    #             AbstractColumn: A view of the column with the sorted data.
+
+    #         """
+    #     # calls argsort() function to retrieve ordered indices
+    #     sorted_index = self.argsort_test(ascending=ascending, axis=-1, kind=kind, order=order)
+    #     return self[sorted_index]
+    
+    def argsort_test(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
+        """ 
+        Return indices that would sorted the column. 
+
+        self :  Input array.
+        axis : [int or None] Axis along which to sort. If None, the array is flattened before sorting. The default is -1, which sorts along the last axis.
+        kind : [quicksort, mergesort, heapsort] Selection algorithm. Default is quicksort.
+        order : [str or list of str] When arr is an array with fields defined, this argument specifies which fields to compare first, second, etc.
+
+        Return : [index_array, ndarray] Array of indices that sort arr along the specified axis.If arr is one-dimensional then arr[index_array] returns a sorted arr.
+        """
+        if not ascending:
+            return np.argsort(-1*self, axis=axis, kind=kind, order=order)
+
+        return np.argsort(self, axis=axis, kind=kind, order=order)
+
     def is_equal(self, other: AbstractColumn) -> bool:
         return (other.__class__ == self.__class__) and (self.data == other.data).all()
 
