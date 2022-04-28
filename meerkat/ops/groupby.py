@@ -1,11 +1,9 @@
 from __future__ import annotations
-from meerkat import DataPanel
-from typing import Union, List, Sequence
-import pandas as pd
 from abc import ABC, abstractmethod
-
+from meerkat import DataPanel
 from meerkat.columns.abstract import AbstractColumn
-
+import pandas as pd
+from typing import Union, List, Sequence
 
 def groupby(
     data: Union[DataPanel, AbstractColumn],
