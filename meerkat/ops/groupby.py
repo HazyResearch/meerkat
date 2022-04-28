@@ -2,6 +2,7 @@ from __future__ import annotations
 from meerkat import DataPanel
 from typing import Union, List, Sequence
 import pandas as pd
+from abc import ABC, abstractmethod
 
 from meerkat.columns.abstract import AbstractColumn
 
@@ -47,45 +48,66 @@ def groupby(
         Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
 
-    group_by_column = data[by]
 
-    dtype = group_by_column.dtype
 
-    # for object types, check if first element is a string, use it if so.
-    # set default.
-    dtype = int
-    if dtype == object:
-        if len(group_by_column) > 0:
-            type_first_element = group_by_column[0]
-            dtype = type(type_first_element)
-    
-    if dtype == int:
-        return DataPanelGroupBy(data.to_pandas().groupby(by))
-    elif dtype == str:
-        return DataPanelGroupBy(data.to_pandas().groupby(by))
-    else:
-        raise NotImplementedError(f"Supported dtypes are ints, and strings, you passed in a {dtype}")
-    
+    # what work do we want pandas to do what do we want to do ourselves? 
+    # this does throw exceptions
+
+    # must pass two arguments (columns - by, by), 
+    # by -> is a dictionary, a map, all distinct group_ids to indicies. 
+    # pass DataPanelGroupBy()
+
+    try:
+        return DataPanelGroupBy(data[by].to_pandas().groupby(by), data)
+    except Exception as e:
+        # future work needed here.
+        return NotImplementedError()
+
 
 
 
 class DataPanelGroupBy:
 
-    def __init__(self, pd_gb) -> None:
-        self._group_by = pd_gb
+    def __init__(self, pd_gb, dp) -> None:
+        self._pd_group_by = pd_gb
+        self._main_dp = dp
+
+    # TODO must write accumulators like sum and mean.
+
+    def mean(self) -> DataPanel:
+        # this is a datapanelgroup by and it has has a list of columns
+
+        pass
+
 
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        return self._group_by[key]
+        indices = self._group_by.indices 
 
+        # pass in groups instead: keys are stable. 
 
-class AbstractColumnGroupBy:
-    pass
+        # what if you sort it? 
+        # TODO: weak reference? 
 
+        if isinstance(key, str):
+            # assuming key is just one string
+            column = self._main_dp[key]
+            return column.to_group_by(indices) #needs to be implemented else where. 
+        else:
+            return DataPanelGroupBy(self._pd_group_by, self._main_df[key])
+
+class AbstractColumnGroupBy(ABC):
+    @abstractmethod
+    def mean(self):
+        raise NotImplementedError()
 
 class NumPyArrayGroupBy(AbstractColumnGroupBy):
-    pass
+
+
+    def mean(self):
+        pass
+
 
 
 class TensorGroupBy(AbstractColumnGroupBy):
