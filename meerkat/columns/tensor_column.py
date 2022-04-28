@@ -8,6 +8,7 @@ from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
+
 import torch
 from yaml.representer import Representer
 
@@ -174,39 +175,55 @@ class TensorColumn(
     def _read_data(path: str) -> torch.Tensor:
         return torch.load(os.path.join(path, "data.pt"))
 
-    # def sort(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> TensorColumn:
-    #         """ 
-    #         Return a sorted view of the column. 
+    def sort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> TensorColumn:
+        """ 
+        Return a sorted view of the column. 
 
-    #         Args:
-    #             ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-    #                 descending order. If a list, must be the same length as `by`. Defaults 
-    #                 to True.
-    #             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
-    #                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
-    #         Return:
-    #             AbstractColumn: A view of the column with the sorted data.
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+                descending order. If a list, must be the same length as `by`. Defaults 
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
 
-    #         """
-    #     # calls argsort() function to retrieve ordered indices
-    #     sorted_index = self.argsort_test(ascending=ascending, axis=-1, kind=kind, order=order)
-    #     return self[sorted_index]
+            """
+        # calls argsort() function to retrieve ordered indices
+        sorted_index = self.argsort(ascending=ascending, kind=kind)
+        return self[sorted_index]
+      
     
-    def argsort_test(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
+    def argsort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> TensorColumn:
         """ 
         Return indices that would sorted the column. 
 
-        self :  Input array.
-        axis : [int or None] Axis along which to sort. If None, the array is flattened before sorting. The default is -1, which sorts along the last axis.
-        kind : [quicksort, mergesort, heapsort] Selection algorithm. Default is quicksort.
-        order : [str or list of str] When arr is an array with fields defined, this argument specifies which fields to compare first, second, etc.
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+                descending order. If a list, must be the same length as `by`. Defaults 
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            TensorColumn: A view of the column with the sorted data.
 
-        Return : [index_array, ndarray] Array of indices that sort arr along the specified axis.If arr is one-dimensional then arr[index_array] returns a sorted arr.
-        """
-        if not ascending:
-            return np.argsort(-1*self, axis=axis, kind=kind, order=order)
+        For now! Raises error when shape of input array is more than one error.
 
-        return np.argsort(self, axis=axis, kind=kind, order=order)
+  """
+        try:
+            num_columns = self.size()[1]
+
+        except IndexError:  # Case 1: The array only has one column
+            # returns indices of descending order of array
+            if not ascending:
+                return torch.argsort(-1*self.data, dim=-1, descending=True)
+            # returns indices of ascending order of array
+            return torch.argsort(self.data, dim=-1, descending=False)
+
+        else:  # Case 2: The array has more than one column, raise error.
+           raise Exception("No implementation for array with more than one column.")
+
+
 
     def is_equal(self, other: AbstractColumn) -> bool:
         return (other.__class__ == self.__class__) and (self.data == other.data).all()

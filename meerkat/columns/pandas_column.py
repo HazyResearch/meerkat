@@ -279,9 +279,16 @@ class PandasSeriesColumn(
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
-            AbstractColumn: A view of the column with the sorted data.
+            PandasSeriesColumn: A view of the column with the sorted data.
+
+         For now! Raises error when shape of input array is more than one error.
 
         """
+        num_columns = self.shape
+        # Raise error if array has more than one column
+        if num_columns > 1:
+            raise Exception("No implementation for array with more than one column.")
+
         # returns indices of descending order of array
         if not ascending:
             return (-1*self.data).argsort(kind=kind)

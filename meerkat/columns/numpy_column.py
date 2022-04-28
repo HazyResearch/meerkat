@@ -196,29 +196,36 @@ class NumpyArrayColumn(
 
         """
         # calls argsort() function to retrieve ordered indices
-        sorted_index = self.argsort(ascending=ascending, axis=-1, kind=kind, order=order)
+        sorted_index = self.argsort(ascending=ascending, kind=kind)
         return self[sorted_index]
     
-    def argsort(self, ascending: Union[bool, List[bool]]=True, axis: int=0, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
+    def argsort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> NumpyArrayColumn:
         """ 
         Return indices that would sorted the column. 
 
-        self :  Input array.
-        axis : [int or None] Axis along which to sort. If None, the array is flattened before sorting. The default is -1, which sorts along the last axis.
-        kind : [quicksort, mergesort, heapsort] Selection algorithm. Default is quicksort.
-        order : [str or list of str] When arr is an array with fields defined, this argument specifies which fields to compare first, second, etc.
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
+                descending order. If a list, must be the same length as `by`. Defaults 
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            NumpySeriesColumn: A view of the column with the sorted data.
 
-        Return : [index_array, ndarray] Array of indices that sort arr along the specified axis.If arr is one-dimensional then arr[index_array] returns a sorted arr.
-  If array has shape of more than  one dimension, raise error 
-  check for number of elements, num_el, size, should be length of array
+        For now! Raises error when shape of input array is more than one error.
 
-  import numpy as _np
-  self.data
   """
-        if not ascending:
-            return np.argsort(-1*self.data, axis=axis, kind=kind, order=order)
+        num_columns = np.shape(self)[1]
+        # Raise error if array has more than one column
+        if num_columns > 1:
+            raise Exception("No implementation for array with more than one column.")
 
-        return np.argsort(self.data, axis=axis, kind=kind, order=order)
+        # returns indices of descending order of array
+        if not ascending:
+            return np.argsort(-1*self.data, axis=0, kind=kind, order=None)
+        
+        # returns indices of ascending order of array
+        return np.argsort(self.data, axis=0, kind=kind, order=None)
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
