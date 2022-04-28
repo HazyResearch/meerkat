@@ -58,10 +58,13 @@ def groupby(
     # pass DataPanelGroupBy()
 
     try:
+        if isinstance(by, str):
+            by = [by]
         return DataPanelGroupBy(data[by].to_pandas().groupby(by), data)
     except Exception as e:
         # future work needed here.
-        return NotImplementedError()
+        print("dataPanel group by error", e)
+        raise NotImplementedError()
 
 
 
@@ -83,7 +86,7 @@ class DataPanelGroupBy:
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        indices = self._group_by.indices 
+        indices = self._pd_group_by.indices 
 
         # pass in groups instead: keys are stable. 
 
@@ -93,7 +96,7 @@ class DataPanelGroupBy:
         if isinstance(key, str):
             # assuming key is just one string
             column = self._main_dp[key]
-            return column.to_group_by(indices) #needs to be implemented else where. 
+            return column.to_group_by(indices) # needs to be implemented else where. 
         else:
             return DataPanelGroupBy(self._pd_group_by, self._main_df[key])
 
