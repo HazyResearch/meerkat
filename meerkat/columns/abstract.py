@@ -508,3 +508,4 @@ class AbstractColumn(
     @property
     def is_mmap(self):
         return False
+

@@ -2,6 +2,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from meerkat import DataPanel
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
+from . import group_by_objects
 import pandas as pd
 from typing import Union, List, Sequence
 
@@ -98,26 +100,4 @@ class DataPanelGroupBy:
         else:
             return DataPanelGroupBy(self._pd_group_by, self._main_df[key])
 
-class AbstractColumnGroupBy(ABC):
-    @abstractmethod
-    def mean(self):
-        raise NotImplementedError()
 
-class NumPyArrayGroupBy(AbstractColumnGroupBy):
-
-
-    def mean(self):
-        pass
-
-
-
-class TensorGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-class SeriesGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-class ArrowGroupBy(AbstractColumnGroupBy):
-    pass
