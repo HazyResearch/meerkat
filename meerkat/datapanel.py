@@ -181,6 +181,7 @@ class DataPanel(
             f"set `overwrite=True` to overwrite."
         )
 
+ 
         if name in self.columns:
             self.remove_column(name)
 
@@ -221,6 +222,7 @@ class DataPanel(
         return meerkat.concat(
             [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
+
 
     def head(self, n: int = 5) -> DataPanel:
         """Get the first `n` examples of the DataPanel."""

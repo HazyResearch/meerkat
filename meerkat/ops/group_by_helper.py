@@ -30,7 +30,22 @@ class NumPyArrayGroupBy(AbstractColumnGroupBy):
             mean_slice = appropriate_slice.mean()
             means.append(mean_slice)
         query = self.keys
-        return DataPanel({"by_column": labels, query : means})
+        d = {}
+        d[query] = means
+        if isinstance(self.by, str):
+            d[self.by] = labels
+            return DataPanel(d)
+        else:
+
+            if len(self.by) == 1:
+                d[self.by[0]] = labels
+            else:
+                unzipped = list(zip(*labels))
+                for i, l in enumerate(unzipped):
+                    d[self.by[i]] = l
+                
+            return DataPanel(d)
+
 
 class TensorGroupBy(AbstractColumnGroupBy):
     pass
