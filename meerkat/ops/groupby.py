@@ -1,9 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from meerkat import DataPanel
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from . import group_by_objects
+
+# from meerkat.columns.numpy_column import NumpyArrayColumn
+from .group_by_helper import NumpyArrayColumn
+# from meerkat.columns.abstract import AbstractColumn
+
 import pandas as pd
 from typing import Union, List, Sequence
 
@@ -60,20 +61,20 @@ def groupby(
     try:
         if isinstance(by, str):
             by = [by]
-        return DataPanelGroupBy(data[by].to_pandas().groupby(by), data)
+        return DataPanelGroupBy(data[by].to_pandas().groupby(by), by, data, data.columns)
     except Exception as e:
         # future work needed here.
         print("dataPanel group by error", e)
         raise NotImplementedError()
 
 
-
-
 class DataPanelGroupBy:
 
-    def __init__(self, pd_gb, dp) -> None:
+    def __init__(self, pd_gb, by, dp, keys) -> None:
         self._pd_group_by = pd_gb
         self._main_dp = dp
+        self._by = by
+        self._keys = keys
 
     # TODO must write accumulators like sum and mean.
 
@@ -96,8 +97,10 @@ class DataPanelGroupBy:
         if isinstance(key, str):
             # assuming key is just one string
             column = self._main_dp[key]
-            return column.to_group_by(indices) # needs to be implemented else where. 
+            return NumpyArrayColumn.to_group_by(column, indices, self._by, key)
+            # return column.to_group_by(indices, self._by) # needs to be implemented else where. 
         else:
-            return DataPanelGroupBy(self._pd_group_by, self._main_df[key])
+            return DataPanelGroupBy(self._pd_group_by,  self._by, self._main_df[key], key)
+
 
 
