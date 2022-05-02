@@ -1,0 +1,43 @@
+# initial attempt at generating age periods of equal change in eeg maturation
+# will need to look through references on maturation
+# then use our own data to refine among normal EEGs
+# expand to iEEG (see atlas)
+
+# 
+PMA ages:
+- 0 weeks 
+- 20 weeks
+- 24 weeks
+- 26 weeks
+- 28 weeks
+- 30 weeks
+- 32 weeks
+- 34 weeks
+- 36 weeks
+- 38 weeks
+- 40 weeks
+- 42 weeks
+- 1 months  # note this assumes + 40 weeks 
+- 2 months
+- 4 months
+- 6 months
+- 9 months
+- 12 months
+- 18 months
+- 24 months
+- 36 months
+- 48 months
+- 5 years
+- 9 years
+- 12 years
+- 15 years
+- 20 years
+- 30 years
+- 40 years
+- 60 years
+- 70 years
+- 80 years
+- 90 years
+- 100 years
+- 110 years
+- 120 years

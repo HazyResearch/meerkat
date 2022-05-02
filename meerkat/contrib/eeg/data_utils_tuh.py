@@ -87,8 +87,16 @@ TUH_EEG_STDS = np.array(
     ]
 )
 
+FILE_DIR = os.path.dirname(os.path.realpath(__file__))
+TUH_FFT_MEANS = torch.FloatTensor(
+    np.load(os.path.join(FILE_DIR, "data_stats/tuh_fft_mean.npy"))
+)
+TUH_FFT_STDS = torch.FloatTensor(
+    np.load(os.path.join(FILE_DIR, "data_stats/tuh_fft_std.npy"))
+)
 
-def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
+
+def compute_file_tuples(dataset_dir, split, clip_len, stride):
     """
     Args:
         dataset_dir (str): location where resampled signals are
@@ -104,13 +112,17 @@ def compute_file_tuples(raw_dataset_dir, dataset_dir, split, clip_len, stride):
     """
 
     # retrieve paths of all edf files in the dataset_dir for given split
-    edf_files = []
-    edf_fullfiles = []
-    for path, _, files in os.walk(os.path.join(raw_dataset_dir, split)):
-        for name in files:
-            if ".edf" in name:
-                edf_fullfiles.append(os.path.join(path, name))
-                edf_files.append(name)
+    # edf_files = []
+    # edf_fullfiles = []
+    # for path, _, files in os.walk(os.path.join(raw_dataset_dir, split)):
+    #     for name in files:
+    #         if ".edf" in name:
+    #             edf_fullfiles.append(os.path.join(path, name))
+    #             edf_files.append(name)
+    
+
+    edf_fullfiles = np.loadtxt(os.path.join(FILE_DIR,f"edf_files_{split}.txt"),dtype=str)
+    edf_files = [entry.split("/")[-1] for entry in edf_fullfiles]
 
     resampled_files = os.listdir(dataset_dir)
     file_tuples = []
@@ -307,7 +319,9 @@ def random_augmentation(signals, included_channels=TUH_INCLUDED_CHANNELS):
     return signals, swapped_pairs
 
 
-def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0):
+def fft_tuh_eeg_loader(
+    input_dict, time_step=1, clip_len=60, stride=60, offset=0, normalize=True
+):
     """
     given filepath and sz_start, extracts EEG clip of length 60 sec
 
@@ -322,13 +336,17 @@ def fft_tuh_eeg_loader(input_dict, time_step=1, clip_len=60, stride=60, offset=0
         curr_eeg_clip = computeFFT(curr_eeg_clip, n=time_step * FREQUENCY)
         fft_clips.append(curr_eeg_clip)
 
-    fft_slice = torch.cat(fft_clips)
+    fft_slice = torch.cat(fft_clips).view(clip_len, -1)
+
+    if normalize:
+        fft_slice = fft_slice - TUH_FFT_MEANS
+        fft_slice = fft_slice / TUH_FFT_STDS
 
     # return {
     #     "fft_input": fft_slice.view(clip_len, -1).numpy(),
     #     "gnn_support": gnn_support.numpy(),
     # }
-    return fft_slice.view(clip_len, -1), gnn_support  # .numpy()
+    return fft_slice, gnn_support  # .numpy()
 
 
 def get_seizure_times(file_name):

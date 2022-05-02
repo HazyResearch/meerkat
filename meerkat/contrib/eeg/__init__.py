@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 @terra.Task
 def build_tuh_eeg_dp(
     dataset_dir: str,
-    raw_dataset_dir: str,
+    #raw_dataset_dir: str,
     splits=["train", "dev"],
     clip_len: int = 60,
     offset: int = 0,
@@ -44,6 +44,7 @@ def build_tuh_eeg_dp(
     stride: int = 60,
     train_frac: float = 0.9,
     valid_frac: float = 0.1,
+    fft: bool = False,
 ):
     """
     Builds a `DataPanel` for accessing EEG data.
@@ -63,16 +64,18 @@ def build_tuh_eeg_dp(
     """
 
     # retrieve paths of all edf files in the raw_dataset_dir
-    edf_files = []
-    for path, subdirs, files in os.walk(raw_dataset_dir):
-        for name in files:
-            if ".edf" in name:
-                edf_files.append(os.path.join(path, name))
+    # edf_files = []
+    # for path, subdirs, files in os.walk(raw_dataset_dir):
+    #     for name in files:
+    #         if ".edf" in name:
+    #             edf_files.append(os.path.join(path, name))
+    curr_dir = os.path.dirname(os.path.realpath(__file__))
+    edf_files = np.loadtxt(os.path.join(curr_dir,"edf_files.txt"),dtype=str)
 
     data = []
     for split in splits:
         file_tuples = compute_file_tuples(
-            raw_dataset_dir, dataset_dir, split, clip_len, stride,
+            dataset_dir, split, clip_len, stride,
         )
 
         for (edf_fn, paitent_id, clip_idx, _) in tqdm(
@@ -128,22 +131,29 @@ def build_tuh_eeg_dp(
         offset=offset,
     )
 
-    dp["input"] = dp[["clip_idx", "h5_fn", "split"]].to_lambda(fn=eeg_loader)
+    if not fft:
+        dp["input"] = dp[["clip_idx", "h5_fn", "split"]].to_lambda(fn=eeg_loader)
+    else:
 
-    # dp.add_column(
-    #     "input", eeg_input_col, overwrite=True,
-    # )
-
-    dp["fft_input"] = dp[["clip_idx", "h5_fn", "split"]].map(
-        function=partial(
-            fft_tuh_eeg_loader,
-            time_step=step_size,
-            clip_len=clip_len,
-            stride=stride,
-            offset=offset,
-        ),
-        pbar=True,
-    )
+        # dp["fft_input"] = dp[["clip_idx", "h5_fn", "split"]].map(
+        #     function=partial(
+        #         fft_tuh_eeg_loader,
+        #         time_step=step_size,
+        #         clip_len=clip_len,
+        #         stride=stride,
+        #         offset=offset,
+        #     ),
+        #     pbar=True,
+        # )
+        dp["input"] = dp[["clip_idx", "h5_fn", "split"]].to_lambda(
+            fn=partial(
+                fft_tuh_eeg_loader,
+                time_step=step_size,
+                clip_len=clip_len,
+                stride=stride,
+                offset=offset,
+            ),
+        )
 
     return dp
 
