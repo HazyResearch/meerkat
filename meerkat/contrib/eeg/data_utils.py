@@ -597,7 +597,7 @@ def get_gnn_support(swap_pairs):
 
 def get_combined_graph(
     swap_nodes=None,
-    adj_mat_dir="/home/ksaab/Documents/meerkat/meerkat/contrib/eeg/adj_mx_3d.pkl",
+    adj_mat_dir="/home/ksaab/hippo_eeg/meerkat/meerkat/contrib/eeg/adj_mx_3d.pkl",
 ):
     """
     Get adjacency matrix for pre-computed distance graph

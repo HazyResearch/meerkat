@@ -84,6 +84,7 @@ def build_tuh_eeg_dp(
             filepath = [file for file in edf_files if edf_fn in file]
             filepath = filepath[0]
             file_id = edf_fn.split(".edf")[0]
+            filepath = os.path.join(dataset_dir.split("resampled_signal")[0],filepath.split("TUH_v1.5.2/")[-1])
 
             sequence_sz, binary_sz = get_sz_labels(
                 edf_fn=filepath,

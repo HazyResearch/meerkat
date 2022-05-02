@@ -138,6 +138,7 @@ def compute_file_tuples(dataset_dir, split, clip_len, stride):
 
         edf_fn_full = edf_fn_full[0]
         patient_id = edf_fn_full.split("/")[-3]
+        edf_fn_full = os.path.join(dataset_dir.split("resampled_signal")[0],edf_fn_full.split("TUH_v1.5.2/")[-1])
         seizure_times = get_seizure_times(edf_fn_full.split(".edf")[0])
 
         h5_fn_full = os.path.join(dataset_dir, h5_fn)
