@@ -3,23 +3,14 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat import DataPanel
 
 
-class AbstractColumnGroupBy(ABC):
-
+class BaseGroupBy(ABC):
     def __init__(self, indices, data, by, keys) -> None:
         self.indices = indices
         self.data = data
         self.by = by
         self.keys = keys
 
-    @abstractmethod
     def mean(self):
-        raise NotImplementedError()
-
-class NumPyArrayGroupBy(AbstractColumnGroupBy):
-
-    def mean(self):
-
-        assert(isinstance(self.keys, str) )
         means = []
         s_indices = list(self.indices.keys())
         s_indices.sort()
@@ -36,7 +27,7 @@ class NumPyArrayGroupBy(AbstractColumnGroupBy):
             d[self.by] = labels
             return DataPanel(d)
         else:
-
+            # self.by is a list
             if len(self.by) == 1:
                 d[self.by[0]] = labels
             else:
@@ -45,7 +36,16 @@ class NumPyArrayGroupBy(AbstractColumnGroupBy):
                     d[self.by[i]] = l
                 
             return DataPanel(d)
+    
 
+class AbstractColumnGroupBy(BaseGroupBy):
+
+    pass
+
+class NumPyArrayGroupBy(AbstractColumnGroupBy):
+    pass
+
+    
 
 class TensorGroupBy(AbstractColumnGroupBy):
     pass

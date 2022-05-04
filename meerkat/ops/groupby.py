@@ -2,7 +2,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 # from meerkat.columns.numpy_column import NumpyArrayColumn
-from .group_by_helper import NumpyArrayColumn
+from .group_by_helper import BaseGroupBy, NumpyArrayColumn
+from meerkat.datapanel import DataPanel
 # from meerkat.columns.abstract import AbstractColumn
 
 import pandas as pd
@@ -61,33 +62,78 @@ def groupby(
     try:
         if isinstance(by, str):
             by = [by]
-        return DataPanelGroupBy(data[by].to_pandas().groupby(by), by, data, data.columns)
+        return DataPanelGroupBy(data[by].to_pandas().groupby(by).indices, data, by, data.columns)
     except Exception as e:
         # future work needed here.
         print("dataPanel group by error", e)
         raise NotImplementedError()
 
 
-class DataPanelGroupBy:
+class DataPanelGroupBy(BaseGroupBy):
 
-    def __init__(self, pd_gb, by, dp, keys) -> None:
-        self._pd_group_by = pd_gb
-        self._main_dp = dp
-        self._by = by
-        self._keys = keys
+
+    # def __init__(self, pd_gb, by, dp, keys) -> None:
+
+    #     # the underlying group by object
+    #     self._pd_group_by = pd_gb
+
+    #     # the original datapanel
+    #     self._main_dp = dp
+
+    #     # by is what the group by is sorted on
+    #     self._by = by
+
+    #     # the queried keys.
+    #     self._keys = keys
 
     # TODO must write accumulators like sum and mean.
 
-    def mean(self) -> DataPanel:
-        # this is a datapanelgroup by and it has has a list of columns
+    # def mean(self) -> DataPanel:
+    #     # this is a datapanelgroup by and it has has a list of columns
+    #     means = []
+    #     indices = self.indices
 
-        pass
+    #     s_indices = list(indices.keys())
+    #     s_indices.sort()
+    #     labels = s_indices
+    #     for key in s_indices:
+    #         indices_l = indices[key]
+    #         appropriate_slice = self.data[indices_l]
+
+    #         # Hmm what do we want to do here? 
+
+    #         # Mean of a data panel? Do we want to combine columns?
+    #         mean_slice = appropriate_slice.mean()
+
+    #         # This is throwing an error.
+    #         means.append(mean_slice)
+
+    #     queries = self.keys
+    #     d = {}
+
+    #     for query in queries:
+    #         d[query] = means
+
+    #     if isinstance(self.by, str):
+    #         d[self.by] = labels
+    #         return DataPanel(d)
+    #     else:
+    #         # self.by is a list
+    #         if len(self.by) == 1:
+    #             d[self.by[0]] = labels
+    #         else:
+    #             unzipped = list(zip(*labels))
+    #             for i, l in enumerate(unzipped):
+    #                 d[self.by[i]] = l
+                
+    #         return DataPanel(d)
+
 
 
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        indices = self._pd_group_by.indices 
+        indices = self.indices 
 
         # pass in groups instead: keys are stable. 
 
@@ -96,11 +142,13 @@ class DataPanelGroupBy:
 
         if isinstance(key, str):
             # assuming key is just one string
-            column = self._main_dp[key]
-            return NumpyArrayColumn.to_group_by(column, indices, self._by, key)
+            column = self.data[key]
+
+            # TODO: File structure is preventing me from doing what I want to do here. 
+            return NumpyArrayColumn.to_group_by(column, indices, self.by, key)
             # return column.to_group_by(indices, self._by) # needs to be implemented else where. 
         else:
-            return DataPanelGroupBy(self._pd_group_by,  self._by, self._main_df[key], key)
+            return DataPanelGroupBy(indices,  self.data, self.by, self.keys)
 
 
 
