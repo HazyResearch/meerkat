@@ -1,8 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-# from meerkat.columns.numpy_column import NumpyArrayColumn
-from .group_by_helper import BaseGroupBy, NumpyArrayColumn
+from meerkat.mixins.groupbyable import BaseGroupBy
 from meerkat.datapanel import DataPanel
 # from meerkat.columns.abstract import AbstractColumn
 
@@ -144,9 +143,12 @@ class DataPanelGroupBy(BaseGroupBy):
             # assuming key is just one string
             column = self.data[key]
 
+            # NumpyArrayColumn has no attr to_group_by
+            # return column.to_group_by()
+
             # TODO: File structure is preventing me from doing what I want to do here. 
-            return NumpyArrayColumn.to_group_by(column, indices, self.by, key)
-            # return column.to_group_by(indices, self._by) # needs to be implemented else where. 
+            # return NumpyArrayColumn.to_group_by(column, indices, self.by, key)
+            return column.to_group_by(indices, self.by) # needs to be implemented else where. 
         else:
             return DataPanelGroupBy(indices,  self.data, self.by, self.keys)
 

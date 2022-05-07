@@ -1,7 +1,7 @@
+
+
+
 from abc import ABC, abstractmethod
-
-from meerkat import DataPanel
-
 
 class BaseGroupBy(ABC):
     def __init__(self, indices, data, by, keys) -> None:
@@ -59,4 +59,19 @@ class SeriesGroupBy(AbstractColumnGroupBy):
 
 class ArrowGroupBy(AbstractColumnGroupBy):
     pass
+
+
+
+class GroupByMixin:
+    def __init__(self, *args, **kwargs):
+        super(GroupByMixin, self).__init__(*args, **kwargs)
+
+    group_by_class: type = None
+
+    def to_group_by(self, indices, by):
+        if self.group_by_class is None:
+            raise NotImplementedError("Not Implemented - not TODO")
+        raise NotImplementedError("TODO")
+
+
 
