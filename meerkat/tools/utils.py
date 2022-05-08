@@ -6,8 +6,9 @@ from yaml.constructor import ConstructorError
 
 
 class MeerkatLoader(yaml.FullLoader):
-    """PyYaml does not load unimported modules for safety reasons. We want to allow
-    importing only meerkat modules
+    """PyYaml does not load unimported modules for safety reasons.
+
+    We want to allow importing only meerkat modules
     """
 
     def find_python_module(self, name: str, mark, unsafe=False):

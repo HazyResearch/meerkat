@@ -10,11 +10,12 @@ torchaudio = LazyLoader("torchaudio")
 
 
 class AudioColumn(FileColumn):
-    """A lambda column where each cell represents an audio file on disk. The underlying
-    data is a `PandasSeriesColumn` of strings, where each string is the path to an
-    image. The column materializes the images into memory when indexed. If the column
-    is lazy indexed with the ``lz`` indexer, the images are not materialized and an
-    ``FileCell`` or an ``AudioColumn`` is returned instead.
+    """A lambda column where each cell represents an audio file on disk. The
+    underlying data is a `PandasSeriesColumn` of strings, where each string is
+    the path to an image. The column materializes the images into memory when
+    indexed. If the column is lazy indexed with the ``lz`` indexer, the images
+    are not materialized and an ``FileCell`` or an ``AudioColumn`` is returned
+    instead.
 
     Args:
         data (Sequence[str]): A list of filepaths to images.

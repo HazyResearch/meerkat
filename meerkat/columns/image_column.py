@@ -13,11 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 class ImageColumn(FileColumn):
-    """A column where each cell represents an image stored on disk. The underlying data
-    is a `PandasSeriesColumn` of strings, where each string is the path to an image.
-    The column materializes the images into memory when indexed. If the column is
-    lazy indexed with the ``lz`` indexer, the images are not materialized and an
-    ``ImageCell`` or an ``ImageColumn`` is returned instead.
+    """A column where each cell represents an image stored on disk. The
+    underlying data is a `PandasSeriesColumn` of strings, where each string is
+    the path to an image. The column materializes the images into memory when
+    indexed. If the column is lazy indexed with the ``lz`` indexer, the images
+    are not materialized and an ``ImageCell`` or an ``ImageColumn`` is returned
+    instead.
 
     Args:
         data (Sequence[str]): A list of filepaths to images.
@@ -38,8 +39,6 @@ class ImageColumn(FileColumn):
 
         base_dir (str): A base directory that the paths in ``data`` are relative to. If
             ``None``, the paths are assumed to be absolute.
-
-
     """
 
     @staticmethod
