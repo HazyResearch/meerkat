@@ -24,7 +24,7 @@ def build_imagenet_dps(
             shell=True,
             check=True,
         )
-        subprocess.run(["unzip imagenet-object-localization-challenge.zip"])
+        subprocess.run(["unzip", "imagenet-object-localization-challenge.zip"])
         subprocess.run(
             ["tar", "-xzvf", "imagenet_object_localization_patched2019.tar.gz"]
         )

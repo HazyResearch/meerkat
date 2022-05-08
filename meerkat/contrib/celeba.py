@@ -82,12 +82,12 @@ def download_celeba(dataset_dir: str):
 def build_celeba_df(dataset_dir: str):
     """Build the dataframe by joining on the attribute, split and identity
     CelebA CSVs."""
-    identity_df = pd.read_csv(
-        os.path.join(dataset_dir, "identity_CelebA.txt"),
-        delim_whitespace=True,
-        header=None,
-        names=["file", "identity"],
-    )
+    # identity_df = pd.read_csv(
+    #     os.path.join(dataset_dir, "identity_CelebA.txt"),
+    #     delim_whitespace=True,
+    #     header=None,
+    #     names=["file", "identity"],
+    # )
     attr_df = pd.read_csv(
         os.path.join(dataset_dir, "list_attr_celeba.csv"),
         index_col=0,
@@ -95,7 +95,7 @@ def build_celeba_df(dataset_dir: str):
     attr_df.columns = pd.Series(attr_df.columns).apply(lambda x: x.lower())
     attr_df = ((attr_df + 1) // 2).rename_axis("file").reset_index()
 
-    celeb_df = identity_df.merge(attr_df, on="file", validate="one_to_one")
+    celeb_df = attr_df  # identity_df.merge(attr_df, on="file", validate="one_to_one")
 
     celeb_df["img_path"] = celeb_df.file.apply(
         lambda x: os.path.join("img_align_celeba", x)

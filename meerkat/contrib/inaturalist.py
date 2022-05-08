@@ -23,8 +23,7 @@ INFO_URLS = {
 def build_inaturalist_dp(
     dataset_dir: str, download: bool = True, splits: List[str] = None
 ) -> mk.DataPanel:
-    """
-    Build a DataPanel from the inaturalist dataset.
+    """Build a DataPanel from the inaturalist dataset.
 
     Args:
         dataset_dir: The directory to store the dataset in.

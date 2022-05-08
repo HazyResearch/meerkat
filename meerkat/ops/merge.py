@@ -66,7 +66,7 @@ def merge(
     )
     left_indices = merged_df.pop("__left_indices__").values
     right_indices = merged_df.pop("__right_indices__").values
-    merged_df = merged_df[set(left_on) & set(right_on)]
+    merged_df = merged_df[list(set(left_on) & set(right_on))]
 
     # reconstruct other columns not in the `left_on & right_on` using `left_indices`
     # and `right_indices`, the row order returned by merge

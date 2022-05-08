@@ -119,6 +119,39 @@ def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
 
 
 @datasets.register()
+def coco(dataset_dir: str = None, download: bool = True, **kwargs):
+    """Common objects in context. 2014.
+
+    [1] https://cocodataset.org/#download
+    """
+    from .coco import build_coco_2014_dp
+
+    return build_coco_2014_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def pascal(dataset_dir: str = None, download: bool = True, **kwargs):
+    """Pascal Visual Object Classes 2012 dataset.
+
+    [1] http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html
+    """
+    from .pascal import build_pascal_2012_dp
+
+    return build_pascal_2012_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
+def mir(dataset_dir: str = None, download: bool = True, **kwargs):
+    """MIRFLICKR Retrieval Evaluation Dataset [1]_
+
+    [1] https://press.liacs.nl/mirflickr/
+    """
+    from .mir import build_mirflickr_25k_dp
+
+    return build_mirflickr_25k_dp(dataset_dir=dataset_dir, download=download, **kwargs)
+
+
+@datasets.register()
 def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
     """iNaturalist 2021 Dataset [1]_
 

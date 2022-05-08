@@ -11,12 +11,11 @@ def build_audioset_dp(
     audio_column: bool = True,
     overwrite: bool = False,
 ) -> Dict[str, mk.DataPanel]:
-    """
-    Build DataPanels for the audioset dataset downloaded to ``dataset_dir``. By
-    default, the resulting DataPanels will be written to ``dataset_dir`` under the
-    filenames "audioset_examples.mk" and "audioset_labels.mk". If these files already
-    exist and ``overwrite`` is False, the DataPanels will not be built anew, and instead
-    will be simply loaded from disk.
+    """Build DataPanels for the audioset dataset downloaded to ``dataset_dir``.
+    By default, the resulting DataPanels will be written to ``dataset_dir``
+    under the filenames "audioset_examples.mk" and "audioset_labels.mk". If
+    these files already exist and ``overwrite`` is False, the DataPanels will
+    not be built anew, and instead will be simply loaded from disk.
 
     Args:
         dataset_dir: The directory where the dataset is stored
@@ -99,8 +98,7 @@ def build_audioset_dp(
 
 
 def build_ontology_dp(dataset_dir: str) -> Dict[str, mk.DataPanel]:
-    """
-    Build a DataPanel from the ontology.json file
+    """Build a DataPanel from the ontology.json file.
 
     Args:
         dataset_dir: The directory where the ontology.json file is stored
@@ -124,8 +122,7 @@ def find_submids(
     relations: mk.DataPanel = None,
     dataset_dir: str = None,
 ) -> List[str]:
-    """
-    Returns a list of IDs of all subcategories of an audio category
+    """Returns a list of IDs of all subcategories of an audio category.
 
     Args:
         ids: ID or list of IDs for which to find the subcategories
