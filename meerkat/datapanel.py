@@ -30,6 +30,7 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
@@ -819,3 +820,20 @@ class DataPanel(
 
     def __finalize__(self, *args, **kwargs):
         return self
+
+    def mean(self) -> DataPanel:
+        columns = self.columns
+        d = {}
+
+
+        for column in columns:
+            try:
+                mean = self.data[column].mean()
+
+
+                d[column] = AbstractColumn([mean])
+            except Exception as e:
+                pass
+        
+        return DataPanel(d)
+

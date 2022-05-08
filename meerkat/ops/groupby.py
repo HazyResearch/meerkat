@@ -143,14 +143,13 @@ class DataPanelGroupBy(BaseGroupBy):
             # assuming key is just one string
             column = self.data[key]
 
-            # NumpyArrayColumn has no attr to_group_by
-            # return column.to_group_by()
+            print(type(column))
 
             # TODO: File structure is preventing me from doing what I want to do here. 
-            # return NumpyArrayColumn.to_group_by(column, indices, self.by, key)
-            return column.to_group_by(indices, self.by) # needs to be implemented else where. 
+            return column.to_group_by(indices, column, self.by, [key]) # needs to be implemented else where. 
         else:
-            return DataPanelGroupBy(indices,  self.data, self.by, self.keys)
+            # TODO: Implement data panel group by.
+            return self.data[key].to_group_by(indices, self.data[key], self.by, key)
 
 
 

@@ -11,12 +11,14 @@ from typing import Callable, Sequence
 
 import numpy as np
 import pandas as pd
+
 import torch
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.groupbyable import NumPyArrayGroupBy
 from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -42,6 +44,7 @@ class NumpyArrayColumn(
 ):
 
     block_class: type = NumpyBlock
+    group_by_class = NumPyArrayGroupBy
 
     def __init__(
         self,

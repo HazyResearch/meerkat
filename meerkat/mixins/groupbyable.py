@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class BaseGroupBy(ABC):
     def __init__(self, indices, data, by, keys) -> None:
         self.indices = indices
@@ -17,12 +18,21 @@ class BaseGroupBy(ABC):
         labels = s_indices
         for key in s_indices:
             indices_l = self.indices[key]
+
             appropriate_slice = self.data[indices_l]
+            
             mean_slice = appropriate_slice.mean()
             means.append(mean_slice)
-        query = self.keys
+
+        from meerkat import DataPanel
         d = {}
-        d[query] = means
+
+        if not isinstance(self.keys, list):
+            raise NotImplementedError("Expected list.")
+
+        for key in self.keys:
+            d[key] = means
+        
         if isinstance(self.by, str):
             d[self.by] = labels
 
@@ -68,10 +78,12 @@ class GroupByMixin:
 
     group_by_class: type = None
 
-    def to_group_by(self, indices, by):
+    def to_group_by(self, indices, data, by, keys) -> BaseGroupBy:
         if self.group_by_class is None:
             raise NotImplementedError("Not Implemented - not TODO")
-        raise NotImplementedError("TODO")
+        elif self.group_by_class == NumPyArrayGroupBy:
+            return NumPyArrayGroupBy(indices, data, by, keys)
+        raise NotImplementedError("Other Group By")
 
 
 
