@@ -78,7 +78,7 @@ class BlockManager(MutableMapping):
             results.reorder(self.keys())
         return results
 
-    def consolidate(self):
+    def consolidate(self, consolidate_unitary_groups: bool = False):
         column_order = list(
             self._columns.keys()
         )  # need to maintain order after consolidate
@@ -88,7 +88,7 @@ class BlockManager(MutableMapping):
             block_ref_groups[block_ref.block.signature].append(block_ref)
 
         for block_refs in block_ref_groups.values():
-            if len(block_refs) == 1:
+            if (not consolidate_unitary_groups) and len(block_refs) == 1:
                 # if there is only one block ref in the group, do not consolidate
                 continue
 
@@ -241,7 +241,9 @@ class BlockManager(MutableMapping):
         os.makedirs(columns_dir)
 
         # consolidate before writing
-        self.consolidate()
+        # we also want to consolidate unitary groups (i.e. groups with only one block 
+        # ref) so that we don't write any data not actually in the dataframe
+        self.consolidate(consolidate_unitary_groups=True)
         for block_id, block_ref in self._block_refs.items():
             block: AbstractBlock = block_ref.block
             block_dir = os.path.join(blocks_dir, str(block_id))
