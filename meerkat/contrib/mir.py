@@ -22,7 +22,7 @@ def build_mirflickr_25k_dp(dataset_dir: str, download: bool = False):
         subprocess.run(
             [
                 "wget",
-                "http://press.liacs.nl/mirflickr/mirflickr25k.v3b/mirflickr25k_annotations_v080.zip",
+                "http://press.liacs.nl/mirflickr/mirflickr25k.v3b/mirflickr25k_annotations_v080.zip",  # noqa: E501
             ]
         )
         subprocess.run(["unzip", "mirflickr25k_annotations_v080.zip"])

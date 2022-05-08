@@ -28,7 +28,7 @@ def build_coco_2014_dp(dataset_dir: str, download: bool = False):
             subprocess.run(
                 args=[
                     "wget",
-                    "http://images.cocodataset.org/annotations/annotations_trainval2014.zip",
+                    "http://images.cocodataset.org/annotations/annotations_trainval2014.zip",  # noqa: E501
                 ]
             )
             subprocess.run(["unzip", "annotations_trainval2014.zip"])
