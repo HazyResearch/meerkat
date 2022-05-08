@@ -241,7 +241,7 @@ class BlockManager(MutableMapping):
         os.makedirs(columns_dir)
 
         # consolidate before writing
-        # we also want to consolidate unitary groups (i.e. groups with only one block 
+        # we also want to consolidate unitary groups (i.e. groups with only one block
         # ref) so that we don't write any data not actually in the dataframe
         self.consolidate(consolidate_unitary_groups=True)
         for block_id, block_ref in self._block_refs.items():

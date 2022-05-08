@@ -19,7 +19,7 @@ class CloneableMixin:
 
     @classmethod
     def _state_keys(cls) -> set:
-        """ """
+        """"""
         raise NotImplementedError()
 
     @classmethod
