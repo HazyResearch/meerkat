@@ -12,6 +12,9 @@ class BaseGroupBy(ABC):
         self.keys = keys
 
     def mean(self):
+
+
+    
         means = []
         s_indices = list(self.indices.keys())
         s_indices.sort()
@@ -21,6 +24,7 @@ class BaseGroupBy(ABC):
 
             appropriate_slice = self.data[indices_l]
             
+            print(type(appropriate_slice))
             mean_slice = appropriate_slice.mean()
             means.append(mean_slice)
 

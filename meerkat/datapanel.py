@@ -830,7 +830,11 @@ class DataPanel(
             try:
                 mean = self.data[column].mean()
 
+                print(f"mean for column {column} {mean}")
+                # Question for 5 / 10: What do I do here? 
 
+                # Want to create a data panel with singular values and this is 
+                # all working but I need assistance bec
                 d[column] = AbstractColumn([mean])
             except Exception as e:
                 pass

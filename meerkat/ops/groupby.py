@@ -71,6 +71,12 @@ def groupby(
 class DataPanelGroupBy(BaseGroupBy):
 
 
+    # def mean(self):
+
+    #     print("mean data panel group by.")
+    #     pass
+
+
     # def __init__(self, pd_gb, by, dp, keys) -> None:
 
     #     # the underlying group by object
@@ -142,14 +148,10 @@ class DataPanelGroupBy(BaseGroupBy):
         if isinstance(key, str):
             # assuming key is just one string
             column = self.data[key]
-
-            print(type(column))
-
-            # TODO: File structure is preventing me from doing what I want to do here. 
             return column.to_group_by(indices, column, self.by, [key]) # needs to be implemented else where. 
         else:
             # TODO: Implement data panel group by.
-            return self.data[key].to_group_by(indices, self.data[key], self.by, key)
+            return DataPanelGroupBy(indices, self.data[key], self.by, key)
 
 
 
