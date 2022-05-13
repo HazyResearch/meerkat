@@ -4,11 +4,14 @@ from meerkat import DataPanel
 
 
 class BaseGroupBy(ABC):
+
+
     def __init__(self, indices, data, by, keys) -> None:
         self.indices = indices
         self.data = data
         self.by = by
         self.keys = keys
+
 
     def mean(self):
         means = []
@@ -39,24 +42,4 @@ class BaseGroupBy(ABC):
                 
             return DataPanel(d)
     
-
-class AbstractColumnGroupBy(BaseGroupBy):
-
-    pass
-
-class NumPyArrayGroupBy(AbstractColumnGroupBy):
-    pass
-
-    
-
-class TensorGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-class SeriesGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-class ArrowGroupBy(AbstractColumnGroupBy):
-    pass
 

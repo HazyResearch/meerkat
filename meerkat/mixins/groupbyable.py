@@ -3,7 +3,6 @@
 
 from abc import ABC, abstractmethod
 
-
 class BaseGroupBy(ABC):
     def __init__(self, indices, data, by, keys) -> None:
         self.indices = indices
@@ -12,82 +11,46 @@ class BaseGroupBy(ABC):
         self.keys = keys
 
     def mean(self):
+        # inputs: self.indices are a dictionary of {
+        #   labels : [indices]
+        # }
+        labels = list(self.indices.keys())
 
+        # sorting them so that they appear in a nice order.
+        labels.sort()
 
-    
+        # Means will be a list of dictionaries where each element in the dict
+
         means = []
-        s_indices = list(self.indices.keys())
-        s_indices.sort()
-        labels = s_indices
-        for key in s_indices:
-            indices_l = self.indices[key]
+        for label in labels:
+            indices_l = self.indices[label]
+            relevant_rows_where_by_is_label = self.data[indices_l]
+            m = relevant_rows_where_by_is_label.mean()
+            means.append(m)
 
-            appropriate_slice = self.data[indices_l]
-            
-            print(type(appropriate_slice))
-            mean_slice = appropriate_slice.mean()
-            means.append(mean_slice)
+        from meerkat.datapanel import DataPanel
 
-        from meerkat import DataPanel
-        d = {}
+        # Create data panel as a list of rows.
+        out = DataPanel(means)
 
-        if not isinstance(self.keys, list):
-            raise NotImplementedError("Expected list.")
 
-        for key in self.keys:
-            d[key] = means
-        
-        if isinstance(self.by, str):
-            d[self.by] = labels
+        assert isinstance(self.by, list)
 
-            # call dp.data.reorder(list_of_string)
-            return DataPanel(d)
-        else:
-            # self.by is a list
-            if len(self.by) == 1:
-                d[self.by[0]] = labels
+        # Add the by columns.
+        if len(labels) > 0:
+            if isinstance(labels[0], tuple):
+                columns = list(zip(*labels))
+
+                for i, col in enumerate(self.by):
+                    out[col] = columns[i]
             else:
-                unzipped = list(zip(*labels))
-                for i, l in enumerate(unzipped):
-                    d[self.by[i]] = l
-                
-            return DataPanel(d)
-    
-
-class AbstractColumnGroupBy(BaseGroupBy):
-
-    pass
-
-class NumPyArrayGroupBy(AbstractColumnGroupBy):
-    pass
-
-    
-
-class TensorGroupBy(AbstractColumnGroupBy):
-    pass
+                # This is the only way that this can occur.
+                assert(len(self.by) == 1)
+                col = self.by[0]
+                out[col] = labels
+        return out
 
 
-class SeriesGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-class ArrowGroupBy(AbstractColumnGroupBy):
-    pass
-
-
-
-class GroupByMixin:
-    def __init__(self, *args, **kwargs):
-        super(GroupByMixin, self).__init__(*args, **kwargs)
-
-    group_by_class: type = None
-
-    def to_group_by(self, indices, data, by, keys) -> BaseGroupBy:
-        if self.group_by_class is None:
-            raise NotImplementedError("Not Implemented - not TODO")
-        elif self.group_by_class == NumPyArrayGroupBy:
-            return NumPyArrayGroupBy(indices, data, by, keys)
-        raise NotImplementedError("Other Group By")
 
 
 

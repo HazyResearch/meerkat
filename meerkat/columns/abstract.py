@@ -22,7 +22,7 @@ from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn
-from meerkat.mixins.groupbyable import GroupByMixin
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ class AbstractColumn(
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
-    GroupByMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""

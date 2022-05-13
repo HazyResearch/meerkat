@@ -70,88 +70,16 @@ def groupby(
 
 class DataPanelGroupBy(BaseGroupBy):
 
-
-    # def mean(self):
-
-    #     print("mean data panel group by.")
-    #     pass
-
-
-    # def __init__(self, pd_gb, by, dp, keys) -> None:
-
-    #     # the underlying group by object
-    #     self._pd_group_by = pd_gb
-
-    #     # the original datapanel
-    #     self._main_dp = dp
-
-    #     # by is what the group by is sorted on
-    #     self._by = by
-
-    #     # the queried keys.
-    #     self._keys = keys
-
-    # TODO must write accumulators like sum and mean.
-
-    # def mean(self) -> DataPanel:
-    #     # this is a datapanelgroup by and it has has a list of columns
-    #     means = []
-    #     indices = self.indices
-
-    #     s_indices = list(indices.keys())
-    #     s_indices.sort()
-    #     labels = s_indices
-    #     for key in s_indices:
-    #         indices_l = indices[key]
-    #         appropriate_slice = self.data[indices_l]
-
-    #         # Hmm what do we want to do here? 
-
-    #         # Mean of a data panel? Do we want to combine columns?
-    #         mean_slice = appropriate_slice.mean()
-
-    #         # This is throwing an error.
-    #         means.append(mean_slice)
-
-    #     queries = self.keys
-    #     d = {}
-
-    #     for query in queries:
-    #         d[query] = means
-
-    #     if isinstance(self.by, str):
-    #         d[self.by] = labels
-    #         return DataPanel(d)
-    #     else:
-    #         # self.by is a list
-    #         if len(self.by) == 1:
-    #             d[self.by[0]] = labels
-    #         else:
-    #             unzipped = list(zip(*labels))
-    #             for i, l in enumerate(unzipped):
-    #                 d[self.by[i]] = l
-                
-    #         return DataPanel(d)
-
-
-
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
         indices = self.indices 
-
-        # pass in groups instead: keys are stable. 
-
-        # what if you sort it? 
         # TODO: weak reference? 
-
+        
         if isinstance(key, str):
-            # assuming key is just one string
-            column = self.data[key]
-            return column.to_group_by(indices, column, self.by, [key]) # needs to be implemented else where. 
-        else:
-            # TODO: Implement data panel group by.
-            return DataPanelGroupBy(indices, self.data[key], self.by, key)
+            key = [key]
+
+        return DataPanelGroupBy(indices, self.data[key], self.by, key)
 
 
 
