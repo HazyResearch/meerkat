@@ -16,6 +16,7 @@ from typing import (
     Tuple,
     Union,
 )
+from cv2 import sepFilter2D
 
 import cytoolz as tz
 import datasets
@@ -30,6 +31,10 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
+
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
@@ -754,12 +759,42 @@ class DataPanel(
         Return:
             DataPanel: A sorted view of DataPanel.
 
-            raise not implemented if multiple columns
-            how do you break ties? in pandas
-            
-        """
-        raise NotImplementedError
 
+        """
+
+        pandaColType = '<class \'meerkat.columns.pandas_column.PandasSeriesColumn\'>'
+        numpyColType = '<class \'meerkat.columns.numpy_column.NumpyArrayColumn\'>'
+        tensorColType = '<class \'meerkat.columns.tensor_column.TensorColumn\'>'
+
+        keys = []
+
+        if len(by) > 1:
+            for col in by:
+                currColType = str(type(self[col]))
+                if currColType == pandaColType:
+                    self[col] = self[col].values
+
+                if currColType == tensorColType:
+                    self[col] = self[col].numpy()
+
+            for col in by[::-1]:
+                keys.append(self[col])
+            
+            sorted_indices = np.lexsort(keys = keys)
+            
+        
+        else:
+            currColType = str(type(self[by[0]]))
+            if currColType == pandaColType:
+                sorted_indices = PandasSeriesColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
+            if currColType == numpyColType:
+                sorted_indices = NumpyArrayColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
+            if currColType == tensorColType:
+               sorted_indices = TensorColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
+
+        return self.lz[sorted_indices]
+        
+        
 
     def items(self):
         for name in self.columns:

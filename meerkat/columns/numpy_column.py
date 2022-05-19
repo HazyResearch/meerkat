@@ -215,7 +215,7 @@ class NumpyArrayColumn(
         For now! Raises error when shape of input array is more than one error.
 
   """
-        num_columns = np.shape(self)[1]
+        num_columns = len(np.shape(self))
         # Raise error if array has more than one column
         if num_columns > 1:
             raise Exception("No implementation for array with more than one column.")
