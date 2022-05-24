@@ -19,6 +19,9 @@ class BaseGroupBy(ABC):
         # sorting them so that they appear in a nice order.
         labels.sort()
 
+
+        print("Mean", labels)
+
         # Means will be a list of dictionaries where each element in the dict
 
         means = []

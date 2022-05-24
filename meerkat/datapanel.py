@@ -827,9 +827,21 @@ class DataPanel(
 
         for column in columns:
             try:
-                mean = self.data[column].mean()
+                from meerkat.columns.tensor_column import TensorColumn
+                mean = 0
+                if isinstance(self.data[column], TensorColumn):
+                    print("Tensor Column!", column)
+                    tensor = self.data[column].to_tensor()
+
+                    print("Got tensor", tensor)
+                    mean = tensor.double().mean().item()
+                    print("got mean!")
+                else:
+                    mean = self.data[column].mean()
                 d[column] = mean
             except Exception as e:
+                print("Offensive column data type", type(self.data[column]))
+                print(f"Error inserting column {column}: {e}")
                 pass
         
         return d

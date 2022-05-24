@@ -10,18 +10,14 @@ from meerkat.ops.groupby import groupby
 
 
 # Comment for meeting 5/19: Testing group by multiple columns, 
-# single columsn on list, on string.
+# single columns on list, on string.
 
 # Different columns as by: including ListColumn, NumpyArrayColumn, 
 # TensorColumn
 
 # Key index is NumpyArrays, TensorColumn
 
-# Coverage: 100% in groupby.py
-# 0% in groupBy helper because pytest doesn't
-# understand that I'm using inheritance.
-
-
+# Coverage: 100% 
 
 def assertNumpyArrayEquality(arr1, arr2):
     assert np.linalg.norm( arr1 -  arr2) < 1e-10
