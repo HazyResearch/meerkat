@@ -152,7 +152,11 @@ class PandasSeriesColumn(
                     "Cannot create `PandasSeriesColumn` from a `BlockView` not "
                     "referencing a `PandasBlock`."
                 )
-        elif not isinstance(data, pd.Series):
+        elif isinstance(data, pd.Series):
+            # Force the index to be contiguous so that comparisons between different
+            # pandas series columns are always possible.
+            data = data.reset_index(drop=True)
+        else:
             data = pd.Series(data)
 
         super(PandasSeriesColumn, self)._set_data(data)
