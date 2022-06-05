@@ -31,3 +31,22 @@ def get_yesno(dataset_dir: str, download: bool = True):
     )
 
     return dp
+
+
+def get_speech_commands(dataset_dir: str, download: bool = True):
+    if download:
+        dataset = torchaudio.datasets.Speech(root=dataset_dir, download=True)
+
+    dp = mk.DataPanel(
+        {
+            "id": dataset._walker,
+            "audio": mk.AudioColumn(
+                pd.Series(dataset._walker) + ".wav", base_dir=dataset._path
+            ),
+            "labels": torch.tensor(
+                [[int(c) for c in fileid.split("_")] for fileid in dataset._walker]
+            ),
+        }
+    )
+
+    return dp
