@@ -821,6 +821,10 @@ class DataPanel(
     def __finalize__(self, *args, **kwargs):
         return self
 
+    def groupby(self, *args, **kwargs):
+        from meerkat.ops.groupby import groupby
+        return groupby(self, *args, **kwargs)
+
     def mean(self) -> DataPanel:
         columns = self.columns
         d = {}

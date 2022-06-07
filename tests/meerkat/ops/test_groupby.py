@@ -20,7 +20,7 @@ from meerkat.ops.groupby import groupby
 # Coverage: 100% 
 
 def assertNumpyArrayEquality(arr1, arr2):
-    assert np.linalg.norm( arr1 -  arr2) < 1e-10
+    assert np.allclose(arr1, arr2)
 
 
 def test_group_by_type():
