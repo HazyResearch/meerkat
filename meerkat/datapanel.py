@@ -825,7 +825,7 @@ class DataPanel(
         from meerkat.ops.groupby import groupby
         return groupby(self, *args, **kwargs)
 
-    def mean(self) -> DataPanel:
+    def mean(self, *args, **kwargs) -> DataPanel:
         columns = self.columns
         d = {}
 
@@ -834,19 +834,15 @@ class DataPanel(
                 from meerkat.columns.tensor_column import TensorColumn
                 mean = 0
                 if isinstance(self.data[column], TensorColumn):
-                    print("Tensor Column!", column)
+    
                     tensor = self.data[column].to_tensor()
-
-                    print("Got tensor", tensor)
-                    mean = tensor.double().mean().item()
-                    print("got mean!")
+                    mean = tensor.double().mean(**kwargs).item()
                 else:
-                    mean = self.data[column].mean()
+                    mean = self.data[column].mean(**kwargs)
                 d[column] = mean
             except Exception as e:
                 print("Offensive column data type", type(self.data[column]))
                 print(f"Error inserting column {column}: {e}")
-                pass
-        
+                raise e
         return d
 

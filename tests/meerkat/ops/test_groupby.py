@@ -64,6 +64,65 @@ def test_group_by_integer_type():
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
     assertNumpyArrayEquality(out["a"].data , np.array([1, 2, 3]))
 
+def test_group_by_integer_type_md():
+    b = np.zeros((7, 4))
+    b[0, 0] = 4
+    b[1, 1] = 3
+    dp = DataPanel({
+        'a': NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
+        'name': NumpyArrayColumn(np.array(['a', 'b', 'a', 'c', 'b', 'd', 'd'], dtype = str)),
+        'b': NumpyArrayColumn(b),
+        'c': NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6])
+        })
+
+    df = dp.groupby('a')
+    out = df["b"].mean(axis = 0)
+
+    assertNumpyArrayEquality(out["b"][0], np.array([2, 0, 0, 0]))
+    assert(out["a"][0] == 1)
+    assert(out["a"][1] == 2)
+    assert(out["a"][2] == 3)
+
+    assertNumpyArrayEquality(out["b"][1], np.array([0, 1, 0, 0]))
+    assertNumpyArrayEquality(out["b"][2], np.array([0, 0, 0, 0]))
+
+def test_group_by_integer_type_md_axis1():
+    b = np.zeros((7, 4))
+    b[0, 0] = 4
+    b[1, 1] = 3
+    dp = DataPanel({
+        'a': NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
+        'name': NumpyArrayColumn(np.array(['a', 'b', 'a', 'c', 'b', 'd', 'd'], dtype = str)),
+        'b': NumpyArrayColumn(b),
+        'c': NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6])
+        })
+
+    df = dp.groupby('a')
+    out = df["b"].mean(axis = 1)
+
+    assertNumpyArrayEquality(out["b"][0], np.array([1, 0]))
+    assert(out["a"][0] == 1)
+    assert(out["a"][1] == 2)
+    assert(out["a"][2] == 3)
+
+    assertNumpyArrayEquality(out["b"][1], np.array([0.75, 0, 0]))
+    assertNumpyArrayEquality(out["b"][2], np.array([0, 0]))
+
+
+def test_group_by_integer_type_axis_passed():
+    dp = DataPanel({
+        'a': NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
+        'name': NumpyArrayColumn(np.array(['a', 'b', 'a', 'c', 'b', 'd', 'd'], dtype = str)),
+        'b': NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
+        'c': NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6])
+    })
+
+    df = groupby(dp, 'a')
+    out = df["b"].mean(axis = 0)
+
+    assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
+    assertNumpyArrayEquality(out["a"].data , np.array([1, 2, 3]))
+
 def test_group_by_integer_type_as_prop():
     dp = DataPanel({
         'a': NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
