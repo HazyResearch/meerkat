@@ -12,11 +12,11 @@ class BaseGroupBy(ABC):
         self.by = by
         self.keys = keys
 
-    def __red__(self, fun: Callable):
-        return lambda x : fun(x, axis=None)
+    def mean(self, *args, **kwargs):
+        return self._reduce(lambda x: x.mean(*args, **kwargs))
 
 
-    def mean(self, *args, **kwargs ):
+    def _reduce(self, f: Callable):
         # inputs: self.indices are a dictionary of {
         #   labels : [indices]
         # }
@@ -31,7 +31,7 @@ class BaseGroupBy(ABC):
         for label in labels:
             indices_l = self.indices[label]
             relevant_rows_where_by_is_label = self.data[indices_l]
-            m = relevant_rows_where_by_is_label.mean(**kwargs) # TODO : Use reduce function.
+            m = f(relevant_rows_where_by_is_label) # TODO : Use reduce function.
             means.append(m)
 
         from meerkat.datapanel import DataPanel
