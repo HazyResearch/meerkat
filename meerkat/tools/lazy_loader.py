@@ -37,7 +37,6 @@ class LazyLoader(types.ModuleType):
         self,
         local_name,
         parent_module_globals=None,
-        name=None,
         warning=None,
         error=None,
     ):  # pylint: disable=super-on-old-class
@@ -49,10 +48,7 @@ class LazyLoader(types.ModuleType):
         self._warning = warning
         self._error = error
 
-        if name is None:
-            name = local_name
-
-        super(LazyLoader, self).__init__(name)
+        super(LazyLoader, self).__init__(local_name)
 
     def _load(self):
         """Load the module and insert it into the parent's globals."""
@@ -83,3 +79,15 @@ class LazyLoader(types.ModuleType):
     def __dir__(self):
         module = self._load()
         return dir(module)
+
+    def __getstate__(self):
+        """Enable pickling, by removing the parent module globals from the dict."""
+        return {
+            "local_name": self._local_name,
+            "warning": self._warning,
+            "error": self._error,
+        }
+
+    def __setstate__(self, state):
+        """Enable pickling."""
+        self.__init__(**state)
