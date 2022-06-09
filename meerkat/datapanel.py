@@ -16,7 +16,7 @@ from typing import (
     Tuple,
     Union,
 )
-from cv2 import sepFilter2D
+from cv2 import sepFilter2D, sort
 
 import cytoolz as tz
 import datasets
@@ -759,59 +759,28 @@ class DataPanel(
         Return:
             DataPanel: A sorted view of DataPanel.
 
-
         """
-
-        panda_col_type = '<class \'meerkat.columns.pandas_column.PandasSeriesColumn\'>'
-        numpy_col_type = '<class \'meerkat.columns.numpy_column.NumpyArrayColumn\'>'
-        tensor_col_type = '<class \'meerkat.columns.tensor_column.TensorColumn\'>'
-
         keys = []
         
-
         if len(by) > 1:  # Sort with multiple column
-            tensor_col_name = "none"
-            panda_col_name = "none"
-            for col in by:
-                
-                curr_col_type = str(type(self[col]))
-                print(curr_col_type)
-                # Convert all columns to numpy type
-                if curr_col_type == panda_col_type:
-                    self[col] = self[col].values
-                    panda_col_name = col
-
-                if curr_col_type == tensor_col_type:
-                    self[col] = self[col].numpy()
-                    tensor_col_name = col
-
             for col in by[::-1]:
-                keys.append(self[col])
-            
-            # Sort numpy columns
+                if isinstance(self[col], PandasSeriesColumn):
+                    keys.append(self[col].values)
+                if isinstance(self[col], TensorColumn):
+                    keys.append(self[col].numpy())
+                else:  
+                    keys.append(self[col])
+
             sorted_indices = np.lexsort(keys = keys)
 
-            # !! This doesn't update self!! 
-            self = self.lz[sorted_indices]
-            
-           
-            # Convert columns to original types 
-            if tensor_col_name != "none":
-                self[tensor_col_name] = torch.from_numpy(np.array(self[tensor_col_name]))
-            if panda_col_name != "none":
-                self[panda_col_name] = pd.Series(np.array(self[panda_col_name]))
-        
-        else:  # Sort with single column
-            curr_col_type = str(type(self[by[0]]))
-            if curr_col_type == panda_col_type:
-                sorted_indices = PandasSeriesColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
-            if curr_col_type == numpy_col_type:
-                sorted_indices = NumpyArrayColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
-            if curr_col_type == tensor_col_type:
-               sorted_indices = TensorColumn.argsort(self[by[0]], ascending=ascending, kind=kind)
-            self = self.lz[sorted_indices]
+            if ascending==False:
+                sorted_indices = sorted_indices[::-1].copy()
 
-        return self
+
+        else:  # Sort with single column
+            sorted_indices = self[by[0]].argsort(ascending=ascending, kind=kind)
+
+        return self.lz[sorted_indices]
         
 
     def items(self):

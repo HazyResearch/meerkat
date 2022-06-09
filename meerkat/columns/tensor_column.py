@@ -190,6 +190,7 @@ class TensorColumn(
 
             """
         # calls argsort() function to retrieve ordered indices
+       
         sorted_index = self.argsort(ascending=ascending, kind=kind)
         return self[sorted_index]
       
@@ -216,7 +217,7 @@ class TensorColumn(
         except IndexError:  # Case 1: The array only has one column
             # returns indices of descending order of array
             if not ascending:
-                return torch.argsort(-1*self.data, dim=-1, descending=True)
+                return torch.argsort(self.data, dim=-1, descending=True)
             # returns indices of ascending order of array
             return torch.argsort(self.data, dim=-1, descending=False)
 
