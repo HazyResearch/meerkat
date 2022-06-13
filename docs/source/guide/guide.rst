@@ -44,3 +44,4 @@ Meerkat Internals
    :maxdepth: 2
 
    blocks
+   tests

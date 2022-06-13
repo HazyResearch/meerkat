@@ -10,6 +10,52 @@ from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
 
+from .abstract import AbstractColumnTestBed, TestAbstractColumn
+
+
+class 
+
+class LambdaColumnTestBed(AbstractColumnTestBed):
+    
+    DEFAULT_CONFIG = {
+        "batched": [True, False],
+        "from_dp": [True, False],
+        "multiple_outputs": [True, False],
+    }
+    
+    def __init__(
+        self,
+        tmpdir: str,
+        batched: bool,
+        from_dp: bool,
+        multiple_outputs: bool,
+    ):
+        to_lambda_kwargs = {
+            "is_batched_fn": batched,
+            "batch_size": 4 if batched else 1,
+        }
+        import pdb; pdb.set_trace()
+        self.col = mk.PandasSeriesColumn([1,2,3]).to_lambda(
+            function=lambda x: x+1,
+            **to_lambda_kwargs
+        )
+        pass 
+
+
+
+@pytest.fixture
+def testbed(request, tmpdir):
+    testbed_class, config = request.param
+    return testbed_class(**config, tmpdir=tmpdir)
+
+class TestLambdaColumn(TestAbstractColumn):
+    __test__ = True
+    testbed_class: type = LambdaColumnTestBed
+    column_class: type = LambdaColumn
+
+    def test_1(self):
+        print("here")
+
 
 @pytest.mark.parametrize("col_type", [NumpyArrayColumn, TensorColumn, ListColumn])
 def test_column_to_lambda(col_type: Type):

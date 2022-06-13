@@ -2,6 +2,8 @@ import os
 import pickle
 from functools import wraps
 from itertools import product
+from typing import List, Type
+
 
 import numpy as np
 import pandas as pd
@@ -10,6 +12,28 @@ import pytest
 from meerkat.datapanel import DataPanel
 from meerkat.ops.concat import concat
 
+
+def column_parametrize(
+    testbed_classes: List[Type],
+    config: dict = None,
+    params: dict = None,
+    single: bool = False,
+):
+    params = [
+        c.get_params(config=config, params=params, single=single)
+        for c in testbed_classes
+    ]
+    return {
+        "params": sum([p["argvalues"] for p in params], []),
+        "ids": sum([p["ids"] for p in params], []),
+    }
+
+    return pytest.mark.parametrize(
+        argnames="testbed",
+        argvalues=sum([p["argvalues"] for p in params], []),
+        ids=sum([p["ids"] for p in params], []),
+        indirect=["testbed"],
+    )
 
 @pytest.fixture
 def testbed(request, tmpdir):
@@ -52,8 +76,12 @@ class AbstractColumnTestBed:
     @classmethod
     @wraps(pytest.mark.parametrize)
     def parametrize(
-        cls, config: dict = None, params: dict = None, single: bool = False
+        cls,
+        config: dict = None,
+        params: dict = None,
+        single: bool = False,
     ):
+
         return pytest.mark.parametrize(
             **cls.get_params(config=config, params=params, single=single),
             indirect=["testbed"]
