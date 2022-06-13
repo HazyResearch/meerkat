@@ -9,7 +9,6 @@ from meerkat import LambdaColumn, ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
-
 from .abstract import AbstractColumnTestBed, TestAbstractColumn
 
 

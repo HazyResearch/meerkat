@@ -4,7 +4,6 @@ from functools import wraps
 from itertools import product
 from typing import List, Type
 
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -34,6 +33,7 @@ def column_parametrize(
         ids=sum([p["ids"] for p in params], []),
         indirect=["testbed"],
     )
+
 
 @pytest.fixture
 def testbed(request, tmpdir):
