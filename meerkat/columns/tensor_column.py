@@ -148,6 +148,8 @@ class TensorColumn(
 
     def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
+            if len(self.shape) == 2 and self.shape[1] < 5:
+                return self[index]
             return f"torch.Tensor(shape={self.shape[1:]})"
         else:
             return self[index]

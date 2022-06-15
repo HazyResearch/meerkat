@@ -17,6 +17,8 @@ class BaseGroupBy(ABC):
 
 
     def _reduce(self, f: Callable):
+        """ self.indices are a dictionary of {labels : [indices]}
+        """
         # inputs: self.indices are a dictionary of {
         #   labels : [indices]
         # }
@@ -30,7 +32,7 @@ class BaseGroupBy(ABC):
         means = []
         for label in labels:
             indices_l = self.indices[label]
-            relevant_rows_where_by_is_label = self.data[indices_l]
+            relevant_rows_where_by_is_label = self.data.lz[indices_l]
             m = f(relevant_rows_where_by_is_label) 
             means.append(m)
 
@@ -60,9 +62,9 @@ class BaseGroupBy(ABC):
 
 
 def groupby(
-    data: Union[DataPanel, AbstractColumn],
+    data: DataPanel,
     by: Union[str, Sequence[str]] = None,
-) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
+) -> DataPanelGroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).
 
@@ -99,11 +101,6 @@ def groupby(
     Returns:
         Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
-
-
-
-    # what work do we want pandas to do what do we want to do ourselves? 
-    # this does throw exceptions
 
     # must pass two arguments (columns - by, by), 
     # by -> is a dictionary, a map, all distinct group_ids to indicies. 
