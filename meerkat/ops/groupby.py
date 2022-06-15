@@ -31,7 +31,7 @@ class BaseGroupBy(ABC):
         for label in labels:
             indices_l = self.indices[label]
             relevant_rows_where_by_is_label = self.data[indices_l]
-            m = f(relevant_rows_where_by_is_label) # TODO : Use reduce function.
+            m = f(relevant_rows_where_by_is_label) 
             means.append(m)
 
         from meerkat.datapanel import DataPanel
