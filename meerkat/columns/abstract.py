@@ -23,7 +23,6 @@ from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -510,4 +509,3 @@ class AbstractColumn(
     @property
     def is_mmap(self):
         return False
-
