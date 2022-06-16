@@ -1,9 +1,14 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
+
+from abc import ABC
+from typing import Callable, Sequence, Union
 
 from meerkat.datapanel import DataPanel
-import pandas as pd
-from typing import Union, List, Sequence, Callable
+
+
+class AbstractColumnGroupBy:
+    pass
+
 
 class BaseGroupBy(ABC):
     def __init__(self, indices, data, by, keys) -> None:
@@ -15,10 +20,8 @@ class BaseGroupBy(ABC):
     def mean(self, *args, **kwargs):
         return self._reduce(lambda x: x.mean(*args, **kwargs))
 
-
     def _reduce(self, f: Callable):
-        """ self.indices are a dictionary of {labels : [indices]}
-        """
+        """self.indices are a dictionary of {labels : [indices]}"""
         # inputs: self.indices are a dictionary of {
         #   labels : [indices]
         # }
@@ -33,14 +36,13 @@ class BaseGroupBy(ABC):
         for label in labels:
             indices_l = self.indices[label]
             relevant_rows_where_by_is_label = self.data.lz[indices_l]
-            m = f(relevant_rows_where_by_is_label) 
+            m = f(relevant_rows_where_by_is_label)
             means.append(m)
 
         from meerkat.datapanel import DataPanel
 
         # Create data panel as a list of rows.
         out = DataPanel(means)
-
 
         assert isinstance(self.by, list)
 
@@ -53,12 +55,10 @@ class BaseGroupBy(ABC):
                     out[col] = columns[i]
             else:
                 # This is the only way that this can occur.
-                assert(len(self.by) == 1)
+                assert len(self.by) == 1
                 col = self.by[0]
                 out[col] = labels
         return out
-
-
 
 
 def groupby(
@@ -89,9 +89,10 @@ def groupby(
     being let's just focus on mean, sum, and count.
 
     Note: we'll also want to implement methods `DataPanel.groupby` or
-    `AbstractColumn.groupby` eventually, but we also want a functional version that could
-    be called like `mk.groupby(dp, by="class")`. I'd suggest putting most of the implementation
-    here, and then making the methods just wrappers. See merge as an example.
+    `AbstractColumn.groupby` eventually, but we also want a functional version
+     that could be called like `mk.groupby(dp, by="class")`. I'd suggest
+     putting most of the implementation here,
+      and then making the methods just wrappers. See merge as an example.
 
     Args:
         data (Union[DataPanel, AbstractColumn]): The data to group.
@@ -102,14 +103,16 @@ def groupby(
         Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
 
-    # must pass two arguments (columns - by, by), 
-    # by -> is a dictionary, a map, all distinct group_ids to indicies. 
+    # must pass two arguments (columns - by, by),
+    # by -> is a dictionary, a map, all distinct group_ids to indicies.
     # pass DataPanelGroupBy()
 
     try:
         if isinstance(by, str):
             by = [by]
-        return DataPanelGroupBy(data[by].to_pandas().groupby(by).indices, data, by, data.columns)
+        return DataPanelGroupBy(
+            data[by].to_pandas().groupby(by).indices, data, by, data.columns
+        )
     except Exception as e:
         # future work needed here.
         print("dataPanel group by error", e)
@@ -117,17 +120,13 @@ def groupby(
 
 
 class DataPanelGroupBy(BaseGroupBy):
-
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        indices = self.indices 
-        # TODO: weak reference? 
-        
+        indices = self.indices
+        # TODO: weak reference?
+
         if isinstance(key, str):
             key = [key]
 
         return DataPanelGroupBy(indices, self.data[key], self.by, key)
-
-
-

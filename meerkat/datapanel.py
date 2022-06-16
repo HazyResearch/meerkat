@@ -30,7 +30,6 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
@@ -182,7 +181,6 @@ class DataPanel(
             f"set `overwrite=True` to overwrite."
         )
 
- 
         if name in self.columns:
             self.remove_column(name)
 
@@ -223,7 +221,6 @@ class DataPanel(
         return meerkat.concat(
             [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
-
 
     def head(self, n: int = 5) -> DataPanel:
         """Get the first `n` examples of the DataPanel."""
@@ -823,6 +820,7 @@ class DataPanel(
 
     def groupby(self, *args, **kwargs):
         from meerkat.ops.groupby import groupby
+
         return groupby(self, *args, **kwargs)
 
     def mean(self, *args, **kwargs) -> DataPanel:
@@ -832,6 +830,7 @@ class DataPanel(
         for column in self.columns:
             try:
                 from meerkat.columns.tensor_column import TensorColumn
+
                 mean = None
                 if isinstance(self.data[column], TensorColumn):
                     tensor = self.data[column].to_tensor()
@@ -841,7 +840,6 @@ class DataPanel(
 
                 if mean is not None:
                     d[column] = mean
-            except Exception as e:
+            except Exception:
                 pass
         return d
-

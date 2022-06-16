@@ -11,7 +11,6 @@ from typing import Callable, Sequence
 
 import numpy as np
 import pandas as pd
-
 import torch
 from yaml.representer import Representer
 
@@ -196,8 +195,6 @@ class NumpyArrayColumn(
             # can only create a 1-D series
             return super().to_pandas()
 
-    
-
     @classmethod
     def from_npy(
         cls,
@@ -215,4 +212,3 @@ class NumpyArrayColumn(
             encoding=encoding,
         )
         return cls(data)
-
