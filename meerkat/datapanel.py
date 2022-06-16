@@ -817,3 +817,29 @@ class DataPanel(
 
     def __finalize__(self, *args, **kwargs):
         return self
+
+    def groupby(self, *args, **kwargs):
+        from meerkat.ops.groupby import groupby
+
+        return groupby(self, *args, **kwargs)
+
+    def mean(self, *args, **kwargs) -> DataPanel:
+
+        d = {}
+
+        for column in self.columns:
+            try:
+                from meerkat.columns.tensor_column import TensorColumn
+
+                mean = None
+                if isinstance(self.data[column], TensorColumn):
+                    tensor = self.data[column].to_tensor()
+                    mean = tensor.double().mean(*args, **kwargs).item()
+                else:
+                    mean = self.data[column].mean(*args, **kwargs)
+
+                if mean is not None:
+                    d[column] = mean
+            except Exception:
+                pass
+        return d

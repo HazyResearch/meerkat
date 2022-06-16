@@ -438,6 +438,8 @@ class AbstractColumn(
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
+        from .numpy_column import NumpyArrayColumn
+
         if isinstance(data, AbstractColumn):
             # TODO: Need ton make this view but should decide where to do it exactly
             return data  # .view()
@@ -453,8 +455,6 @@ class AbstractColumn(
             return TensorColumn(data)
 
         if isinstance(data, np.ndarray):
-            from .numpy_column import NumpyArrayColumn
-
             return NumpyArrayColumn(data)
 
         if isinstance(data, Sequence):
@@ -466,9 +466,8 @@ class AbstractColumn(
                 return CellColumn(data)
 
             if len(data) != 0 and isinstance(
-                data[0], (int, float, bool, np.ndarray, np.generic)
+                data[0], (int, float, bool, np.ndarray, np.generic, NumpyArrayColumn)
             ):
-                from .numpy_column import NumpyArrayColumn
 
                 return NumpyArrayColumn(data)
 
