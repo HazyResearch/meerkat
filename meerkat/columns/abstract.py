@@ -455,8 +455,6 @@ class AbstractColumn(
             return TensorColumn(data)
 
         if isinstance(data, np.ndarray):
-            from .numpy_column import NumpyArrayColumn
-
             return NumpyArrayColumn(data)
 
         if isinstance(data, Sequence):
