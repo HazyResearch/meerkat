@@ -15,6 +15,7 @@ registry of "clusterers"
 def cluster(
     data: Union[AbstractColumn, DataPanel], 
     method: Union[str, sklearn.base.ClusterMixin] ="kmeans", 
+    encoder: str = "auto", 
     return_clusterer: bool = False,
     **kwargs
 ) -> NumpyArrayColumn, ClusterMixin:
@@ -121,7 +122,6 @@ Potentially a danger in abstract away embedding, if the user thinks the embeddin
 ```
     cb = dp.clusterby(
         "image", 
-        description="photo with a {} background", 
         instruction="group images by their background"
     )
 
@@ -138,7 +138,8 @@ Potentially a danger in abstract away embedding, if the user thinks the embeddin
 
     
 
-    
+    # instruction should be like an abstrtaction independent embedding, should work with language model 
+    # TODO: we 
 
     class Instruction: 
         def __init__(self):
