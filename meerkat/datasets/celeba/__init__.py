@@ -5,6 +5,30 @@ import pandas as pd
 
 import meerkat as mk
 
+import meerkat as mk
+from ..registry import datasets
+from ..utils import download_url, extract
+from ..abstract import DatasetBuilder
+
+@datasets.register()
+class imagenette(DatasetBuilder):
+
+    VERSIONS = ["main"]
+
+    def build(self):
+        df = build_celeba_df(dataset_dir=self.dataset_dir)
+        dp = mk.DataPanel.from_pandas(df)
+        dp["image"] = mk.ImageColumn.from_filepaths(
+            filepaths=dp["img_path"], base_dir=self.dataset_dir
+        )
+
+    def download(self):
+        download_celeba(self.dataset_dir)
+
+    def is_downloaded(self):
+        return True 
+
+
 ATTRIBUTES = [
     "5_o_clock_shadow",
     "arched_eyebrows",

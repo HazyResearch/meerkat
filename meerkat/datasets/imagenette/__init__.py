@@ -2,15 +2,12 @@ import os
 import tarfile
 
 import pandas as pd
-from torchvision.datasets.utils import download_url
 
 import meerkat as mk
-
-VERSION_TO_URL = {
-    "full": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2.tgz",
-    "320px": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2-320.tgz",
-    "160px": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2-160.tgz",
-}
+from ..registry import datasets
+from ..utils import download_url, extract
+from ..abstract import DatasetBuilder
+from ..info import DatasetInfo
 
 ID_TO_WORDS = {
     "n02979186": "cassette player",
@@ -39,6 +36,64 @@ ID_TO_IDX = {
 }
 
 
+@datasets.register()
+class imagenette(DatasetBuilder):
+    VERSION_TO_URL = {
+        "full": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2.tgz",
+        "320px": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2-320.tgz",
+        "160px": "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2-160.tgz",
+    }
+    VERSIONS = ["full", "320px", "160px"]
+
+    info = DatasetInfo(
+        name="imagenette",
+        description=(
+            "Imagenette is a subset of 10 easily classified classes from Imagenet "
+            "(tench, English springer, cassette player, chain saw, church, "
+            "French horn, garbage truck, gas pump, golf ball, parachute)."
+        ),
+        homepage="https://github.com/fastai/imagenette",
+        tags=["image_classification", "computer_vision"],
+    )
+
+    @property
+    def data_dir(self):
+        return os.path.join(self.dataset_dir, "imagenette2")
+
+    def build(self):
+        df = build_df(self.data_dir)
+        dp = mk.DataPanel.from_pandas(df)
+        dp["img"] = mk.ImageColumn.from_filepaths(
+            dp["img_path"], base_dir=self.data_dir
+        )
+        return dp
+
+    def download(self):
+        url = self.VERSION_TO_URL[self.version]
+        path = download_url(url, self.dataset_dir)
+        extract(path, self.data_dir)
+
+    def is_downloaded(self):
+        return True
+
+
+def build_df(
+    data_dir: str,
+):
+    csv_path = os.path.join(data_dir, "imagenette.csv")
+
+    df = pd.read_csv(os.path.join(data_dir, "noisy_imagenette.csv"))
+    df["label_id"] = df["noisy_labels_0"]
+    df["label"] = df["label_id"].replace(ID_TO_WORDS)
+    df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
+    df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
+    df["img_path"] = df.path
+    df[["img_path", "label", "label_id", "label_idx", "split"]].to_csv(
+        csv_path, index=False
+    )
+    return df
+
+
 def download_imagenette(
     download_dir, version="160px", overwrite: bool = False, return_df: bool = False
 ):
@@ -58,7 +113,9 @@ def download_imagenette(
     References:
         https://github.com/fastai/imagenette
     """
-    tar_path = os.path.join(download_dir, os.path.basename(VERSION_TO_URL[version]))
+    tar_path = os.path.join(
+        download_dir, os.path.basename(imagenette.VERSION_TO_URL[version])
+    )
     dir_path = os.path.splitext(tar_path)[0]
     csv_path = os.path.join(dir_path, "imagenette.csv")
     if not overwrite and os.path.isfile(csv_path):
@@ -66,7 +123,7 @@ def download_imagenette(
 
     if overwrite or not os.path.exists(dir_path):
         download_url(
-            url=VERSION_TO_URL[version],
+            url=imagenette.VERSION_TO_URL[version],
             root=download_dir,
         )
         print("Extracting tar archive, this may take a few minutes...")

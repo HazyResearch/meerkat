@@ -1,19 +1,33 @@
 from abc import ABC, abstractmethod
+from typing import List
+import os
+from meerkat.config import DatasetsOptions
 
+from .info import DatasetInfo
 
 class DatasetBuilder(ABC):
+    REVISIONS: List[str]
+
+    info: DatasetInfo = None
+
     def __init__(
-        name: str,
+        self,
         dataset_dir: str = None,
-        revision: str = None,
+        version: str = None,
         download_mode: str = "reuse",
         **kwargs,
     ):
-        self.name = name
-        self.dataset_dir = dataset_dir
-        self.revision = revision
+        self.name = self.__class__.__name__
+        self.version = self.VERSIONS[0] if version is None else version
         self.download_mode = download_mode
         self.kwargs = kwargs
+
+        if dataset_dir is None:
+            self.dataset_dir = os.path.join(
+                DatasetsOptions.default_dataset_dir, self.name, self.version
+            )
+        else:
+            self.dataset_dir = dataset_dir
 
     def __call__(self):
 

@@ -21,17 +21,15 @@ class Registry(_Registry):
         self._metadata_map = {}
 
     def get(
-        self, name: str, dataset_dir: str = None, download: bool = True, *args, **kwargs
+        self, name: str, dataset_dir: str = None, download: bool = True, **kwargs
     ) -> Any:
         ret = self._obj_map.get(name)
         if ret is None:
             raise KeyError(
                 "No object named '{}' found in '{}' registry!".format(name, self._name)
             )
-        if dataset_dir is None:
-            dataset_dir = os.path.join(DatasetsOptions.default_dataset_dir, name)
-            os.makedirs(dataset_dir, exist_ok=True)
-        return ret(dataset_dir=dataset_dir, download=download, *args, **kwargs)
+
+        return ret(dataset_dir=dataset_dir, download=download, **kwargs)()
 
     def _get_aliases(self, obj_func_or_class):
         for kw in self._ALIAS_KEYWORDS:
@@ -83,3 +81,7 @@ class Registry(_Registry):
     def __repr__(self) -> str:
         table = tabulate(self._metadata_map.values(), tablefmt="fancy_grid")
         return "Registry of {}:\n".format(self._name) + table
+
+
+datasets = Registry("datasets")
+datasets.__doc__ = """Registry for datasets in meerkat"""

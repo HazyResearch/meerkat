@@ -3,10 +3,11 @@ from typing import Dict, Union
 
 from meerkat.datapanel import DataPanel
 
-from .registry import Registry
+from .registry import Registry, datasets
 
-datasets = Registry("datasets")
-datasets.__doc__ = """Registry for datasets in meerkat"""
+from .pascal import pascal
+from .imagenette import imagenette
+
 
 DOWNLOAD_MODES = ["force", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
@@ -55,18 +56,7 @@ def get(
                 download_mode=download_mode,
                 **kwargs,
             )
-            try:
-                dataset = datasets.get(
-                    name=name,
-                    dataset_dir=dataset_dir,
-                    revision=revision,
-                    download_mode=download_mode,
-                    **kwargs,
-                )
-            except:
-                pass
-            else:
-                return dataset
+            return dataset 
 
         elif registry == "huggingface":
             try:
@@ -98,7 +88,6 @@ def get(
     raise ValueError("pass")
 
 
-@datasets.register()
 def cifar10(dataset_dir: str = None, download: bool = True, **kwargs):
     """[summary]"""
     from .torchvision import get_cifar10
@@ -106,28 +95,24 @@ def cifar10(dataset_dir: str = None, download: bool = True, **kwargs):
     return get_cifar10(download_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def imagenet(dataset_dir: str = None, download: bool = True, **kwargs):
     from .imagenet import build_imagenet_dps
 
     return build_imagenet_dps(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def imagenette(dataset_dir: str = None, download: bool = True, **kwargs):
     from .imagenette import build_imagenette_dp
 
     return build_imagenette_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def celeba(dataset_dir: str = None, download: bool = True, **kwargs):
     from .celeba import get_celeba
 
     return get_celeba(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def coco(dataset_dir: str = None, download: bool = True, **kwargs):
     """Common objects in context. 2014.
 
@@ -138,7 +123,6 @@ def coco(dataset_dir: str = None, download: bool = True, **kwargs):
     return build_coco_2014_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def pascal(dataset_dir: str = None, download: bool = True, **kwargs):
     """Pascal Visual Object Classes 2012 dataset.
 
@@ -149,7 +133,6 @@ def pascal(dataset_dir: str = None, download: bool = True, **kwargs):
     return build_pascal_2012_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def mir(dataset_dir: str = None, download: bool = True, **kwargs):
     """MIRFLICKR Retrieval Evaluation Dataset [1]_
 
@@ -160,7 +143,6 @@ def mir(dataset_dir: str = None, download: bool = True, **kwargs):
     return build_mirflickr_25k_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
     """iNaturalist 2021 Dataset [1]_
 
@@ -187,7 +169,6 @@ def inaturalist(dataset_dir: str = None, download: bool = True, **kwargs) -> Dat
     return build_inaturalist_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def dew(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
     """Date Estimation in the Wild Dataset (DEW) [1]_
 
@@ -215,21 +196,18 @@ def dew(dataset_dir: str = None, download: bool = True, **kwargs) -> DataPanel:
     return build_dew_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def enron(dataset_dir: str = None, download: bool = True, **kwargs):
     from .enron import build_enron_dp
 
     return build_enron_dp(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def yesno(dataset_dir: str = None, download: bool = True, **kwargs):
     from .torchaudio import get_yesno
 
     return get_yesno(dataset_dir=dataset_dir, download=download, **kwargs)
 
 
-@datasets.register()
 def waterbirds(dataset_dir: str = None, download: bool = True, **kwargs):
     from .waterbirds import build_waterbirds_dp
 

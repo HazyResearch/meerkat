@@ -1,22 +1,34 @@
 import os
-
+import subprocess
 import meerkat as mk
 
+
 from ..abstract import DatasetBuilder
+from ..utils import download_url, extract
+from ..registry import datasets
 
 
-class PascalDatasetBuilder(DatasetBuilder):
-    REVISIONS = [2012]
+@datasets.register()
+class pascal(DatasetBuilder):
+    VERSIONS = ["2012"]
+    VERSION_TO_URL = {
+        "2012": "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar"
+    }
 
     def build(self):
-        if self.revision == "2012":
+        if self.version == "2012":
             return build_pascal_2012_dp(dataset_dir=self.dataset_dir)
+        else:
+            raise ValueError()
 
     def download(self):
-        pass 
+        url = self.VERSION_TO_URL[self.version]
+
+        downloaded_path = download_url(url, self.dataset_dir)
+        extract(downloaded_path, os.path.join(self.dataset_dir, "VOCdevkit"))
 
     def is_downloaded(self):
-        return False 
+        return True
 
 
 def build_pascal_2012_dp(dataset_dir: str):
