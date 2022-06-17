@@ -4,13 +4,19 @@ import meerkat as mk
 
 from ..abstract import DatasetBuilder
 
-REVISIONS = [2012]
-
 
 class PascalDatasetBuilder(DatasetBuilder):
+    REVISIONS = [2012]
+
     def build(self):
         if self.revision == "2012":
             return build_pascal_2012_dp(dataset_dir=self.dataset_dir)
+
+    def download(self):
+        pass 
+
+    def is_downloaded(self):
+        return False 
 
 
 def build_pascal_2012_dp(dataset_dir: str):
