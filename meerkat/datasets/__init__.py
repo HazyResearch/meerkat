@@ -1,92 +1,101 @@
-import functools
-import os
-from typing import Any, List, Optional, Sequence
+from multiprocessing.sharedctypes import Value
+from typing import Dict, Union
 
-from fvcore.common.registry import Registry as _Registry
-from tabulate import tabulate
-
-from meerkat.config import ContribOptions
 from meerkat.datapanel import DataPanel
 
-
-class Registry(_Registry):
-    """Extension of fvcore's registry that supports aliases."""
-
-    _ALIAS_KEYWORDS = ("_aliases", "_ALIASES")
-
-    def __init__(self, name: str):
-
-        super().__init__(name=name)
-
-        self._metadata_map = {}
-
-    def get(
-        self, name: str, dataset_dir: str = None, download: bool = True, *args, **kwargs
-    ) -> Any:
-        ret = self._obj_map.get(name)
-        if ret is None:
-            raise KeyError(
-                "No object named '{}' found in '{}' registry!".format(name, self._name)
-            )
-        if dataset_dir is None:
-            dataset_dir = os.path.join(ContribOptions.download_dir, name)
-            os.makedirs(dataset_dir, exist_ok=True)
-        return ret(dataset_dir=dataset_dir, download=download, *args, **kwargs)
-
-    def _get_aliases(self, obj_func_or_class):
-        for kw in self._ALIAS_KEYWORDS:
-            if hasattr(obj_func_or_class, kw):
-                return getattr(obj_func_or_class, kw)
-        return []
-
-    def register(
-        self, obj: object = None, aliases: Sequence[str] = None
-    ) -> Optional[object]:
-        if obj is None:
-            # used as a decorator
-            def deco(func_or_class: object, aliases=None) -> object:
-                name = func_or_class.__name__  # pyre-ignore
-                self._do_register(name, func_or_class)
-                if aliases is None:
-                    aliases = self._get_aliases(func_or_class)
-                if not isinstance(aliases, (list, tuple, set)):
-                    aliases = [aliases]
-                for alias in aliases:
-                    self._do_register(alias, func_or_class)
-                return func_or_class
-
-            kwargs = {"aliases": aliases}
-            if any(v is not None for v in kwargs.values()):
-                return functools.partial(deco, **kwargs)
-            else:
-                return deco
-
-        name = obj.__name__  # pyre-ignore
-        self._do_register(name, obj)
-        if aliases is None:
-            aliases = self._get_aliases(obj)
-        for alias in aliases:
-            self._do_register(alias, obj)
-
-    def _do_register(self, name: str, obj: Any, **kwargs) -> None:
-        self._metadata_map[name] = {"name": name, "description": obj.__doc__, **kwargs}
-        return super()._do_register(name, obj)
-
-    @property
-    def names(self) -> List[str]:
-        return list(self._obj_map.keys())
-
-    @property
-    def catalog(self) -> DataPanel:
-        return DataPanel(data=list(self._metadata_map.values()))
-
-    def __repr__(self) -> str:
-        table = tabulate(self._metadata_map.values(), tablefmt="fancy_grid")
-        return "Registry of {}:\n".format(self._name) + table
-
+from .registry import Registry
 
 datasets = Registry("datasets")
 datasets.__doc__ = """Registry for datasets in meerkat"""
+
+DOWNLOAD_MODES = ["force", "reuse", "skip"]
+REGISTRIES = ["meerkat", "huggingface"]
+
+
+def get(
+    name: str,
+    dataset_dir: str = None,
+    revision: str = None,
+    download_mode: str = "reuse",
+    registry: str = None,
+    **kwargs,
+) -> Union[DataPanel, Dict[str, DataPanel]]:
+    """
+    Load a dataset into .
+
+    Args:
+        name (str): Name of the dataset.
+        dataset_dir (str): The directory containing dataset data. Defaults to
+            `~/.meerkat/datasets/{name}`.
+        revision (str): The revision of the dataset. Defaults to `latest`.
+        download_mode (str): The download mode. Options are: "reuse" (default) will
+            download the dataset if it does not exist, "force" will download the dataset
+            even if it exists, and "skip" will not download the dataset if it doesn't
+            yet exist. Defaults to `reuse`.
+        **kwargs: Additional arguments passed to the dataset.
+    """
+    if download_mode not in DOWNLOAD_MODES:
+        raise ValueError(
+            f"Invalid download mode: {download_mode}."
+            f"Must pass one of {DOWNLOAD_MODES}"
+        )
+
+    if registry is None:
+        registry_order = REGISTRIES
+    else:
+        registry_order = [registry]
+
+    errors = []
+    for registry in registry_order:
+        if registry == "meerkat":
+            dataset = datasets.get(
+                name=name,
+                dataset_dir=dataset_dir,
+                revision=revision,
+                download_mode=download_mode,
+                **kwargs,
+            )
+            try:
+                dataset = datasets.get(
+                    name=name,
+                    dataset_dir=dataset_dir,
+                    revision=revision,
+                    download_mode=download_mode,
+                    **kwargs,
+                )
+            except:
+                pass
+            else:
+                return dataset
+
+        elif registry == "huggingface":
+            try:
+                import datasets as hf_datasets
+
+                mapping = {
+                    "force": hf_datasets.DownloadMode.FORCE_REDOWNLOAD,
+                    "reuse": hf_datasets.DownloadMode.REUSE_DATASET_IF_EXISTS,
+                }
+                if download_mode == "skip":
+                    raise ValueError(
+                        "Download mode `skip` is not supported for HuggingFace datasets."
+                    )
+                dataset = DataPanel.from_huggingface(
+                    name=name,
+                    download_mode=mapping[download_mode],
+                    revision=revision,
+                    cache_dir=dataset_dir,
+                    **kwargs,
+                )
+            except FileNotFoundError as e:
+                errors.append(e)
+            else:
+                return dataset
+        else:
+            raise ValueError(
+                f"Invalid registry: {registry}. Must be one of {REGISTRIES}"
+            )
+    raise ValueError("pass")
 
 
 @datasets.register()

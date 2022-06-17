@@ -2,11 +2,18 @@ import os
 
 import meerkat as mk
 
+from ..abstract import DatasetBuilder
 
-def build_pascal_2012_dp(dataset_dir: str, download: bool = False):
+REVISIONS = [2012]
 
-    if download:
-        raise NotImplementedError
+
+class PascalDatasetBuilder(DatasetBuilder):
+    def build(self):
+        if self.revision == "2012":
+            return build_pascal_2012_dp(dataset_dir=self.dataset_dir)
+
+
+def build_pascal_2012_dp(dataset_dir: str):
 
     base_dir = os.path.join(dataset_dir, "VOCdevkit/VOC2012")
 
