@@ -17,7 +17,7 @@ def get_link(text: str, url: str):
 def get_datasets_table():
     dp = mk.datasets.catalog
     df = dp.to_pandas()
-    df = df[["name", "homepage", "tags", "description"]]
+    df = df[["name", "homepage", "tags"]]
     style = df.style.set_table_styles(
         {"description": [{"selector": "", "props": "max-width: 50%;"}]}
     )
@@ -27,8 +27,6 @@ def get_datasets_table():
 
     return html
 
-
-template = open("source/datasets/datasets_template.rst").read()
 
 datasets_table = get_datasets_table()
 

@@ -31,6 +31,9 @@ class Registry(_Registry):
 
         return ret(dataset_dir=dataset_dir, download=download, **kwargs)()
 
+    def get_obj(self, name: str) -> type:
+        return self._obj_map[name]
+
     def _get_aliases(self, obj_func_or_class):
         for kw in self._ALIAS_KEYWORDS:
             if hasattr(obj_func_or_class, kw):

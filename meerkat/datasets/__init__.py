@@ -1,11 +1,12 @@
 from multiprocessing.sharedctypes import Value
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from meerkat.datapanel import DataPanel
 
 from .imagenette import imagenette
 from .pascal import pascal
-from .registry import Registry, datasets
+from .celeba import celeba
+from .registry import datasets
 
 DOWNLOAD_MODES = ["force", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
@@ -16,7 +17,7 @@ catalog = datasets.catalog
 def get(
     name: str,
     dataset_dir: str = None,
-    revision: str = None,
+    version: str = None,
     download_mode: str = "reuse",
     registry: str = None,
     **kwargs,
@@ -28,7 +29,7 @@ def get(
         name (str): Name of the dataset.
         dataset_dir (str): The directory containing dataset data. Defaults to
             `~/.meerkat/datasets/{name}`.
-        revision (str): The revision of the dataset. Defaults to `latest`.
+        version (str): The version of the dataset. Defaults to `latest`.
         download_mode (str): The download mode. Options are: "reuse" (default) will
             download the dataset if it does not exist, "force" will download the dataset
             even if it exists, and "skip" will not download the dataset if it doesn't
@@ -53,7 +54,7 @@ def get(
                 dataset = datasets.get(
                     name=name,
                     dataset_dir=dataset_dir,
-                    revision=revision,
+                    version=version,
                     download_mode=download_mode,
                     **kwargs,
                 )
@@ -76,7 +77,7 @@ def get(
                 dataset = DataPanel.from_huggingface(
                     path=name,
                     download_mode=mapping[download_mode],
-                    revision=revision,
+                    version=version,
                     cache_dir=dataset_dir,
                     **kwargs,
                 )
@@ -89,6 +90,19 @@ def get(
                 f"Invalid registry: {registry}. Must be one of {REGISTRIES}"
             )
     raise ValueError("pass")
+
+
+def versions(name: str) -> List[str]:
+    """Get the versions of a dataset. These can be passed to the ``version`` argument
+    of the :func:`~meerkat.get` function.
+
+    Args:
+        name (str): Name of the dataset.
+
+    Returns:
+        List[str]: List of versions.
+    """
+    return datasets.get_obj(name).VERSIONS
 
 
 def cifar10(dataset_dir: str = None, download: bool = True, **kwargs):

@@ -24,7 +24,7 @@ class DatasetBuilder(ABC):
 
         if dataset_dir is None:
             self.dataset_dir = os.path.join(
-                DatasetsOptions.default_dataset_dir, self.name, self.version
+                DatasetsOptions.root_datasets_dir, self.name, self.version
             )
         else:
             self.dataset_dir = dataset_dir

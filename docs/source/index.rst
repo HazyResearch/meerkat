@@ -132,7 +132,7 @@ Next Steps
     :hidden:
     :maxdepth: 2
 
-    apidocs/meerkat
+    apidocs/index
 
 
 ..

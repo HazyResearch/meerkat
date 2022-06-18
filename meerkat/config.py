@@ -13,4 +13,4 @@ class DisplayOptions:
 
 
 class DatasetsOptions:
-    default_dataset_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+    root_datasets_dir: str = os.path.join(Path.home(), ".meerkat/datasets")

@@ -26,12 +26,13 @@ def concat(
     - If concatenating `DataPanel`s along axis 1 (columns), all `DataPanel`s must have
     the same length and cannot have any of the same column names.
 
+
     Args:
         objs (Union[Sequence[DataPanel], Sequence[AbstractColumn]]): sequence of columns
             or DataPanels.
         axis (Union[str, int]): The axis along which to concatenate. Ignored if
             concatenating columns.
-
+    
     Returns:
         Union[DataPanel, AbstractColumn]: concatenated DataPanel or column
     """

@@ -9,11 +9,25 @@ import meerkat as mk
 from ..registry import datasets
 from ..utils import download_url, extract
 from ..abstract import DatasetBuilder
+from ..info import DatasetInfo
+
 
 @datasets.register()
-class imagenette(DatasetBuilder):
+class celeba(DatasetBuilder):
 
     VERSIONS = ["main"]
+
+    info = DatasetInfo(
+        name="celeba",
+        description=(
+            "CelebFaces Attributes Dataset (CelebA) is a large-scale face attributes "
+            "dataset with more than 200K celebrity images, each with 40 attribute "
+            " annotations. The images in this dataset cover large pose variations and "
+            " background clutter."
+        ),
+        homepage="https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html",
+        tags=["image_classification", "computer_vision"],
+    )
 
     def build(self):
         df = build_celeba_df(dataset_dir=self.dataset_dir)
@@ -26,7 +40,7 @@ class imagenette(DatasetBuilder):
         download_celeba(self.dataset_dir)
 
     def is_downloaded(self):
-        return True 
+        return True
 
 
 ATTRIBUTES = [
