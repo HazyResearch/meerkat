@@ -4,10 +4,11 @@ import tarfile
 import pandas as pd
 
 import meerkat as mk
-from ..registry import datasets
-from ..utils import download_url, extract
+
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
+from ..registry import datasets
+from ..utils import download_url, extract
 
 ID_TO_WORDS = {
     "n02979186": "cassette player",

@@ -14,7 +14,7 @@ def download_url(url: str, dataset_dir: str, force: bool = False):
 def extract(input_path: str, dataset_dir: str):
     from datasets.utils.extract import Extractor
     from datasets.utils.filelock import FileLock
-    
+
     # Prevent parallel extractions
     lock_path = input_path + ".lock"
     with FileLock(lock_path):

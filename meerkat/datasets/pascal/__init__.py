@@ -1,12 +1,12 @@
 import os
 import subprocess
+
 import meerkat as mk
 
-
 from ..abstract import DatasetBuilder
-from ..utils import download_url, extract
-from ..registry import datasets
 from ..info import DatasetInfo
+from ..registry import datasets
+from ..utils import download_url, extract
 
 
 @datasets.register()
@@ -17,7 +17,7 @@ class pascal(DatasetBuilder):
     }
 
     info = DatasetInfo(
-        name="pascal", 
+        name="pascal",
     )
 
     def build(self):

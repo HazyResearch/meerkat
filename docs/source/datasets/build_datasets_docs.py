@@ -22,7 +22,7 @@ def get_datasets_table():
         {"description": [{"selector": "", "props": "max-width: 50%;"}]}
     )
     df = df.set_index("name")
-    
+
     html = style.to_html()
 
     return html

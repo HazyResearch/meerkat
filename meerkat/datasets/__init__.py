@@ -3,16 +3,15 @@ from typing import Dict, Union
 
 from meerkat.datapanel import DataPanel
 
-from .registry import Registry, datasets
-
-from .pascal import pascal
 from .imagenette import imagenette
-
+from .pascal import pascal
+from .registry import Registry, datasets
 
 DOWNLOAD_MODES = ["force", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
 
 catalog = datasets.catalog
+
 
 def get(
     name: str,
@@ -58,7 +57,7 @@ def get(
                     download_mode=download_mode,
                     **kwargs,
                 )
-                return dataset 
+                return dataset
             except KeyError as e:
                 errors.append(e)
 

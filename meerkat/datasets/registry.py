@@ -78,9 +78,7 @@ class Registry(_Registry):
     def catalog(self) -> DataPanel:
         rows = []
         for name, builder in self:
-            rows.append(
-                builder.info.__dict__
-            )
+            rows.append(builder.info.__dict__)
         return DataPanel(rows)
 
     def __repr__(self) -> str:
