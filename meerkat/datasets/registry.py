@@ -76,7 +76,12 @@ class Registry(_Registry):
 
     @property
     def catalog(self) -> DataPanel:
-        return DataPanel(data=list(self._metadata_map.values()))
+        rows = []
+        for name, builder in self:
+            rows.append(
+                builder.info.__dict__
+            )
+        return DataPanel(rows)
 
     def __repr__(self) -> str:
         table = tabulate(self._metadata_map.values(), tablefmt="fancy_grid")

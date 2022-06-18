@@ -7,18 +7,18 @@ def download_url(url: str, dataset_dir: str, force: bool = False):
     from datasets.utils.file_utils import get_from_cache
 
     return get_from_cache(
-        url, 
-        cache_dir=os.path.join(dataset_dir, "downloads"),
-        force_download=force
+        url, cache_dir=os.path.join(dataset_dir, "downloads"), force_download=force
     )
 
 
-def extract(input_path: str, output_path: str):
+def extract(input_path: str, dataset_dir: str):
     from datasets.utils.extract import Extractor
-
-    # need to check because extractor will rmtree 
-    if os.path.exists(output_path):
-        raise ValueError("Cannot extract, output path already exists.")
-
-    ex = Extractor()
-    return ex.extract(input_path, output_path)
+    from datasets.utils.filelock import FileLock
+    
+    # Prevent parallel extractions
+    lock_path = input_path + ".lock"
+    with FileLock(lock_path):
+        for extractor in Extractor.extractors:
+            if extractor.is_extractable(input_path):
+                return extractor.extract(input_path, dataset_dir)
+        raise ValueError("Extraction method not found for {}".format(input_path))

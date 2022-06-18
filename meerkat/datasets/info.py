@@ -11,9 +11,3 @@ class DatasetInfo:
     homepage: str = None
     license: str = None
     tags: str = None
-
-    """
-
-    Args:
-    
-    """

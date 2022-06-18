@@ -71,7 +71,7 @@ class imagenette(DatasetBuilder):
     def download(self):
         url = self.VERSION_TO_URL[self.version]
         path = download_url(url, self.dataset_dir)
-        extract(path, self.data_dir)
+        extract(path, self.dataset_dir)
 
     def is_downloaded(self):
         return True

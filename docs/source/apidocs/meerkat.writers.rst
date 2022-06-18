@@ -1,11 +1,6 @@
 meerkat.writers package
 =======================
 
-.. automodule:: meerkat.writers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -29,6 +24,14 @@ meerkat.writers.numpy\_writer module
 ------------------------------------
 
 .. automodule:: meerkat.writers.numpy_writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: meerkat.writers
    :members:
    :undoc-members:
    :show-inheritance:

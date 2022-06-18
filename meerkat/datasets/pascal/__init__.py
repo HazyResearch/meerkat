@@ -6,6 +6,7 @@ import meerkat as mk
 from ..abstract import DatasetBuilder
 from ..utils import download_url, extract
 from ..registry import datasets
+from ..info import DatasetInfo
 
 
 @datasets.register()
@@ -14,6 +15,10 @@ class pascal(DatasetBuilder):
     VERSION_TO_URL = {
         "2012": "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar"
     }
+
+    info = DatasetInfo(
+        name="pascal", 
+    )
 
     def build(self):
         if self.version == "2012":

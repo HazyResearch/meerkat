@@ -12,6 +12,7 @@ from .imagenette import imagenette
 DOWNLOAD_MODES = ["force", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
 
+catalog = datasets.catalog
 
 def get(
     name: str,
@@ -49,14 +50,17 @@ def get(
     errors = []
     for registry in registry_order:
         if registry == "meerkat":
-            dataset = datasets.get(
-                name=name,
-                dataset_dir=dataset_dir,
-                revision=revision,
-                download_mode=download_mode,
-                **kwargs,
-            )
-            return dataset 
+            try:
+                dataset = datasets.get(
+                    name=name,
+                    dataset_dir=dataset_dir,
+                    revision=revision,
+                    download_mode=download_mode,
+                    **kwargs,
+                )
+                return dataset 
+            except KeyError as e:
+                errors.append(e)
 
         elif registry == "huggingface":
             try:
@@ -71,7 +75,7 @@ def get(
                         "Download mode `skip` is not supported for HuggingFace datasets."
                     )
                 dataset = DataPanel.from_huggingface(
-                    name=name,
+                    path=name,
                     download_mode=mapping[download_mode],
                     revision=revision,
                     cache_dir=dataset_dir,
