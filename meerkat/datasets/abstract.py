@@ -1,9 +1,11 @@
+import os
 from abc import ABC, abstractmethod
 from typing import List
-import os
+
 from meerkat.config import DatasetsOptions
 
 from .info import DatasetInfo
+
 
 class DatasetBuilder(ABC):
     REVISIONS: List[str]

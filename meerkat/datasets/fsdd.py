@@ -1,4 +1,4 @@
-import os 
+import os
 import subprocess
 
 GIT_URL = "https://github.com/Jakobovski/free-spoken-digit-dataset.git"

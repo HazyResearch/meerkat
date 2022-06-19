@@ -3,9 +3,9 @@ from typing import Dict, List, Union
 
 from meerkat.datapanel import DataPanel
 
+from .celeba import celeba
 from .imagenette import imagenette
 from .pascal import pascal
-from .celeba import celeba
 from .registry import datasets
 
 DOWNLOAD_MODES = ["force", "reuse", "skip"]

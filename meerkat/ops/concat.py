@@ -32,7 +32,7 @@ def concat(
             or DataPanels.
         axis (Union[str, int]): The axis along which to concatenate. Ignored if
             concatenating columns.
-    
+
     Returns:
         Union[DataPanel, AbstractColumn]: concatenated DataPanel or column
     """

@@ -22,16 +22,16 @@ class pascal(DatasetBuilder):
         homepage="http://host.robots.ox.ac.uk/pascal/VOC/",
         tags=["image_classification", "computer_vision"],
         citation=(
-            '@Article{Everingham10,'
+            "@Article{Everingham10,"
             'author = "Everingham, M. and Van~Gool, L. and Williams, C. K. I. and Winn, J. and Zisserman, A.",'
             'title = "The Pascal Visual Object Classes (VOC) Challenge",'
             'journal = "International Journal of Computer Vision",'
             'volume = "88",'
             'year = "2010",'
             'number = "2",'
-            'month = jun,'
+            "month = jun,"
             'pages = "303--338",}'
-        )
+        ),
     )
 
     def build(self):
