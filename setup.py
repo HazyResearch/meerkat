@@ -47,7 +47,7 @@ REQUIRED = [
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
     "fvcore",
-    "ipywidgets>=7.6.2",
+    "ipywidgets>=7.0.0",
     "IPython",
 ]
 

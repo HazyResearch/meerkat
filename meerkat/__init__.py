@@ -19,10 +19,9 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.spacy_column import SpacyColumn
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.columns.video_column import VideoColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
-from meerkat.contrib.registry import datasets
 from meerkat.datapanel import DataPanel
+from meerkat.datasets import get
 from meerkat.ops.concat import concat
 from meerkat.ops.merge import merge
 from meerkat.provenance import provenance
@@ -52,7 +51,7 @@ __all__ = [
     "LambdaCell",
     "FileCell",
     "MedicalVolumeCell",
-    "datasets",
+    "get",
     "concat",
     "merge",
     "provenance",

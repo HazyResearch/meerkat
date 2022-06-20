@@ -20,7 +20,7 @@ test-cov:
 	pytest --cov=./ --cov-report=xml
 
 docs:
-	sphinx-apidoc ../meerkat -o source/apidocs -f --tocfile "API Docs"
+	sphinx-apidoc meerkat -o docs/source/apidocs -f --tocfile "apidoc"
 	sphinx-build -b html docs/source/ docs/build/html/
 
 docs-check:

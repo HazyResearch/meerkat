@@ -18,7 +18,6 @@ from typing import (
 )
 
 import cytoolz as tz
-import datasets
 import dill
 import numpy as np
 import pandas as pd
@@ -64,7 +63,7 @@ class DataPanel(
 
     def __init__(
         self,
-        data: Union[dict, list, datasets.Dataset] = None,
+        data: Union[dict, list] = None,
         *args,
         **kwargs,
     ):
@@ -317,6 +316,8 @@ class DataPanel(
 
         >>> dict_of_datapanels = DataPanel.from_huggingface('boolq')
         """
+        import datasets
+
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
 

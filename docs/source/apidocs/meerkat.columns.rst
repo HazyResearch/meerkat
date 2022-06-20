@@ -1,11 +1,6 @@
 meerkat.columns package
 =======================
 
-.. automodule:: meerkat.columns
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -25,10 +20,26 @@ meerkat.columns.arrow\_column module
    :undoc-members:
    :show-inheritance:
 
+meerkat.columns.audio\_column module
+------------------------------------
+
+.. automodule:: meerkat.columns.audio_column
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.columns.cell\_column module
 -----------------------------------
 
 .. automodule:: meerkat.columns.cell_column
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.columns.file\_column module
+-----------------------------------
+
+.. automodule:: meerkat.columns.file_column
    :members:
    :undoc-members:
    :show-inheritance:
@@ -89,18 +100,18 @@ meerkat.columns.tensor\_column module
    :undoc-members:
    :show-inheritance:
 
-meerkat.columns.video\_column module
-------------------------------------
-
-.. automodule:: meerkat.columns.video_column
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 meerkat.columns.volume\_column module
 -------------------------------------
 
 .. automodule:: meerkat.columns.volume_column
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: meerkat.columns
    :members:
    :undoc-members:
    :show-inheritance:

@@ -12,5 +12,5 @@ class DisplayOptions:
     show_audio: bool = True
 
 
-class ContribOptions:
-    download_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+class DatasetsOptions:
+    root_datasets_dir: str = os.path.join(Path.home(), ".meerkat/datasets")

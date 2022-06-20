@@ -1,11 +1,6 @@
 meerkat.ml package
 ==================
 
-.. automodule:: meerkat.ml
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -85,6 +80,14 @@ meerkat.ml.tensormodel module
 -----------------------------
 
 .. automodule:: meerkat.ml.tensormodel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: meerkat.ml
    :members:
    :undoc-members:
    :show-inheritance:
