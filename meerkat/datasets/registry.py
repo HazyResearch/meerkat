@@ -1,11 +1,9 @@
 import functools
-import os
 from typing import Any, List, Optional, Sequence
 
 from fvcore.common.registry import Registry as _Registry
 from tabulate import tabulate
 
-from meerkat.config import DatasetsOptions
 from meerkat.datapanel import DataPanel
 
 
