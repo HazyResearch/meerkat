@@ -48,13 +48,14 @@ class imagenette(DatasetBuilder):
 
     info = DatasetInfo(
         name="imagenette",
+        full_name="ImageNette",
         description=(
             "Imagenette is a subset of 10 easily classified classes from Imagenet "
             "(tench, English springer, cassette player, chain saw, church, "
             "French horn, garbage truck, gas pump, golf ball, parachute)."
         ),
         homepage="https://github.com/fastai/imagenette",
-        tags=["image_classification", "computer_vision"],
+        tags=["image", "classification"],
     )
 
     @property
@@ -71,11 +72,9 @@ class imagenette(DatasetBuilder):
 
     def download(self):
         url = self.VERSION_TO_URL[self.version]
-        path = download_url(url, self.dataset_dir)
+        path = self.download_url(url, self.dataset_dir)
         extract(path, self.dataset_dir)
-
-    def is_downloaded(self):
-        return True
+        self.certify_download()
 
 
 def build_df(

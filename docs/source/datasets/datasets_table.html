@@ -1,35 +1,104 @@
 <style type="text/css">
-#T_49b1e .col-1 {
+#T_cdc69 .col-1 {
   max-width: 50%;
 }
 </style>
-<table id="T_49b1e">
+<table id="T_cdc69">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_49b1e_level0_col0" class="col_heading level0 col0" >name</th>
-      <th id="T_49b1e_level0_col1" class="col_heading level0 col1" >homepage</th>
-      <th id="T_49b1e_level0_col2" class="col_heading level0 col2" >tags</th>
+      <th id="T_cdc69_level0_col0" class="col_heading level0 col0" >tags</th>
+      <th id="T_cdc69_level0_col1" class="col_heading level0 col1" >versions</th>
+      <th id="T_cdc69_level0_col2" class="col_heading level0 col2" >homepage</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_49b1e_level0_row0" class="row_heading level0 row0" >0</th>
-      <td id="T_49b1e_row0_col0" class="data row0 col0" >imagenette</td>
-      <td id="T_49b1e_row0_col1" class="data row0 col1" >https://github.com/fastai/imagenette</td>
-      <td id="T_49b1e_row0_col2" class="data row0 col2" >['image_classification', 'computer_vision']</td>
+      <th id="T_cdc69_level0_row0" class="row_heading level0 row0" >celeba</th>
+      <td id="T_cdc69_row0_col0" class="data row0 col0" >
+        <div class='tags'>
+            <div class='tag'>image</div><div class='tag'>face recognition</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row0_col1" class="data row0 col1" >
+        <div class='versions'>
+            <div class='tag'>main</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row0_col2" class="data row0 col2" ><a href="https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">link</a></td>
     </tr>
     <tr>
-      <th id="T_49b1e_level0_row1" class="row_heading level0 row1" >1</th>
-      <td id="T_49b1e_row1_col0" class="data row1 col0" >pascal</td>
-      <td id="T_49b1e_row1_col1" class="data row1 col1" >http://host.robots.ox.ac.uk/pascal/VOC/</td>
-      <td id="T_49b1e_row1_col2" class="data row1 col2" >['image_classification', 'computer_vision']</td>
+      <th id="T_cdc69_level0_row1" class="row_heading level0 row1" >imagenette</th>
+      <td id="T_cdc69_row1_col0" class="data row1 col0" >
+        <div class='tags'>
+            <div class='tag'>image</div><div class='tag'>classification</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row1_col1" class="data row1 col1" >
+        <div class='versions'>
+            <div class='tag'>full</div><div class='tag'>320px</div><div class='tag'>160px</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row1_col2" class="data row1 col2" ><a href="https://github.com/fastai/imagenette">link</a></td>
     </tr>
     <tr>
-      <th id="T_49b1e_level0_row2" class="row_heading level0 row2" >2</th>
-      <td id="T_49b1e_row2_col0" class="data row2 col0" >celeba</td>
-      <td id="T_49b1e_row2_col1" class="data row2 col1" >https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html</td>
-      <td id="T_49b1e_row2_col2" class="data row2 col2" >['image_classification', 'computer_vision']</td>
+      <th id="T_cdc69_level0_row2" class="row_heading level0 row2" >pascal</th>
+      <td id="T_cdc69_row2_col0" class="data row2 col0" >
+        <div class='tags'>
+            <div class='tag'>image</div><div class='tag'>object recognition</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row2_col1" class="data row2 col1" >
+        <div class='versions'>
+            <div class='tag'>2012</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row2_col2" class="data row2 col2" ><a href="http://host.robots.ox.ac.uk/pascal/VOC/">link</a></td>
+    </tr>
+    <tr>
+      <th id="T_cdc69_level0_row3" class="row_heading level0 row3" >mirflickr</th>
+      <td id="T_cdc69_row3_col0" class="data row3 col0" >
+        <div class='tags'>
+            <div class='tag'>image</div><div class='tag'>retrieval</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row3_col1" class="data row3 col1" >
+        <div class='versions'>
+            <div class='tag'>25k</div>
+        </div>
+    </td>
+      <td id="T_cdc69_row3_col2" class="data row3 col2" ><a href="https://press.liacs.nl/mirflickr/">link</a></td>
     </tr>
   </tbody>
 </table>
+
+        <style>
+            .tag {
+                font-family: monospace;
+                font-size: 0.8em;
+                border: 10px;
+                border-radius: 5px;
+                border-color: black;
+                padding-left: 7px;
+                padding-right: 7px;
+                padding-top: 0px;
+                padding-bottom: 0px;
+                margin: 1px;
+            }
+            .tags .tag {
+                background-color: lightgrey;
+            }
+            .versions .tag {
+                background-color: lightblue;
+            }
+            .tags {
+                display: inline-flex;
+                flex-wrap: wrap;
+            }
+            .versions {
+                display: inline-flex;
+                flex-wrap: wrap;
+            }
+
+        </style>
+    

@@ -16,7 +16,7 @@ Some datasets have multiple versions, for example Imagenette provides a full-siz
    mk.datasets.versions("imagenette")
    
    @verbatim
-   mk.datasets/get("imagenette", version="160px")
+   mk.datasets.get("imagenette", version="160px")
 
 By default datasets are downloaded to ``~/.meerkat/datasets/{name}/{version}``. However, if you already have the dataset downloaded elsewhere or you want to download to a different location, you can specify the ``dataset_dir`` argument. 
 
@@ -27,7 +27,7 @@ By default datasets are downloaded to ``~/.meerkat/datasets/{name}/{version}``. 
 You can also configure Meerkat to use a different default root directory. By setting the ``mk.config.DatasetsOptions.root_datasets_dir = "/local/download/of"``, the default location for datasets will be ``/local/download/of/datasets/{name}/{version}``.
 
 *How does Meerkat's dataset registry fit in with other dataset hubs?*    The purpose of the Meerkat dataset registry is to provide *code* for downloading datasets and loading them into :class:`~meerkat.DataPanel` objects. The Meerkat registry, like `Torchvision Datasets <https://pytorch.org/vision/stable/datasets.html>`_, doesn't actually host any data. 
-In contrast, dataset hubs like `HuggingFace Datasets <https://huggingface.co/docs/datasets/index>`_ and `Activeloop Hub <https://www.activeloop.ai/>`_ are great community efforts that *do* host data. So, the Meerkat registry is complementary to these hubs: in fact, we can currently load any dataset in the HuggingFace hubs directly through our registry. For example, we can load the `IMBD dataset <https://huggingface.co/datasets/imdb>`_ hosted on HuggingFace with ``mk.get("imdb")``. 
+In contrast, dataset hubs like `HuggingFace Datasets <https://huggingface.co/docs/datasets/index>`_ and `Activeloop Hub <https://www.activeloop.ai/>`_ are great community efforts that *do* host data. So, the Meerkat registry is complementary to these hubs: in fact, we can currently load any dataset in the HuggingFace hubs directly through our registry. For example, we can load the `IMBD dataset <https://huggingface.co/datasets/imdb>`_ hosted on HuggingFace with ``mk.datasets.get("imdb")``. 
 
 
 .. admonition:: Contributing Datasets
@@ -37,7 +37,7 @@ In contrast, dataset hubs like `HuggingFace Datasets <https://huggingface.co/doc
 
     
 The table below lists all of the datasets currently in the meerkat registry. 
-You can also list these datasets programmatically ~`meerkat.datasets.catalog`. 
+You can also list these datasets programmatically :func:`~meerkat.datasets.catalog`. 
 
 
 .. raw:: html

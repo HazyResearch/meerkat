@@ -39,6 +39,14 @@ meerkat.datasets.abstract module
    :undoc-members:
    :show-inheritance:
 
+meerkat.datasets.fsdd module
+----------------------------
+
+.. automodule:: meerkat.datasets.fsdd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.datasets.info module
 ----------------------------
 

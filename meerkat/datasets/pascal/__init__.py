@@ -1,5 +1,4 @@
 import os
-import subprocess
 
 import meerkat as mk
 
@@ -13,17 +12,20 @@ from ..utils import download_url, extract
 class pascal(DatasetBuilder):
     VERSIONS = ["2012"]
     VERSION_TO_URL = {
+        # flake8: noqa
         "2012": "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar"
     }
 
     info = DatasetInfo(
         name="pascal",
+        full_name="PASCAL",
         description="Image data sets for object class recognition.",
         homepage="http://host.robots.ox.ac.uk/pascal/VOC/",
-        tags=["image_classification", "computer_vision"],
+        tags=["image", "object recognition"],
         citation=(
             "@Article{Everingham10,"
-            'author = "Everingham, M. and Van~Gool, L. and Williams, C. K. I. and Winn, J. and Zisserman, A.",'
+            'author = "Everingham, M. and Van~Gool, L. and Williams, C. K. I. and Winn,'
+            'J. and Zisserman, A.",'
             'title = "The Pascal Visual Object Classes (VOC) Challenge",'
             'journal = "International Journal of Computer Vision",'
             'volume = "88",'
@@ -45,9 +47,6 @@ class pascal(DatasetBuilder):
 
         downloaded_path = download_url(url, self.dataset_dir)
         extract(downloaded_path, os.path.join(self.dataset_dir, "VOCdevkit"))
-
-    def is_downloaded(self):
-        return True
 
 
 def build_pascal_2012_dp(dataset_dir: str):

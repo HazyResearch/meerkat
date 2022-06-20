@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
-from datasets import DatasetInfo
-
 
 @dataclass
 class DatasetInfo:
 
     name: str
+    full_name: str = None
     description: str = None
     citation: str = None
     homepage: str = None

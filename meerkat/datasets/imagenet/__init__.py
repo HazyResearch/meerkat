@@ -6,16 +6,34 @@ import numpy as np
 import pandas as pd
 
 import meerkat as mk
-import meerkat as mk
+
+from ..abstract import DatasetBuilder
+from ..info import DatasetInfo
 from ..registry import datasets
 from ..utils import download_url, extract
-from ..abstract import DatasetBuilder
 
 
 @datasets.register()
 class imagenet(DatasetBuilder):
 
     VERSIONS = ["ilsvrc2012"]
+
+    info = DatasetInfo(
+        name="imagenet",
+        full_name="ImageNet",
+        # flake8: noqa
+        description="ImageNet is an image database organized according to the WordNet hierarchy (currently only the nouns), in which each node of the hierarchy is depicted by hundreds and thousands of images..",
+        homepage="https://www.image-net.org/",
+        tags=["image", "classification"],
+        citation=(
+            "@inproceedings{imagenet_cvpr09,"
+            "AUTHOR = {Deng, J. and Dong, W. and Socher, R. and Li, L.-J. and Li, K. and Fei-Fei, L.},"
+            "TITLE = {{ImageNet: A Large-Scale Hierarchical Image Database}},"
+            "BOOKTITLE = {CVPR09},"
+            "YEAR = {2009},"
+            'BIBSOURCE = "http://www.image-net.org/papers/imagenet_cvpr09.bib"}'
+        ),
+    )
 
     def build(self):
         paths = pd.read_csv(
@@ -84,9 +102,6 @@ class imagenet(DatasetBuilder):
             ["tar", "-xzvf", "imagenet_object_localization_patched2019.tar.gz"]
         )
         os.chdir(curr_dir)
-
-    def is_downloaded(self):
-        return True
 
 
 def build_imagenet_dps(
