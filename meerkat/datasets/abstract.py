@@ -57,7 +57,10 @@ class DatasetBuilder(ABC):
             self.dump_download_meta()
 
         if not self.is_downloaded():
-            raise ValueError(f"Dataset {self.name} is not downloaded.")
+            raise ValueError(
+                f"Dataset {self.name} is not downloaded to directory"
+                f"{self.dataset_dir}."
+            )
 
         return self.build()
 
