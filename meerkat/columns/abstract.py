@@ -262,7 +262,7 @@ class AbstractColumn(
 
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         if len(self) > max_rows:
             col = pd.Series(
@@ -281,7 +281,7 @@ class AbstractColumn(
     def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         if len(self) > max_rows:
             pd_index = np.concatenate(

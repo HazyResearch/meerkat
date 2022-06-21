@@ -26,6 +26,8 @@ from meerkat.ops.concat import concat
 from meerkat.ops.merge import merge
 from meerkat.provenance import provenance
 
+from .config import config
+
 # aliases for core column types
 ArrayColumn = NumpyArrayColumn
 SeriesColumn = PandasSeriesColumn
@@ -55,4 +57,5 @@ __all__ = [
     "concat",
     "merge",
     "provenance",
+    "config",
 ]
