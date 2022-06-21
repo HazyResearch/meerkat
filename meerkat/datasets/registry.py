@@ -18,16 +18,14 @@ class Registry(_Registry):
 
         self._metadata_map = {}
 
-    def get(
-        self, name: str, dataset_dir: str = None, download: bool = True, **kwargs
-    ) -> Any:
+    def get(self, name: str, **kwargs) -> Any:
         ret = self._obj_map.get(name)
         if ret is None:
             raise KeyError(
                 "No object named '{}' found in '{}' registry!".format(name, self._name)
             )
 
-        return ret(dataset_dir=dataset_dir, download=download, **kwargs)()
+        return ret(**kwargs)()
 
     def get_obj(self, name: str) -> type:
         return self._obj_map[name]

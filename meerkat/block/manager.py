@@ -325,7 +325,7 @@ class BlockManager(MutableMapping):
 
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
         cols = {}
         formatters = {}
         for name, column in self._columns.items():

@@ -1,10 +1,12 @@
+from typing import List
+
 import meerkat as mk
 
 
-def test_names():
-    names = mk.datasets.names
-    assert isinstance(names, list)
-    assert len(names) > 0
+def test_versions():
+    versions = mk.datasets.versions("imagenette")
+    assert isinstance(versions, List)
+    assert len(versions) > 0
 
 
 def test_catalog():

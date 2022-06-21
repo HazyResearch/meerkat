@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from typing import List
 
 import meerkat as mk
-from meerkat.config import DatasetsOptions
 
 from .info import DatasetInfo
 from .utils import download_url
@@ -29,7 +28,7 @@ class DatasetBuilder(ABC):
 
         if dataset_dir is None:
             self.dataset_dir = os.path.join(
-                DatasetsOptions.root_datasets_dir, self.name, self.version
+                mk.config.datasets.root_dir, self.name, self.version
             )
         else:
             self.dataset_dir = dataset_dir
@@ -42,7 +41,6 @@ class DatasetBuilder(ABC):
             "name": self.name,
             "version": self.version,
             "dataset_dir": self.dataset_dir,
-            "meerkat_version": mk.__version__,
         }
         json.dump(
             data,
@@ -52,13 +50,15 @@ class DatasetBuilder(ABC):
     def __call__(self):
 
         if self.download_mode in ["force", "extract"] or (
-            self.download_mode == "reuse" and not self.is_downloaded
+            self.download_mode == "reuse" and not self.is_downloaded()
         ):
             self.download()
             self.dump_download_meta()
 
         if not self.is_downloaded():
-            raise ValueError(f"Dataset {self.name} is not downloaded.")
+            raise ValueError(
+                f"Dataset {self.name} is not downloaded to {self.dataset_dir}."
+            )
 
         return self.build()
 
@@ -70,7 +70,6 @@ class DatasetBuilder(ABC):
     def download(self):
         raise NotImplementedError()
 
-    @abstractmethod
     def is_downloaded(self) -> bool:
         """This is a very weak check for the existence of the dataset.
 

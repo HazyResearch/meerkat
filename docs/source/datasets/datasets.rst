@@ -24,7 +24,7 @@ By default datasets are downloaded to ``~/.meerkat/datasets/{name}/{version}``. 
    
       dp = mk.datasets.get("imagenette", dataset_dir="/local/download/of/imagenette/full")
 
-You can also configure Meerkat to use a different default root directory. By setting the ``mk.config.DatasetsOptions.root_datasets_dir = "/local/download/of"``, the default location for datasets will be ``/local/download/of/datasets/{name}/{version}``.
+You can also configure Meerkat to use a different default root directory. By setting the ``mk.config.root_dir = "/local/download/of"``, the default location for datasets will be ``/local/download/of/datasets/{name}/{version}``.
 
 *How does Meerkat's dataset registry fit in with other dataset hubs?*    The purpose of the Meerkat dataset registry is to provide *code* for downloading datasets and loading them into :class:`~meerkat.DataPanel` objects. The Meerkat registry, like `Torchvision Datasets <https://pytorch.org/vision/stable/datasets.html>`_, doesn't actually host any data. 
 In contrast, dataset hubs like `HuggingFace Datasets <https://huggingface.co/docs/datasets/index>`_ and `Activeloop Hub <https://www.activeloop.ai/>`_ are great community efforts that *do* host data. So, the Meerkat registry is complementary to these hubs: in fact, we can currently load any dataset in the HuggingFace hubs directly through our registry. For example, we can load the `IMBD dataset <https://huggingface.co/datasets/imdb>`_ hosted on HuggingFace with ``mk.datasets.get("imdb")``. 

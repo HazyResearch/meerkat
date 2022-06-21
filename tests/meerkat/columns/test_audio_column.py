@@ -176,7 +176,7 @@ class TestAudioColumn(TestAbstractColumn):
 
     @AudioColumnTestBed.parametrize(params={"max_rows": [6, 16, 20]})
     def test_repr_pandas(self, testbed, max_rows):
-        meerkat.config.DisplayOptions.max_rows = max_rows
+        meerkat.config.display.max_rows = max_rows
         series, _ = testbed.col._repr_pandas_()
         assert isinstance(series, pd.Series)
         assert len(series) == min(len(series), max_rows + 1)
