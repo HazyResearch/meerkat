@@ -14,6 +14,7 @@ Meerkat Basics
    map
    ops
    visualization
+   configure
    patterns
 
 Common Use Cases
