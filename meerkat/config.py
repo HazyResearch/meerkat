@@ -26,7 +26,7 @@ class MeerkatConfig:
                 # create empty config
                 yaml.dump({"display": {}, "datasets": {}}, open(path, "w"))
         config = yaml.load(open(path, "r"), Loader=yaml.FullLoader)
-        print(config)
+
         return cls(
             display=DisplayConfig(**config.get("display", {})),
             datasets=DatasetsConfig(**config.get("datasets", {})),

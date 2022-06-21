@@ -27,11 +27,11 @@ def lambda_cell_formatter(cell: LambdaCell):
 
 def image_formatter(cell: Image.Image):
 
-    if not mk.config.DisplayOptions.show_images:
+    if not mk.config.display.show_images:
         return repr(cell)
 
-    max_image_width = mk.config.DisplayOptions.max_image_width
-    max_image_height = mk.config.DisplayOptions.max_image_height
+    max_image_width = mk.config.display.max_image_width
+    max_image_height = mk.config.display.max_image_height
 
     cell.thumbnail((max_image_width, max_image_height))
 
@@ -42,14 +42,14 @@ def image_formatter(cell: Image.Image):
 
 
 def image_file_formatter(cell: FileCell):
-    if not mk.config.DisplayOptions.show_images:
+    if not mk.config.display.show_images:
         return repr(cell)
 
     return lambda_cell_formatter(cell)
 
 
 def audio_file_formatter(cell: FileCell) -> str:
-    if not mk.config.DisplayOptions.show_audio:
+    if not mk.config.display.show_audio:
         return repr(cell)
 
     # TODO (Sabri): Implement based on audio_formatter so we can include transform
