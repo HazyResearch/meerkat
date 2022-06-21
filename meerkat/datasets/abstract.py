@@ -41,7 +41,6 @@ class DatasetBuilder(ABC):
             "name": self.name,
             "version": self.version,
             "dataset_dir": self.dataset_dir,
-            "meerkat_version": mk.__version__,
         }
         json.dump(
             data,
