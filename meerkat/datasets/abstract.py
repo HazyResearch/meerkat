@@ -51,15 +51,14 @@ class DatasetBuilder(ABC):
     def __call__(self):
 
         if self.download_mode in ["force", "extract"] or (
-            self.download_mode == "reuse" and not self.is_downloaded
+            self.download_mode == "reuse" and not self.is_downloaded()
         ):
             self.download()
             self.dump_download_meta()
 
         if not self.is_downloaded():
             raise ValueError(
-                f"Dataset {self.name} is not downloaded to directory"
-                f"{self.dataset_dir}."
+                f"Dataset {self.name} is not downloaded to {self.dataset_dir}."
             )
 
         return self.build()
