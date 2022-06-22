@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 from meerkat.datapanel import DataPanel
 
 from .celeba import celeba
+from .expw import expw
 from .imagenet import imagenet
 from .imagenette import imagenette
 from .mirflickr import mirflickr
@@ -15,6 +16,7 @@ __all__ = [
     "imagenette",
     "mirflickr",
     "pascal",
+    "expw",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
