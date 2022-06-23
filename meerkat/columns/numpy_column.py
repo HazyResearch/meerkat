@@ -7,7 +7,7 @@ import numbers
 import os
 import shutil
 from mmap import mmap
-from typing import Callable, Sequence, Union, List
+from typing import Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -180,41 +180,44 @@ class NumpyArrayColumn(
         else:
             return self[index]
 
-
-    def sort(self, ascending: Union[bool, List[bool]]=True, axis: int=-1, kind: str = "quicksort", order: Union[str, List[str]]=None) -> NumpyArrayColumn:
-        """ 
-        Return a sorted view of the column. 
+    def sort(
+        self,
+        ascending: Union[bool, List[bool]] = True,
+        axis: int = -1,
+        kind: str = "quicksort",
+        order: Union[str, List[str]] = None,
+    ) -> NumpyArrayColumn:
+        """Return a sorted view of the column.
 
         Args:
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-                descending order. If a list, must be the same length as `by`. Defaults 
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
                 to True.
-            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
             AbstractColumn: A view of the column with the sorted data.
-
         """
         # calls argsort() function to retrieve ordered indices
         sorted_index = self.argsort(ascending=ascending, kind=kind)
         return self[sorted_index]
-    
-    def argsort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> NumpyArrayColumn:
-        """ 
-        Return indices that would sorted the column. 
+
+    def argsort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> NumpyArrayColumn:
+        """Return indices that would sorted the column.
 
         Args:
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-                descending order. If a list, must be the same length as `by`. Defaults 
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
                 to True.
-            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
             NumpySeriesColumn: A view of the column with the sorted data.
 
         For now! Raises error when shape of input array is more than one error.
-
-  """
+        """
         num_columns = len(np.shape(self))
         # Raise error if array has more than one column
         if num_columns > 1:
@@ -222,8 +225,8 @@ class NumpyArrayColumn(
 
         # returns indices of descending order of array
         if not ascending:
-            return np.argsort(-1*self.data, axis=0, kind=kind, order=None)
-        
+            return np.argsort(-1 * self.data, axis=0, kind=kind, order=None)
+
         # returns indices of ascending order of array
         return np.argsort(self.data, axis=0, kind=kind, order=None)
 

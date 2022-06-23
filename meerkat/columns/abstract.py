@@ -351,42 +351,42 @@ class AbstractColumn(
         )
         indices = np.where(outputs)[0]
         return self.lz[indices]
-    
-    def sort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> AbstractColumn:
-        """ 
-        Return a sorted view of the column. 
+
+    def sort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> AbstractColumn:
+        """Return a sorted view of the column.
 
         TODO(Hannah): Implement this method in subclasses of AbstractColumn and
         ask Sabri for pointers on implementing tests.
 
         Args:
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-                descending order. If a list, must be the same length as `by`. Defaults 
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
                 to True.
-            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
             AbstractColumn: A view of the column with the sorted data.
-
         """
         raise NotImplementedError
-    
-    def argsort(self, ascending: Union[bool, List[bool]]=True, kind: str = "quicksort") -> AbstractColumn:
-        """ 
-        Return indices that would sorted the column. 
+
+    def argsort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> AbstractColumn:
+        """Return indices that would sorted the column.
 
         TODO(Hannah): Implement this method in subclasses of AbstractColumn and
         ask Sabri for pointers on implementing tests.
 
         Args:
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-                descending order. If a list, must be the same length as `by`. Defaults 
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
                 to True.
-            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
             AbstractColumn: A view of the column with the sorted data.
-
         """
         raise NotImplementedError
 

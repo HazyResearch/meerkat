@@ -16,7 +16,6 @@ from typing import (
     Tuple,
     Union,
 )
-from cv2 import sepFilter2D, sort
 
 import cytoolz as tz
 import datasets
@@ -31,11 +30,9 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-
-from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
@@ -734,54 +731,50 @@ class DataPanel(
             suffixes=suffixes,
             validate=validate,
         )
-    
+
     def sort(
         self,
         by: Union[str, List[str]],
         ascending: Union[bool, List[bool]] = True,
         kind: str = "quicksort",
     ) -> DataPanel:
-        """ 
-        Sort the DataPanel by the values in the specified columns. Similar to 
-        ``sort_values`` in pandas.
+        """Sort the DataPanel by the values in the specified columns. Similar
+        to ``sort_values`` in pandas.
 
-        TODO(Hannah): Implement this method – should likely just wrap 
-        meerkat.ops.sort.sort. 
+        TODO(Hannah): Implement this method – should likely just wrap
+        meerkat.ops.sort.sort.
 
         Args:
             by (Union[str, List[str]]): The columns to sort by.
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or 
-                descending order. If a list, must be the same length as `by`.Defaults 
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`.Defaults
                 to True.
-            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options 
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
 
         Return:
             DataPanel: A sorted view of DataPanel.
-
         """
         keys = []
-        
+
         if len(by) > 1:  # Sort with multiple column
             for col in by[::-1]:
                 if isinstance(self[col], PandasSeriesColumn):
                     keys.append(self[col].values)
                 if isinstance(self[col], TensorColumn):
                     keys.append(self[col].numpy())
-                else:  
+                else:
                     keys.append(self[col])
 
-            sorted_indices = np.lexsort(keys = keys)
+            sorted_indices = np.lexsort(keys=keys)
 
-            if ascending==False:
+            if ascending is False:
                 sorted_indices = sorted_indices[::-1].copy()
-
 
         else:  # Sort with single column
             sorted_indices = self[by[0]].argsort(ascending=ascending, kind=kind)
 
         return self.lz[sorted_indices]
-        
 
     def items(self):
         for name in self.columns:
