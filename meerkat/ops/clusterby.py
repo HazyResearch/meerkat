@@ -1,16 +1,19 @@
 
+import meerkat as mk
+import numpy as np
+from meerkat import DataPanel, NumpyArrayColumn
+from typing import Union, Sequence
+from meerkat.ops.groupby import DataPanelGroupBy, groupby
+from sklearn.cluster import KMeans 
 
-
-
-
-Registry of 
-
-
-
+def embed( img):
+    return np.array(img).mean(axis = 0).mean(axis = 0)
 
 def clusterby(
     data: DataPanel,
     by: Union[str, Sequence[str]] = None,
+    alg : str = "kmeans", 
+    does_embed: bool = True
 ) -> DataPanelGroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).
@@ -54,23 +57,44 @@ def clusterby(
     # by -> is a dictionary, a map, all distinct group_ids to indicies.
     # pass DataPanelGroupBy()
 
-    try:
+    if does_embed:
+        data[".emb"] = data[by].map(embed, num_workers=4, pbar=True)
+        by = [".emb"]
+
+    if alg == "kmeans":
         if isinstance(by, str):
             by = [by]
-        return DataPanelGroupBy(
-            data[by].to_pandas().groupby(by).indices, data, by, data.columns
-        )
-    except Exception as e:
-        # future work needed here.
-        print("dataPanel group by error", e)
-        raise NotImplementedError()
+        
+        if len(by) > 1:
+            raise NotImplementedError()
+        
 
+        arr = data[by[0]].data
+        n_clusters = 10
 
+        groups = KMeans(n_clusters=n_clusters, random_state=0).fit(arr).labels_
+        data['.group'] = groups
+
+        return groupby(data, by = ".group")
 
 
 
 def main():
-    print("hello world this is c3po")
+
+    dp = mk.get("imagenette")[:100]
+
+    
+    gb = clusterby(dp, by = 'img')["img"] # Numpy Array Column
+    
+    for class_id in gb.indices:
+        print(class_id, ":", gb.indices[class_id])
+
+
+
+
+    
+    # print(dp.columns)
+
 
 if __name__ == "__main__":
     main()
