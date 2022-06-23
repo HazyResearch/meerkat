@@ -58,17 +58,18 @@ def clusterby(
     # by -> is a dictionary, a map, all distinct group_ids to indicies.
     # pass DataPanelGroupBy()
 
-    if does_embed:
-        data[".emb"] = data[by].map(embed, num_workers=4, pbar=True)
-        by = [".emb"]
-
     if isinstance(by, str):
         by = [by]
     elif isinstance(by, list):
         pass
     else:
         raise NotImplementedError("Please pass in a list or a string for by.")
-        
+
+    if does_embed:
+        by = by[0]
+        data = mk.embed(data, input=by, encoder="clip", out_col=".emb")
+        by = [".emb"]
+
     if len(by) > 1:
         raise NotImplementedError()
 
@@ -92,7 +93,7 @@ def clusterby(
 
 def main():
 
-    dp = mk.get("imagenette")[:100]
+    dp = mk.get("imagenette").lz[:100]
 
     
     gb = clusterby(dp, by = 'img')["img"] # Numpy Array Column
