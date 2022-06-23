@@ -1,8 +1,18 @@
 from collections import defaultdict
+from functools import reduce
 from typing import Callable, Dict, List, Optional, Sequence
 
 import yaml
 from yaml.constructor import ConstructorError
+
+
+def nested_getattr(obj, attr, *args):
+    """Get a nested property from an object.
+
+    # noqa: E501
+    Source: https://stackoverflow.com/questions/31174295/getattr-and-setattr-on-nested-subobjects-chained-properties
+    """
+    return reduce(lambda o, a: getattr(o, a, *args), [obj] + attr.split("."))
 
 
 class MeerkatLoader(yaml.FullLoader):
