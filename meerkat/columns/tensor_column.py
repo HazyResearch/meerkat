@@ -176,6 +176,54 @@ class TensorColumn(
     def _read_data(path: str) -> torch.Tensor:
         return torch.load(os.path.join(path, "data.pt"))
 
+    def sort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> TensorColumn:
+        """Return a sorted view of the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
+        """
+        # calls argsort() function to retrieve ordered indices
+
+        sorted_index = self.argsort(ascending=ascending, kind=kind)
+        return self[sorted_index]
+
+    def argsort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> TensorColumn:
+        """Return indices that would sorted the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            TensorColumn: A view of the column with the sorted data.
+
+        For now! Raises error when shape of input array is more than one error.
+        """
+        try:
+            self.size()[1]
+
+        except IndexError:  # Case 1: The array only has one column
+            # returns indices of descending order of array
+            if not ascending:
+                return torch.argsort(self.data, dim=-1, descending=True)
+            # returns indices of ascending order of array
+            return torch.argsort(self.data, dim=-1, descending=False)
+
+        else:  # Case 2: The array has more than one column, raise error.
+            raise Exception("No implementation for array with more than one column.")
+
     def is_equal(self, other: AbstractColumn) -> bool:
         return (other.__class__ == self.__class__) and (self.data == other.data).all()
 
