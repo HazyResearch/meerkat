@@ -5,6 +5,7 @@ from meerkat import DataPanel, NumpyArrayColumn
 from typing import Union, Sequence
 from meerkat.ops.groupby import DataPanelGroupBy, groupby
 from sklearn.cluster import KMeans 
+from sklearn.base import ClusterMixin
 
 def embed( img):
     return np.array(img).mean(axis = 0).mean(axis = 0)
@@ -12,7 +13,7 @@ def embed( img):
 def clusterby(
     data: DataPanel,
     by: Union[str, Sequence[str]] = None,
-    alg : str = "kmeans", 
+    alg : Union[str, ClusterMixin]  = "kmeans", 
     does_embed: bool = True
 ) -> DataPanelGroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
@@ -61,21 +62,31 @@ def clusterby(
         data[".emb"] = data[by].map(embed, num_workers=4, pbar=True)
         by = [".emb"]
 
-    if alg == "kmeans":
-        if isinstance(by, str):
-            by = [by]
+    if isinstance(by, str):
+        by = [by]
+    elif isinstance(by, list):
+        pass
+    else:
+        raise NotImplementedError("Please pass in a list or a string for by.")
         
-        if len(by) > 1:
-            raise NotImplementedError()
-        
+    if len(by) > 1:
+        raise NotImplementedError()
 
-        arr = data[by[0]].data
-        n_clusters = 10
+    arr = data[by[0]].data
+    groups = None
+    if isinstance(alg, str):
+        if alg == "kmeans":
+            alg = KMeans(n_clusters=10, random_state=0)
+        else:
+            raise NotImplementedError("Please consider passing in a custom object via the sklearn interface.")
+    if isinstance(alg, ClusterMixin):
+        groups = alg.fit(arr).labels_
 
-        groups = KMeans(n_clusters=n_clusters, random_state=0).fit(arr).labels_
+    if groups is not None:
         data['.group'] = groups
-
         return groupby(data, by = ".group")
+    else:
+        raise NotImplementedError()
 
 
 
