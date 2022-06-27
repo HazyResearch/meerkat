@@ -15,7 +15,7 @@ def _get_reduction_fn(reduction_name):
 
 
 class ActivationExtractor:
-    """Class for extracting activations a targetted intermediate layer"""
+    """Class for extracting activations a targetted intermediate layer."""
 
     def __init__(self, reduction_fn: callable = None):
         self.activation = None

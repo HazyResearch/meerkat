@@ -8,7 +8,7 @@ from .encoder import Encoder
 def transformers(
     variant: str = "bert-large-cased", device: Union[int, str] = "cpu"
 ) -> Dict[str, Encoder]:
-    """Transformer encoders
+    """Transformer encoders.
 
     - "text"
 
@@ -20,7 +20,6 @@ def transformers(
             "ViT-B/32".
         device (Union[int, str], optional): The device on which the encoders will be
             loaded. Defaults to "cpu".
-
     """
     try:
         from transformers import AutoModel, AutoTokenizer

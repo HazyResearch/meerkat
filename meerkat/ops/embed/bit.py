@@ -26,8 +26,9 @@ def bit(
     reduction: str = "mean",
     layer: str = "body",
 ) -> Dict[str, Encoder]:
-    """Big Transfer (BiT) encoders [kolesnivok_2019]_. Includes encoders for the
-    following modalities:
+    """Big Transfer (BiT) encoders [kolesnivok_2019]_. Includes encoders for
+    the following modalities:
+
         - "image"
 
     Args:
@@ -126,16 +127,17 @@ def conv1x1(cin, cout, stride=1, bias=False):
 
 
 def tf2th(conv_weights):
-    """Possibly convert HWIO to OIHW"""
+    """Possibly convert HWIO to OIHW."""
     if conv_weights.ndim == 4:
         conv_weights = np.transpose(conv_weights, [3, 2, 0, 1])
     return torch.from_numpy(conv_weights)
 
 
 class PreActBottleneck(nn.Module):
-    """
-    Follows the implementation of "Identity Mappings in Deep Residual Networks" here:
-    https://github.com/KaimingHe/resnet-1k-layers/blob/master/resnet-pre-act.lua
+    """Follows the implementation of "Identity Mappings in Deep Residual
+    Networks" here:
+    https://github.com/KaimingHe/resnet-1k-layers/blob/master/resnet-pre-
+    act.lua.
 
     Except it puts the stride on 3x3 conv when available.
     """

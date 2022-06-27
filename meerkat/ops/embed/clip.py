@@ -8,8 +8,8 @@ from .registry import encoders
 def clip(
     variant: str = "ViT-B/32", device: Union[int, str] = "cpu"
 ) -> Dict[str, Encoder]:
-    """Contrastive Language-Image Pre-training (CLIP) encoders [radford_2021]_. Includes
-    encoders for the following modalities:
+    """Contrastive Language-Image Pre-training (CLIP) encoders [radford_2021]_.
+    Includes encoders for the following modalities:
 
     - "text"
     - "image"
