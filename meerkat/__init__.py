@@ -23,6 +23,7 @@ from meerkat.columns.volume_column import MedicalVolumeColumn
 from meerkat.datapanel import DataPanel
 from meerkat.datasets import get
 from meerkat.ops.concat import concat
+from meerkat.ops.embed import embed
 from meerkat.ops.merge import merge
 from meerkat.provenance import provenance
 
@@ -56,6 +57,7 @@ __all__ = [
     "get",
     "concat",
     "merge",
+    "embed",
     "provenance",
     "config",
 ]
