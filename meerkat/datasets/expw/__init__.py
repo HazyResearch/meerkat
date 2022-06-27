@@ -68,7 +68,7 @@ class expw(DatasetBuilder):
 
     def download(self):
         gdrive_id = self.VERSION_TO_GDRIVE_ID[self.version]
-        download_google_drive(id=gdrive_id, dst=self.dataset_dir, is_folder=True)
+        #download_google_drive(id=gdrive_id, dst=self.dataset_dir, is_folder=True)
 
         for file in os.listdir(os.path.join(self.dataset_dir, "image")):
             # run 7za to extract the file using subprocess
