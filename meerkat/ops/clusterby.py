@@ -68,6 +68,9 @@ def clusterby(
     if does_embed:
         by = by[0]
         data = mk.embed(data, input=by, encoder="clip", out_col=".emb")
+
+        data.write("imagenette_clip_embedded_full.dp")
+
         by = [".emb"]
 
     if len(by) > 1:
@@ -93,20 +96,13 @@ def clusterby(
 
 def main():
 
-    dp = mk.get("imagenette").lz[:100]
+    dp = mk.get("imagenette").lz[:]
 
     
     gb = clusterby(dp, by = 'img')["img"] # Numpy Array Column
     
     for class_id in gb.indices:
         print(class_id, ":", gb.indices[class_id])
-
-
-
-
-    
-    # print(dp.columns)
-
 
 if __name__ == "__main__":
     main()
