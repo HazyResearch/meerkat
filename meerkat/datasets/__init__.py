@@ -8,6 +8,7 @@ from .imagenet import imagenet
 from .imagenette import imagenette
 from .mirflickr import mirflickr
 from .pascal import pascal
+from .fer import fer
 from .registry import datasets
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "mirflickr",
     "pascal",
     "expw",
+    "fer",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
