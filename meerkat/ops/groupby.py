@@ -38,16 +38,25 @@ class BaseGroupBy(ABC):
             embedded_images = self.data[".emb"]
             embedding_label = correct_col[".emb"]
 
+            print(type(embedded_images.data))
+            print(embedded_images.data.shape)
 
+            norms = np.linalg.norm(embedded_images, axis = 1)[:, np.newaxis]
+            embedded_images_vec = embedded_images / norms
+            print(norms.shape)
 
-
+            # This is just an inefficient implementation
             for i in range(len(embedded_images)):
                 im = torch.Tensor(embedded_images[i])
                 im /= im.norm(dim = -1, keepdim = True)
                 embedded_images[i] = im
-# d = {}
-
             t_embedded_ims = torch.Tensor(embedded_images)
+
+            print("Error", torch.norm(torch.Tensor(embedded_images_vec) - t_embedded_ims).item())
+            # assert(torch.norm(torch.Tensor(embedded_images_vec) - t_embedded_ims) < 1e-8)
+
+            
+# d = {}
 
             scores = torch.zeros((len(embedded_images), len(classes)))
             for i in range(embedding_label.shape[0]):
@@ -64,7 +73,6 @@ class BaseGroupBy(ABC):
 
 
             preds = scores.softmax(dim = -1).argmax(dim = -1)
-
 
 
             class_preds = np.array([classes[i] for i in preds])
