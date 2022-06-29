@@ -10,6 +10,32 @@ from sklearn.base import ClusterMixin
 def embed( img):
     return np.array(img).mean(axis = 0).mean(axis = 0)
 
+
+
+def _clusterby(embedded_data: DataPanel,
+    by: Sequence[str] = None,
+    alg : Union[str, ClusterMixin]  = "kmeans"):
+
+    if len(by) > 1:
+        raise NotImplementedError()
+
+    arr = embedded_data[by[0]].data
+    groups = None
+    if isinstance(alg, str):
+        if alg == "kmeans":
+            alg = KMeans(n_clusters=10, random_state=0)
+        else:
+            raise NotImplementedError("Please consider passing in a custom object via the sklearn interface.")
+    if isinstance(alg, ClusterMixin):
+        groups = alg.fit(arr).labels_
+
+    if groups is not None:
+        embedded_data['.group'] = groups
+        return groupby(embedded_data, by = ".group", is_soft = True)
+    else:
+        raise NotImplementedError()
+
+
 def clusterby(
     data: DataPanel,
     by: Union[str, Sequence[str]] = None,
@@ -67,42 +93,25 @@ def clusterby(
 
     if does_embed:
         by = by[0]
-        data = mk.embed(data, input=by, encoder="clip", out_col=".emb")
-
-        data.write("imagenette_clip_embedded_full.dp")
-
+        embedded_data = mk.embed(data, input=by, encoder="clip", out_col=".emb")
         by = [".emb"]
-
-    if len(by) > 1:
-        raise NotImplementedError()
-
-    arr = data[by[0]].data
-    groups = None
-    if isinstance(alg, str):
-        if alg == "kmeans":
-            alg = KMeans(n_clusters=10, random_state=0)
-        else:
-            raise NotImplementedError("Please consider passing in a custom object via the sklearn interface.")
-    if isinstance(alg, ClusterMixin):
-        groups = alg.fit(arr).labels_
-
-    if groups is not None:
-        data['.group'] = groups
-        return groupby(data, by = ".group")
+        return _clusterby(embedded_data, by, alg)
     else:
-        raise NotImplementedError()
-
+        return _clusterby(data, by, alg)
 
 
 def main():
 
-    dp = mk.get("imagenette").lz[:]
+
+
+    clusterby_intermediate = mk.DataPanel.read("imagenette_clip_embedded_full.dp")
+    clusters = _clusterby(clusterby_intermediate, [".emb"])
+
+    clusters.describe()
 
     
-    gb = clusterby(dp, by = 'img')["img"] # Numpy Array Column
-    
-    for class_id in gb.indices:
-        print(class_id, ":", gb.indices[class_id])
+    # for class_id in gb.indices:
+        # print(class_id, ":", gb.indices[class_id])
 
 if __name__ == "__main__":
     main()

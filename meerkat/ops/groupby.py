@@ -2,20 +2,89 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import Callable, Sequence, Union
+from collections import Counter
+import numpy as np
+import torch
 
 from meerkat.datapanel import DataPanel
-
+from meerkat import embed
 
 class AbstractColumnGroupBy:
     pass
 
 
+def mode(l):
+    item, count = Counter(l).most_common(1)[0]
+    return item, count / len(l)
+
 class BaseGroupBy(ABC):
-    def __init__(self, indices, data, by, keys) -> None:
+    def __init__(self, indices, data, by, keys, is_soft = False) -> None:
         self.indices = indices
         self.data = data
         self.by = by
         self.keys = keys
+        self.is_soft = is_soft
+
+
+    def describe(self) -> str:
+        if self.is_soft:
+
+
+            classes = list(set(self.data["label"].data.values))
+
+
+            correct_col = DataPanel({"class" : [c for c in classes], "label" : [f"a photo of a {c}" for c in classes]})
+            embed(correct_col, "label", modality = "text", out_col = ".emb", num_workers = 0)
+            embedded_images = self.data[".emb"]
+            embedding_label = correct_col[".emb"]
+
+
+
+
+            for i in range(len(embedded_images)):
+                im = torch.Tensor(embedded_images[i])
+                im /= im.norm(dim = -1, keepdim = True)
+                embedded_images[i] = im
+# d = {}
+
+            t_embedded_ims = torch.Tensor(embedded_images)
+
+            scores = torch.zeros((len(embedded_images), len(classes)))
+            for i in range(embedding_label.shape[0]):
+
+                emb = correct_col[i][".emb"] 
+
+                t = torch.Tensor(emb)
+                t /= t.norm(dim = -1, keepdim = True)
+
+                out = (t_embedded_ims * t).sum(axis = 1)
+
+                scores[:, i] = out
+
+
+
+            preds = scores.softmax(dim = -1).argmax(dim = -1)
+
+
+
+            class_preds = np.array([classes[i] for i in preds])
+            print("Description of generated clusters.")
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            
+
+
+            print(f"Created {len(self.indices)} clusters")
+            for i, group in enumerate(self.indices):
+                preds_by_group = class_preds[self.indices[group]]
+                item, freq = mode(preds_by_group)
+                print(f"Cluster {i} is made up of {round(freq * 100, 1)} {item}s")
+                
+                # print(f"Generating description for id: {group}")
+            print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+            return ""
+        else:
+            return "You already know this because it's a normal categorical value."
+
 
     def mean(self, *args, **kwargs):
         return self._reduce(lambda x: x.mean(*args, **kwargs))
@@ -64,6 +133,7 @@ class BaseGroupBy(ABC):
 def groupby(
     data: DataPanel,
     by: Union[str, Sequence[str]] = None,
+    is_soft: bool = False
 ) -> DataPanelGroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).
@@ -111,7 +181,7 @@ def groupby(
         if isinstance(by, str):
             by = [by]
         return DataPanelGroupBy(
-            data[by].to_pandas().groupby(by).indices, data, by, data.columns
+            data[by].to_pandas().groupby(by).indices, data, by, data.columns, is_soft
         )
     except Exception as e:
         # future work needed here.
@@ -120,6 +190,13 @@ def groupby(
 
 
 class DataPanelGroupBy(BaseGroupBy):
+
+    def describe(self) -> str:
+        return super().describe()
+
+    def get_assignments(self):
+        return self.indices
+
     def __getitem__(
         self, key: Union[str, Sequence[str]]
     ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
@@ -129,4 +206,4 @@ class DataPanelGroupBy(BaseGroupBy):
         if isinstance(key, str):
             key = [key]
 
-        return DataPanelGroupBy(indices, self.data[key], self.by, key)
+        return DataPanelGroupBy(indices, self.data[key], self.by, key, self.is_soft)
