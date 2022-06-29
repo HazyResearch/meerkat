@@ -112,15 +112,15 @@ def build_imagenet_dps(
         curr_dir = os.getcwd()
         os.makedirs(dataset_dir, exist_ok=True)
         os.chdir(dataset_dir)
-        subprocess.run(
-            args=[
-                "kaggle competitions download "
-                "-c imagenet-object-localization-challenge",
-            ],
-            shell=True,
-            check=True,
-        )
-        subprocess.run(["unzip", "imagenet-object-localization-challenge.zip"])
+        # subprocess.run(
+        #     args=[
+        #         "kaggle competitions download "
+        #         "-c imagenet-object-localization-challenge",
+        #     ],
+        #     shell=True,
+        #     check=True,
+        # )
+        #subprocess.run(["unzip", "imagenet-object-localization-challenge.zip"])
         subprocess.run(
             ["tar", "-xzvf", "imagenet_object_localization_patched2019.tar.gz"]
         )
