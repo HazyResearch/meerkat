@@ -20,7 +20,7 @@ class fer(DatasetBuilder):
 
     info = DatasetInfo(
         name="fer",
-        full_name="ImageNet",
+        full_name="Facial Expression Recognition Challenge",
         # flake8: noqa
         description="ImageNet is an image database organized according to the WordNet hierarchy (currently only the nouns), in which each node of the hierarchy is depicted by hundreds and thousands of images..",
         # flake8: noqa
@@ -44,6 +44,24 @@ class fer(DatasetBuilder):
             shell=True,
             check=True,
         )
-        extract("fer2013.tar.gz", "fer2013")
+        # extract(
+        #     os.path.join(
+        #         self.dataset_dir, 
+        #         "challenges-in-representation-learning-facial-expression-recognition-challenge.zip", 
+        #     ),
+        #     "fer2013"
+        # )
+        extract(
+            os.path.join(
+                self.dataset_dir,
+                "fer2013",
+                "fer2013.tar.gz"
+            ),
+            os.path.join(
+                self.dataset_dir,
+                "fer2013",
+                "images"
+            )
+        )
         os.chdir(curr_dir)
 

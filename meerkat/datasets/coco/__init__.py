@@ -4,6 +4,77 @@ import subprocess
 
 import meerkat as mk
 
+import os
+
+import meerkat as mk
+
+from ..abstract import DatasetBuilder
+from ..info import DatasetInfo
+from ..registry import datasets
+from ..utils import download_url, extract
+
+IMAGE_URL = "http://images.cocodataset.org/zips/{split}{version}.zip"
+TEST_LABEL_URL = "http://images.cocodataset.org/annotations/image_info_test{version}.zip"  # flake8: noqa
+TRAIN_VAL_LABEL_URL = "http://images.cocodataset.org/annotations/annotations_trainval{version}.zip"  # flake8: noqa
+
+
+@datasets.register()
+class coco(DatasetBuilder):
+    VERSIONS = ["2014"]
+
+    info = DatasetInfo(
+        name="coco",
+        full_name="Common Objects in Context",
+        description="Image data sets for object class recognition.",
+        homepage="https://cocodataset.org/#home",
+        tags=["image", "object recognition"],
+        citation=None,
+    )
+
+    def build(self):
+        dps = []
+        for split in ["train", "val"]:
+            dct = json.load(
+                open(
+                    os.path.join(
+                        self.dataset_dir, f"annotations/instances_{split}2014.json"
+                    ),
+                    "rb",
+                )
+            )
+
+            dp = mk.DataPanel(dct["images"])
+            dp["split"] = [split] * len(dp)
+            dps.append(dp)
+
+        dp = mk.concat(dps, axis=0)
+
+        path = dp["split"] + "2014/" + dp["file_name"]
+        dp["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.dataset_dir)
+
+        dp.data.reorder(
+            ["id", "image"] + [c for c in dp.columns if c not in ["id", "image"]]
+        )
+        return dp
+
+    def download(self):
+
+        for split in ["train", "val", "test"]:
+            downloaded_path = download_url(
+                IMAGE_URL.format(version=self.version, split=split), self.dataset_dir
+            )
+            extract(downloaded_path, self.dataset_dir)
+
+        downloaded_path = download_url(
+            TEST_LABEL_URL.format(version=self.version), self.dataset_dir
+        )
+        extract(downloaded_path, self.dataset_dir)
+
+        downloaded_path = download_url(
+            TRAIN_VAL_LABEL_URL.format(version=self.version), self.dataset_dir
+        )
+        extract(downloaded_path, self.dataset_dir)
+
 
 def build_coco_2014_dp(dataset_dir: str, download: bool = False):
     if download:

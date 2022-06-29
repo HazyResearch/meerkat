@@ -34,6 +34,7 @@ class celeba(DatasetBuilder):
         dp["image"] = mk.ImageColumn.from_filepaths(
             filepaths=dp["img_path"], base_dir=self.dataset_dir
         )
+        return dp 
 
     def download(self):
         download_celeba(self.dataset_dir)

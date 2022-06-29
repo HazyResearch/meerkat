@@ -60,15 +60,31 @@ class expw(DatasetBuilder):
                 "Some images are not downloaded to expected directory: "
                 f"{os.path.join(self.dataset_dir, 'image/origin')}. Verify download."
             )
+
+        # remove file extension and add the face_id
+        dp["example_id"] = (
+            dp["image_name"].str.replace(".jpg", "", regex=False)
+            + "_"
+            + dp["face_id_in_image"].astype(str)
+        )
+
         dp["image"] = mk.ImageColumn.from_filepaths(
             "image/origin/" + dp["image_name"], base_dir=self.dataset_dir
         )
+        dp["face_image"] = dp[
+            "image",
+            "face_box_top",
+            "face_box_left",
+            "face_box_right",
+            "face_box_bottom",
+        ].to_lambda(crop)
 
         return dp
 
     def download(self):
         gdrive_id = self.VERSION_TO_GDRIVE_ID[self.version]
-        #download_google_drive(id=gdrive_id, dst=self.dataset_dir, is_folder=True)
+        download_google_drive(id=gdrive_id, dst=self.dataset_dir, is_folder=True)
+        os.makedirs(os.path.join(self.dataset_dir, "image"), exist_ok=True)
 
         for file in os.listdir(os.path.join(self.dataset_dir, "image")):
             # run 7za to extract the file using subprocess
@@ -83,4 +99,6 @@ class expw(DatasetBuilder):
 
 
 def crop(row: dict):
-    row["image"]
+    return row["image"].crop(
+        (row["face_box_left"], row["face_box_top"], row["face_box_right"], row["face_box_bottom"])
+    )
