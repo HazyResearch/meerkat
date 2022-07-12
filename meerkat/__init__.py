@@ -25,6 +25,7 @@ from meerkat.datasets import get
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
 from meerkat.ops.merge import merge
+from meerkat.ops.sample import sample
 from meerkat.ops.sort import sort
 from meerkat.provenance import provenance
 
@@ -60,6 +61,7 @@ __all__ = [
     "merge",
     "embed",
     "sort",
+    "sample",
     "provenance",
     "config",
 ]

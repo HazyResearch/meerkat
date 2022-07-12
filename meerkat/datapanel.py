@@ -755,6 +755,46 @@ class DataPanel(
 
         return sort(data=self, by=by, ascending=ascending, kind=kind)
 
+    def sample(
+        self,
+        n: int = None,
+        frac: float = None,
+        replace: bool = False,
+        weights: Union[str, np.ndarray] = None,
+        random_state: Union[int, np.random.RandomState] = None,
+    ) -> DataPanel:
+        """Select a random sample of rows from DataPanel. Roughly equivalent to
+        ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
+        s.DataFrame.sample.html.
+
+        Args:
+            n (int): Number of samples to draw. If `frac` is specified, this parameter
+                should not be passed. Defaults to 1 if `frac` is not passed.
+            frac (float): Fraction of rows to sample. If `n` is specified, this
+                parameter should not be passed.
+            replace (bool): Sample with or without replacement. Defaults to False.
+            weights (Union[str, np.ndarray]): Weights to use for sampling. If `None`
+                (default), the rows will be sampled uniformly. If a numpy array, the
+                sample will be weighted accordingly. If a string, the weights will be
+                applied to the rows based on the column with the name specified. If
+                weights do not sum to 1 they will be normalized to sum to 1.
+            random_state (Union[int, np.random.RandomState]): Random state or seed to
+                use for sampling.
+
+        Return:
+            DataPanel: A random sample of rows from the DataPanel.
+        """
+        from meerkat import sample
+
+        return sample(
+            data=self,
+            n=n,
+            frac=frac,
+            replace=replace,
+            weights=weights,
+            random_state=random_state,
+        )
+
     def items(self):
         for name in self.columns:
             yield name, self.data[name]
