@@ -357,9 +357,6 @@ class AbstractColumn(
     ) -> AbstractColumn:
         """Return a sorted view of the column.
 
-        TODO(Hannah): Implement this method in subclasses of AbstractColumn and
-        ask Sabri for pointers on implementing tests.
-
         Args:
             ascending (Union[bool, List[bool]]): Whether to sort in ascending or
                 descending order. If a list, must be the same length as `by`. Defaults
@@ -375,9 +372,6 @@ class AbstractColumn(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
     ) -> AbstractColumn:
         """Return indices that would sorted the column.
-
-        TODO(Hannah): Implement this method in subclasses of AbstractColumn and
-        ask Sabri for pointers on implementing tests.
 
         Args:
             ascending (Union[bool, List[bool]]): Whether to sort in ascending or

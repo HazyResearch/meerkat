@@ -232,7 +232,10 @@ class TensorColumn(
 
     def to_pandas(self) -> pd.Series:
         if len(self.shape) == 1:
-            return pd.Series(self.data)
+            return pd.Series(self.to_numpy())
         else:
             # can only create a 1-D series
             return super().to_pandas()
+
+    def to_numpy(self) -> pd.Series:
+        return self.data.detach().cpu().numpy()

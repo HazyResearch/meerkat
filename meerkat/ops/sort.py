@@ -1,27 +1,18 @@
 from typing import List, Union
 
-from meerkat import AbstractColumn, DataPanel
+import numpy as np
+
+from meerkat import DataPanel
 
 
 def sort(
-    self,
-    data: Union[DataPanel, AbstractColumn],
+    data: DataPanel,
     by: Union[str, List[str]],
     ascending: Union[bool, List[bool]] = True,
     kind: str = "quicksort",
 ) -> DataPanel:
     """Sort a DataPanel or Column. If a DataPanel, sort by the values in the
     specified columns. Similar to ``sort_values`` in pandas.
-
-    TODO(Hannah): Implement this method and add tests for it in
-    tests/meerkat/ops/test_sort.py
-    This method will rely on implementations of sort and argsort for each of the
-    column types:
-    e.g. NumpyArrayColumn.sort(), PandasSeriesColumn.sort(), TensorColumn.sort().
-    Recommend implementing this in a top down manner – so start with this implementation
-    of sort, assuming you have access to implementations of argsort and sort for each
-    column type. Then implement sort for those column types. Ask questions if things are
-    unclear or you're stuck!
 
     Args:
         data (Union[DataPanel, AbstractColumn]): DataPanel or Column to sort.
@@ -35,4 +26,19 @@ def sort(
     Return:
         DataPanel: A sorted view of DataPanel.
     """
-    raise NotImplementedError
+    by = [by] if isinstance(by, str) else by
+
+    if len(by) > 1:  # Sort with multiple column
+        keys = []
+        for col in by[::-1]:
+            keys.append(data[col].to_numpy())
+
+        sorted_indices = np.lexsort(keys=keys)
+
+        if ascending is False:
+            sorted_indices = sorted_indices[::-1].copy()
+
+    else:  # Sort with single column
+        sorted_indices = data[by[0]].argsort(ascending=ascending, kind=kind)
+
+    return data.lz[sorted_indices]

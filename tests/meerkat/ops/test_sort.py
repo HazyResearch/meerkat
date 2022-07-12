@@ -7,11 +7,11 @@ import pandas as pd
 import meerkat as mk
 
 
-# helper function, returns test dp
 def make_test_dp(
     by: Union[str, List[str]],
     ascending: Union[bool, List[bool]] = True,
 ):
+    """Helper function, returns test dp."""
     dp = mk.DataPanel(
         {
             "tensor": mk.TensorColumn([3, 1, 2]),
@@ -41,8 +41,10 @@ def make_tiebreaker_test_dp(
 # flake8: noqa
 ######## SINGLE COLUMN TESTS ########
 
-# Testing all columns after sorting by an ascending tensor column
+
 def test_sort_by_ascending_tensor_column():
+    """Testing all columns after sorting by an ascending tensor column."""
+
     test = make_test_dp(by=["tensor"])
     assert (
         (test["tensor"] == mk.TensorColumn([1, 2, 3])).all()
@@ -51,8 +53,9 @@ def test_sort_by_ascending_tensor_column():
     )
 
 
-# Testing all columns after sorting by an ascending pandas column
 def test_sort_by_ascending_pandas_on_pandas_column():
+    """Testing all columns after sorting by an ascending pandas column."""
+
     test = make_test_dp(by=["pandas"])
     assert (
         (test["tensor"] == mk.TensorColumn([2, 1, 3])).all()
@@ -61,8 +64,9 @@ def test_sort_by_ascending_pandas_on_pandas_column():
     )
 
 
-# Testing all columns after sorting by an ascending numpy column
 def test_sort_single_numpy_column_ascending():
+    """Testing all columns after sorting by an ascending numpy column."""
+
     test = make_test_dp(by=["numpy"])
     assert (
         (test["tensor"] == mk.TensorColumn([1, 3, 2])).all()
@@ -71,9 +75,13 @@ def test_sort_single_numpy_column_ascending():
     )
 
 
+# flake8: noqa
 ######## SINGLE COLUMN TESTS DESCENDING ########
-# Testing all columns after sorting by a descending tensor column
+
+
 def test_sort_single_tensor_column_descending():
+    """Testing all columns after sorting by a descending tensor column."""
+
     test = make_test_dp(by=["tensor"], ascending=False)
     assert (
         (test["tensor"] == mk.TensorColumn([3, 2, 1])).all()
@@ -82,8 +90,8 @@ def test_sort_single_tensor_column_descending():
     )
 
 
-# Testing all columns after sorting by a descending pandas column
 def test_sort_single_pandas_column_descending():
+    """Testing all columns after sorting by a descending pandas column."""
     test = make_test_dp(by=["pandas"], ascending=False)
     assert (
         (test["tensor"] == mk.TensorColumn([3, 1, 2])).all()
@@ -92,8 +100,8 @@ def test_sort_single_pandas_column_descending():
     )
 
 
-# Testing all columns after sorting by a descending numpy column
 def test_sort_single_numpy_column_descending():
+    """Testing all columns after sorting by a descending numpy column."""
     test = make_test_dp(by=["numpy"], ascending=False)
     assert (
         (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
@@ -104,8 +112,10 @@ def test_sort_single_numpy_column_descending():
 
 ######## MULTIPLE COLUMN TESTS ########
 
-# Testing all columns after sorting with multiple ascending columns (numpy and tensor)
+
 def test_sort_numpy_and_tensor_ascending():
+    """# Testing all columns after sorting with multiple ascending columns
+    (numpy and tensor)"""
     test = make_tiebreaker_test_dp(by=["numpy", "tensor"], ascending=True)
     assert (
         (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
@@ -114,8 +124,9 @@ def test_sort_numpy_and_tensor_ascending():
     )
 
 
-# Testing all columns after sorting with multiple ascending columns (numpy and pandas)
 def test_sort_numpy_and_pandas_ascending():
+    """Testing all columns after sorting with multiple ascending columns (numpy
+    and tensor)"""
     test = make_tiebreaker_test_dp(by=["numpy", "pandas"], ascending=True)
     assert (
         (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
@@ -124,8 +135,9 @@ def test_sort_numpy_and_pandas_ascending():
     )
 
 
-# Testing all columns after sorting with multiple ascending columns (numpy and pandas and tensor)
 def test_sort_numpy_and_pandas_and_tensor_ascending():
+    """Testing all columns after sorting with multiple ascending columns (numpy
+    and pandas and tensor)"""
     dp = mk.DataPanel(
         {
             "tensor": mk.TensorColumn([3, 2, 1]),
@@ -141,8 +153,9 @@ def test_sort_numpy_and_pandas_and_tensor_ascending():
     )
 
 
-# Testing all columns after sorting with multiple ascending columns (tensor and pandas)
 def test_sort_tensor_and_pandas_descending():
+    """Testing all columns after sorting with multiple ascending columns
+    (tensor and pandas)."""
     dp = mk.DataPanel(
         {
             "tensor": mk.TensorColumn([3, 2, 2]),
