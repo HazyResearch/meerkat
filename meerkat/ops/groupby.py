@@ -1,70 +1,68 @@
 from __future__ import annotations
 
-from abc import ABC
-from typing import Callable, Sequence, Union
+from typing import Callable, Dict, List, Sequence, Tuple, Union
+
+import numpy as np
 
 from meerkat.datapanel import DataPanel
 
 
-class AbstractColumnGroupBy:
-    pass
-
-
-class BaseGroupBy(ABC):
-    def __init__(self, indices, data, by, keys) -> None:
-        self.indices = indices
+class GroupBy:
+    def __init__(
+        self,
+        data: DataPanel,
+        indices: Dict[Union[str, Tuple[str]], np.ndarray],
+        by: Union[List[str], str],
+    ):
+        self.indices = [indices] if isinstance(indices, str) else indices
         self.data = data
         self.by = by
-        self.keys = keys
 
     def mean(self, *args, **kwargs):
         return self._reduce(lambda x: x.mean(*args, **kwargs))
 
     def _reduce(self, f: Callable):
         """self.indices are a dictionary of {labels : [indices]}"""
-        # inputs: self.indices are a dictionary of {
-        #   labels : [indices]
-        # }
-        labels = list(self.indices.keys())
+        group_keys = list(self.indices.keys())
 
         # sorting them so that they appear in a nice order.
-        labels.sort()
+        group_keys.sort()
 
         # Means will be a list of dictionaries where each element in the dict
-
-        means = []
-        for label in labels:
+        groups = []
+        for label in group_keys:
             indices_l = self.indices[label]
             relevant_rows_where_by_is_label = self.data.lz[indices_l]
             m = f(relevant_rows_where_by_is_label)
-            means.append(m)
+            groups.append(m)
 
         from meerkat.datapanel import DataPanel
 
-        # Create data panel as a list of rows.
-        out = DataPanel(means)
-
-        assert isinstance(self.by, list)
+        # Create DataPanel as a list of rows.
+        out = DataPanel(groups)
 
         # Add the by columns.
-        if len(labels) > 0:
-            if isinstance(labels[0], tuple):
-                columns = list(zip(*labels))
-
+        if len(group_keys) > 0:
+            if len(self.by) > 1:
+                columns = list(zip(*group_keys))
                 for i, col in enumerate(self.by):
                     out[col] = columns[i]
             else:
-                # This is the only way that this can occur.
-                assert len(self.by) == 1
                 col = self.by[0]
-                out[col] = labels
+                out[col] = group_keys
         return out
+
+    def __getitem__(self, key: Union[str, Sequence[str]]) -> GroupBy:
+        if isinstance(key, str):
+            key = [key]
+
+        return GroupBy(data=self.data[key], indices=self.indices, by=self.by)
 
 
 def groupby(
     data: DataPanel,
     by: Union[str, Sequence[str]] = None,
-) -> DataPanelGroupBy:
+) -> GroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).
 
@@ -110,23 +108,10 @@ def groupby(
     try:
         if isinstance(by, str):
             by = [by]
-        return DataPanelGroupBy(
-            data[by].to_pandas().groupby(by).indices, data, by, data.columns
+        return GroupBy(
+            data=data, indices=data[by].to_pandas().groupby(by).indices, by=by
         )
     except Exception as e:
         # future work needed here.
         print("dataPanel group by error", e)
         raise NotImplementedError()
-
-
-class DataPanelGroupBy(BaseGroupBy):
-    def __getitem__(
-        self, key: Union[str, Sequence[str]]
-    ) -> Union[DataPanelGroupBy, AbstractColumnGroupBy]:
-        indices = self.indices
-        # TODO: weak reference?
-
-        if isinstance(key, str):
-            key = [key]
-
-        return DataPanelGroupBy(indices, self.data[key], self.by, key)

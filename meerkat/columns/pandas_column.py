@@ -307,10 +307,13 @@ class PandasSeriesColumn(
         # TODO (Sabri): understand why `torch.tensor(column)` is so slow
         return torch.tensor(self.data.values)
 
+    def to_numpy(self) -> torch.Tensor:
+        return self.values
+
+    def to_pandas(self) -> pd.Series:
+        return self.data
+
     def is_equal(self, other: AbstractColumn) -> bool:
         if other.__class__ != self.__class__:
             return False
         return (self.data.values == other.data.values).all()
-
-    def to_pandas(self) -> pd.Series:
-        return self.data

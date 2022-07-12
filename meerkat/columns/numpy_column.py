@@ -245,6 +245,9 @@ class NumpyArrayColumn(
             # can only create a 1-D series
             return super().to_pandas()
 
+    def to_numpy(self) -> np.ndarray:
+        return self.data
+
     @classmethod
     def from_npy(
         cls,
