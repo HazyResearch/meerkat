@@ -9,6 +9,7 @@ from .imagenette import imagenette
 from .mirflickr import mirflickr
 from .pascal import pascal
 from .fer import fer
+from .rfw import rfw
 from .coco import coco 
 from .ngoa import ngoa
 from .registry import datasets
@@ -21,6 +22,7 @@ __all__ = [
     "pascal",
     "expw",
     "fer",
+    "rfw", 
     "ngoa",
     "coco"
 ]

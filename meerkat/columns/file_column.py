@@ -164,6 +164,7 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
 def download_image(url: str, cache_dir: str):
     parse = urlparse(url)
     local_path = os.path.join(cache_dir, parse.netloc + parse.path)
+
     if not os.path.exists(local_path):
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
         try:

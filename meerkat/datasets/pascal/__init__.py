@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import meerkat as mk
 
@@ -46,7 +47,11 @@ class pascal(DatasetBuilder):
         url = self.VERSION_TO_URL[self.version]
 
         downloaded_path = download_url(url, self.dataset_dir)
-        extract(downloaded_path, os.path.join(self.dataset_dir, "VOCdevkit"))
+        extract(downloaded_path, os.path.join(self.dataset_dir, "tmp"))
+        shutil.move(
+            os.path.join(self.dataset_dir, "tmp/VOCdevkit"), 
+            os.path.join(self.dataset_dir, "VOCdevkit")
+        )
 
 
 def build_pascal_2012_dp(dataset_dir: str):
