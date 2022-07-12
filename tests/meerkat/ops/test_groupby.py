@@ -2,7 +2,7 @@ import numpy as np
 
 from meerkat import ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.datapanel import DataPanel
-from meerkat.ops.groupby import DataPanelGroupBy, groupby
+from meerkat.ops.groupby import GroupBy, groupby
 
 # Comment for meeting 5/19: Testing group by multiple columns,
 # single columns on list, on string.
@@ -36,7 +36,7 @@ def test_group_by_type():
 
     df = groupby(dp, "name")
 
-    assert isinstance(df, DataPanelGroupBy)
+    assert isinstance(df, GroupBy)
 
 
 def test_tensor_column_by():
