@@ -1,9 +1,6 @@
 from typing import Union
 
 import numpy as np
-import pandas.core.common as com
-from pandas.core.sample import process_sampling_size
-from pandas.core.sample import sample as _sample
 
 from meerkat import AbstractColumn, DataPanel
 
@@ -39,6 +36,10 @@ def sample(
         Union[DataPanel, AbstractColumn]: A random sample of rows from DataPanel or
             Column.
     """
+    import pandas.core.common as com
+    from pandas.core.sample import process_sampling_size
+    from pandas.core.sample import sample as _sample
+
     if isinstance(weights, str):
         if isinstance(data, AbstractColumn):
             raise ValueError(
