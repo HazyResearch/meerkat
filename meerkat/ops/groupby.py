@@ -52,7 +52,7 @@ class BaseGroupBy(ABC):
                 embedded_images[i] = im
             t_embedded_ims = torch.Tensor(embedded_images)
 
-            print("Error", torch.norm(torch.Tensor(embedded_images_vec) - t_embedded_ims).item())
+            print("Error", torch.norm(torch.Tensor(embedded_images_vec) - t_embedded_ims) / torch.norm(t_embedded_ims).item())
             # assert(torch.norm(torch.Tensor(embedded_images_vec) - t_embedded_ims) < 1e-8)
 
             
@@ -76,6 +76,8 @@ class BaseGroupBy(ABC):
 
 
             class_preds = np.array([classes[i] for i in preds])
+
+            self.data[".class_preds"] = class_preds
             print("Description of generated clusters.")
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             

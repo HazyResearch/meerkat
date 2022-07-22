@@ -11,6 +11,11 @@ def embed( img):
     return np.array(img).mean(axis = 0).mean(axis = 0)
 
 
+def get_edge_indices(dp : DataPanel):
+    cluster = clusterby(dp, "img")
+    cluster.describe()
+    return cluster.data[".class_preds"] != cluster.data["img"]
+
 
 def _clusterby(embedded_data: DataPanel,
     by: Sequence[str] = None,
@@ -108,6 +113,8 @@ def main():
     clusters = _clusterby(clusterby_intermediate, [".emb"])
 
     clusters.describe()
+
+    ind = get_edge_indices()
 
     
     # for class_id in gb.indices:
