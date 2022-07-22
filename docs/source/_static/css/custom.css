@@ -1,0 +1,7 @@
+html[data-theme="light"] {
+    /*****************************************************************************
+    * main colors
+    */
+    --pst-color-primary: rgb(19,7,83);
+    --pst-color-secondary: rgb(252,177,62);
+}
