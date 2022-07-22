@@ -100,5 +100,10 @@ class expw(DatasetBuilder):
 
 def crop(row: dict):
     return row["image"].crop(
-        (row["face_box_left"], row["face_box_top"], row["face_box_right"], row["face_box_bottom"])
+        (
+            row["face_box_left"],
+            row["face_box_top"],
+            row["face_box_right"],
+            row["face_box_bottom"],
+        )
     )

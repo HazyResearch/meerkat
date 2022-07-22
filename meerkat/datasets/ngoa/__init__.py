@@ -4,10 +4,6 @@ import subprocess
 
 import meerkat as mk
 
-import os
-
-import meerkat as mk
-
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
@@ -47,7 +43,7 @@ class ngoa(DatasetBuilder):
             db["published_images"]["iiifthumburl"],
             loader=Downloader(cache_dir=os.path.join(base_dir, "iiifthumburl")),
         )
-        return db 
+        return db
 
     def download(self):
 

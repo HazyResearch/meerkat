@@ -4,18 +4,20 @@ import subprocess
 
 import meerkat as mk
 
-import os
-
-import meerkat as mk
-
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
 from ..utils import download_url, extract
 
 IMAGE_URL = "http://images.cocodataset.org/zips/{split}{version}.zip"
-TEST_LABEL_URL = "http://images.cocodataset.org/annotations/image_info_test{version}.zip"  # flake8: noqa
-TRAIN_VAL_LABEL_URL = "http://images.cocodataset.org/annotations/annotations_trainval{version}.zip"  # flake8: noqa
+# flake8: noqa
+TEST_LABEL_URL = (
+    "http://images.cocodataset.org/annotations/image_info_test{version}.zip"
+)
+# flake8: noqa
+TRAIN_VAL_LABEL_URL = (
+    "http://images.cocodataset.org/annotations/annotations_trainval{version}.zip"
+)
 
 
 @datasets.register()

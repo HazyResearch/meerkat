@@ -49,8 +49,8 @@ class pascal(DatasetBuilder):
         downloaded_path = download_url(url, self.dataset_dir)
         extract(downloaded_path, os.path.join(self.dataset_dir, "tmp"))
         shutil.move(
-            os.path.join(self.dataset_dir, "tmp/VOCdevkit"), 
-            os.path.join(self.dataset_dir, "VOCdevkit")
+            os.path.join(self.dataset_dir, "tmp/VOCdevkit"),
+            os.path.join(self.dataset_dir, "VOCdevkit"),
         )
 
 

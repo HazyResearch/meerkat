@@ -29,7 +29,7 @@ class fer(DatasetBuilder):
     )
 
     def build(self):
-        pass 
+        pass
         return None
 
     def download(self):
@@ -46,22 +46,13 @@ class fer(DatasetBuilder):
         )
         # extract(
         #     os.path.join(
-        #         self.dataset_dir, 
-        #         "challenges-in-representation-learning-facial-expression-recognition-challenge.zip", 
+        #         self.dataset_dir,
+        #         "challenges-in-representation-learning-facial-expression-recognition-challenge.zip",
         #     ),
         #     "fer2013"
         # )
         extract(
-            os.path.join(
-                self.dataset_dir,
-                "fer2013",
-                "fer2013.tar.gz"
-            ),
-            os.path.join(
-                self.dataset_dir,
-                "fer2013",
-                "images"
-            )
+            os.path.join(self.dataset_dir, "fer2013", "fer2013.tar.gz"),
+            os.path.join(self.dataset_dir, "fer2013", "images"),
         )
         os.chdir(curr_dir)
-

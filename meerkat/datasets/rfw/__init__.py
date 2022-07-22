@@ -1,6 +1,6 @@
-from multiprocessing.sharedctypes import Value
 import os
 import subprocess
+from multiprocessing.sharedctypes import Value
 from typing import Dict
 
 import numpy as np
@@ -38,27 +38,23 @@ class rfw(DatasetBuilder):
             df = pd.read_csv(
                 os.path.join(self.dataset_dir, f"test/txts/{group}/{group}_images.txt"),
                 delimiter="\t",
-                names=["filename", "count"]
+                names=["filename", "count"],
             )
 
             df["ethnicity"] = group.lower()
             df["identity"] = df["filename"].str.rsplit("_", n=1).str[0]
             df["image_id"] = df["filename"].str.rsplit(".", n=1).str[0]
             df["image_path"] = df.apply(
-                lambda x: f"test/data/{group}/{x['identity']}/{x['filename']}",
-                axis=1
+                lambda x: f"test/data/{group}/{x['identity']}/{x['filename']}", axis=1
             )
             df.drop(columns=["filename", "count"])
             dfs.append(df)
         df = pd.concat(dfs)
         dp = mk.DataPanel.from_pandas(df)
         dp["image"] = mk.ImageColumn.from_filepaths(
-            dp["image_path"],
-            base_dir=self.dataset_dir
+            dp["image_path"], base_dir=self.dataset_dir
         )
         return dp[["image_id", "identity", "ethnicity", "image"]]
-
-
 
         return None
 
