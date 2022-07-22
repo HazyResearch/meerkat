@@ -43,7 +43,6 @@ REQUIRED = [
     "datasets>=1.4.1",
     "PyYAML>=5.4.1",
     "omegaconf>=2.0.5",
-    "fuzzywuzzy>=0.18.0",
     "semver>=2.13.0",
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
@@ -84,7 +83,6 @@ EXTRAS = {
     "text": [
         "transformers",
         "spacy>=3.0.0",
-        "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
     "audio": ["torchaudio"],
