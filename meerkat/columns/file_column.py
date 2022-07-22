@@ -68,11 +68,12 @@ class FileCell(FileLoaderMixin, LambdaCell):
 
 
 class FileColumn(FileLoaderMixin, LambdaColumn):
-    """A column where each cell represents an file stored on disk or the web. The
-    underlying data is a `PandasSeriesColumn` of strings, where each string is the path
-    to a file. The column materializes the files into memory when indexed. If the column
-    is lazy indexed with the ``lz`` indexer, the files are not materialized and a
-    ``FileCell`` or a ``FileColumn`` is returned instead.
+    """A column where each cell represents an file stored on disk or the web.
+    The underlying data is a `PandasSeriesColumn` of strings, where each string
+    is the path to a file. The column materializes the files into memory when
+    indexed. If the column is lazy indexed with the ``lz`` indexer, the files
+    are not materialized and a ``FileCell`` or a ``FileColumn`` is returned
+    instead.
 
     Args:
         data (Sequence[str]): A list of filepaths to images.
@@ -93,8 +94,6 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
 
         base_dir (str): A base directory that the paths in ``data`` are relative to. If
             ``None``, the paths are assumed to be absolute.
-
-
     """
 
     def __init__(
@@ -165,6 +164,7 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
 def download_image(url: str, cache_dir: str):
     parse = urlparse(url)
     local_path = os.path.join(cache_dir, parse.netloc + parse.path)
+
     if not os.path.exists(local_path):
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
         try:

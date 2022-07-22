@@ -262,7 +262,7 @@ class AbstractColumn(
 
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         if len(self) > max_rows:
             col = pd.Series(
@@ -281,7 +281,7 @@ class AbstractColumn(
     def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         if len(self) > max_rows:
             pd_index = np.concatenate(
@@ -351,6 +351,77 @@ class AbstractColumn(
         )
         indices = np.where(outputs)[0]
         return self.lz[indices]
+
+    def sort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> AbstractColumn:
+        """Return a sorted view of the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
+        """
+        raise NotImplementedError
+
+    def argsort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> AbstractColumn:
+        """Return indices that would sorted the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
+        """
+        raise NotImplementedError
+
+    def sample(
+        self,
+        n: int = None,
+        frac: float = None,
+        replace: bool = False,
+        weights: Union[str, np.ndarray] = None,
+        random_state: Union[int, np.random.RandomState] = None,
+    ) -> AbstractColumn:
+        """Select a random sample of rows from Column. Roughly equivalent to
+        ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
+        s.DataFrame.sample.html.
+
+        Args:
+            n (int): Number of samples to draw. If `frac` is specified, this parameter
+                should not be passed. Defaults to 1 if `frac` is not passed.
+            frac (float): Fraction of rows to sample. If `n` is specified, this
+                parameter should not be passed.
+            replace (bool): Sample with or without replacement. Defaults to False.
+            weights (np.ndarray): Weights to use for sampling. If `None`
+                (default), the rows will be sampled uniformly. If a numpy array, the
+                sample will be weighted accordingly. If
+                weights do not sum to 1 they will be normalized to sum to 1.
+            random_state (Union[int, np.random.RandomState]): Random state or seed to
+                use for sampling.
+
+        Return:
+            AbstractColumn: A random sample of rows from the DataPanel.
+        """
+        from meerkat import sample
+
+        return sample(
+            data=self,
+            n=n,
+            frac=frac,
+            replace=replace,
+            weights=weights,
+            random_state=random_state,
+        )
 
     def append(self, column: AbstractColumn) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
@@ -438,6 +509,8 @@ class AbstractColumn(
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
+        from .numpy_column import NumpyArrayColumn
+
         if isinstance(data, AbstractColumn):
             # TODO: Need ton make this view but should decide where to do it exactly
             return data  # .view()
@@ -453,8 +526,6 @@ class AbstractColumn(
             return TensorColumn(data)
 
         if isinstance(data, np.ndarray):
-            from .numpy_column import NumpyArrayColumn
-
             return NumpyArrayColumn(data)
 
         if isinstance(data, Sequence):
@@ -466,9 +537,8 @@ class AbstractColumn(
                 return CellColumn(data)
 
             if len(data) != 0 and isinstance(
-                data[0], (int, float, bool, np.ndarray, np.generic)
+                data[0], (int, float, bool, np.ndarray, np.generic, NumpyArrayColumn)
             ):
-                from .numpy_column import NumpyArrayColumn
 
                 return NumpyArrayColumn(data)
 

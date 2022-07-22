@@ -1,11 +1,6 @@
 meerkat.mixins package
 ======================
 
-.. automodule:: meerkat.mixins
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Submodules
 ----------
 
@@ -77,6 +72,14 @@ meerkat.mixins.materialize module
 ---------------------------------
 
 .. automodule:: meerkat.mixins.materialize
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: meerkat.mixins
    :members:
    :undoc-members:
    :show-inheritance:

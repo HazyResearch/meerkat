@@ -18,7 +18,6 @@ from typing import (
 )
 
 import cytoolz as tz
-import datasets
 import dill
 import numpy as np
 import pandas as pd
@@ -64,7 +63,7 @@ class DataPanel(
 
     def __init__(
         self,
-        data: Union[dict, list, datasets.Dataset] = None,
+        data: Union[dict, list] = None,
         *args,
         **kwargs,
     ):
@@ -78,7 +77,7 @@ class DataPanel(
 
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         df, formatters = self.data._repr_pandas_(max_rows=max_rows)
         rename = {k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
@@ -89,7 +88,7 @@ class DataPanel(
 
     def _repr_html_(self, max_rows: int = None):
         if max_rows is None:
-            max_rows = meerkat.config.DisplayOptions.max_rows
+            max_rows = meerkat.config.display.max_rows
 
         df, formatters = self._repr_pandas_(max_rows=max_rows)
 
@@ -317,6 +316,8 @@ class DataPanel(
 
         >>> dict_of_datapanels = DataPanel.from_huggingface('boolq')
         """
+        import datasets
+
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
 
@@ -730,6 +731,70 @@ class DataPanel(
             validate=validate,
         )
 
+    def sort(
+        self,
+        by: Union[str, List[str]],
+        ascending: Union[bool, List[bool]] = True,
+        kind: str = "quicksort",
+    ) -> DataPanel:
+        """Sort the DataPanel by the values in the specified columns. Similar
+        to ``sort_values`` in pandas.
+
+        Args:
+            by (Union[str, List[str]]): The columns to sort by.
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`.Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+
+        Return:
+            DataPanel: A sorted view of DataPanel.
+        """
+        from meerkat import sort
+
+        return sort(data=self, by=by, ascending=ascending, kind=kind)
+
+    def sample(
+        self,
+        n: int = None,
+        frac: float = None,
+        replace: bool = False,
+        weights: Union[str, np.ndarray] = None,
+        random_state: Union[int, np.random.RandomState] = None,
+    ) -> DataPanel:
+        """Select a random sample of rows from DataPanel. Roughly equivalent to
+        ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
+        s.DataFrame.sample.html.
+
+        Args:
+            n (int): Number of samples to draw. If `frac` is specified, this parameter
+                should not be passed. Defaults to 1 if `frac` is not passed.
+            frac (float): Fraction of rows to sample. If `n` is specified, this
+                parameter should not be passed.
+            replace (bool): Sample with or without replacement. Defaults to False.
+            weights (Union[str, np.ndarray]): Weights to use for sampling. If `None`
+                (default), the rows will be sampled uniformly. If a numpy array, the
+                sample will be weighted accordingly. If a string, the weights will be
+                applied to the rows based on the column with the name specified. If
+                weights do not sum to 1 they will be normalized to sum to 1.
+            random_state (Union[int, np.random.RandomState]): Random state or seed to
+                use for sampling.
+
+        Return:
+            DataPanel: A random sample of rows from the DataPanel.
+        """
+        from meerkat import sample
+
+        return sample(
+            data=self,
+            n=n,
+            frac=frac,
+            replace=replace,
+            weights=weights,
+            random_state=random_state,
+        )
+
     def items(self):
         for name in self.columns:
             yield name, self.data[name]
@@ -817,3 +882,27 @@ class DataPanel(
 
     def __finalize__(self, *args, **kwargs):
         return self
+
+    def groupby(self, *args, **kwargs):
+        from meerkat.ops.groupby import groupby
+
+        return groupby(self, *args, **kwargs)
+
+    def mean(self, *args, **kwargs) -> DataPanel:
+
+        result = {}
+
+        for column in self.columns:
+            from meerkat.columns.tensor_column import TensorColumn
+
+            mean = None
+            if isinstance(self.data[column], TensorColumn):
+                tensor = self.data[column].to_tensor()
+                mean = tensor.double().mean(*args, **kwargs).item()
+            else:
+                mean = self.data[column].mean(*args, **kwargs)
+
+            if mean is not None:
+                result[column] = mean
+
+        return result
