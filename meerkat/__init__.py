@@ -5,6 +5,7 @@ from meerkat.logging.utils import initialize_logging
 
 initialize_logging()
 
+import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.cells.volume import MedicalVolumeCell
 from meerkat.columns.abstract import AbstractColumn
@@ -37,6 +38,7 @@ SeriesColumn = PandasSeriesColumn
 
 
 __all__ = [
+    "GlobalState",
     "DataPanel",
     "AbstractColumn",
     "LambdaColumn",
