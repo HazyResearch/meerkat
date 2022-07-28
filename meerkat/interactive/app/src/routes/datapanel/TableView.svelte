@@ -1,10 +1,22 @@
 <script lang="ts">
-    import { zip } from 'underscore';
+	import { zip } from 'underscore';
 
 	export let columns: Array<string> = [];
 	export let types: Array<string> = [];
 	export let rows: Array<any> = [];
 	export let nshow: number = 10;
+
+	async function fetch_url(url: string): Promise<any> {
+		const res: Response = await fetch(url);
+		if (!res.ok) {
+			throw new Error('HTTP status ' + res.status);
+		}
+		const json = await res.json();
+		return json;
+	}
+
+	const url = `http://localhost:7860/data_id`;
+	let data_promise = fetch_url(url).then(json => json);
 
 	let nrows: number = rows.length;
 	let npages: number = Math.ceil(nrows / nshow);
@@ -27,11 +39,20 @@
 	<title>DataPanel Table View</title>
 </svelte:head> -->
 
+
+
 <div class="border border-dotted border-gray-100 bg-slate-800 p-2">
 	<div class="flex flex-row justify-end w-full space-x-2">
 		<!-- Buttons for switching between different table views. -->
 		<button class="bg-slate-500 hover:bg-slate-700 rounded font-bold px-4">Table</button>
 		<button class="bg-slate-500 hover:bg-slate-700 rounded font-bold px-4">Gallery</button>
+	</div>
+	<div>
+		{#await data_promise}
+			<div>Loading data...</div>
+		{:then data}
+			<div>{data}</div>
+		{/await}
 	</div>
 
 	<div class="m-3 overflow-x-auto relative">
@@ -42,15 +63,23 @@
 					{#each columns as column}
 						<!-- <th class="border bg-slate-500 hover:bg-slate-700">{column}</th> -->
 						<!-- <th scope="col" class="py-2 px-4">{column}</th> -->
-                        <th scope="col" class="py-2 px-4">
-                            <div class="flex items-center">
-                                {column}
-                                <button on:click={() => {}}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 320 512"><path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"/></svg>
-                                </button>
-                            </div>
-                        </th>
-                        
+						<th scope="col" class="py-2 px-4">
+							<div class="flex items-center">
+								{column}
+								<button on:click={() => {}}>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="ml-1 w-3 h-3"
+										aria-hidden="true"
+										fill="currentColor"
+										viewBox="0 0 320 512"
+										><path
+											d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"
+										/></svg
+									>
+								</button>
+							</div>
+						</th>
 					{/each}
 				</tr>
 			</thead>

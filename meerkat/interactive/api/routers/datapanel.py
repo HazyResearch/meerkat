@@ -61,3 +61,4 @@ def get_rows(limit: int = 32, offset: int = 0):
     )
 
     return _get_rows(dp, limit, offset)
+
