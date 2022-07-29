@@ -12,13 +12,13 @@ class GUI:
     def table(self, nrows=10) -> IFrame:
 
         interface_id = add_interface(
-            self.dp, 
+            self.dp,
             config=dict(
                 type="table",
                 params=dict(
                     nrows=nrows,
-                )
-            )
+                ),
+            ),
         )
         return IFrame(
             f"http://localhost:5173/interface?id={interface_id}",

@@ -3,8 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from meerkat.interactive.state import interfaces
 
-from .routers import datapanel
-from .routers import interface
+from .routers import datapanel, interface
 
 app = FastAPI()
 

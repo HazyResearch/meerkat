@@ -1,11 +1,15 @@
 import weakref
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Union
+
+from meerkat.datapanel import DataPanel
+from meerkat.columns.abstract import AbstractColumn
 
 
 @dataclass
 class Interface:
-    data: str
+    # TODO (all): decide on this schema 
+    data: Union[DataPanel, AbstractColumn]
     config: Dict
 
 
