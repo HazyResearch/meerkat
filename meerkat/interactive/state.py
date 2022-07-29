@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import weakref
 from dataclasses import dataclass
 from typing import Any, Dict

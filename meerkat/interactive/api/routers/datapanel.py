@@ -7,7 +7,8 @@ from fastapi import APIRouter
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
-from meerkat.datasets.imagenette import build_imagenette_dp
+
+from .interface import get_interface
 
 router = APIRouter(
     prefix="/dp",
@@ -46,19 +47,9 @@ def _get_rows(dp: DataPanel, limit: int = None, offset: int = 0):
 
 
 @router.get("/rows/")
-def get_rows(limit: int = 32, offset: int = 0):
+def get_rows(interface_id: int, limit: int = 32, offset: int = 0):
     """
     Get rows from a DataPanel as a JSON object.
     """
-
-    # TODO(karan): Robust lookup for the DataPanel instance
-    # that is pertinent to the request
-    dp = build_imagenette_dp(
-        dataset_dir="/Users/krandiash/Desktop/"
-        "workspace/projects/datasci/data/imagenette/",
-        version="320px",
-        download=True,
-    )
-
+    dp = get_interface(interface_id).data 
     return _get_rows(dp, limit, offset)
-

@@ -1,11 +1,12 @@
-from dataclasses import dataclass
 import weakref
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class GlobalState:
-    data_id: int = None 
+    data_id: int = None
+
 
 state = GlobalState()
 
