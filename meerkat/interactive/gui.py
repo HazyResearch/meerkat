@@ -20,9 +20,8 @@ class GUI:
                 )
             )
         )
-
         return IFrame(
             f"http://localhost:5173/interface?id={interface_id}",
             width=800,
-            height=100,
+            height=800,
         )

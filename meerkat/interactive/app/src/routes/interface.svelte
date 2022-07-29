@@ -9,7 +9,8 @@
 		return {
 			status: response.status,
 			props: {
-				config: response.ok && (await response.json())
+				config: response.ok && (await response.json()),
+				id: id, 
 			}
 		};
 	}
@@ -30,6 +31,7 @@
 	}
 
 	export let config: any;
+	export let id: number;
 
 	// GET request from the Python API to pull in some data (used below in HTML)
 	// let data_promise = fetch_url("http://127.0.0.1:7860/config?id=123");
@@ -45,7 +47,7 @@
 		{ data }
 	{/await} -->
 	{#if config.type == 'table'}
-		<Table nrows={config.params.nrows} />
+		<Table interface_id={id} nrows={config.params.nrows} />
 	{:else}
 		<div>Type not recognized.</div>
 	{/if}
