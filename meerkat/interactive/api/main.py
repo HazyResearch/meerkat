@@ -1,9 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import datapanel
+from meerkat.interactive.state import interfaces
+
+from .routers import datapanel, interface
 
 app = FastAPI()
+
+app.include_router(interface.router)
+app.include_router(datapanel.router)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -11,5 +17,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.include_router(datapanel.router)
