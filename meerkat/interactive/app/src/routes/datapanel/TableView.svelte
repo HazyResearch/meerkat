@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { zip } from 'underscore';
+    import _, { zip } from 'underscore';
 
 	export let columns: Array<string> = [];
 	export let types: Array<string> = [];
@@ -21,18 +21,38 @@
 	let nrows: number = rows.length;
 	let npages: number = Math.ceil(nrows / nshow);
 	let page: number = 0;
+    let sorted_by: {col_index: number, ascending: boolean} = {'col_index': -1, 'ascending': true};
 
 	let value_formatter = (value: any, type: string) => {
 		if (type === 'string') {
 			return value;
 		} else if (type === 'number') {
-			return value.toFixed(2);
+            return value;
 		} else if (type === 'image') {
 			return `<img class="block object-center h-4/5 w-full rounded-md shadow-lg" src="${value}"/>`;
 		} else {
 			return value;
 		}
 	};
+
+    let sort = (col_index: number) => {
+        let type = types[col_index];
+        let ascending = sorted_by['col_index'] === col_index ? !sorted_by['ascending'] : true;
+        sorted_by = {'col_index': col_index, 'ascending': ascending};
+        let sorted_rows = _.sortBy(rows, (row: any) => {
+            let value = row[col_index];
+            if (type === 'number') {
+                return value;
+            } else {
+                return value.toLowerCase();
+            }
+        });
+        if (!ascending) {
+            sorted_rows = sorted_rows.reverse();
+        }
+        rows = sorted_rows;
+    };
+
 </script>
 
 <!-- <svelte:head>
@@ -40,8 +60,45 @@
 </svelte:head> -->
 
 
-
 <div class="border border-dotted border-gray-100 bg-slate-800 p-2">
+    
+    <div class="m-3 overflow-x-auto relative">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="py-2 px-4 resize-x [overflow:auto]">
+                        <div class="flex items-center">A
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 320 512"><path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"/></svg>
+                        </button>
+                    </div></th>
+                    <th scope="col" class="py-2 px-4 resize-x [overflow:auto]"><div class="flex items-center">B
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 320 512"><path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"/></svg>
+                        </button>
+                    </div></th>
+                    <th scope="col" class="py-2 px-4 resize-x [overflow:auto]"><div class="flex items-center">B
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 320 512"><path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"/></svg>
+                        </button>
+                    </div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td>a quick brown fox jumped over the lazy dog and it went </td>
+                    <td>a quick brown fox jumped over the lazy dog and it went </td>
+                    <td>b</td>
+                </tr>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td>a quick brown fox jumped over</td>
+                    <td>b</td>
+                    <td>b</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 	<div class="flex flex-row justify-end w-full space-x-2">
 		<!-- Buttons for switching between different table views. -->
 		<button class="bg-slate-500 hover:bg-slate-700 rounded font-bold px-4">Table</button>
@@ -56,8 +113,8 @@
 	</div>
 
 	<div class="m-3 overflow-x-auto relative">
-		<!-- <table class="table-auto border border-separate bg-slate-400 text-center"> -->
-		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <!-- table-fixed is necessary otherwise the columns cannot be resized when the table overflows horizontally -->
+		<table class="table-fixed w-full text-sm text-left text-gray-500 dark:text-gray-400">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
 					{#each columns as column}
@@ -89,8 +146,9 @@
 						class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
 					>
 						{#each zip(row, types) as [value, type]}
-							<!-- <td class="border bg-slate-200 hover:bg-slate-400">{value}</td> -->
-							<td class="py-2 px-4">{@html value_formatter(value, type)}</td>
+							<td class="py-2 px-4 overflow-auto break-words">
+                                {@html value_formatter(value, type)}
+                            </td>
 						{/each}
 					</tr>
 				{/each}
@@ -166,3 +224,4 @@
 		</ul>
 	</nav>
 </div>
+
