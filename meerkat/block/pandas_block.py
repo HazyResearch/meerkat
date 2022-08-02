@@ -108,6 +108,10 @@ class PandasBlock(AbstractBlock):
             return {
                 name: data[col._block_index] for name, col in block_ref.columns.items()
             }
+
+        # All Pandas Columns should have contiguous indices so that we can perform
+        # comparisons etc.
+        data = data.reset_index(drop=True)
         block = self.__class__(data)
 
         columns = {

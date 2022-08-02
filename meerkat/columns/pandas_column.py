@@ -5,7 +5,7 @@ import functools
 import logging
 import numbers
 import os
-from typing import Callable, Sequence
+from typing import Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -249,6 +249,52 @@ class PandasSeriesColumn(
     def _repr_cell(self, index) -> object:
         return self[index]
 
+    def sort(
+        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+    ) -> PandasSeriesColumn:
+        """Return a sorted view of the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            AbstractColumn: A view of the column with the sorted data.
+        """
+        # calls argsort() function to retrieve ordered indices
+        sorted_index = self.argsort(ascending, kind)
+        return self[sorted_index]
+
+    def argsort(
+        self, ascending: bool = True, kind: str = "quicksort"
+    ) -> PandasSeriesColumn:
+        """Return indices that would sorted the column.
+
+        Args:
+            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
+                descending order. If a list, must be the same length as `by`. Defaults
+                to True.
+            kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
+                include 'quicksort', 'mergesort', 'heapsort', 'stable'.
+        Return:
+            PandasSeriesColumn: A view of the column with the sorted data.
+
+         For now! Raises error when shape of input array is more than one error.
+        """
+        num_columns = len(self.shape)
+        # Raise error if array has more than one column
+        if num_columns > 1:
+            raise Exception("No implementation for array with more than one column.")
+
+        # returns indices of descending order of array
+        if not ascending:
+            return (-1 * self.data).argsort(kind=kind)
+
+        # returns indices of ascending order of array
+        return self.data.argsort(kind=kind)
+
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
         very slow."""
@@ -261,10 +307,13 @@ class PandasSeriesColumn(
         # TODO (Sabri): understand why `torch.tensor(column)` is so slow
         return torch.tensor(self.data.values)
 
+    def to_numpy(self) -> torch.Tensor:
+        return self.values
+
+    def to_pandas(self) -> pd.Series:
+        return self.data
+
     def is_equal(self, other: AbstractColumn) -> bool:
         if other.__class__ != self.__class__:
             return False
         return (self.data.values == other.data.values).all()
-
-    def to_pandas(self) -> pd.Series:
-        return self.data
