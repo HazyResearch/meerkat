@@ -9,7 +9,6 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
-from meerkat.ml.prediction_column import ClassificationOutputColumn
 
 from ...testbeds import MockDatapanel
 
@@ -93,12 +92,6 @@ def test_concat_different_lengths():
 
     with pytest.raises(ConcatError):
         concat([a, b], axis="columns")
-
-
-def test_concat_maintains_subclass():
-    col = ClassificationOutputColumn(logits=[0, 1, 0, 1], num_classes=2)
-    out = concat([col, col])
-    assert isinstance(out, ClassificationOutputColumn)
 
 
 def test_empty_concat():
