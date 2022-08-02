@@ -20,8 +20,7 @@ def robust(
     device: Union[int, str] = "cpu",
     model_path: str = None,
 ) -> Dict[str, Encoder]:
-    """Image classifier trained with adversarial robustness loss.
-
+    """Image classifier trained with adversarial robustness loss
     [engstrom_2019]_.
 
     Args:

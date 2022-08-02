@@ -18,9 +18,17 @@ def extract(path: str, dst: str, extractor: str = None):
     # Prevent parallel extractions
     lock_path = path + ".lock"
     with FileLock(lock_path):
+        # Support for older versions of datasets that have list of extractors instead
+        # of dict of extractors
+        extractors = (
+            Extractor.extractors
+            if isinstance(Extractor.extractors, list)
+            else Extractor.extractors.values()
+        )
         if extractor:
             return extractor.extract(path, dst)
-        for extractor in Extractor.extractors:
+
+        for extractor in extractors:
             if extractor.is_extractable(path):
                 return extractor.extract(path, dst)
         raise ValueError("Extraction method not found for {}".format(path))
