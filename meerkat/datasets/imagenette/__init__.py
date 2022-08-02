@@ -60,10 +60,15 @@ class imagenette(DatasetBuilder):
 
     @property
     def data_dir(self):
-        return os.path.join(self.dataset_dir, "imagenette2")
+        if self.version == "full":
+            return os.path.join(self.dataset_dir, "imagenette2")
+        elif self.version == "160px":
+            return os.path.join(self.dataset_dir, "imagenette2-160")
+        else:
+            return os.path.join(self.dataset_dir, "imagenette2-320")
 
     def build(self):
-        df = build_df(self.data_dir)
+        df = self._build_df()
         dp = mk.DataPanel.from_pandas(df)
         dp["img"] = mk.ImageColumn.from_filepaths(
             dp["img_path"], base_dir=self.data_dir
@@ -75,22 +80,18 @@ class imagenette(DatasetBuilder):
         path = self.download_url(url)
         extract(path, self.dataset_dir)
 
+    def _build_df(
+        self,
+    ):
+        csv_path = os.path.join(self.data_dir, "noisy_imagenette.csv")
 
-def build_df(
-    data_dir: str,
-):
-    csv_path = os.path.join(data_dir, "imagenette.csv")
-
-    df = pd.read_csv(os.path.join(data_dir, "noisy_imagenette.csv"))
-    df["label_id"] = df["noisy_labels_0"]
-    df["label"] = df["label_id"].replace(ID_TO_WORDS)
-    df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
-    df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
-    df["img_path"] = df.path
-    df[["img_path", "label", "label_id", "label_idx", "split"]].to_csv(
-        csv_path, index=False
-    )
-    return df
+        df = pd.read_csv(csv_path)
+        df["label_id"] = df["noisy_labels_0"]
+        df["label"] = df["label_id"].replace(ID_TO_WORDS)
+        df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
+        df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
+        df["img_path"] = df.path
+        return df
 
 
 def download_imagenette(
