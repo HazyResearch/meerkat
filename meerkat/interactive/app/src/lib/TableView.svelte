@@ -1,11 +1,8 @@
 <script lang="ts">
-	import Pagination from './components/pagination/Pagination.svelte';
 	import Table from '$lib/components/table/Table.svelte';
+	import { post } from '$lib/utils/requests';
 	import { api_url } from '../routes/network/stores';
-	import { get, post } from '$lib/utils/requests';
-
-
-	// import Item from './Item.svelte';
+	import Pagination from './components/pagination/Pagination.svelte';
 
 	let columns: Array<string> = [];
 	let types: Array<string> = [];
