@@ -2,7 +2,7 @@ from IPython.display import IFrame
 
 import meerkat as mk
 
-from .state import add_interface
+from .state import add_interface, state
 
 
 class GUI:
@@ -20,8 +20,9 @@ class GUI:
                 ),
             ),
         )
+
         return IFrame(
-            f"http://localhost:5173/interface?id={interface_id}",
+            f"{state.network_info.npm_server_url}/interface?id={interface_id}",
             width=800,
             height=800,
         )

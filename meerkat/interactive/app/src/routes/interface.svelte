@@ -17,38 +17,44 @@
 </script>
 
 <script lang="ts">
-	import { dataset_dev } from 'svelte/internal';
-	import Table  from '$lib/interfaces/Table.svelte';
-
-
-	async function fetch_url(url: string): Promise<any> {
-		const res: Response = await fetch(url);
-		if (!res.ok) {
-			throw new Error('HTTP status ' + res.status);
-		}
-		const json = await res.json();
-		return json;
-	}
+	import TableView from '$lib/TableView.svelte';
+	import _, { unzip } from "underscore";
+	import { api_url } from './network/stores';
+	import { get, post } from '$lib/utils/requests';
 
 	export let config: any;
 	export let id: number;
 
-	// GET request from the Python API to pull in some data (used below in HTML)
-	// let data_promise = fetch_url("http://127.0.0.1:7860/config?id=123");
-	// data_promise.then(data => console.log("JSON", data));
+	let columns: Array<string> = [];
+	let types: Array<string> = [];
+	let rows;
+	let indices: Array<number> = [];
 
-	// do stuff
+	let loader = async (start: number, end: number) => {
+		let data_promise = await post(
+			`${$api_url}/dp/${id}/rows`, 
+			{start: start, end: end}
+		);
+
+		columns = data_promise.column_info.map((col: any) => col.name);
+		rows = data_promise.rows;
+		types = data_promise.column_info.map((col: any) => col.type);
+		indices = data_promise.indices;
+	}
+	
+	let data_promise = loader(0, 10);
+
 </script>
 
 <div>
-	<!-- {#await data_promise}
-		Loading data...
+	{#await data_promise}
+		<TableView columns={["Loading..."]} rows={rows} types={types} loader={loader} nrows={config.params.nrows} />
 	{:then data} 
-		{ data }
-	{/await} -->
-	{#if config.type == 'table'}
-		<Table interface_id={id} nrows={config.params.nrows} />
-	{:else}
-		<div>Type not recognized.</div>
-	{/if}
+		{#if config.type == 'table'}
+			<TableView bind:columns={columns} bind:rows={rows} bind:types={types} loader={loader} nrows={config.params.nrows} />
+		{:else}
+			<div>Type not recognized.</div>
+		{/if}
+	{/await}
+	
 </div>

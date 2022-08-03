@@ -6,44 +6,21 @@ import os
 import pathlib
 import socket
 import subprocess
-import threading
 import time
-from types import SimpleNamespace
 
 import requests
-import uvicorn
 from uvicorn import Config
 
 from meerkat.interactive.api import MeerkatAPI
+from meerkat.interactive.server import (
+    INITIAL_PORT_VALUE,
+    LOCALHOST_NAME,
+    MEERKAT_API_SERVER,
+    TRY_NUM_PORTS,
+    Server,
+)
+from meerkat.interactive.state import NetworkInfo, state
 from meerkat.interactive.tunneling import create_tunnel
-
-# By default, the local server will try to open on localhost, port 7860.
-# If that is not available, then it will try 7861, 7862, ... 7959.
-INITIAL_PORT_VALUE = int(os.getenv("MK_SERVER_PORT", "7860"))
-TRY_NUM_PORTS = int(os.getenv("MK_NUM_PORTS", "100"))
-LOCALHOST_NAME = os.getenv("MK_SERVER_NAME", "127.0.0.1")
-MEERKAT_API_SERVER = "https://api.meerkat.app/v1/tunnel-request"
-
-
-class Server(uvicorn.Server):
-    """
-    Taken from
-    https://stackoverflow.com/questions/61577643/python-how-to-use-fastapi-and-uvicorn-run-without-blocking-the-thread
-    and Gradio.
-    """
-
-    def install_signal_handlers(self):
-        pass
-
-    def run_in_thread(self):
-        self.thread = threading.Thread(target=self.run, daemon=True)
-        self.thread.start()
-        while not self.started:
-            time.sleep(1e-3)
-
-    def close(self):
-        self.should_exit = True
-        self.thread.join()
 
 
 def is_notebook() -> bool:
@@ -92,8 +69,9 @@ def get_first_available_port(initial: int, final: int) -> int:
 
 
 def interactive_mode(
-    server_name: str = None,
-    server_port: int = None,
+    api_server_name: str = None,
+    api_port: int = None,
+    npm_port: int = None,
 ):
     """
     Start Meerkat interactive mode in a Jupyter notebook.
@@ -101,39 +79,69 @@ def interactive_mode(
     if not is_notebook():
         raise RuntimeError("This function can only be run in a notebook.")
 
-    server_name = server_name or LOCALHOST_NAME
-    url_host_name = "localhost" if server_name == "0.0.0.0" else server_name
+    api_server_name = api_server_name or LOCALHOST_NAME
 
     # if port is not specified, search for first available port
-    if server_port is None:
-        port = get_first_available_port(
+    if api_port is None:
+        api_port = get_first_available_port(
             INITIAL_PORT_VALUE, INITIAL_PORT_VALUE + TRY_NUM_PORTS
         )
     else:
-        port = get_first_available_port(server_port, server_port + 1)
+        api_port = get_first_available_port(api_port, api_port + 1)
 
-    path_to_local_server = "http://{}:{}/".format(url_host_name, port)
+    # url_host_name = "localhost" if api_server_name == "0.0.0.0" else api_server_name
+    # path_to_local_server = "http://{}:{}/".format(url_host_name, api_port)
 
     # Start the FastAPI server
-    apiserver = Server(
-        Config(MeerkatAPI, port=port, host=server_name, log_level="warning")
+    api_server = Server(
+        Config(MeerkatAPI, port=api_port, host=api_server_name, log_level="warning")
     )
-    apiserver.run_in_thread()
+    api_server.run_in_thread()
 
     # Start the npm server
+    if npm_port is None:
+        npm_port = get_first_available_port(
+            INITIAL_PORT_VALUE, INITIAL_PORT_VALUE + TRY_NUM_PORTS
+        )
+    else:
+        npm_port = get_first_available_port(npm_port, npm_port + 1)
+
+    # Enter the "app/" directory
     libpath = pathlib.Path(__file__).parent.resolve() / "app"
     currdir = os.getcwd()
     os.chdir(libpath)
-    npm_process = subprocess.Popen(["npm", "run", "dev"])
+
+    # npm run dev -- --port {npm_port}
+    npm_process = subprocess.Popen(["npm", "run", "dev", "--", "--port", str(npm_port)])
+    time.sleep(1)
+
+    # Back to the original directory
     os.chdir(currdir)
 
-    return SimpleNamespace(
-        port=port,
-        path_to_local_server=path_to_local_server,
+    # Store in global state
+    network_info = NetworkInfo(
         api=MeerkatAPI,
-        server=apiserver,
+        api_server=api_server,
+        api_server_name=api_server_name,
+        api_server_port=api_port,
+        npm_server_port=npm_port,
         npm_process=npm_process,
     )
+    state.update("network_info", network_info)
+
+    from IPython.display import IFrame
+
+    # This register_fn must be invoked in the notebook
+    # TODO: figure out why requests.get and urllib.request.urlopen are not working
+    # (maybe related to localStorage only being accessible from the notebook context?)
+    register_fn = lambda: IFrame(
+        f"{network_info.npm_server_url}"
+        "/network/register?api={network_info.api_server_url}",
+        width=1,
+        height=1,
+    )
+
+    return network_info, register_fn
 
 
 def setup_tunnel(local_server_port: int, endpoint: str) -> str:

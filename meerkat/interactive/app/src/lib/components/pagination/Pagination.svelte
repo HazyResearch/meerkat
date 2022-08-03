@@ -54,10 +54,11 @@
     $: per_page = selection.label;
     $: on_change(per_page);
 
-    function on_change(per_page: any) {
+    async function on_change(per_page: any) {
         page = 0;
         start_item = page * per_page + 1; // why doesn't this happen automatically?!
         end_item = Math.min(page * per_page + per_page, loaded_items);
+        await loader(page * per_page, (page + 1) * per_page);
     };
 
 </script>

@@ -1,38 +1,39 @@
 <script lang="ts">
-	import { SortDown, SortUp } from 'svelte-bootstrap-icons';
-	import _, { forEach, zip } from 'underscore';
+	// import { SortDown, SortUp } from 'svelte-bootstrap-icons';
+	// import _, { forEach, zip } from 'underscore';
 	import Pagination from './components/pagination/Pagination.svelte';
 	import Table from '$lib/components/table/Table.svelte';
-	import Item from './Item.svelte';
+	// import Item from './Item.svelte';
 
 
 	export let columns: Array<string> = [];
 	export let types: Array<string> = [];
 	export let rows: Array<any> = [];
 	export let per_page: number = 10;
+	export let loader = async (start: number, end: number) => {};
 
-	let nrows: number = rows.length;
+	export let nrows: number = rows.length;
 	// let npages: number = Math.ceil(nrows / per_page);
 	let page: number = 0;
-	let sorted_by: { col_index: number; ascending: boolean } = { col_index: -1, ascending: true };
+	// let sorted_by: { col_index: number; ascending: boolean } = { col_index: -1, ascending: true };
 
-	let sort = (col_index: number) => {
-		let type = types[col_index];
-		let ascending = sorted_by['col_index'] === col_index ? !sorted_by['ascending'] : true;
-		sorted_by = { col_index: col_index, ascending: ascending };
-		let sorted_rows = _.sortBy(rows, (row: any) => {
-			let value = row[col_index];
-			if (type === 'number') {
-				return value;
-			} else {
-				return value.toLowerCase();
-			}
-		});
-		if (!ascending) {
-			sorted_rows = sorted_rows.reverse();
-		}
-		rows = sorted_rows;
-	};
+	// let sort = (col_index: number) => {
+	// 	let type = types[col_index];
+	// 	let ascending = sorted_by['col_index'] === col_index ? !sorted_by['ascending'] : true;
+	// 	sorted_by = { col_index: col_index, ascending: ascending };
+	// 	let sorted_rows = _.sortBy(rows, (row: any) => {
+	// 		let value = row[col_index];
+	// 		if (type === 'number') {
+	// 			return value;
+	// 		} else {
+	// 			return value.toLowerCase();
+	// 		}
+	// 	});
+	// 	if (!ascending) {
+	// 		sorted_rows = sorted_rows.reverse();
+	// 	}
+	// 	rows = sorted_rows;
+	// };
 </script>
 
 <style>
@@ -45,7 +46,7 @@
 <div class="table-view">
 
 	<div class="overflow-y-auto overflow-x-hidden h-[700px]">
-		<Table {columns} {types} rows={rows.slice(page * per_page, Math.min(page * per_page + per_page, nrows))}/>
+		<Table bind:columns={columns} bind:types={types} bind:rows={rows}/>
 	</div>
 	<div class="z-10 top-0 m-2 h-20">
 		<Pagination
@@ -53,7 +54,7 @@
 			bind:per_page
 			loaded_items={nrows}
 			total_items={nrows}
-			loader={async (start, end) => {}}
+			loader={loader}
 		/>
 	</div>
 </div>
