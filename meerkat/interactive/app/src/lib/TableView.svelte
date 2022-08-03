@@ -3,19 +3,34 @@
 	// import _, { forEach, zip } from 'underscore';
 	import Pagination from './components/pagination/Pagination.svelte';
 	import Table from '$lib/components/table/Table.svelte';
+	import { api_url } from '../routes/network/stores';
+	import { get, post } from '$lib/utils/requests';
+
+
 	// import Item from './Item.svelte';
 
+	let columns: Array<string> = [];
+	let types: Array<string> = [];
+	let rows: Array<any> = [];
+	let indices: Array<number> = [];
 
-	export let columns: Array<string> = [];
-	export let types: Array<string> = [];
-	export let rows: Array<any> = [];
 	export let per_page: number = 10;
-	export let loader = async (start: number, end: number) => {};
 
 	export let nrows: number = rows.length;
+	export let dp: string = '';
 	// let npages: number = Math.ceil(nrows / per_page);
 	let page: number = 0;
 	// let sorted_by: { col_index: number; ascending: boolean } = { col_index: -1, ascending: true };
+
+	let loader = async (start: number, end: number) => {
+		let data_promise = await post(`${$api_url}/dp/${dp}/rows`, { start: start, end: end });
+
+		columns = data_promise.column_info.map((col: any) => col.name);
+		rows = data_promise.rows;
+		types = data_promise.column_info.map((col: any) => col.type);
+		indices = data_promise.indices;
+	};
+	let data_promise = loader(0, 10);
 
 	// let sort = (col_index: number) => {
 	// 	let type = types[col_index];
@@ -36,29 +51,18 @@
 	// };
 </script>
 
-<style>
-	.table-view {
-		@apply h-full overflow-hidden;
-		@apply dark:bg-slate-700;
-	}
-</style>
-
-<div class="table-view">
-
-	<div class="overflow-y-auto overflow-x-hidden h-[700px]">
-		<Table bind:columns={columns} bind:types={types} bind:rows={rows}/>
+{#await data_promise}
+	<div>Loading data...</div>
+{:then data}
+	<div class="table-view">
+		<div class="overflow-y-auto overflow-x-hidden h-[700px]">
+			<Table bind:columns bind:types bind:rows />
+		</div>
+		<div class="z-10 top-0 m-2 h-20">
+			<Pagination bind:page bind:per_page loaded_items={nrows} total_items={nrows} {loader} />
+		</div>
 	</div>
-	<div class="z-10 top-0 m-2 h-20">
-		<Pagination
-			bind:page
-			bind:per_page
-			loaded_items={nrows}
-			total_items={nrows}
-			loader={loader}
-		/>
-	</div>
-</div>
-
+{/await}
 
 <!-- <div class="bg-slate-800 p-2">
     
@@ -114,3 +118,10 @@
 		</table>
 	</div>
 </div> -->
+
+<style>
+	.table-view {
+		@apply h-full overflow-hidden;
+		@apply dark:bg-slate-700;
+	}
+</style>
