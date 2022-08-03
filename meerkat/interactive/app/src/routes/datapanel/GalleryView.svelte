@@ -35,10 +35,6 @@
 	};
 </script>
 
-<!-- <svelte:head>
-	<title>DataPanel Table View</title>
-</svelte:head> -->
-
 <style>
 	.panel {
 		display: flex;

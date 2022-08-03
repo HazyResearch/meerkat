@@ -16,7 +16,6 @@
 
 <script lang="ts">
 	import TableView from '$lib/TableView.svelte';
-	import { post } from '$lib/utils/requests';
 	import { get } from 'svelte/store';
 	import { api_url } from './network/stores';
 
