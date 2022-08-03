@@ -135,8 +135,7 @@ def interactive_mode(
     # TODO: figure out why requests.get and urllib.request.urlopen are not working
     # (maybe related to localStorage only being accessible from the notebook context?)
     register_fn = lambda: IFrame(
-        f"{network_info.npm_server_url}"
-        "/network/register?api={network_info.api_server_url}",
+        f"{network_info.npm_server_url}/network/register?api={network_info.api_server_url}",  # noqa
         width=1,
         height=1,
     )
