@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from meerkat.mixins.blockable import BlockableMixin
+from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.provenance import ProvenanceMixin
 
 
@@ -49,6 +50,9 @@ class CloneableMixin:
         if isinstance(self, ProvenanceMixin):
             # need to create a node for the object
             obj._init_node()
+
+        if isinstance(self, IdentifiableMixin):
+            obj._set_id()
 
         return obj
 

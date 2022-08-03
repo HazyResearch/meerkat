@@ -1,22 +1,31 @@
-import base64
-from io import BytesIO
+from dataclasses import dataclass
+from typing import Dict, Union
 
-import PIL
 from fastapi import APIRouter, HTTPException
 
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.datapanel import DataPanel
-from meerkat.datasets.imagenette import build_imagenette_dp
-from meerkat.interactive.state import interfaces
+from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.state import state
+
+
+class Interface(IdentifiableMixin):
+    # TODO (all): I think this should probably be a subclassable thing that people
+    # implement. e.g. TableInterface
+
+    identifiable_group: str = "interfaces"
+
+    def __init__(self, config: Dict):
+        super().__init__()
+        self.config = config
 
 
 def get_interface(interface_id: int):
-    if interface_id not in interfaces:
+    try:
+        interface = state.identifiables.interfaces[interface_id]
+    except KeyError:
         raise HTTPException(
             status_code=404, detail="No interface with id {}".format(interface_id)
         )
-    return interfaces[interface_id]
+    return interface
 
 
 router = APIRouter(
@@ -26,7 +35,7 @@ router = APIRouter(
 )
 
 
-@router.get("/config/")
-def get_config(id: int):
-    interface = get_interface(id)
+@router.get("/{interface_id}/config/")
+def get_config(interface_id: str):
+    interface = get_interface(interface_id)
     return interface.config

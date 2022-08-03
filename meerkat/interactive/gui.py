@@ -1,8 +1,9 @@
 from IPython.display import IFrame
 
 import meerkat as mk
+from meerkat.state import state
 
-from .state import add_interface, state
+from .api.routers.interface import Interface
 
 
 class GUI:
@@ -11,18 +12,18 @@ class GUI:
 
     def table(self, nrows=10) -> IFrame:
 
-        interface_id = add_interface(
-            self.dp,
+        interface = Interface(
             config=dict(
                 type="table",
-                params=dict(
-                    nrows=nrows,
-                ),
+                nrows=nrows,
+                dp=self.dp.id,
             ),
         )
+        url = f"{state.network_info.npm_server_url}/interface?id={interface.id}"
+        print(url)
 
         return IFrame(
-            f"{state.network_info.npm_server_url}/interface?id={interface_id}",
+            url,
             width=800,
             height=800,
         )

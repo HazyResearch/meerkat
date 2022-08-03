@@ -25,9 +25,10 @@ def infer_modality(col: mk.AbstractColumn):
         raise ValueError(f"Cannot infer modality from colummn of type {type(col)}.")
 
 
+# @cache(params=["encoder", "modality", ""])
 def embed(
-    data: mk.DataPanel,
-    input: str,
+    data: Union[mk.DataPanel, mk.AbstractColumn],
+    input: str = None,
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
     out_col: str = None,
@@ -36,7 +37,7 @@ def embed(
     num_workers: int = 4,
     batch_size: int = 128,
     **kwargs,
-) -> mk.DataPanel:
+) -> Union[mk.DataPanel, mk.AbstractColumn]:
     """Embed a column of data with an encoder from the encoder registry.
 
     Examples
@@ -59,8 +60,11 @@ def embed(
 
 
     Args:
-        data (mk.DataPanel): A DataPanel containing the data to embed.
-        input_col (str): The name of the column to embed.
+        data (Union[mk.DataPanel, mk.AbstractColumn]): A datapanel or column
+            containing the data to embed.
+        input_col (str, optional): If ``data`` is a datapanel, the name of the column
+            to embed. If ``data`` is a column, then the parameter is ignored. Defaults
+            to None.
         encoder (Union[str, Encoder], optional): Name of the encoder to use. List
             supported encoders with ``domino.encoders``. Defaults to "clip".
             Alternatively, pass an :class:`~domino._embed.encoder.Encoder` object

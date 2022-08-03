@@ -1,9 +1,35 @@
+import weakref
 from collections import defaultdict
+from collections.abc import Mapping
 from functools import reduce
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 import yaml
 from yaml.constructor import ConstructorError
+
+
+class WeakMapping(Mapping):
+    def __init__(self):
+        self.refs: Dict[Any, weakref.ReferenceType] = {}
+
+    def __getitem__(self, key: str):
+        ref = self.refs[key]
+        obj = ref()
+        if obj is None:
+            raise KeyError(f"Object with key {key} no longer exists")
+        return obj
+
+    def __setitem__(self, key: str, value: Any):
+        self.refs[key] = weakref.ref(value)
+
+    def __delitem__(self, key: str):
+        del self.refs[key]
+
+    def __iter__(self):
+        return iter(self.refs)
+
+    def __len__(self):
+        return len(self.refs)
 
 
 def nested_getattr(obj, attr, *args):

@@ -1,17 +1,27 @@
 import base64
 from io import BytesIO
+from pkgutil import get_data
 from typing import Any, List, Type
 
 import PIL
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
+from meerkat.state import state
 
-from .interface import get_interface
+
+def get_datapanel(datapanel_id: str):
+    try:
+        datapanel = state.identifiables.datapanels[datapanel_id]
+    except KeyError:
+        raise HTTPException(
+            status_code=404, detail="No datapanel with id {}".format(datapanel_id)
+        )
+    return datapanel
 
 
 router = APIRouter(
@@ -36,9 +46,6 @@ FORMATTERS = {
 }
 
 
-# TODO (Sabri): add support for multiple dps per interface, will probably need to add dp id
-
-
 class ColumnInfoResponse(BaseModel):
 
     name: str
@@ -46,12 +53,11 @@ class ColumnInfoResponse(BaseModel):
     formatter: str
 
 
-@router.get("/{interface_id}/column_info/")
+@router.get("/{datapanel_id}/column_info/")
 def get_column_info(
-    interface_id: int,
+    datapanel_id: int,
 ):
-    interface = get_interface(interface_id)
-    dp = interface.data
+    dp = get_datapanel(datapanel_id)
     return _get_column_info(dp, dp.columns)
 
 
@@ -86,15 +92,15 @@ class DataPanelRequest(BaseModel):
     columns: List[str] = None
 
 
-@router.post("/{interface_id}/rows/")
+@router.post("/{datapanel_id}/rows/")
 def get_rows(
-    interface_id: int,
+    datapanel_id: str,
     request: DataPanelRequest,
 ) -> DataPanelResponse:
     """
     Get rows from a DataPanel as a JSON object.
     """
-    dp = get_interface(interface_id).data
+    dp = get_datapanel(datapanel_id)
     column_info = _get_column_info(dp, request.columns)
 
     dp = dp[[info.name for info in column_info]]

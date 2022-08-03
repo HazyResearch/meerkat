@@ -31,6 +31,7 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
@@ -48,12 +49,15 @@ BatchOrDataset = Union[Batch, "DataPanel"]
 class DataPanel(
     CloneableMixin,
     FunctionInspectorMixin,
+    IdentifiableMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
 ):
     """Meerkat DataPanel class."""
+
+    identifiable_group: str = "datapanels"
 
     # Path to a log directory
     logdir: pathlib.Path = pathlib.Path.home() / "meerkat/"

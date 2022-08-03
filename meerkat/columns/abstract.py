@@ -15,6 +15,7 @@ import meerkat.config
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
+from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
@@ -32,6 +33,7 @@ class AbstractColumn(
     CollateMixin,
     ColumnIOMixin,
     FunctionInspectorMixin,
+    IdentifiableMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
@@ -47,6 +49,8 @@ class AbstractColumn(
 
     # Create a directory
     logdir.mkdir(parents=True, exist_ok=True)
+
+    identifiable_group: str = "columns"
 
     def __init__(
         self,

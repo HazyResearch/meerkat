@@ -19,8 +19,8 @@ from meerkat.interactive.server import (
     TRY_NUM_PORTS,
     Server,
 )
-from meerkat.interactive.state import NetworkInfo, state
 from meerkat.interactive.tunneling import create_tunnel
+from meerkat.state import NetworkInfo, state
 
 
 def is_notebook() -> bool:
@@ -127,7 +127,7 @@ def interactive_mode(
         npm_server_port=npm_port,
         npm_process=npm_process,
     )
-    state.update("network_info", network_info)
+    state.network_info = network_info
 
     from IPython.display import IFrame
 
