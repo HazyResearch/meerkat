@@ -1,10 +1,9 @@
 <script context="module">
 	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ url, fetch }) {
-		const id = url.searchParams.get('id') || '/dashboard';
 
-		const api_url = 'http://127.0.0.1:7860/interface/config?id=' + id;
-		const response = await fetch(api_url);
+		const id = url.searchParams.get('id');
+		const response = await fetch(`${get(api_url)}/interface/config?id=` + id);
 
 		return {
 			status: response.status,
@@ -18,9 +17,9 @@
 
 <script lang="ts">
 	import TableView from '$lib/TableView.svelte';
-	import _, { unzip } from "underscore";
+	import { post } from '$lib/utils/requests';
+	import { get } from 'svelte/store';
 	import { api_url } from './network/stores';
-	import { get, post } from '$lib/utils/requests';
 
 	export let config: any;
 	export let id: number;
