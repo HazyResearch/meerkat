@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 	import _, { zip } from 'underscore';
-	import Item from '$lib/Item.svelte';
+	import Item from '$lib/components/item/Item.svelte';
 
 	export let columns: Array<string> = [];
 	export let types: Array<string> = [];

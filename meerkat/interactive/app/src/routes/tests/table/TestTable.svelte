@@ -1,18 +1,11 @@
 <script lang="ts">
     import Table from "$lib/components/table/Table.svelte";
-
+    import { get } from "$lib/utils/requests";
     import _, { unzip } from "underscore";
+    import { api_url } from "src/routes/network/stores";
 
-    async function fetch_url (url: string): Promise<any> {
-		const res: Response = await fetch(url);
-		if (!res.ok) {
-			throw new Error("HTTP status " + res.status);
-		}
-		const json = await res.json();
-		return json;
-	};
-
-    let data_promise = fetch_url(`http://localhost:7860/dp/rows`);
+    // TODO: replace with dummy rows from API
+    let data_promise = get(`${$api_url}/dp/rows`);
 
     let parse_data = (json: any) => {
         return {
