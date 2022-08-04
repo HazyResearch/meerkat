@@ -60,7 +60,10 @@ class imagenette(DatasetBuilder):
 
     @property
     def data_dir(self):
-        return os.path.join(self.dataset_dir, "imagenette2")
+        return os.path.join(
+            self.dataset_dir,
+            self.VERSION_TO_URL[self.version].split("/")[-1].split(".")[0],
+        )
 
     def build(self):
         df = build_df(self.data_dir)
