@@ -1,27 +1,27 @@
 import base64
 from io import BytesIO
-from pkgutil import get_data
-from typing import Any, List, Type
+from typing import Any, List
 
 import PIL
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+import meerkat as mk
 from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.list_column import ListColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
 from meerkat.state import state
 
 
 def get_datapanel(datapanel_id: str):
     try:
-        datapanel = state.identifiables.datapanels[datapanel_id]
+        if datapanel_id == "test-imagenette":
+            return mk.get("imagenette", version="320px")
+
+        return state.identifiables.datapanels[datapanel_id]
     except KeyError:
         raise HTTPException(
             status_code=404, detail="No datapanel with id {}".format(datapanel_id)
         )
-    return datapanel
 
 
 router = APIRouter(
