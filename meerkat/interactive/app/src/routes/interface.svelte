@@ -2,13 +2,12 @@
 	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ url, fetch }) {
 		const id = url.searchParams.get('id');
-		const response = await fetch(`${get(api_url)}/interface/` + id + '/config');
+		const response = await fetch(`${get(api_url)}/interface/${id}/config`);
 
 		return {
 			status: response.status,
 			props: {
 				config: response.ok && (await response.json()),
-				id: id
 			}
 		};
 	}
