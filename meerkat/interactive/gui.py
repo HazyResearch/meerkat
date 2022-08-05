@@ -10,7 +10,7 @@ class GUI:
     def __init__(self, dp: mk.DataPanel):
         self.dp = dp
 
-    def table(self, nrows=10) -> IFrame:
+    def table(self, nrows=10, return_iframe: bool = True) -> IFrame:
 
         interface = Interface(
             config=dict(
@@ -21,9 +21,11 @@ class GUI:
         )
         url = f"{state.network_info.npm_server_url}/interface?id={interface.id}"
         print(url)
-
-        return IFrame(
-            url,
-            width=800,
-            height=800,
-        )
+        if return_iframe:
+            return IFrame(
+                url,
+                width=800,
+                height=800,
+            )
+        else:
+            return url

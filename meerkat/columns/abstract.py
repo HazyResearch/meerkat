@@ -12,6 +12,7 @@ import pandas as pd
 import torch
 
 import meerkat.config
+from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
@@ -255,14 +256,20 @@ class AbstractColumn(
     def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
-    def _get_default_formatter(self) -> Callable:
+    def _get_default_formatter(self) -> Formatter:
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
-        return None
+        from meerkat.interactive.formatter import BasicFormatter
+
+        return BasicFormatter()
 
     @property
-    def formatter(self) -> Callable:
+    def formatter(self) -> Formatter:
         return self._formatter
+
+    @formatter.setter
+    def formatter(self, formatter: Formatter):
+        self._formatter = formatter
 
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
@@ -280,7 +287,7 @@ class AbstractColumn(
         else:
             col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
 
-        return col, self.formatter
+        return col, self.formatter if self.formatter is None else self.formatter.html
 
     def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_

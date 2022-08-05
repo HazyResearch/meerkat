@@ -17,13 +17,18 @@
 	import TableView from '$lib/TableView.svelte';
 	import { get } from 'svelte/store';
 	import { api_url } from './network/stores';
+	import Prism from "../lib/components/cell/code/Code.svelte";
+
 
 	export let config: any;
+
+
+
 </script>
 
-<div>
+<div class="h-[800px]">
 	{#if config.type == 'table'}
-		<TableView nrows={config.nrows} dp={config.dp} />
+		<TableView nrows={config.nrows} dp_id={config.dp} />
 	{:else}
 		<div>Type not recognized.</div>
 	{/if}

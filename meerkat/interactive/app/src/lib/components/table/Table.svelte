@@ -1,13 +1,14 @@
 <script lang="ts">
-	import Item from '$lib/components/item/Item.svelte';
+	import type { DataPanelRows, ColumnInfo } from '$lib/api/datapanel';
+	import Cell from '$lib/components/cell/Cell.svelte';
 	import { onMount } from 'svelte';
 	import { zip } from 'underscore';
 
-	export let columns: Array<string> = [];
-	export let types: Array<string> = [];
-	export let rows: Array<any> = [];
+	console.log("in table.svelte")
+	export let datapanel: DataPanelRows;
+	let column_infos: Array<ColumnInfo> = datapanel.column_infos; 
 
-	let column_widths = Array.apply(null, Array(columns.length)).map((x, i) => 100 / columns.length);
+	let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 100 / column_infos.length);
 	let column_unit: string = '%';
 
 	let resize_props = {
@@ -57,8 +58,8 @@
 
 	let table_width: number;
 	onMount(async () => {
-		column_widths = Array.apply(null, Array(columns.length)).map(
-			(x, i) => table_width / columns.length
+		column_widths = Array.apply(null, Array(column_infos.length)).map(
+			(x, i) => table_width / column_infos.length
 		);
 		column_unit = 'px';
 	});
@@ -67,10 +68,10 @@
 <div class="table">
 	<div class="table-header-group">
 		<div class="table-row" bind:clientWidth={table_width}>
-			{#each columns as column, col_index}
+			{#each column_infos as column, col_index}
 				<div class="table-cell" style="width:{column_widths[col_index]}{column_unit}">
 					<slot id="header-cell">
-						<div class="flex items-center">{column}</div>
+						<div class="flex items-center">{column.name}</div>
 					</slot>
 					<div class="resizer" on:mousedown={resize_methods.mousedown(col_index)} />
 				</div>
@@ -78,11 +79,11 @@
 		</div>
 	</div>
 	<div class="table-row-group">
-		{#each rows as row}
+		{#each datapanel.rows as row}
 			<div class="table-row">
-				{#each zip(row, types) as [value, type]}
+				{#each zip(row, datapanel.column_infos) as [value, column_info]}
 					<div class="table-cell">
-						<Item data={value} />
+						<Cell data={value} cell_component={column_info.cell_component} cell_props={column_info.cell_props}/>
 					</div>
 				{/each}
 			</div>
@@ -92,7 +93,7 @@
 
 <style>
 	.table {
-		@apply pl-4 pr-4 table-fixed text-xs w-full;
+		@apply pl-4 pr-4 table-fixed text-sm w-full;
 		@apply dark:text-gray-300 dark:bg-gray-700;
 	}
 
@@ -100,7 +101,7 @@
 		@apply sticky top-0 py-2 px-4; /* sticky-top */
 		/* @apply resize-x [overflow:hidden]; resizing */
 		@apply dark:bg-gray-700 dark:text-slate-400;
-		@apply uppercase;
+		@apply font-bold;
 	}
 
 	.table-header-group .table-cell:not(:last-child) .resizer {

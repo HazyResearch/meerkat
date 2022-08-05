@@ -9,7 +9,7 @@
 	export let loaded_items: number;
 	export let total_items: number;
 	export let load_more_pages: number = 1;
-	export let loader: (start: number, end: number) => Promise<any>;
+	// export let loader: (start: number, end: number) => Promise<any>;
 	export let load_widget: boolean = false;
 	let _load_on_page_change: boolean = !load_widget;
 
@@ -17,7 +17,7 @@
 		loaded_items = total_items;
 	}
 
-	$: page_count = Math.ceil(loaded_items / per_page);
+	$: page_count = Math.ceil(total_items / per_page);
 	$: start_item = page * per_page + 1;
 	$: end_item = Math.min(page * per_page + per_page, loaded_items);
 
@@ -27,18 +27,18 @@
 		if (page < 0) {
 			page = 0;
 		}
-		if (_load_on_page_change) {
-			await loader(page * per_page, (page + 1) * per_page);
-		}
+		// if (_load_on_page_change) {
+		// 	await loader(page * per_page, (page + 1) * per_page);
+		// }
 	};
 	let on_page_right = async () => {
 		page = page + 1;
 		if (page >= page_count) {
 			page = page_count - 1;
 		}
-		if (_load_on_page_change) {
-			await loader(page * per_page, (page + 1) * per_page);
-		}
+		// if (_load_on_page_change) {
+		// 	await loader(page * per_page, (page + 1) * per_page);
+		// }
 	};
 
 	let on_load_more = async () => {
@@ -46,7 +46,7 @@
 			return;
 		}
 		let new_loaded_items = Math.min(loaded_items + per_page * load_more_pages, total_items);
-		await loader(loaded_items + 1, new_loaded_items);
+		//await loader(loaded_items + 1, new_loaded_items);
 		loaded_items = new_loaded_items;
 	};
 
@@ -58,7 +58,7 @@
 		page = 0;
 		start_item = page * per_page + 1; // why doesn't this happen automatically?!
 		end_item = Math.min(page * per_page + per_page, loaded_items);
-		await loader(page * per_page, (page + 1) * per_page);
+		//await loader(page * per_page, (page + 1) * per_page);
 	}
 </script>
 

@@ -1,13 +1,10 @@
-import base64
-from io import BytesIO
-from typing import Any, List
+from multiprocessing.sharedctypes import Value
+from typing import Any, Dict, List
 
-import PIL
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 import meerkat as mk
-from meerkat.columns.image_column import ImageColumn
 from meerkat.datapanel import DataPanel
 from meerkat.state import state
 
@@ -17,11 +14,13 @@ def get_datapanel(datapanel_id: str):
         if datapanel_id == "test-imagenette":
             return mk.get("imagenette", version="320px")
 
-        return state.identifiables.datapanels[datapanel_id]
+        datapanel = state.identifiables.datapanels[datapanel_id]
+
     except KeyError:
         raise HTTPException(
             status_code=404, detail="No datapanel with id {}".format(datapanel_id)
         )
+    return datapanel
 
 
 router = APIRouter(
@@ -31,26 +30,12 @@ router = APIRouter(
 )
 
 
-def image_to_base64(image: PIL.Image) -> str:
-    with BytesIO() as buffer:
-        image.save(buffer, "jpeg")
-        return "data:image/jpeg;base64,{im_base_64}".format(
-            im_base_64=base64.b64encode(buffer.getvalue()).decode()
-        )
-
-
-FORMATTERS = {
-    "image": image_to_base64,
-    "number": float,
-    "string": str,
-}
-
-
 class ColumnInfoResponse(BaseModel):
 
     name: str
     type: str
-    formatter: str
+    cell_component: str
+    cell_props: Dict[str, Any]
 
 
 @router.get("/{datapanel_id}/column_info/")
@@ -58,10 +43,10 @@ def get_column_info(
     datapanel_id: int,
 ):
     dp = get_datapanel(datapanel_id)
-    return _get_column_info(dp, dp.columns)
+    return _get_column_infos(dp, dp.columns)
 
 
-def _get_column_info(dp: DataPanel, columns: List[str] = None):
+def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     if columns is None:
         columns = dp.columns
 
@@ -69,16 +54,15 @@ def _get_column_info(dp: DataPanel, columns: List[str] = None):
         ColumnInfoResponse(
             name=col,
             type=str(type(dp[col])),
-            formatter="image"
-            if isinstance(dp[col], ImageColumn)
-            else "string",  # TODO(sabri): add formatter
+            cell_component=dp[col].formatter.cell_component,
+            cell_props=dp[col].formatter.cell_props,
         )
         for col in columns
     ]
 
 
 class DataPanelResponse(BaseModel):
-    column_info: List[ColumnInfoResponse]
+    column_infos: List[ColumnInfoResponse]
     indices: List[int] = None
     rows: List[List[Any]]
     full_length: int
@@ -101,9 +85,10 @@ def get_rows(
     Get rows from a DataPanel as a JSON object.
     """
     dp = get_datapanel(datapanel_id)
-    column_info = _get_column_info(dp, request.columns)
+    full_length = len(dp)
+    column_infos = _get_column_infos(dp, request.columns)
 
-    dp = dp[[info.name for info in column_info]]
+    dp = dp[[info.name for info in column_infos]]
 
     if request.indices is not None:
         dp = dp.lz[request.indices]
@@ -117,14 +102,13 @@ def get_rows(
         raise ValueError()
 
     rows = []
-    for row in dp:
+    for row in dp.lz:
         rows.append(
-            [FORMATTERS[info.formatter](row[info.name]) for info in column_info]
+            [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
-
     return DataPanelResponse(
-        column_info=column_info,
+        column_infos=column_infos,
         rows=rows,
-        full_length=len(dp),
+        full_length=full_length,
         indices=indices,
     )

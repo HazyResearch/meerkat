@@ -32,6 +32,7 @@
 		"svelte": "^3.44.0",
 		"svelte-bootstrap-icons": "^2.2.0",
 		"svelte-check": "^2.7.1",
+		"svelte-highlight": "^6.2.0",
 		"svelte-preprocess": "^4.10.7",
 		"svelte-select": "^4.4.7",
 		"tailwindcss": "^3.1.6",
@@ -42,6 +43,7 @@
 	"type": "module",
 	"dependencies": {
 		"@types/underscore": "^1.11.4",
+		"prismjs": "^1.28.0",
 		"underscore": "^1.13.4"
 	}
 }

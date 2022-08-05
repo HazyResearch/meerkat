@@ -4,7 +4,7 @@ import logging
 from typing import Callable
 
 from meerkat.columns.file_column import FileColumn
-from meerkat.display import image_file_formatter
+from meerkat.interactive.formatter import PILImageFormatter
 from meerkat.tools.lazy_loader import LazyLoader
 
 folder = LazyLoader("torchvision.datasets.folder")
@@ -43,7 +43,7 @@ class ImageColumn(FileColumn):
 
     @staticmethod
     def _get_default_formatter() -> Callable:
-        return image_file_formatter
+        return PILImageFormatter()
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
