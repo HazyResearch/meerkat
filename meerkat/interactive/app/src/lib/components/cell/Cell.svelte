@@ -1,3 +1,11 @@
+<script context="module" lang="ts">
+	export interface CellInterface {
+		data: any;
+		cell_component: string;
+		cell_props: object;
+	}
+</script>
+
 <script lang="ts">
 	import Code from './code/Code.svelte';
 	import Image from './image/Image.svelte';
@@ -8,7 +16,7 @@
 </script>
 
 {#if cell_component === 'image'}
-	<Image data={data} />
+	<Image data={data} {...cell_props} />
 {:else if cell_component === 'code'}
 	<Code data={data} {...cell_props} />
 {:else}

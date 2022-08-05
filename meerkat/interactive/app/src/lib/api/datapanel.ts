@@ -21,8 +21,6 @@ export interface DataPanelRows {
 export async function get_schema(
     api_url: string, datapanel_id: string, columns: Array<string> | null = null
 ): Promise<DataPanelSchema> {
-    console.log(api_url)
-    console.log(datapanel_id)
     return await post(`${api_url}/dp/${datapanel_id}/schema`, { columns: columns });
 }
 

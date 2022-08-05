@@ -1,7 +1,6 @@
 <script lang="ts">
+	import { get_rows,get_schema } from '$lib/api/datapanel';
 	import Table from '$lib/components/table/Table.svelte';
-	import { post } from '$lib/utils/requests';
-	import { get_rows, get_schema, type DataPanelRows } from '$lib/api/datapanel';
 	import { api_url } from '../routes/network/stores';
 	import Pagination from './components/pagination/Pagination.svelte';
 
@@ -13,23 +12,19 @@
 
 	$: schema_promise = get_schema($api_url, datapanel_id);
 	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
-
 </script>
 
 <div class="table-view">
 	{#await schema_promise}
-	<div class="h-full">Loading data...</div>
+		<div class="h-full">Loading data...</div>
 	{:then schema}
-		{#await rows_promise}
 		<div class="overflow-y-auto overflow-x-hidden h-full">
-			<Table rows={null} {schema} />
+			{#await rows_promise}
+				<Table rows={null} {schema} />
+			{:then rows}
+				<Table {rows} {schema} />
+			{/await}
 		</div>
-
-		{:then rows}
-		<div class="overflow-y-auto overflow-x-hidden h-full">
-			<Table {rows} {schema} />
-		</div>
-		{/await}
 	{/await}
 	<div class="z-10 top-0 m-2 h-20">
 		<Pagination bind:page bind:per_page loaded_items={nrows} total_items={nrows} />

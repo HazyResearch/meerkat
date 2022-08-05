@@ -1,18 +1,15 @@
 <script lang="ts">
-    import Gallery from "$lib/components/gallery/Gallery.svelte";
-    import { post } from '$lib/utils/requests';
-	import { api_url } from '$network/stores';
+    import { get_rows } from "$lib/api/datapanel";
 
-    let columns: Array<string> = [];
+    import Gallery from "$lib/components/gallery/Gallery.svelte";
+    import { api_url } from '$network/stores';
+
+    let column_infos: Array<any> = [];
     let rows: Array<any> = [];
 
     let loader = async (start: number, end: number) => {
-        let data_promise = await post(
-            `${$api_url}/dp/test-imagenette/rows`, 
-            { start: start, end: end }
-        );
-
-        columns = data_promise.column_info.map((col: any) => col.name);
+        let data_promise = await get_rows($api_url, "test-imagenette", start, end);
+        column_infos = data_promise.column_infos;
         rows = data_promise.rows;
     };
     let data_promise = loader(0, 100);
@@ -24,7 +21,7 @@
     Loading...
 {:then data} 
     <Gallery 
-        columns={columns}
+        column_infos={column_infos}
         rows={rows}
         main_column={"img"}
         tag_columns={["split", "img_path"]}
