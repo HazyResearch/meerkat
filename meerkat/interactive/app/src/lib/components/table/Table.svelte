@@ -3,8 +3,10 @@
 	import Cell from '$lib/components/cell/Cell.svelte';
 	import { onMount } from 'svelte';
 	import { zip } from 'underscore';
+	import { BarLoader } from 'svelte-loading-spinners'
 
-	export let rows: DataPanelRows;
+
+	export let rows: DataPanelRows | null;
 	export let schema: DataPanelSchema;
 	let column_infos: Array<ColumnInfo> = schema.columns; 
 
@@ -78,18 +80,26 @@
 			{/each}
 		</div>
 	</div>
+
 	<div class="table-row-group">
-		{#each rows.rows as row}
-			<div class="table-row">
-				{#each zip(row, rows.column_infos) as [value, column_info]}
-					<div class="table-cell">
-						<Cell data={value} cell_component={column_info.cell_component} cell_props={column_info.cell_props}/>
-					</div>
-				{/each}
-			</div>
-		{/each}
+		{#if rows}
+			{#each rows.rows as row}
+				<div class="table-row">
+					{#each zip(row, rows.column_infos) as [value, column_info]}
+						<div class="table-cell">
+							<Cell data={value} cell_component={column_info.cell_component} cell_props={column_info.cell_props}/>
+						</div>
+					{/each}
+				</div>
+			{/each}
+		{/if}
 	</div>
 </div>
+{#if !rows}
+<div class="flex justify-center items-center h-full">
+	<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+</div>
+{/if}
 
 <style>
 	.table {

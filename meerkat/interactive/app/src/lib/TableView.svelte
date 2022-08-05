@@ -13,16 +13,23 @@
 
 	$: schema_promise = get_schema($api_url, datapanel_id);
 	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
-	
+
 </script>
 
 <div class="table-view">
-	{#await Promise.all([rows_promise, schema_promise])}
-		<div class="h-full">Loading data...</div>
-	{:then [ rows, schema ]}
+	{#await schema_promise}
+	<div class="h-full">Loading data...</div>
+	{:then schema}
+		{#await rows_promise}
+		<div class="overflow-y-auto overflow-x-hidden h-full">
+			<Table rows={null} {schema} />
+		</div>
+
+		{:then rows}
 		<div class="overflow-y-auto overflow-x-hidden h-full">
 			<Table {rows} {schema} />
 		</div>
+		{/await}
 	{/await}
 	<div class="z-10 top-0 m-2 h-20">
 		<Pagination bind:page bind:per_page loaded_items={nrows} total_items={nrows} />

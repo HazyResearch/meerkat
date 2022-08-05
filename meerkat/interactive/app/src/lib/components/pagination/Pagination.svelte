@@ -83,20 +83,20 @@
 		<li>
 			<button
 				on:click={on_page_left}
-				class="w-12 h-10 rounded-l-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="w-12 h-10 rounded-l-lg border hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
 				<ChevronLeft class="ml-2" width={24} height={24} />
 			</button>
 		</li>
 		<li>
-			<button class="w-24 h-10 border dark:border-gray-700 dark:bg-gray-700 dark:text-white">
+			<button class="w-24 h-10 border dark:border-gray-700  dark:bg-gray-700 dark:text-white">
 				{page + 1} / {page_count}
 			</button>
 		</li>
 		<li>
 			<button
 				on:click={on_page_right}
-				class="w-12 h-10 rounded-r-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="w-12 h-10 rounded-r-lg border  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
 				<ChevronRight class="ml-3" width={24} height={24} />
 			</button>
