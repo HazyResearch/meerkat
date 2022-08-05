@@ -6,7 +6,7 @@
 </script>
 
 <img
-	class="block object-center h-4/5 w-full rounded-md shadow-lg"
+	class="block w-full rounded-md shadow-lg"
 	src={data}
 	alt="A cell."
 />

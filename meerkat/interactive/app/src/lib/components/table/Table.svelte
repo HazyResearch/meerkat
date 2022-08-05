@@ -68,7 +68,7 @@
 </script>
 
 <div class="table">
-	<div class="table-header-group">
+	<div class="table-header-group sticky top-0 py-2 px-4 bg-slate-100 shadow-lg">
 		<div class="table-row" bind:clientWidth={table_width}>
 			{#each column_infos as column, col_index}
 				<div class="table-cell" style="width:{column_widths[col_index]}{column_unit}">
@@ -86,7 +86,7 @@
 			{#each rows.rows as row}
 				<div class="table-row">
 					{#each zip(row, rows.column_infos) as [value, column_info]}
-						<div class="table-cell">
+						<div class="table-cell align-middle p-5">
 							<Cell data={value} cell_component={column_info.cell_component} cell_props={column_info.cell_props}/>
 						</div>
 					{/each}
@@ -125,10 +125,10 @@
 	}
 
 	.table-row-group .table-row {
-		@apply dark:bg-gray-800 dark:border-gray-700  dark:hover:bg-gray-600;
+		@apply border-b border-slate-100 dark:bg-gray-800 dark:border-gray-700  dark:hover:bg-gray-600;
 	}
 
 	.table-row-group .table-cell {
-		@apply px-4 text-left overflow-hidden break-words;
+		@apply border-b border-slate-200 px-4 text-left overflow-hidden break-words;
 	}
 </style>

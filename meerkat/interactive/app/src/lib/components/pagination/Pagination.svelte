@@ -62,11 +62,11 @@
 	}
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
 	<link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/g90.css" />
-</svelte:head>
+</svelte:head> -->
 
-<ul class="flex justify-between pt-1">
+<ul class="flex justify-between pt-1 bg-slate-100 rounded-lg shadow-lg">
 	<li class="inline-flex">
 		<NumberSelect
 			bind:selection
@@ -79,6 +79,16 @@
 			hint_text={'Items per page'}
 		/>
 	</li>
+	<div class="pt-2 dark:text-gray-400">
+		<span class="font-semibold dark:text-white">
+			{start_item}-{end_item}
+		</span>
+		of
+		<span class="font-semibold dark:text-white">
+			{total_items}
+		</span>
+		total
+	</div>
 	<ul class="inline-flex">
 		<li>
 			<button
@@ -133,7 +143,7 @@
 		</div>
 	{:else}
 		<!-- "1-10 of 32 total" -->
-		<div class="pt-2 dark:text-gray-400">
+		<!-- <div class="pt-2 dark:text-gray-400">
 			<span class="font-semibold dark:text-white">
 				{start_item}-{end_item}
 			</span>
@@ -142,6 +152,6 @@
 				{total_items}
 			</span>
 			total
-		</div>
+		</div> -->
 	{/if}
 </div>
