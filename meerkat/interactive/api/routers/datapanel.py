@@ -30,7 +30,7 @@ router = APIRouter(
 )
 
 
-class ColumnInfoResponse(BaseModel):
+class ColumnInfo(BaseModel):
 
     name: str
     type: str
@@ -38,20 +38,38 @@ class ColumnInfoResponse(BaseModel):
     cell_props: Dict[str, Any]
 
 
-@router.get("/{datapanel_id}/column_info/")
-def get_column_info(
-    datapanel_id: int,
-):
+class SchemaRequest(BaseModel):
+    columns: List[str] = None
+
+
+class SchemaResponse(BaseModel):
+    id: str
+    columns: List[ColumnInfo]
+
+
+@router.post("/{datapanel_id}/schema/")
+def get_schema(datapanel_id: str, request: SchemaRequest) -> SchemaResponse:
     dp = get_datapanel(datapanel_id)
-    return _get_column_infos(dp, dp.columns)
+    columns = dp.columns if request is None else request.columns
+    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, columns))
 
 
 def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     if columns is None:
         columns = dp.columns
+    else:
+        missing_columns = set(columns) - set(dp.columns)
+        if len(missing_columns) > 0:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"Requested columns {columns} do not exist in datapanel"
+                    f" with id {dp.id}"
+                ),
+            )
 
     return [
-        ColumnInfoResponse(
+        ColumnInfo(
             name=col,
             type=str(type(dp[col])),
             cell_component=dp[col].formatter.cell_component,
@@ -61,14 +79,14 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     ]
 
 
-class DataPanelResponse(BaseModel):
-    column_infos: List[ColumnInfoResponse]
+class RowsResponse(BaseModel):
+    column_infos: List[ColumnInfo]
     indices: List[int] = None
     rows: List[List[Any]]
     full_length: int
 
 
-class DataPanelRequest(BaseModel):
+class RowsRequest(BaseModel):
     # TODO (sabri): add support for data validation
     start: int = None
     end: int = None
@@ -79,8 +97,8 @@ class DataPanelRequest(BaseModel):
 @router.post("/{datapanel_id}/rows/")
 def get_rows(
     datapanel_id: str,
-    request: DataPanelRequest,
-) -> DataPanelResponse:
+    request: RowsRequest,
+) -> RowsResponse:
     """
     Get rows from a DataPanel as a JSON object.
     """
@@ -106,7 +124,7 @@ def get_rows(
         rows.append(
             [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
-    return DataPanelResponse(
+    return RowsResponse(
         column_infos=column_infos,
         rows=rows,
         full_length=full_length,

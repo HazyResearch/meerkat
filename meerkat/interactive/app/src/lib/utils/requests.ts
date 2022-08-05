@@ -16,7 +16,9 @@ export async function post(url: string, data: any): Promise<any> {
         body: JSON.stringify(data)
     });
     if (!res.ok) {
-        throw new Error("HTTP status " + res.status);
+        throw new Error(
+            "HTTP status " + res.status + ": " + res.statusText + "\n url: " + url + "\n data: " + JSON.stringify(data)
+        );
     }
     const json = await res.json();
     return json;

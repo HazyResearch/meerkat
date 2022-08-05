@@ -1,26 +1,27 @@
 <script lang="ts">
 	import Table from '$lib/components/table/Table.svelte';
 	import { post } from '$lib/utils/requests';
-	import { get_rows, type DataPanelRows } from '$lib/api/datapanel';
+	import { get_rows, get_schema, type DataPanelRows } from '$lib/api/datapanel';
 	import { api_url } from '../routes/network/stores';
 	import Pagination from './components/pagination/Pagination.svelte';
 
-	console.log('in tableview');
 	export let per_page: number = 10;
 
 	export let nrows: number = 0;
-	export let dp_id: string = '';
+	export let datapanel_id: string = '';
 	export let page: number = 0;
 
-	$: datapanel_promise = get_rows($api_url, dp_id, page * per_page, (page + 1) * per_page)
+	$: schema_promise = get_schema($api_url, datapanel_id);
+	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
+	
 </script>
 
 <div class="table-view">
-	{#await datapanel_promise}
+	{#await Promise.all([rows_promise, schema_promise])}
 		<div class="h-full">Loading data...</div>
-	{:then datapanel}
+	{:then [ rows, schema ]}
 		<div class="overflow-y-auto overflow-x-hidden h-full">
-			<Table {datapanel} />
+			<Table {rows} {schema} />
 		</div>
 	{/await}
 	<div class="z-10 top-0 m-2 h-20">

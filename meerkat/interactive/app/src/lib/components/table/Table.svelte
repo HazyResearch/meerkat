@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { DataPanelRows, ColumnInfo } from '$lib/api/datapanel';
+	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
 	import Cell from '$lib/components/cell/Cell.svelte';
 	import { onMount } from 'svelte';
 	import { zip } from 'underscore';
 
-	console.log("in table.svelte")
-	export let datapanel: DataPanelRows;
-	let column_infos: Array<ColumnInfo> = datapanel.column_infos; 
+	export let rows: DataPanelRows;
+	export let schema: DataPanelSchema;
+	let column_infos: Array<ColumnInfo> = schema.columns; 
 
 	let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 100 / column_infos.length);
 	let column_unit: string = '%';
@@ -79,9 +79,9 @@
 		</div>
 	</div>
 	<div class="table-row-group">
-		{#each datapanel.rows as row}
+		{#each rows.rows as row}
 			<div class="table-row">
-				{#each zip(row, datapanel.column_infos) as [value, column_info]}
+				{#each zip(row, rows.column_infos) as [value, column_info]}
 					<div class="table-cell">
 						<Cell data={value} cell_component={column_info.cell_component} cell_props={column_info.cell_props}/>
 					</div>

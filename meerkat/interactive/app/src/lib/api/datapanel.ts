@@ -7,7 +7,10 @@ export interface ColumnInfo {
     cell_props: any
 }
 
-
+export interface DataPanelSchema {
+    columns: Array<ColumnInfo>;
+    id: string;
+}
 export interface DataPanelRows {
     column_infos: Array<ColumnInfo>
     indices: Array<number>
@@ -15,10 +18,14 @@ export interface DataPanelRows {
     full_length: number
 }
 
+export async function get_schema(
+    api_url: string, datapanel_id: string, columns: Array<string> | null = null
+): Promise<DataPanelSchema> {
+    console.log(api_url)
+    console.log(datapanel_id)
+    return await post(`${api_url}/dp/${datapanel_id}/schema`, { columns: columns });
+}
 
-export async function get_rows(api_url: string, dp_id: string, start: number, end: number): Promise<any> {
-    console.log("hello in datapanel.ts");
-    console.log(`${api_url}/dp/${dp_id}/rows`);
-    let data_promise = await post(`${api_url}/dp/${dp_id}/rows`, { start: start, end: end });
-    return data_promise;
+export async function get_rows(api_url: string, datapanel_id: string, start: number, end: number): Promise<DataPanelRows> {
+    return await post(`${api_url}/dp/${datapanel_id}/rows`, { start: start, end: end });
 }

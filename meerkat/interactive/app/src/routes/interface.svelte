@@ -28,7 +28,7 @@
 
 <div class="h-[800px]">
 	{#if config.type == 'table'}
-		<TableView nrows={config.nrows} dp_id={config.dp} />
+		<TableView nrows={config.nrows} datapanel_id={config.dp} />
 	{:else}
 		<div>Type not recognized.</div>
 	{/if}
