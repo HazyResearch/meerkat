@@ -13,7 +13,8 @@ const config = {
 			$layouts: path.resolve('./src/lib/layouts'),
 			$utils: path.resolve('./src/lib/utils'),
 			$styles: path.resolve('./src/lib/styles'),
-			$stores: path.resolve('./src/lib/stores')
+			$stores: path.resolve('./src/lib/stores'),
+			$network: path.resolve('./src/routes/network')
 		}
 	}
 	
