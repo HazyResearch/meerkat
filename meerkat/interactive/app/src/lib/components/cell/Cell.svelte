@@ -3,8 +3,8 @@
 	import Image from './image/Image.svelte';
 
 	export let data: any;
-	export let cell_component: string;
-	export let cell_props: object;
+	export let cell_component: string = "";
+	export let cell_props: object = {};
 </script>
 
 {#if cell_component === 'image'}

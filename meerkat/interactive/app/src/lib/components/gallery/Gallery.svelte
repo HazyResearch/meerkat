@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Card from './Card.svelte';
     import { Slider } from "carbon-components-svelte";
-import Item from '../item/Item.svelte';
-import InfoCard from './InfoCard.svelte';
+    // import Cell from '../cell/Cell.svelte';
+    import InfoCard from './InfoCard.svelte';
 
 	export let columns: Array<string> = [];
 	export let rows: Array<any> = [];
@@ -63,7 +63,7 @@ import InfoCard from './InfoCard.svelte';
                     --pivot-height="{layout === 'gimages' ? `${pivot_height}vh` : ""}"
                     --card-width=""
                 />
-                <!-- <Item data={row[main_index - 1]}/> -->
+                <!-- <Cell data={row[main_index - 1]}/> -->
             </div>
         </Card>
 	{/each}

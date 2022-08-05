@@ -2,7 +2,7 @@
     import { tippy, createTippy } from 'svelte-tippy';
     import {followCursor} from 'tippy.js';
 
-    import Item from '$lib/components/item/Item.svelte';
+    import Cell from '$lib/components/cell/Cell.svelte';
 
     export let id: string;
     export let pivot: any;
@@ -57,11 +57,11 @@
         use:pivot_tippy={{content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML}}
     >
         <!-- The pivot item, followed by the tooltip content. -->
-        <Item data={pivot} />
+        <Cell data={pivot} />
         {#if pivot_tooltip}
             <div id="{id}-pivot-tooltip" class="hidden">
                 <slot name="pivot-tooltip">
-                    <Item data={pivot} />
+                    <Cell data={pivot} />
                 </slot>
             </div>
         {/if}
@@ -72,10 +72,10 @@
                 class="subcontent" 
                 use:content_tippy={{content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML}}
             >
-                <Item data={subcontent}/>
+                <Cell data={subcontent}/>
                 {#if content_tooltip}
                     <div id="{id}-content-tooltip-{j}" class="hidden">
-                        <Item data={subcontent} />
+                        <Cell data={subcontent} />
                     </div>
                 {/if}
             </div>

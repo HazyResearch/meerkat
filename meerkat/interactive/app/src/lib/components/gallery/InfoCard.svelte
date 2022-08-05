@@ -1,5 +1,5 @@
 <script lang="ts">    
-    import Item from '$lib/components/item/Item.svelte';
+    import Cell from '$lib/components/cell/Cell.svelte';
 
     export let pivot: any;
     export let content: any;
@@ -12,12 +12,12 @@
 
 <div class="card" class:flex-grow={card_flex_grow}>
     <div class="pivot">
-        <Item data={pivot} />
+        <Cell data={pivot} />
     </div>
     <div class="content">
         {#each content as subcontent, j}
             <div class="subcontent">
-                <Item data={subcontent}/>
+                <Cell data={subcontent}/>
             </div>
         {/each}
     </div>
