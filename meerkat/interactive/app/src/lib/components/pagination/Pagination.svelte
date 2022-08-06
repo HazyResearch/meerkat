@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { CloudDownload } from 'carbon-icons-svelte';
-	import { ChevronLeft,ChevronRight } from 'svelte-bootstrap-icons';
+	import ChevronLeft from 'svelte-bootstrap-icons/lib/ChevronLeft.svelte';
+	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
+
 	import NumberInput from './NumberInput.svelte';
 	import NumberSelect from './NumberSelect.svelte';
 
@@ -96,6 +97,7 @@
 				class="w-12 h-10 rounded-l-lg border hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
 				<ChevronLeft class="ml-2" width={24} height={24} />
+				
 			</button>
 		</li>
 		<li>
@@ -119,7 +121,8 @@
 				on:click={on_load_more}
 				class="inline-flex py-2 px-3 border border-solid dark:bg-gray-800 dark:border-gray-400 dark:hover:bg-gray-700"
 			>
-				<CloudDownload size={24} />
+				<!-- <CloudDownload size={24} /> -->
+				download
 			</button>
 		</li>
 	{/if}
