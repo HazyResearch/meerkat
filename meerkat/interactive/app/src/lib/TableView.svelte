@@ -26,7 +26,7 @@
 			{/await}
 		</div>
 	{/await}
-	<div class="z-10 top-0 m-2 h-20">
+	<div class="z-10 top-0 m-0 h-20">
 		<Pagination bind:page bind:per_page loaded_items={nrows} total_items={nrows} />
 	</div>
 </div>

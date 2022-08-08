@@ -12,14 +12,14 @@
 
 <div class="themed flex w-60">
 	<div
-		class="inline-flex justify-center w-3/5 p-2.5 border border-solid text-sm rounded-l-lg dark:bg-gray-800 dark:text-gray-100"
+		class="inline-flex justify-center w-9/10 py-3.5 px-2 text-sm rounded-l-lg dark:bg-gray-800 dark:text-gray-100"
 	>
 		{hint_text}
 	</div>
-	<Select
+	<Select 
 		value={selection.value}
 		items={options}
-		containerClasses="w-2/5"
+		containerClasses="w-1/10"
 		placeholder={hint_text}
 		isClearable={false}
 		showIndicator={true}
@@ -34,17 +34,16 @@
 	*/
 
 	.themed {
+		@apply rounded-md;
 		--tw-bg-opacity: 1;
-		--background: theme(colors.gray.600);
-		--border: 1px solid;
-		--borderRadius: 0px;
-		--borderHoverColor: theme(colors.gray.600);
+		--background: theme(colors.slate.100);
+		--borderHoverColor: theme(colors.violet.600);
 		--borderFocusColor: theme(colors.violet.600);
 		--itemColor: theme(colors.gray.600);
 		--itemHoverColor: theme(colors.gray.600);
 		--itemActiveBackground: theme(colors.gray.800);
 		--listBackground: theme(colors.gray.400);
-		--itemHoverBG: theme(colors.gray.300);
+		--itemHoverBG: theme(colors.gray.200);
 		--itemIsActiveBG: theme(colors.violet.600);
 	}
 </style>

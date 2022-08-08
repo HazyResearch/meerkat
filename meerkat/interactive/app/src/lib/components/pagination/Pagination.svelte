@@ -67,8 +67,8 @@
 	<link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/g90.css" />
 </svelte:head> -->
 
-<ul class="flex justify-between pt-1 bg-slate-100 rounded-lg shadow-lg">
-	<li class="inline-flex">
+<ul class="flex justify-between py-2 px-2 bg-slate-100 rounded-xl shadow-lg">
+	<li class="inline-flex self-center">
 		<NumberSelect
 			bind:selection
 			options={[
@@ -80,7 +80,7 @@
 			hint_text={'Items per page'}
 		/>
 	</li>
-	<div class="pt-2 dark:text-gray-400">
+	<div class="dark:text-gray-400 self-center">
 		<span class="font-semibold dark:text-white">
 			{start_item}-{end_item}
 		</span>
@@ -90,13 +90,13 @@
 		</span>
 		total
 	</div>
-	<ul class="inline-flex">
+	<ul class="inline-flex self-center">
 		<li>
 			<button
 				on:click={on_page_left}
-				class="w-12 h-10 rounded-l-lg border hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="group w-12 h-10 rounded-l-lg border hover:border-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronLeft class="ml-2" width={24} height={24} />
+				<ChevronLeft class="group-hover:stroke-violet-600 ml-2" width={24} height={24} />
 				
 			</button>
 		</li>
@@ -108,9 +108,9 @@
 		<li>
 			<button
 				on:click={on_page_right}
-				class="w-12 h-10 rounded-r-lg border  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="group w-12 h-10 rounded-r-lg border  hover:border-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronRight class="ml-3" width={24} height={24} />
+				<ChevronRight class="group-hover:stroke-violet-600 ml-3" width={24} height={24} />
 			</button>
 		</li>
 	</ul>

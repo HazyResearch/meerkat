@@ -3,4 +3,4 @@
 	export let height: string = "100%";
 </script>
 
-<img class="rounded-sm" style:height={height} src={data} alt="A cell." />
+<img class="rounded-md shadow-lg" style:height={height} src={data} alt="A cell." />

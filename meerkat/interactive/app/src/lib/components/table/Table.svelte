@@ -68,20 +68,25 @@
 </script>
 
 <div class="table">
-	<div class="table-header-group sticky top-0 py-2 px-4 bg-slate-100 shadow-lg">
+	<div class="table-header-group">
 		<div class="table-row" bind:clientWidth={table_width}>
 			{#each column_infos as column, col_index}
 				<div class="table-cell" style="width:{column_widths[col_index]}{column_unit}">
 					<slot id="header-cell">
-						<div class="flex items-center">{column.name}</div>
+						<div class="flex flex-col items-center">
+							<div class="pb-1 font-bold">{column.name}</div>
+							<div class="text-clip bg-violet-200  font-mono text-slate-500 rounded-full px-3 py-0.5">
+								{column.type}
+							</div>
+						</div>
 					</slot>
-					<div class="resizer" on:mousedown={resize_methods.mousedown(col_index)} />
+					<div class="resizer rounded-md" on:mousedown={resize_methods.mousedown(col_index)} />
 				</div>
 			{/each}
 		</div>
 	</div>
 
-	<div class="table-row-group">
+	<div class="table-row-group bg-white">
 		{#if rows}
 			{#each rows.rows as row}
 				<div class="table-row">
@@ -111,11 +116,11 @@
 		@apply sticky top-0 py-2 px-4; /* sticky-top */
 		/* @apply resize-x [overflow:hidden]; resizing */
 		@apply dark:bg-gray-700 dark:text-slate-400;
-		@apply font-bold;
+		@apply bg-slate-100 drop-shadow-xl rounded-l;
 	}
 
 	.table-header-group .table-cell:not(:last-child) .resizer {
-		@apply absolute h-full right-0 top-0 w-2 cursor-col-resize;
+		@apply absolute h-60 right-0 top-0 w-2 cursor-col-resize;
 		user-select: none;
 	}
 

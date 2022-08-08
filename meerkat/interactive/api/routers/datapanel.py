@@ -71,7 +71,7 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     return [
         ColumnInfo(
             name=col,
-            type=str(type(dp[col])),
+            type=type(dp[col]).__name__,
             cell_component=dp[col].formatter.cell_component,
             cell_props=dp[col].formatter.cell_props,
         )
