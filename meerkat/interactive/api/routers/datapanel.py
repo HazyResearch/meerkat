@@ -1,4 +1,5 @@
 from multiprocessing.sharedctypes import Value
+from time import sleep
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, HTTPException
@@ -130,3 +131,13 @@ def get_rows(
         full_length=full_length,
         indices=indices,
     )
+
+
+class CreateColumnRequest(BaseModel):
+    text: str = None
+
+
+@router.post("/{datapanel_id}/create_column/")
+def create_column(datapanel_id: str, request: CreateColumnRequest):
+    sleep(1)
+    return "created:" + request.text

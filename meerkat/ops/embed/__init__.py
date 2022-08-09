@@ -1,6 +1,7 @@
 import os
 from typing import Callable, Union
 
+import PIL
 import torch
 
 import meerkat as mk
@@ -19,15 +20,15 @@ def infer_modality(col: mk.AbstractColumn):
 
     if isinstance(col, mk.ImageColumn):
         return "image"
-    elif isinstance(col, mk.PandasSeriesColumn):
+    elif isinstance(col, (mk.PandasSeriesColumn, str)):
         return "text"
     else:
-        raise ValueError(f"Cannot infer modality from colummn of type {type(col)}.")
+        raise ValueError(f"Cannot infer modality from column of type {type(col)}.")
 
 
 # @cache(params=["encoder", "modality", ""])
 def embed(
-    data: Union[mk.DataPanel, mk.AbstractColumn],
+    data: Union[mk.DataPanel, mk.AbstractColumn, str, PIL.Image.Image],
     input: str = None,
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
@@ -89,9 +90,11 @@ def embed(
         mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
+    col = data if isinstance(data, mk.AbstractColumn) else data[input]
+
     if modality is None:
 
-        modality = infer_modality(col=data[input])
+        modality = infer_modality(col=col)
 
     if out_col is None:
         out_col = f"{encoder}({input})"
@@ -103,10 +106,8 @@ def embed(
 
     encoder = encoder[modality]
 
-    return _embed(
-        data=data,
-        input=input,
-        out_col=out_col,
+    out = _embed(
+        col=col,
         encode=encoder.encode,
         preprocess=encoder.preprocess,
         collate=encoder.collate,
@@ -116,11 +117,15 @@ def embed(
         batch_size=batch_size,
     )
 
+    if isinstance(data, mk.DataPanel):
+        data[out_col] = out
+        return data
+    else:
+        return out
+
 
 def _embed(
-    data: mk.DataPanel,
-    input: str,
-    out_col: str,
+    col: mk.AbstractColumn,
     encode: Callable,
     preprocess: Callable,
     collate: Callable,
@@ -133,9 +138,9 @@ def _embed(
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if preprocess is not None:
-        embed_input = data[input].to_lambda(preprocess)
+        embed_input = col.to_lambda(preprocess)
     else:
-        embed_input = data[input]
+        embed_input = col
 
     if collate is not None:
         embed_input.collate_fn = collate
@@ -148,7 +153,7 @@ def _embed(
         return x
 
     with torch.no_grad():
-        data[out_col] = embed_input.map(
+        out = embed_input.map(
             lambda x: encode(_prepare_input(x)).cpu().detach().numpy(),
             pbar=True,
             is_batched_fn=True,
@@ -160,4 +165,4 @@ def _embed(
             else os.path.join(mmap_dir, "emb_mmap.npy"),
             flush_size=128,
         )
-    return data
+    return out

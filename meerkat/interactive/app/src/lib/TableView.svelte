@@ -2,7 +2,8 @@
 	import { get_rows,get_schema } from '$lib/api/datapanel';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import Pagination from './components/pagination/Pagination.svelte';
+	import Pagination from '$lib/components/pagination/Pagination.svelte';
+	import SearchHeader from '$lib/components/search_header/SearchHeader.svelte';
 
 	export let per_page: number = 10;
 
@@ -14,6 +15,7 @@
 	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
 </script>
 
+<SearchHeader datapanel_id={datapanel_id} schema_promise={schema_promise}></SearchHeader>
 <div class="table-view">
 	{#await schema_promise}
 		<div class="h-full">Loading data...</div>

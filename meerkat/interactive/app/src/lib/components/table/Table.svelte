@@ -65,6 +65,7 @@
 		);
 		column_unit = 'px';
 	});
+
 </script>
 
 <div class="table">

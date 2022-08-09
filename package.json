@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "svelte-select": "^4.4.7"
+  }
+}

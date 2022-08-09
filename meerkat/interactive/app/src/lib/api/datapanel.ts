@@ -27,3 +27,10 @@ export async function get_schema(
 export async function get_rows(api_url: string, datapanel_id: string, start: number, end: number): Promise<DataPanelRows> {
     return await post(`${api_url}/dp/${datapanel_id}/rows`, { start: start, end: end });
 }
+
+
+export async function create_column(
+    api_url: string, datapanel_id: string, text: string
+): Promise<string> {
+    return await post(`${api_url}/dp/${datapanel_id}/create_column`, { text: text });
+}

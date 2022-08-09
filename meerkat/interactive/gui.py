@@ -1,4 +1,4 @@
-from IPython.display import IFrame
+from IPython.display import HTML, IFrame
 
 import meerkat as mk
 from meerkat.state import state
@@ -22,10 +22,12 @@ class GUI:
         url = f"{state.network_info.npm_server_url}/interface?id={interface.id}"
         print(url)
         if return_iframe:
-            return IFrame(
-                url,
-                width=800,
-                height=800,
-            )
+            # return HTML(
+            #     "<style>iframe{width:100%}</style>"
+            #     '<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"></script>'
+            #     f'<iframe id="meerkatIframe" src="{url}"></iframe>'
+            #     "<script>iFrameResize({{ log: true }}, '#meerkatIframe')</script>"
+            # )
+            return IFrame(url, width="100%", height="800")
         else:
             return url
