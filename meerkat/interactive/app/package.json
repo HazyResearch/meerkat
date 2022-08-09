@@ -46,6 +46,7 @@
 	"dependencies": {
 		"@types/underscore": "^1.11.4",
 		"prismjs": "^1.28.0",
+		"svelte-modals": "^1.1.0",
 		"svelte-tippy": "^1.3.2",
 		"tippy.js": "^6.3.7",
 		"underscore": "^1.13.4"

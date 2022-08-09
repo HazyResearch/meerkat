@@ -3,10 +3,19 @@
 	import { followCursor } from 'tippy.js';
 
 	import Cell,{ type CellInterface } from '$lib/components/cell/Cell.svelte';
-
+	import type { SvelteComponent } from 'svelte';
+	import { openModal } from 'svelte-modals';
+	
+	// ID for this component
 	export let id: string;
+
+	// Pivot cell
 	export let pivot: CellInterface;
-	export let content: any;
+
+	// Content cells
+	export let content: Array<CellInterface>;
+
+	// Layout
 	export let layout: string;
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
@@ -14,22 +23,23 @@
 	export let card_flex_grow: boolean = false;
 
 	// Tooltip setup
-	export let pivot_tooltip: boolean = true;
+	export let pivot_tooltip: boolean = false;
 	export let content_tooltip: boolean = true;
-
 	let pivot_tippy = (node: HTMLElement, parameters: any = null) => {};
+	let content_tippy = (node: HTMLElement, parameters: any = null) => {};
+
 	if (pivot_tooltip) {
 		pivot_tippy = createTippy({
 			placement: 'auto',
 			allowHTML: true,
 			theme: 'pivot-tooltip',
-			trigger: 'click',
+			followCursor: true,
+			plugins: [followCursor],
 			duration: [0, 0],
-			maxWidth: '95vw'
+			maxWidth: '95vw',
+			// interactive: true
 		});
 	}
-
-	let content_tippy = (node: HTMLElement, parameters: any = null) => {};
 	if (content_tooltip) {
 		content_tippy = createTippy({
 			allowHTML: true,
@@ -40,6 +50,11 @@
 			maxWidth: '95vw'
 		});
 	}
+
+	// Modal setup
+	export let pivot_modal: boolean = true;
+	export let pivot_modal_component: SvelteComponent;
+	export let pivot_modal_component_props: Object;
 </script>
 
 <div
@@ -48,12 +63,20 @@
 	class:card-masonry={layout === 'masonry'}
 	class:card-gimages={layout === 'gimages'}
 >
+	<!-- Pivot (main) element -->
 	<div
 		class="pivot"
-		use:pivot_tippy={{ content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }}
+		on:click={pivot_modal
+			? () => openModal(pivot_modal_component, { is_open: true, ...pivot_modal_component_props })
+			: null} 
+		use:pivot_tippy={pivot_tooltip
+			? { content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }
+			: null}
 	>
-		<!-- The pivot item, followed by the tooltip content. -->
+		<!-- Pivot item -->
 		<Cell {...pivot} />
+
+		<!-- Pivot tooltip -->
 		{#if pivot_tooltip}
 			<div id="{id}-pivot-tooltip" class="hidden">
 				<slot name="pivot-tooltip">
@@ -62,6 +85,8 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Content -->
 	<div class="content">
 		{#each content as subcontent, j}
 			<div
@@ -70,38 +95,39 @@
 					content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML
 				}}
 			>
-				<Cell data={subcontent} />
+				<Cell {...subcontent} />
 				{#if content_tooltip}
 					<div id="{id}-content-tooltip-{j}" class="hidden">
-						<Cell data={subcontent} />
+						<Cell {...subcontent} />
 					</div>
 				{/if}
 			</div>
 		{/each}
 	</div>
+
 </div>
 
 <style>
 	.card {
 		min-width: var(--card-width, '');
+		@apply border-2 border-solid rounded-lg shadow-md;
+		@apply dark:bg-gray-700 dark:border-gray-600;
 	}
 
 	.card-masonry {
 		/* Solution 1: multiple columns in a masonry layout */
-		@apply m-2 break-inside-avoid h-auto;
+		@apply break-inside-avoid h-auto;
 	}
 
 	.card-gimages {
 		/* Solution 2: flex containers in the Google Images style */
-		@apply m-1;
-		@apply rounded-lg border shadow-md;
-		@apply dark:bg-gray-700 dark:border-gray-600;
 		/* Make the card a flex-col so the pivot element can be centered horizontally */
 		@apply flex flex-col;
 	}
 
 	.pivot {
 		@apply self-center;
+		@apply border-2 border-solid border-transparent;
 	}
 
 	.content {
@@ -119,16 +145,18 @@
 		@apply bg-slate-600;
 	}
 
-	.card:hover > .pivot {
-		filter: blur(2px);
+	.pivot:hover {
+		@apply border-2 border-solid border-violet-600;
 	}
 
 	/* CSS for the tooltips */
 	:global(.tippy-box[data-theme='pivot-tooltip']) {
+		@apply py-1 px-1 text-xs font-mono rounded-lg shadow-sm;
+		@apply text-white bg-violet-500;
 	}
 
 	:global(.tippy-box[data-theme='content-tooltip']) {
 		@apply py-4 px-4 text-base font-mono rounded-lg shadow-sm;
-		@apply text-white bg-gray-900;
+		@apply text-white bg-violet-900;
 	}
 </style>

@@ -1,38 +1,43 @@
 <script lang="ts">
-	import Cell, { type CellInterface } from '$lib/components/cell/Cell.svelte';
-import { zip } from 'underscore';
+	import Cell,{ type CellInterface } from '$lib/components/cell/Cell.svelte';
+	import { zip } from 'underscore';
+	import Pill from './Pill.svelte';
 
 	export let pivot: CellInterface;
 	export let pivot_header: string;
-	export let content: any;
+	export let content: Array<any>;
 	export let content_headers: Array<string> = [];
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
 	export let card_flex_grow: boolean = false;
+	export let as_modal: boolean = false;
+	export let wrap_content: boolean = false;
 </script>
 
-<div class="card" class:flex-grow={card_flex_grow}>
+<div class="card" class:flex-grow={card_flex_grow} class:modal={as_modal}>
 	<div class="pivot">
-		<div class="header"><Cell data={pivot_header} /></div>
+		<Pill header={pivot_header} layout={'wide-header'} />
 		<Cell {...pivot} />
 	</div>
-	<div class="content">
+	<div class="content" class:wrap-content={wrap_content}>
 		{#each zip(content_headers, content) as [header, subcontent], j}
-			<div class="tag">
-				<div class="header"><Cell data={header} /></div>
-				<div class="subcontent"><Cell data={subcontent} /></div>
-			</div>
+			<Pill {header} content={subcontent} layout={'wide-content'} />
 		{/each}
 	</div>
 </div>
 
 <style>
+	.modal {
+		@apply max-h-[95vh] max-w-[90vw];
+	}
+
 	.card {
 		/* min-width: var(--card-width, ''); */
 		@apply bg-gray-400;
 		@apply p-2 rounded-lg;
 		@apply flex flex-col;
+		@apply overflow-y-auto overflow-x-hidden;
 	}
 
 	.pivot {
@@ -40,21 +45,13 @@ import { zip } from 'underscore';
 	}
 
 	.content {
-		@apply flex flex-wrap items-start mt-2;
+		/* Take up atleast 30% of the height of the card */
+		@apply min-h-[30%];
+		@apply mt-8 p-2 border-t-2 border-solid;
+		@apply overflow-y-auto;
 	}
 
-	.tag {
-		@apply flex flex-row pr-2 pl-2;
-	}
-
-	.header {
-		@apply p-1 mr-0 ml-0 m-1 rounded-l-md bg-slate-900 items-start;
-		@apply text-center text-xs text-ellipsis whitespace-nowrap select-none font-mono;
-	}
-
-	.subcontent {
-		@apply p-1 ml-0 m-1 rounded-r-md;
-		@apply text-center overflow-hidden text-xs text-ellipsis whitespace-nowrap select-none font-mono;
-		@apply text-slate-200 bg-slate-500;
+	.wrap-content {
+		@apply flex flex-wrap;
 	}
 </style>
