@@ -134,6 +134,9 @@ def _embed(
     num_workers: int = 4,
     batch_size: int = 128,
 ):
+    def _encode(x):
+        return encode(_prepare_input(x)).cpu().detach().numpy()
+
     if device is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -154,7 +157,7 @@ def _embed(
 
     with torch.no_grad():
         out = embed_input.map(
-            lambda x: encode(_prepare_input(x)).cpu().detach().numpy(),
+            _encode,
             pbar=True,
             is_batched_fn=True,
             batch_size=batch_size,
