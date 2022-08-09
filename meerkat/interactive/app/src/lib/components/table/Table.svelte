@@ -76,7 +76,7 @@
 					<slot id="header-cell">
 						<div class="flex flex-col items-center">
 							<div class="pb-1 font-bold">{column.name}</div>
-							<div class="text-clip bg-violet-200  font-mono text-slate-500 rounded-full px-3 py-0.5">
+							<div class="text-clip bg-violet-200 font-mono text-slate-500 rounded-full px-3 py-0.5">
 								{column.type}
 							</div>
 						</div>

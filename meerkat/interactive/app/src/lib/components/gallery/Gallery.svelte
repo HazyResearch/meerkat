@@ -1,10 +1,12 @@
 <script lang="ts">
+    import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
 	import { Slider } from 'carbon-components-svelte';
 	import Card from './Card.svelte';
 	import InfoModal from './InfoModal.svelte';
 
-	export let column_infos: Array<string> = [];
-	export let rows: Array<any> = [];
+	export let schema: DataPanelSchema;
+    let column_infos: Array<ColumnInfo> = schema.columns; 
+    export let rows: DataPanelRows | null;
 
 	export let layout = 'gimages'; // 'gimages' or 'masonry'
 	export let layout_style = 'natural'; // 'natural' or 'square'
@@ -50,7 +52,7 @@
 		style:height={layout === 'gimages' ? '720px' : 'auto'}
 		style:columns={layout === 'gimages' ? null : num_columns}
 	>
-		{#each rows as row, i}
+		{#each rows.rows as row, i}
 			<Card
 				id={i.toString()}
 				pivot={{

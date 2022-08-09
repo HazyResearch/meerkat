@@ -11,6 +11,7 @@
 		let data_promise = await get_rows($api_url, 'test-imagenette', start, end);
 		column_infos = data_promise.column_infos;
 		rows = data_promise.rows;
+        return data_promise;
 	};
 	let data_promise = loader(0, 100);
 </script>
@@ -19,8 +20,8 @@
 	Loading...
 {:then data}
 	<Gallery
-		{column_infos}
-		{rows}
+		schema={{columns: column_infos}}
+		rows={data}
 		main_column={'img'}
 		tag_columns={['label', 'split']}
 	/>

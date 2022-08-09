@@ -12,10 +12,10 @@ export interface DataPanelSchema {
     id: string;
 }
 export interface DataPanelRows {
-    column_infos: Array<ColumnInfo>
-    indices: Array<number>
-    rows: Array<Array<any>>
-    full_length: number
+    column_infos?: Array<ColumnInfo>
+    indices?: Array<number>
+    rows?: Array<Array<any>>
+    full_length?: number
 }
 
 export async function get_schema(
