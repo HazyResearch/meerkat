@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
 	export interface CellInterface {
 		data: any;
-		cell_component: string;
-		cell_props: object;
+		cell_component?: string;
+		cell_props?: object;
 	}
 </script>
 

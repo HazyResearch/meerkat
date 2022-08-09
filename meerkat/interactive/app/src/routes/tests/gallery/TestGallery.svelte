@@ -1,30 +1,27 @@
 <script lang="ts">
-    import { get_rows } from "$lib/api/datapanel";
+	import { get_rows } from '$lib/api/datapanel';
 
-    import Gallery from "$lib/components/gallery/Gallery.svelte";
-    import { api_url } from '$network/stores';
+	import Gallery from '$lib/components/gallery/Gallery.svelte';
+	import { api_url } from '$network/stores';
 
-    let column_infos: Array<any> = [];
-    let rows: Array<any> = [];
+	let column_infos: Array<any> = [];
+	let rows: Array<any> = [];
 
-    let loader = async (start: number, end: number) => {
-        let data_promise = await get_rows($api_url, "test-imagenette", start, end);
-        column_infos = data_promise.column_infos;
-        rows = data_promise.rows;
-    };
-    let data_promise = loader(0, 100);
-
+	let loader = async (start: number, end: number) => {
+		let data_promise = await get_rows($api_url, 'test-imagenette', start, end);
+		column_infos = data_promise.column_infos;
+		rows = data_promise.rows;
+	};
+	let data_promise = loader(0, 100);
 </script>
 
-
 {#await data_promise}
-    Loading...
-{:then data} 
-    <Gallery 
-        column_infos={column_infos}
-        rows={rows}
-        main_column={"img"}
-        tag_columns={["split", "img_path"]}
-    />
+	Loading...
+{:then data}
+	<Gallery
+		{column_infos}
+		{rows}
+		main_column={'img'}
+		tag_columns={['label', 'split']}
+	/>
 {/await}
-
