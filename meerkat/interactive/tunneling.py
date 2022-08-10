@@ -1,8 +1,7 @@
-"""
-This file provides remote port forwarding functionality using paramiko package,
-Inspired by: https://github.com/paramiko/paramiko/blob/master/demos/rforward.py
-Taken from: https://github.com/gradio-app/gradio/blob/main/gradio/tunneling.py
-"""
+"""This file provides remote port forwarding functionality using paramiko
+package, Inspired by:
+https://github.com/paramiko/paramiko/blob/master/demos/rforward.py Taken from:
+https://github.com/gradio-app/gradio/blob/main/gradio/tunneling.py."""
 
 import select
 import socket

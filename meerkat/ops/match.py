@@ -11,8 +11,12 @@ def match(
     input: Optional[str] = None,
     input_modality: Optional[str] = None,
     query_modality: Optional[str] = None,
+    return_column_names: bool = False,
 ):
     """Match data to another column.
+
+    This operation adds q columns to the datapanel where q is the number of queries.
+    Note, if data is a datapanel, this operation is performed in-place.
 
     Args:
         data: A datapanel or column containing the data to embed.
@@ -22,6 +26,8 @@ def match(
             Defaults to None.
         input_modality: The input modality. If None, infer from the input column.
         query_modality: The query modality. If None, infer from the query column.
+        return_column_names: Whether to return the names of columns added based
+            on match.
 
     Returns:
         mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
@@ -32,7 +38,13 @@ def match(
     out_col = f"{encoder}({input})"
     # TODO (arjundd): Remove this guard once caching is supported.
     if out_col not in data.columns:
-        embed(data=data, input=input, encoder=encoder, out_col=out_col, modality=input_modality)
+        embed(
+            data=data,
+            input=input,
+            encoder=encoder,
+            out_col=out_col,
+            modality=input_modality,
+        )
 
     data_embedding = data[out_col]
 
@@ -42,9 +54,14 @@ def match(
         query = PandasSeriesColumn(query)
     # Text cannot be embedded with num_workers > 0 because the clip text encoder
     # is not pickleable.
-    to_embedding = embed(data=query, encoder=encoder, num_workers=0, modality=query_modality)
+    to_embedding = embed(
+        data=query, encoder=encoder, num_workers=0, modality=query_modality
+    )
 
     scores = data_embedding @ to_embedding.T
+    column_names = []
     for i, query_item in enumerate(query):
-        data[f"_match_{input}_{query_item}"] = scores[:, i]
-    return data
+        col_name = f"_match_{input}_{query_item}"
+        data[col_name] = scores[:, i]
+        column_names.append(col_name)
+    return (data, column_names) if return_column_names else data

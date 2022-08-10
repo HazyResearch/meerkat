@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { get_rows, get_schema } from '$lib/api/datapanel';
+	import type { RefreshCallback } from '$lib/api/callbacks';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
 	import { writable } from 'svelte/store';
@@ -11,17 +12,23 @@
 	import Tabs from '$lib/components/header/Tabs.svelte';
 	import Tab from '$lib/components/header/Tab.svelte';
 
+	export let datapanel_id: string;
+	export let nrows: number = 0;
+	export let page: number = 0;
 	export let per_page: number = 10;
 
-	export let nrows: number = 0;
-	export let datapanel_id: string = '';
-	export let page: number = 0;
+	const base_datapanel_id: string = datapanel_id;
 
 	$: schema_promise = get_schema($api_url, datapanel_id);
 	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
 
 	let toggle_button: boolean = false;
 	$: active_view = toggle_button ? 'gallery' : 'table';
+
+	const refresh: RefreshCallback = (new_datapanel_id: string) => {
+		datapanel_id = new_datapanel_id;
+	}
+
 </script>
 
 <!-- <div class="inline-flex mb-4">

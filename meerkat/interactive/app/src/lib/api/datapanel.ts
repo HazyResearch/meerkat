@@ -18,6 +18,7 @@ export interface DataPanelRows {
     full_length?: number
 }
 
+
 export async function get_schema(
     api_url: string, datapanel_id: string, columns: Array<string> | null = null
 ): Promise<DataPanelSchema> {
@@ -29,8 +30,14 @@ export async function get_rows(api_url: string, datapanel_id: string, start: num
 }
 
 
-export async function create_column(
-    api_url: string, datapanel_id: string, text: string
-): Promise<string> {
-    return await post(`${api_url}/dp/${datapanel_id}/create_column`, { text: text });
+export async function match(
+    api_url: string, datapanel_id: string, query: string | Array<string>, input: string
+): Promise<DataPanelSchema> {
+    return await post(`${api_url}/dp/${datapanel_id}/match`, { query: query, input: input });
+}
+
+export async function sort(
+    api_url: string, datapanel_id: string, by: string
+): Promise<DataPanelSchema> {
+    return await  post(`${api_url}/dp/${datapanel_id}/sort`, { by: by });
 }
