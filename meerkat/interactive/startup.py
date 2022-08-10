@@ -1,5 +1,5 @@
-"""
-Startup script for interactive Meerkat.
+"""Startup script for interactive Meerkat.
+
 Code is heavily borrowed from Gradio.
 """
 import os
@@ -24,8 +24,8 @@ from meerkat.state import NetworkInfo, state
 
 
 def is_notebook() -> bool:
-    """
-    Check if the current environment is a notebook.
+    """Check if the current environment is a notebook.
+
     Taken from
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook.
     """
@@ -42,9 +42,8 @@ def is_notebook() -> bool:
 
 
 def get_first_available_port(initial: int, final: int) -> int:
-    """
-    Gets the first open port in a specified range of port numbers.
-    Taken from https://github.com/gradio-app/gradio/blob/main/gradio/networking.py.
+    """Gets the first open port in a specified range of port numbers. Taken
+    from https://github.com/gradio-app/gradio/blob/main/gradio/networking.py.
 
     Args:
         initial: the initial value in the range of port numbers
@@ -73,9 +72,7 @@ def interactive_mode(
     api_port: int = None,
     npm_port: int = None,
 ):
-    """
-    Start Meerkat interactive mode in a Jupyter notebook.
-    """
+    """Start Meerkat interactive mode in a Jupyter notebook."""
     if not is_notebook():
         raise RuntimeError("This function can only be run in a notebook.")
 

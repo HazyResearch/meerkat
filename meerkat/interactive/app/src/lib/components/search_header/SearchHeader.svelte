@@ -1,16 +1,27 @@
 <script lang="ts">
-	import { create_column, type DataPanelSchema } from '$lib/api/datapanel';
+	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
 	import { api_url } from '$lib/../routes/network/stores';
+	import type { RefreshCallback } from '$lib/api/callbacks';
 	import Select from 'svelte-select';
 
-	export let datapanel_id: string;
+	export let base_datapanel_id: string;
 	export let schema_promise: Promise<DataPanelSchema>;
+	export let refresh_callback: RefreshCallback;
 	
 	let search_box_text: string = '';
-	let create_column_promise: Promise<string>;
+	let search_promise: Promise<DataPanelSchema>;
 
 	let on_search = async () => {
-		create_column_promise = create_column($api_url, '0', search_box_text);
+		console.log("on search: asdfasdfsafasf")
+		let match_output: DataPanelSchema = await match($api_url, base_datapanel_id, search_box_text, "img");
+		console.log("on search: Match complete")
+		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name)
+		console.log("on search: Sort complete")
+		search_promise.then(
+			(schema: DataPanelSchema) => {
+				refresh_callback(schema.id)
+			}
+		)
 	};
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
@@ -75,10 +86,10 @@
 				</div>
 			</div>
 
-			{#await create_column_promise}
-				<div class="h-full">Loading data...</div>
-			{:then response_text}
-				<div class="h-full">{response_text}</div>
+			{#await search_promise}
+				<div class="h-full">Matching...</div>
+			{:then items}
+				<div class="h-full">Finished...</div>
 			{/await}
 		</div>
 	</div>

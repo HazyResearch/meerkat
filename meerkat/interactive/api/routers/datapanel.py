@@ -1,3 +1,4 @@
+from ctypes import Union
 from multiprocessing.sharedctypes import Value
 from time import sleep
 from typing import Any, Dict, List
@@ -100,9 +101,7 @@ def get_rows(
     datapanel_id: str,
     request: RowsRequest,
 ) -> RowsResponse:
-    """
-    Get rows from a DataPanel as a JSON object.
-    """
+    """Get rows from a DataPanel as a JSON object."""
     dp = get_datapanel(datapanel_id)
     full_length = len(dp)
     column_infos = _get_column_infos(dp, request.columns)
@@ -133,11 +132,29 @@ def get_rows(
     )
 
 
-class CreateColumnRequest(BaseModel):
-    text: str = None
+class MatchRequest(BaseModel):
+    input: str  # The name of the input column.
+    query: str  # The query text to match against.
 
 
-@router.post("/{datapanel_id}/create_column/")
-def create_column(datapanel_id: str, request: CreateColumnRequest):
-    sleep(1)
-    return "created:" + request.text
+@router.post("/{datapanel_id}/match")
+def match(datapanel_id: str, request: MatchRequest) -> SchemaResponse:
+    dp = get_datapanel(datapanel_id)
+    try:
+        dp, match_columns = mk.match(
+            data=dp, query=request.query, input=request.input, return_column_names=True
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
+
+
+class SortRequest(BaseModel):
+    by: str
+
+
+@router.post("/{datapanel_id}/sort")
+def sort(datapanel_id: str, request: SortRequest):
+    dp = get_datapanel(datapanel_id)
+    dp = mk.sort(data=dp, by=request.by, ascending=False)
+    return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))

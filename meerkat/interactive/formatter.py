@@ -1,6 +1,6 @@
-""" 
-Desiderata for formatters:
-    1. 
+"""Desiderata for formatters:
+
+1.
 """
 import base64
 from abc import ABC, abstractmethod
@@ -25,17 +25,21 @@ class Formatter(ABC):
 
     @abstractmethod
     def encode(self, cell: Any):
-        """Encode the cell on the backend side before sending it to the frontend.
+        """Encode the cell on the backend side before sending it to the
+        frontend.
 
-        The cell is lazily loaded, so when used on a LambdaColumn, ``cell``
-        will be a ``LambdaCell``. This is important for displays that don't actually
-        need to apply the lambda in order to display the value.
+        The cell is lazily loaded, so when used on a LambdaColumn,
+        ``cell`` will be a ``LambdaCell``. This is important for
+        displays that don't actually need to apply the lambda in order
+        to display the value.
         """
         pass
 
     @abstractmethod
     def html(self, cell: Any):
-        """When not in interactive mode, objects are visualized using static html.
+        """When not in interactive mode, objects are visualized using static
+        html.
+
         This method should produce that static html for the cell.
         """
         pass

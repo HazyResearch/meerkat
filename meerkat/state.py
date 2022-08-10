@@ -63,8 +63,9 @@ class NetworkInfo:
 
 @dataclass
 class Identifiables:
-    """We maintain a separate group for each type of identifiable object. Objects in the
-    group are identified by a unique id.
+    """
+    We maintain a separate group for each type of identifiable object.
+    Objects in the group are identified by a unique id.
     """
 
     columns: WeakMapping = field(default_factory=WeakMapping)
