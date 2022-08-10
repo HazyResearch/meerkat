@@ -27,17 +27,16 @@
 
 	const refresh: RefreshCallback = (new_datapanel_id: string) => {
 		datapanel_id = new_datapanel_id;
-	}
-
+	};
 </script>
 
 <!-- <div class="inline-flex mb-4">
 	<Toggle label_left="Table" label_right="Gallery" bind:checked={toggle_button} />
 </div> -->
 
-<Tabs bind:toggle_button={toggle_button}>
+<Tabs bind:toggle_button>
 	<Tab label="Match" id="match">
-		<MatchHeader {datapanel_id} {schema_promise} />
+		<MatchHeader {base_datapanel_id} {schema_promise} refresh_callback={refresh} />
 	</Tab>
 	<Tab label="Info" id="info">second</Tab>
 </Tabs>

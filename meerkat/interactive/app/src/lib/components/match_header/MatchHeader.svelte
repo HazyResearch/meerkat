@@ -1,93 +1,112 @@
 <script lang="ts">
-	import { create_column, type DataPanelSchema } from '$lib/api/datapanel';
+	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
+	import type { RefreshCallback } from '$lib/api/callbacks';
 	import { api_url } from '$lib/../routes/network/stores';
 	import Select from 'svelte-select';
+	import Status from '$lib/components/common/Status.svelte';
 
-	export let datapanel_id: string;
+	export let base_datapanel_id: string;
 	export let schema_promise: Promise<DataPanelSchema>;
-	
+	export let refresh_callback: RefreshCallback;
+
 	let search_box_text: string = '';
-	let create_column_promise: Promise<string>;
+	let search_promise: Promise<DataPanelSchema>;
+	let column: string = '';
+	let status: string = 'waiting';
 
 	let on_search = async () => {
-		create_column_promise = create_column($api_url, '0', search_box_text);
+		if (column === '') {
+			console.log('empty');
+			status = "error";
+			return;
+		}
+
+		let match_output: DataPanelSchema = await match(
+			$api_url,
+			base_datapanel_id,
+			search_box_text,
+			column
+		);
+		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name);
+		search_promise.then((schema: DataPanelSchema) => {
+			refresh_callback(schema.id);
+			status = 'success';
+		});
+		
 	};
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
+		else status = 'waiting';
 	};
 
 	const empty_items: Array<any> = [];
-	let items_promise = schema_promise.then(
-		(schema) => {
-			return schema.columns.map((column) => {
-				return {
-					value: column.name,
-					label: column.name,
-				};
-			});
-		}
-	);
+	let items_promise = schema_promise.then((schema) => {
+		return schema.columns.map((column) => {
+			return {
+				value: column.name,
+				label: column.name
+			};
+		});
+	});
 
 	let favouriteFood = undefined;
 
 	function handleSelect(event) {
-		favouriteFood = event.detail;
+		column = event.detail.value;
 	}
 
 	function handleClear() {
-		favouriteFood = undefined;
+		column = '';
 	}
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
-	<div class="form-control w-full pl-10">
+	<div class="form-control w-full">
 		<div class="input-group w-full flex items-center">
+			<div class="px-3">
+				{#await search_promise}
+					<Status status="working" />
+				{:then items}					
+					<Status status={status} />
+				{/await}
+			</div>
 			<input
 				type="text"
 				bind:value={search_box_text}
 				placeholder="Write some text to be matched..."
-				class="input input-bordered w-3/5 h-10 px-3 rounded-md shadow-md"
+				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
 				on:keypress={onKeyPress}
 			/>
-			<div class="text-slate-400 px-2"> against </div>
+			<div class="text-slate-400 px-2">against</div>
 
-			<div class="themed">
+			<div class="themed pr-2">
 				{#await items_promise}
-					<Select 
-						id="column" 
-						placeholder="...a column."
-						isWaiting={true}
-						showIndicator={true}
-					/>
+					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 				{:then items}
-					<Select 
-						id="column" 
+					<Select
+						id="column"
 						placeholder="...a column."
-						{items} 
-						showIndicator={true},
-						listPlacement="auto",
-						on:select={handleSelect} 
-						on:clear={handleClear} />
+						{items}
+						showIndicator={true}
+						listPlacement="auto"
+						on:select={handleSelect}
+						on:clear={handleClear}
+					/>
 				{/await}
 			</div>
 		</div>
 	</div>
-	{#await create_column_promise}
-	<div class="h-full">Loading data...</div>
-	{:then response_text}
-		<div class="h-full">{response_text}</div>
-	{/await}
 </div>
 
-<style>	
+<style>
 	/* 	
 			CSS variables can be used to control theming.
 			https://github.com/rob-balfre/svelte-select/blob/master/docs/theming_variables.md
 	*/
-	
+
 	.themed {
 		--itemPadding: 0.1rem;
-		--itemColor: "#7c3aed"; 
+		--itemColor: '#7c3aed';
 		@apply rounded-md w-40 border-0;
 		@apply z-[1000000];
 	}

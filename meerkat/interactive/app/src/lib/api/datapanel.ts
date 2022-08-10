@@ -33,6 +33,7 @@ export async function get_rows(api_url: string, datapanel_id: string, start: num
 export async function match(
     api_url: string, datapanel_id: string, query: string | Array<string>, input: string
 ): Promise<DataPanelSchema> {
+    console.log(`${api_url}/dp/${datapanel_id}/match`)
     return await post(`${api_url}/dp/${datapanel_id}/match`, { query: query, input: input });
 }
 

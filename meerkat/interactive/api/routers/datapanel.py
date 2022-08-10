@@ -70,6 +70,9 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
                 ),
             )
 
+    # TODO: remove this and fix
+    columns = [column for column in columns if column != "clip(img)"]
+
     return [
         ColumnInfo(
             name=col,
@@ -153,8 +156,14 @@ class SortRequest(BaseModel):
     by: str
 
 
+# TODO: (Sabri/Arjun) Make this more robust and less hacky
+curr_dp: mk.DataPanel = None
+
+
 @router.post("/{datapanel_id}/sort")
 def sort(datapanel_id: str, request: SortRequest):
     dp = get_datapanel(datapanel_id)
     dp = mk.sort(data=dp, by=request.by, ascending=False)
+    global curr_dp
+    curr_dp = dp
     return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))
