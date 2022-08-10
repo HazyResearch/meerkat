@@ -28,6 +28,9 @@ class GUI:
             #     f'<iframe id="meerkatIframe" src="{url}"></iframe>'
             #     "<script>iFrameResize({{ log: true }}, '#meerkatIframe')</script>"
             # )
-            return IFrame(url, width="100%", height="800")
+            return IFrame(url, width="100%", height="1000")
         else:
             return url
+
+    def gallery(self):
+        pass

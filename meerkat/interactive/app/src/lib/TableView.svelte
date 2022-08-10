@@ -2,10 +2,14 @@
 	import { get_rows, get_schema } from '$lib/api/datapanel';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
+	import { writable } from 'svelte/store';
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import SearchHeader from '$lib/components/search_header/SearchHeader.svelte';
 	import Toggle from './components/common/Toggle.svelte';
 	import Gallery from './components/gallery/Gallery.svelte';
+	import Header from './components/header/Header.svelte';
+	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
+	import Tabs from '$lib/components/header/Tabs.svelte';
+	import Tab from '$lib/components/header/Tab.svelte';
 
 	export let per_page: number = 10;
 
@@ -20,11 +24,17 @@
 	$: active_view = toggle_button ? 'gallery' : 'table';
 </script>
 
-<div class="inline-flex mb-4">
+<!-- <div class="inline-flex mb-4">
 	<Toggle label_left="Table" label_right="Gallery" bind:checked={toggle_button} />
-</div>
+</div> -->
 
-<!-- <SearchHeader datapanel_id={datapanel_id} schema_promise={schema_promise}></SearchHeader> -->
+<Tabs bind:toggle_button={toggle_button}>
+	<Tab label="Match" id="match">
+		<MatchHeader {datapanel_id} {schema_promise} />
+	</Tab>
+	<Tab label="Info" id="info">second</Tab>
+</Tabs>
+
 {#if active_view === 'table'}
 	<div class="table-view">
 		{#await schema_promise}
@@ -49,17 +59,9 @@
 		{:then schema}
 			<div class="overflow-y-auto overflow-x-hidden h-full">
 				{#await rows_promise}
-					<Gallery
-						{schema}
-						rows={{rows: []}}
-					/>
+					<Gallery {schema} rows={{ rows: [] }} />
 				{:then rows}
-					<Gallery
-						{schema}
-						{rows}
-						main_column={'img'}
-						tag_columns={['label_idx', 'split']}
-					/>
+					<Gallery {schema} {rows} main_column={'img'} tag_columns={['label_idx', 'split']} />
 				{/await}
 			</div>
 		{/await}

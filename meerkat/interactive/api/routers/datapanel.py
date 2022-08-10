@@ -140,4 +140,8 @@ class CreateColumnRequest(BaseModel):
 @router.post("/{datapanel_id}/create_column/")
 def create_column(datapanel_id: str, request: CreateColumnRequest):
     sleep(1)
+    dp = get_datapanel(datapanel_id)
+    match(datapanel[""])
+    emb = embed(request.text)
+
     return "created:" + request.text
