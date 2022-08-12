@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Table from '$lib/components/table/Table.svelte';
 	import { get } from '$lib/utils/requests';
-	import { api_url } from 'src/routes/network/stores';
+	import { api_url } from '../../../routes/network/stores';
 	import { unzip } from 'underscore';
 
 	// TODO: replace with dummy rows from API
