@@ -1,0 +1,50 @@
+<script lang="ts">
+	import { getContext } from 'svelte';
+
+	const { padding } = getContext('LayerCake');
+
+	export let label: string = 'axis label';
+    export let axis: 'x' | 'y' = 'x';
+	export let inputable: boolean = false;
+</script>
+
+<!-- Outer div is a container that spans the whole plot, 
+    For x-axis, it's shifted to the bottom.
+    For y-axis, it's shifted to the left. -->
+
+<div 
+    class="container" 
+    style:transform={axis === 'y' ? `translate(-${$padding.left}px, 0)`: ""}
+>
+	<!-- Inner div styles the label.
+        For y-axis, it rotates and translates it about a modified origin and positions it center left. -->
+	<div class="label {axis === 'x' ? 'xlabel' : 'ylabel'}">
+		{#if inputable}
+			<input bind:value={label} />
+		{:else}
+			<div>{label}</div>
+		{/if}
+	</div>
+</div>
+
+<style>
+	.container {
+		@apply absolute w-full h-full;
+	}
+
+    .label {
+        @apply absolute;
+        @apply text-center font-mono font-light text-sm text-violet-500;
+    }
+
+    .xlabel {
+        @apply w-1/2 left-1/4 bottom-0;
+        transform: translate(0px, 45px);
+    }
+
+	.ylabel {
+		@apply left-0 top-1/2;
+		transform-origin: center left;
+		transform: rotate(-90deg) translate(-50%, -100%);
+	}
+</style>

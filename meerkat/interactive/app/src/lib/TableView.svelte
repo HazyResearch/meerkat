@@ -8,6 +8,7 @@
 	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
 	import Tabs from '$lib/components/header/Tabs.svelte';
 	import Tab from '$lib/components/header/Tab.svelte';
+	import ScatterPlot from './components/plot/layercake/ScatterPlot.svelte';
 
 	export let datapanel_id: string;
 	export let nrows: number = 0;
@@ -27,7 +28,14 @@
 	};
 </script>
 
+<!-- <div class="flex justify-center">
+	<div class="basis-5/12">
+		<ScatterPlot height=300px width=300px padding=0/>
+	</div>
+</div> -->
+
 <!-- <div class="inline-flex mb-4">
+>>>>>>> 52057ea (Add scatterplot)
 	<Toggle label_left="Table" label_right="Gallery" bind:checked={toggle_button} />
 </div> -->
 
