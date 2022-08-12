@@ -12,6 +12,11 @@ import { compute_slots } from 'svelte/internal';
                 <slot name="match"></slot>
 		    </Tab>
         {/if}
+		{#if $$slots.filter}
+			<Tab label="Filter" id="filter">
+				<slot name="filter"></slot>
+			</Tab>
+		{/if}
 		<Tab label="Info" id="info">
 			second
 		</Tab>

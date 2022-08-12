@@ -1,8 +1,10 @@
+import functools
 from ctypes import Union
 from multiprocessing.sharedctypes import Value
 from time import sleep
 from typing import Any, Dict, List
 
+import numpy as np
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -161,9 +163,57 @@ curr_dp: mk.DataPanel = None
 
 
 @router.post("/{datapanel_id}/sort")
-def sort(datapanel_id: str, request: SortRequest):
+def sort(datapanel_id: str, request: SortRequest) -> SchemaResponse:
     dp = get_datapanel(datapanel_id)
     dp = mk.sort(data=dp, by=request.by, ascending=False)
     global curr_dp
     curr_dp = dp
     return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))
+
+
+# TODO: Filter to take filtering criteria objects
+# TODO: update for filtering row
+class FilterRequest(BaseModel):
+    columns: List[str]
+    values: List[Any]
+    ops: List[str]
+
+
+# Map a string operator to a function that takes a value and returns a boolean.
+_operator_str_to_func = {
+    "==": lambda x, y: x == y,  # equality
+    "!=": lambda x, y: x != y,  # inequality
+    ">": lambda x, y: x > y,  # greater than
+    "<": lambda x, y: x < y,  # less than
+    ">=": lambda x, y: x >= y,  # greater than or equal to
+    "<=": lambda x, y: x <= y,  # less than or equal to
+    "in": lambda x, y: x in y,  # in
+    "not in": lambda x, y: x not in y,  # not in
+}
+
+
+@router.post("/{datapanel_id}/filter")
+def filter(datapanel_id: str, request: FilterRequest) -> SchemaResponse:
+    dp = get_datapanel(datapanel_id)
+
+    supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
+    if not all(
+        isinstance(dp[column], supported_column_types) for column in request.columns
+    ):
+        raise HTTPException(
+            f"Only {supported_column_types} are supported for filtering."
+        )
+
+    # Filter pandas series columns.
+    all_series = [
+        _operator_str_to_func[op](dp[col], value)
+        for col, value, op in zip(request.columns, request.values, request.ops)
+    ]
+    mask = functools.reduce(lambda x, y: x & y, all_series)
+    dp = dp.lz[mask]
+
+    global curr_dp
+    curr_dp = dp
+    return SchemaResponse(
+        id=dp.id, columns=_get_column_infos(dp, ["img", "path", "label"])
+    )

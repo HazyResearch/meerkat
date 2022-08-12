@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
+	import { match, MatchCriterion, sort, type DataPanelSchema } from '$lib/api/datapanel';
 	import type { RefreshCallback } from '$lib/api/callbacks';
 	import { api_url } from '$lib/../routes/network/stores';
 	import Select from 'svelte-select';
 	import Status from '$lib/components/common/Status.svelte';
 
-	export let base_datapanel_id: string;
+
 	export let schema_promise: Promise<DataPanelSchema>;
 	export let refresh_callback: RefreshCallback;
+	export let match_criterion: MatchCriterion;
 
 	let search_box_text: string = '';
 	let search_promise: Promise<DataPanelSchema>;
@@ -20,20 +21,16 @@
 			status = "error";
 			return;
 		}
+		match_criterion = new MatchCriterion(column, search_box_text);
 
-		let match_output: DataPanelSchema = await match(
-			$api_url,
-			base_datapanel_id,
-			search_box_text,
-			column
-		);
-		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name);
-		search_promise.then((schema: DataPanelSchema) => {
-			refresh_callback(schema.id);
-			status = 'success';
-		});
+		let promise = refresh_callback();
 		
+		promise.then(() => {
+			status = 'success';
+		})
+		status = 'success';
 	};
+
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
 		else status = 'waiting';
