@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
-	import type { RefreshCallback } from '$lib/api/callbacks';
 	import { api_url } from '$lib/../routes/network/stores';
-	import Select from 'svelte-select';
+	import type { RefreshCallback } from '$lib/api/callbacks';
+	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
 	import Status from '$lib/components/common/Status.svelte';
+	import Select from 'svelte-select';
 
 	export let base_datapanel_id: string;
 	export let schema_promise: Promise<DataPanelSchema>;
@@ -16,30 +16,28 @@
 
 	let on_search = async () => {
 		if (column === '') {
-			status = "error";
+			status = 'error';
 			return;
 		}
-		status = "working"
+		status = 'working';
 		let match_output: DataPanelSchema = await match(
 			$api_url,
 			base_datapanel_id,
 			search_box_text,
 			column
 		);
-		status = "success";
+		status = 'success';
 		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name);
 		search_promise.then((schema: DataPanelSchema) => {
 			refresh_callback(schema.id);
 			status = 'success';
 		});
-		
 	};
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
 		else status = 'waiting';
 	};
 
-	const empty_items: Array<any> = [];
 	let items_promise = schema_promise.then((schema) => {
 		return schema.columns.map((column) => {
 			return {
@@ -48,8 +46,6 @@
 			};
 		});
 	});
-
-	let favouriteFood = undefined;
 
 	function handleSelect(event) {
 		column = event.detail.value;
@@ -64,7 +60,7 @@
 	<div class="form-control w-full">
 		<div class="input-group w-full flex items-center">
 			<div class="px-3">
-				<Status status={status} />
+				<Status {status} />
 			</div>
 			<input
 				type="text"
