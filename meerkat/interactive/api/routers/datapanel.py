@@ -143,6 +143,9 @@ class MatchRequest(BaseModel):
 @router.post("/{datapanel_id}/match")
 def match(datapanel_id: str, request: MatchRequest) -> SchemaResponse:
     dp = get_datapanel(datapanel_id)
+    # write the query to a file
+    with open("/tmp/query.txt", "w") as f:
+        f.write(request.query)
     try:
         dp, match_columns = mk.match(
             data=dp, query=request.query, input=request.input, return_column_names=True

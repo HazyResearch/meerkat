@@ -3,11 +3,8 @@
 	import type { RefreshCallback } from '$lib/api/callbacks';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import { writable } from 'svelte/store';
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Toggle from './components/common/Toggle.svelte';
 	import Gallery from './components/gallery/Gallery.svelte';
-	import Header from './components/header/Header.svelte';
 	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
 	import Tabs from '$lib/components/header/Tabs.svelte';
 	import Tab from '$lib/components/header/Tab.svelte';

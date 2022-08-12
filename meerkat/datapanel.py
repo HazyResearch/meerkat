@@ -826,6 +826,7 @@ class DataPanel(
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         dp = cls.__new__(cls)
+        dp._set_id()  # TODO: consider if we want to persist this id
         dp._set_state(state)
 
         # Load the the manager

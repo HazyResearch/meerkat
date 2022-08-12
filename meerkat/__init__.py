@@ -23,6 +23,7 @@ from meerkat.columns.tensor_column import TensorColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
 from meerkat.datapanel import DataPanel
 from meerkat.datasets import get
+from meerkat.interactive.startup import interactive_mode
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
 from meerkat.ops.match import match
@@ -67,4 +68,5 @@ __all__ = [
     "sample",
     "provenance",
     "config",
+    "interactive_mode",
 ]

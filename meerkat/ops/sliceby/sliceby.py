@@ -20,27 +20,38 @@ def sets_only(fn: Callable) -> Callable:
     return wrapped
 
 
+SliceKey = Union[str, int]
+
+
 class SliceBy(IdentifiableMixin):
 
-    identifiable_group: str = "sliceby"
+    identifiable_group: str = "slicebys"
 
     def __init__(
         self,
         data: DataPanel,
         by: Union[List[str], str],
-        sets: Dict[Union[str, Tuple[str]], np.ndarray] = None,
-        scores: Dict[Union[str, Tuple[str], np.ndarray]] = None,
+        sets: Dict[Union[SliceKey, Tuple[SliceKey]], np.ndarray] = None,
+        scores: Dict[Union[SliceKey, Tuple[SliceKey], np.ndarray]] = None,
     ):
+        super().__init__()
         # exactly one of sets and scores must be provided
         if (sets is None) == (scores is None):
             raise ValueError("Exactly one of sets and scores must be provided")
 
         self.slice_type = "scores" if scores is not None else "sets"
-
-        self.sets = sets
-        self.scores = scores
+        self.slices = scores if scores is not None else sets
         self.data = data
         self.by = by
+
+        # prepare the gui object
+        from meerkat.interactive.gui import SliceByGUI
+
+        self.gui = SliceByGUI(self)
+        self.slice = SliceIndexer(self)
+
+    def __len__(self) -> int:
+        return len(self.slices)
 
     def mean(self, *args, **kwargs):
         return self._reduce(lambda x: x.mean(*args, **kwargs))
@@ -53,19 +64,20 @@ class SliceBy(IdentifiableMixin):
     def median(self, *args, **kwargs):
         return self._reduce(lambda x: x.median(*args, **kwargs))
 
+    @property
+    def slice_keys(self):
+        return sorted(list(self.slices.keys()))
+
     def _reduce(self, f: Callable):
         """self.sets are a dictionary of {labels : [sets]}"""
 
-        # sorting them so that they appear in a nice order.
-        slice_keys = sorted(list(self.sets.keys()))
-
         # means will be a list of dictionaries where each element in the dict
         out = []
-        for slice_key in slice_keys:
+        for slice_key in self.slice_keys:
             if self.slice_type == "scores":
                 pass
             else:
-                slice_dp = self.data.lz[self.sets[slice_key]]
+                slice_dp = self.data.lz[self.slices[slice_key]]
                 slice_values: Dict[str, Any] = f(slice_dp)
             out.append(slice_values)
 
@@ -75,18 +87,49 @@ class SliceBy(IdentifiableMixin):
         out = DataPanel(out)
 
         # add the by columns.
-        if len(slice_keys) > 0:
+        if len(self.slice_keys) > 0:
             if len(self.by) > 1:
-                columns = list(zip(*slice_keys))
+                columns = list(zip(*self.slice_keys))
                 for i, col in enumerate(self.by):
                     out[col] = columns[i]
             else:
                 col = self.by[0]
-                out[col] = slice_keys
+                out[col] = self.slice_keys
         return out
 
-    def __getitem__(self, key: Union[str, Sequence[str]]) -> SliceBy:
-        if isinstance(key, str):
-            key = [key]
+    def _get(self, slice_key: str, index, materialize: bool = False) -> List[Any]:
+        """
+        Get rows from a slice by.
+        """
+        if self.slice_type == "sets":
+            return self.data._get(
+                self.slices[slice_key][index], materialize=materialize
+            )
+        else:
+            raise NotImplemented
 
-        return self.__class__(data=self.data[key], sets=self.sets, by=self.by)
+    def get_slice_length(self, slice_key: SliceKey) -> int:
+        if self.slice_type == "sets":
+            return len(self.slices[slice_key])
+        else:
+            return len(self.data)
+
+    def __getitem__(self, column: Union[str, Sequence[str]]) -> SliceBy:
+        if isinstance(column, str):
+            column = [column]
+
+        if self.slice_type == "sets":
+            return self.__class__(data=self.data[column], sets=self.slices, by=self.by)
+        else:
+            return self.__class__(
+                data=self.data[column], scores=self.slices, by=self.by
+            )
+
+
+class SliceIndexer:
+    def __init__(self, obj: object):
+        self.obj = obj
+
+    def __getitem__(self, index):
+        key, index = index
+        return self.obj._get(key, index, materialize=False)

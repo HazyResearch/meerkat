@@ -16,17 +16,17 @@
 
 	let on_search = async () => {
 		if (column === '') {
-			console.log('empty');
 			status = "error";
 			return;
 		}
-
+		status = "working"
 		let match_output: DataPanelSchema = await match(
 			$api_url,
 			base_datapanel_id,
 			search_box_text,
 			column
 		);
+		status = "success";
 		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name);
 		search_promise.then((schema: DataPanelSchema) => {
 			refresh_callback(schema.id);
@@ -64,11 +64,7 @@
 	<div class="form-control w-full">
 		<div class="input-group w-full flex items-center">
 			<div class="px-3">
-				{#await search_promise}
-					<Status status="working" />
-				{:then items}					
-					<Status status={status} />
-				{/await}
+				<Status status={status} />
 			</div>
 			<input
 				type="text"

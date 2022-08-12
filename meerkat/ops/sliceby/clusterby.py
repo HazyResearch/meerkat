@@ -48,7 +48,7 @@ def clusterby(
     # TODO (sabri): Give the user the option to specify the output and remove this guard
     # once caching is supported
 
-    if isinstance(by, Sequence):
+    if not isinstance(by, str):
         raise NotImplementedError
 
     if out_col not in data:

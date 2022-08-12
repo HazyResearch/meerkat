@@ -6,7 +6,7 @@
 </script>
 
 <img 
-	class="rounded-sm" 
+	class="rounded-md shadow-md" 
 	class:object-cover={layout === 'object-cover'}
 	style:height={height} 
 	style:width={width} 
