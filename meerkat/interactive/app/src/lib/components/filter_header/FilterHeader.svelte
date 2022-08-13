@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { filter, type DataPanelSchema, FilterCriterion } from '$lib/api/datapanel';
+	import type { DataPanelSchema, FilterCriterion } from '$lib/api/datapanel';
 	import type { RefreshCallback } from '$lib/api/callbacks';
 	import { api_url } from '$lib/../routes/network/stores';
 	import Select from 'svelte-select';

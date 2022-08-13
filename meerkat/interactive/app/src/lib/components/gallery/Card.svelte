@@ -110,7 +110,7 @@
 <style>
 	.card {
 		min-width: var(--card-width, '');
-		@apply border-2 border-solid rounded-lg shadow-md;
+		@apply m-2 border-2 border-solid rounded-lg shadow-md;
 		@apply dark:bg-gray-700 dark:border-gray-600;
 	}
 

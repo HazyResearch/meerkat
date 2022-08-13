@@ -71,6 +71,7 @@ class Identifiables:
     columns: WeakMapping = field(default_factory=WeakMapping)
     datapanels: WeakMapping = field(default_factory=WeakMapping)
     interfaces: Mapping = field(default_factory=dict)
+    slicebys: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)

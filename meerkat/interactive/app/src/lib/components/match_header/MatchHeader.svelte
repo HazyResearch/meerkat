@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { match, MatchCriterion, sort, type DataPanelSchema } from '$lib/api/datapanel';
+	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
 	import type { RefreshCallback } from '$lib/api/callbacks';
 	import { api_url } from '$lib/../routes/network/stores';
-	import Select from 'svelte-select';
 	import Status from '$lib/components/common/Status.svelte';
+	import Select from 'svelte-select';
 
 
 	export let schema_promise: Promise<DataPanelSchema>;
@@ -11,24 +11,21 @@
 	export let match_criterion: MatchCriterion;
 
 	let search_box_text: string = '';
-	let search_promise: Promise<DataPanelSchema>;
 	let column: string = '';
 	let status: string = 'waiting';
 
 	let on_search = async () => {
 		if (column === '') {
-			console.log('empty');
-			status = "error";
+			status = 'error';
 			return;
 		}
+		status = 'working';
 		match_criterion = new MatchCriterion(column, search_box_text);
 
 		let promise = refresh_callback();
-		
 		promise.then(() => {
 			status = 'success';
 		})
-		status = 'success';
 	};
 
 	const onKeyPress = (e) => {
@@ -36,7 +33,6 @@
 		else status = 'waiting';
 	};
 
-	const empty_items: Array<any> = [];
 	let items_promise = schema_promise.then((schema) => {
 		return schema.columns.map((column) => {
 			return {
@@ -45,8 +41,6 @@
 			};
 		});
 	});
-
-	let favouriteFood = undefined;
 
 	function handleSelect(event) {
 		column = event.detail.value;
@@ -61,11 +55,7 @@
 	<div class="form-control w-full">
 		<div class="input-group w-full flex items-center">
 			<div class="px-3">
-				{#await search_promise}
-					<Status status="working" />
-				{:then items}					
-					<Status status={status} />
-				{/await}
+				<Status {status} />
 			</div>
 			<input
 				type="text"

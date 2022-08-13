@@ -13,9 +13,17 @@ class Interface(IdentifiableMixin):
 
     identifiable_group: str = "interfaces"
 
-    def __init__(self, config: Dict):
+    def __init__(self, component: str, props: Dict):
         super().__init__()
-        self.config = config
+        self.component = component
+        self.props = props
+
+    @property
+    def config(self):
+        return {
+            "component": self.component,
+            "props": self.props,
+        }
 
 
 def get_interface(interface_id: int):

@@ -43,7 +43,7 @@
 
 	.header {
 		@apply p-1 mr-0 ml-0 m-1 rounded-l-md;
-		@apply bg-red-800;
+		@apply bg-violet-700;
 	}
 
 	.content {

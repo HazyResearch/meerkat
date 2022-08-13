@@ -826,6 +826,7 @@ class DataPanel(
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         dp = cls.__new__(cls)
+        dp._set_id()  # TODO: consider if we want to persist this id
         dp._set_state(state)
 
         # Load the the manager
@@ -888,11 +889,16 @@ class DataPanel(
         return self
 
     def groupby(self, *args, **kwargs):
-        from meerkat.ops.groupby import groupby
+        from meerkat.ops.sliceby.groupby import groupby
 
         return groupby(self, *args, **kwargs)
 
-    def mean(self, *args, **kwargs) -> DataPanel:
+    def clusterby(self, *args, **kwargs):
+        from meerkat.ops.sliceby.clusterby import clusterby
+
+        return clusterby(self, *args, **kwargs)
+
+    def mean(self, *args, **kwargs) -> Dict[str, any]:
 
         result = {}
 

@@ -3,15 +3,13 @@
 	import type { RefreshCallback, NoArgCallback } from '$lib/api/callbacks';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import { writable } from 'svelte/store';
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Toggle from './components/common/Toggle.svelte';
 	import Gallery from './components/gallery/Gallery.svelte';
-	import Header from './components/header/Header.svelte';
 	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
 	import Tabs from '$lib/components/header/Tabs.svelte';
 	import Tab from '$lib/components/header/Tab.svelte';
 	import FilterHeader from './components/filter_header/FilterHeader.svelte';
+	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
 
 	export let datapanel_id: string;
 	export let nrows: number = 0;
@@ -111,8 +109,10 @@
 
 </script>
 
-<!-- <div class="inline-flex mb-4">
-	<Toggle label_left="Table" label_right="Gallery" bind:checked={toggle_button} />
+<!-- <div class="flex justify-center">
+	<div class="basis-5/12">
+		<ScatterPlot height=300px width=300px padding=0/>
+	</div>
 </div> -->
 
 <Tabs bind:toggle_button>
