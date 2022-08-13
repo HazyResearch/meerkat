@@ -8,7 +8,7 @@
     let column_infos: Array<ColumnInfo> = schema.columns; 
     export let rows: DataPanelRows | null;
 
-	export let layout = 'masonry'; // 'gimages' or 'masonry'
+	export let layout = 'gimages'; // 'gimages' or 'masonry'
 	export let layout_style = 'natural'; // 'natural' or 'square'
 
 	// Main column to display.

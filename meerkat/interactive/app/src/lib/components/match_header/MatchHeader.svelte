@@ -4,15 +4,25 @@
 	import { api_url } from '$lib/../routes/network/stores';
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	function dispatch_match(search_text: string, column: string) {
+		dispatch('match', {
+			search_text: search_text,
+			column: column
+		});
+	};
 
 
 	export let schema_promise: Promise<DataPanelSchema>;
 	export let refresh_callback: RefreshCallback;
 	export let match_criterion: MatchCriterion;
 
-	let search_box_text: string = '';
-	let column: string = '';
-	let status: string = 'waiting';
+	export let search_box_text: string = '';
+	export let column: string = '';
+	export let status: string = 'waiting';
 
 	let on_search = async () => {
 		if (column === '') {
@@ -25,7 +35,9 @@
 		let promise = refresh_callback();
 		promise.then(() => {
 			status = 'success';
-		})
+		});
+		// Dispatch the match event
+		dispatch_match(search_box_text, column);
 	};
 
 	const onKeyPress = (e) => {

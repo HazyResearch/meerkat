@@ -19,11 +19,11 @@ export interface DataPanelRows {
 }
 
 export class FilterCriterion {
-    constructor(readonly column: string, readonly value: any, readonly op: string) {}
+    constructor(readonly column: string, readonly value: any, readonly op: string) { }
 }
 
 export class MatchCriterion {
-    constructor(readonly column: string, readonly query: string) {}
+    constructor(readonly column: string, readonly query: string) { }
 }
 
 export async function get_schema(
@@ -32,8 +32,18 @@ export async function get_schema(
     return await post(`${api_url}/dp/${datapanel_id}/schema`, { columns: columns });
 }
 
-export async function get_rows(api_url: string, datapanel_id: string, start: number, end: number): Promise<DataPanelRows> {
-    return await post(`${api_url}/dp/${datapanel_id}/rows`, { start: start, end: end });
+export async function get_rows(
+    api_url: string,
+    datapanel_id: string,
+    start?: number,
+    end?: number,
+    indices?: Array<number>,
+    columns?: Array<string>
+): Promise<DataPanelRows> {
+    return await post(
+        `${api_url}/dp/${datapanel_id}/rows`,
+        { start: start, end: end, indices: indices, columns: columns }
+    );
 }
 
 
@@ -47,7 +57,7 @@ export async function match(
 export async function sort(
     api_url: string, datapanel_id: string, by: string
 ): Promise<DataPanelSchema> {
-    return await  post(`${api_url}/dp/${datapanel_id}/sort`, { by: by });
+    return await post(`${api_url}/dp/${datapanel_id}/sort`, { by: by });
 }
 
 export async function filter(
@@ -56,5 +66,5 @@ export async function filter(
     const columns: Array<string> = filter_criteria.map(criterion => criterion.column);
     const values: Array<any> = filter_criteria.map(criterion => criterion.value);
     const ops: Array<string> = filter_criteria.map(criterion => criterion.op);
-    return await  post(`${api_url}/dp/${datapanel_id}/filter`, { columns: columns, values: values, ops: ops });
+    return await post(`${api_url}/dp/${datapanel_id}/filter`, { columns: columns, values: values, ops: ops });
 }

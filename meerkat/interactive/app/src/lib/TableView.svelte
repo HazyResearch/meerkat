@@ -9,7 +9,8 @@
 	import Tabs from '$lib/components/header/Tabs.svelte';
 	import Tab from '$lib/components/header/Tab.svelte';
 	import FilterHeader from './components/filter_header/FilterHeader.svelte';
-	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
+	import PlotHeader from '$lib/components/plot_header/PlotHeader.svelte';
+	import { activeTabId } from './components/header/stores';
 
 	export let datapanel_id: string;
 	export let nrows: number = 0;
@@ -100,20 +101,30 @@
 		return op_promise;
 	};
 
-	$: schema_promise = get_schema($api_url, datapanel_id);
+	$: schema_promise = get_schema($api_url, datapanel_id).then(
+		(schema) => {
+			schema.columns = schema.columns.filter((column: any) => {
+				return !column.name.startsWith('__');
+			});
+		return schema;
+	});
 	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
+
+	let on_selection_change = async (event: CustomEvent) => {
+		/* Triggered when brush selection on scatter plot changes. */
+		// Update rows_promise: call get_rows again with the new selection (indices)
+		rows_promise = get_rows(
+			$api_url, base_datapanel_id, undefined, undefined, Array.from(event.detail.selected_points)
+		);
+		console.log("On Selection Change");
+		console.log(event.detail.selected_points);
+	}
 
 	let toggle_button: boolean = false;
 	$: active_view = toggle_button ? 'gallery' : 'table';
 
-
+	
 </script>
-
-<!-- <div class="flex justify-center">
-	<div class="basis-5/12">
-		<ScatterPlot height=300px width=300px padding=0/>
-	</div>
-</div> -->
 
 <Tabs bind:toggle_button>
 	<Tab label="Match" id="match">
@@ -123,6 +134,16 @@
 		<FilterHeader bind:filter_criteria={filter_criteria} {schema_promise} refresh_callback={refresh} />
 	</Tab>
 	<Tab label="Info" id="info">second</Tab>
+
+	<Tab label="Plot" id="plot">
+		<PlotHeader
+			datapanel_id={base_datapanel_id}
+			{rows_promise}
+			{schema_promise}
+			refresh_callback={refresh}
+			on:selection-change={on_selection_change}
+		/>
+	</Tab>
 </Tabs>
 
 {#if active_view === 'table'}

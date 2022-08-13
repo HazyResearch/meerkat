@@ -2,28 +2,41 @@
 	import { getContext } from 'svelte';
 	import Brush from '../interaction/Brush.svg.svelte';
 	import Quadtree from '../utils/Quadtree.svelte';
+	import { createEventDispatcher } from 'svelte';
 
+	const dispatch = createEventDispatcher();
 	const { data, xGet, yGet, xScale, yScale } = getContext('LayerCake');
 
 	export let scanned_points = new Set();
 	export let selected_points = new Set();
 	export let radius = 5;
+	export let show_scanned = false;
 
 	// Bind to Quadtree component (d3 quadtree)
 	let quadtree: any;
 
+	function dispatch_selection_change() {
+		dispatch('selection-change', {
+			selected_points: selected_points
+		});
+	};
+
 	// Event handler for brush events
 	export let brushed = function (event: any) {
+		// Clear out the scanned points
 		scanned_points.clear();
+		// No Ctrl key pressed, so clear out the selected points
 		if (!event.sourceEvent.ctrlKey) {
 			selected_points.clear();
+			[selected_points, scanned_points] = [selected_points, scanned_points]; // trigger re-render
 		}
 		if (event.selection) {
 			let [_selected, _scanned] = quadtree.search(event.selection);
 			selected_points = new Set([...selected_points, ..._selected]);
 			scanned_points = new Set([...scanned_points, ..._scanned]);
 		}
-		[selected_points, scanned_points] = [selected_points, scanned_points]; // trigger re-render
+		// Dispatch the selection change event only on end of brushing
+		if (event.type === 'end') dispatch_selection_change();
 	}
 
 	// Selected scatter points
@@ -47,14 +60,14 @@
 
 <g class="w-full h-full" on:contextmenu={clear_points}>
 	<Quadtree bind:this={quadtree} />
-	<Brush {brushed} />
+	<Brush {brushed} fire_on="start brush end" />
 	<g class="scatter-group">
 		{#each $data as d}
 			<circle
 				class={selected_points.has(d.id) || manual_selected_points.has(d.id)
 					? `scatter-point--selected`
 					: scanned_points.has(d.id)
-					? `scatter-point--scanned`
+					? (show_scanned ? `scatter-point--scanned` : `scatter-point`)
 					: `scatter-point`}
 				cx={$xGet(d) + ($xScale.bandwidth ? $xScale.bandwidth() / 2 : 0)}
 				cy={$yGet(d) + ($yScale.bandwidth ? $yScale.bandwidth() / 2 : 0)}
