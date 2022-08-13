@@ -53,22 +53,35 @@ class SliceBy(IdentifiableMixin):
     def __len__(self) -> int:
         return len(self.slices)
 
-    def mean(self, *args, **kwargs):
-        return self._reduce(lambda x: x.mean(*args, **kwargs))
+    def mean(self, *args, **kwargs) -> DataPanel:
+        return self._aggregate(lambda x: x.mean(*args, **kwargs))
 
     @sets_only
-    def count(self, *args, **kwargs):
-        return self._reduce(lambda x: x.count(*args, **kwargs))
+    def count(self, *args, **kwargs) -> DataPanel:
+        return self._aggregate(lambda x: x.count(*args, **kwargs))
 
     @sets_only
-    def median(self, *args, **kwargs):
-        return self._reduce(lambda x: x.median(*args, **kwargs))
+    def median(self, *args, **kwargs) -> DataPanel:
+        return self._aggregate(lambda x: x.median(*args, **kwargs))
+
+    @sets_only
+    def aggregate(self, function: Callable, accepts_dp: bool = False) -> DataPanel:
+        """_summary_
+
+        Args:
+            function (Callable): _description_
+            accepts_dp (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            DataPanel: _description_
+        """
+        return self._aggregate(f=function, accepts_dp=accepts_dp)
 
     @property
     def slice_keys(self):
         return sorted(list(self.slices.keys()))
 
-    def _reduce(self, f: Callable):
+    def _aggregate(self, f: Callable, accepts_dp: bool = False) -> DataPanel:
         """self.sets are a dictionary of {labels : [sets]}"""
 
         # means will be a list of dictionaries where each element in the dict
@@ -78,7 +91,10 @@ class SliceBy(IdentifiableMixin):
                 pass
             else:
                 slice_dp = self.data.lz[self.slices[slice_key]]
-                slice_values: Dict[str, Any] = f(slice_dp)
+                slice_values: Dict[str, Any] = slice_dp.aggregate(
+                    f, accepts_dp=accepts_dp
+                )
+
             out.append(slice_values)
 
         from meerkat.datapanel import DataPanel

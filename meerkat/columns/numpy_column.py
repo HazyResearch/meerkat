@@ -12,11 +12,14 @@ from typing import Callable, List, Sequence, Union
 import numpy as np
 import pandas as pd
 import torch
+from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.interactive.formatter import NumpyArrayFormatter
+from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -182,6 +185,10 @@ class NumpyArrayColumn(
         else:
             return self[index]
 
+    @staticmethod
+    def _get_default_formatter() -> Callable:
+        return NumpyArrayFormatter()
+
     def sort(
         self,
         ascending: Union[bool, List[bool]] = True,
@@ -265,3 +272,14 @@ class NumpyArrayColumn(
             encoding=encoding,
         )
         return cls(data)
+
+    def mean(
+        self, axis: int = None, keepdims: bool = False, **kwargs
+    ) -> NumpyArrayColumn:
+        try:
+            return self.data.mean(axis=axis, keepdims=keepdims, **kwargs)
+        except UFuncTypeError:
+            raise AggregationError(
+                "Cannot apply mean aggregation to NumPy array with "
+                f" dtype '{self.data.dtype}'."
+            )

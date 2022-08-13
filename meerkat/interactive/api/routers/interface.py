@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
 
@@ -13,10 +13,19 @@ class Interface(IdentifiableMixin):
 
     identifiable_group: str = "interfaces"
 
-    def __init__(self, component: str, props: Dict):
+    def __init__(
+        self,
+        component: str,
+        props: Dict[str, Any],
+        store: Dict[str, IdentifiableMixin] = None,
+    ):
         super().__init__()
         self.component = component
         self.props = props
+
+        # this is useful for maintaining a handle on objects relative to the interface,
+        # but only for it's lifetime.
+        self.store = {} if store is None else store
 
     @property
     def config(self):

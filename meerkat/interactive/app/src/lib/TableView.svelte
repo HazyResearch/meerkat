@@ -67,7 +67,7 @@
 				{#await rows_promise}
 					<Gallery {schema} rows={{ rows: [] }} />
 				{:then rows}
-					<Gallery {schema} {rows} main_column={'img'} tag_columns={['label_idx', 'split']} />
+					<Gallery {schema} {rows} main_column={'image'} tag_columns={['v6_fnmr', 'ethnicity']} />
 				{/await}
 			</div>
 		{/await}

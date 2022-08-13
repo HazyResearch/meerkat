@@ -1,14 +1,15 @@
 <script lang="ts">
-    import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
-	import { Slider } from 'carbon-components-svelte';
+	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
+	// import { Slider } from 'carbon-components-svelte';
+	import Slider from '$lib/components/common/Slider.svelte';
 	import Card from './Card.svelte';
 	import InfoModal from './InfoModal.svelte';
 
 	export let schema: DataPanelSchema;
-    let column_infos: Array<ColumnInfo> = schema.columns; 
-    export let rows: DataPanelRows | null;
+	let column_infos: Array<ColumnInfo> = schema.columns;
+	export let rows: DataPanelRows | null;
 
-	export let layout = 'masonry'; // 'gimages' or 'masonry'
+	export let layout = 'gimages'; // 'gimages' or 'masonry'
 	export let layout_style = 'natural'; // 'natural' or 'square'
 
 	// Main column to display.
@@ -29,24 +30,48 @@
 	$: num_columns = layout === 'masonry' ? cell_size_variable : undefined;
 </script>
 
-<svelte:head>
-	<link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/g90.css" />
-</svelte:head>
 
-<div class="h-full overflow-hidden">
-	<div class="m-2">
-		<Slider
-			fullWidth
-			labelText={layout === 'gimages' ? 'Image height' : 'Image columns'}
-			min={layout === 'gimages' ? 5 : 1}
-			max={layout === 'gimages' ? 95 : 12}
-			minLabel={layout === 'gimages' ? '5%' : '1'}
-			maxLabel={layout === 'gimages' ? '95%' : '12'}
-			bind:value={cell_size_variable}
-		/>
+<div class="flex mx-2 w-52 items-center">
+	<div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="18"
+			height="18"
+			class=" text-slate-500 fill-current self-center"
+			viewBox="0 0 20 20"
+		>
+			<path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+			<path
+				d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"
+			/>
+		</svg>
 	</div>
+
+	<Slider
+		id="range1"
+		min={layout === 'gimages' ? 5 : 1}
+		max={layout === 'gimages' ? 95 : 12}
+		bind:value={cell_size_variable}
+	/>
+	<div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="48"
+			height="48"
+			class="bi bi-imag text-slate-500 fill-current"
+			viewBox="0 0 20 20"
+		>
+			<path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+			<path
+				d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"
+			/>
+		</svg>
+	</div>
+</div>
+<div class="h-full overflow-hidden">
+
 	<div
-		class="panel overflow-y-auto"
+		class="panel overflow-y-scroll"
 		class:panel-masonry={layout === 'masonry'}
 		class:panel-gimages={layout === 'gimages'}
 		style:height={layout === 'gimages' ? '720px' : 'auto'}

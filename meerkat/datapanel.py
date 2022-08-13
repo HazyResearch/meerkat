@@ -4,7 +4,9 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+from functools import wraps
 from typing import (
+    Any,
     Callable,
     Dict,
     Iterable,
@@ -78,6 +80,12 @@ class DataPanel(
         logger.debug("Creating DataPanel.")
 
         self.data = data
+
+    @property
+    def gui(self):
+        from meerkat.interactive.gui import DataPanelGUI
+
+        return DataPanelGUI(self)
 
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
@@ -898,21 +906,14 @@ class DataPanel(
 
         return clusterby(self, *args, **kwargs)
 
-    def mean(self, *args, **kwargs) -> Dict[str, any]:
+    def aggregate(
+        self, function: Union[str, Callable], nuisance: str = "drop", *args, **kwargs
+    ) -> Dict[str, Any]:
+        from meerkat.ops.aggregate.aggregate import aggregate
 
-        result = {}
+        return aggregate(self, function, *args, **kwargs)
 
-        for column in self.columns:
-            from meerkat.columns.tensor_column import TensorColumn
+    def mean(self, *args, nuisance: str = "drop", **kwargs):
+        from meerkat.ops.aggregate.aggregate import aggregate
 
-            mean = None
-            if isinstance(self.data[column], TensorColumn):
-                tensor = self.data[column].to_tensor()
-                mean = tensor.double().mean(*args, **kwargs).item()
-            else:
-                mean = self.data[column].mean(*args, **kwargs)
-
-            if mean is not None:
-                result[column] = mean
-
-        return result
+        return aggregate(self, function="mean", nuisance=nuisance, *args, **kwargs)

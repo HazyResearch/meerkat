@@ -13,6 +13,7 @@ import torch
 
 import meerkat.config
 from meerkat.interactive.formatter import Formatter
+from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
@@ -29,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractColumn(
+    AggregateMixin,
     BlockableMixin,
     CloneableMixin,
     CollateMixin,

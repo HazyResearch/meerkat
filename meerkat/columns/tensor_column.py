@@ -14,6 +14,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.tensor_block import TensorBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.interactive.formatter import TensorFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
@@ -154,6 +155,10 @@ class TensorColumn(
         else:
             return self[index]
 
+    @staticmethod
+    def _get_default_formatter() -> Callable:
+        return TensorFormatter()
+
     @classmethod
     def from_data(cls, data: Union[Columnable, AbstractColumn]):
         """Convert data to an EmbeddingColumn."""
@@ -239,3 +244,23 @@ class TensorColumn(
 
     def to_numpy(self) -> pd.Series:
         return self.data.detach().cpu().numpy()
+
+    def mean(
+        self, dim: int = None, keepdim: bool = False, *args, **kwargs
+    ) -> torch.Tensor:
+        # torch only supports mean for floating point dtypes
+        if self.data.dtype not in [
+            torch.float,
+            torch.double,
+            torch.cfloat,
+            torch.cdouble,
+            torch.half,
+            torch.bfloat16,
+        ]:
+            data = self.data.float()
+        else:
+            data = self.data
+        if dim is not None:
+            return data.mean(*args, dim=dim, keepdim=keepdim, **kwargs)
+        else:
+            return data.mean(*args, **kwargs).numpy().item()

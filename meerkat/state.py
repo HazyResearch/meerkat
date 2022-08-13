@@ -4,7 +4,7 @@ from ast import Global
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, Mapping, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
@@ -72,14 +72,22 @@ class Identifiables:
     datapanels: WeakMapping = field(default_factory=WeakMapping)
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
+    aggregations: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
         group[obj.id] = obj
 
     def get(self, id: str, group: str):
-        group = getattr(self, group)
-        return group[id]
+        group, group_name = getattr(self, group), group
+        try:
+            value = group[id]
+        except KeyError:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No object in group '{group_name}' with id '{id}'",
+            )
+        return value
 
 
 @dataclass

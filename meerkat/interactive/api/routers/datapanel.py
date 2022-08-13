@@ -1,29 +1,14 @@
-from ctypes import Union
 from multiprocessing.sharedctypes import Value
-from time import sleep
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Body, HTTPException
+from pydantic import BaseModel, validator
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.state import state
 
-
-def get_datapanel(datapanel_id: str):
-    try:
-        if datapanel_id == "test-imagenette":
-            return mk.get("imagenette", version="320px")
-
-        datapanel = state.identifiables.datapanels[datapanel_id]
-
-    except KeyError:
-        raise HTTPException(
-            status_code=404, detail="No datapanel with id {}".format(datapanel_id)
-        )
-    return datapanel
-
+from ....tools.utils import convert_to_python
 
 router = APIRouter(
     prefix="/dp",
@@ -51,7 +36,7 @@ class SchemaResponse(BaseModel):
 
 @router.post("/{datapanel_id}/schema/")
 def get_schema(datapanel_id: str, request: SchemaRequest) -> SchemaResponse:
-    dp = get_datapanel(datapanel_id)
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     columns = dp.columns if request is None else request.columns
     return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, columns))
 
@@ -71,7 +56,9 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
             )
 
     # TODO: remove this and fix
-    columns = [column for column in columns if column != "clip(img)"]
+    columns = [
+        column for column in columns if column not in ["clip(img)", "clip(image)"]
+    ]
 
     return [
         ColumnInfo(
@@ -105,7 +92,7 @@ def get_rows(
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    dp = get_datapanel(datapanel_id)
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     full_length = len(dp)
     column_infos = _get_column_infos(dp, request.columns)
 
@@ -140,33 +127,67 @@ class MatchRequest(BaseModel):
     query: str  # The query text to match against.
 
 
-@router.post("/{datapanel_id}/match")
-def match(datapanel_id: str, request: MatchRequest) -> SchemaResponse:
-    dp = get_datapanel(datapanel_id)
+@router.post("/{datapanel_id}/match/")
+def match(
+    datapanel_id: str, input: str = Body(), query: str = Body()
+) -> SchemaResponse:
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
-        f.write(request.query)
+        f.write(query)
     try:
         dp, match_columns = mk.match(
-            data=dp, query=request.query, input=request.input, return_column_names=True
+            data=dp, query=query, input=input, return_column_names=True
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
 
 
-class SortRequest(BaseModel):
-    by: str
-
-
 # TODO: (Sabri/Arjun) Make this more robust and less hacky
 curr_dp: mk.DataPanel = None
 
 
-@router.post("/{datapanel_id}/sort")
-def sort(datapanel_id: str, request: SortRequest):
-    dp = get_datapanel(datapanel_id)
-    dp = mk.sort(data=dp, by=request.by, ascending=False)
+@router.post("/{datapanel_id}/sort/")
+def sort(datapanel_id: str, by: str = Body()):
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    dp = mk.sort(data=dp, by=by, ascending=False)
     global curr_dp
     curr_dp = dp
     return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))
+
+
+@router.post("/{datapanel_id}/aggregate/")
+def aggregate(
+    datapanel_id: str,
+    aggregation_id: str = Body(None),
+    aggregation: str = Body(None),
+    accepts_dp: bool = Body(False),
+    columns: List[str] = Body(None),
+) -> Union[float, int, str]:
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+
+    if columns is not None:
+        dp = dp[columns]
+
+    if (aggregation_id is None) == (aggregation is None):
+        raise HTTPException(
+            status_code=400,
+            detail="Must specify either aggregation_id or aggregation",
+        )
+
+    if aggregation_id is not None:
+        aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
+        value = dp.aggregate(aggregation, accepts_dp=accepts_dp)
+
+    else:
+        if aggregation not in ["mean", "sum", "min", "max"]:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid aggregation {aggregation}"
+            )
+        value = dp.aggregate(aggregation)
+
+    # convert value to native python type
+    value = convert_to_python(value)
+
+    return value

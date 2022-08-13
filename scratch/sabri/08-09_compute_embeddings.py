@@ -1,5 +1,5 @@
 import meerkat as mk
 
-dp = mk.get("imagenette")
-dp = mk.embed(dp, input="img", num_workers=0)
-dp.write("imagenette_embedded.csv")
+dp = mk.get("rfw")
+dp = mk.embed(dp, input="image", num_workers=0)
+dp.write("rfw_embedded.csv")

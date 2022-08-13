@@ -8,14 +8,9 @@ from .imagenette import imagenette
 from .mirflickr import mirflickr
 from .pascal import pascal
 from .registry import datasets
+from .rfw import rfw
 
-__all__ = [
-    "celeba",
-    "imagenet",
-    "imagenette",
-    "mirflickr",
-    "pascal",
-]
+__all__ = ["celeba", "imagenet", "imagenette", "mirflickr", "pascal", "rfw"]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]

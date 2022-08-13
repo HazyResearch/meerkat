@@ -57,8 +57,9 @@
 	export let pivot_modal_component_props: Object;
 </script>
 
+
 <div
-	class="card"
+	class="mx-2 my-4"
 	class:flex-grow={card_flex_grow}
 	class:card-masonry={layout === 'masonry'}
 	class:card-gimages={layout === 'gimages'}
@@ -90,7 +91,7 @@
 	<div class="content">
 		{#each content as subcontent, j}
 			<div
-				class="subcontent"
+				class="mx-1 my-1 px-2 py-0.5 rounded-full text-center text-slate-800 text-xs font-mono bg-violet-200 hover:bg-violet-600 hover:text-slate-200"
 				use:content_tippy={{
 					content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML
 				}}

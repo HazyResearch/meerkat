@@ -32,6 +32,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.mixins.aggregate import AggregationError
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -317,3 +318,12 @@ class PandasSeriesColumn(
         if other.__class__ != self.__class__:
             return False
         return (self.data.values == other.data.values).all()
+
+    def mean(self, skipna: bool = True):
+        try:
+            return self.data.mean(skipna=skipna)
+        except TypeError:
+            raise AggregationError(
+                "Cannot apply mean aggregation to Pandas Series with "
+                f" dtype '{self.data.dtype}'."
+            )

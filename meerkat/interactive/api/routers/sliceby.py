@@ -2,13 +2,14 @@ from multiprocessing.sharedctypes import Value
 from time import sleep
 from typing import Any, Dict, List, Union
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
+from meerkat.tools.utils import convert_to_python
 
 from .datapanel import RowsRequest, RowsResponse, _get_column_infos
 
@@ -105,3 +106,38 @@ def get_rows(
         full_length=full_length,
         indices=indices,
     )
+
+
+@router.post("/{sliceby_id}/aggregate/")
+def aggregate(
+    sliceby_id: str,
+    aggregation_id: str = Body(None),
+    aggregation: str = Body(None),
+    accepts_dp: bool = Body(False),
+    columns: List[str] = Body(None),
+) -> Dict:
+    sliceby = state.identifiables.get(group="slicebys", id=sliceby_id)
+
+    if columns is not None:
+        sliceby = sliceby[columns]
+
+    if (aggregation_id is None) == (aggregation is None):
+        raise HTTPException(
+            status_code=400,
+            detail="Must specify either aggregation_id or aggregation",
+        )
+
+    if aggregation_id is not None:
+        aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
+        value = sliceby.aggregate(aggregation, accepts_dp=accepts_dp)
+
+    else:
+        if aggregation not in ["mean", "sum", "min", "max"]:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid aggregation {aggregation}"
+            )
+        value = sliceby.aggregate(aggregation)
+
+    # convert to dict format for output
+    dct = value.to_pandas().set_index(sliceby.by).to_dict()
+    return dct

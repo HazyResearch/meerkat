@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from functools import reduce
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
+import numpy as np
 import yaml
 from yaml.constructor import ConstructorError
 
@@ -179,3 +180,18 @@ def convert_to_batch_fn(
     else:
         # Wrap in a lambda to apply the indices argument
         return lambda batch, *args, **kwargs: _function(batch, None, *args, **kwargs)
+
+
+def convert_to_python(obj: Any):
+    """Utility for converting NumPy and torch dtypes to native python types.
+    Useful when sending objects to frontend.
+    """
+    import torch
+
+    if torch.is_tensor(obj):
+        obj = obj.numpy()
+
+    if isinstance(obj, np.generic):
+        obj = obj.item()
+
+    return obj
