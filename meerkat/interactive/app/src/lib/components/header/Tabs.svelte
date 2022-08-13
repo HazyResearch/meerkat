@@ -3,6 +3,7 @@
 	import { writable } from 'svelte/store';
     import Toggle from '$lib/components/common/Toggle.svelte';
     import banner from "$lib/assets/banner_small.png"
+	import { activeTabId } from './stores';
 
     export let toggle_button: boolean = false; 
 
@@ -11,7 +12,6 @@
 		id: string;
 	}
 
-	const activeTabId = writable('');
 	let tabs: Array<TabInterface> = [];
 
 	const tabsContext = setContext('tabs', { activeTabId, addTab });

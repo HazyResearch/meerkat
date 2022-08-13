@@ -9,6 +9,7 @@
 	export let brush_x: boolean = true;
 	export let brush_y: boolean = true;
 	export let brush_element: any = undefined;
+    export let fire_on: string = 'start brush end';
 
 	// Setup the brush using d3
 	// .extent defines the viewport of the brush
@@ -23,7 +24,7 @@
 				[-1, -1],
 				[$width + 1, $height + 1]
 			])
-			.on('start brush end', brushed)
+			.on(fire_on, brushed)
 			.filter((event) => !event.button);
 
 		if (brush_element) {

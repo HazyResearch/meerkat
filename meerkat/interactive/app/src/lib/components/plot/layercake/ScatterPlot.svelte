@@ -9,7 +9,7 @@
 
 	export let data: Array<Point2D>;
 
-	export let radius = 5;
+	export let radius = 3;
     export let padding: number = 10;
 
     export let xlabel: string = 'x label';
@@ -37,7 +37,7 @@
 		<Svg>
 			<SvgAxisX />
 			<SvgAxisY />
-			<SvgScatter {radius} />
+			<SvgScatter {radius} on:selection-change />
 		</Svg>
         
 	</LayerCake>

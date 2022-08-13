@@ -1,18 +1,28 @@
 <script lang="ts">
-	import { api_url } from '$lib/../routes/network/stores';
+	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
 	import type { RefreshCallback } from '$lib/api/callbacks';
-	import { match, sort, type DataPanelSchema } from '$lib/api/datapanel';
+	import { api_url } from '$lib/../routes/network/stores';
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
+	import { createEventDispatcher } from 'svelte';
 
-	export let base_datapanel_id: string;
+	const dispatch = createEventDispatcher();
+
+	function dispatch_match(search_text: string, column: string) {
+		dispatch('match', {
+			search_text: search_text,
+			column: column
+		});
+	};
+
+
 	export let schema_promise: Promise<DataPanelSchema>;
 	export let refresh_callback: RefreshCallback;
+	export let match_criterion: MatchCriterion;
 
-	let search_box_text: string = '';
-	let search_promise: Promise<DataPanelSchema>;
-	let column: string = '';
-	let status: string = 'waiting';
+	export let search_box_text: string = '';
+	export let column: string = '';
+	export let status: string = 'waiting';
 
 	let on_search = async () => {
 		if (column === '') {
@@ -20,19 +30,16 @@
 			return;
 		}
 		status = 'working';
-		let match_output: DataPanelSchema = await match(
-			$api_url,
-			base_datapanel_id,
-			search_box_text,
-			column
-		);
-		status = 'success';
-		search_promise = sort($api_url, base_datapanel_id, match_output.columns[0].name);
-		search_promise.then((schema: DataPanelSchema) => {
-			refresh_callback(schema.id);
+		match_criterion = new MatchCriterion(column, search_box_text);
+
+		let promise = refresh_callback();
+		promise.then(() => {
 			status = 'success';
 		});
+		// Dispatch the match event
+		dispatch_match(search_box_text, column);
 	};
+
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
 		else status = 'waiting';
