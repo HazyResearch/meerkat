@@ -92,7 +92,7 @@ class SliceByGUI(GUI):
                 main_column=main_column,
                 tag_columns=tag_columns if tag_columns is not None else [],
                 aggregations={
-                    k: v.id for k, v in aggregations.items
+                    k: v.id for k, v in aggregations.items()
                 },  # we pass the id of the aggregations to the frontend
             ),
             # and keep a handle on them in the interfaces store so they aren't gc'd

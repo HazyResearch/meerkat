@@ -7,9 +7,9 @@ from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
+from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
-from meerkat.tools.utils import convert_to_python
 
 from .datapanel import RowsRequest, RowsResponse, _get_column_infos
 
@@ -116,6 +116,7 @@ def aggregate(
     accepts_dp: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Dict:
+    # print("agg_id" + aggregation_id)
     sliceby = state.identifiables.get(group="slicebys", id=sliceby_id)
 
     if columns is not None:
@@ -139,5 +140,6 @@ def aggregate(
         value = sliceby.aggregate(aggregation)
 
     # convert to dict format for output
-    dct = value.to_pandas().set_index(sliceby.by).to_dict()
+    df = value.to_pandas().set_index(sliceby.by)
+    dct = df.applymap(BasicFormatter().encode).to_dict()
     return dct

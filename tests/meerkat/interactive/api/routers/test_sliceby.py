@@ -68,7 +68,6 @@ def test_aggregate_w_id(sliceby_testbed):
         f"/sliceby/{sb.id}/aggregate/",
         json={"aggregation_id": aggregation.id, "accepts_dp": True},
     )
-    print(response)
 
     assert response.status_code == 200, response.text
     assert response.json() == {

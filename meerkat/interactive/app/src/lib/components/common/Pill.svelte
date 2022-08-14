@@ -6,10 +6,10 @@
 	export let layout: string;
 </script>
 
-<div class="pill">
+<div class="flex h-fit">
     {#if header}
         <div 
-            class="header header-text" 
+            class="p-1 mr-0 ml-0 m-1 rounded-l-md header-text text-violet-800 bg-slate-200 text-center text-xs text-ellipsis font-bold whitespace-nowrap select-none"
             class:w-full={layout === 'wide-header' || layout === 'equal'}
             class:rounded-md={!content}
         >
@@ -18,7 +18,7 @@
     {/if}
     {#if content}
         <div 
-            class="content content-text" 
+            class="p-1 pl-2 ml-0 m-1 rounded-r-md bg-slate-200 overflow-hidden text-right text-center text-xs text-ellipsis whitespace-nowrap select-none font-mono" 
             class:w-full={layout === 'wide-content' || layout === 'equal'}
             class:rounded-md={!header}
         >
@@ -27,27 +27,4 @@
     {/if}
 </div>
 
-<style>
-	.pill {
-		@apply flex;
-	}
 
-	.header-text,
-	.content-text {
-		@apply text-center text-xs text-ellipsis whitespace-nowrap select-none font-mono;
-		@apply text-slate-200;
-	}
-	.content-text {
-		@apply overflow-hidden text-right;
-	}
-
-	.header {
-		@apply p-1 mr-0 ml-0 m-1 rounded-l-md;
-		@apply bg-violet-700;
-	}
-
-	.content {
-		@apply p-1 pl-2 ml-0 m-1 rounded-r-md;
-		@apply bg-slate-500;
-	}
-</style>

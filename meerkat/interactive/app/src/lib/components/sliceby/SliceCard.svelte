@@ -3,9 +3,10 @@
 	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
 	import { api_url } from '../../../routes/network/stores';
 	import { get_rows } from '$lib/api/sliceby';
-    import type {SliceKey} from '$lib/api/sliceby';
+	import type { SliceKey } from '$lib/api/sliceby';
 	import RowCard from '../row/RowCard.svelte';
 	import LoadButton from '../common/LoadButton.svelte';
+	import Pill from '$lib/components/common/Pill.svelte';
 	// import Matrix, { type MatrixType } from './matrix/Matrix.svelte';
 	// import Stats, { type StatsType } from './Stats.svelte';
 
@@ -15,6 +16,7 @@
 	export let schema: DataPanelSchema;
 	export let main_column: string;
 	export let tag_columns: Array<string>;
+	export let aggregations_promise: any;
 
 	let columns = schema.columns.map((col: any) => col.name);
 	let tag_indices: Array<number> = tag_columns.map((tag) => columns.indexOf(tag));
@@ -51,10 +53,11 @@
 	let load_promise = load_rows();
 </script>
 
-<div class="pt-2 px-6 pb-2 h-fit mx-auto bg-white rounded-xl shadow-lg overflow-x-hidden ml-4">
+<div class="pt-2 pl-6 pb-2 h-fit mx-auto bg-white rounded-xl shadow-lg overflow-x-hidden ml-4">
 	<div class="h-10 mb-2 flex space-x-6 items-center">
-		<div class="whitespace-nowrap text-xl font-medium text-black">
-			{slice_key}
+		<div class="flex space-x-3 whitespace-nowrap text-xl text-black">
+			<div>Slice</div>
+			<div class="font-bold"> {slice_key} </div>
 		</div>
 		<!-- <div class="mx-auto flex h-full items-center space-x-4 overflow-x-scroll no-scrollbar ml-4">
 			{#each descriptions as description}
@@ -64,6 +67,17 @@
 	</div>
 	<div class="flex h-40">
 		<!-- <Stats {stats} /> -->
+		<div class="flex-row">
+			{#await aggregations_promise}
+				Loading aggregations...
+			{:then aggregations}
+				{#each Object.entries(aggregations) as [name, aggregation]}
+					<Pill layout="wide-content" header={name} content={aggregation.dp[slice_key]} />
+				{/each}
+			{:catch error}
+				{error}
+			{/await}
+		</div>
 
 		<!-- {#if plot.PLOT_TYPE === 'matrix' && plot.matrix}
 			<Matrix {...plot.matrix} />
@@ -71,7 +85,7 @@
 			{plot.html}
 		{/if} -->
 
-		<div class="flex overflow-x-scroll no-scrollbar ml-4 items-center space-x-4">
+		<div class="flex overflow-x-scroll no-scrollbar mx-2 items-center space-x-4">
 			{#if rows.rows.length < 1}
 				<LoadButton status="loading" on:load={load_rows} />
 			{:else}
