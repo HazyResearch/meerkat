@@ -88,8 +88,6 @@ def get_rows(
         dp = sb.slice[slice_key, request.indices]
         indices = request.indices
     elif request.start is not None:
-        if request.end is None:
-            request.end = len(dp)
         dp = sb.slice[slice_key, request.start : request.end]
         indices = list(range(request.start, request.end))
     else:
@@ -116,7 +114,6 @@ def aggregate(
     accepts_dp: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Dict:
-    # print("agg_id" + aggregation_id)
     sliceby = state.identifiables.get(group="slicebys", id=sliceby_id)
 
     if columns is not None:

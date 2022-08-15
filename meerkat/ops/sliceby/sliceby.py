@@ -42,6 +42,8 @@ class SliceBy(IdentifiableMixin):
         self.slice_type = "scores" if scores is not None else "sets"
         self.slices = scores if scores is not None else sets
         self.data = data
+        if isinstance(by, str):
+            by = [by]
         self.by = by
 
         # prepare the gui object
@@ -88,7 +90,7 @@ class SliceBy(IdentifiableMixin):
         out = []
         for slice_key in self.slice_keys:
             if self.slice_type == "scores":
-                pass
+                raise NotImplementedError
             else:
                 slice_dp = self.data.lz[self.slices[slice_key]]
                 slice_values: Dict[str, Any] = slice_dp.aggregate(
@@ -122,7 +124,8 @@ class SliceBy(IdentifiableMixin):
                 self.slices[slice_key][index], materialize=materialize
             )
         else:
-            raise NotImplemented
+            sorted = self.data.lz[np.argsort(-self.slices[slice_key])]
+            return sorted._get(index, materialize=materialize)
 
     def get_slice_length(self, slice_key: SliceKey) -> int:
         if self.slice_type == "sets":

@@ -278,7 +278,7 @@ class NumpyArrayColumn(
     ) -> NumpyArrayColumn:
         try:
             return self.data.mean(axis=axis, keepdims=keepdims, **kwargs)
-        except UFuncTypeError:
+        except (UFuncTypeError, TypeError):
             raise AggregationError(
                 "Cannot apply mean aggregation to NumPy array with "
                 f" dtype '{self.data.dtype}'."
