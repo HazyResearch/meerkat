@@ -1,8 +1,12 @@
 <script context="module">
 	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ url, fetch }) {
+		console.log("In here.");
 		const id = url.searchParams.get('id');
 		const response = await fetch(`${get(api_url)}/interface/${id}/config`);
+
+		console.log(get(api_url));
+		console.log(response);
 
 		return {
 			status: response.status,
@@ -21,6 +25,7 @@
 	import Prism from '../lib/components/cell/code/Code.svelte';
 
 	export let config: any;
+	console.log(config);
 </script>
 
 <div class="h-[800px]">

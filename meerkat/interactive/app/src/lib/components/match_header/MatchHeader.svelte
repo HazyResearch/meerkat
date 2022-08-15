@@ -35,9 +35,10 @@
 		let promise = refresh_callback();
 		promise.then(() => {
 			status = 'success';
+			// Dispatch the match event
+			dispatch_match(search_box_text, column);
 		});
-		// Dispatch the match event
-		dispatch_match(search_box_text, column);
+		
 	};
 
 	const onKeyPress = (e) => {

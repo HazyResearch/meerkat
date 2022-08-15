@@ -15,7 +15,7 @@
 	export let datapanel_id: string;
 	export let nrows: number = 0;
 	export let page: number = 0;
-	export let per_page: number = 10;
+	export let per_page: number = 100;
 
 	const base_datapanel_id: string = datapanel_id;
 	let filter_criteria: Array<FilterCriterion> = [];
@@ -29,11 +29,13 @@
 		// Run operations: match -> sort -> filter.
 		// match is performed first to ensure columns are added to the base datapanel.
 		// TODO (arjundd): Figure out a way to put sorting after filtering for time efficiency.
+
 		let run_match: boolean = (match_criterion.query !== "") && (match_criterion.column !== "");
 		let run_filter: boolean = (filter_criteria.length > 0)
 		let sort_by_column: string = "";
 
-		console.log("dp id start: ", curr_datapanel_id)
+		console.log("dp id start: ", curr_datapanel_id);
+		console.log("run_match: ", run_match);
 		
 		type PromiseLambda = {
 			(): Promise<any>;
@@ -43,27 +45,35 @@
 		let op_names: Array<string> = [];
 		// Match.
 		if (run_match) {
-			op_promises.push(() => match(
-				$api_url,
-				curr_datapanel_id,
-				match_criterion
-			).then((schema: DataPanelSchema) => {
-				let previous_dp_id = curr_datapanel_id;
-				curr_datapanel_id = schema.id;
-				sort_by_column = schema.columns[0].name;
-				console.log("match: ", previous_dp_id, " -> ", curr_datapanel_id, sort_by_column);
-				return sort(
-					$api_url, curr_datapanel_id, sort_by_column
-				)
-			}).then((schema: DataPanelSchema) => {
-				console.log("sort: ", curr_datapanel_id, " -> ", schema.id);
-				curr_datapanel_id = schema.id;
-			})
+
+			// Push a promise that matches --> sorts --> updates datapanel_id
+			op_promises.push(
+				async () => {
+					// Run match
+					let schema_after_match = await match(
+						$api_url,
+						curr_datapanel_id,
+						match_criterion
+					)
+					
+					const previous_dp_id = curr_datapanel_id;
+					curr_datapanel_id = schema_after_match.id;
+					sort_by_column = schema_after_match.columns[0].name;
+					console.log("match: ", previous_dp_id, " -> ", curr_datapanel_id, sort_by_column);
+
+					let schema_after_sort = await sort(
+						$api_url, curr_datapanel_id, sort_by_column
+					);
+					
+					console.log("sort: ", curr_datapanel_id, " -> ", schema_after_sort.id);
+					curr_datapanel_id = schema_after_sort.id;
+				}
 			);
+
 			op_names.push("match");
 		}
 		// Filter.
-		if (filter_criteria.length > 0) {
+		if (run_filter) {
 			op_promises.push(() => filter(
 				$api_url,
 				curr_datapanel_id,
@@ -122,7 +132,6 @@
 
 	let toggle_button: boolean = false;
 	$: active_view = toggle_button ? 'gallery' : 'table';
-
 	
 </script>
 
@@ -137,6 +146,7 @@
 
 	<Tab label="Plot" id="plot">
 		<PlotHeader
+			bind:match_criterion
 			datapanel_id={base_datapanel_id}
 			{rows_promise}
 			{schema_promise}

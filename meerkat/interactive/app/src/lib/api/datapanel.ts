@@ -40,6 +40,12 @@ export async function get_rows(
     indices?: Array<number>,
     columns?: Array<string>
 ): Promise<DataPanelRows> {
+    console.log(`${api_url}/dp/${datapanel_id}/rows`);
+    console.log(`start: ${start}`);
+    console.log(`end: ${end}`);
+    console.log(`indices: ${indices}`);
+    console.log(`columns: ${columns}`);
+
     return await post(
         `${api_url}/dp/${datapanel_id}/rows`,
         { start: start, end: end, indices: indices, columns: columns }
@@ -50,7 +56,6 @@ export async function get_rows(
 export async function match(
     api_url: string, datapanel_id: string, match_criterion: MatchCriterion
 ): Promise<DataPanelSchema> {
-    console.log(`${api_url}/dp/${datapanel_id}/match`)
     return await post(`${api_url}/dp/${datapanel_id}/match`, { query: match_criterion.query, input: match_criterion.column });
 }
 
