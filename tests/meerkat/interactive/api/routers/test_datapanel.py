@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import meerkat as mk
@@ -40,6 +39,34 @@ def test_get_schema(dp_testbed):
             },
         ],
     }
+
+
+def test_sort(dp_testbed):
+    dp = dp_testbed["dp"]
+    dp["c"] = np.random.rand(10)
+    response = client.post(f"/dp/{dp.id}/sort/", json={"by": "c"})
+    assert response.status_code == 200
+    assert response.json()["id"] != dp.id
+    assert response.json()["columns"] == [
+        {
+            "name": "a",
+            "type": "NumpyArrayColumn",
+            "cell_component": "basic",
+            "cell_props": {},
+        },
+        {
+            "name": "b",
+            "type": "NumpyArrayColumn",
+            "cell_component": "basic",
+            "cell_props": {},
+        },
+        {
+            "name": "c",
+            "type": "NumpyArrayColumn",
+            "cell_component": "basic",
+            "cell_props": {},
+        },
+    ]
 
 
 @pytest.mark.parametrize("aggregation", ["mean"])

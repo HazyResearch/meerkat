@@ -17,7 +17,7 @@
 
 <style>
 	.label {
-		@apply text-sm font-medium text-gray-900 dark:text-gray-300;
+		@apply text-sm font-medium text-gray-300 dark:text-gray-300;
 	}
 
 	.toggle {

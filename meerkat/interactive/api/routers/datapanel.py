@@ -1,11 +1,8 @@
 import functools
-from ctypes import Union
-from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
-
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
@@ -18,6 +15,8 @@ router = APIRouter(
     tags=["dp"],
     responses={404: {"description": "Not found"}},
 )
+
+EmbeddedBody = functools.partial(Body, embed=True)
 
 
 class ColumnInfo(BaseModel):
@@ -132,8 +131,13 @@ class MatchRequest(BaseModel):
 
 @router.post("/{datapanel_id}/match/")
 def match(
-    datapanel_id: str, input: str = Body(), query: str = Body()
+    datapanel_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
 ) -> SchemaResponse:
+    """
+    Match a query string against a DataPanel column.
+
+    The `datapanel_id` remains the same as the original request.
+    """
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
@@ -152,7 +156,7 @@ curr_dp: mk.DataPanel = None
 
 
 @router.post("/{datapanel_id}/sort/")
-def sort(datapanel_id: str, by: str = Body()):
+def sort(datapanel_id: str, by: str = EmbeddedBody()):
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     dp = mk.sort(data=dp, by=by, ascending=False)
     global curr_dp
@@ -219,7 +223,9 @@ _operator_str_to_func = {
 
 @router.post("/{datapanel_id}/filter")
 def filter(datapanel_id: str, request: FilterRequest) -> SchemaResponse:
-    dp = get_datapanel(datapanel_id)
+    # TODO(karan): untested change as earlier version called a function
+    # that didn't exist
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
 
     supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     if not all(
