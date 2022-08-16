@@ -30,6 +30,7 @@ def explainby(
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     scores: bool = False,
+    use_cache: bool = True,
     **kwargs,
 ) -> ExplainBy:
     """Perform a clusterby operation on a DataPanel.
@@ -53,7 +54,7 @@ def explainby(
     if not isinstance(by, str):
         raise NotImplementedError
 
-    if out_col not in data:
+    if out_col not in data or not use_cache:
         data, _ = explain(
             data=data,
             input=by,
