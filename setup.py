@@ -38,16 +38,16 @@ REQUIRED = [
     "cytoolz",
     "ujson",
     "torch>=1.7.0",
+    "scikit-learn",
     "tqdm>=4.49.0",
     "datasets>=1.4.1",
     "PyYAML>=5.4.1",
     "omegaconf>=2.0.5",
-    "fuzzywuzzy>=0.18.0",
     "semver>=2.13.0",
     "multiprocess>=0.70.11" "Cython>=0.29.21",
     "progressbar>=2.5",
     "fvcore",
-    "ipywidgets>=7.6.2",
+    "ipywidgets>=7.0.0",
     "IPython",
 ]
 
@@ -80,19 +80,12 @@ EXTRAS = {
         "faiss-gpu",
         "umap-learn[plot]",
     ],
-    "tabular": [
-        "scikit-learn",
-    ],
     "text": [
         "transformers",
         "spacy>=3.0.0",
-        "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
     "audio": ["torchaudio"],
-    "wilds": [
-        "wilds>=1.1.0",
-    ],
     "medimg": [
         "dosma>=0.0.13",
         "kaggle",

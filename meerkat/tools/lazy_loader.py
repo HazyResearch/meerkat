@@ -81,7 +81,8 @@ class LazyLoader(types.ModuleType):
         return dir(module)
 
     def __getstate__(self):
-        """Enable pickling, by removing the parent module globals from the dict."""
+        """Enable pickling, by removing the parent module globals from the
+        dict."""
         return {
             "local_name": self._local_name,
             "warning": self._warning,

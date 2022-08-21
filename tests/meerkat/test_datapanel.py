@@ -1040,7 +1040,7 @@ class TestDataPanel:
 
     @DataPanelTestBed.parametrize(params={"max_rows": [6, 16, 20]})
     def test_repr_pandas(self, testbed, max_rows: int):
-        meerkat.config.DisplayOptions.max_rows = max_rows
+        meerkat.config.display.max_rows = max_rows
         df, _ = testbed.dp._repr_pandas_()
         assert isinstance(df, pd.DataFrame)
         assert len(df) == min(len(df), max_rows + 1)

@@ -123,16 +123,15 @@ Next Steps
    :hidden:
    :maxdepth: 2
 
-   overview.md
-   guide/guide.md
-   datasets/datasets.md
+   guide/guide
+   datasets/datasets
 
 
 .. toctree::
     :hidden:
     :maxdepth: 2
 
-    apidocs/meerkat
+    apidocs/index
 
 
 ..

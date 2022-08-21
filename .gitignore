@@ -149,3 +149,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Giant file
+examples/datasets
+
+# History
+.history
+

@@ -12,6 +12,6 @@ exclude_lines =
 ignore_errors = True
 omit =
     tests/*
-    meerkat/contrib/*
+    meerkat/datasets/*
     meerkat/ml/*
     setup.py
