@@ -1,5 +1,14 @@
 export async function get(url: string): Promise<any> {
-    const res: Response = await fetch(url);
+    const res: Response = await fetch(
+        url,
+        {
+            headers: new Headers({
+                'Authorization': "token 7bb042cbe944410497963e0481e83f4d",
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }),
+            
+        }
+    );
     if (!res.ok) {
         throw new Error('HTTP status ' + res.status);
     }

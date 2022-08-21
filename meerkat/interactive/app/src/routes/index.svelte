@@ -1,11 +1,20 @@
 <script lang="ts">
 	import { get as get_url } from '$lib/utils/requests';
+	import { browser } from '$app/env';
 
-	let promise = get_url('http://34.83.137.148/user/krandiash/proxy/7860/');
+	//let promise = get(`${api_url}/`)
+	console.log('Browser: ', browser);
+
+	let fn = async () => {
+		return 'SSR';
+	};
+
+	let promise = fn();
+
+    promise.then(
+        (response) => console.log(response)
+    )
 </script>
-
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
 
 {#await promise}
 	waiting...
