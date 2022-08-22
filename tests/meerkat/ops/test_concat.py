@@ -9,6 +9,7 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
+from ...utils import product_parametrize
 
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ..columns.test_common import column_testbed
@@ -49,7 +50,8 @@ def test_datapanel_column_concat():
     assert list(out["a"].data) == out["b"].data
 
 
-def test_concat(column_testbed: AbstractColumnTestBed, n: int = 2):
+@product_parametrize(params={"n": [1, 2, 3]})
+def test_concat(column_testbed: AbstractColumnTestBed, n: int):
     col = column_testbed.col
     out = concat([col] * n)
 

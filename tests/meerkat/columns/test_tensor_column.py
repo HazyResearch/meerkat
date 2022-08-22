@@ -6,7 +6,7 @@ import torch
 from meerkat import TensorColumn
 from meerkat.block.numpy_block import NumpyBlock
 
-from .abstract import AbstractColumnTestBed, TestAbstractColumn
+from .abstract import AbstractColumnTestBed, column_parametrize
 
 
 class TensorColumnTestBed(AbstractColumnTestBed):
@@ -75,99 +75,45 @@ class TensorColumnTestBed(AbstractColumnTestBed):
         assert (data1 == data2).all()
 
 
-@pytest.fixture
+@pytest.fixture(**column_parametrize([TensorColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-class TestTensorColumn(TestAbstractColumn):
+def test_init_block():
+    block_view = NumpyBlock(np.zeros((10, 10)))[0]
+    with pytest.raises(ValueError):
+        TensorColumn(block_view)
 
-    __test__ = True
-    testbed_class: type = TensorColumnTestBed
-    column_class: type = TensorColumn
 
-    def test_init_block(self):
-        block_view = NumpyBlock(np.zeros((10, 10)))[0]
-        with pytest.raises(ValueError):
-            TensorColumn(block_view)
+def test_to_tensor(testbed):
+    col, _ = testbed.col, testbed.data
 
-    def _get_data_to_set(self, testbed, data_index):
-        return torch.zeros_like(testbed.get_data(data_index))
+    tensor = col.to_tensor()
 
-    @TensorColumnTestBed.parametrize(params={"index_type": [np.array]})
-    def test_set_item(self, testbed, index_type: type):
-        return super().test_set_item(testbed, index_type=index_type)
+    assert torch.is_tensor(tensor)
+    assert (col == tensor.numpy()).all()
 
-    @TensorColumnTestBed.parametrize(params={"index_type": [np.array]})
-    def test_getitem(self, testbed, index_type: type):
-        return super().test_getitem(testbed, index_type=index_type)
 
-    @TensorColumnTestBed.parametrize(
-        config={"num_dims": [1], "dim_length": [1]}, params={"batched": [True, False]}
-    )
-    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_filter_1(testbed, batched, materialize=True)
+def test_to_pandas(testbed):
+    series = testbed.col.to_pandas()
 
-    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_multiple(testbed, batched, materialize=True)
+    assert isinstance(series, pd.Series)
 
-    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_single(testbed, batched, materialize=True)
+    if testbed.col.shape == 1:
+        assert (series.values == testbed.col.data).all()
+    else:
+        for idx in range(len(testbed.col)):
+            assert (series.iloc[idx] == testbed.col[idx]).all()
 
-    @TensorColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_single_w_kwarg(
-        self, testbed: AbstractColumnTestBed, batched: bool
-    ):
-        return super().test_map_return_single_w_kwarg(
-            testbed, batched, materialize=True
-        )
 
-    @TensorColumnTestBed.parametrize(params={"n": [1, 2, 3]})
-    def test_concat(self, testbed: AbstractColumnTestBed, n: int):
-        return super().test_concat(testbed, n=n)
+def test_repr_pandas(testbed):
+    series = testbed.col.to_pandas()
+    assert isinstance(series, pd.Series)
 
-    @TensorColumnTestBed.parametrize()
-    def test_copy(self, testbed: AbstractColumnTestBed):
-        return super().test_copy(testbed)
 
-    @TensorColumnTestBed.parametrize()
-    def test_io(self, tmp_path, testbed):
-        super().test_io(tmp_path, testbed)
-
-    @TensorColumnTestBed.parametrize()
-    def test_pickle(self, testbed):
-        super().test_pickle(testbed)
-
-    @TensorColumnTestBed.parametrize()
-    def test_to_tensor(self, testbed):
-        col, _ = testbed.col, testbed.data
-
-        tensor = col.to_tensor()
-
-        assert torch.is_tensor(tensor)
-        assert (col == tensor.numpy()).all()
-
-    @TensorColumnTestBed.parametrize()
-    def test_to_pandas(self, testbed):
-        series = testbed.col.to_pandas()
-
-        assert isinstance(series, pd.Series)
-
-        if testbed.col.shape == 1:
-            assert (series.values == testbed.col.data).all()
-        else:
-            for idx in range(len(testbed.col)):
-                assert (series.iloc[idx] == testbed.col[idx]).all()
-
-    @TensorColumnTestBed.parametrize()
-    def test_repr_pandas(self, testbed):
-        series = testbed.col.to_pandas()
-        assert isinstance(series, pd.Series)
-
-    def test_ufunc_unhandled(self):
-        a = TensorColumn([1, 2, 3])
-        with pytest.raises(TypeError):
-            a == "a"
+def test_ufunc_unhandled():
+    a = TensorColumn([1, 2, 3])
+    with pytest.raises(TypeError):
+        a == "a"

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class LambdaCell(AbstractCell):
-    def __init__(self, data: LambdaCellOp, output_key: Union[None, str, int] = None):
+    def __init__(self, data: LambdaCellOp):
         self._data = data
 
     @property
@@ -42,7 +42,7 @@ class LambdaCell(AbstractCell):
 
     def __repr__(self):
         name = getattr(self.data.fn, "__qualname__", repr(self.data.fn))
-        return f"LambdaCell(fn={name})"
+        return f"{self.__class__.__qualname__}(fn={name})"
 
 
 class LambdaColumn(AbstractColumn):

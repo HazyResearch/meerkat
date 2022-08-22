@@ -56,6 +56,14 @@ class LambdaCellOp:
         op.return_index = index
         return op
 
+    def __len__(self):
+        if len(self.args) > 0:
+            return len(self.args[0])
+        else:
+            for col in self.kwargs.values():
+                return len(col)
+        return 0
+
 
 @dataclass
 class LambdaOp:
@@ -304,19 +312,19 @@ class LambdaOp:
 class LambdaBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
-        n_rows: int
         klass: type
         fn: callable
+        args: Tuple[int]
         # dicts are not hashable, so inputs should be a sorted tuple of tuples
-        inputs: Tuple[Tuple[Union[str, int], int]]
+        kwargs: Tuple[Tuple[Union[str, int], int]]
 
     @property
     def signature(self) -> Hashable:
         return self.Signature(
             klass=LambdaBlock,
             fn=self.data.fn,
-            inputs=tuple(sorted((k, id(v)) for k, v in self.data.inputs.items())),
-            nrows=self.data.shape[0],
+            args=tuple(map(id, self.data.args)),
+            kwargs=tuple(sorted((k, id(v)) for k, v in self.data.kwargs.items())),
         )
 
     def __init__(self, data: LambdaOp):
@@ -336,7 +344,13 @@ class LambdaBlock(AbstractBlock):
 
     @classmethod
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
-        pass
+        block = LambdaBlock.from_block_data(block_refs[0].block.data.with_return_index(None))
+        columns = {
+            name: col._clone(data=block[col._block_index])
+            for ref in block_refs
+            for name, col in ref.items()
+        }
+        return BlockRef(block=block, columns=columns)
 
     def _convert_index(self, index):
         return translate_index(index, length=len(self.data))  # TODO
@@ -386,6 +400,8 @@ class LambdaBlock(AbstractBlock):
                 }
                 return [
                     BlockRef(columns={name: col}, block=col._block)
+                    if col.is_blockable()  # may return a non-blockable type
+                    else (name, col)
                     for name, col in outputs.items()
                 ]
             else:
@@ -402,9 +418,10 @@ class LambdaBlock(AbstractBlock):
         return self.data.with_return_index(index)
 
     def _write_data(self, path: str, *args, **kwargs):
-
-        return super()._write_data(path, *args, **kwargs)
+        path = os.path.join(path, "data.op")
+        return self.data.write(path, *args, **kwargs)
 
     @staticmethod
-    def _read_data(path: str, *args, **kwargs) -> object:
-        return super()._read_data(path, *args, **kwargs)
+    def _read_data(path: str, mmap: bool = False, *args, **kwargs) -> object:
+        path = os.path.join(path, "data.op")
+        return LambdaOp.read(path, *args, **kwargs)

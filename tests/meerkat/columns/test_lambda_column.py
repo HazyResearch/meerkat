@@ -10,13 +10,12 @@ from meerkat import (
     LambdaColumn,
     ListColumn,
     NumpyArrayColumn,
-    PandasSeriesColumn,
     TensorColumn,
 )
 from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
-from .abstract import AbstractColumnTestBed, TestAbstractColumn
+from .abstract import AbstractColumnTestBed, column_parametrize
 
 
 class LambdaColumnTestBed(AbstractColumnTestBed):
@@ -99,19 +98,11 @@ class LambdaColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture
+@pytest.fixture(**column_parametrize([LambdaColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
-
-class TestLambdaColumn(TestAbstractColumn):
-    __test__ = True
-    testbed_class: type = LambdaColumnTestBed
-    column_class: type = LambdaColumn
-
-    def test_1(self):
-        print("here")
 
 
 @pytest.mark.parametrize("col_type", [NumpyArrayColumn, TensorColumn, ListColumn])

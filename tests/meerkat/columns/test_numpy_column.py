@@ -11,6 +11,7 @@ from meerkat import NumpyArrayColumn
 from meerkat.block.tensor_block import TensorBlock
 
 from .abstract import AbstractColumnTestBed, column_parametrize
+from ...utils import product_parametrize
 
 
 class NumpyArrayColumnTestBed(AbstractColumnTestBed):
@@ -102,7 +103,7 @@ def test_init_block():
         NumpyArrayColumn(block_view)
 
 
-@NumpyArrayColumnTestBed.parametrize(params={"batched": [True, False]})
+@product_parametrize(params={"batched": [True, False]})
 def test_map_return_single_mmap(tmpdir, testbed: AbstractColumnTestBed, batched: bool):
     col = testbed.col
     map_spec = testbed.get_map_spec(batched=batched)
@@ -126,14 +127,7 @@ def test_map_return_single_mmap(tmpdir, testbed: AbstractColumnTestBed, batched:
     assert result.data.filename == mmap_path
 
 
-# @NumpyArrayColumnTestBed.parametrize(params={"n": [1, 2, 3]})
-# def test_concat(self, testbed: AbstractColumnTestBed, n: int):
-#     return super().test_concat(testbed, n=n)
-
-
-@NumpyArrayColumnTestBed.parametrize(
-    params={"link": [True, False], "mmap": [True, False]}
-)
+@product_parametrize(params={"link": [True, False], "mmap": [True, False]})
 def test_io_mmap(tmp_path, testbed, link, mmap):
     col = testbed.col
 

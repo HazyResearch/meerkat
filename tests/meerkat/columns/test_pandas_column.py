@@ -93,6 +93,7 @@ def testbed(request, tmpdir):
 @PandasSeriesColumnTestBed.parametrize({"dtype": ["str"]})
 def test_str_accessor(testbed):
     col = testbed.col
+    assert col.dtype == object
 
     new_col = col.str.split(".").str[0].astype(int)
     assert isinstance(new_col, PandasSeriesColumn)

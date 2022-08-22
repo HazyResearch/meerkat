@@ -46,7 +46,9 @@ class AbstractColumnTestBed:
     marks: pytest.Mark = None
 
     @classmethod
-    def get_params(cls, config: dict = None, single: bool = False) -> Dict[str, Any]:
+    def get_params(
+        cls, config: dict = None, params: dict = None, single: bool = False
+    ) -> Dict[str, Any]:
         updated_config = cls.DEFAULT_CONFIG.copy()
         if config is not None:
             updated_config.update(config)
@@ -62,18 +64,26 @@ class AbstractColumnTestBed:
         if single:
             configs = configs[:1]
 
-        return {
-            "argnames": "testbed",
-            "argvalues": configs,
-            "ids": [str(config) for config in configs],
-        }
+        if params is None:
+            return {
+                "argnames": "testbed",
+                "argvalues": configs,
+                "ids": [str(config) for config in configs],
+            }
+        else:
+            argvalues = list(product(configs, *params.values()))
+            return {
+                "argnames": "testbed," + ",".join(params.keys()),
+                "argvalues": argvalues,
+                "ids": [",".join(map(str, values)) for values in argvalues],
+            }
 
     @classmethod
     @wraps(pytest.mark.parametrize)
     def parametrize(
         cls,
         config: dict = None,
-        params: dict = None,  # deprecate this
+        params: dict = None,
         single: bool = False,
     ):
 
@@ -90,6 +100,10 @@ class AbstractColumnTestBed:
 
     def get_data(self, index):
         raise NotImplementedError()
+    
+    def get_data_to_set(self, index):
+        # only mutable columns need implement this
+        pass
 
     @staticmethod
     def assert_data_equal(data1: np.ndarray, data2: np.ndarray):

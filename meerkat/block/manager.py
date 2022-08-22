@@ -4,7 +4,7 @@ import os
 import shutil
 from collections import defaultdict
 from collections.abc import MutableMapping
-from typing import Dict, List, Mapping, Sequence, Union
+from typing import Dict, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -69,7 +69,13 @@ class BlockManager(MutableMapping):
             
             if isinstance(result, List):
                 for ref in result:
-                    results.update(ref)
+                    if isinstance(ref, BlockRef):
+                        results.update(ref)
+                    elif isinstance(ref, Tuple): 
+                        name, column = ref
+                        results[name] = column
+                    else:
+                        raise ValueError("Unrecognized.")
             else:    
                 results.update(result)
 
@@ -374,7 +380,7 @@ class BlockManager(MutableMapping):
 
 
 def _serialize_block_index(index: BlockIndex) -> Union[Dict, str, int]:
-    if not isinstance(index, (int, str, slice)):
+    if index is not None and not isinstance(index, (int, str, slice)):
         raise ValueError("Can only serialize `BlockIndex` objects.")
     elif isinstance(index, slice):
         return {"start": index.start, "stop": index.stop, "step": index.step}

@@ -8,7 +8,7 @@ from meerkat import NumpyArrayColumn
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.cell_column import CellColumn
 
-from .abstract import AbstractColumnTestBed, TestAbstractColumn
+from .abstract import AbstractColumnTestBed, column_parametrize
 
 
 class SimpleCell(AbstractCell):
@@ -39,6 +39,7 @@ def add_one(x):
 class CellColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {}
+    marks = pytest.mark.cell_col
 
     def __init__(
         self,
@@ -129,6 +130,13 @@ class CellColumnTestBed(AbstractColumnTestBed):
                 index = np.arange(len(self.cells))[index]
                 return [self.cells[idx] for idx in index]
 
+    def get_data_to_set(self, data_index):
+        data_index = self.col._translate_index(data_index)
+        if isinstance(data_index, int):
+            return SimpleCell(0, add_one)
+
+        return [SimpleCell(idx, add_one) for idx in range(len(data_index))]
+
     @staticmethod
     def assert_data_equal(
         data1: Union[np.number, np.ndarray, List[AbstractCell], AbstractCell],
@@ -141,77 +149,7 @@ class CellColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture
+@pytest.fixture(**column_parametrize([CellColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
-
-
-class TestCellColumn(TestAbstractColumn):
-
-    __test__ = True
-    testbed_class: type = CellColumnTestBed
-    column_class: type = CellColumn
-
-    def _get_data_to_set(self, testbed, data_index):
-        data_index = testbed.col._translate_index(data_index)
-        if isinstance(data_index, int):
-            return SimpleCell(0, add_one)
-
-        return [SimpleCell(idx, add_one) for idx in range(len(data_index))]
-
-    @CellColumnTestBed.parametrize(params={"index_type": [np.array]})
-    def test_set_item(self, testbed, index_type: type):
-        return super().test_set_item(testbed, index_type=index_type)
-
-    @CellColumnTestBed.parametrize(params={"index_type": [np.array]})
-    def test_getitem(self, testbed, index_type: type):
-        return super().test_getitem(testbed, index_type=index_type)
-
-    @CellColumnTestBed.parametrize(config={}, params={"batched": [True, False]})
-    def test_filter_1(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_filter_1(testbed, batched, materialize=True)
-
-    @CellColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_multiple(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_multiple(testbed, batched, materialize=True)
-
-    @CellColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_single(self, testbed: AbstractColumnTestBed, batched: bool):
-        return super().test_map_return_single(testbed, batched, materialize=True)
-
-    @CellColumnTestBed.parametrize(params={"batched": [True, False]})
-    def test_map_return_single_w_kwarg(
-        self, testbed: AbstractColumnTestBed, batched: bool
-    ):
-        return super().test_map_return_single_w_kwarg(
-            testbed, batched, materialize=True
-        )
-
-    @CellColumnTestBed.parametrize(params={"n": [1, 2, 3]})
-    def test_concat(self, testbed: AbstractColumnTestBed, n: int):
-        return super().test_concat(testbed, n=n)
-
-    @CellColumnTestBed.parametrize()
-    def test_copy(self, testbed: AbstractColumnTestBed):
-        return super().test_copy(testbed)
-
-    @CellColumnTestBed.parametrize()
-    def test_io(self, tmp_path, testbed):
-        super().test_io(tmp_path, testbed)
-
-    @CellColumnTestBed.parametrize()
-    def test_pickle(self, testbed):
-        super().test_pickle(testbed)
-
-    @CellColumnTestBed.parametrize()
-    def test_to_pandas(self, testbed):
-        series = testbed.col.to_pandas()
-
-        assert isinstance(series, pd.Series)
-        testbed.assert_data_equal(list(series), testbed.cells)
-
-    @CellColumnTestBed.parametrize()
-    def test_repr_pandas(self, testbed):
-        series = testbed.col.to_pandas()
-        assert isinstance(series, pd.Series)
