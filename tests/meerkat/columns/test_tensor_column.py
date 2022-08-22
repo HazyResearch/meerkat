@@ -67,6 +67,9 @@ class TensorColumnTestBed(AbstractColumnTestBed):
     def get_data(self, index, materialize=True):
         return self.data[index]
 
+    def get_data_to_set(self, data_index):
+        return torch.zeros_like(self.get_data(data_index))
+
     @staticmethod
     def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
         assert (data1 == data2).all()

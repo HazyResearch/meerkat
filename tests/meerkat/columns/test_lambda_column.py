@@ -88,6 +88,9 @@ class LambdaColumnTestBed(AbstractColumnTestBed):
         else:
             raise NotImplementedError()
 
+    def get_data_to_set(self, index):
+        return 0
+
     @staticmethod
     def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
         if isinstance(data1, np.ndarray):

@@ -1,17 +1,20 @@
 from __future__ import annotations
 
+import os
 from copy import copy
 from dataclasses import dataclass
 from multiprocessing.sharedctypes import Value
 from typing import Dict, Hashable, List, Sequence, Tuple, Union
 
+import dill
 import numpy as np
+import yaml
 from cytoolz import merge_with
 
 import meerkat as mk
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.tools.utils import translate_index
+from meerkat.tools.utils import MeerkatLoader, translate_index
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
@@ -103,6 +106,83 @@ class LambdaOp:
             if not self.kwargs[key].is_equal(other.kwargs[key]):
                 return False
         return True
+
+    def write(self, path: str, written_inputs: dict = None):
+        """_summary_
+
+        Args:
+            path (str): _description_
+            written_inputs (dict, optional): _description_. Defaults to None.
+
+        """
+        # Make all the directories to the path
+        os.makedirs(path, exist_ok=True)
+
+        if written_inputs is None:
+            written_inputs = {}
+        state = {
+            "fn": self.fn,
+            "return_index": self.return_index,
+            "return_format": self.return_format,
+            "is_batched_fn": self.is_batched_fn,
+            "batch_size": self.batch_size,
+        }
+        state_path = os.path.join(path, "state.dill")
+        dill.dump(state, open(state_path, "wb"))
+
+        meta = {"args": [], "kwargs": {}}
+
+        args_dir = os.path.join(path, "args")
+        os.makedirs(args_dir, exist_ok=True)
+        for idx, arg in enumerate(self.args):
+            if id(arg) in written_inputs:
+                meta["args"].append(written_inputs[id(arg)])
+            else:
+                col_path = os.path.join(args_dir, f"{idx}.col")
+                arg.write(col_path)
+                meta["args"].append(col_path)
+
+        kwargs_dir = os.path.join(path, "kwargs")
+        os.makedirs(kwargs_dir, exist_ok=True)
+        for key, arg in self.kwargs.items():
+            if id(arg) in written_inputs:
+                meta["kwargs"][key] = written_inputs[id(arg)]
+            else:
+                col_path = os.path.join(kwargs_dir, f"{key}.col")
+                arg.write(col_path)
+                meta["kwargs"][key] = col_path
+
+        # Save the metadata as a yaml file
+        meta_path = os.path.join(path, "meta.yaml")
+        yaml.dump(meta, open(meta_path, "w"))
+
+    @classmethod
+    def read(cls, path, read_inputs: dict = None):
+        if read_inputs is None:
+            read_inputs = {}
+
+        # Assert that the path exists
+        assert os.path.exists(path), f"`path` {path} does not exist."
+
+        meta = dict(
+            yaml.load(
+                open(os.path.join(path, "meta.yaml")),
+                Loader=MeerkatLoader,
+            )
+        )
+
+        args = [
+            read_inputs.get(arg_path, AbstractColumn.read(arg_path))
+            for arg_path in meta["args"]
+        ]
+        kwargs = {
+            key: read_inputs.get(kwarg_path, AbstractColumn.read(kwarg_path))
+            for key, kwarg_path in meta["kwargs"]
+        }
+
+        state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+
+        return cls(args=args, kwargs=kwargs, **state)
 
     def _get(
         self,
@@ -322,6 +402,7 @@ class LambdaBlock(AbstractBlock):
         return self.data.with_return_index(index)
 
     def _write_data(self, path: str, *args, **kwargs):
+
         return super()._write_data(path, *args, **kwargs)
 
     @staticmethod

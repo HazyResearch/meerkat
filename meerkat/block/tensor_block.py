@@ -122,6 +122,21 @@ class TensorBlock(AbstractBlock):
             # to be interpreted as an index
             return torch.as_tensor(index.data)
 
+        if isinstance(index, list):
+            # convert to np.ndarray so that it will be converted to a torch tensor
+            # following rules below
+            index = np.array(index)
+
+        if isinstance(index, pd.Series):
+            # convert to np.ndarray so that it will be converted to a torch tensor
+            index = index.values
+
+        if isinstance(index, np.ndarray) and index.dtype == np.bool_:
+            # needed to silence torch deprecation warning
+            # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
+            # to be interpreted as an index
+            return torch.as_tensor(index)
+
         if isinstance(index, pd.Series):
             return torch.as_tensor(index.values)
 

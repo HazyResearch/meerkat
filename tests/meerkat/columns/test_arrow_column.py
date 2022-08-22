@@ -116,6 +116,11 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
             data = self.data.take(index)
         return data
 
+    def get_data_to_set(self, data_index):
+        if isinstance(data_index, int):
+            return 0
+        return pd.Series(np.zeros(len(self.data)))
+
     @staticmethod
     def assert_data_equal(data1: pa.Array, data2: pa.Array):
         if isinstance(data1, (pa.Array, pa.ChunkedArray)):

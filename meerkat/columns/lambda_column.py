@@ -16,7 +16,7 @@ from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
 from meerkat.display import lambda_cell_formatter
-from meerkat.errors import ConcatWarning
+from meerkat.errors import ConcatWarning, ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
 
 Image = LazyLoader("PIL.Image")
@@ -62,7 +62,7 @@ class LambdaColumn(AbstractColumn):
         self._output_type = output_type
 
     def _set(self, index, value):
-        raise ValueError("Cannot setitem on a `LambdaColumn`.")
+        raise ImmutableError("LambdaColumn is immutable.")
 
     @property
     def fn(self) -> Callable:
@@ -117,14 +117,7 @@ class LambdaColumn(AbstractColumn):
 
     @staticmethod
     def _read_data(path: str):
-        meta = yaml.load(
-            open(os.path.join(path, "data", "meta.yaml")),
-            Loader=yaml.FullLoader,
-        )
-        if issubclass(meta["dtype"], AbstractColumn):
-            return AbstractColumn.read(os.path.join(path, "data"))
-        else:
-            return DataPanel.read(os.path.join(path, "data"))
+        return LambdaOp.read(path=os.path.join(path, "data"))
 
     @staticmethod
     def _get_default_formatter() -> Callable:
