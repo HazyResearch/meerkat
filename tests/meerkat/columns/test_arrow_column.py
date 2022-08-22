@@ -27,6 +27,8 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
         "dtype": ["float", "int", "str"],
     }
 
+    marks = pytest.mark.arrow_col
+
     def __init__(
         self,
         length: int = 16,

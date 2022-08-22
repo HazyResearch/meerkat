@@ -25,8 +25,6 @@ Image = LazyLoader("PIL.Image")
 logger = logging.getLogger(__name__)
 
 
-
-
 class LambdaCell(AbstractCell):
     def __init__(self, data: LambdaCellOp, output_key: Union[None, str, int] = None):
         self._data = data
@@ -66,10 +64,11 @@ class LambdaColumn(AbstractColumn):
     def _set(self, index, value):
         raise ValueError("Cannot setitem on a `LambdaColumn`.")
 
-    def fn(self, data: object):
+    @property
+    def fn(self) -> Callable:
         """Subclasses like `ImageColumn` should be able to implement their own
         version."""
-        raise NotImplementedError
+        return self.data.fn
 
     def _create_cell(self, data: object) -> LambdaCell:
         return LambdaCell(data=data)
@@ -105,7 +104,7 @@ class LambdaColumn(AbstractColumn):
                 )
                 break
 
-        return columns[0]._clone(mk.concat([c._data for c in columns]))
+        return columns[0]._clone(data=LambdaOp.concat([c.data for c in columns]))
 
     def _write_data(self, path):
         # TODO (Sabri): avoid redundant writes in dataframes
@@ -114,9 +113,6 @@ class LambdaColumn(AbstractColumn):
     def is_equal(self, other: AbstractColumn) -> bool:
         if other.__class__ != self.__class__:
             return False
-        if self.fn != other.fn:
-            return False
-
         return self.data.is_equal(other.data)
 
     @staticmethod

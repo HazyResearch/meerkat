@@ -22,6 +22,8 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         "mmap": [True, False],
     }
 
+    marks = pytest.mark.numpy_col
+
     def __init__(
         self,
         length: int = 16,

@@ -17,6 +17,8 @@ class TensorColumnTestBed(AbstractColumnTestBed):
         "dtype": ["float", "int"],
     }
 
+    marks = pytest.mark.tensor_col
+
     def __init__(
         self,
         length: int = 16,

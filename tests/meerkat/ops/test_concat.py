@@ -10,7 +10,8 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
 
-from ...testbeds import MockDatapanel
+from ...testbeds import AbstractColumnTestBed, MockDatapanel
+from ..columns.test_common import column_testbed
 
 
 @pytest.mark.parametrize(
@@ -46,6 +47,16 @@ def test_datapanel_column_concat():
     assert isinstance(out, DataPanel)
     assert set(out.columns) == {"a", "b"}
     assert list(out["a"].data) == out["b"].data
+
+
+def test_concat(column_testbed: AbstractColumnTestBed, n: int = 2):
+    col = column_testbed.col
+    out = concat([col] * n)
+
+    assert len(out) == len(col) * n
+    assert isinstance(out, type(col))
+    for i in range(n):
+        assert out.lz[i * len(col) : (i + 1) * len(col)].is_equal(col)
 
 
 def test_concat_same_columns():

@@ -64,6 +64,46 @@ class LambdaOp:
     return_format: type = None
     return_index: Union[str, int] = None
 
+    @staticmethod
+    def concat(ops: Sequence[LambdaOp]):
+        """Concatenate a sequence of operations."""
+        if len(ops) == 0:
+            raise ValueError("Cannot concatenate empty sequence of LambdaOp.")
+
+        if len(ops) == 1:
+            return ops[0]
+
+        # going to use the `fn` etc. of the first op
+        op = copy(ops[0])
+
+        op.args = [mk.concat([op.args[i] for op in ops]) for i in range(len(op.args))]
+        op.kwargs = {
+            kwarg: mk.concat([op.kwargs[kwarg] for op in ops])
+            for kwarg in op.kwargs.keys()
+        }
+        return op
+
+    def is_equal(self, other: AbstractColumn):
+        if (
+            self.fn != other.fn
+            or self.is_batched_fn != other.is_batched_fn
+            or self.return_format != other.return_format
+            or self.return_index != other.return_index
+        ):
+            return False
+
+        for arg, other_arg in zip(self.args, other.args):
+            if not arg.is_equal(other_arg):
+                return False
+
+        if set(self.kwargs.keys()) != set(other.kwargs.keys()):
+            return False
+
+        for key in self.kwargs:
+            if not self.kwargs[key].is_equal(other.kwargs[key]):
+                return False
+        return True
+
     def _get(
         self,
         index: Union[int, np.ndarray],
@@ -133,7 +173,7 @@ class LambdaOp:
                     for i in range(len(index)):
                         output = self.fn(
                             *[arg[i] for arg in args],
-                            **{kwarg: column[i] for kwarg, column in kwargs.items()}
+                            **{kwarg: column[i] for kwarg, column in kwargs.items()},
                         )
 
                         if self.return_index is not None:
@@ -162,6 +202,8 @@ class LambdaOp:
                     kwargs=kwargs,
                     is_batched_fn=self.is_batched_fn,
                     batch_size=self.batch_size,
+                    return_format=self.return_format,
+                    return_index=self.return_index,
                 )
 
     def __len__(self):
