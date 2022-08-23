@@ -5,25 +5,25 @@ import pandas as pd
 import pytest
 
 from meerkat import (
+    CellColumn,
     LambdaColumn,
     NumpyArrayColumn,
     PandasSeriesColumn,
     TensorColumn,
-    CellColumn,
 )
 from meerkat.errors import ImmutableError
-from .test_audio_column import AudioColumnTestBed
-
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
 from .test_arrow_column import ArrowArrayColumnTestBed
+from .test_audio_column import AudioColumnTestBed
+from .test_cell_column import CellColumnTestBed
+from .test_file_column import FileColumnTestBed
+from .test_image_column import ImageColumnTestBed
 from .test_lambda_column import LambdaColumnTestBed
 from .test_numpy_column import NumpyArrayColumnTestBed
 from .test_pandas_column import PandasSeriesColumnTestBed
 from .test_tensor_column import TensorColumnTestBed
-from .test_image_column import ImageColumnTestBed
-from .test_cell_column import CellColumnTestBed
 
 
 @pytest.fixture(
@@ -35,8 +35,9 @@ from .test_cell_column import CellColumnTestBed
             LambdaColumnTestBed,
             ArrowArrayColumnTestBed,
             CellColumnTestBed,
+            FileColumnTestBed,
             ImageColumnTestBed,
-            AudioColumnTestBed
+            AudioColumnTestBed,
         ]
     )
 )

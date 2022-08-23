@@ -148,7 +148,7 @@ class LambdaOp:
             else:
                 col_path = os.path.join(args_dir, f"{idx}.col")
                 arg.write(col_path)
-                meta["args"].append(col_path)
+                meta["args"].append(os.path.relpath(col_path, path))
 
         kwargs_dir = os.path.join(path, "kwargs")
         os.makedirs(kwargs_dir, exist_ok=True)
@@ -158,7 +158,7 @@ class LambdaOp:
             else:
                 col_path = os.path.join(kwargs_dir, f"{key}.col")
                 arg.write(col_path)
-                meta["kwargs"][key] = col_path
+                meta["kwargs"][key] = os.path.relpath(col_path, path)
 
         # Save the metadata as a yaml file
         meta_path = os.path.join(path, "meta.yaml")
@@ -180,11 +180,13 @@ class LambdaOp:
         )
 
         args = [
-            read_inputs.get(arg_path, AbstractColumn.read(arg_path))
+            read_inputs.get(arg_path, AbstractColumn.read(os.path.join(path, arg_path)))
             for arg_path in meta["args"]
         ]
         kwargs = {
-            key: read_inputs.get(kwarg_path, AbstractColumn.read(kwarg_path))
+            key: read_inputs.get(
+                kwarg_path, AbstractColumn.read(os.path.join(path, kwarg_path))
+            )
             for key, kwarg_path in meta["kwargs"]
         }
 
@@ -344,7 +346,9 @@ class LambdaBlock(AbstractBlock):
 
     @classmethod
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
-        block = LambdaBlock.from_block_data(block_refs[0].block.data.with_return_index(None))
+        block = LambdaBlock.from_block_data(
+            block_refs[0].block.data.with_return_index(None)
+        )
         columns = {
             name: col._clone(data=block[col._block_index])
             for ref in block_refs

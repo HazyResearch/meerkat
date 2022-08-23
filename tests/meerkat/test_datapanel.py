@@ -22,8 +22,8 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.datapanel import DataPanel
-from ..utils import product_parametrize
 
+from ..utils import product_parametrize
 from .columns.test_arrow_column import ArrowArrayColumnTestBed
 from .columns.test_cell_column import CellColumnTestBed
 from .columns.test_image_column import ImageColumnTestBed
@@ -549,9 +549,7 @@ def test_map_return_single_multi_worker(
     )
 
 
-@product_parametrize(
-    params={"batched": [True, False], "materialize": [True, False]}
-)
+@product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
 def test_map_update_new(testbed: DataPanelTestBed, batched: bool, materialize: bool):
     dp = testbed.dp
     map_specs = {
@@ -582,9 +580,7 @@ def test_map_update_new(testbed: DataPanelTestBed, batched: bool, materialize: b
         assert result[f"{key}_new"].is_equal(map_spec["expected_result"])
 
 
-@product_parametrize(
-    params={"batched": [True, False], "materialize": [True, False]}
-)
+@product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
 def test_map_update_existing(
     testbed: DataPanelTestBed, batched: bool, materialize: bool
 ):
@@ -616,9 +612,7 @@ def test_map_update_existing(
         assert result[key].is_equal(map_spec["expected_result"])
 
 
-@product_parametrize(
-    params={"batched": [True, False], "materialize": [True, False]}
-)
+@product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
 def test_filter(testbed: DataPanelTestBed, batched: bool, materialize: bool):
     dp = testbed.dp
     name = list(testbed.column_testbeds.keys())[0]
@@ -684,8 +678,9 @@ def test_io(testbed, tmp_path, move):
 
         if isinstance(new_dp[name], LambdaColumn):
             # the lambda function isn't exactly the same after reading
-            new_dp[name].data.fn = dp[name].fn
-        assert new_dp[name].is_equal(dp[name])
+            new_dp[name].data.fn = dp[name].data.fn
+        if not new_dp[name].is_equal(dp[name]):
+            assert False
 
 
 def test_repr_html_(testbed):
