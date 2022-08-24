@@ -49,14 +49,38 @@ class BlockManager(MutableMapping):
         self._column_to_block_id.update({name: block_id for name in block_ref.keys()})
 
     def topological_block_refs(self):
-        # TODO: fix this to work with chained lambda columns
-        for key, _block_ref in self._block_refs.items():
-            if not isinstance(_block_ref.block, LambdaBlock):
-                yield key, _block_ref
+        """
+        Topological sort of the block refs based on Kahn's algorithm.
+        """
+        children = defaultdict(list)
+        parents = defaultdict(list)
 
-        for key, _block_ref in self._block_refs.items():
-            if isinstance(_block_ref.block, LambdaBlock):
-                yield key, _block_ref
+        for block_id, block_ref in self._block_refs.items():
+            if isinstance(block_ref.block, LambdaBlock):
+
+                for arg in block_ref.block.data.args + list(
+                    block_ref.block.data.kwargs.values()
+                ):
+                    if arg.is_blockable():
+                        children[id(arg._block)].append(block_id)
+
+                        # if the parent is in the block ref, add it to the graph
+                        if (id(arg._block)) in self._block_refs:
+                            parents[block_id].append(id(arg._block))
+
+        current = []  # get a set of all the nodes without an incoming edge
+        for block_id, block_ref in self._block_refs.items():
+            if not parents[block_id] or not isinstance(block_ref.block, LambdaBlock):
+                current.append((block_id, block_ref))
+
+        while current:
+            block_id, block_ref = current.pop(0)
+            yield block_id, block_ref
+
+            for child_id in children[block_id]:
+                parents[child_id].remove(block_id)
+                if not parents[child_id]:
+                    current.append((child_id, self._block_refs[child_id]))
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """ """

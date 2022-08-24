@@ -447,7 +447,6 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     mgr.add_column(base_col, "a")
     lambda_column = base_col.to_lambda(lambda x: x + 2)
     mgr.add_column(lambda_column, "b")
-    mgr.write(os.path.join(tmpdir, "test"))
     second_lambda_column = lambda_column.to_lambda(lambda x: x + 2)
     mgr.add_column(second_lambda_column, "c")
     mgr.write(os.path.join(tmpdir, "test"))
@@ -467,3 +466,61 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     assert not os.listdir(
         os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/kwargs")
     )
+
+
+def test_topological_block_refs():
+    mgr = BlockManager()
+    base_col = mk.NumpyArrayColumn(np.arange(16))
+
+    lambda_columns = []
+    expected_order = [id(base_col._block)]
+    curr_col = base_col
+    for _ in range(10):
+        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        expected_order.append(id(curr_col._block))
+        lambda_columns.append(curr_col)
+
+    # add to manager in reversed order
+    for i, col in enumerate(lambda_columns[::-1]):
+        mgr.add_column(col, f"lambda_{i}")
+    mgr.add_column(base_col, "base")
+
+    sorted_block_refs = list(list(zip(*mgr.topological_block_refs()))[0])
+
+    assert sorted_block_refs == expected_order
+
+
+def test_topological_block_refs_w_gap():
+    mgr = BlockManager()
+    base_col = mk.NumpyArrayColumn(np.arange(16))
+
+    lambda_columns = []
+    curr_col = base_col
+    for _ in range(10):
+        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        lambda_columns.append(curr_col)
+
+    mgr.add_column(lambda_columns[0], f"first")
+    mgr.add_column(lambda_columns[-2], f"second_to_last")
+    mgr.add_column(lambda_columns[-1], f"last")
+    mgr.add_column(base_col, "base")
+
+    expected_order = [
+        id(base_col._block),
+        id(lambda_columns[0]._block),
+        id(lambda_columns[-2]._block),
+        id(lambda_columns[-1]._block),
+    ]
+
+    sorted_block_refs = list(list(zip(*mgr.topological_block_refs()))[0])
+
+    # because there is a gap, we cannot guarantee the global order of the blocks
+    # at some point, we may want to support this, but for the time being we don't
+    # need to support this
+    assert sorted_block_refs.index(id(base_col._block)) < sorted_block_refs.index(
+        id(lambda_columns[0]._block)
+    )
+    assert sorted_block_refs.index(
+        id(lambda_columns[-2]._block)
+    ) < sorted_block_refs.index(id(lambda_columns[-1]._block))
+    assert len(sorted_block_refs) == len(expected_order)
