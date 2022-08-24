@@ -6,8 +6,8 @@ import urllib.request
 from typing import Collection, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlparse
-from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
 
+from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -57,27 +57,16 @@ class FileCell(FileLoaderMixin, LambdaCell):
 
         super().__init__(data=data)
 
-    # @property
-    # def absolute_path(self):
-    #     return (
-    #         os.path.join(self.base_dir, self.data)
-    #         if self.base_dir is not None
-    #         else self.data
-    #     )
+    @property
+    def absolute_path(self):
+        return (
+            os.path.join(self.base_dir, self.data)
+            if self.base_dir is not None
+            else self.data
+        )
 
-    # def __eq__(self, other):
-    #     return (
-    #         (other.__class__ == self.__class__)
-    #         and (self.data == other.data)
-    #         and (self.transform == other.transform)
-    #         and (self.loader == other.loader)
-    #     )
-
-    # def __repr__(self):
-    #     transform = getattr(self.transform, "__qualname__", repr(self.transform))
-    #     dirs = self.data.args[0].split("/")
-    #     short_path = ("" if len(dirs) <= 2 else ".../") + "/".join(dirs[-2:])
-    #     return f"{self.__class__.__name__}.({short_path}, transform={transform})"
+    def __eq__(self, other):
+        return (other.__class__ == self.__class__) and other.data.is_equal(self.data)
 
 
 class FileColumn(FileLoaderMixin, LambdaColumn):
@@ -134,16 +123,9 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
         )
 
         super(FileColumn, self).__init__(data, *args, **kwargs)
-    
+
     def _create_cell(self, data: object) -> LambdaCell:
         return FileCell(data=data)
-    # def _create_cell(self, data: object) -> FileCell:
-    #     return FileCell(
-    #         data=data,
-    #         loader=self.loader,
-    #         transform=self.transform,
-    #         base_dir=self.base_dir,
-    #     )
 
     @classmethod
     def from_filepaths(

@@ -1,11 +1,9 @@
-from meerkat import NumpyArrayColumn, LambdaColumn
-from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
-from meerkat.block.abstract import BlockView
-from meerkat.block.ref import BlockRef
-
-
 import numpy as np
 
+from meerkat import LambdaColumn, NumpyArrayColumn
+from meerkat.block.abstract import BlockView
+from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
+from meerkat.block.ref import BlockRef
 
 from ...utils import product_parametrize
 
@@ -27,7 +25,7 @@ def test_consolidate(num_blocks: int):
         for block_view in block_views
     ]
 
-    block_ref = LambdaBlock.consolidate(
+    block_ref, _ = LambdaBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,
@@ -61,7 +59,7 @@ def test_consolidate_same_index():
         for i, block_view in enumerate(block_views)
     ]
 
-    block_ref = LambdaBlock.consolidate(
+    block_ref, _ = LambdaBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,

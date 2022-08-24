@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Hashable, Mapping, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Hashable, Mapping, Sequence, Tuple, Union
 
 import yaml
 
@@ -14,6 +14,7 @@ BlockIndex = Union[int, slice, str]
 
 if TYPE_CHECKING:
     from meerkat.block.ref import BlockRef
+    from meerkat.columns.abstract import AbstractColumn
 
 
 @dataclass
@@ -51,7 +52,9 @@ class AbstractBlock:
 
     @classmethod
     def consolidate(
-        cls, block_refs: Sequence[BlockRef]
+        cls,
+        block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
     ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
         if len(block_refs) == 0:
             raise ConsolidationError("Must pass at least 1 BlockRef to consolidate.")
@@ -60,8 +63,15 @@ class AbstractBlock:
             raise ConsolidationError(
                 "Can only consolidate blocks with matching signatures."
             )
+        new_block_ref = cls._consolidate(
+            block_refs=block_refs, consolidated_inputs=consolidated_inputs
+        )
 
-        return cls._consolidate(block_refs=block_refs)
+        consolidated_inputs = {}
+        for block_ref in block_refs:
+            for name, col in block_ref.items():
+                consolidated_inputs[id(col)] = new_block_ref[name]
+        return new_block_ref, consolidated_inputs
 
     @classmethod
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:

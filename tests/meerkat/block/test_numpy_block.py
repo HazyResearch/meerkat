@@ -66,7 +66,7 @@ def test_consolidate_1(num_blocks):
     block_refs = [
         BlockRef(block=block, columns=cols) for block, cols in zip(blocks, cols)
     ]
-    block_ref = NumpyBlock.consolidate(block_refs=block_refs)
+    block_ref, _ = NumpyBlock.consolidate(block_refs=block_refs)
     for ref in block_refs:
         block = ref.block
         for name, col in ref.items():

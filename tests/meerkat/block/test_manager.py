@@ -8,6 +8,8 @@ import torch
 import meerkat as mk
 from meerkat.block.manager import BlockManager
 
+from ...utils import product_parametrize
+
 
 def test_consolidate_no_op():
     mgr = BlockManager()
@@ -323,3 +325,27 @@ def test_io_no_overwrite(tmpdir):
         match=f"Cannot write `BlockManager`. {new_dir} is a directory.",
     ):
         mgr.write(new_dir)
+
+
+@product_parametrize(
+    {
+        "column_type": [
+            mk.NumpyArrayColumn,
+            mk.PandasSeriesColumn,
+            mk.ArrowArrayColumn,
+            mk.TensorColumn,
+        ]
+    }
+)
+def test_io_lambda_args(tmpdir, column_type):
+    mgr = BlockManager()
+    base_col = column_type(np.arange(16))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+    mgr.write(os.path.join(tmpdir, "test"))
+    new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
+
+    # ensure that in the loaded dp, the lambda column points to the same
+    # underlying data as the base column
+    assert new_mgr["b"].data.args[0] is new_mgr["a"]

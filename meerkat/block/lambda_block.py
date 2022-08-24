@@ -115,7 +115,7 @@ class LambdaOp:
                 return False
         return True
 
-    def write(self, path: str, written_inputs: dict = None):
+    def write(self, path: str, written_inputs: Dict[int, str] = None):
         """_summary_
 
         Args:
@@ -165,7 +165,7 @@ class LambdaOp:
         yaml.dump(meta, open(meta_path, "w"))
 
     @classmethod
-    def read(cls, path, read_inputs: dict = None):
+    def read(cls, path, read_inputs: Dict[str, AbstractColumn] = None):
         if read_inputs is None:
             read_inputs = {}
 
@@ -178,15 +178,16 @@ class LambdaOp:
                 Loader=MeerkatLoader,
             )
         )
-
         args = [
-            read_inputs.get(arg_path, AbstractColumn.read(os.path.join(path, arg_path)))
+            read_inputs[arg_path]
+            if arg_path in read_inputs
+            else AbstractColumn.read(os.path.join(path, arg_path))
             for arg_path in meta["args"]
         ]
         kwargs = {
-            key: read_inputs.get(
-                kwarg_path, AbstractColumn.read(os.path.join(path, kwarg_path))
-            )
+            key: read_inputs[kwarg_path]
+            if kwarg_path in read_inputs
+            else AbstractColumn.read(os.path.join(path, kwarg_path))
             for key, kwarg_path in meta["kwargs"]
         }
 
@@ -345,15 +346,31 @@ class LambdaBlock(AbstractBlock):
         return cls(data=data)
 
     @classmethod
-    def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
-        block = LambdaBlock.from_block_data(
-            block_refs[0].block.data.with_return_index(None)
-        )
+    def _consolidate(
+        cls,
+        block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, AbstractColumn] = None,
+    ) -> BlockRef:
+        if consolidated_inputs is None:
+            consolidated_inputs = {}
+
+        # if the input column has been consolidated, we need to update the inputs
+        # (i.e. args and kwargs) of the data
+        op = block_refs[0].block.data.with_return_index(None)
+        op.args = [consolidated_inputs.get(id(arg), arg) for arg in op.args]
+        op.kwargs = {
+            kwarg: consolidated_inputs.get(id(column), column)
+            for kwarg, column in op.kwargs.items()
+        }
+
+        block = LambdaBlock.from_block_data(op)
+
         columns = {
             name: col._clone(data=block[col._block_index])
             for ref in block_refs
             for name, col in ref.items()
         }
+
         return BlockRef(block=block, columns=columns)
 
     def _convert_index(self, index):
@@ -421,11 +438,13 @@ class LambdaBlock(AbstractBlock):
     def _get_data(self, index: BlockIndex) -> object:
         return self.data.with_return_index(index)
 
-    def _write_data(self, path: str, *args, **kwargs):
+    def _write_data(self, path: str, written_inputs: Dict[int, str] = None):
         path = os.path.join(path, "data.op")
-        return self.data.write(path, *args, **kwargs)
+        return self.data.write(path, written_inputs=written_inputs)
 
     @staticmethod
-    def _read_data(path: str, mmap: bool = False, *args, **kwargs) -> object:
+    def _read_data(
+        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+    ) -> object:
         path = os.path.join(path, "data.op")
-        return LambdaOp.read(path, *args, **kwargs)
+        return LambdaOp.read(path, read_inputs=read_inputs)

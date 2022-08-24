@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, Sequence, Tuple, Union
+from typing import Dict, Hashable, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.errors import ConsolidationError
 
@@ -74,6 +75,7 @@ class TensorBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
     ) -> BlockRef:
         offset = 0
         new_indices = {}
@@ -112,6 +114,7 @@ class TensorBlock(AbstractBlock):
             name: columns[name]._clone(data=block[block_index])
             for name, block_index in new_indices.items()
         }
+
         return BlockRef(block=block, columns=new_columns)
 
     @staticmethod
@@ -182,5 +185,7 @@ class TensorBlock(AbstractBlock):
         torch.save(self.data, os.path.join(path, "data.pt"))
 
     @staticmethod
-    def _read_data(path: str, mmap: bool = False):
+    def _read_data(
+        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+    ):
         return torch.load(os.path.join(path, "data.pt"))

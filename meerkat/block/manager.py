@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import shutil
+from asyncio import WriteTransport
 from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, List, Mapping, Sequence, Tuple, Union
@@ -15,6 +16,7 @@ from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.tools.utils import MeerkatLoader
 
+from .lambda_block import LambdaBlock
 from .ref import BlockRef
 
 
@@ -46,6 +48,16 @@ class BlockManager(MutableMapping):
 
         self._column_to_block_id.update({name: block_id for name in block_ref.keys()})
 
+    def topological_block_refs(self):
+        # TODO: fix this to work with chained lambda columns
+        for key, _block_ref in self._block_refs.items():
+            if not isinstance(_block_ref.block, LambdaBlock):
+                yield key, _block_ref
+
+        for key, _block_ref in self._block_refs.items():
+            if isinstance(_block_ref.block, LambdaBlock):
+                yield key, _block_ref
+
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """ """
         from ..columns.lambda_column import LambdaColumn
@@ -55,28 +67,28 @@ class BlockManager(MutableMapping):
         lambda_block_refs = []
         for block_ref in self._block_refs.values():
 
-            if isinstance(lambda_block_refs, LambdaBlock):
+            if isinstance(block_ref.block, LambdaBlock):
                 # defer computation of lambda columns, since they may be functions of
                 # the other columns
                 lambda_block_refs.append(block_ref)
-                #continue
+                # continue  # TODO: fix this to work with chained lambda columns
 
             result = block_ref.apply(method_name=method_name, *args, **kwargs)
 
             if results is None:
                 # apply returns one of BlockRef, List[BlockRef], dict
                 results = BlockManager() if isinstance(result, (BlockRef, List)) else {}
-            
+
             if isinstance(result, List):
                 for ref in result:
                     if isinstance(ref, BlockRef):
                         results.update(ref)
-                    elif isinstance(ref, Tuple): 
+                    elif isinstance(ref, Tuple):
                         name, column = ref
                         results[name] = column
                     else:
                         raise ValueError("Unrecognized.")
-            else:    
+            else:
                 results.update(result)
 
         # apply method to columns not stored in block
@@ -108,9 +120,11 @@ class BlockManager(MutableMapping):
         )  # need to maintain order after consolidate
 
         block_ref_groups = defaultdict(list)
-        for block_ref in self._block_refs.values():
+        for _, block_ref in self.topological_block_refs():
             block_ref_groups[block_ref.block.signature].append(block_ref)
 
+        # TODO we need to go through these block_ref groups in topological order
+        consolidated_inputs: Dict[int, AbstractColumn] = {}
         for block_refs in block_ref_groups.values():
             if (not consolidate_unitary_groups) and len(block_refs) == 1:
                 # if there is only one block ref in the group, do not consolidate
@@ -118,7 +132,13 @@ class BlockManager(MutableMapping):
 
             # consolidate group
             block_class = block_refs[0].block.__class__
-            block_ref = block_class.consolidate(block_refs)
+
+            # consolidate needs to return a mapping from old column ids to new column
+            # ids so that we can update dependent lambda columns.
+            block_ref, ci = block_class.consolidate(
+                block_refs, consolidated_inputs=consolidated_inputs
+            )
+            consolidated_inputs.update(ci)
             self.update(block_ref)
 
         self.reorder(column_order)
@@ -264,11 +284,23 @@ class BlockManager(MutableMapping):
         # consolidate before writing
         # we also want to consolidate unitary groups (i.e. groups with only one block
         # ref) so that we don't write any data not actually in the dataframe
-        self.consolidate(consolidate_unitary_groups=True)
-        for block_id, block_ref in self._block_refs.items():
+        # because of this we need to make sure lambda columns know about there
+        # dependencies
+        self.consolidate(consolidate_unitary_groups=True)  # TODO: change this back
+
+        # maintain a dictionary mapping column ids to paths where they are written
+        # so that lambda blocks that depend on those columns can refer to them
+        # appropriately
+        written_inputs: Dict[int, str] = {}
+
+        for block_id, block_ref in self.topological_block_refs():
             block: AbstractBlock = block_ref.block
             block_dir = os.path.join(blocks_dir, str(block_id))
-            block.write(block_dir)
+
+            if isinstance(block, LambdaBlock):
+                block.write(block_dir, written_inputs=written_inputs)
+            else:
+                block.write(block_dir)
 
             for name, column in block_ref.items():
                 column_dir = os.path.join(columns_dir, name)
@@ -285,12 +317,17 @@ class BlockManager(MutableMapping):
                 }
                 column._write_state(column_dir)
 
+                # add the written column to the inputs
+                written_inputs[id(column)] = os.path.relpath(column_dir, path)
+
         # write columns not in a block
         for name, column in self._columns.items():
             if name in meta["columns"]:
                 continue
             meta["columns"][name] = column._get_meta()
             column.write(os.path.join(columns_dir, name))
+
+            # TODO(sabri): move this above and add to written inputs
 
         # Save the metadata as a yaml file
         yaml.dump(meta, open(meta_path, "w"))
@@ -300,7 +337,6 @@ class BlockManager(MutableMapping):
         cls,
         path: str,
         columns: Sequence[str] = None,
-        *args,
         **kwargs,
     ) -> BlockManager:
         """Load a DataPanel stored on disk."""
@@ -309,6 +345,10 @@ class BlockManager(MutableMapping):
         meta = dict(
             yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
         )
+
+        # maintain a dictionary mapping from paths to columns
+        # so that lambda blocks that depend on those columns don't load them again
+        read_inputs: Dict[int, AbstractColumn] = {}
 
         blocks = {}
         mgr = cls()
@@ -325,6 +365,7 @@ class BlockManager(MutableMapping):
                     blocks[block_meta["block_dir"]] = AbstractBlock.read(
                         os.path.join(path, block_meta["block_dir"]),
                         mmap=block_meta.get("mmap", False),
+                        read_inputs=read_inputs,
                     )
                 block = blocks[block_meta["block_dir"]]
 
@@ -336,6 +377,8 @@ class BlockManager(MutableMapping):
                     **kwargs,
                 )
                 mgr.add_column(col, name)
+                read_inputs[os.path.relpath(column_dir, path)] = col
+
             else:
                 mgr.add_column(
                     col_meta["dtype"].read(path=column_dir, _meta=col_meta, **kwargs),

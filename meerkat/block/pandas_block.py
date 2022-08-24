@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, Sequence, Tuple, Union
+from typing import Dict, Hashable, Sequence, Tuple, Union
 
 import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 
@@ -57,6 +58,7 @@ class PandasBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
     ) -> BlockRef:
         df = pd.DataFrame(
             # need to ignore index when concatenating
@@ -125,5 +127,7 @@ class PandasBlock(AbstractBlock):
         self.data.reset_index(drop=True).to_feather(os.path.join(path, "data.feather"))
 
     @staticmethod
-    def _read_data(path: str, mmap: bool = False):
+    def _read_data(
+        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+    ):
         return pd.read_feather(os.path.join(path, "data.feather"))
