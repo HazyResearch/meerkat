@@ -60,20 +60,24 @@ class BlockManager(MutableMapping):
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """ """
-        from ..columns.lambda_column import LambdaColumn
         from .lambda_block import LambdaBlock
 
         results = None
-        lambda_block_refs = []
-        for block_ref in self._block_refs.values():
+        indexed_inputs = {}
+        for _, block_ref in self.topological_block_refs():
 
             if isinstance(block_ref.block, LambdaBlock):
                 # defer computation of lambda columns, since they may be functions of
                 # the other columns
-                lambda_block_refs.append(block_ref)
+                result = block_ref.apply(
+                    method_name=method_name,
+                    indexed_inputs=indexed_inputs,
+                    *args,
+                    **kwargs,
+                )
                 # continue  # TODO: fix this to work with chained lambda columns
-
-            result = block_ref.apply(method_name=method_name, *args, **kwargs)
+            else:
+                result = block_ref.apply(method_name=method_name, *args, **kwargs)
 
             if results is None:
                 # apply returns one of BlockRef, List[BlockRef], dict
@@ -88,16 +92,19 @@ class BlockManager(MutableMapping):
                         results[name] = column
                     else:
                         raise ValueError("Unrecognized.")
-            else:
+            elif isinstance(result, (BlockRef, Dict)):
+                # result is a new block_ref
+                new_block_ref = result
+                for name, col in block_ref.items():
+                    indexed_inputs[id(col)] = new_block_ref[name]
+
                 results.update(result)
+            else:
+                raise ValueError("Unexpected result of type {}".format(type(result)))
 
         # apply method to columns not stored in block
         for name, col in self._columns.items():
-            if (results is not None and name in results) or isinstance(
-                col, LambdaColumn
-            ):
-                # defer computation of lambda columns, since they may be functions of
-                # other columns
+            if results is not None and name in results:
                 continue
 
             result = getattr(col, method_name)(*args, **kwargs)
@@ -106,9 +113,6 @@ class BlockManager(MutableMapping):
                 results = BlockManager() if isinstance(result, AbstractColumn) else {}
 
             results[name] = result
-
-        for block_ref in lambda_block_refs:
-            pass
 
         if isinstance(results, BlockManager):
             results.reorder(self.keys())
@@ -135,11 +139,14 @@ class BlockManager(MutableMapping):
 
             # consolidate needs to return a mapping from old column ids to new column
             # ids so that we can update dependent lambda columns.
-            block_ref, ci = block_class.consolidate(
+            new_block_ref = block_class.consolidate(
                 block_refs, consolidated_inputs=consolidated_inputs
             )
-            consolidated_inputs.update(ci)
-            self.update(block_ref)
+            for block_ref in block_refs:
+                for name, col in block_ref.items():
+                    consolidated_inputs[id(col)] = new_block_ref[name]
+
+            self.update(new_block_ref)
 
         self.reorder(column_order)
 

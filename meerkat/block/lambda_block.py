@@ -198,7 +198,7 @@ class LambdaOp:
     def _get(
         self,
         index: Union[int, np.ndarray],
-        indexed_inputs: dict = None,
+        indexed_inputs: Dict[int, AbstractColumn] = None,
         materialize: bool = True,
     ):
         if indexed_inputs is None:
@@ -214,14 +214,16 @@ class LambdaOp:
         # prepare inputs
         kwargs = {
             # if column has already been indexed
-            kwarg: indexed_inputs.get(
-                id(column), column._get(index, materialize=materialize)
-            )
+            kwarg: indexed_inputs[id(column)]
+            if id(column) in indexed_inputs
+            else column._get(index, materialize=materialize)
             for kwarg, column in self.kwargs.items()
         }
 
         args = [
-            indexed_inputs.get(id(column), column._get(index, materialize=materialize))
+            indexed_inputs[id(column)]
+            if id(column) in indexed_inputs
+            else column._get(index, materialize=materialize)
             for column in self.args
         ]
 

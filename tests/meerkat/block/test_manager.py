@@ -142,6 +142,7 @@ def test_apply_get_multiple(num_blocks, consolidated):
     product([1, 2, 3], [True, False]),
 )
 def test_apply_get_single(num_blocks, consolidated):
+
     mgr = BlockManager()
 
     for dtype in [int, float]:
@@ -153,11 +154,80 @@ def test_apply_get_single(num_blocks, consolidated):
 
     for slc in [0, 8]:
         result_dict = mgr.apply(method_name="_get", index=slc)
-        isinstance(result_dict, dict)
+        assert isinstance(result_dict, dict)
         for dtype in [int, float]:
             for idx in range(num_blocks):
                 # check it's equivalent to applying the slice to each column in turn
                 assert result_dict[f"col{idx}_{dtype}"] == mgr[f"col{idx}_{dtype}"][slc]
+
+
+@pytest.fixture()
+def call_count(monkeypatch):
+    from meerkat import NumpyArrayColumn
+    from meerkat.block.numpy_block import NumpyBlock
+
+    calls = {"count": 0}
+
+    block_get = NumpyBlock._get
+
+    def patched_get(self, *args, **kwargs):
+        nonlocal calls
+        calls["count"] += 1
+        return block_get(self, *args, **kwargs)
+
+    monkeypatch.setattr(NumpyBlock, "_get", patched_get)
+
+    col_get = NumpyArrayColumn._get
+
+    def patched_get_col(self, *args, **kwargs):
+        nonlocal calls
+        calls["count"] += 1
+        return col_get(self, *args, **kwargs)
+
+    monkeypatch.setattr(NumpyArrayColumn, "_get", patched_get_col)
+
+    return calls
+
+
+@product_parametrize({"consolidated": [True, False]})
+def test_apply_get_single_lambda(call_count, consolidated):
+
+    mgr = BlockManager()
+
+    base_col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+
+    if consolidated:
+        mgr.consolidate()
+
+    mgr.apply(method_name="_get", index=1, materialize=False)
+
+    # we should only call NumpyBlock._get once
+    assert call_count["count"] == 1
+
+
+@product_parametrize({"consolidated": [True, False]})
+def test_apply_get_multiple_lambda(call_count, consolidated):
+
+    mgr = BlockManager()
+
+    base_col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+
+    if consolidated:
+        mgr.consolidate()
+
+    new_mgr = mgr.apply(method_name="_get", index=[1, 3, 5], materialize=False)
+
+    # the columns should stil be linked after an index
+    assert new_mgr["b"].data.args[0] is new_mgr["a"]
+
+    # we should only call NumpyBlock._get once
+    assert call_count["count"] == 1
 
 
 @pytest.mark.parametrize(
@@ -349,3 +419,51 @@ def test_io_lambda_args(tmpdir, column_type):
     # ensure that in the loaded dp, the lambda column points to the same
     # underlying data as the base column
     assert new_mgr["b"].data.args[0] is new_mgr["a"]
+
+    # ensure that the the base column was not written twice
+    # check that dir is empty
+    block_id = mgr._column_to_block_id["b"]
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/args")
+    )
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/kwargs")
+    )
+
+
+@product_parametrize(
+    {
+        "column_type": [
+            mk.NumpyArrayColumn,
+            mk.PandasSeriesColumn,
+            mk.ArrowArrayColumn,
+            mk.TensorColumn,
+        ]
+    }
+)
+def test_io_chained_lambda_args(tmpdir, column_type):
+    mgr = BlockManager()
+    base_col = column_type(np.arange(16))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+    mgr.write(os.path.join(tmpdir, "test"))
+    second_lambda_column = lambda_column.to_lambda(lambda x: x + 2)
+    mgr.add_column(second_lambda_column, "c")
+    mgr.write(os.path.join(tmpdir, "test"))
+    new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
+
+    # ensure that in the loaded dp, the lambda column points to the same
+    # underlying data as the base column
+    # TODO: this should work once we get topological sort correct
+    assert new_mgr["c"].data.args[0] is new_mgr["b"]
+
+    # ensure that the the base column was not written twice
+    # check that dir is empty
+    block_id = mgr._column_to_block_id["c"]
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/args")
+    )
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/kwargs")
+    )

@@ -63,15 +63,9 @@ class AbstractBlock:
             raise ConsolidationError(
                 "Can only consolidate blocks with matching signatures."
             )
-        new_block_ref = cls._consolidate(
+        return cls._consolidate(
             block_refs=block_refs, consolidated_inputs=consolidated_inputs
         )
-
-        consolidated_inputs = {}
-        for block_ref in block_refs:
-            for name, col in block_ref.items():
-                consolidated_inputs[id(col)] = new_block_ref[name]
-        return new_block_ref, consolidated_inputs
 
     @classmethod
     def _consolidate(cls, block_refs: Sequence[BlockRef]) -> BlockRef:
