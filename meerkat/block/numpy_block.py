@@ -4,12 +4,13 @@ import os
 import shutil
 from dataclasses import dataclass
 from mmap import mmap
-from typing import Hashable, Sequence, Tuple, Union
+from typing import Dict, Hashable, Sequence, Tuple, Union
 
 import numpy as np
 import torch
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
@@ -75,6 +76,7 @@ class NumpyBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
     ) -> BlockRef:
         offset = 0
         new_indices = {}
@@ -113,6 +115,7 @@ class NumpyBlock(AbstractBlock):
             name: columns[name]._clone(data=block[block_index])
             for name, block_index in new_indices.items()
         }
+
         return BlockRef(block=block, columns=new_columns)
 
     @staticmethod
@@ -158,7 +161,9 @@ class NumpyBlock(AbstractBlock):
             np.save(path, self.data)
 
     @staticmethod
-    def _read_data(path: str, mmap: bool = False):
+    def _read_data(
+        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+    ):
         data_path = os.path.join(path, "data.npy")
 
         if mmap:

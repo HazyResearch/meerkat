@@ -3,10 +3,16 @@ from __future__ import annotations
 import logging
 import os
 import urllib.request
-from typing import Collection, Sequence
+import warnings
+from string import Template
+from typing import Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlparse
 
+import dill
+import yaml
+
+from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
@@ -17,32 +23,78 @@ folder = LazyLoader("torchvision.datasets.folder")
 logger = logging.getLogger(__name__)
 
 
-class FileLoaderMixin:
-    def fn(self, filepath: str):
-        absolute_path = (
-            os.path.join(self.base_dir, filepath)
-            if self.base_dir is not None
-            else filepath
-        )
-        image = self.loader(absolute_path)
+class FileLoader:
+    def __init__(
+        self,
+        transform: callable = None,
+        loader: callable = None,
+        base_dir: str = None,
+    ):
+        self.transform = transform
+        self.loader = loader
+        self.base_dir = base_dir
+
+    def __call__(self, filepath: str):
+        # support invluding environment varaiables in the base_dir so that DataPanels
+        # can be easily moved between machines
+        # we don't use os.expanvars because it doesn't raise an error
+        if self.base_dir is not None:
+
+            # need to convert Path objects to strings for Template to work
+            base_dir = str(self.base_dir)
+
+            try:
+                base_dir = Template(base_dir).substitute(os.environ)
+            except KeyError:
+                raise ValueError(
+                    f'`base_dir="{base_dir}"` contains an undefined environment'
+                    "variable."
+                )
+            filepath = os.path.join(base_dir, filepath)
+
+        image = self.loader(filepath)
 
         if self.transform is not None:
             image = self.transform(image)
         return image
 
+    def __eq__(self, other: FileLoader) -> bool:
+        return (
+            (other.__class__ == self.__class__)
+            and (self.loader == other.loader)
+            and (self.transform == other.transform)
+            and (self.base_dir == other.base_dir)
+        )
 
-class FileCell(FileLoaderMixin, LambdaCell):
-    def __init__(
+    def __hash__(self) -> int:
+        # needs to be hasable for block signature
+        return hash((self.loader, self.transform, self.base_dir))
+
+
+class FileCell(LambdaCell):
+    def from_filepath(
         self,
         transform: callable = None,
         loader: callable = None,
-        data: str = None,
+        path: str = None,
         base_dir: str = None,
     ):
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform
-        self._data = data
+
         self.base_dir = base_dir
+
+        data = LambdaCellOp(
+            fn=self.fn,
+            args=[
+                path,
+            ],
+            kwargs={},
+            is_batched_fn=False,
+            return_index=None,
+        )
+
+        super().__init__(data=data)
 
     @property
     def absolute_path(self):
@@ -53,21 +105,10 @@ class FileCell(FileLoaderMixin, LambdaCell):
         )
 
     def __eq__(self, other):
-        return (
-            (other.__class__ == self.__class__)
-            and (self.data == other.data)
-            and (self.transform == other.transform)
-            and (self.loader == other.loader)
-        )
-
-    def __repr__(self):
-        transform = getattr(self.transform, "__qualname__", repr(self.transform))
-        dirs = self.data.split("/")
-        short_path = ("" if len(dirs) <= 2 else ".../") + "/".join(dirs[-2:])
-        return f"{self.__class__.__name__}.({short_path}, transform={transform})"
+        return (other.__class__ == self.__class__) and other.data.is_equal(self.data)
 
 
-class FileColumn(FileLoaderMixin, LambdaColumn):
+class FileColumn(LambdaColumn):
     """A column where each cell represents an file stored on disk or the web.
     The underlying data is a `PandasSeriesColumn` of strings, where each string
     is the path to a file. The column materializes the files into memory when
@@ -99,27 +140,57 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
     def __init__(
         self,
         data: Sequence[str] = None,
-        transform: callable = None,
         loader: callable = None,
+        transform: callable = None,
         base_dir: str = None,
         *args,
         **kwargs,
     ):
+        fn = FileLoader(
+            transform=transform,
+            loader=self.default_loader if loader is None else loader,
+            base_dir=base_dir,
+        )
 
         if not isinstance(data, PandasSeriesColumn):
             data = PandasSeriesColumn(data)
-        super(FileColumn, self).__init__(data, *args, **kwargs)
-        self.loader = self.default_loader if loader is None else loader
-        self.transform = transform
-        self.base_dir = base_dir
 
-    def _create_cell(self, data: object) -> FileCell:
-        return FileCell(
-            data=data,
-            loader=self.loader,
-            transform=self.transform,
-            base_dir=self.base_dir,
+        data = LambdaOp(
+            args=[data],
+            kwargs={},
+            batch_size=1,
+            fn=fn,
+            is_batched_fn=False,
         )
+
+        super(FileColumn, self).__init__(data, *args, **kwargs)
+
+    @property
+    def loader(self):
+        return self.data.fn.loader
+
+    @loader.setter
+    def loader(self, loader: callable):
+        self.data.fn.loader = loader
+
+    @property
+    def transform(self):
+        return self.data.fn.transform
+
+    @transform.setter
+    def transform(self, transform: callable):
+        self.data.fn.transform = transform
+
+    @property
+    def base_dir(self):
+        return self.data.fn.base_dir
+
+    @base_dir.setter
+    def base_dir(self, base_dir: str):
+        self.data.fn.base_dir = base_dir
+
+    def _create_cell(self, data: object) -> LambdaCell:
+        return FileCell(data=data)
 
     @classmethod
     def from_filepaths(
@@ -128,37 +199,60 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
         loader: callable = None,
         transform: callable = None,
         base_dir: str = None,
-        *args,
-        **kwargs,
     ):
         return cls(
             data=filepaths,
             loader=loader,
             transform=transform,
             base_dir=base_dir,
-            *args,
-            **kwargs,
         )
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
         return folder.default_loader(*args, **kwargs)
 
-    @classmethod
-    def _state_keys(cls) -> Collection:
-        return (super()._state_keys() | {"transform", "loader", "base_dir"}) - {"fn"}
+    @staticmethod
+    def _read_data(path: str):
+        try:
+            return LambdaOp.read(path=os.path.join(path, "data"))
+        except KeyError:
+            # TODO(Sabri): Remove this in a future version, once we no longer need to
+            # support old DataPanels.
+            warnings.warn(
+                "Reading a LambdaColumn stored in a format that will not be"
+                " supported in the future. Please re-write the column to the new"
+                " format.",
+                category=FutureWarning,
+            )
+            meta = yaml.load(
+                open(os.path.join(path, "data", "meta.yaml")),
+                Loader=yaml.FullLoader,
+            )
+            if issubclass(meta["dtype"], AbstractColumn):
+                col = AbstractColumn.read(os.path.join(path, "data"))
+            else:
+                raise ValueError(
+                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                )
 
-    def _set_state(self, state: dict):
-        state["base_dir"] = state.get("base_dir", None)  # backwards compatibility
-        super()._set_state(state)
+            state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+
+            fn = FileLoader(
+                transform=state["transform"],
+                loader=state["loader"],
+                base_dir=state["base_dir"],
+            )
+
+            return LambdaOp(
+                args=[col],
+                kwargs={},
+                fn=fn,
+                is_batched_fn=False,
+                batch_size=1,
+            )
 
     def is_equal(self, other: AbstractColumn) -> bool:
-        return (
-            (other.__class__ == self.__class__)
-            and (self.loader == other.loader)
-            and (self.transform == other.transform)
-            and self.data.is_equal(other.data)
-        )
+        return (other.__class__ == self.__class__) and self.data.is_equal(other.data)
 
 
 def download_image(url: str, cache_dir: str):

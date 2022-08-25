@@ -5,6 +5,7 @@ from typing import List
 
 import meerkat as mk
 
+from ..config import DATASETS_ENV_VARIABLE
 from .info import DatasetInfo
 from .utils import download_url
 
@@ -29,6 +30,9 @@ class DatasetBuilder(ABC):
         if dataset_dir is None:
             self.dataset_dir = os.path.join(
                 mk.config.datasets.root_dir, self.name, self.version
+            )
+            self.var_dataset_dir = os.path.join(
+                f"${DATASETS_ENV_VARIABLE}", self.name, self.version
             )
         else:
             self.dataset_dir = dataset_dir
