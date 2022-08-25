@@ -64,6 +64,26 @@ class LambdaCellOp:
                 return len(col)
         return 0
 
+    def is_equal(self, other: AbstractColumn):
+        if (
+            self.fn != other.fn
+            or self.is_batched_fn != other.is_batched_fn
+            or self.return_index != other.return_index
+        ):
+            return False
+
+        for arg, other_arg in zip(self.args, other.args):
+            if arg != other_arg:
+                return False
+
+        if set(self.kwargs.keys()) != set(other.kwargs.keys()):
+            return False
+
+        for key in self.kwargs:
+            if self.kwargs[key] != other.kwargs[key]:
+                return False
+        return True
+
 
 @dataclass
 class LambdaOp:

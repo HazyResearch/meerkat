@@ -25,7 +25,7 @@ def test_consolidate(num_blocks: int):
         for block_view in block_views
     ]
 
-    block_ref, _ = LambdaBlock.consolidate(
+    block_ref = LambdaBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,
@@ -59,7 +59,7 @@ def test_consolidate_same_index():
         for i, block_view in enumerate(block_views)
     ]
 
-    block_ref, _ = LambdaBlock.consolidate(
+    block_ref = LambdaBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,
