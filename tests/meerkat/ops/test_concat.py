@@ -13,6 +13,9 @@ from meerkat.errors import ConcatError
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
 
+# flake8: noqa: E501
+from ..columns.test_common import column_testbed
+
 
 @pytest.mark.parametrize(
     "use_visible_columns,n",
