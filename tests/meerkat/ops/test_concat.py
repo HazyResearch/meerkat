@@ -9,9 +9,12 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
-from meerkat.ml.prediction_column import ClassificationOutputColumn
 
-from ...testbeds import MockDatapanel
+from ...testbeds import AbstractColumnTestBed, MockDatapanel
+from ...utils import product_parametrize
+
+# flake8: noqa: E501
+from ..columns.test_common import column_testbed
 
 
 @pytest.mark.parametrize(
@@ -47,6 +50,17 @@ def test_datapanel_column_concat():
     assert isinstance(out, DataPanel)
     assert set(out.columns) == {"a", "b"}
     assert list(out["a"].data) == out["b"].data
+
+
+@product_parametrize(params={"n": [1, 2, 3]})
+def test_concat(column_testbed: AbstractColumnTestBed, n: int):
+    col = column_testbed.col
+    out = concat([col] * n)
+
+    assert len(out) == len(col) * n
+    assert isinstance(out, type(col))
+    for i in range(n):
+        assert out.lz[i * len(col) : (i + 1) * len(col)].is_equal(col)
 
 
 def test_concat_same_columns():
@@ -93,12 +107,6 @@ def test_concat_different_lengths():
 
     with pytest.raises(ConcatError):
         concat([a, b], axis="columns")
-
-
-def test_concat_maintains_subclass():
-    col = ClassificationOutputColumn(logits=[0, 1, 0, 1], num_classes=2)
-    out = concat([col, col])
-    assert isinstance(out, ClassificationOutputColumn)
 
 
 def test_empty_concat():

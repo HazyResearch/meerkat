@@ -11,14 +11,47 @@ def download_url(url: str, dataset_dir: str, force: bool = False):
     )
 
 
-def extract(input_path: str, dataset_dir: str):
+def extract(path: str, dst: str, extractor: str = None):
     from datasets.utils.extract import Extractor
     from datasets.utils.filelock import FileLock
 
     # Prevent parallel extractions
-    lock_path = input_path + ".lock"
+    lock_path = path + ".lock"
     with FileLock(lock_path):
-        for extractor in Extractor.extractors.values():
-            if extractor.is_extractable(input_path):
-                return extractor.extract(input_path, dataset_dir)
-        raise ValueError("Extraction method not found for {}".format(input_path))
+        # Support for older versions of datasets that have list of extractors instead
+        # of dict of extractors
+        extractors = (
+            Extractor.extractors
+            if isinstance(Extractor.extractors, list)
+            else Extractor.extractors.values()
+        )
+        if extractor:
+            return extractor.extract(path, dst)
+
+        for extractor in extractors:
+            if extractor.is_extractable(path):
+                return extractor.extract(path, dst)
+        raise ValueError("Extraction method not found for {}".format(path))
+
+
+def download_google_drive(
+    url: str = None, id: str = None, dst: str = None, is_folder: bool = False
+):
+    os.makedirs(dst, exist_ok=True)
+    if (url is None) == (id is None):
+        raise ValueError("Exactly one of url or id must be provided.")
+
+    if dst is None:
+        raise ValueError("dst must be provided.")
+
+    try:
+        import gdown
+    except ImportError:
+        raise ImportError(
+            "Google Drive download requires gdown. Install with `pip install gdown`."
+        )
+
+    if is_folder:
+        gdown.download_folder(url=url, id=id, output=dst)
+    else:
+        gdown.download(url=url, id=id, output=dst)

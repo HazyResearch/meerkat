@@ -8,6 +8,8 @@ import torch
 import meerkat as mk
 from meerkat.block.manager import BlockManager
 
+from ...utils import product_parametrize
+
 
 def test_consolidate_no_op():
     mgr = BlockManager()
@@ -140,6 +142,7 @@ def test_apply_get_multiple(num_blocks, consolidated):
     product([1, 2, 3], [True, False]),
 )
 def test_apply_get_single(num_blocks, consolidated):
+
     mgr = BlockManager()
 
     for dtype in [int, float]:
@@ -151,11 +154,80 @@ def test_apply_get_single(num_blocks, consolidated):
 
     for slc in [0, 8]:
         result_dict = mgr.apply(method_name="_get", index=slc)
-        isinstance(result_dict, dict)
+        assert isinstance(result_dict, dict)
         for dtype in [int, float]:
             for idx in range(num_blocks):
                 # check it's equivalent to applying the slice to each column in turn
                 assert result_dict[f"col{idx}_{dtype}"] == mgr[f"col{idx}_{dtype}"][slc]
+
+
+@pytest.fixture()
+def call_count(monkeypatch):
+    from meerkat import NumpyArrayColumn
+    from meerkat.block.numpy_block import NumpyBlock
+
+    calls = {"count": 0}
+
+    block_get = NumpyBlock._get
+
+    def patched_get(self, *args, **kwargs):
+        nonlocal calls
+        calls["count"] += 1
+        return block_get(self, *args, **kwargs)
+
+    monkeypatch.setattr(NumpyBlock, "_get", patched_get)
+
+    col_get = NumpyArrayColumn._get
+
+    def patched_get_col(self, *args, **kwargs):
+        nonlocal calls
+        calls["count"] += 1
+        return col_get(self, *args, **kwargs)
+
+    monkeypatch.setattr(NumpyArrayColumn, "_get", patched_get_col)
+
+    return calls
+
+
+@product_parametrize({"consolidated": [True, False]})
+def test_apply_get_single_lambda(call_count, consolidated):
+
+    mgr = BlockManager()
+
+    base_col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+
+    if consolidated:
+        mgr.consolidate()
+
+    mgr.apply(method_name="_get", index=1, materialize=False)
+
+    # we should only call NumpyBlock._get once
+    assert call_count["count"] == 1
+
+
+@product_parametrize({"consolidated": [True, False]})
+def test_apply_get_multiple_lambda(call_count, consolidated):
+
+    mgr = BlockManager()
+
+    base_col = mk.NumpyArrayColumn(np.arange(10))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+
+    if consolidated:
+        mgr.consolidate()
+
+    new_mgr = mgr.apply(method_name="_get", index=[1, 3, 5], materialize=False)
+
+    # the columns should stil be linked after an index
+    assert new_mgr["b"].data.args[0] is new_mgr["a"]
+
+    # we should only call NumpyBlock._get once
+    assert call_count["count"] == 1
 
 
 @pytest.mark.parametrize(
@@ -193,10 +265,9 @@ def test_getitem():
     b = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(b, "b")
 
-    # check that manager holds view of original column, but returns a coreference
-    assert mgr["a"] is not a
+    # check that manager holds coreference of original column, but returns a coreference
+    assert mgr["a"] is a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,
@@ -206,9 +277,9 @@ def test_getitem():
 
     out = mgr[["a", "b"]]
     assert isinstance(out, BlockManager)
-    # check that manager holds view of original column, but returns a coreference
+    # check that manager holds reference of original column, and returns a coreference
     assert mgr["a"].data.base is out["a"].data.base
-    assert mgr["a"] is not out["a"]
+    assert mgr["a"] is out["a"]
     assert out["a"] is out["a"]
 
     with pytest.raises(ValueError, match="`BlockManager` does not contain column 'c'."):
@@ -222,10 +293,9 @@ def test_setitem():
     b = mk.NumpyArrayColumn(np.arange(10)) * 2
     mgr["b"] = b
 
-    # check that manager holds view of original column, but returns a coreference
-    assert mgr["a"] is not a
+    # check that manager holds coreference of original column, and returns a coreference
+    assert mgr["a"] is a
     assert mgr["a"] is mgr["a"]
-    assert mgr["a"].data.base is a.data
 
     with pytest.raises(
         ValueError,
@@ -325,3 +395,134 @@ def test_io_no_overwrite(tmpdir):
         match=f"Cannot write `BlockManager`. {new_dir} is a directory.",
     ):
         mgr.write(new_dir)
+
+
+@product_parametrize(
+    {
+        "column_type": [
+            mk.NumpyArrayColumn,
+            mk.PandasSeriesColumn,
+            mk.ArrowArrayColumn,
+            mk.TensorColumn,
+        ],
+        "column_order": [("z", "a"), ("a", "z")],
+    }
+)
+def test_io_lambda_args(tmpdir, column_type, column_order):
+    mgr = BlockManager()
+    base_col_name, col_name = column_order
+    base_col = column_type(np.arange(16))
+    mgr.add_column(base_col, base_col_name)  # want to order backwards
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, col_name)
+    mgr.write(os.path.join(tmpdir, "test"))
+    new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
+
+    # ensure that in the loaded dp, the lambda column points to the same
+    # underlying data as the base column
+    assert new_mgr[col_name].data.args[0] is new_mgr[base_col_name]
+
+    # ensure that the the base column was not written twice
+    # check that dir is empty
+    block_id = mgr._column_to_block_id[col_name]
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/args")
+    )
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/kwargs")
+    )
+
+
+@product_parametrize(
+    {
+        "column_type": [
+            mk.NumpyArrayColumn,
+            mk.PandasSeriesColumn,
+            mk.ArrowArrayColumn,
+            mk.TensorColumn,
+        ]
+    }
+)
+def test_io_chained_lambda_args(tmpdir, column_type):
+    mgr = BlockManager()
+    base_col = column_type(np.arange(16))
+    mgr.add_column(base_col, "a")
+    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    mgr.add_column(lambda_column, "b")
+    second_lambda_column = lambda_column.to_lambda(lambda x: x + 2)
+    mgr.add_column(second_lambda_column, "c")
+    mgr.write(os.path.join(tmpdir, "test"))
+    new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
+
+    # ensure that in the loaded dp, the lambda column points to the same
+    # underlying data as the base column
+    # TODO: this should work once we get topological sort correct
+    assert new_mgr["c"].data.args[0] is new_mgr["b"]
+
+    # ensure that the the base column was not written twice
+    # check that dir is empty
+    block_id = mgr._column_to_block_id["c"]
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/args")
+    )
+    assert not os.listdir(
+        os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/kwargs")
+    )
+
+
+def test_topological_block_refs():
+    mgr = BlockManager()
+    base_col = mk.NumpyArrayColumn(np.arange(16))
+
+    lambda_columns = []
+    expected_order = [id(base_col._block)]
+    curr_col = base_col
+    for _ in range(10):
+        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        expected_order.append(id(curr_col._block))
+        lambda_columns.append(curr_col)
+
+    # add to manager in reversed order
+    for i, col in enumerate(lambda_columns[::-1]):
+        mgr.add_column(col, f"lambda_{i}")
+    mgr.add_column(base_col, "base")
+
+    sorted_block_refs = list(list(zip(*mgr.topological_block_refs()))[0])
+
+    assert sorted_block_refs == expected_order
+
+
+def test_topological_block_refs_w_gap():
+    mgr = BlockManager()
+    base_col = mk.NumpyArrayColumn(np.arange(16))
+
+    lambda_columns = []
+    curr_col = base_col
+    for _ in range(10):
+        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        lambda_columns.append(curr_col)
+
+    mgr.add_column(lambda_columns[0], "first")
+    mgr.add_column(lambda_columns[-2], "second_to_last")
+    mgr.add_column(lambda_columns[-1], "last")
+    mgr.add_column(base_col, "base")
+
+    expected_order = [
+        id(base_col._block),
+        id(lambda_columns[0]._block),
+        id(lambda_columns[-2]._block),
+        id(lambda_columns[-1]._block),
+    ]
+
+    sorted_block_refs = list(list(zip(*mgr.topological_block_refs()))[0])
+
+    # because there is a gap, we cannot guarantee the global order of the blocks
+    # at some point, we may want to support this, but for the time being we don't
+    # need to support this
+    assert sorted_block_refs.index(id(base_col._block)) < sorted_block_refs.index(
+        id(lambda_columns[0]._block)
+    )
+    assert sorted_block_refs.index(
+        id(lambda_columns[-2]._block)
+    ) < sorted_block_refs.index(id(lambda_columns[-1]._block))
+    assert len(sorted_block_refs) == len(expected_order)

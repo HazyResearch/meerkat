@@ -30,7 +30,6 @@ class MappableMixin:
         flush_size: int = None,
         **kwargs,
     ):
-        # TODO (sabri): add materialize?
         from meerkat.columns.abstract import AbstractColumn
         from meerkat.datapanel import DataPanel
 

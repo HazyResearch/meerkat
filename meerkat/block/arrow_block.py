@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Hashable, List, Sequence, Union
+from typing import Dict, Hashable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ import pyarrow as pa
 import torch
 
 from meerkat.block.ref import BlockRef
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 
@@ -51,6 +52,7 @@ class ArrowBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
+        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
     ) -> BlockRef:
         table = pa.Table.from_pydict(
             # need to ignore index when concatenating
@@ -70,6 +72,7 @@ class ArrowBlock(AbstractBlock):
         new_columns = {
             name: col._clone(data=block[name]) for name, col in columns.items()
         }
+
         return BlockRef(block=block, columns=new_columns)
 
     @staticmethod
@@ -153,5 +156,7 @@ class ArrowBlock(AbstractBlock):
         self._write_table(os.path.join(path, "data.arrow"), self.data)
 
     @staticmethod
-    def _read_data(path: str, mmap: bool = False):
+    def _read_data(
+        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+    ):
         return ArrowBlock._read_table(os.path.join(path, "data.arrow"), mmap=mmap)

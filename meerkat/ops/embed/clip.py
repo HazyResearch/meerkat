@@ -33,9 +33,8 @@ def clip(
         from clip import load, tokenize
     except ImportError:
         raise ImportError(
-            "To embed with CLIP run pip install git+https://github.com/openai/CLIP.git"
-            "and install domino with the `clip` submodule. For example, "
-            "`pip install domino[clip]`"
+            "To embed with CLIP you must install the. "
+            "Run `pip install ftfy regex git+https://github.com/openai/CLIP.git`."
         )
 
     model, preprocess = load(variant, device=device)

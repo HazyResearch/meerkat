@@ -79,9 +79,9 @@ def test_custom_fn():
 
     custom_op = dp3.node.last_parent[0]
     # test that dp2, which was passed in to `custom_fn`, is not in children
+    # also that the columns, which are unchanged, are nto in children
     assert custom_op.children == [
         (dp3.node, (0, "dp")),
-        *[(dp3[key].node, (0, "dp", key)) for key in dp3.keys()],
     ]
 
     custom_op.captured_args["x"] == "abc"

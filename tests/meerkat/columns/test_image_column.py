@@ -14,6 +14,7 @@ from torchvision.transforms.functional import to_tensor
 
 import meerkat
 from meerkat import ImageColumn
+from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.file_column import FileCell
 from meerkat.columns.lambda_column import LambdaCell
@@ -21,7 +22,8 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 
-from .abstract import AbstractColumnTestBed, TestAbstractColumn
+from ...utils import product_parametrize
+from .abstract import AbstractColumnTestBed, column_parametrize
 
 
 class ImageColumnTestBed(AbstractColumnTestBed):
@@ -30,6 +32,8 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         "transform": [True, False],
         "use_base_dir": [True, False],
     }
+
+    marks = pytest.mark.image_col
 
     def __init__(
         self,
@@ -183,13 +187,20 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         else:
             if isinstance(index, int):
                 return FileCell(
-                    data=self.image_paths[index],
-                    loader=self.col.loader,
-                    transform=self.col.transform,
-                    base_dir=self.base_dir,
+                    LambdaCellOp(
+                        args=[self.image_paths[index]],
+                        kwargs={},
+                        fn=self.col.fn,
+                        is_batched_fn=False,
+                        return_index=None,
+                    )
                 )
+
             index = np.arange(len(self.data))[index]
-            return PandasSeriesColumn([self.image_paths[idx] for idx in index])
+            col = PandasSeriesColumn([self.image_paths[idx] for idx in index])
+            return LambdaOp(
+                args=[col], kwargs={}, fn=self.col.fn, is_batched_fn=False, batch_size=1
+            )
 
     @staticmethod
     def assert_data_equal(
@@ -204,6 +215,8 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             assert (data1 == data2).all()
         elif isinstance(data1, LambdaCell):
             assert data1 == data2
+        elif isinstance(data1, LambdaOp):
+            assert data1.is_equal(data2)
         else:
             raise ValueError(
                 "Cannot assert data equal between objects type:"
@@ -211,97 +224,15 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             )
 
 
-@pytest.fixture
+@pytest.fixture(**column_parametrize([ImageColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-class TestImageColumn(TestAbstractColumn):
-
-    __test__ = True
-    testbed_class: type = ImageColumnTestBed
-    column_class: type = ImageColumn
-
-    def _get_data_to_set(self, testbed, data_index):
-        return np.zeros_like(testbed.get_data(data_index))
-
-    @ImageColumnTestBed.parametrize(single=True, params={"index_type": [np.ndarray]})
-    def test_set_item(self, testbed, index_type: type):
-        with pytest.raises(ValueError, match="Cannot setitem on a `LambdaColumn`."):
-            testbed.col[0] = 0
-
-    @ImageColumnTestBed.parametrize(params={"index_type": [np.array]})
-    def test_getitem(self, testbed, index_type: type):
-        return super().test_getitem(testbed, index_type=index_type)
-
-    @ImageColumnTestBed.parametrize(
-        config={"transform": [True]},
-        params={"batched": [True, False], "materialize": [True, False]},
-    )
-    def test_filter_1(
-        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
-    ):
-        return super().test_filter_1(testbed, batched, materialize=materialize)
-
-    @ImageColumnTestBed.parametrize(
-        params={"batched": [True, False], "materialize": [True, False]}
-    )
-    def test_map_return_multiple(
-        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
-    ):
-        return super().test_map_return_multiple(
-            testbed, batched, materialize=materialize
-        )
-
-    @ImageColumnTestBed.parametrize(
-        params={"batched": [True, False], "materialize": [True, False]}
-    )
-    def test_map_return_single(
-        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
-    ):
-        return super().test_map_return_single(testbed, batched, materialize)
-
-    @ImageColumnTestBed.parametrize(
-        params={"batched": [True, False], "materialize": [True, False]}
-    )
-    def test_map_return_single_w_kwarg(
-        self, testbed: AbstractColumnTestBed, batched: bool, materialize: bool
-    ):
-        return super().test_map_return_single_w_kwarg(testbed, batched, materialize)
-
-    @ImageColumnTestBed.parametrize(params={"n": [1, 2, 3]})
-    def test_concat(self, testbed: AbstractColumnTestBed, n: int):
-        return super().test_concat(testbed, n=n)
-
-    @ImageColumnTestBed.parametrize()
-    def test_copy(self, testbed: AbstractColumnTestBed):
-        return super().test_copy(testbed)
-
-    @ImageColumnTestBed.parametrize()
-    def test_io(self, tmp_path, testbed):
-        # uses the tmp_path fixture which will provide a
-        # temporary directory unique to the test invocation,
-        # important for dataloader
-        col, _ = testbed.col, testbed.data
-
-        path = os.path.join(tmp_path, "test")
-        col.write(path)
-
-        new_col = self.column_class.read(path)
-
-        assert isinstance(new_col, self.column_class)
-        # can't check if the functions are the same since they point to different
-        # methods
-        assert col.data.is_equal(new_col.data)
-
-    @ImageColumnTestBed.parametrize()
-    def test_pickle(self, testbed):
-        super().test_pickle(testbed)
-
-    @ImageColumnTestBed.parametrize(params={"max_rows": [6, 16, 20]})
-    def test_repr_pandas(self, testbed, max_rows):
-        meerkat.config.display.max_rows = max_rows
-        series, _ = testbed.col._repr_pandas_()
-        assert isinstance(series, pd.Series)
-        assert len(series) == min(len(series), max_rows + 1)
+@product_parametrize(params={"max_rows": [6, 16, 20]})
+def test_repr_pandas(testbed, max_rows):
+    meerkat.config.display.max_rows = max_rows
+    series, _ = testbed.col._repr_pandas_()
+    assert isinstance(series, pd.Series)
+    assert len(series) == min(len(series), max_rows + 1)

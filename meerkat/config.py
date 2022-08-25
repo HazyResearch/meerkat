@@ -7,6 +7,7 @@ from pathlib import Path
 import yaml
 
 CONFIG_ENV_VARIABLE = "MEERKAT_CONFIG"
+DATASETS_ENV_VARIABLE = "MEERKAT_DATASETS"
 
 
 @dataclass
@@ -27,10 +28,13 @@ class MeerkatConfig:
                 yaml.dump({"display": {}, "datasets": {}}, open(path, "w"))
         config = yaml.load(open(path, "r"), Loader=yaml.FullLoader)
 
-        return cls(
+        config = cls(
             display=DisplayConfig(**config.get("display", {})),
             datasets=DatasetsConfig(**config.get("datasets", {})),
         )
+        os.environ[DATASETS_ENV_VARIABLE] = config.datasets.root_dir
+
+        return config
 
 
 @dataclass
@@ -46,7 +50,16 @@ class DisplayConfig:
 
 @dataclass
 class DatasetsConfig:
-    root_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+    _root_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+
+    @property
+    def root_dir(self):
+        return self._root_dir
+
+    @root_dir.setter
+    def root_dir(self, value):
+        os.environ[DATASETS_ENV_VARIABLE] = value
+        self._root_dir = value
 
 
 config = MeerkatConfig.from_yaml()

@@ -5,6 +5,8 @@ from functools import reduce
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
 import numpy as np
+import pandas as pd
+import torch
 import yaml
 from yaml.constructor import ConstructorError
 
@@ -195,3 +197,48 @@ def convert_to_python(obj: Any):
         obj = obj.item()
 
     return obj
+
+
+def translate_index(index, length: int):
+    def _is_batch_index(index):
+        # np.ndarray indexed with a tuple of length 1 does not return an np.ndarray
+        # so we match this behavior
+        return not (
+            isinstance(index, int) or (isinstance(index, tuple) and len(index) == 1)
+        )
+
+    # `index` should return a single element
+    if not _is_batch_index(index):
+        return index
+
+    from ..columns.abstract import AbstractColumn
+
+    if isinstance(index, pd.Series):
+        index = index.values
+
+    if torch.is_tensor(index):
+        index = index.numpy()
+
+    if isinstance(index, tuple) or isinstance(index, list):
+        index = np.array(index)
+
+    # `index` should return a batch
+    if isinstance(index, slice):
+        # int or slice index => standard list slicing
+        indices = np.arange(*index.indices(length))
+
+    elif isinstance(index, np.ndarray):
+        if len(index.shape) != 1:
+            raise TypeError(
+                "`np.ndarray` index must have 1 axis, not {}".format(len(index.shape))
+            )
+        if index.dtype == bool:
+            indices = np.where(index)[0]
+        else:
+            return index
+    elif isinstance(index, AbstractColumn):
+        # TODO (sabri): get rid of the np.arange here, very slow for large columns
+        indices = np.arange(length)[index]
+    else:
+        raise TypeError("Object of type {} is not a valid index".format(type(index)))
+    return indices
