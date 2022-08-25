@@ -6,6 +6,7 @@ import warnings
 from dataclasses import dataclass
 from typing import Callable, Collection, Mapping, Sequence, Union
 
+import dill
 import numpy as np
 import yaml
 
@@ -117,7 +118,36 @@ class LambdaColumn(AbstractColumn):
 
     @staticmethod
     def _read_data(path: str):
-        return LambdaOp.read(path=os.path.join(path, "data"))
+        try:
+            return LambdaOp.read(path=os.path.join(path, "data"))
+        except KeyError:
+            # TODO
+            meta = yaml.load(
+                open(os.path.join(path, "data", "meta.yaml")),
+                Loader=yaml.FullLoader,
+            )
+            if issubclass(meta["dtype"], AbstractColumn):
+                col = AbstractColumn.read(os.path.join(path, "data"))
+            else:
+                raise ValueError(
+                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                )
+
+            return LambdaOp(
+                args=[col],
+                kwargs={},
+                fn=None,
+                is_batched_fn=False,
+                batch_size=1,
+            )
+
+    def _set_data(self, data):
+        super()._set_data(data)
+
+        # TODO(Sabri): remove this eventually, currently needed for backwards
+        # compatibility with old lambda columns
+        if self._data.fn is None:
+            self._data.fn = self.fn
 
     @staticmethod
     def _get_default_formatter() -> Callable:

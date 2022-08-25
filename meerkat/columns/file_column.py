@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import logging
 import os
 import urllib.request
@@ -153,6 +154,12 @@ class FileColumn(FileLoaderMixin, LambdaColumn):
     def _set_state(self, state: dict):
         state["base_dir"] = state.get("base_dir", None)  # backwards compatibility
         super()._set_state(state)
+
+    def _set_data(self, data: LambdaOp):
+        super()._set_data(data)
+        # this is needed to ensure that the lambda column is using it's own `fn`
+        # and not the one from the written DataPanel.
+        self.data.fn = self.fn
 
     def is_equal(self, other: AbstractColumn) -> bool:
         return (

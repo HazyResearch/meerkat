@@ -361,7 +361,9 @@ class BlockManager(MutableMapping):
             # TODO(sabri): move this above and add to written inputs
 
         # Save the metadata as a yaml file
-        yaml.dump(meta, open(meta_path, "w"))
+        # sort_keys=Flase is required so that the columns are written in topological
+        # order
+        yaml.dump(meta, open(meta_path, "w"), sort_keys=False)
 
     @classmethod
     def read(

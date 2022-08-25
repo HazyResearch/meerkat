@@ -404,25 +404,27 @@ def test_io_no_overwrite(tmpdir):
             mk.PandasSeriesColumn,
             mk.ArrowArrayColumn,
             mk.TensorColumn,
-        ]
+        ],
+        "column_order": [("z", "a"), ("a", "z")],
     }
 )
-def test_io_lambda_args(tmpdir, column_type):
+def test_io_lambda_args(tmpdir, column_type, column_order):
     mgr = BlockManager()
+    base_col_name, col_name = column_order
     base_col = column_type(np.arange(16))
-    mgr.add_column(base_col, "a")
+    mgr.add_column(base_col, base_col_name)  # want to order backwards
     lambda_column = base_col.to_lambda(lambda x: x + 2)
-    mgr.add_column(lambda_column, "b")
+    mgr.add_column(lambda_column, col_name)
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
 
     # ensure that in the loaded dp, the lambda column points to the same
     # underlying data as the base column
-    assert new_mgr["b"].data.args[0] is new_mgr["a"]
+    assert new_mgr[col_name].data.args[0] is new_mgr[base_col_name]
 
     # ensure that the the base column was not written twice
     # check that dir is empty
-    block_id = mgr._column_to_block_id["b"]
+    block_id = mgr._column_to_block_id[col_name]
     assert not os.listdir(
         os.path.join(tmpdir, "test", f"blocks/{block_id}", "data.op/args")
     )
