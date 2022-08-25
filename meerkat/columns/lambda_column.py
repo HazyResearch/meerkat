@@ -3,19 +3,16 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from dataclasses import dataclass
-from typing import Callable, Collection, Mapping, Sequence, Union
+from typing import Callable, Collection, Sequence, Union
 
 import dill
 import numpy as np
 import yaml
 
-import meerkat as mk
 from meerkat.block.abstract import BlockView
 from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.datapanel import DataPanel
 from meerkat.display import lambda_cell_formatter
 from meerkat.errors import ConcatWarning, ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
@@ -121,7 +118,13 @@ class LambdaColumn(AbstractColumn):
         try:
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
-            # TODO
+            # TODO(Sabri): Remove this in a future version, once we no longer need to
+            # support old DataPanels.
+            warnings.warn(
+                "Reading a LambdaColumn stored in a format that will soon be"
+                " deprecated. Please re-write the column to the new format."
+            )
+            print("here")
             meta = yaml.load(
                 open(os.path.join(path, "data", "meta.yaml")),
                 Loader=yaml.FullLoader,
@@ -133,21 +136,15 @@ class LambdaColumn(AbstractColumn):
                     "Support for LambdaColumns based on a DataPanel is deprecated."
                 )
 
+            state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+
             return LambdaOp(
                 args=[col],
                 kwargs={},
-                fn=None,
+                fn=state["fn"],
                 is_batched_fn=False,
                 batch_size=1,
             )
-
-    def _set_data(self, data):
-        super()._set_data(data)
-
-        # TODO(Sabri): remove this eventually, currently needed for backwards
-        # compatibility with old lambda columns
-        if self._data.fn is None:
-            self._data.fn = self.fn
 
     @staticmethod
     def _get_default_formatter() -> Callable:

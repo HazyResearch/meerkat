@@ -10,8 +10,8 @@ from numpy.lib.format import open_memmap
 from meerkat import NumpyArrayColumn
 from meerkat.block.tensor_block import TensorBlock
 
-from .abstract import AbstractColumnTestBed, column_parametrize
 from ...utils import product_parametrize
+from .abstract import AbstractColumnTestBed, column_parametrize
 
 
 class NumpyArrayColumnTestBed(AbstractColumnTestBed):

@@ -21,8 +21,8 @@ from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
-from ...utils import product_parametrize
 
+from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
 
 

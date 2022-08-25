@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import shutil
-from asyncio import WriteTransport
 from collections import defaultdict
 from collections.abc import MutableMapping
 from typing import Dict, List, Mapping, Sequence, Tuple, Union
@@ -49,9 +48,7 @@ class BlockManager(MutableMapping):
         self._column_to_block_id.update({name: block_id for name in block_ref.keys()})
 
     def topological_block_refs(self):
-        """
-        Topological sort of the block refs based on Kahn's algorithm.
-        """
+        """Topological sort of the block refs based on Kahn's algorithm."""
         children = defaultdict(list)
         parents = defaultdict(list)
 
@@ -83,7 +80,7 @@ class BlockManager(MutableMapping):
                     current.append((child_id, self._block_refs[child_id]))
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
-        """ """
+        """"""
         from .lambda_block import LambdaBlock
 
         results = None

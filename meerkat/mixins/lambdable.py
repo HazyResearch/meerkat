@@ -1,14 +1,14 @@
 import logging
-from multiprocessing.sharedctypes import Value
 from typing import TYPE_CHECKING, Callable, Mapping, Sequence, Union
+
 from pandas.util._decorators import doc
 
 from meerkat.block.abstract import BlockView
 
 if TYPE_CHECKING:
+    from meerkat.columns.abstract import AbstractColumn
     from meerkat.columns.lambda_column import LambdaColumn
     from meerkat.datapanel import DataPanel
-    from meerkat.columns.abstract import AbstractColumn
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,8 @@ def to_lambda(
             :class:`LambdaColumn`s is returned. , This is useful when the output of
             ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
             ``function`` to column names in the resulting :class:`DataPanel`.
-        output_type (Union[Dict[str, type], type], optional): _description_. Defaults to None.
+        output_type (Union[Dict[str, type], type], optional): _description_. Defaults
+            to None.
 
     Raises:
         ValueError: _description_

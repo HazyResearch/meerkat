@@ -2,16 +2,10 @@
 from typing import Type
 
 import numpy as np
-import pandas as pd
 import pytest
 
 import meerkat as mk
-from meerkat import (
-    LambdaColumn,
-    ListColumn,
-    NumpyArrayColumn,
-    TensorColumn,
-)
+from meerkat import LambdaColumn, ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.errors import ConcatWarning
 
 from ...testbeds import MockColumn, MockDatapanel
@@ -102,7 +96,6 @@ class LambdaColumnTestBed(AbstractColumnTestBed):
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
-
 
 
 @pytest.mark.parametrize("col_type", [NumpyArrayColumn, TensorColumn, ListColumn])

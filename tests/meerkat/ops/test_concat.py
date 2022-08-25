@@ -9,10 +9,9 @@ from meerkat.columns.list_column import ListColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.errors import ConcatError
-from ...utils import product_parametrize
 
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
-from ..columns.test_common import column_testbed
+from ...utils import product_parametrize
 
 
 @pytest.mark.parametrize(

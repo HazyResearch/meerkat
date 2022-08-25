@@ -8,13 +8,10 @@ import pytest
 from PIL import Image
 
 from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.file_column import Downloader, FileCell, FileColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
-
-from ...utils import product_parametrize
 
 
 def load_json(path):

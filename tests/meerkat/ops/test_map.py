@@ -1,17 +1,17 @@
 import pytest
-from meerkat import (
-    LambdaColumn,
-)
+
+from meerkat import LambdaColumn
+from meerkat.datapanel import DataPanel
+
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
 from ..columns.test_arrow_column import ArrowArrayColumnTestBed
+from ..columns.test_cell_column import CellColumnTestBed
+from ..columns.test_image_column import ImageColumnTestBed
 from ..columns.test_lambda_column import LambdaColumnTestBed
 from ..columns.test_numpy_column import NumpyArrayColumnTestBed
 from ..columns.test_pandas_column import PandasSeriesColumnTestBed
 from ..columns.test_tensor_column import TensorColumnTestBed
-from ..columns.test_image_column import ImageColumnTestBed
-from ..columns.test_cell_column import CellColumnTestBed
-from meerkat.datapanel import DataPanel
 
 
 @pytest.fixture(

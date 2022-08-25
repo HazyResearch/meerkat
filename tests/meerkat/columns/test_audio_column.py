@@ -21,8 +21,10 @@ from .abstract import AbstractColumnTestBed
 def simple_transform(audio):
     return 2 * audio
 
+
 def loader(filepath):
     return torchaudio.load(filepath)[0]
+
 
 class AudioColumnTestBed(AbstractColumnTestBed):
 

@@ -502,9 +502,9 @@ def test_topological_block_refs_w_gap():
         curr_col = curr_col.to_lambda(lambda x: x + 2)
         lambda_columns.append(curr_col)
 
-    mgr.add_column(lambda_columns[0], f"first")
-    mgr.add_column(lambda_columns[-2], f"second_to_last")
-    mgr.add_column(lambda_columns[-1], f"last")
+    mgr.add_column(lambda_columns[0], "first")
+    mgr.add_column(lambda_columns[-2], "second_to_last")
+    mgr.add_column(lambda_columns[-1], "last")
     mgr.add_column(base_col, "base")
 
     expected_order = [

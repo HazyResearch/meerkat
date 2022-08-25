@@ -1,8 +1,7 @@
 import numpy as np
 
 from meerkat import LambdaColumn, NumpyArrayColumn
-from meerkat.block.abstract import BlockView
-from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
+from meerkat.block.lambda_block import LambdaBlock, LambdaOp
 from meerkat.block.ref import BlockRef
 
 from ...utils import product_parametrize
