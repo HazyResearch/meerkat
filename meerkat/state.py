@@ -114,6 +114,8 @@ class Identifiables:
     aggregations: WeakMapping = field(default_factory=WeakMapping)
     boxes: WeakMapping = field(default_factory=WeakMapping)
     box_operations: WeakMapping = field(default_factory=WeakMapping)
+    components:  WeakMapping = field(default_factory=WeakMapping)
+    boxes:  WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)

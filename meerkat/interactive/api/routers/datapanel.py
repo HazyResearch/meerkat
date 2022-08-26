@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.state import state
+from meerkat.interactive.gui import trigger
 
 from ....tools.utils import convert_to_python
 
@@ -152,9 +153,9 @@ def match(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    response = pivot.trigger(scope=match_columns)
-    return response 
-    return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
+    modifications = trigger(pivot)
+    return modifications 
+    # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
 
 
 

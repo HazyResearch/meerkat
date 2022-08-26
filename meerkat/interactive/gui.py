@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List, Union, Any
 
 from IPython.display import IFrame
 from pydantic import BaseModel
@@ -116,70 +116,198 @@ class Aggregation(IdentifiableMixin):
         return self.func(dp)
 
 
-class Box:
-    pass 
-
-class Pivot(Box):
-    pass 
-
-    def prepare_config(self):
-        pass
-
-
-class Derived(Box):
-    pass 
-class Store:
-    pass
-
-    def prepare_config(self):
-        pass
-
 class Component: 
     pass 
 
     def prepare_config(self):
         pass
 
-class StoreConfig(BaseModel):
+
+class Box(IdentifiableMixin):
+    identifiable_group: str = "boxes"
+
+class Operation:
     pass
+
+class Modification(BaseModel):
+    box_id: int
+    scope: List[str]
+
+
+class Store(Box):
+    def __init__(self, value: Any):
+        super().__init__()
+        self.value = value
+
+    @property
+    def config(self):
+        return StoreConfig(
+            store_id=self.id,
+            value=self.value,
+        )
+
+class Pivot(Box):
+    
+    def __init__(self, obj):
+        super().__init__()
+        self.obj = obj
+
+    @property
+    def config(self):
+        return PivotConfig(
+            pivot_id=self.id,
+            type="DataPanel"
+        )
+
+class Derived(Box):
+    pass 
+
+# @dataclass 
+# class Operation:
+#     fn: Callable
+#     kwargs: Dict 
+
+#     def __call__(self):
+#         # deref the kwargs (check which things are Box)
+#         #_apply fn 
+#         pass 
+
+
+def trigger(pivots: Union[Pivot, List[Pivot]]) ->  List[Modification]:
+    
+    
+    ops_to_exec, modifications = topological(pivots)
+    
+    for op in ops_to_exec:
+        op()
+    
+    return modifications
+
+
+class StoreConfig(BaseModel):
+    store_id: str
+    value: Any 
 
 class ComponentConfig(BaseModel):
-    pass
+    component_id: str
+    component: str 
+    props: Dict
+
+
 
 class PivotConfig(BaseModel):
-    pass
-
-
+    pivot_id: str
+    type: str = "DataPanel"
 
 
 class InterfaceConfig(BaseModel):
 
     pivots: List[PivotConfig]
     stores: List[StoreConfig]
-    Components: List[ComponentConfig]
+    components: List[ComponentConfig]
 
-class PlotInterface:
+
+class Component(IdentifiableMixin):
+
+    identifiable_group: str = "components"
+
+    name: str
+    
+    @property
+    def config(self):
+        return ComponentConfig(
+            component_id=self.id,
+            component=self.name,
+            props=self.props
+        )
+    
+    @property
+    def props(self):
+        return {}
+
+
+
+class Match(Component):
+
+    name = "Match"
+    
+    def __init__(
+        self, 
+        pivot: Pivot,
+        against: Union[Store, str]
+    ):
+        super().__init__()
+        self.pivot = pivot
+        self.against = against
+        self._col = Store('')
+        self._text = Store('')
+
+    @property
+    def stores(self):
+        return [self._col, self._text]
+
+    @property
+    def props(self):
+        return {}
+
+    @property
+    def col(self):
+        return self._col
+
+    @property
+    def text(self):
+        return self._text
+
+        
+class Gallery(Component):
+
+    name = "Gallery"
+
+    
+    def __init__(
+        self, 
+        dp: Pivot,
+    ) -> None:
+        super().__init__()
+        self.dp = dp
+        
+
+class Plot(Component):
+    name: str = "Plot"
+    
+    def __init__(
+        self, 
+        dp: Pivot, 
+        selection: Pivot,
+        x: Union[str, Store],
+        y: Union[str, Store],
+        x_label: Union[str, Store],
+        y_label: Union[str, Store],
+    ) -> None:
+        super().__init__()
+        self.dp = dp
+        self.selection = selection
+        self.x = x
+        self.y = y
+        self.x_label = x_label
+        self.y_label = y_label
+
+        
+
+class PlotInterface(Interface):
     
     def __init__(
         self,
         dp: mk.DataPanel,
         id_column: str,
     ):
+        super().__init__()
         self.id_column = id_column
 
         self.pivots = []
+        self.stores = []
+        self.dp = dp 
         
-        self.layout()
-
-    
-    def prepare_config(self):
-        return InterfaceConfig(
-            pivots=[pivot.prepare_config() for pivot in self.pivots]
-            stores=[store.prepare_config() for store in self.stores]
-            components=[
-                component.prepare_config() for component in self.components
-            ]
-        )
 
     def pivot(self, obj):
         # checks whether the object is valid pivot 
@@ -210,15 +338,15 @@ class PlotInterface:
         
         
         # Setup computation graph
-        merge_derived: Derived = mk.merge(
-            left=dp_pivot, right=selection_pivot, on=self.id_column
-        )
+        # merge_derived: Derived = mk.merge(
+        #     left=dp_pivot, right=selection_pivot, on=self.id_column
+        # )
+        merge_derived = None
         
-
         # Setup components
-        match_x: Component = mk.gui.Match(dp_pivot, against=against)
-        match_y: Component = mk.gui.Match(dp_pivot, against=against)
-        plot: Component = mk.gui.Plot(
+        match_x: Component = Match(dp_pivot, against=against)
+        match_y: Component = Match(dp_pivot, against=against)
+        plot: Component = Plot(
             dp_pivot, 
             selection=selection_pivot,
             x=match_x.col,
@@ -226,7 +354,37 @@ class PlotInterface:
             x_label=match_x.text,
             y_label=match_y.text,
         )
-        gallery: Component = mk.gui.Gallery(merge_derived)
+        gallery: Component = Gallery(merge_derived)
 
         # TODO: make this more magic
         self.components = [match_x, match_y, plot, gallery]
+
+    @property
+    def config(self):
+        return InterfaceConfig(
+            pivots=[pivot.config for pivot in self.pivots],
+            stores=[store.config for store in self.stores],
+            components=[
+                component.config for component in self.components
+            ]
+        )
+
+    def launch(self, return_url: bool = False):
+
+        if state.network_info is None:
+            raise ValueError(
+                "Interactive mode not initialized."
+                "Run `network, register_api = mk.interactive_mode()` followed by "
+                "`register_api()` first."
+            )
+
+        url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
+        if return_url:
+            return url
+        # return HTML(
+        #     "<style>iframe{width:100%}</style>"
+        #     '<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"></script>'
+        #     f'<iframe id="meerkatIframe" src="{url}"></iframe>'
+        #     "<script>iFrameResize({{ log: true }}, '#meerkatIframe')</script>"
+        # )
+        return IFrame(url, width="100%", height="1000")

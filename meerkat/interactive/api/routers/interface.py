@@ -7,32 +7,12 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
 
-class InterfaceConfig(IdentifiableMixin):
+class Interface(IdentifiableMixin):
     # TODO (all): I think this should probably be a subclassable thing that people
     # implement. e.g. TableInterface
 
     identifiable_group: str = "interfaces"
 
-    def __init__(
-        self,
-        component: str,
-        props: Dict[str, Any],
-        store: Dict[str, IdentifiableMixin] = None,
-    ):
-        super().__init__()
-        self.component = component
-        self.props = props
-
-        # this is useful for maintaining a handle on objects relative to the interface,
-        # but only for it's lifetime.
-        self.store = {} if store is None else store
-
-    @property
-    def config(self):
-        return {
-            "component": self.component,
-            "props": self.props,
-        }
 
 
 def get_interface(interface_id: int):
