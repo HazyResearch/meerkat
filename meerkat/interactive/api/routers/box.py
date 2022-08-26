@@ -11,8 +11,8 @@ from meerkat.state import state
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
-    prefix="/dp",
-    tags=["dp"],
+    prefix="/box",
+    tags=["box"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -88,15 +88,18 @@ class RowsRequest(BaseModel):
     columns: List[str] = None
 
 
-@router.post("/{datapanel_id}/rows/")
+@router.post("/{box_id}/rows/")
 def get_rows(
     box_id: str,
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
     box = state.identifiables.get(group="boxes", id= box_id)
+    
+    if not isinstance(box.obj, DataPanel):
+        raise HTTPException("`get_rows` expects a box holding a Datapanel.")
+    dp = box.obj
 
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     full_length = len(dp)
     column_infos = _get_column_infos(dp, request.columns)
 
@@ -130,18 +133,17 @@ class MatchRequest(BaseModel):
     input: str  # The name of the input column.
     query: str  # The query text to match against.
 
+
 @router.post("/{datapanel_id}/match/")
 def match(
-    pivot_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
+    datapanel_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
 ) -> SchemaResponse:
     """
     Match a query string against a DataPanel column.
 
     The `datapanel_id` remains the same as the original request.
     """
-    pivot = state.identifiables.get(group="datapanels", id=pivot_id)
-
-    dp = state.identifiables.get(group="datapanels", id=pivot.datapanel_id)
+    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
         f.write(query)
@@ -151,11 +153,7 @@ def match(
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-    pivot.register_modification(scope=match_columns)
-    
-    return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
-
+    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky
@@ -228,30 +226,51 @@ _operator_str_to_func = {
 }
 
 
-@router.post("/{datapanel_id}/filter")
-def filter(datapanel_id: str, request: FilterRequest) -> SchemaResponse:
-    # TODO(karan): untested change as earlier version called a function
-    # that didn't exist
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
-
+def _filter(
+    dp: DataPanel, 
+    columns: List[str],
+    values: List[Any],
+    ops: List[str] 
+) -> DataPanel:
     supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     if not all(
-        isinstance(dp[column], supported_column_types) for column in request.columns
+        isinstance(dp[column], supported_column_types) for column in columns
     ):
         raise HTTPException(
             f"Only {supported_column_types} are supported for filtering."
         )
-
-    # Filter pandas series columns.
     all_series = [
         _operator_str_to_func[op](dp[col], value)
-        for col, value, op in zip(request.columns, request.values, request.ops)
+        for col, value, op in zip(columns, values, ops)
     ]
     mask = functools.reduce(lambda x, y: x & y, all_series)
-    dp = dp.lz[mask]
+    return dp.lz[mask]
 
-    global curr_dp
-    curr_dp = dp
-    return SchemaResponse(
-        id=dp.id, columns=_get_column_infos(dp, ["img", "path", "label"])
+
+class Op(BaseModel):
+    box_id: str
+    op_id: str 
+    
+
+@router.post("/{box_id}/filter")
+def filter(box_id: str, request: FilterRequest) -> Op:
+    # TODO(karan): untested change as earlier version called a function
+    # that didn't exist
+    box = state.identifiables.get(group="boxes", id=box_id)
+
+    op = box.apply(_filter, columns=request.columns, values=request.values, ops=request.ops)
+    
+    return Op(
+        box_id=box.id,
+        op_id=op.id 
     )
+
+@router.post("/{box_id}/undo")
+def undo(box_id: str, operation_id: str = EmbeddedBody()) -> Op:
+    box = state.identifiables.get(group="boxes", id=box_id)
+    box.undo(operation_id=operation_id)
+    return Op(
+        box_id=box_id,
+        op_id="meerkat" # TODO fix this 
+    )
+

@@ -1,11 +1,14 @@
 from typing import Callable, Dict, List, Union
+from functools import wraps 
 
 from IPython.display import IFrame
 
 import meerkat as mk
+from meerkat.mixins.collate import identity_collate
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
+from pydantic import BaseModel
 
 from .api.routers.interface import Interface
 
@@ -111,3 +114,119 @@ class Aggregation(IdentifiableMixin):
 
     def __call__(self, dp: mk.DataPanel) -> Union[int, float, str]:
         return self.func(dp)
+
+
+class Box:
+    pass 
+
+class Pivot(Box):
+    pass 
+
+    def prepare_config(self):
+        pass
+
+
+class Derived(Box):
+    pass 
+class Store:
+    pass
+
+    def prepare_config(self):
+        pass
+
+class Component: 
+    pass 
+
+    def prepare_config(self):
+        pass
+
+class StoreConfig(BaseModel):
+    pass
+
+class ComponentConfig(BaseModel):
+    pass
+
+class PivotConfig(BaseModel):
+    pass
+
+
+
+
+class InterfaceConfig(BaseModel):
+
+    pivots: List[PivotConfig]
+    stores: List[StoreConfig]
+    Components: List[ComponentConfig]
+
+class PlotInterface:
+    
+    def __init__(
+        self,
+        dp: mk.DataPanel,
+        id_column: str,
+    ):
+        self.id_column = id_column
+
+        self.pivots = []
+        
+        self.layout()
+
+    
+    def prepare_config(self):
+        return InterfaceConfig(
+            pivots=[pivot.prepare_config() for pivot in self.pivots]
+            stores=[store.prepare_config() for store in self.stores]
+            components=[
+                component.prepare_config() for component in self.components
+            ]
+        )
+
+    def pivot(self, obj):
+        # checks whether the object is valid pivot 
+        
+        pivot = Pivot(obj)
+        self.pivots.append(pivot)
+
+        return pivot 
+        
+    def store(self, obj):
+        # checks whether the object is valid store
+        
+        store = Store(obj)
+        self.stores.append(store)
+
+        return store
+        
+
+    def layout(self):
+
+        # Setup pivots
+        dp_pivot = self.pivot(self.dp)
+        selection_dp = mk.DataPanel({self.id_column: []})
+        selection_pivot = self.pivot(selection_dp)
+
+        # Setup stores
+        against = self.store("image")
+        
+        
+        # Setup computation graph
+        merge_derived: Derived = mk.merge(
+            left=dp_pivot, right=selection_pivot, on=self.id_column
+        )
+        
+
+        # Setup components
+        match_x: Component = mk.gui.Match(dp_pivot, against=against)
+        match_y: Component = mk.gui.Match(dp_pivot, against=against)
+        plot: Component = mk.gui.Plot(
+            dp_pivot, 
+            selection=selection_pivot,
+            x=match_x.col,
+            y=match_y.col,
+            x_label=match_x.text,
+            y_label=match_y.text,
+        )
+        gallery: Component = mk.gui.Gallery(merge_derived)
+
+        # TODO: make this more magic
+        self.components = [match_x, match_y, plot, gallery]

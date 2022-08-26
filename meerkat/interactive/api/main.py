@@ -1,13 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import datapanel, interface, sliceby
+from .routers import datapanel, interface, sliceby, llm, box
 
 app = FastAPI()
 
 app.include_router(interface.router)
 app.include_router(datapanel.router)
 app.include_router(sliceby.router)
+app.include_router(llm.router)
+app.include_router(box.router)
+
 
 
 app.add_middleware(

@@ -7,7 +7,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
 
-class Interface(IdentifiableMixin):
+class InterfaceConfig(IdentifiableMixin):
     # TODO (all): I think this should probably be a subclassable thing that people
     # implement. e.g. TableInterface
 

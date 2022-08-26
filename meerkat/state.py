@@ -16,6 +16,43 @@ if TYPE_CHECKING:
 
 
 @dataclass
+class Secrets:
+
+    api_keys: Dict[str, str] = field(default_factory=dict)
+
+    def add(self, api: str, api_key: str):
+        self.api_keys[api] = api_key
+
+    def get(self, api: str):
+        try:
+            return self.api_keys[api]
+        except KeyError:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No API key found for {api}.\
+                 Add one with `secrets.add(api, api_key)`.",
+            )
+
+@dataclass
+class LanguageModel:
+
+    manifest: Any = None
+
+    def set(self, client: str = "ai21", engine: str = "j1-jumbo"):
+        from manifest import Manifest
+
+        self.manifest = Manifest(
+            client_name=client,
+            client_connection=state.secrets.get(client),
+            engine=engine,
+            cache_name="sqlite",
+            cache_connection="./logs",
+        )
+
+    def get(self):
+        return self.manifest
+
+@dataclass
 class NetworkInfo:
 
     api: FastAPI
@@ -73,6 +110,8 @@ class Identifiables:
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)
+    boxes: WeakMapping =  field(default_factory=WeakMapping)
+    box_operations: WeakMapping =  field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
@@ -95,7 +134,15 @@ class GlobalState:
 
     network_info: NetworkInfo = None
     identifiables: Identifiables = field(default_factory=Identifiables)
+    secrets: Secrets = field(default_factory=Secrets)
+    llm: LanguageModel = field(default_factory=LanguageModel)
 
 
 global state
 state = GlobalState()
+
+def add_secret(api: str, api_key: str):
+    """
+    Add an API key to the global state.
+    """
+    state.secrets.add(api, api_key)

@@ -23,6 +23,7 @@
 	import { get } from 'svelte/store';
 	import { api_url } from './network/stores';
 	import Prism from '../lib/components/cell/code/Code.svelte';
+import Everything from '$lib/components/blocks/Everything.svelte';
 
 	export let config: any;
 	console.log(config);
@@ -30,7 +31,8 @@
 
 <div class="h-[800px]">
 	{#if config.component === 'table'}
-		<TableView nrows={config.props.nrows} datapanel_id={config.props.dp} />
+		<Everything/>
+		<!-- <TableView nrows={config.props.nrows} datapanel_id={config.props.dp} /> -->
 	{:else if config.component === 'sliceby-cards'}
 		<SliceCards {...config.props} />
 	{:else}

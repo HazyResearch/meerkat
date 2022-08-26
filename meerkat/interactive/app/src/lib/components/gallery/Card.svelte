@@ -55,11 +55,15 @@
 	export let pivot_modal: boolean = true;
 	export let pivot_modal_component: SvelteComponent;
 	export let pivot_modal_component_props: Object;
+
+	// Additional styling props
+	export let blur = false;
 </script>
 
 
 <div
 	class="mx-2 my-4"
+	class:blur-sm={blur}
 	class:flex-grow={card_flex_grow}
 	class:card-masonry={layout === 'masonry'}
 	class:card-gimages={layout === 'gimages'}

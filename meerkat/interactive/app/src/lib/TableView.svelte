@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { FilterCriterion, get_rows, get_schema, filter, match, sort, type DataPanelSchema, MatchCriterion } from '$lib/api/datapanel';
-	import type { RefreshCallback, NoArgCallback } from '$lib/api/callbacks';
+	import type { RefreshCallback } from '$lib/api/callbacks';
+	import { filter,FilterCriterion,get_rows,get_schema,match,MatchCriterion,sort,type DataPanelSchema } from '$lib/api/datapanel';
+	import Tab from '$lib/components/header/Tab.svelte';
+	import Tabs from '$lib/components/header/Tabs.svelte';
+	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
+	import Pagination from '$lib/components/pagination/Pagination.svelte';
+	import PlotHeader from '$lib/components/plot_header/PlotHeader.svelte';
 	import Table from '$lib/components/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Gallery from './components/gallery/Gallery.svelte';
-	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
-	import Tabs from '$lib/components/header/Tabs.svelte';
-	import Tab from '$lib/components/header/Tab.svelte';
+	import DummyBlock from './components/blocks/DummyBlock.svelte';
+import Everything from './components/blocks/Everything.svelte';
 	import FilterHeader from './components/filter_header/FilterHeader.svelte';
-	import PlotHeader from '$lib/components/plot_header/PlotHeader.svelte';
-	import { activeTabId } from './components/header/stores';
+	import Gallery from './components/gallery/Gallery.svelte';
+	import CategoryGenerator from './components/lm/CategoryGenerator.svelte';
 
 	export let datapanel_id: string;
 	export let nrows: number = 0;
@@ -135,6 +137,8 @@
 	
 </script>
 
+
+
 <Tabs bind:toggle_button>
 	<Tab label="Match" id="match">
 		<MatchHeader bind:match_criterion={match_criterion} {schema_promise} refresh_callback={refresh} />
@@ -142,7 +146,12 @@
 	<Tab label="Filter" id="filter">
 		<FilterHeader bind:filter_criteria={filter_criteria} {schema_promise} refresh_callback={refresh} />
 	</Tab>
-	<Tab label="Info" id="info">second</Tab>
+	<Tab label="Info" id="info">
+		<CategoryGenerator categories={["age", "ethnicity", "facial expression", "resolution", "blurry", "age", "ethnicity", "facial expression", "resolution", "blurry", "age", "ethnicity", "facial expression", "resolution", "blurry"]}></CategoryGenerator>
+	</Tab>
+	<Tab label="Block" id="block">
+		<Everything/>
+	</Tab>
 
 	<Tab label="Plot" id="plot">
 		<PlotHeader

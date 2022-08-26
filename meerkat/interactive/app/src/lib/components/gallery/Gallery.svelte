@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
-	// import { Slider } from 'carbon-components-svelte';
 	import Slider from '$lib/components/common/Slider.svelte';
+	import { includes, without } from 'underscore';
 	import Card from './Card.svelte';
 	import InfoModal from './InfoModal.svelte';
 
@@ -28,6 +28,10 @@
 	let cell_size_variable = layout === 'gimages' ? 20 : 4;
 	$: pivot_height = layout === 'gimages' ? cell_size_variable : undefined;
 	$: num_columns = layout === 'masonry' ? cell_size_variable : undefined;
+
+
+	// Temporary code for labeling
+	let selected_indices: Array<number> = [];
 </script>
 
 
@@ -110,14 +114,37 @@
 						card_flex_grow: false
 					}
 				}}
+				
 			>
 				<div slot="pivot-tooltip">Click to see example</div>
 			</Card>
+			<!-- Labeling selection widget -->
+			<div 
+				class="w-2 self-center"
+				style="height: {!selected_indices.includes(i) ? 0.5 * pivot_height : 0.9 * pivot_height}vh;"
+				on:click={() => {
+					if (selected_indices.includes(i)) {
+						selected_indices = without(selected_indices, i);
+					} else if (!selected_indices.includes(i) && selected_indices.length < 2) {
+						selected_indices.push(i); 
+						selected_indices.sort((a, b) => a - b);
+					}
+					selected_indices = selected_indices;
+				}}
+			>
+				<div 
+					class="rounded-full bg-slate-600 hover:bg-violet-400 h-full w-1" 
+					class:threshold_selector--clicked="{selected_indices.includes(i) || (selected_indices.length === 2 && i < selected_indices[1] && i > selected_indices[0])}"
+				/>
+			</div>
 		{/each}
 	</div>
 </div>
 
 <style>
+	.threshold_selector--clicked{
+		@apply bg-violet-400;
+	}
 	.panel {
 		@apply dark:bg-slate-600;
 	}

@@ -3,7 +3,7 @@
 
 	export let header: string | undefined = undefined;
 	export let content: any = undefined;
-	export let layout: string;
+	export let layout: "wide-header" | "equal" | "wide-content";
 </script>
 
 <div class="flex h-fit">
