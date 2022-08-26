@@ -20,7 +20,7 @@ def extract(path: str, dst: str, extractor: str = None):
     with FileLock(lock_path):
         if extractor:
             return extractor.extract(path, dst)
-        for extractor in Extractor.extractors:
+        for extractor in Extractor.extractors.values():
             if extractor.is_extractable(path):
                 return extractor.extract(path, dst)
         raise ValueError("Extraction method not found for {}".format(path))
