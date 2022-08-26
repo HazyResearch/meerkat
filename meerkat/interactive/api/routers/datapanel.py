@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
+from meerkat.interactive.gui import Modification, trigger
 from meerkat.state import state
-from meerkat.interactive.gui import trigger
 
 from ....tools.utils import convert_to_python
 
@@ -37,11 +37,13 @@ class SchemaResponse(BaseModel):
     columns: List[ColumnInfo]
 
 
-@router.post("/{datapanel_id}/schema/")
-def get_schema(datapanel_id: str, request: SchemaRequest) -> SchemaResponse:
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+@router.post("/{pivot_id}/schema/")
+def get_schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
+    pivot = state.identifiables.get(group="boxes", id=pivot_id)
+
+    dp = state.identifiables.get(group="datapanels", id=pivot.obj.id)
     columns = dp.columns if request is None else request.columns
-    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, columns))
+    return SchemaResponse(id=pivot.obj.id, columns=_get_column_infos(dp, columns))
 
 
 def _get_column_infos(dp: DataPanel, columns: List[str] = None):
@@ -95,7 +97,7 @@ def get_rows(
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    box = state.identifiables.get(group="boxes", id= box_id)
+    box = state.identifiables.get(group="boxes", id=box_id)
 
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     full_length = len(dp)
@@ -131,6 +133,7 @@ class MatchRequest(BaseModel):
     input: str  # The name of the input column.
     query: str  # The query text to match against.
 
+
 @router.post("/{datapanel_id}/match/")
 def match(
     pivot_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
@@ -154,9 +157,22 @@ def match(
         raise HTTPException(status_code=400, detail=str(e))
 
     modifications = trigger(pivot)
-    return modifications 
+    return modifications
     # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
 
+
+@router.post("/{pivot_id}/add/")
+def add_column(pivot_id: str, column: str = EmbeddedBody()):
+    pivot = state.identifiables.get(group="boxes", id=pivot_id)
+    dp = pivot.obj
+
+    import numpy as np
+
+    dp[column] = np.zeros(len(dp))
+
+    modifications = [Modification(box_id=pivot_id, scope=[column])]
+    modifications = trigger(modifications)
+    return modifications
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky

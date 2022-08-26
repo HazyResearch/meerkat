@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 import meerkat as mk
 from meerkat.interactive.api.main import app
+from meerkat.interactive.gui import Pivot
 
 client = TestClient(app)
 
@@ -17,13 +18,14 @@ def dp_testbed():
 
 def test_get_schema(dp_testbed):
     dp = dp_testbed["dp"]
+    dp = Pivot(dp)
     response = client.post(
         f"/dp/{dp.id}/schema/",
         json={"columns": ["a", "b"]},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": dp.id,
+        "id": dp.obj.id,
         "columns": [
             {
                 "name": "a",
@@ -39,6 +41,16 @@ def test_get_schema(dp_testbed):
             },
         ],
     }
+
+
+def test_add(dp_testbed):
+    dp = dp_testbed["dp"]
+    dp = Pivot(dp)
+    response = client.post(
+        f"/dp/{dp.id}/add/",
+        json={"column": "z"},
+    )
+    assert response.status_code == 200
 
 
 def test_sort(dp_testbed):

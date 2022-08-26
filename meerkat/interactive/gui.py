@@ -1,5 +1,8 @@
+from ast import Call
+from copy import copy
+from dataclasses import dataclass
 from functools import wraps
-from typing import Callable, Dict, List, Union, Any
+from typing import Any, Callable, Dict, List, Union
 
 from IPython.display import IFrame
 from pydantic import BaseModel
@@ -116,8 +119,8 @@ class Aggregation(IdentifiableMixin):
         return self.func(dp)
 
 
-class Component: 
-    pass 
+class Component:
+    pass
 
     def prepare_config(self):
         pass
@@ -126,15 +129,29 @@ class Component:
 class Box(IdentifiableMixin):
     identifiable_group: str = "boxes"
 
-class Operation:
-    pass
+    def __init__(self, obj):
+        super().__init__()
+        self.obj = obj
+
+        self.children: List[Operation] = []
+
+    @property
+    def config(self):
+        return BoxConfig(box_id=self.id, type="DataPanel")
+
 
 class Modification(BaseModel):
-    box_id: int
+    box_id: str
     scope: List[str]
 
+    @property
+    def box(self):
+        return state.identifiables.get(group="boxes", id=self.box_id)
 
-class Store(Box):
+
+class Store(IdentifiableMixin):
+    identifiable_group: str = "stores"
+
     def __init__(self, value: Any):
         super().__init__()
         self.value = value
@@ -146,58 +163,67 @@ class Store(Box):
             value=self.value,
         )
 
-class Pivot(Box):
-    
-    def __init__(self, obj):
-        super().__init__()
-        self.obj = obj
 
-    @property
-    def config(self):
-        return PivotConfig(
-            pivot_id=self.id,
-            type="DataPanel"
-        )
+class Pivot(Box):
+    pass
+
 
 class Derived(Box):
-    pass 
+    pass
 
-# @dataclass 
+
+# @dataclass
 # class Operation:
 #     fn: Callable
-#     kwargs: Dict 
+#     kwargs: Dict
 
 #     def __call__(self):
 #         # deref the kwargs (check which things are Box)
-#         #_apply fn 
-#         pass 
+#         #_apply fn
+#         pass
 
 
-def trigger(pivots: Union[Pivot, List[Pivot]]) ->  List[Modification]:
-    
-    
-    ops_to_exec, modifications = topological(pivots)
-    
-    for op in ops_to_exec:
-        op()
-    
-    return modifications
+def trigger(modifications: List[Modification]) -> List[Modification]:
+    modifications = copy(modifications)
+    all_modifications = []
+    while modifications:
+        modification = modifications.pop(0)
+        all_modifications.append(modification)
+        box = modification.box
+        for op in box.children:
+            derived = op()
+            modifications.append(Modification(box_id=derived.id, scope=[]))
+
+    # ops_to_exec, modifications = topological(pivots)
+
+    # for op in ops_to_exec:
+    #     op()
+
+    return all_modifications
 
 
 class StoreConfig(BaseModel):
     store_id: str
-    value: Any 
+    value: Any
+
 
 class ComponentConfig(BaseModel):
     component_id: str
-    component: str 
+    component: str
     props: Dict
 
 
-
-class PivotConfig(BaseModel):
-    pivot_id: str
+class BoxConfig(BaseModel):
+    box_id: str
     type: str = "DataPanel"
+
+
+class PivotConfig(BoxConfig):
+    pass
+
+
+class DerivedConfig(BoxConfig):
+    pass
 
 
 class InterfaceConfig(BaseModel):
@@ -212,90 +238,169 @@ class Component(IdentifiableMixin):
     identifiable_group: str = "components"
 
     name: str
-    
+
     @property
     def config(self):
         return ComponentConfig(
-            component_id=self.id,
-            component=self.name,
-            props=self.props
+            component_id=self.id, component=self.name, props=self.props
         )
-    
+
     @property
     def props(self):
         return {}
 
+
+Storeable = Union[int, str, float]
+
+
+def make_store(value: Union[str, Storeable]):
+    if isinstance(value, Store):
+        return value
+    return Store(value)
 
 
 class Match(Component):
 
     name = "Match"
-    
-    def __init__(
-        self, 
-        pivot: Pivot,
-        against: Union[Store, str]
-    ):
+
+    def __init__(self, pivot: Pivot, against: Union[Store, str]):
         super().__init__()
         self.pivot = pivot
-        self.against = against
-        self._col = Store('')
-        self._text = Store('')
-
-    @property
-    def stores(self):
-        return [self._col, self._text]
+        self.against: Store = make_store(against)
+        self.col = Store("")
+        self.text = Store("")
 
     @property
     def props(self):
-        return {}
+        return {
+            "against": self.against.config,
+            "dp": self.pivot.config,
+            "col": self.col.config,
+            "text": self.text.config,
+        }
 
-    @property
-    def col(self):
-        return self._col
 
-    @property
-    def text(self):
-        return self._text
-
-        
 class Gallery(Component):
 
     name = "Gallery"
 
-    
     def __init__(
-        self, 
-        dp: Pivot,
+        self,
+        dp: Box,
     ) -> None:
         super().__init__()
         self.dp = dp
-        
+
+    @property
+    def props(self):
+        return {
+            "dp": self.dp.config,
+        }
+
 
 class Plot(Component):
     name: str = "Plot"
-    
+
     def __init__(
-        self, 
-        dp: Pivot, 
+        self,
+        dp: Pivot,
         selection: Pivot,
         x: Union[str, Store],
         y: Union[str, Store],
         x_label: Union[str, Store],
         y_label: Union[str, Store],
+        type: str = "scatter",
     ) -> None:
         super().__init__()
         self.dp = dp
         self.selection = selection
-        self.x = x
-        self.y = y
-        self.x_label = x_label
-        self.y_label = y_label
+        self.x = make_store(x)
+        self.y = make_store(y)
+        self.x_label = make_store(x_label)
+        self.y_label = make_store(y_label)
+        self.type = type
 
-        
+    @property
+    def props(self):
+        return {
+            "dp": self.dp.config,
+            "selection": self.selection.config,
+            "x": self.x.config,
+            "y": self.y.config,
+            "x_label": self.x_label.config,
+            "y_label": self.y_label.config,
+            "type": self.type,
+        }
+
+
+@dataclass
+class Operation:
+    fn: Callable
+    args: List[Any]
+    kwargs: Dict[str, Any]
+    result: Derived
+
+    def __call__(self):
+        unpacked_args, unpacked_kwargs, _ = _unpack_boxes(*self.args, **self.kwargs)
+        result = self.fn(*unpacked_args, **unpacked_kwargs)
+        # TODO: result may be multiple
+        self.result.obj = result
+        return self.result
+
+
+def _unpack_boxes(*args, **kwargs):
+    # TODO(Sabri): this should be nested
+    boxes = []
+    unpacked_args = []
+    for arg in args:
+        if isinstance(arg, Box):
+            boxes.append(arg)
+            unpacked_args.append(arg.obj)
+        else:
+            unpacked_args.append(arg)
+
+    unpacked_kwargs = {}
+    for k, v in kwargs.items():
+        if isinstance(v, Box):
+            boxes.append(v)
+            unpacked_kwargs[k] = v.obj
+        else:
+            unpacked_kwargs[k] = v
+
+    return unpacked_args, unpacked_kwargs, boxes
+
+
+def interface_op(fn: Callable):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        # TODO(Sabri): this should be nested
+        unpacked_args, unpacked_kwargs, boxes = _unpack_boxes(*args, **kwargs)
+
+        result = fn(*unpacked_args, **unpacked_kwargs)
+
+        if len(boxes) > 0:
+            derived = Derived(result)
+            op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+            for input_box in boxes:
+                input_box.children.append(op)
+            # TODO(Sabri): this should be nested
+            return derived
+
+        return result
+
+    return wrapper
+
+
+@interface_op
+def head(dp: mk.DataPanel, n: int = 5):
+    new_dp = dp.head(n)
+    import numpy as np
+
+    new_dp["head_column"] = np.zeros(len(new_dp))
+    return new_dp
+
 
 class PlotInterface(Interface):
-    
     def __init__(
         self,
         dp: mk.DataPanel,
@@ -306,27 +411,27 @@ class PlotInterface(Interface):
 
         self.pivots = []
         self.stores = []
-        self.dp = dp 
-        
+        self.dp = dp
+
+        self._layout()
 
     def pivot(self, obj):
-        # checks whether the object is valid pivot 
-        
+        # checks whether the object is valid pivot
+
         pivot = Pivot(obj)
         self.pivots.append(pivot)
 
-        return pivot 
-        
+        return pivot
+
     def store(self, obj):
         # checks whether the object is valid store
-        
+
         store = Store(obj)
         self.stores.append(store)
 
         return store
-        
 
-    def layout(self):
+    def _layout(self):
 
         # Setup pivots
         dp_pivot = self.pivot(self.dp)
@@ -335,19 +440,18 @@ class PlotInterface(Interface):
 
         # Setup stores
         against = self.store("image")
-        
-        
+
         # Setup computation graph
         # merge_derived: Derived = mk.merge(
         #     left=dp_pivot, right=selection_pivot, on=self.id_column
         # )
-        merge_derived = None
-        
+        merge_derived = head(dp_pivot, n=5)
+
         # Setup components
         match_x: Component = Match(dp_pivot, against=against)
         match_y: Component = Match(dp_pivot, against=against)
         plot: Component = Plot(
-            dp_pivot, 
+            dp_pivot,
             selection=selection_pivot,
             x=match_x.col,
             y=match_y.col,
@@ -364,9 +468,7 @@ class PlotInterface(Interface):
         return InterfaceConfig(
             pivots=[pivot.config for pivot in self.pivots],
             stores=[store.config for store in self.stores],
-            components=[
-                component.config for component in self.components
-            ]
+            components=[component.config for component in self.components],
         )
 
     def launch(self, return_url: bool = False):
