@@ -20,7 +20,7 @@ class IdentifiableMixin:
         if id is None:
             self.id = uuid4().hex
         else:
-            self.id = id 
+            self.id = id
 
         from meerkat.state import state
 

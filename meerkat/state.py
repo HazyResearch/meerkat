@@ -33,6 +33,7 @@ class Secrets:
                  Add one with `secrets.add(api, api_key)`.",
             )
 
+
 @dataclass
 class LanguageModel:
 
@@ -51,6 +52,7 @@ class LanguageModel:
 
     def get(self):
         return self.manifest
+
 
 @dataclass
 class NetworkInfo:
@@ -110,8 +112,8 @@ class Identifiables:
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)
-    boxes: WeakMapping =  field(default_factory=WeakMapping)
-    box_operations: WeakMapping =  field(default_factory=WeakMapping)
+    boxes: WeakMapping = field(default_factory=WeakMapping)
+    box_operations: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
@@ -140,6 +142,7 @@ class GlobalState:
 
 global state
 state = GlobalState()
+
 
 def add_secret(api: str, api_key: str):
     """

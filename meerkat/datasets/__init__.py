@@ -9,8 +9,9 @@ from .mirflickr import mirflickr
 from .pascal import pascal
 from .registry import datasets
 from .rfw import rfw
+from .ngoa import ngoa
 
-__all__ = ["celeba", "imagenet", "imagenette", "mirflickr", "pascal", "rfw"]
+__all__ = ["celeba", "imagenet", "imagenette", "mirflickr", "pascal", "rfw", "ngoa"]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
@@ -93,7 +94,7 @@ def get(
             raise ValueError(
                 f"Invalid registry: {registry}. Must be one of {REGISTRIES}"
             )
-    raise ValueError("pass")
+    raise ValueError(f"pass {errors}")
 
 
 def versions(name: str) -> List[str]:

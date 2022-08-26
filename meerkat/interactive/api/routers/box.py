@@ -94,8 +94,8 @@ def get_rows(
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    box = state.identifiables.get(group="boxes", id= box_id)
-    
+    box = state.identifiables.get(group="boxes", id=box_id)
+
     if not isinstance(box.obj, DataPanel):
         raise HTTPException("`get_rows` expects a box holding a Datapanel.")
     dp = box.obj
@@ -227,15 +227,10 @@ _operator_str_to_func = {
 
 
 def _filter(
-    dp: DataPanel, 
-    columns: List[str],
-    values: List[Any],
-    ops: List[str] 
+    dp: DataPanel, columns: List[str], values: List[Any], ops: List[str]
 ) -> DataPanel:
     supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
-    if not all(
-        isinstance(dp[column], supported_column_types) for column in columns
-    ):
+    if not all(isinstance(dp[column], supported_column_types) for column in columns):
         raise HTTPException(
             f"Only {supported_column_types} are supported for filtering."
         )
@@ -249,8 +244,8 @@ def _filter(
 
 class Op(BaseModel):
     box_id: str
-    op_id: str 
-    
+    op_id: str
+
 
 @router.post("/{box_id}/filter")
 def filter(box_id: str, request: FilterRequest) -> Op:
@@ -258,19 +253,15 @@ def filter(box_id: str, request: FilterRequest) -> Op:
     # that didn't exist
     box = state.identifiables.get(group="boxes", id=box_id)
 
-    op = box.apply(_filter, columns=request.columns, values=request.values, ops=request.ops)
-    
-    return Op(
-        box_id=box.id,
-        op_id=op.id 
+    op = box.apply(
+        _filter, columns=request.columns, values=request.values, ops=request.ops
     )
+
+    return Op(box_id=box.id, op_id=op.id)
+
 
 @router.post("/{box_id}/undo")
 def undo(box_id: str, operation_id: str = EmbeddedBody()) -> Op:
     box = state.identifiables.get(group="boxes", id=box_id)
     box.undo(operation_id=operation_id)
-    return Op(
-        box_id=box_id,
-        op_id="meerkat" # TODO fix this 
-    )
-
+    return Op(box_id=box_id, op_id="meerkat")  # TODO fix this

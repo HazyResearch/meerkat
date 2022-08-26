@@ -1,14 +1,14 @@
+from functools import wraps
 from typing import Callable, Dict, List, Union
-from functools import wraps 
 
 from IPython.display import IFrame
+from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.mixins.collate import identity_collate
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
-from pydantic import BaseModel
 
 from .api.routers.interface import Interface
 

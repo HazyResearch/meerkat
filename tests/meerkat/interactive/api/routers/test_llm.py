@@ -7,10 +7,12 @@ from meerkat.interactive.api.main import app
 
 client = TestClient(app)
 
+
 def test_get_categories():
     from meerkat.state import state
+
     state.secrets.add(api="ai21", api_key="")
-    # TODO(karan): this .set() below fails to work, 
+    # TODO(karan): this .set() below fails to work,
     # but ideally we would like it to be done here
     # the issue is caused by Manifest, which sets up a SQLLite cache
     # that throws an error that it's being used in multiple threads (and
@@ -26,10 +28,12 @@ def test_get_categories():
     )
     assert response.status_code == 200
 
+
 def test_get_categorization():
     from meerkat.state import state
+
     state.secrets.add(api="ai21", api_key="")
-    # TODO(karan): this .set() below fails to work, 
+    # TODO(karan): this .set() below fails to work,
     # but ideally we would like it to be done here
     # the issue is caused by Manifest, which sets up a SQLLite cache
     # that throws an error that it's being used in multiple threads (and

@@ -17,4 +17,3 @@ router = APIRouter(
 )
 
 EmbeddedBody = functools.partial(Body, embed=True)
-

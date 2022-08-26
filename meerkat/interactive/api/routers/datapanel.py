@@ -94,7 +94,7 @@ def get_rows(
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    box = state.identifiables.get(group="boxes", id= box_id)
+    box = state.identifiables.get(group="boxes", id=box_id)
 
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     full_length = len(dp)
@@ -130,6 +130,7 @@ class MatchRequest(BaseModel):
     input: str  # The name of the input column.
     query: str  # The query text to match against.
 
+
 @router.post("/{datapanel_id}/match/")
 def match(
     pivot_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
@@ -153,9 +154,10 @@ def match(
         raise HTTPException(status_code=400, detail=str(e))
 
     pivot.register_modification(scope=match_columns)
-    
-    return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
 
+    return SchemaResponse(
+        id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns)
+    )
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky

@@ -23,8 +23,10 @@ EmbeddedBody = functools.partial(Body, embed=True)
 class CategoryGenerationResponse(BaseModel):
     categories: List[str]
 
+
 class CategorizationGenerationResponse(BaseModel):
     categories: List[str]
+
 
 @router.post("/generate/categories")
 def generate_categories(
@@ -35,8 +37,9 @@ def generate_categories(
     """
     Generate a list of categories for a dataset using an LLM.
     """
-    
+
     from manifest import Prompt
+
     state.llm.set(client="ai21", engine="j1-jumbo")
 
     try:
@@ -65,6 +68,7 @@ Attributes:
         categories=categories,
     )
 
+
 @router.post("/generate/categorization")
 def generate_categorization(
     description: str = EmbeddedBody(),
@@ -74,6 +78,7 @@ def generate_categorization(
     Generate a list of categories for a dataset using an LLM.
     """
     from manifest import Prompt
+
     state.llm.set(client="ai21", engine="j1-jumbo")
 
     random.shuffle(existing_categories)
