@@ -58,7 +58,7 @@
 			let component = config.components[i];
 			let component_name = component.component;
 			imported_components[component_name] = (
-				await import(`$lib/components/blanks/${component_name}.svelte`)
+				await import(`$lib/component/${component_name.toLowerCase()}/${component_name}.svelte`)
 			).default;
 		}
 	});
