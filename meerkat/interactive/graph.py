@@ -1,13 +1,14 @@
 from copy import copy
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Callable, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
 from pydantic import BaseModel
 
-import meerkat as mk
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.state import state
+
+if TYPE_CHECKING:
+    from meerkat.datapanel import DataPanel
 
 
 class BoxConfig(BaseModel):
@@ -35,6 +36,8 @@ class Modification(BaseModel):
 
     @property
     def box(self):
+        from meerkat.state import state
+
         return state.identifiables.get(group="boxes", id=self.box_id)
 
 
@@ -161,7 +164,7 @@ def interface_op(fn: Callable):
 
 
 @interface_op
-def head(dp: mk.DataPanel, n: int = 5):
+def head(dp: "DataPanel", n: int = 5):
     new_dp = dp.head(n)
     import numpy as np
 

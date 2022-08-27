@@ -13,6 +13,7 @@ from .graph import (
     Store,
     StoreConfig,
     make_store,
+    trigger,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "Store",
     "StoreConfig",
     "make_store",
+    "trigger",
 ]

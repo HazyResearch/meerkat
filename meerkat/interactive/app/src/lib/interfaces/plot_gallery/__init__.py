@@ -3,7 +3,7 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.plot import Plot
-from meerkat.interactive.gui import Pivot, Store, head
+from meerkat.interactive.graph import Pivot, Store, head
 from meerkat.state import state
 
 from ..abstract import Interface, InterfaceConfig

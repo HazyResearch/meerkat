@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
-from meerkat.interactive.gui import Modification, trigger
+from meerkat.interactive import Modification, trigger
 from meerkat.state import state
 
 from ....tools.utils import convert_to_python
