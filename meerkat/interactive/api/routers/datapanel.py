@@ -134,18 +134,21 @@ class MatchRequest(BaseModel):
     query: str  # The query text to match against.
 
 
-@router.post("/{datapanel_id}/match/")
-def match(
-    pivot_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
-) -> SchemaResponse:
+@router.post("/{box_id}/match/")
+def match(box_id: str, input: str = Body(), query: str = Body()) -> SchemaResponse:
     """
     Match a query string against a DataPanel column.
 
     The `datapanel_id` remains the same as the original request.
     """
-    pivot = state.identifiables.get(group="datapanels", id=pivot_id)
+    print("here")
+    box = state.identifiables.get(group="boxes", id=box_id)
 
-    dp = state.identifiables.get(group="datapanels", id=pivot.datapanel_id)
+    dp = box.obj
+    if not isinstance(dp, DataPanel):
+        raise HTTPException(
+            status_code=404, detail="`match` expects a box containing a datapanel"
+        )
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
         f.write(query)
@@ -156,7 +159,8 @@ def match(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    modifications = trigger(pivot)
+    modifications = [Modification(box_id=box_id, scope=match_columns)]
+    modifications = trigger(modifications)
     return modifications
     # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
 

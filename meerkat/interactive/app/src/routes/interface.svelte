@@ -19,7 +19,7 @@
 	import { getContext, setContext } from 'svelte';
 
 	import { global_stores } from '$lib/components/blanks/stores';
-	import { get_schema } from '$lib/api/datapanel';
+	import { get_schema, MatchCriterion } from '$lib/api/datapanel';
 
 	import { onMount } from 'svelte';
 	import { post, modify } from '$lib/utils/requests';
@@ -40,9 +40,20 @@
 	const _add = writable(add);
 	$: $_add = add;
 
+	$: match = async (box_id: string, criterion: MatchCriterion) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/match`, {
+			input: criterion.column,
+			query: criterion.query
+		});
+		return modifications;
+	};
+	const _match = writable(match);
+	$: $_match = match;
+
 	$: context = {
 		schema: _schema,
-		add: _add
+		add: _add,
+		match: _match
 	};
 	$: setContext('Interface', context);
 

@@ -35,7 +35,7 @@ def embed(
     out_col: str = None,
     device: Union[int, str] = "cpu",
     mmap_dir: str = None,
-    num_workers: int = 4,
+    num_workers: int = 0,
     batch_size: int = 128,
     **kwargs,
 ) -> Union[mk.DataPanel, mk.AbstractColumn]:
@@ -92,12 +92,12 @@ def embed(
     """
     col = data if isinstance(data, mk.AbstractColumn) else data[input]
 
+    if out_col is None:
+        out_col = f"{encoder}({input})"
+
     if modality is None:
 
         modality = infer_modality(col=col)
-
-    if out_col is None:
-        out_col = f"{encoder}({input})"
 
     encoder = encoders.get(encoder, device=device, **kwargs)
 
@@ -131,7 +131,7 @@ def _embed(
     collate: Callable,
     device: int = None,
     mmap_dir: str = None,
-    num_workers: int = 4,
+    num_workers: int = 0,
     batch_size: int = 128,
 ):
     def _encode(x):

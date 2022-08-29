@@ -3,29 +3,31 @@ import pytest
 from fastapi.testclient import TestClient
 
 import meerkat as mk
+from meerkat.interactive import Pivot
 from meerkat.interactive.api.main import app
-from meerkat.interactive.gui import Pivot
 
 client = TestClient(app)
 
 
 @pytest.fixture
 def dp_testbed():
-    dp = mk.DataPanel({"a": np.arange(10), "b": np.arange(10, 20)})
+    dp = mk.DataPanel(
+        {"a": np.arange(10), "b": np.arange(10, 20), "clip(a)": np.zeros((10, 4))}
+    )
 
     return {"dp": dp}
 
 
 def test_get_schema(dp_testbed):
     dp = dp_testbed["dp"]
-    dp = Pivot(dp)
+    box = Pivot(dp)
     response = client.post(
-        f"/dp/{dp.id}/schema/",
+        f"/dp/{box.id}/schema/",
         json={"columns": ["a", "b"]},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": dp.obj.id,
+        "id": box.obj.id,
         "columns": [
             {
                 "name": "a",
@@ -41,6 +43,20 @@ def test_get_schema(dp_testbed):
             },
         ],
     }
+
+
+def test_match(dp_testbed, monkeypatch):
+    from meerkat.ops import match
+
+    monkeypatch.setattr(match, "embed", lambda *args, **kwargs: np.zeros((1, 4)))
+
+    dp = dp_testbed["dp"]
+    box = Pivot(dp)
+    response = client.post(
+        f"/dp/{box.id}/match/", json={"input": "a", "query": "this is the query"}
+    )
+
+    assert response.status_code == 200
 
 
 def test_add(dp_testbed):
