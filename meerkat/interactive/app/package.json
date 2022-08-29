@@ -59,6 +59,7 @@
 		"layercake": "^7.0.0",
 		"prismjs": "^1.28.0",
 		"svelte-forms": "^2.3.1",
+		"svelte-grid": "^5.1.1",
 		"svelte-heros": "^2.3.3",
 		"svelte-modals": "^1.1.0",
 		"svelte-tippy": "^1.3.2",
