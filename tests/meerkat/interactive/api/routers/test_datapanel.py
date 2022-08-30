@@ -64,6 +64,26 @@ def test_rows(dp_testbed):
     assert response.json()["full_length"] == 10
 
 
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id": column_type(list(map(str, np.arange(10, 20)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+
+    response = client.post(
+        f"/dp/{pivot.id}/edit/",
+        json={"value": "100", "column": "value", "row_id": "14", "id_column": "row_id"},
+    )
+    assert response.status_code == 200
+    assert dp["value"][4] == "100"
+    assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "box"}]
+
+
 def test_add(dp_testbed):
     dp = dp_testbed["dp"]
     dp = Pivot(dp)

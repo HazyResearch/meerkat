@@ -179,9 +179,6 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
             computation graph.
 
     """
-    # shallow copy the modifications, since we'll be popping from it
-    modifications = copy(modifications)
-
     # build a graph rooted at the stores and boxes in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
@@ -189,8 +186,8 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
     ]
 
-    modifications = [op() for op in order]
-    return modifications
+    new_modifications = [op() for op in order]
+    return modifications + new_modifications
 
 
 def _unpack_boxes_and_stores(*args, **kwargs):

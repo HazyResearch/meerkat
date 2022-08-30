@@ -3,7 +3,7 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.plot import Plot
-from meerkat.interactive.app.src.lib.component.table import Table
+from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
 from meerkat.interactive.graph import Pivot, Store, head
 from meerkat.state import state
 
@@ -52,7 +52,10 @@ class PlotInterface(Interface):
         # )
         sort_derived = mk.sort(dp_pivot, by=match_x.col, ascending=False)
 
-        gallery: Component = Table(sort_derived)
+        gallery: Component = Table(
+            sort_derived,
+            edit_target=EditTarget(dp_pivot, self.id_column, self.id_column),
+        )
 
         plot: Component = Plot(
             dp_pivot,

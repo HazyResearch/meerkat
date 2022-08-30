@@ -1,4 +1,5 @@
 import functools
+from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
 from fastapi import APIRouter, Body, HTTPException
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
+from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
 
 from ....tools.utils import convert_to_python
@@ -125,6 +127,27 @@ def rows(
         full_length=full_length,
         indices=indices,
     )
+
+
+@router.post("/{box_id}/edit/")
+def edit(
+    box_id: str,
+    value=Body(),  # don't set type
+    column: str = Body(),
+    row_id=Body(),
+    id_column: str = Body(),
+) -> List[Modification]:
+
+    box = state.identifiables.get(group="boxes", id=box_id)
+    dp = box.obj
+
+    mask = dp[id_column] == row_id
+    if mask.sum() == 0:
+        raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
+    dp[column][mask] = value
+
+    modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
+    return modifications
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky

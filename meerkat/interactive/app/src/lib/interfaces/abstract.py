@@ -12,7 +12,6 @@ from meerkat.state import state
 class InterfaceConfig(BaseModel):
 
     pivots: List[PivotConfig]
-    stores: List[StoreConfig]
     components: List[ComponentConfig]
 
 

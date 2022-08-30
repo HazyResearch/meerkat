@@ -53,11 +53,13 @@ class BasicFormatter(Formatter):
     cell_component = "basic"
 
     def encode(self, cell: Any):
-        return format_array(np.array([cell]), formatter=None)[0]
+        if isinstance(cell, np.generic):
+            return cell.item()
+        return cell
 
     def html(self, cell: Any):
         cell = self.encode(cell)
-        return cell
+        return format_array(np.array([cell]), formatter=None)[0]
 
 
 class NumpyArrayFormatter(Formatter):

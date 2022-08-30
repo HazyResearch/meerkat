@@ -77,16 +77,38 @@
 		indices?: Array<number>,
 		columns?: Array<string>
 	) => {
-		return await post(`${$api_url}/dp/${box_id}/rows`, {
+		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
 			columns: columns
 		});
+        console.log(result)
+        return result 
+
 	};
 
 	$: add = async (box_id: string, column_name: string) => {
 		let modifications = await modify(`${$api_url}/dp/${box_id}/add`, { column: column_name });
+		return modifications;
+	};
+
+    $: edit = async (
+        box_id: string, 
+        value: string | number,
+        column: string,
+        row_id: string | number,
+        id_column: string,
+    ) => {
+		let modifications = await modify(
+            `${$api_url}/dp/${box_id}/edit`, 
+            { 
+                value: value, 
+                column: column, 
+                row_id: row_id, 
+                id_column: id_column,
+            }
+        );
 		return modifications;
 	};
 
@@ -117,17 +139,20 @@
 	const _add = writable(add);
 	const _match = writable(match);
     const _get_rows = writable(get_rows);
+    const _edit = writable(edit);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
 	$: $_match = match;
     $: $_get_rows = get_rows;
+    $: $_edit = edit;
 
 	$: context = {
 		get_schema: _get_schema,
 		add: _add,
 		match: _match,
         get_rows: _get_rows,
+        edit: _edit,
 	};
 	$: setContext('Interface', context);
 
@@ -263,18 +288,19 @@
 	</Grid>
 </div> -->
 
-{#each Array.from(global_stores.keys()) as store_id}
-	<!-- TODO: Things that are not in the computation graph should have a blank callback. -->
-	<StoreComponent 
-		{store_id}
-		store={global_stores.get(store_id)} 
-		callback={() => {console.log(store_id, "changed")}} 
-	/>
-{/each}
+<div class="flex flex-col space-y-3 h-screen">
 
-<div class="flex-col space-y-3">
+    {#each Array.from(global_stores.keys()) as store_id}
+        <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
+        <StoreComponent 
+            {store_id}
+            store={global_stores.get(store_id)} 
+            callback={() => {console.log(store_id, "changed")}} 
+        />
+    {/each}
+
 	{#each config.components as { component, component_id, props }}
-		{@const Component = imported_components[component]}
+        {@const Component = imported_components[component]}
 		<svelte:component this={Component} {...props} />
 	{/each}
 </div>

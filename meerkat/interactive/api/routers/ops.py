@@ -25,7 +25,7 @@ router = APIRouter(
 @router.post("/{box_id}/match/")
 def match(
     box_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
-) -> SchemaResponse:
+) -> List[Modification]:
     """
     Match a query string against a DataPanel column.
 
