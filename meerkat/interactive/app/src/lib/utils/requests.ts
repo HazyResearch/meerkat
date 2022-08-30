@@ -1,4 +1,5 @@
-import { global_stores } from "$lib/components/blanks/stores";
+import { global_stores, store_lock } from "$lib/components/blanks/stores";
+import { get as get_store } from "svelte/store";
 
 
 export async function get(url: string): Promise<any> {
@@ -35,6 +36,7 @@ export async function modify(url: string, data: any): Promise<any> {
     // url must hit an endpoint that returns a list of modifications 
     for (let modification of modifications) {
         if (modification.type === 'box') {
+            // Box modification
             let store = global_stores.get(modification.id)
             store.update((value: any) => {
                 value.scope = modification.scope;
@@ -42,6 +44,8 @@ export async function modify(url: string, data: any): Promise<any> {
             }
             )
         } else if (modification.type === 'store') {
+            // Store modification
+            get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);
             store.set(modification.value);
         }
