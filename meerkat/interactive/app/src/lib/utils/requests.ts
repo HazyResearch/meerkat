@@ -37,6 +37,11 @@ export async function modify(url: string, data: any): Promise<any> {
     for (let modification of modifications) {
         if (modification.type === 'box') {
             // Box modification
+            if (!global_stores.has(modification.id)) {
+                // derived objects may not be maintained on the frontend 
+                // TODO: consider adding a mechanism to add new derived objects to the frontend
+                continue
+            }
             let store = global_stores.get(modification.id)
             store.update((value: any) => {
                 value.scope = modification.scope;
@@ -45,9 +50,15 @@ export async function modify(url: string, data: any): Promise<any> {
             )
         } else if (modification.type === 'store') {
             // Store modification
-            get_store(store_lock).add(modification.id);
+            //get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);
-            store.set(modification.value);
+
+            // set with trigger=false so that the store change doesn't trigger backend 
+            if (!("trigger_store" in store)) {
+                throw "Must use `meerkat_writable` for backend stores."
+            }
+            store.set(modification.value, false);
         }
     }
 }
+

@@ -18,7 +18,7 @@
 	import { api_url } from './network/stores';
 	import { setContext } from 'svelte';
 
-	import { global_stores, store_lock } from '$lib/components/blanks/stores';
+	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
 	import { MatchCriterion } from '$lib/api/datapanel';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
  
@@ -32,6 +32,7 @@
 	export let config: any;
 
 	$: store_trigger = async (store_id: string, value: any) => {
+        console.log("Triggering store", store_id, value);
 		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
 		return modifications;
 	};
@@ -160,8 +161,9 @@
 					// unpack the store
 					if (!global_stores.has(v.store_id)) {
 						// add it to the global_stores Map if it isn't already there
-                        let store = writable(v.value);
-                        store.store_id = v.store_id
+                        let store = meerkat_writable(v.value);
+                        store.store_id = v.store_id;
+						store.backend_store = v.has_children;
 						global_stores.set(v.store_id, store);
 					}
 					component.props[k] = global_stores.get(v.store_id);
@@ -222,7 +224,7 @@
         <StoreComponent 
             {store_id}
             store={global_stores.get(store_id)} 
-            callback={() => {console.log(store_id, "changed")}} 
+			is_backend_store={global_stores.get(store_id).backend_store}
         />
     {/each}
 

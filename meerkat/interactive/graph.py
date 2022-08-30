@@ -97,6 +97,7 @@ class Derived(Box):
 class StoreConfig(BaseModel):
     store_id: str
     value: Any
+    has_children: bool
 
 
 class Store(IdentifiableMixin, NodeMixin):
@@ -138,7 +139,13 @@ class Operation(NodeMixin):
         result = self.fn(*unpacked_args, **unpacked_kwargs)
         # TODO: result may be multiple
         self.result.obj = result
-        return BoxModification(id=self.result.id, scope=result.columns)
+
+        from meerkat.datapanel import DataPanel
+
+        if isinstance(result, DataPanel):
+            return BoxModification(id=self.result.id, scope=result.columns)
+
+        return BoxModification(id=self.result.id, scope=[])
 
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:

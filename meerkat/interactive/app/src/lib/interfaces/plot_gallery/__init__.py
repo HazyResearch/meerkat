@@ -4,10 +4,15 @@ from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.plot import Plot
 from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head
+from meerkat.interactive.graph import Pivot, Store, head, interface_op
 from meerkat.state import state
 
 from ..abstract import Interface, InterfaceConfig
+
+
+@interface_op
+def simple_op(col: str):
+    return col + "!"
 
 
 class PlotInterface(Interface):
@@ -51,6 +56,8 @@ class PlotInterface(Interface):
         #     left=dp_pivot, right=selection_pivot, on=self.id_column
         # )
         sort_derived = mk.sort(dp_pivot, by=match_x.col, ascending=False)
+
+        result = simple_op(against)
 
         gallery: Component = Table(
             sort_derived,

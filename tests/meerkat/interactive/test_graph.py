@@ -1,5 +1,4 @@
 from ast import unaryop
-from graphlib import TopologicalSorter
 
 import numpy as np
 import pytest
