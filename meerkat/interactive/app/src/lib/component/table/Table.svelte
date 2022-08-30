@@ -28,7 +28,6 @@
 		let row_index = rows.indices.indexOf(row);
 		let row_id = rows.rows[row_index][row_id_column_index];
 
-		console.log(pivot.box_id)
 		$edit(
 			pivot.box_id,
 			value,

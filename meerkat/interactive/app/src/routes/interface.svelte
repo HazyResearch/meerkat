@@ -18,7 +18,7 @@
 	import { api_url } from './network/stores';
 	import { setContext } from 'svelte';
 
-	import { global_stores, backend_updated_stores } from '$lib/components/blanks/stores';
+	import { global_stores, store_lock } from '$lib/components/blanks/stores';
 	import { MatchCriterion } from '$lib/api/datapanel';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
  
@@ -29,41 +29,11 @@
 	import gridHelp from 'svelte-grid/build/helper/index';
 	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 
-	import {
-		PriorityQueue,
-		MinPriorityQueue,
-		MaxPriorityQueue,
-		type ICompare,
-		type IGetCompareValue,
-	} from '@datastructures-js/priority-queue';
-
 	export let config: any;
 
 	$: store_trigger = async (store_id: string, value: any) => {
-		// TODO Make this API
-		let modifications = await post(`${$api_url}/stores/${store_id}/trigger`, { value: value });
-		// run on_backend_result here
-		// then return
-	};
-
-	$: on_backend_result = async (store_modifications: Array<any>) => {
-		// When the backend returns StoreModifications
-		// put the set of store_ids being updated into the 
-		for (let {store_id, store_value} of store_modifications) {
-			// Update the store
-			// We assume this block runs atomically
-				// The problem here could be that another part of the frontend updates
-				// store_id's store between these 2 statements
-			$backend_updated_stores.add(store_id);
-			global_stores.get(store_id).set(store_value);
-		}
-
-		// // Clear all the excess stores and temporary store values
-		// for (let store_id of $excess_stores) {
-		// 	store_trigger(store_id, $temp.get(store_id).value);
-		// }
-		// $excess_stores.clear();
-		// $temp.clear();
+		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
+		return modifications;
 	};
 
 	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
@@ -140,12 +110,14 @@
 	const _match = writable(match);
     const _get_rows = writable(get_rows);
     const _edit = writable(edit);
+	const _store_trigger = writable(store_trigger);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
 	$: $_match = match;
     $: $_get_rows = get_rows;
     $: $_edit = edit;
+	$: $_store_trigger = store_trigger;
 
 	$: context = {
 		get_schema: _get_schema,
@@ -153,6 +125,7 @@
 		match: _match,
         get_rows: _get_rows,
         edit: _edit,
+		store_trigger: _store_trigger,
 	};
 	$: setContext('Interface', context);
 
@@ -214,52 +187,6 @@
 			id: i
 		});
 	}
-
-	interface StoreTrigger {
-		store_id: string
-		// The source of the trigger - 1=frontend, 0=backend
-		source: number
-	}
-
-	const compare_store_trigger: ICompare<StoreTrigger> = (a: StoreTrigger, b: StoreTrigger) => {
-		return a.source < b.source ? -1 : 1;
-	}
-	// Queue to keep track of stores that would trigger graph execution on the backend.
-	// We order the queue by the timestamp
-	const store_trigger_queue = new PriorityQueue<StoreTrigger>(compare_store_trigger);
-
-	// Setup a trigger function that calls the computational graph when stores change
-	// TODO (arjundd): Only do this for backend stores.
-	let trigger_fn = (store_trigger: StoreTrigger) => {
-		// let _store = global_stores.get(store_id);
-		// console.log("triggering", $_store);
-		// Remove all backend stores from the queue
-		let stores_changed_from_frontend = {}
-		while (!store_trigger_queue.isEmpty()) {
-			const store_trigger = store_trigger_queue.dequeue();
-			const store_id = store_trigger.store_id;
-			const source = store_trigger.source;
-			if (source == 0) { // store was updated from backend
-				continue
-			} else { // store was updated from frontend
-				stores_to_send_to_backend[store_id] = global_stores.get(store_id);
-			}
-		}
-
-		// Mapping from store_id -> value.
-		const store_values = update_stores(stores_changed_from_frontend)
-
-	};
-	// $: {
-	// 	for (let store_id of global_stores.keys()) {
-	// 		store_trigger_queue.push({store_id: store_id, source: 0});
-	// 		console.log(store_id);
-	// 		// trigger_fn({
-	// 		// 	store_id: store_id, 
-	// 		// 	timestamp: Date.now()
-	// 		// })
-	// 	}
-	// }
 
 	const cols = [[1200, 6]];
 </script>

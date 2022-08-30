@@ -23,6 +23,9 @@ class NodeMixin:
     def __eq__(self, other):
         return id(self) == id(other)
 
+    def has_children(self):
+        return len(self.children) > 0
+
 
 Storeable = Union[int, str, float]
 
@@ -108,7 +111,7 @@ class Store(IdentifiableMixin, NodeMixin):
         return StoreConfig(
             store_id=self.id,
             value=self.value,
-            has_children=len(self.children) > 0,
+            has_children=self.has_children(),
         )
 
 
