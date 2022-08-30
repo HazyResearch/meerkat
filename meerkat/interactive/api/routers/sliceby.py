@@ -11,7 +11,7 @@ from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
 
-from .datapanel import RowsRequest, RowsResponse, _get_column_infos
+from .datapanel import RowsResponse, _get_column_infos
 
 
 def get_sliceby(sliceby_id: str) -> SliceBy:

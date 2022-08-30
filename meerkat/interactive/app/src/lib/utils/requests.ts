@@ -30,14 +30,20 @@ export async function post(url: string, data: any): Promise<any> {
 
 export async function modify(url: string, data: any): Promise<any> {
     let modifications = await post(url, data);
+    console.log(modifications)
 
     // url must hit an endpoint that returns a list of modifications 
-    for (let modification of  modifications){
-        let store = global_stores.get(modification.box_id)
-        store.update((value: any) => {
-            value.scope = modification.scope;
-            return value
+    for (let modification of modifications) {
+        if (modification.type === 'box') {
+            let store = global_stores.get(modification.id)
+            store.update((value: any) => {
+                value.scope = modification.scope;
+                return value
+            }
+            )
+        } else if (modification.type === 'store') {
+            let store = global_stores.get(modification.id);
+            store.set(modification.value);
         }
-        )
-    }    
+    }
 }

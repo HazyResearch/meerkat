@@ -5,7 +5,7 @@
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
 
-	const { schema, add, match } = getContext('Interface');
+	const { get_schema, add, match } = getContext('Interface');
 
 	export let dp: Writable;
 	export let against: Writable<string>;
@@ -17,7 +17,7 @@
     let schema_promise;
     let items_promise;
 	$: {
-		schema_promise = $schema($dp.box_id);
+		schema_promise = $get_schema($dp.box_id);
 		items_promise = schema_promise.then((schema: DataPanelSchema) => {
 			return schema.columns.map((column) => {
 				return {
@@ -27,13 +27,6 @@
 			});
 		});
 	}
-
-	let on_add = async () => {
-		let box_id = $dp.box_id;
-		let column_name = `add(${$against})`;
-		col.set(column_name);
-		$add(box_id, column_name);
-	};
 
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
@@ -49,11 +42,16 @@
 		}
 		status = 'working';
         let box_id = $dp.box_id;
-		let match_criterion = new MatchCriterion($against, $text);
-        let promise = $match(box_id, match_criterion);
+        let promise = $match(
+            box_id, 
+            $against,
+            $text, 
+            col
+        );
 		promise.then(() => {
 			status = 'success';
 		});
+
 	};
 
 	function handleSelect(event) {

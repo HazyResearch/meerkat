@@ -42,21 +42,26 @@ def test_get_schema(dp_testbed):
                 "cell_props": {},
             },
         ],
+        "nrows": 10,
     }
 
 
-def test_match(dp_testbed, monkeypatch):
-    from meerkat.ops import match
-
-    monkeypatch.setattr(match, "embed", lambda *args, **kwargs: np.zeros((1, 4)))
-
+def test_rows(dp_testbed):
     dp = dp_testbed["dp"]
     box = Pivot(dp)
     response = client.post(
-        f"/dp/{box.id}/match/", json={"input": "a", "query": "this is the query"}
+        f"/dp/{box.id}/rows/",
+        json={"start": 3, "end": 7},
     )
-
     assert response.status_code == 200
+    assert response.json()["rows"] == [
+        [" 3", " 13", "[0. 0. 0. 0.]"],
+        [" 4", " 14", "[0. 0. 0. 0.]"],
+        [" 5", " 15", "[0. 0. 0. 0.]"],
+        [" 6", " 16", "[0. 0. 0. 0.]"],
+    ]
+    assert response.json()["indices"] == [3, 4, 5, 6]
+    assert response.json()["full_length"] == 10
 
 
 def test_add(dp_testbed):

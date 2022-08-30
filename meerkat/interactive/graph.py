@@ -1,7 +1,9 @@
+from abc import ABC
+from collections import defaultdict
 from copy import copy
 from dataclasses import dataclass
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Hashable, List, Set, Union
 
 from pydantic import BaseModel
 
@@ -11,34 +13,66 @@ if TYPE_CHECKING:
     from meerkat.datapanel import DataPanel
 
 
+class NodeMixin:
+    def __init__(self):
+        self.children: Set[Operation] = set()
+
+    def __hash__(self):
+        return hash(id(self))
+
+    def __eq__(self, other):
+        return id(self) == id(other)
+
+
+Storeable = Union[int, str, float]
+
+
 class BoxConfig(BaseModel):
     box_id: str
     type: str = "DataPanel"
 
 
-class Box(IdentifiableMixin):
+class Box(IdentifiableMixin, NodeMixin):
     identifiable_group: str = "boxes"
 
     def __init__(self, obj):
         super().__init__()
         self.obj = obj
 
-        self.children: List[Operation] = []
-
     @property
     def config(self):
         return BoxConfig(box_id=self.id, type="DataPanel")
 
 
-class Modification(BaseModel):
-    box_id: str
-    scope: List[str]
+class Modification(BaseModel, ABC):
+    id: str
 
     @property
-    def box(self):
+    def node(self):
+        raise NotImplementedError()
+
+
+class BoxModification(Modification):
+    scope: List[str]
+    type: str = "box"
+
+    @property
+    def node(self):
         from meerkat.state import state
 
-        return state.identifiables.get(group="boxes", id=self.box_id)
+        return state.identifiables.get(group="boxes", id=self.id)
+
+
+class StoreModification(Modification):
+    id: str
+    value: Storeable
+    type: str = "store"
+
+    @property
+    def node(self):
+        from meerkat.state import state
+
+        return state.identifiables.get(group="stores", id=self.id)
 
 
 class PivotConfig(BoxConfig):
@@ -62,7 +96,7 @@ class StoreConfig(BaseModel):
     value: Any
 
 
-class Store(IdentifiableMixin):
+class Store(IdentifiableMixin, NodeMixin):
     identifiable_group: str = "stores"
 
     def __init__(self, value: Any):
@@ -74,10 +108,8 @@ class Store(IdentifiableMixin):
         return StoreConfig(
             store_id=self.id,
             value=self.value,
+            has_children=len(self.children) > 0,
         )
-
-
-Storeable = Union[int, str, float]
 
 
 def make_store(value: Union[str, Storeable]):
@@ -86,48 +118,93 @@ def make_store(value: Union[str, Storeable]):
     return Store(value)
 
 
-@dataclass
-class Operation:
-    fn: Callable
-    args: List[Any]
-    kwargs: Dict[str, Any]
-    result: Derived
+class Operation(NodeMixin):
+    def __init__(
+        self, fn: Callable, args: List[Box], kwargs: Dict[str, Box], result: Derived
+    ):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.result = result
 
     def __call__(self):
-        unpacked_args, unpacked_kwargs, _ = _unpack_boxes(*self.args, **self.kwargs)
+        unpacked_args, unpacked_kwargs, _, _ = _unpack_boxes_and_stores(
+            *self.args, **self.kwargs
+        )
         result = self.fn(*unpacked_args, **unpacked_kwargs)
         # TODO: result may be multiple
         self.result.obj = result
-        return self.result
+        return BoxModification(id=self.result.id, scope=result.columns)
+
+
+def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
+    """
+    Perform a topological sort on a graph.
+
+    Args:
+        nodes: A graph represented as a dictionary mapping nodes to lists of its
+            parents.
+    """
+    # get a mapping from node to the children of each node
+    parents = defaultdict(set)
+    nodes = set()
+    while root_nodes:
+        node = root_nodes.pop(0)
+        for child in node.children:
+            parents[child].add(node)
+            nodes.add(node)
+            root_nodes.append(child)
+
+    current = [
+        node for node in nodes if not parents[node]
+    ]  # get a set of all the nodes without an incoming edge
+
+    while current:
+        node = current.pop(0)
+        yield node
+
+        for child in node.children:
+            parents[child].remove(node)
+            if not parents[child]:
+                current.append(child)
 
 
 def trigger(modifications: List[Modification]) -> List[Modification]:
+    """Trigger the computation graph of an interface based on a list of
+    modifications.
+
+    Return:
+        List[Modification]: The list of modifications that resulted from running the
+            computation graph.
+
+    """
+    # shallow copy the modifications, since we'll be popping from it
     modifications = copy(modifications)
-    all_modifications = []
-    while modifications:
-        modification = modifications.pop(0)
-        all_modifications.append(modification)
-        box = modification.box
-        for op in box.children:
-            derived = op()
-            modifications.append(Modification(box_id=derived.id, scope=[]))
 
-    # ops_to_exec, modifications = topological(pivots)
+    # build a graph rooted at the stores and boxes in the modifications list
+    root_nodes = [mod.node for mod in modifications]
 
-    # for op in ops_to_exec:
-    #     op()
+    order = [
+        node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
+    ]
 
-    return all_modifications
+    modifications = [op() for op in order]
+    return modifications
 
 
-def _unpack_boxes(*args, **kwargs):
+def _unpack_boxes_and_stores(*args, **kwargs):
     # TODO(Sabri): this should be nested
     boxes = []
+    stores = []
     unpacked_args = []
     for arg in args:
         if isinstance(arg, Box):
             boxes.append(arg)
             unpacked_args.append(arg.obj)
+        elif isinstance(arg, Store):
+            stores.append(arg)
+            unpacked_args.append(arg.value)
         else:
             unpacked_args.append(arg)
 
@@ -136,25 +213,34 @@ def _unpack_boxes(*args, **kwargs):
         if isinstance(v, Box):
             boxes.append(v)
             unpacked_kwargs[k] = v.obj
+        elif isinstance(v, Store):
+            stores.append(v)
+            unpacked_kwargs[k] = v.value
         else:
             unpacked_kwargs[k] = v
 
-    return unpacked_args, unpacked_kwargs, boxes
+    return unpacked_args, unpacked_kwargs, boxes, stores
 
 
 def interface_op(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         # TODO(Sabri): this should be nested
-        unpacked_args, unpacked_kwargs, boxes = _unpack_boxes(*args, **kwargs)
+        unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
+            *args, **kwargs
+        )
 
         result = fn(*unpacked_args, **unpacked_kwargs)
 
-        if len(boxes) > 0:
+        if len(boxes) > 0 or len(stores) > 0:
             derived = Derived(result)
+            # this `fn` explicitly shouldn't be the wrapped version!
             op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
             for input_box in boxes:
-                input_box.children.append(op)
+                input_box.children.add(op)
+            for input_store in stores:
+                input_store.children.add(op)
+            op.children.add(derived)
             # TODO(Sabri): this should be nested
             return derived
 

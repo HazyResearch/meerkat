@@ -35,15 +35,18 @@ class SchemaRequest(BaseModel):
 class SchemaResponse(BaseModel):
     id: str
     columns: List[ColumnInfo]
+    nrows: int = None
 
 
 @router.post("/{pivot_id}/schema/")
-def get_schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
+def schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
     pivot = state.identifiables.get(group="boxes", id=pivot_id)
 
     dp = state.identifiables.get(group="datapanels", id=pivot.obj.id)
     columns = dp.columns if request is None else request.columns
-    return SchemaResponse(id=pivot.obj.id, columns=_get_column_infos(dp, columns))
+    return SchemaResponse(
+        id=pivot.obj.id, columns=_get_column_infos(dp, columns), nrows=len(dp)
+    )
 
 
 def _get_column_infos(dp: DataPanel, columns: List[str] = None):
@@ -83,36 +86,31 @@ class RowsResponse(BaseModel):
     full_length: int
 
 
-class RowsRequest(BaseModel):
-    # TODO (sabri): add support for data validation
-    start: int = None
-    end: int = None
-    indices: List[int] = None
-    columns: List[str] = None
-
-
-@router.post("/{datapanel_id}/rows/")
-def get_rows(
+@router.post("/{box_id}/rows/")
+def rows(
     box_id: str,
-    request: RowsRequest,
+    start: int = Body(None),
+    end: int = Body(None),
+    indices: List[int] = Body(None),
+    columns: List[str] = Body(None),
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
     box = state.identifiables.get(group="boxes", id=box_id)
+    dp = box.obj
 
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
     full_length = len(dp)
-    column_infos = _get_column_infos(dp, request.columns)
+    column_infos = _get_column_infos(dp, columns)
 
     dp = dp[[info.name for info in column_infos]]
 
-    if request.indices is not None:
-        dp = dp.lz[request.indices]
-        indices = request.indices
-    elif request.start is not None:
-        if request.end is None:
-            request.end = len(dp)
-        dp = dp.lz[request.start : request.end]
-        indices = list(range(request.start, request.end))
+    if indices is not None:
+        dp = dp.lz[indices]
+        indices = indices
+    elif start is not None:
+        if end is None:
+            end = len(dp)
+        dp = dp.lz[start:end]
+        indices = list(range(start, end))
     else:
         raise ValueError()
 
@@ -127,56 +125,6 @@ def get_rows(
         full_length=full_length,
         indices=indices,
     )
-
-
-class MatchRequest(BaseModel):
-    input: str  # The name of the input column.
-    query: str  # The query text to match against.
-
-
-@router.post("/{box_id}/match/")
-def match(box_id: str, input: str = Body(), query: str = Body()) -> SchemaResponse:
-    """
-    Match a query string against a DataPanel column.
-
-    The `datapanel_id` remains the same as the original request.
-    """
-    print("here")
-    box = state.identifiables.get(group="boxes", id=box_id)
-
-    dp = box.obj
-    if not isinstance(dp, DataPanel):
-        raise HTTPException(
-            status_code=404, detail="`match` expects a box containing a datapanel"
-        )
-    # write the query to a file
-    with open("/tmp/query.txt", "w") as f:
-        f.write(query)
-    try:
-        dp, match_columns = mk.match(
-            data=dp, query=query, input=input, return_column_names=True
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    modifications = [Modification(box_id=box_id, scope=match_columns)]
-    modifications = trigger(modifications)
-    return modifications
-    # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
-
-
-@router.post("/{pivot_id}/add/")
-def add_column(pivot_id: str, column: str = EmbeddedBody()):
-    pivot = state.identifiables.get(group="boxes", id=pivot_id)
-    dp = pivot.obj
-
-    import numpy as np
-
-    dp[column] = np.zeros(len(dp))
-
-    modifications = [Modification(box_id=pivot_id, scope=[column])]
-    modifications = trigger(modifications)
-    return modifications
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky

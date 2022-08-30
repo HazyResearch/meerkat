@@ -49,6 +49,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@datastructures-js/priority-queue": "^6.1.2",
 		"@types/underscore": "^1.11.4",
 		"d3": "^7.6.1",
 		"d3-brush": "^3.0.0",

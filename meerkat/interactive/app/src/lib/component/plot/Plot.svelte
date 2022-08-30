@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { api_url } from '$network/stores.js';
-	import { get_schema } from '$lib/api/datapanel';
     import { get, writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
+	import { getContext } from 'svelte';
+
+	const { get_schema } = getContext('Interface');
 
 
 	export let dp: Writable;
@@ -12,10 +15,8 @@
     export let y_label: Writable;
     export let type: string;
 
-	let schema_promise = get_schema($api_url, $dp.box_id);
-	dp.subscribe((value: any) => {
-		schema_promise = get_schema($api_url, $dp.box_id);
-	});
+	$: schema_promise = $get_schema($dp.box_id);
+
 	// export let selection: any;
 	// export let
 </script>
