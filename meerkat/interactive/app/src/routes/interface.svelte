@@ -48,13 +48,15 @@
 		indices?: Array<number>,
 		columns?: Array<string>
 	) => {
+		console.log("Inside get_rows");
+		console.log(box_id, start, end, indices, columns);
 		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
 			columns: columns
 		});
-        console.log(result)
+        console.log(result);
         return result 
 
 	};

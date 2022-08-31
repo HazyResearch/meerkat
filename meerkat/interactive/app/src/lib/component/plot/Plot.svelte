@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { api_url } from '$network/stores.js';
-    import { get, writable } from 'svelte/store';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
+	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
+	import type { Point2D } from '$lib/components/plot/types';
 
-	const { get_schema } = getContext('Interface');
-
+	const { get_rows } = getContext('Interface');
 
 	export let dp: Writable;
 	export let selection: Writable;
@@ -13,33 +12,44 @@
 	export let y: Writable;
     export let x_label: Writable;
     export let y_label: Writable;
-    export let type: string;
+	export let type: string;
 
-	$: schema_promise = $get_schema($dp.box_id);
+	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
+		// Fetch all the data from the datapanel for the columns to be plotted
+		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y]);
+		let datum: Array<Point2D> = [];
+		rows.rows?.forEach((row: any, index: number) => {
+			datum.push({
+				x: parseFloat(row[0]),
+				y: parseFloat(row[1]),
+				id: rows.indices[index]
+			});
+		});
+		return datum;
+	};
+	$: datum_promise = get_datum($dp.box_id);
 
-	// export let selection: any;
-	// export let
 </script>
 
-<div class="bg-slate-100">
-	Plot of type {type}
-
-    x: {$x}, y: {$y}
-    x_label: {$x_label}, y_label: {$y_label}
-
-
-
-	{#await schema_promise}
-		waiting....
-	{:then schema}
-		<div class="flex space-x-3">
-			{#each schema.columns as column_info}
-				<div class="bg-violet-200 rounded-md px-3 font-bold text-slate-700">
-					{column_info.name}
-				</div>
-			{/each}
-		</div>
-	{:catch error}
-		{error}
+<div class="flex flex-col items-center pb-8">
+	{#await datum_promise}
+		<ScatterPlot
+			data={[{ x: 0, y: 0, id: 0 }]}
+			bind:xlabel={$x_label}
+			bind:ylabel={$y_label}
+			width="90%"
+			height="300px"
+		/>
+	{:then datum}
+		<ScatterPlot
+			data={datum}
+			bind:xlabel={$x_label}
+			bind:ylabel={$y_label}
+			width="90%"
+			height="300px"
+			on:selection-change={(e) => {
+				$selection = Array.from(e.detail.selected_points);
+			}}
+		/>
 	{/await}
 </div>

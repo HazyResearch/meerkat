@@ -11,7 +11,7 @@ class Plot(Component):
     def __init__(
         self,
         dp: Pivot,
-        selection: Pivot,
+        selection: Union[list, Store],
         x: Union[str, Store],
         y: Union[str, Store],
         x_label: Union[str, Store],
@@ -20,7 +20,7 @@ class Plot(Component):
     ) -> None:
         super().__init__()
         self.dp = dp
-        self.selection = selection
+        self.selection = make_store(selection)
         self.x = make_store(x)
         self.y = make_store(y)
         self.x_label = make_store(x_label)
