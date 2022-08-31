@@ -14,13 +14,14 @@ from ..abstract import Interface, InterfaceConfig
 def simple_op(col: str):
     return col + "!"
 
+
 @interface_op
 def make_selection_dp(dp, id, selection):
     """An out of place operation to take a store and make it a derived datapanel"""
     return mk.DataPanel({id: dp[id][selection]})
 
+
 class PlotInterface(Interface):
-    
     def __init__(
         self,
         dp: mk.DataPanel,
@@ -45,9 +46,7 @@ class PlotInterface(Interface):
         match_y: Component = Match(dp_pivot, against=against)
 
         # Setup computation graph
-        merge_derived = mk.merge(
-            left=dp_pivot, right=selection_dp, on=self.id_column
-        )
+        merge_derived = mk.merge(left=dp_pivot, right=selection_dp, on=self.id_column)
         sort_derived = mk.sort(dp_pivot, by=match_x.col, ascending=False)
 
         result = simple_op(against)

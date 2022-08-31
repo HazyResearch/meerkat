@@ -48,7 +48,7 @@ def call_function_get_frame(func, *args, **kwargs):
 class InterfaceMeta(type):
     def __call__(cls, *args, **kwargs):
         instance = super().__call__(*args, **kwargs)
-        # Automatically call the layout method when the 
+        # Automatically call the layout method when the
         # interface is created
         instance._layout()
         return instance
