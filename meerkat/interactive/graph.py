@@ -27,7 +27,8 @@ class NodeMixin:
         return len(self.children) > 0
 
 
-Storeable = Union[int, str, float]
+Primitive = Union[int, str, float, bool]
+Storeable = Union[Primitive, List[Primitive], Dict[Primitive, Primitive]]
 
 
 class BoxConfig(BaseModel):

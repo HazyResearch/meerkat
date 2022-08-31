@@ -116,7 +116,7 @@
 				}}
 				
 			>
-				<div slot="pivot-tooltip">Click to see example</div>
+				<div slot="pivot-tooltip">Double-click to see example</div>
 			</Card>
 			<!-- Labeling selection widget -->
 			<div 

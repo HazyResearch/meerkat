@@ -71,7 +71,7 @@
 	<!-- Pivot (main) element -->
 	<div
 		class="pivot"
-		on:click={pivot_modal
+		on:dblclick={pivot_modal
 			? () => openModal(pivot_modal_component, { is_open: true, ...pivot_modal_component_props })
 			: null} 
 		use:pivot_tippy={pivot_tooltip

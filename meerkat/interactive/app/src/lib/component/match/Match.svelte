@@ -5,7 +5,7 @@
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
 
-	const { get_schema, add, match } = getContext('Interface');
+	const { get_schema, match } = getContext('Interface');
 
 	export let dp: Writable;
 	export let against: Writable<string>;
