@@ -19,13 +19,20 @@ class InterfaceConfig(BaseModel):
     pivots: List[PivotConfig]
     components: List[ComponentConfig]
 
+    def pivot(self, obj):
+        # checks whether the object is valid pivot
+
+        pivot = Pivot(obj)
+        self.pivots.append(pivot)
+
+        return pivot
+
 
 def call_function_get_frame(func, *args, **kwargs):
-    """
-    https://stackoverflow.com/questions/4214936/how-can-i-get-the-values-of-the-locals-of-a-function-after-it-has-been-executed
-    Calls the function *func* with the specified arguments and keyword
-    arguments and snatches its local frame before it actually executes.
-    """
+    """https://stackoverflow.com/questions/4214936/how-can-i-get-the-values-of-
+    the-locals-of-a-function-after-it-has-been-executed Calls the function
+    *func* with the specified arguments and keyword arguments and snatches its
+    local frame before it actually executes."""
 
     frame = None
     trace = sys.gettrace()

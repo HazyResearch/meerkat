@@ -34,9 +34,7 @@ def generate_categories(
     hint: str = EmbeddedBody(),
     n_categories: int = EmbeddedBody(default=20),
 ) -> CategoryGenerationResponse:
-    """
-    Generate a list of categories for a dataset using an LLM.
-    """
+    """Generate a list of categories for a dataset using an LLM."""
 
     from manifest import Prompt
 
@@ -74,9 +72,7 @@ def generate_categorization(
     description: str = EmbeddedBody(),
     existing_categories: List[str] = EmbeddedBody(default=["none"]),
 ) -> CategorizationGenerationResponse:
-    """
-    Generate a list of categories for a dataset using an LLM.
-    """
+    """Generate a list of categories for a dataset using an LLM."""
     from manifest import Prompt
 
     state.llm.set(client="ai21", engine="j1-jumbo")

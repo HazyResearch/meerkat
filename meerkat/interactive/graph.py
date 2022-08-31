@@ -3,11 +3,23 @@ from collections import defaultdict
 from copy import copy
 from dataclasses import dataclass
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Dict, Hashable, List, Set, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Hashable,
+    List,
+    Set,
+    TypeVar,
+    Union,
+)
 
 from pydantic import BaseModel
 
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.ops.sliceby.sliceby import SliceBy
 
 if TYPE_CHECKING:
     from meerkat.datapanel import DataPanel
@@ -36,7 +48,10 @@ class BoxConfig(BaseModel):
     type: str = "DataPanel"
 
 
-class Box(IdentifiableMixin, NodeMixin):
+T = TypeVar("T", DataPanel, SliceBy)
+
+
+class Box(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "boxes"
 
     def __init__(self, obj):
@@ -150,8 +165,7 @@ class Operation(NodeMixin):
 
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
-    """
-    Perform a topological sort on a graph.
+    """Perform a topological sort on a graph.
 
     Args:
         nodes: A graph represented as a dictionary mapping nodes to lists of its
@@ -188,7 +202,6 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
     Return:
         List[Modification]: The list of modifications that resulted from running the
             computation graph.
-
     """
     # build a graph rooted at the stores and boxes in the modifications list
     root_nodes = [mod.node for mod in modifications]

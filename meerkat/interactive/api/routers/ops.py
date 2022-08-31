@@ -26,8 +26,7 @@ router = APIRouter(
 def match(
     box_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
 ) -> List[Modification]:
-    """
-    Match a query string against a DataPanel column.
+    """Match a query string against a DataPanel column.
 
     The `datapanel_id` remains the same as the original request.
     """

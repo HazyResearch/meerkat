@@ -18,9 +18,8 @@ EmbeddedBody = functools.partial(Body, embed=True)
 
 @router.post("/{store_id}/trigger/")
 def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
-    """
-    Triggers the computational graph when a store on the frontend changes.
-    """
+    """Triggers the computational graph when a store on the frontend
+    changes."""
     # Create a store modification
     store_modification = StoreModification(id=store_id, value=value)
 

@@ -114,9 +114,7 @@ class SliceBy(IdentifiableMixin):
         return out
 
     def _get(self, slice_key: str, index, materialize: bool = False) -> List[Any]:
-        """
-        Get rows from a slice by.
-        """
+        """Get rows from a slice by."""
         if self.slice_type == "sets":
             return self.data._get(
                 self.slices[slice_key][index], materialize=materialize

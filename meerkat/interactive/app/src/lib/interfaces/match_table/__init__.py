@@ -15,7 +15,7 @@ def simple_op(col: str):
     return col + "!"
 
 
-class MatchInterface(Interface):
+class MatchTableInterface(Interface):
     def __init__(self, dp: mk.DataPanel, id_column: str, against: str = None):
         super().__init__()
         self.id_column = id_column
