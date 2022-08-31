@@ -9,12 +9,14 @@ class Match(Component):
 
     name = "Match"
 
-    def __init__(self, pivot: Pivot, against: Union[Store, str], col: str = ""):
+    def __init__(
+        self, pivot: Pivot, against: Union[Store, str], col: Union[Store, str] = ""
+    ):
         super().__init__()
         self.pivot = pivot
         self.against: Store = make_store(against)
-        self.col = Store(col)
-        self.text = Store("")
+        self.col = make_store(col)
+        self.text = make_store("")
 
     @property
     def props(self):

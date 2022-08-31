@@ -14,8 +14,8 @@
 
 	let status: string = 'waiting';
 
-    let schema_promise;
-    let items_promise;
+	let schema_promise;
+	let items_promise;
 	$: {
 		schema_promise = $get_schema($dp.box_id);
 		items_promise = schema_promise.then((schema: DataPanelSchema) => {
@@ -34,24 +34,21 @@
 	};
 
 	let on_search = async () => {
-
-
 		if ($against === '') {
 			status = 'error';
 			return;
 		}
 		status = 'working';
-        let box_id = $dp.box_id;
-        let promise = $match(
-            box_id, 
-            $against,
-            $text, 
-            col
-        );
-		promise.then(() => {
-			status = 'success';
-		});
-
+		let box_id = $dp.box_id;
+		let promise = $match(box_id, $against, $text, col);
+		promise
+			.then(() => {
+				status = 'success';
+			})
+			.catch((error) => {
+				status = 'error';
+				console.log(error);
+			});
 	};
 
 	function handleSelect(event) {
@@ -61,6 +58,7 @@
 	function handleClear() {
 		$against = '';
 	}
+	$: against_item ={value: $against, label: $against};
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
@@ -85,6 +83,7 @@
 					<Select
 						id="column"
 						placeholder="...a column."
+						value={against_item}
 						{items}
 						showIndicator={true}
 						listPlacement="auto"
