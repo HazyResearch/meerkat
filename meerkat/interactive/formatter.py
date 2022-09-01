@@ -79,7 +79,10 @@ class BasicFormatter(Formatter):
     @property
     def cell_props(self):
         return {
-            "dtype": self.dtype,
+            # backwards compatability
+            "dtype": self.dtype
+            if hasattr(self, "dtype")
+            else "str",
         }
 
 
