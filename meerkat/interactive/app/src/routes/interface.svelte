@@ -1,8 +1,9 @@
 <script context="module">
 	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ url, fetch }) {
+		let api_server_url = import.meta.env['VITE_API_URL']
 		const id = url.searchParams.get('id');
-		const response = await fetch(`${get(api_url)}/interface/${id}/config`);
+		const response = await fetch(`${api_server_url}/interface/${id}/config`);
 
 		return {
 			status: response.status,
@@ -14,12 +15,11 @@
 </script>
 
 <script lang="ts">
+
 	import { get, writable, type Writable } from 'svelte/store';
-	import { api_url } from './network/stores';
 	import { setContext } from 'svelte';
 
 	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
-	import { MatchCriterion } from '$lib/api/datapanel';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
 
 	import { onMount } from 'svelte';
@@ -30,16 +30,17 @@
 	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
 
+	let api_url2 = writable(import.meta.env["VITE_API_URL"]);
+
 	export let config: any;
 
 	$: store_trigger = async (store_id: string, value: any) => {
-		console.log('Triggering store', store_id, value);
-		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
+		let modifications = await modify(`${$api_url2}/store/${store_id}/trigger`, { value: value });
 		return modifications;
 	};
 
 	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
-		return await post(`${$api_url}/dp/${box_id}/schema`, { columns: columns });
+		return await post(`${$api_url2}/dp/${box_id}/schema`, { columns: columns });
 	};
 
 	$: get_rows = async (
@@ -49,7 +50,7 @@
 		indices?: Array<number>,
 		columns?: Array<string>
 	) => {
-		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
+		let result = await post(`${$api_url2}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
@@ -59,7 +60,7 @@
 	};
 
 	$: add = async (box_id: string, column_name: string) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/add`, { column: column_name });
+		let modifications = await modify(`${$api_url2}/dp/${box_id}/add`, { column: column_name });
 		return modifications;
 	};
 
@@ -70,7 +71,7 @@
 		row_id: string | number,
 		id_column: string
 	) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/edit`, {
+		let modifications = await modify(`${$api_url2}/dp/${box_id}/edit`, {
 			value: value,
 			column: column,
 			row_id: row_id,
@@ -80,7 +81,7 @@
 	};
 
 	$: match = async (box_id: string, input: string, query: string, col_out: Writable<string>) => {
-		let modifications = await modify(`${$api_url}/ops/${box_id}/match`, {
+		let modifications = await modify(`${$api_url2}/ops/${box_id}/match`, {
 			input: input,
 			query: query,
 			col_out: col_out.store_id
@@ -89,7 +90,7 @@
 	};
 
 	$: get_sliceby_info = async (box_id: string) => {
-		return await get_request(`${$api_url}/sliceby/${box_id}/info`);
+		return await get_request(`${$api_url2}/sliceby/${box_id}/info`);
 	};
 
 	$: get_sliceby_rows = async (
@@ -98,7 +99,7 @@
 		start?: number,
 		end?: number
 	) => {
-		return await post(`${$api_url}/sliceby/${box_id}/rows`, {
+		return await post(`${$api_url2}/sliceby/${box_id}/rows`, {
 			slice_key: slice_key,
 			start: start,
 			end: end
@@ -108,7 +109,7 @@
 	$: aggregate_sliceby = async (box_id: string, aggregations: { string: { id: string } }) => {
 		let out = Object();
 		for (const [name, aggregation] of Object.entries(aggregations)) {
-			out[name] = await post(`${$api_url}/sliceby/${box_id}/aggregate/`, {
+			out[name] = await post(`${$api_url2}/sliceby/${box_id}/aggregate/`, {
 				aggregation_id: aggregation.id,
 				accepts_dp: true
 			});
@@ -235,7 +236,6 @@
 		{/if}
 	</Grid>
 </div> -->
-
 <div class="flex flex-col space-y-3 h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<!-- TODO: Things that are not in the computation graph should have a blank callback. -->

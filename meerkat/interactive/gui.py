@@ -14,36 +14,22 @@ from meerkat.state import state
 from .api.routers.interface import Interface
 from .app.src.lib.interfaces.match_table import MatchTableInterface
 from .app.src.lib.interfaces.sliceby import SliceByInterface
+from .startup import is_notebook
 
 
 class GUI:
-    @staticmethod
-    def launch_interface(interface: Interface, return_url: bool = False):
-
-        if state.network_info is None:
-            raise ValueError(
-                "Interactive mode not initialized."
-                "Run `network, register_api = mk.interactive_mode()` followed by "
-                "`register_api()` first."
-            )
-
-        url = f"{state.network_info.npm_server_url}/interface?id={interface.id}"
-        if return_url:
-            return url
-        # return HTML(
-        #     "<style>iframe{width:100%}</style>"
-        #     '<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"></script>'
-        #     f'<iframe id="meerkatIframe" src="{url}"></iframe>'
-        #     "<script>iFrameResize({{ log: true }}, '#meerkatIframe')</script>"
-        # )
-        return IFrame(url, width="100%", height="1000")
+    pass
 
 
 class DataPanelGUI(GUI):
     def __init__(self, dp: mk.DataPanel):
         self.dp = dp
 
-    def table(self, *args, **kwargs) -> IFrame:
+    def table(
+        self,
+        *args,
+        **kwargs,
+    ) -> IFrame:
         interface = MatchTableInterface(dp=self.dp, *args, **kwargs)
         return interface.launch()
 

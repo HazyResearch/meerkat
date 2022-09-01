@@ -61,7 +61,7 @@ class NetworkInfo:
     api_server_port: int
     api_server: Server
     npm_server_port: int
-    npm_process: subprocess.Popen
+    npm_process: subprocess.Popen = None
     api_server_name: str = "localhost"
     npm_server_name: str = "localhost"
 

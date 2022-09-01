@@ -7,6 +7,7 @@ import pathlib
 import socket
 import subprocess
 import time
+from contextlib import closing
 
 import requests
 from uvicorn import Config
@@ -45,6 +46,7 @@ def get_first_available_port(initial: int, final: int) -> int:
     """Gets the first open port in a specified range of port numbers. Taken
     from https://github.com/gradio-app/gradio/blob/main/gradio/networking.py.
 
+    New solution: https://stackoverflow.com/questions/19196105/how-to-check-if-a-network-port-is-open
     Args:
         initial: the initial value in the range of port numbers
         final: final (exclusive) value in the range of port numbers,
@@ -60,6 +62,7 @@ def get_first_available_port(initial: int, final: int) -> int:
             return port
         except OSError:
             pass
+
     raise OSError(
         "All ports from {} to {} are in use. Please close a port.".format(
             initial, final - 1
@@ -73,8 +76,6 @@ def interactive_mode(
     npm_port: int = None,
 ):
     """Start Meerkat interactive mode in a Jupyter notebook."""
-    if not is_notebook():
-        raise RuntimeError("This function can only be run in a notebook.")
 
     api_server_name = api_server_name or LOCALHOST_NAME
 
@@ -85,9 +86,6 @@ def interactive_mode(
         )
     else:
         api_port = get_first_available_port(api_port, api_port + 1)
-
-    # url_host_name = "localhost" if api_server_name == "0.0.0.0" else api_server_name
-    # path_to_local_server = "http://{}:{}/".format(url_host_name, api_port)
 
     # Start the FastAPI server
     api_server = Server(
@@ -108,36 +106,38 @@ def interactive_mode(
     currdir = os.getcwd()
     os.chdir(libpath)
 
-    # npm run dev -- --port {npm_port}
-    npm_process = subprocess.Popen(["npm", "run", "dev", "--", "--port", str(npm_port)])
-    time.sleep(1)
-
-    # Back to the original directory
-    os.chdir(currdir)
-
-    # Store in global state
     network_info = NetworkInfo(
         api=MeerkatAPI,
         api_server=api_server,
         api_server_name=api_server_name,
         api_server_port=api_port,
         npm_server_port=npm_port,
-        npm_process=npm_process,
     )
+
+    # npm run dev -- --port {npm_port}
+    current_env = os.environ.copy()
+    current_env.update({"VITE_API_URL": network_info.api_server_url})
+    npm_process = subprocess.Popen(
+        [
+            "npm",
+            "run",
+            "dev",
+            "--",
+            "--port",
+            str(npm_port),
+        ],
+        env=current_env,
+    )
+    network_info.npm_process = npm_process
+    time.sleep(1)
+
+    # Back to the original directory
+    os.chdir(currdir)
+
+    # Store in global state
     state.network_info = network_info
 
-    from IPython.display import IFrame
-
-    # This register_fn must be invoked in the notebook
-    # TODO: figure out why requests.get and urllib.request.urlopen are not working
-    # (maybe related to localStorage only being accessible from the notebook context?)
-    register_fn = lambda: IFrame(
-        f"{network_info.npm_server_url}/network/register?api={network_info.api_server_url}",  # noqa
-        width=1,
-        height=1,
-    )
-
-    return network_info, register_fn
+    return network_info
 
 
 def setup_tunnel(local_server_port: int, endpoint: str) -> str:

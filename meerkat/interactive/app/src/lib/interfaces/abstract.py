@@ -1,3 +1,4 @@
+import code
 import sys
 from typing import List
 
@@ -10,6 +11,7 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     ComponentConfig,
 )
 from meerkat.interactive.graph import Pivot
+from meerkat.interactive.startup import is_notebook
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -93,13 +95,15 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
         url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
         if return_url:
             return url
-        # return HTML(
-        #     "<style>iframe{width:100%}</style>"
-        #     '<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"></script>'
-        #     f'<iframe id="meerkatIframe" src="{url}"></iframe>'
-        #     "<script>iFrameResize({{ log: true }}, '#meerkatIframe')</script>"
-        # )
-        return IFrame(url, width="100%", height="1000")
+        if is_notebook():
+            return IFrame(url, width="100%", height="1000")
+        else:
+            print(url)
+
+            # get locals of the main module when running in script.
+            import __main__
+
+            code.interact(local=__main__.__dict__)
 
     def pivot(self, obj):
         # checks whether the object is valid pivot
