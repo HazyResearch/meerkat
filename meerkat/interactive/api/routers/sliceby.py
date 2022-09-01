@@ -1,17 +1,13 @@
-from multiprocessing.sharedctypes import Value
-from time import sleep
-from typing import Any, Dict, List, Union
+from typing import Dict, List
 
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
-import meerkat as mk
-from meerkat.datapanel import DataPanel
 from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
 
-from .datapanel import RowsRequest, RowsResponse, _get_column_infos
+from .datapanel import RowsResponse, _get_column_infos
 
 
 def get_sliceby(sliceby_id: str) -> SliceBy:
@@ -45,14 +41,13 @@ class InfoResponse(BaseModel):
         smart_union = True
 
 
-@router.get("/{sliceby_id}/info/")
-def get_info(sliceby_id: str) -> InfoResponse:
-    if sliceby_id == "test":
-        sliceby_id = list(state.identifiables.slicebys.keys())[0]
-    sb = get_sliceby(sliceby_id=sliceby_id)
+@router.get("/{box_id}/info/")
+def get_info(box_id: str) -> InfoResponse:
+    box = state.identifiables.get(group="boxes", id=box_id)
+    sb = box.obj
 
     return InfoResponse(
-        id=sliceby_id,
+        id=sb.id,
         type=type(sb).__name__,
         n_slices=len(sb),
         slice_keys=sb.slice_keys,
@@ -71,13 +66,15 @@ class SliceByRowsRequest(BaseModel):
         smart_union = True
 
 
-@router.post("/{sliceby_id}/rows/")
+@router.post("/{box_id}/rows/")
 def get_rows(
-    sliceby_id: str,
+    box_id: str,
     request: SliceByRowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    sb = get_sliceby(sliceby_id=sliceby_id)
+    box = state.identifiables.get(group="boxes", id=box_id)
+    sb = box.obj
+
     slice_key = request.slice_key
     full_length = sb.get_slice_length(slice_key)
     column_infos = _get_column_infos(sb.data, request.columns)
@@ -106,16 +103,18 @@ def get_rows(
     )
 
 
-@router.post("/{sliceby_id}/aggregate/")
+@router.post("/{box_id}/aggregate/")
 def aggregate(
-    sliceby_id: str,
+    box_id: str,
     aggregation_id: str = Body(None),
     aggregation: str = Body(None),
     accepts_dp: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Dict:
-    sliceby = state.identifiables.get(group="slicebys", id=sliceby_id)
+    box = state.identifiables.get(group="boxes", id=box_id)
+    sb = box.obj
 
+    sliceby = sb
     if columns is not None:
         sliceby = sliceby[columns]
 

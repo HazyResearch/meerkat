@@ -3,7 +3,7 @@
 
 	export let header: string | undefined = undefined;
 	export let content: any = undefined;
-	export let layout: string;
+	export let layout: "wide-header" | "equal" | "wide-content";
 </script>
 
 <div class="flex h-fit">
@@ -13,7 +13,7 @@
             class:w-full={layout === 'wide-header' || layout === 'equal'}
             class:rounded-md={!content}
         >
-            <Cell data={header} />
+            {header}
         </div>
     {/if}
     {#if content}
@@ -22,7 +22,7 @@
             class:w-full={layout === 'wide-content' || layout === 'equal'}
             class:rounded-md={!header}
         >
-            <Cell data={content} />
+            <Cell data={content} cell_component="basic"/>
         </div>
     {/if}
 </div>

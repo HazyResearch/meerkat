@@ -1,6 +1,10 @@
-from typing import Callable, Dict, List, Union
+from copy import copy
+from dataclasses import dataclass
+from functools import wraps
+from typing import Any, Callable, Dict, List, Union
 
 from IPython.display import IFrame
+from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -8,6 +12,8 @@ from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
 
 from .api.routers.interface import Interface
+from .app.src.lib.interfaces.match_table import MatchTableInterface
+from .app.src.lib.interfaces.sliceby import SliceByInterface
 
 
 class GUI:
@@ -37,17 +43,9 @@ class DataPanelGUI(GUI):
     def __init__(self, dp: mk.DataPanel):
         self.dp = dp
 
-    def table(self, return_url: bool = False) -> IFrame:
-
-        interface = Interface(
-            component="table",
-            props=dict(
-                type="table",
-                nrows=len(self.dp),
-                dp=self.dp.id,
-            ),
-        )
-        return self.launch_interface(interface, return_url=return_url)
+    def table(self, *args, **kwargs) -> IFrame:
+        interface = MatchTableInterface(dp=self.dp, *args, **kwargs)
+        return interface.launch()
 
     def gallery(self):
         pass
@@ -78,27 +76,12 @@ class SliceByGUI(GUI):
         Returns:
             IFrame: _description_
         """
-        if aggregations is None:
-            aggregations = {}
-
-        aggregations = {k: Aggregation(v) for k, v in aggregations.items()}
-
-        interface = Interface(
-            component="sliceby-cards",
-            props=dict(
-                type="sliceby-cards",
-                sliceby_id=self.sb.id,
-                datapanel_id=self.sb.data.id,
-                main_column=main_column,
-                tag_columns=tag_columns if tag_columns is not None else [],
-                aggregations={
-                    k: v.id for k, v in aggregations.items()
-                },  # we pass the id of the aggregations to the frontend
-            ),
-            # and keep a handle on them in the interfaces store so they aren't gc'd
-            store={"aggregations": aggregations},
-        )
-        return self.launch_interface(interface)
+        return SliceByInterface(
+            sliceby=self.sb,
+            main_column=main_column,
+            tag_columns=tag_columns,
+            aggregations=aggregations,
+        ).launch()
 
 
 class Aggregation(IdentifiableMixin):

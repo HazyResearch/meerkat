@@ -3,8 +3,10 @@ from typing import List, Union
 import numpy as np
 
 from meerkat import DataPanel
+from meerkat.interactive.graph import interface_op
 
 
+@interface_op
 def sort(
     data: DataPanel,
     by: Union[str, List[str]],

@@ -18,8 +18,11 @@ export interface DataPanelRows {
     full_length?: number
 }
 
-export class FilterCriterion {
-    constructor(readonly column: string, readonly value: any, readonly op: string) { }
+export interface FilterCriterion {
+    is_enabled: boolean;
+    column: string;
+    op: string;
+    value: any;
 }
 
 export class MatchCriterion {
@@ -40,14 +43,14 @@ export async function get_rows(
     indices?: Array<number>,
     columns?: Array<string>
 ): Promise<DataPanelRows> {
-    console.log(`${api_url}/dp/${datapanel_id}/rows`);
+    console.log(`${api_url}/box/${datapanel_id}/rows`);
     console.log(`start: ${start}`);
     console.log(`end: ${end}`);
     console.log(`indices: ${indices}`);
     console.log(`columns: ${columns}`);
 
     return await post(
-        `${api_url}/dp/${datapanel_id}/rows`,
+        `${api_url}/box/${datapanel_id}/rows`,
         { start: start, end: end, indices: indices, columns: columns }
     );
 }
@@ -72,4 +75,23 @@ export async function filter(
     const values: Array<any> = filter_criteria.map(criterion => criterion.value);
     const ops: Array<string> = filter_criteria.map(criterion => criterion.op);
     return await post(`${api_url}/dp/${datapanel_id}/filter`, { columns: columns, values: values, ops: ops });
+}
+
+export async function filter_box(
+    api_url: string, 
+    box_id: string, 
+    filter_criteria: Array<FilterCriterion>
+): Promise<DataPanelSchema> {
+    const columns: Array<string> = filter_criteria.map(criterion => criterion.column);
+    const values: Array<any> = filter_criteria.map(criterion => criterion.value);
+    const ops: Array<string> = filter_criteria.map(criterion => criterion.op);
+    return await post(`${api_url}/box/${box_id}/filter`, { columns: columns, values: values, ops: ops });
+}
+
+export async function undo_box(
+    api_url: string, 
+    box_id: string, 
+    operation_id: string
+): Promise<DataPanelSchema> {
+    return await post(`${api_url}/box/${box_id}/undo`, { operation_id: operation_id });
 }

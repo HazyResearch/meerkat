@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import meerkat as mk
+from meerkat.interactive import Pivot
 from meerkat.interactive.api.main import app
 
 client = TestClient(app)
@@ -10,20 +11,23 @@ client = TestClient(app)
 
 @pytest.fixture
 def dp_testbed():
-    dp = mk.DataPanel({"a": np.arange(10), "b": np.arange(10, 20)})
+    dp = mk.DataPanel(
+        {"a": np.arange(10), "b": np.arange(10, 20), "clip(a)": np.zeros((10, 4))}
+    )
 
     return {"dp": dp}
 
 
 def test_get_schema(dp_testbed):
     dp = dp_testbed["dp"]
+    box = Pivot(dp)
     response = client.post(
-        f"/dp/{dp.id}/schema/",
+        f"/dp/{box.id}/schema/",
         json={"columns": ["a", "b"]},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": dp.id,
+        "id": box.obj.id,
         "columns": [
             {
                 "name": "a",
@@ -38,7 +42,56 @@ def test_get_schema(dp_testbed):
                 "cell_props": {},
             },
         ],
+        "nrows": 10,
     }
+
+
+def test_rows(dp_testbed):
+    dp = dp_testbed["dp"]
+    box = Pivot(dp)
+    response = client.post(
+        f"/dp/{box.id}/rows/",
+        json={"start": 3, "end": 7},
+    )
+    assert response.status_code == 200
+    assert response.json()["rows"] == [
+        [" 3", " 13", "[0. 0. 0. 0.]"],
+        [" 4", " 14", "[0. 0. 0. 0.]"],
+        [" 5", " 15", "[0. 0. 0. 0.]"],
+        [" 6", " 16", "[0. 0. 0. 0.]"],
+    ]
+    assert response.json()["indices"] == [3, 4, 5, 6]
+    assert response.json()["full_length"] == 10
+
+
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id": column_type(list(map(str, np.arange(10, 20)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+
+    response = client.post(
+        f"/dp/{pivot.id}/edit/",
+        json={"value": "100", "column": "value", "row_id": "14", "id_column": "row_id"},
+    )
+    assert response.status_code == 200
+    assert dp["value"][4] == "100"
+    assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "box"}]
+
+
+def test_add(dp_testbed):
+    dp = dp_testbed["dp"]
+    dp = Pivot(dp)
+    response = client.post(
+        f"/dp/{dp.id}/add/",
+        json={"column": "z"},
+    )
+    assert response.status_code == 200
 
 
 def test_sort(dp_testbed):

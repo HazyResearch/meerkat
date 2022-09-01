@@ -15,7 +15,7 @@ def aggregate(
     *args,
     **kwargs,
 ) -> Dict[str, Any]:
-    """ """
+    """"""
     if nuisance not in ["drop", "raise", "warn"]:
         raise ValueError(f"{nuisance} is not a valid nuisance option")
 

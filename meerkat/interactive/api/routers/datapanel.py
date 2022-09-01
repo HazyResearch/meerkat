@@ -1,4 +1,5 @@
 import functools
+from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
 from fastapi import APIRouter, Body, HTTPException
@@ -6,6 +7,8 @@ from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
+from meerkat.interactive import Modification, trigger
+from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
 
 from ....tools.utils import convert_to_python
@@ -34,13 +37,18 @@ class SchemaRequest(BaseModel):
 class SchemaResponse(BaseModel):
     id: str
     columns: List[ColumnInfo]
+    nrows: int = None
 
 
-@router.post("/{datapanel_id}/schema/")
-def get_schema(datapanel_id: str, request: SchemaRequest) -> SchemaResponse:
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+@router.post("/{pivot_id}/schema/")
+def schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
+    pivot = state.identifiables.get(group="boxes", id=pivot_id)
+
+    dp = state.identifiables.get(group="datapanels", id=pivot.obj.id)
     columns = dp.columns if request is None else request.columns
-    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, columns))
+    return SchemaResponse(
+        id=pivot.obj.id, columns=_get_column_infos(dp, columns), nrows=len(dp)
+    )
 
 
 def _get_column_infos(dp: DataPanel, columns: List[str] = None):
@@ -80,34 +88,31 @@ class RowsResponse(BaseModel):
     full_length: int
 
 
-class RowsRequest(BaseModel):
-    # TODO (sabri): add support for data validation
-    start: int = None
-    end: int = None
-    indices: List[int] = None
-    columns: List[str] = None
-
-
-@router.post("/{datapanel_id}/rows/")
-def get_rows(
-    datapanel_id: str,
-    request: RowsRequest,
+@router.post("/{box_id}/rows/")
+def rows(
+    box_id: str,
+    start: int = Body(None),
+    end: int = Body(None),
+    indices: List[int] = Body(None),
+    columns: List[str] = Body(None),
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    box = state.identifiables.get(group="boxes", id=box_id)
+    dp = box.obj
+
     full_length = len(dp)
-    column_infos = _get_column_infos(dp, request.columns)
+    column_infos = _get_column_infos(dp, columns)
 
     dp = dp[[info.name for info in column_infos]]
 
-    if request.indices is not None:
-        dp = dp.lz[request.indices]
-        indices = request.indices
-    elif request.start is not None:
-        if request.end is None:
-            request.end = len(dp)
-        dp = dp.lz[request.start : request.end]
-        indices = list(range(request.start, request.end))
+    if indices is not None:
+        dp = dp.lz[indices]
+        indices = indices
+    elif start is not None:
+        if end is None:
+            end = len(dp)
+        dp = dp.lz[start:end]
+        indices = list(range(start, end))
     else:
         raise ValueError()
 
@@ -124,31 +129,25 @@ def get_rows(
     )
 
 
-class MatchRequest(BaseModel):
-    input: str  # The name of the input column.
-    query: str  # The query text to match against.
+@router.post("/{box_id}/edit/")
+def edit(
+    box_id: str,
+    value=Body(),  # don't set type
+    column: str = Body(),
+    row_id=Body(),
+    id_column: str = Body(),
+) -> List[Modification]:
 
+    box = state.identifiables.get(group="boxes", id=box_id)
+    dp = box.obj
 
-@router.post("/{datapanel_id}/match/")
-def match(
-    datapanel_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
-) -> SchemaResponse:
-    """
-    Match a query string against a DataPanel column.
+    mask = dp[id_column] == row_id
+    if mask.sum() == 0:
+        raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
+    dp[column][mask] = value
 
-    The `datapanel_id` remains the same as the original request.
-    """
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
-    # write the query to a file
-    with open("/tmp/query.txt", "w") as f:
-        f.write(query)
-    try:
-        dp, match_columns = mk.match(
-            data=dp, query=query, input=input, return_column_names=True
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
+    modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
+    return modifications
 
 
 # TODO: (Sabri/Arjun) Make this more robust and less hacky

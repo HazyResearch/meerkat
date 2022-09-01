@@ -16,8 +16,8 @@ def cluster(
     modality: str = None,
     **kwargs,
 ) -> Tuple[NumpyArrayColumn, ClusterMixin]:
-    """Cluster the data in a column. If the column is an unstructured type, (e.g.
-    image), the column is first embedded then clustered.
+    """Cluster the data in a column. If the column is an unstructured type,
+    (e.g. image), the column is first embedded then clustered.
 
     Args:
         data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel

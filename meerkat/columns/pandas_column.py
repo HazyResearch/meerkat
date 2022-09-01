@@ -250,6 +250,26 @@ class PandasSeriesColumn(
     def _repr_cell(self, index) -> object:
         return self[index]
 
+    def _get_default_formatter(self) -> Formatter:
+        # can't implement this as a class level property because then it will treat
+        # the formatter as a method
+        from meerkat.interactive.formatter import BasicFormatter
+
+        if len(self) == 0:
+            return BasicFormatter()
+
+        if self.dtype == object:
+            return BasicFormatter(dtype="str")
+
+        if self.dtype == pd.StringDtype:
+            return BasicFormatter(dtype="str")
+
+        cell = self[0]
+        if isinstance(cell, np.generic):
+            return BasicFormatter(dtype=type(cell.item()).__name__)
+
+        return BasicFormatter()
+
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
     ) -> PandasSeriesColumn:

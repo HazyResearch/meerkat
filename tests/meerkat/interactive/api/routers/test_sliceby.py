@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import meerkat as mk
