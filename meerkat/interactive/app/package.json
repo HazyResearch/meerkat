@@ -22,6 +22,7 @@
 		"@types/d3-selection": "^3.0.3",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
+		"@zerodevx/svelte-toast": "^0.7.2",
 		"autoprefixer": "^10.4.7",
 		"carbon-components-svelte": "^0.67.4",
 		"carbon-icons-svelte": "^11.2.0",

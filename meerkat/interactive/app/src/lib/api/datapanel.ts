@@ -18,8 +18,11 @@ export interface DataPanelRows {
     full_length?: number
 }
 
-export class FilterCriterion {
-    constructor(readonly column: string, readonly value: any, readonly op: string) { }
+export interface FilterCriterion {
+    is_enabled: boolean;
+    column: string;
+    op: string;
+    value: any;
 }
 
 export class MatchCriterion {

@@ -9,7 +9,7 @@ from meerkat.interactive.graph import Pivot, Store, head, interface_op
 from meerkat.state import state
 
 from ..abstract import Interface, InterfaceConfig
-
+from meerkat.interactive.app.src.lib.component.filter import Filter
 
 @interface_op
 def simple_op(col: str):
@@ -52,7 +52,9 @@ class MatchGalleryInterface(Interface):
         # Setup components
         match: Component = Match(dp_pivot, against=self.against, col="label")
 
-        sort_derived = mk.sort(dp_pivot, by=match.col, ascending=False)
+        filter: Component = Filter(dp_pivot)
+
+        sort_derived = mk.sort(filter.derived(), by=match.col, ascending=False)
 
         gallery: Component = Gallery(
             sort_derived,
@@ -62,7 +64,8 @@ class MatchGalleryInterface(Interface):
         )
 
         # TODO: make this more magic
-        self.components = [match, gallery]
+        # FIXME: Do these have to be ordered?
+        self.components = [match, filter, gallery]
 
     @property
     def config(self):

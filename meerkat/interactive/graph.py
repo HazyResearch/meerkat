@@ -28,7 +28,7 @@ class NodeMixin:
 
 
 Primitive = Union[int, str, float, bool]
-Storeable = Union[Primitive, List[Primitive], Dict[Primitive, Primitive]]
+Storeable = Union[Primitive, List[Primitive], Dict[Primitive, Primitive], Dict[Primitive, List[Primitive]], List[Dict[Primitive, Primitive]]]
 
 
 class BoxConfig(BaseModel):
