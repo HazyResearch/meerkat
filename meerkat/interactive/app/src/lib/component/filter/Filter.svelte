@@ -20,7 +20,8 @@
 	export let criteria: Writable<FilterCriterion[]>;
     export let operations: string[];
 
-	let criteria_frontend: FilterCriterion[] = new Array<FilterCriterion>();
+	// Initialize the value to be the value of the store.
+	let criteria_frontend: FilterCriterion[] = $criteria;
 
     console.log("criteria", $criteria);
     let schema_promise;
@@ -76,9 +77,13 @@
 		trigger_filter();
 	}
 
+	const disableCheckbox = (criterion: FilterCriterion) => {
+		return !criterion.column || !criterion.op || !criterion.value;
+	}
+
     const addCriterion = () => {
 		// Add a new filter criteria.
-        criteria_frontend = [...criteria_frontend, {is_enabled: false, column: "", op: "", value: ""}];
+        criteria_frontend = [...criteria_frontend, {is_enabled: false, column: "", op: operations[0], value: ""}];
     }
 
 	const deleteCriterion = (index: number) => {
@@ -112,15 +117,17 @@
 	<div class="form-control w-full">
 		{#each criteria_frontend as criterion, i }
 
-		<div class="input-group w-100% flex items-center">
+		<div class="py-2 input-group w-100% flex items-center">
+			<div class="px-3">
 			<input 
 				id={""+i}
 				type="checkbox"
-				disabled={!criterion.column || !criterion.op || !criterion.value}
+				disabled={disableCheckbox(criterion)}
 				bind:checked={criterion.is_enabled}
 				class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 				on:change={(e) => setCheckbox(criterion, e.target.checked, true)}
 			>
+			</div>
 
             <div class="themed pr-2 w-48">
 				{#await items_promise}
@@ -150,27 +157,49 @@
 				/>
 			</div>
 
-			<div class="themed pr-2">
+			<div class="themed pr-5">
 				<input
 					type="text"
 					id="value"
 					bind:value={criterion.value}
 					placeholder="...a value"
-                    on:keypress="{(e) => {if (e.charCode === 13) {criterion.is_enabled = true; trigger_filter();}}}"
+                    on:keypress="{(e) => {if (e.charCode === 13 && !disableCheckbox(criterion)) {criterion.is_enabled = true; trigger_filter();}}}"
+					class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
 				/>
 			</div>
-			<div >
-				<button on:click={() => deleteCriterion(i)} class="themed">X</button>
+			<div>
+				<button class="themed" on:click={() => deleteCriterion(i)}>x</button>
 			</div>
 
 		</div>
 		{/each}
 		<div >
-			<button on:click={addCriterion} class="themed">+ Add Filter</button>
-		</div>
-		<div >
-			<button on:click={handleClear} class="themed">Clear All</button>
+			<button on:click={addCriterion} class="px-3 hover:font-bold">+ Add Filter</button>
+			<button on:click={handleClear} class="px-3 hover:font-bold">Clear All</button>
 		</div>
 	</div>
 </div>
 
+<style>
+	/* 	
+			CSS variables can be used to control theming.
+			https://github.com/rob-balfre/svelte-select/blob/master/docs/theming_variables.md
+	*/
+
+	.themed {
+		--itemPadding: 0.1rem;
+		--itemColor: '#7c3aed';
+		@apply rounded-md w-40 border-0;
+		@apply z-[1000000];
+	}
+
+	.btn {
+		@apply font-bold py-2 px-4 rounded;
+	}
+	.btn-blue {
+		@apply bg-blue-500 text-white;
+	}
+	.btn-blue:hover {
+		@apply bg-blue-700;
+	}
+</style>
