@@ -15,7 +15,7 @@ def simple_op(col: str):
     return col + "!"
 
 
-class MatchInterface(Interface):
+class MatchTableInterface(Interface):
     def __init__(self, dp: mk.DataPanel, id_column: str, against: str = None):
         super().__init__()
         self.id_column = id_column
@@ -27,20 +27,12 @@ class MatchInterface(Interface):
         # with context
         self._layout()
 
-    def pivot(self, obj):
-        # checks whether the object is valid pivot
-
-        pivot = Pivot(obj)
-        self.pivots.append(pivot)
-
-        return pivot
-
     def _layout(self):
         # Setup pivots
         dp_pivot = self.pivot(self.dp)
 
         # Setup components
-        match: Component = Match(dp_pivot, against=self.against, col="label")
+        match: Component = Match(dp_pivot, against=self.against, col=self.id_column)
 
         sort_derived = mk.sort(dp_pivot, by=match.col, ascending=False)
 

@@ -52,6 +52,20 @@ class Formatter(ABC):
 class BasicFormatter(Formatter):
     cell_component = "basic"
 
+    DTYPES = [
+        "str",
+        "int",
+        "float",
+        "bool",
+    ]
+
+    def __init__(self, dtype: str = "str"):
+        if dtype not in self.DTYPES:
+            raise ValueError(
+                f"dtype {dtype} not supported. Must be one of {self.DTYPES}"
+            )
+        self.dtype = dtype
+
     def encode(self, cell: Any):
         if isinstance(cell, np.generic):
             return cell.item()
@@ -60,6 +74,12 @@ class BasicFormatter(Formatter):
     def html(self, cell: Any):
         cell = self.encode(cell)
         return format_array(np.array([cell]), formatter=None)[0]
+
+    @property
+    def cell_props(self):
+        return {
+            "dtype": self.dtype,
+        }
 
 
 class NumpyArrayFormatter(Formatter):

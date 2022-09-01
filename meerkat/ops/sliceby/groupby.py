@@ -24,7 +24,7 @@ def groupby(
     by: Union[str, Sequence[str]] = None,
 ) -> GroupBy:
     """Perform a groupby operation on a DataPanel or Column (similar to a
-    `DataFrame.groupby` and `Series.groupby` operations in Pandas).j
+    `DataFrame.groupby` and `Series.groupby` operations in Pandas).j.
 
     Args:
         data (Union[DataPanel, AbstractColumn]): The data to group.

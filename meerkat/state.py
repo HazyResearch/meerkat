@@ -148,7 +148,5 @@ state = GlobalState()
 
 
 def add_secret(api: str, api_key: str):
-    """
-    Add an API key to the global state.
-    """
+    """Add an API key to the global state."""
     state.secrets.add(api, api_key)

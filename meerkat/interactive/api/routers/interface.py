@@ -14,7 +14,6 @@ class Interface(IdentifiableMixin):
     identifiable_group: str = "interfaces"
 
 
-
 def get_interface(interface_id: int):
     try:
         interface = state.identifiables.interfaces[interface_id]

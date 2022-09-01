@@ -13,7 +13,7 @@
             class:w-full={layout === 'wide-header' || layout === 'equal'}
             class:rounded-md={!content}
         >
-            <Cell data={header} />
+            {header}
         </div>
     {/if}
     {#if content}
@@ -22,7 +22,7 @@
             class:w-full={layout === 'wide-content' || layout === 'equal'}
             class:rounded-md={!header}
         >
-            <Cell data={content} />
+            <Cell data={content} cell_component="basic"/>
         </div>
     {/if}
 </div>

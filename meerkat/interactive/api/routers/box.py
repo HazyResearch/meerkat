@@ -138,8 +138,7 @@ class MatchRequest(BaseModel):
 def match(
     datapanel_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
 ) -> SchemaResponse:
-    """
-    Match a query string against a DataPanel column.
+    """Match a query string against a DataPanel column.
 
     The `datapanel_id` remains the same as the original request.
     """

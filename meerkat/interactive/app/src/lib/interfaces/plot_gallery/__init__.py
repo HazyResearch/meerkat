@@ -17,7 +17,8 @@ def simple_op(col: str):
 
 @interface_op
 def make_selection_dp(dp, id, selection):
-    """An out of place operation to take a store and make it a derived datapanel"""
+    """An out of place operation to take a store and make it a derived
+    datapanel."""
     return mk.DataPanel({id: dp[id][selection]})
 
 

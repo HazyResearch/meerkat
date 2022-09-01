@@ -1,0 +1,42 @@
+<script lang="ts">
+	import type { DataPanelBox, SliceByBox } from '$lib/utils/graph';
+
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import SliceByCard from './SliceByCard.svelte';
+
+	const { get_schema, get_sliceby_info, aggregate_sliceby } = getContext('Interface');
+
+	export let sliceby: Writable<SliceByBox>;
+	export let dp: Writable<DataPanelBox>;
+	export let main_column: Writable<string>;
+	export let tag_columns: Writable<Array<string>>;
+	export let aggregations: any;
+
+	$: schema_promise = $get_schema($dp.box_id);
+	$: info_promise = $get_sliceby_info($sliceby.box_id);
+	let aggregations_promise = $aggregate_sliceby($sliceby.box_id, (aggregations = aggregations));
+</script>
+
+<div class="isolate bg-white container mx-auto space-y-2 p-2">
+	{#await schema_promise}
+		<div>Loading schema...</div>
+	{:then schema}
+		{#await info_promise}
+			<div class="h-full">Loading data...</div>
+		{:then info}
+			<div class="flex-rows space-y-3 overflow-y-auto overflow-x-hidden h-full">
+				{#each info.slice_keys as slice_key}
+					<SliceByCard
+						{sliceby}
+						{slice_key}
+						{schema}
+						main_column={$main_column}
+						tag_columns={$tag_columns}
+						{aggregations_promise}
+					/>
+				{/each}
+			</div>
+		{/await}
+	{/await}
+</div>
