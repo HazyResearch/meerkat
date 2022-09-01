@@ -236,3 +236,13 @@ def test_repr_pandas(testbed, max_rows):
     series, _ = testbed.col._repr_pandas_()
     assert isinstance(series, pd.Series)
     assert len(series) == min(len(series), max_rows + 1)
+
+
+def test_repr_when_transform_produces_invalid_image(testbed):
+    from torchvision.transforms import ToTensor
+
+    def mean_transform(cell):
+        return ToTensor()(cell).mean(dim=[1, 2])
+
+    testbed.col.transform = mean_transform
+    testbed.col._repr_html_()

@@ -8,6 +8,7 @@ from io import BytesIO
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
+import PIL
 import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
@@ -112,19 +113,34 @@ class PILImageFormatter(Formatter):
 
     cell_component = "image"
 
-    def encode(self, cell: Union["FileCell", Image], thumbnail: bool = False) -> str:
+    def encode(
+        self, cell: Union["FileCell", Image, torch.Tensor], thumbnail: bool = False
+    ) -> str:
         from meerkat.columns.file_column import FileCell
 
         if isinstance(cell, FileCell):
             cell = cell.get()
+
+        if torch.is_tensor(cell) or isinstance(cell, np.ndarray):
+            from torchvision.transforms.functional import to_pil_image
+
+            try:
+                cell = to_pil_image(cell)
+            except ValueError:
+                if isinstance(cell, np.ndarray):
+                    cell = NumpyArrayFormatter.encode(self, cell)
+                else:
+                    cell = TensorFormatter.encode(self, cell)
+                return cell
+
         return self._encode(cell, thumbnail=thumbnail)
 
     def _encode(self, image: Image, thumbnail: bool = False) -> str:
         with BytesIO() as buffer:
             if thumbnail:
                 image.thumbnail((64, 64))
-            image.save(buffer, "jpeg")
-            return "data:image/jpeg;base64,{im_base_64}".format(
+            image.save(buffer, "png")
+            return "data:image/png;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 

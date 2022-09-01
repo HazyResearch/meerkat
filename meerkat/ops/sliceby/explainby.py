@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-import domino
 import numpy as np
 
 from meerkat.datapanel import DataPanel
 from meerkat.ops.explain import explain
 
 from .sliceby import SliceBy
+
+if TYPE_CHECKING:
+    import domino.Slicer
 
 
 class ExplainBy(SliceBy):
@@ -26,7 +28,7 @@ def explainby(
     data: DataPanel,
     by: Union[str, Sequence[str]],
     target: Union[str, Sequence[str]],
-    method: Union[str, domino.Slicer] = "MixtureSlicer",
+    method: Union[str, "domino.Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     scores: bool = False,

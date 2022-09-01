@@ -1,21 +1,22 @@
-from typing import Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
-import domino
 import numpy as np
-from domino import Slicer
 
 from meerkat import AbstractColumn, DataPanel, NumpyArrayColumn, embed
+
+if TYPE_CHECKING:
+    from domino import Slicer
 
 
 def explain(
     data: Union[AbstractColumn, DataPanel],
     input: Optional[str] = None,
     target: Optional[str] = None,
-    method: Union[str, Slicer] = "MixtureSlicer",
+    method: Union[str, "Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
-) -> Tuple[NumpyArrayColumn, Slicer]:
+) -> Tuple[NumpyArrayColumn, "Slicer"]:
     """Cluster the data in a column. If the column is an unstructured type, (e.g.
     image), the column is first embedded then clustered.
 

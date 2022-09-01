@@ -114,7 +114,15 @@
 						card_flex_grow: false
 					}
 				}}
-				
+				on:click={() => {
+					if (selected_indices.includes(i)) {
+						selected_indices = without(selected_indices, i);
+					} else if (!selected_indices.includes(i) && selected_indices.length < 2) {
+						selected_indices.push(i); 
+						selected_indices.sort((a, b) => a - b);
+					}
+					selected_indices = selected_indices;
+				}}			
 			>
 				<div slot="pivot-tooltip">Double-click to see example</div>
 			</Card>
