@@ -142,8 +142,8 @@ class PILImageFormatter(Formatter):
         with BytesIO() as buffer:
             if thumbnail:
                 image.thumbnail((64, 64))
-            image.save(buffer, "png")
-            return "data:image/png;base64,{im_base_64}".format(
+            image.save(buffer, "jpeg")
+            return "data:image/jpeg;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 
