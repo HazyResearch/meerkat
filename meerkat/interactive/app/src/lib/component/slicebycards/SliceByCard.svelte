@@ -3,14 +3,11 @@
 	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import { get_rows } from '$lib/api/sliceby';
 	import type { SliceKey } from '$lib/api/sliceby';
 	import type { SliceByBox } from '$lib/utils/graph';
-	import RowCard from '../../component/slicebycards/RowCard.svelte';
-	import LoadButton from '../common/LoadButton.svelte';
+	import RowCard from './RowCard.svelte';
+	import LoadButton from '$lib/components/common/LoadButton.svelte';
 	import Pill from '$lib/components/common/Pill.svelte';
-	// import Matrix, { type MatrixType } from './matrix/Matrix.svelte';
-	// import Stats, { type StatsType } from './Stats.svelte';
 
 	const { get_sliceby_rows } = getContext('Interface');
 
@@ -24,8 +21,10 @@
 	let columns = schema.columns.map((col: any) => col.name);
 	let tag_indices: Array<number> = tag_columns.map((tag) => columns.indexOf(tag));
 	let main_index: number = columns.indexOf(main_column);
+	console.log(main_column)
 	let main_component = schema.columns[main_index].cell_component;
 	let main_props = schema.columns[main_index].cell_props;
+
 
 	let page: number = 0;
 	const per_page: number = 25;
@@ -39,7 +38,7 @@
 	let load_status = 'waiting';
 	let load_rows = async () => {
 		load_status = 'loading';
-		let new_rows = await get_sliceby_rows(
+		let new_rows = await $get_sliceby_rows(
 			$sliceby.box_id,
 			slice_key,
 			page * per_page,
@@ -50,7 +49,10 @@
 		page = page + 1;
 		load_status = 'waiting';
 	};
-	let load_promise = load_rows();
+	load_rows();
+
+	let get_type
+
 </script>
 
 <div class="pt-2 pl-6 pb-2 h-fit mx-auto bg-white rounded-xl shadow-lg overflow-x-hidden ml-4">
@@ -72,18 +74,16 @@
 				Loading aggregations...
 			{:then aggregations}
 				{#each Object.entries(aggregations) as [name, aggregation]}
-					<Pill layout="wide-content" header={name} content={aggregation.dp[slice_key]} />
+					<Pill 
+						layout="wide-content" 
+						header={name} 
+						content={aggregation.dp[slice_key]} 
+					/>
 				{/each}
 			{:catch error}
 				{error}
 			{/await}
 		</div>
-
-		<!-- {#if plot.PLOT_TYPE === 'matrix' && plot.matrix}
-			<Matrix {...plot.matrix} />
-		{:else if plot.PLOT_TYPE === 'plotly'}
-			{plot.html}
-		{/if} -->
 
 		<div class="flex overflow-x-scroll no-scrollbar mx-2 items-center space-x-4">
 			{#if rows.rows.length < 1}
@@ -109,7 +109,7 @@
 						layout="gimages"
 					/>
 				{/each}
-				<LoadButton status={load_status} on:load={load_rows} />
+				<LoadButton status={"waiting"} on:load={load_rows} />
 			{/if}
 		</div>
 	</div>

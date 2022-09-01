@@ -12,6 +12,7 @@
 <script lang="ts">
 	import Code from './code/Code.svelte';
 	import Image from './image/Image.svelte';
+	import BasicType from './basic/Basic.svelte';
 
 	export let data: any;
 	export let cell_component: string = '';
@@ -20,7 +21,6 @@
 	const dispatch = createEventDispatcher();
 
 	function edit() {
-		console.log(`editing: ${data}`)
 		dispatch('edit', {
 			value: data
 		});
@@ -32,5 +32,6 @@
 {:else if cell_component === 'code'}
 	<Code {data} {...cell_props} />
 {:else}
-	<input on:change={edit} bind:value={data} />
+	<BasicType {data} {...cell_props}/>
+	<!-- <input class="bg-transparent w-fit" on:change={edit} bind:value={data} /> -->
 {/if}

@@ -19,10 +19,10 @@ from typing import (
 from pydantic import BaseModel
 
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.ops.sliceby.sliceby import SliceBy
 
 if TYPE_CHECKING:
     from meerkat.datapanel import DataPanel
+    from meerkat.ops.sliceby.sliceby import SliceByCards
 
 
 class NodeMixin:
@@ -48,7 +48,7 @@ class BoxConfig(BaseModel):
     type: str = "DataPanel"
 
 
-T = TypeVar("T", DataPanel, SliceBy)
+T = TypeVar("T", "DataPanel", "SliceBy")
 
 
 class Box(IdentifiableMixin, NodeMixin, Generic[T]):

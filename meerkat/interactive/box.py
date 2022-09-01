@@ -6,9 +6,9 @@ from fastapi import APIRouter, HTTPException
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.ops.sliceby.sliceby import SliceBy
+from meerkat.ops.sliceby.sliceby import SliceByCards
 
-Boxable = Union[DataPanel, AbstractColumn, SliceBy]
+Boxable = Union[DataPanel, AbstractColumn, SliceByCards]
 
 
 class BoxOperation(IdentifiableMixin):

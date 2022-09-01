@@ -2,7 +2,7 @@ import { global_stores, store_lock } from "$lib/components/blanks/stores";
 import { get as get_store } from "svelte/store";
 
 
-export async function get(url: string): Promise<any> {
+export async function get_request(url: string): Promise<any> {
     const res: Response = await fetch(url);
     if (!res.ok) {
         throw new Error('HTTP status ' + res.status);
@@ -31,7 +31,6 @@ export async function post(url: string, data: any): Promise<any> {
 
 export async function modify(url: string, data: any): Promise<any> {
     let modifications = await post(url, data);
-    console.log(modifications)
 
     // url must hit an endpoint that returns a list of modifications 
     for (let modification of modifications) {

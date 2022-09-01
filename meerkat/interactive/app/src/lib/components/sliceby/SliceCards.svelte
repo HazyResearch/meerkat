@@ -3,8 +3,6 @@
 	import { get_aggregations, get_info } from '$lib/api/sliceby';
 	import { get_schema } from '$lib/api/datapanel';
 	import SliceCard from './SliceCard.svelte';
-	import { post } from '$lib/utils/requests';
-	import { ExpandCategories } from 'carbon-icons-svelte';
 
 	export let sliceby_id: string;
 	export let datapanel_id: string;

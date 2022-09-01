@@ -19,14 +19,6 @@ class InterfaceConfig(BaseModel):
     pivots: List[PivotConfig]
     components: List[ComponentConfig]
 
-    def pivot(self, obj):
-        # checks whether the object is valid pivot
-
-        pivot = Pivot(obj)
-        self.pivots.append(pivot)
-
-        return pivot
-
 
 def call_function_get_frame(func, *args, **kwargs):
     """https://stackoverflow.com/questions/4214936/how-can-i-get-the-values-of-
@@ -67,7 +59,9 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
 
     identifiable_group: str = "interfaces"
 
-    def __init__(self):
+    def __init__(self, layout: callable = None):
+        if layout is not None:
+            self.layout = layout
         super().__init__()
 
         self.pivots = []
