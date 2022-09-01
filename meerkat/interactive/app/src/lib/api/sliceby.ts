@@ -1,5 +1,4 @@
-import { post } from '$lib/utils/requests';
-import type { DataPanelRows } from '$lib/api/datapanel';
+
 
 export type SliceKey = string | number 
 
