@@ -1,12 +1,8 @@
-from multiprocessing.sharedctypes import Value
-from time import sleep
-from typing import Any, Dict, List, Union
+from typing import Dict, List
 
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
-import meerkat as mk
-from meerkat.datapanel import DataPanel
 from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
@@ -89,8 +85,6 @@ def get_rows(
         dp = sb.slice[slice_key, request.indices]
         indices = request.indices
     elif request.start is not None:
-        if request.end is None:
-            request.end = len(dp)
         dp = sb.slice[slice_key, request.start : request.end]
         indices = list(range(request.start, request.end))
     else:

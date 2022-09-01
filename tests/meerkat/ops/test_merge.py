@@ -119,8 +119,12 @@ class TestMerge:
 
             if isinstance(out[f"{name}_1"], ImageColumn):
                 assert out[f"{name}_1"].__class__ == out[f"{name}_2"].__class__
-                assert out[f"{name}_1"].data.is_equal(
-                    out[f"{name}_2"].data.str.replace("right", "left")
+                assert (
+                    out[f"{name}_1"]
+                    .data.args[0]
+                    .is_equal(
+                        out[f"{name}_2"].data.args[0].str.replace("right", "left")
+                    )
                 )
             else:
                 assert out[f"{name}_1"].is_equal(out[f"{name}_2"])
@@ -287,7 +291,7 @@ class TestMerge:
 
         out = dp1.merge(dp2, on="a", how="inner")
         assert isinstance(out["img"], ImageColumn)
-        assert [str(fp) for fp in out["img"].data] == [
+        assert [str(fp) for fp in out["img"].data.args[0]] == [
             img_col_test_bed.image_paths[row] for row in rows
         ]
 

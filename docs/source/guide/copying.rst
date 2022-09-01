@@ -371,7 +371,7 @@ to the underlying column(s) – *not* a copy or view.
 (2) Indexing multiple columns (*i.e.* with ``Sequence[str]``) returns a
     `view <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
     of the ``DataPanel`` holding
-    `views <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
+    `coreferences <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
     to the columns in the original ``DataPanel``. This means the
     :class:`~meerkat.AbstractColumn` objects held in the new ``DataPanel`` are the
     same :class:`~meerkat.AbstractColumn` objects held in the original ``DataPanel``.
@@ -381,6 +381,6 @@ to the underlying column(s) – *not* a copy or view.
    # (1) `Sequence[str]` -> single column
    >>> new_dp: mk.DataPanel = dp[["col_a", "col_b"]]
    >>> new_dp["col_a"] is dp["col_a"]
-   False
+   True
    >>> new_dp["col_a"].data is dp["col_a"].data
    True

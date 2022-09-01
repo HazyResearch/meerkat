@@ -32,7 +32,7 @@ class celeba(DatasetBuilder):
         df = build_celeba_df(dataset_dir=self.dataset_dir)
         dp = mk.DataPanel.from_pandas(df)
         dp["image"] = mk.ImageColumn.from_filepaths(
-            filepaths=dp["img_path"], base_dir=self.dataset_dir
+            filepaths=dp["img_path"], base_dir=self.var_dataset_dir
         )
         return dp
 

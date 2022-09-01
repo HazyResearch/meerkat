@@ -49,7 +49,12 @@ class rfw(DatasetBuilder):
             )
             df.drop(columns=["filename", "count"])
             dfs.append(df)
+
         df = pd.concat(dfs)
+
+        # drop duplicate rows with the same image_id
+        df = df.drop_duplicates(subset=["image_id"], keep=False)
+
         dp = mk.DataPanel.from_pandas(df)
         dp["image"] = mk.ImageColumn.from_filepaths(
             dp["image_path"], base_dir=self.dataset_dir

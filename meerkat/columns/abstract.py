@@ -24,7 +24,7 @@ from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
-from meerkat.tools.utils import convert_to_batch_column_fn
+from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 logger = logging.getLogger(__name__)
 
@@ -198,43 +198,7 @@ class AbstractColumn(
         )
 
     def _translate_index(self, index):
-        # `index` should return a single element
-        if not self._is_batch_index(index):
-            return index
-
-        if isinstance(index, pd.Series):
-            index = index.values
-
-        if torch.is_tensor(index):
-            index = index.numpy()
-
-        if isinstance(index, tuple) or isinstance(index, list):
-            index = np.array(index)
-
-        # `index` should return a batch
-        if isinstance(index, slice):
-            # int or slice index => standard list slicing
-            # TODO (sabri): get rid of the np.arange here, very slow for large columns
-            indices = np.arange(self.full_length())[index]
-        elif isinstance(index, np.ndarray):
-            if len(index.shape) != 1:
-                raise TypeError(
-                    "`np.ndarray` index must have 1 axis, not {}".format(
-                        len(index.shape)
-                    )
-                )
-            if index.dtype == bool:
-                indices = np.where(index)[0]
-            else:
-                return index
-        elif isinstance(index, AbstractColumn):
-            # TODO (sabri): get rid of the np.arange here, very slow for large columns
-            indices = np.arange(self.full_length())[index]
-        else:
-            raise TypeError(
-                "Object of type {} is not a valid index".format(type(index))
-            )
-        return indices
+        return translate_index(index, length=len(self))
 
     @staticmethod
     def _convert_to_batch_fn(

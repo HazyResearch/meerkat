@@ -112,22 +112,24 @@ class PILImageFormatter(Formatter):
 
     cell_component = "image"
 
-    def encode(self, cell: Union["FileCell", Image]) -> str:
+    def encode(self, cell: Union["FileCell", Image], thumbnail: bool = False) -> str:
         from meerkat.columns.file_column import FileCell
 
         if isinstance(cell, FileCell):
             cell = cell.get()
-        return self._encode(cell)
+        return self._encode(cell, thumbnail=thumbnail)
 
-    def _encode(self, image: Image) -> str:
+    def _encode(self, image: Image, thumbnail: bool = False) -> str:
         with BytesIO() as buffer:
+            if thumbnail:
+                image.thumbnail((64, 64))
             image.save(buffer, "jpeg")
             return "data:image/jpeg;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 
     def html(self, cell: Union["FileCell", Image]) -> str:
-        encoded = self.encode(cell)
+        encoded = self.encode(cell, thumbnail=True)
         return f'<img src="{encoded}">'
 
 

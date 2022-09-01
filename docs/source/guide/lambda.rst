@@ -23,7 +23,7 @@ Consider the following example, where we create a simple Meerkat column...
 
 .. ipython:: python
 
-    lambda_col = col.to_lambda(fn=lambda x: x + 10)
+    lambda_col = col.to_lambda(function=lambda x: x + 10)
     lambda_col[1]  # the function is only called at this point!
 
 
@@ -31,12 +31,56 @@ Critically, the function inside a lambda column is only called at the time the c
 
 .. ipython:: python
     :verbatim:
+
+    from PIL import Image
     
-    filepath_col = mk.PandasSeriesColumn(["path/to/image0.jpg", ...])
-    img_col = filepath_col.to_lambda(fn=load_image)
+    dp = mk.DataPanel(
+        {
+            "filepath": ["/abs/path/to/image0.jpg", ...], 
+            "image_id": ["image0", ...] 
+        }
+    )
+    dp["image"] = dp["filepath"].to_lambda(fn=Image.open)
+
+Notice how we provide an absolute path to the images. This makes the column useable from any working directory. 
+However, using absolute paths is in other ways not ideal: what if we want to share the DataPanel and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.LambdaColumn` that makes it easy to manage filepaths. 
+
+FileColumn
+########### 
+
+As discussed above, :class:`~meerkat.LambdaColumn`s are commonly used to load files from disk. To make it easier to work with file loading columns, Meerkat provides the :class:`~meerkat.FileColumn`, a simple subclass of :class:`~meerkat.LambdaColumn`. 
+
+The :class:`~meerkat.FileColumn` constructor takes an additional argument, ``base_dir``, which is the base directory from which all file paths are relative. 
+When ``base_dir`` is provided, the paths passed to ``filepaths`` should be relative to ``base_dir``:
+
+.. ipython:: python
+    :verbatim:
+
+    from PIL import Image
+
+    dp = mk.DataPanel(
+        {
+            "filepath": ["image0.jpg", ...], 
+            "image_id": ["image0", ...] 
+        }
+    )
+    dp["image"] = mk.FileColumn.from_filepaths(
+        filepaths=dp["filepath"],
+        loader=Image.open,
+        base_dir="/abs/path/to",
+    )
 
 
-An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.LambdaColumn` like this one, with a few more bells and whistles!
+The ``base_dir`` can then be changed at any time, so if we wanted to share the DataPanel with another user, we could instruct them to reset the base_dir using ``dp["image"].base_dir = "/other/users/abs/path/to"``. Introducing this additional step isn't ideal though, so we recommend using the environment variables technique as described below.
+
+.. admonition:: Using Environment Variables in ``base_dir``
+
+    Environment variables in the ``base_dir`` argument are automatically expanded. For example, if you set the environment variable ``MEERKAT_BASE_DIR`` to ``"/abs/path/to"``, then you can use ``dp["image"].base_dir = "$MEERKAT_BASE_DIR/path/to"``. This is ideal for sharing DataPanels between different users and machines. 
+
+    Note that the Meerkat dataset registry relies heavily on this technique, using a special environment variable ``MEERKAT_DATASET_DIR`` that points to the ``mk.config.datasets.root_dir``. 
+    
+
+An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.FileColumn` like this one, with a few more bells and whistles!
 
 Lazy Selection
 --------------
