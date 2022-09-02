@@ -64,6 +64,8 @@ class NetworkInfo:
     npm_process: subprocess.Popen = None
     api_server_name: str = "localhost"
     npm_server_name: str = "localhost"
+    npm_out_path: str = None
+    npm_err_path: str = None
 
     def __post_init__(self):
         # Hit the npm server _network endpoint with the api url
@@ -78,6 +80,18 @@ class NetworkInfo:
     @property
     def npm_network_url(self):
         return f"{self.npm_server_url}/network"
+
+    @property
+    def npm_server_out(self) -> str:
+        if self.npm_out_path is None:
+            return ""
+        return open(self.npm_out_path, "r").read()
+
+    @property
+    def npm_server_err(self) -> str:
+        if self.npm_err_path is None:
+            return ""
+        return open(self.npm_err_path, "r").read()
 
     @property
     def npm_network(self):

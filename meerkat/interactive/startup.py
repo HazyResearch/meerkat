@@ -2,12 +2,15 @@
 
 Code is heavily borrowed from Gradio.
 """
+
 import os
 import pathlib
+import re
 import socket
 import subprocess
 import time
 from contextlib import closing
+from tempfile import mkstemp, mktemp
 
 import requests
 from uvicorn import Config
@@ -117,6 +120,11 @@ def interactive_mode(
     # npm run dev -- --port {npm_port}
     current_env = os.environ.copy()
     current_env.update({"VITE_API_URL": network_info.api_server_url})
+
+    # open a temporary file to write the output of the npm process
+    out_file, out_path = mkstemp(suffix=".out")
+    err_file, err_path = mkstemp(suffix=".err")
+
     npm_process = subprocess.Popen(
         [
             "npm",
@@ -125,11 +133,28 @@ def interactive_mode(
             "--",
             "--port",
             str(npm_port),
+            "--logLevel",
+            "info",
         ],
         env=current_env,
+        stdout=out_file,
+        stderr=err_file,
     )
     network_info.npm_process = npm_process
+    network_info.npm_out_path = out_path
+    network_info.npm_err_path = err_path
+
     time.sleep(1)
+
+    # this is a hack to address the issue that the vite skips over a port that we
+    # deem to be open per `get_first_available_port`
+    # TODO: remove this once we figure out how to properly check for unavailable ports
+    # in a way that is compatible with vite's port selection logic
+    network_info.npm_server_port = int(
+        re.search("Local:   http://localhost:(.*)/", network_info.npm_server_out).group(
+            1
+        )
+    )
 
     # Back to the original directory
     os.chdir(currdir)
@@ -152,3 +177,21 @@ def setup_tunnel(local_server_port: int, endpoint: str) -> str:
             raise RuntimeError(str(e))
     else:
         raise RuntimeError("Could not get share link from Meerkat API Server.")
+
+
+def output_startup_message(url: str):
+    import rich
+
+    meerkat_header = "[bold violet]\[Meerkat][/bold violet]"
+
+    rich.print("")
+    rich.print(
+        f"{meerkat_header} [bold green]➜[/bold green] [bold] Open interface at: "
+        f"[/bold] [turqoise] {url} [/turqoise]"
+    )
+    rich.print(
+        f"{meerkat_header} [bold green]➜[/bold green] [bold] Interact with Meerkat "
+        " programatically with the console below. Use [yellow]quit()[/yellow] to end "
+        "session. [/bold]"
+    )
+    rich.print("")

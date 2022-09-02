@@ -11,7 +11,7 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     ComponentConfig,
 )
 from meerkat.interactive.graph import Pivot
-from meerkat.interactive.startup import is_notebook
+from meerkat.interactive.startup import is_notebook, output_startup_message
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -20,6 +20,7 @@ class InterfaceConfig(BaseModel):
 
     pivots: List[PivotConfig]
     components: List[ComponentConfig]
+    name: str = "Interface"
 
 
 def call_function_get_frame(func, *args, **kwargs):
@@ -98,7 +99,11 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
         if is_notebook():
             return IFrame(url, width="100%", height="1000")
         else:
-            print(url)
+            import webbrowser
+
+            webbrowser.open(url)
+
+            output_startup_message(url=url)
 
             # get locals of the main module when running in script.
             import __main__

@@ -30,17 +30,19 @@
 	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
 
-	let api_url2 = writable(import.meta.env["VITE_API_URL"]);
+	let api_url = writable(import.meta.env["VITE_API_URL"]);
+
 
 	export let config: any;
 
+
 	$: store_trigger = async (store_id: string, value: any) => {
-		let modifications = await modify(`${$api_url2}/store/${store_id}/trigger`, { value: value });
+		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
 		return modifications;
 	};
 
 	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
-		return await post(`${$api_url2}/dp/${box_id}/schema`, { columns: columns });
+		return await post(`${$api_url}/dp/${box_id}/schema`, { columns: columns });
 	};
 
 	$: get_rows = async (
@@ -50,7 +52,7 @@
 		indices?: Array<number>,
 		columns?: Array<string>
 	) => {
-		let result = await post(`${$api_url2}/dp/${box_id}/rows`, {
+		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
@@ -60,7 +62,7 @@
 	};
 
 	$: add = async (box_id: string, column_name: string) => {
-		let modifications = await modify(`${$api_url2}/dp/${box_id}/add`, { column: column_name });
+		let modifications = await modify(`${$api_url}/dp/${box_id}/add`, { column: column_name });
 		return modifications;
 	};
 
@@ -71,7 +73,7 @@
 		row_id: string | number,
 		id_column: string
 	) => {
-		let modifications = await modify(`${$api_url2}/dp/${box_id}/edit`, {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/edit`, {
 			value: value,
 			column: column,
 			row_id: row_id,
@@ -81,7 +83,7 @@
 	};
 
 	$: match = async (box_id: string, input: string, query: string, col_out: Writable<string>) => {
-		let modifications = await modify(`${$api_url2}/ops/${box_id}/match`, {
+		let modifications = await modify(`${$api_url}/ops/${box_id}/match`, {
 			input: input,
 			query: query,
 			col_out: col_out.store_id
@@ -90,7 +92,7 @@
 	};
 
 	$: get_sliceby_info = async (box_id: string) => {
-		return await get_request(`${$api_url2}/sliceby/${box_id}/info`);
+		return await get_request(`${$api_url}/sliceby/${box_id}/info`);
 	};
 
 	$: get_sliceby_rows = async (
@@ -99,7 +101,7 @@
 		start?: number,
 		end?: number
 	) => {
-		return await post(`${$api_url2}/sliceby/${box_id}/rows`, {
+		return await post(`${$api_url}/sliceby/${box_id}/rows`, {
 			slice_key: slice_key,
 			start: start,
 			end: end
@@ -109,7 +111,7 @@
 	$: aggregate_sliceby = async (box_id: string, aggregations: { string: { id: string } }) => {
 		let out = Object();
 		for (const [name, aggregation] of Object.entries(aggregations)) {
-			out[name] = await post(`${$api_url2}/sliceby/${box_id}/aggregate/`, {
+			out[name] = await post(`${$api_url}/sliceby/${box_id}/aggregate/`, {
 				aggregation_id: aggregation.id,
 				accepts_dp: true
 			});
@@ -168,6 +170,7 @@
 		}
 
 		document_container = document.documentElement;
+		document.title = config.name;
 	});
 
 	let grid_items = [];

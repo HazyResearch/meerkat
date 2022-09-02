@@ -49,4 +49,5 @@ class MatchTableInterface(Interface):
         return InterfaceConfig(
             pivots=[pivot.config for pivot in self.pivots],
             components=[component.config for component in self.components],
+            name="MatchTable",
         )
