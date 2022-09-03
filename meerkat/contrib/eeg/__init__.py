@@ -3,7 +3,7 @@ import os
 import pickle
 from functools import partial
 
-import terra
+#import terra
 from tqdm import tqdm
 import numpy as np
 
@@ -183,7 +183,7 @@ def download_tusz(download_dir, version="1.5.2"):
     os.system(rsync_command)
 
 
-@terra.Task
+#@terra.Task
 def build_stanford_eeg_dp(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
@@ -335,7 +335,7 @@ def build_stanford_eeg_dp(
     return dp
 
 
-@terra.Task
+#@terra.Task
 def build_streaming_stanford_eeg_dp(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
