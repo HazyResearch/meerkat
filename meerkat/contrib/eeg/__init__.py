@@ -33,7 +33,7 @@ from .data_utils_tuh import (
 logger = logging.getLogger(__name__)
 
 
-@terra.Task
+#@terra.Task
 def build_tuh_eeg_dp(
     dataset_dir: str,
     #raw_dataset_dir: str,
@@ -74,18 +74,20 @@ def build_tuh_eeg_dp(
 
     data = []
     for split in splits:
-        file_tuples = compute_file_tuples(
-            dataset_dir, split, clip_len, stride,
-        )
+        # file_tuples = compute_file_tuples(
+        #     dataset_dir, split, clip_len, stride,
+        # )
+        file_tuples_pth = os.path.join(curr_dir,f"file_tuples_cliplen{clip_len}_{split}.pkl")
+        with open(file_tuples_pth, "rb") as pkl_f:
+            file_tuples = pickle.load(pkl_f)
 
-        for (edf_fn, paitent_id, clip_idx, _) in tqdm(
+        for (edf_fn, paitent_id, clip_idx, binary_sz) in tqdm(
             file_tuples, total=len(file_tuples)
         ):
             filepath = [file for file in edf_files if edf_fn in file]
             filepath = filepath[0]
-            file_id = edf_fn.split(".edf")[0]
             filepath = os.path.join(dataset_dir.split("resampled_signal")[0],filepath.split("TUH_v1.5.2/")[-1])
-
+            file_id = edf_fn.split(".edf")[0]
             sequence_sz, binary_sz = get_sz_labels(
                 edf_fn=filepath,
                 clip_idx=int(clip_idx),
@@ -95,7 +97,7 @@ def build_tuh_eeg_dp(
             )
 
             row_df = {
-                "filepath": filepath,
+                #"filepath": filepath,
                 "id": file_id,
                 "paitent_id": paitent_id,
                 "sequence_sz": sequence_sz,
