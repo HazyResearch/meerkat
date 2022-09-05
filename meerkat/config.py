@@ -48,9 +48,14 @@ class DisplayConfig:
     show_audio: bool = True
 
 
-@dataclass
+
 class DatasetsConfig:
-    _root_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+
+    def __init__(self, root_dir: str = None):
+        if root_dir is None:
+            self.root_dir: str = os.path.join(Path.home(), ".meerkat/datasets")
+        else:
+            self.root_dir: str = root_dir
 
     @property
     def root_dir(self):
