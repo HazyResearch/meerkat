@@ -49,6 +49,8 @@ REQUIRED = [
     "fvcore",
     "ipywidgets>=7.0.0",
     "IPython",
+    "fastapi",
+    "uvicorn"
 ]
 
 # What packages are optional?

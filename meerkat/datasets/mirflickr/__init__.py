@@ -68,8 +68,9 @@ class mirflickr(DatasetBuilder):
         # remove jpg extension
         ids = file_names.str.replace(".jpg", "", regex=False)
         dp = mk.DataPanel({"id": ids, "file_name": file_names})
+        
         dp["image"] = mk.ImageColumn.from_filepaths(
-            dp["file_name"], base_dir=os.path.join(self.dataset_dir, "mirflickr")
+            dp["file_name"], base_dir=os.path.join(self.var_dataset_dir, "mirflickr")
         )
 
         for class_name in MIR_FLICKR_25K_CLASSES:

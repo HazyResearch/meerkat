@@ -15,6 +15,7 @@ class MeerkatConfig:
 
     display: DisplayConfig
     datasets: DatasetsConfig
+    system: SystemConfig
 
     @classmethod
     def from_yaml(cls, path: str = None):
@@ -31,6 +32,7 @@ class MeerkatConfig:
         config = cls(
             display=DisplayConfig(**config.get("display", {})),
             datasets=DatasetsConfig(**config.get("datasets", {})),
+            system=SystemConfig(**config.get("system", {})),
         )
         os.environ[DATASETS_ENV_VARIABLE] = config.datasets.root_dir
 
@@ -46,6 +48,10 @@ class DisplayConfig:
     max_image_width: int = 128
 
     show_audio: bool = True
+
+@dataclass
+class SystemConfig:
+    use_gpu: bool = True
 
 
 

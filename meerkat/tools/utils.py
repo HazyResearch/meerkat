@@ -243,3 +243,18 @@ def translate_index(index, length: int):
     else:
         raise TypeError("Object of type {} is not a valid index".format(type(index)))
     return indices
+
+def choose_device(device: str = "auto"):
+    """Choose the device to use for a Meerkat operation."""
+    from meerkat.config import config
+
+    if not config.system.use_gpu:
+        return "cpu"
+
+    if device == "auto":
+        if torch.cuda.is_available():
+            device = "cuda"
+        else:
+            device = "cpu"
+    
+    return device 

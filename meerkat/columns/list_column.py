@@ -8,7 +8,7 @@ import cytoolz as tz
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.display import auto_formatter
+from meerkat.interactive.formatter import ObjectFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -28,7 +28,6 @@ class ListColumn(AbstractColumn):
             data = list(data)
         super(ListColumn, self).__init__(data=data, *args, **kwargs)
 
-    default_formatter: Callable = auto_formatter
 
     @classmethod
     def from_list(cls, data: Sequence):
@@ -64,5 +63,5 @@ class ListColumn(AbstractColumn):
         return self[index]
 
     @staticmethod
-    def _get_default_formatter() -> Callable:
-        return auto_formatter
+    def _get_default_formatter() -> ObjectFormatter:
+        return ObjectFormatter()

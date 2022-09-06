@@ -5,6 +5,7 @@ import PIL
 import torch
 
 import meerkat as mk
+from meerkat.tools.utils import choose_device
 
 from .bit import bit
 from .clip import clip
@@ -33,7 +34,7 @@ def embed(
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
     out_col: str = None,
-    device: Union[int, str] = "cpu",
+    device: Union[int, str] = "auto",
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
@@ -91,6 +92,8 @@ def embed(
         This column will be named according to the ``out_col`` parameter.
     """
     col = data if isinstance(data, mk.AbstractColumn) else data[input]
+
+    device = choose_device(device)
 
     if out_col is None:
         out_col = f"{encoder}({input})"

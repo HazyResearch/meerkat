@@ -86,6 +86,16 @@ class BasicFormatter(Formatter):
         }
 
 
+class ObjectFormatter(Formatter):
+    cell_component = "object"
+
+    def encode(self, cell: Any):
+        raise NotImplementedError
+
+    def html(self, cell: Any):
+        return str(cell)
+
+
 class NumpyArrayFormatter(Formatter):
     cell_component = "basic"
 

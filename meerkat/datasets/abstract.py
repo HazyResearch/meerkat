@@ -36,6 +36,7 @@ class DatasetBuilder(ABC):
             )
         else:
             self.dataset_dir = dataset_dir
+            self.var_dataset_dir = dataset_dir 
 
     def download_url(self, url: str):
         return download_url(url, self.dataset_dir, force=self.download_mode == "force")
