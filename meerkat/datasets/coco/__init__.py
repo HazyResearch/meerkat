@@ -52,7 +52,7 @@ class coco(DatasetBuilder):
         dp = mk.concat(dps, axis=0)
 
         path = dp["split"] + "2014/" + dp["file_name"]
-        dp["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.dataset_dir)
+        dp["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.var_dataset_dir)
 
         dp.data.reorder(
             ["id", "image"] + [c for c in dp.columns if c not in ["id", "image"]]
