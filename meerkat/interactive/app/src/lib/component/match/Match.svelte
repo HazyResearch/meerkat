@@ -45,9 +45,9 @@
 			.then(() => {
 				status = 'success';
 			})
-			.catch((error) => {
+			.catch((error: TypeError) => {
 				status = 'error';
-				console.log(error);
+				console.log(error)
 			});
 	};
 

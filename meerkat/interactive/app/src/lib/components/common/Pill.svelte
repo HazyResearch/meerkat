@@ -16,7 +16,7 @@
             {header}
         </div>
     {/if}
-    {#if content}
+    {#if typeof(content) !== "undefined"}
         <div 
             class="p-1 pl-2 ml-0 m-1 rounded-r-md bg-slate-200 overflow-hidden text-right text-center text-xs text-ellipsis whitespace-nowrap select-none font-mono" 
             class:w-full={layout === 'wide-content' || layout === 'equal'}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ast import Slice
 from functools import wraps
 from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
 
@@ -60,7 +61,7 @@ class SliceBy(IdentifiableMixin):
 
     @sets_only
     def count(self, *args, **kwargs) -> DataPanel:
-        return self._aggregate(lambda x: x.count(*args, **kwargs))
+        return self._aggregate(lambda x: len(x))
 
     @sets_only
     def median(self, *args, **kwargs) -> DataPanel:
@@ -150,3 +151,29 @@ class SliceIndexer:
     def __getitem__(self, index):
         key, index = index
         return self.obj._get(key, index, materialize=False)
+
+
+def sliceby(
+    data: DataPanel,
+    by: Union[str, Sequence[str]] = None,
+    key_mapping: Dict[int, str] = None,
+) -> SliceBy:
+    """Perform a groupby operation on a DataPanel or Column (similar to a
+    `DataFrame.groupby` and `Series.groupby` operations in Pandas).j.
+
+    Args:
+        data (Union[DataPanel, AbstractColumn]): The data to group.
+        by (Union[str, Sequence[str]]): The column(s) to group by. Ignored if ``data``
+            is a Column.
+
+    Returns:
+        Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
+    """
+    if isinstance(by, str):
+        by = [by]
+
+    return SliceBy(
+        data=data,
+        by=by,
+        sets={curr_by: np.where(data[curr_by] == 1)[0] for curr_by in by},
+    )

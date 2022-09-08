@@ -90,7 +90,7 @@ class ObjectFormatter(Formatter):
     cell_component = "object"
 
     def encode(self, cell: Any):
-        raise NotImplementedError
+        return str(cell)
 
     def html(self, cell: Any):
         return str(cell)
@@ -129,9 +129,9 @@ class PILImageFormatter(Formatter):
     def encode(
         self, cell: Union["FileCell", Image, torch.Tensor], thumbnail: bool = False
     ) -> str:
-        from meerkat.columns.file_column import FileCell
+        from meerkat.columns.lambda_column import LambdaCell
 
-        if isinstance(cell, FileCell):
+        if isinstance(cell, LambdaCell):
             cell = cell.get()
 
         if torch.is_tensor(cell) or isinstance(cell, np.ndarray):

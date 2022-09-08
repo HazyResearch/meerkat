@@ -32,6 +32,14 @@ class SliceByInterface(Interface):
             str, Callable[[mk.DataPanel], Union[int, float, str]]
         ] = None,
     ):
+
+        if main_column not in sliceby.data:
+            raise ValueError(f"The column {main_column} is not in the sliceby.")
+
+        for tag_column in tag_columns:
+            if tag_column not in sliceby.data:
+                raise ValueError(f"The column {tag_column} is not in the sliceby.")
+
         super().__init__()
         self.sliceby = sliceby
         self.main_column = main_column

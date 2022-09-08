@@ -28,15 +28,13 @@ class DatasetBuilder(ABC):
         self.kwargs = kwargs
 
         if dataset_dir is None:
-            self.dataset_dir = os.path.join(
-                mk.config.datasets.root_dir, self.name, self.version
-            )
+            self.dataset_dir = self._get_dataset_dir(self.name, self.version)
             self.var_dataset_dir = os.path.join(
                 f"${DATASETS_ENV_VARIABLE}", self.name, self.version
             )
         else:
             self.dataset_dir = dataset_dir
-            self.var_dataset_dir = dataset_dir 
+            self.var_dataset_dir = dataset_dir
 
     def download_url(self, url: str):
         return download_url(url, self.dataset_dir, force=self.download_mode == "force")
@@ -81,3 +79,7 @@ class DatasetBuilder(ABC):
         Subclasses should ideally implement more thorough checks.
         """
         return os.path.exists(self.dataset_dir)
+
+    @staticmethod
+    def _get_dataset_dir(name: str, version: str) -> str:
+        return os.path.join(mk.config.datasets.root_dir, name, version)

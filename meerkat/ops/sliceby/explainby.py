@@ -1,6 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 
@@ -27,7 +37,7 @@ class ExplainBy(SliceBy):
 def explainby(
     data: DataPanel,
     by: Union[str, Sequence[str]],
-    target: Union[str, Sequence[str]],
+    target: Union[str, Mapping[str]],
     method: Union[str, "domino.Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,

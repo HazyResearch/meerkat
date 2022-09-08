@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 def explain(
     data: Union[AbstractColumn, DataPanel],
-    input: Optional[str] = None,
-    target: Optional[str] = None,
+    input: str,
+    target: Union[str, Mapping[str, str]],
     method: Union[str, "Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
@@ -55,17 +55,22 @@ def explain(
         raise NotImplementedError
 
     data_embedding = data[embed_col]
+
     if isinstance(method, str):
+        import domino
+
         method = getattr(domino, method)(**kwargs)
 
-    target = data[target]
-    method.fit(
-        embeddings=data_embedding.data, targets=target, pred_probs=np.zeros_like(target)
-    )
+    if isinstance(target, str):
+        # TODO: make this generalizable – this is a hack to make it work for RFW
+        target = {"targets": data[target], "pred_probs": np.zeros_like(target)}
+
+    elif isinstance(target, Mapping):
+        target = {k: data[v] for k, v in target.items()}
+
+    method.fit(embeddings=data_embedding.data, **target)
     slices = method.predict(
         embeddings=data_embedding.data,
-        pred_probs=np.zeros_like(target),
-        targets=np.zeros_like(target),
     )
 
     if isinstance(data, DataPanel):

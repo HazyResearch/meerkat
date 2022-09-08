@@ -900,10 +900,20 @@ class DataPanel(
 
         return groupby(self, *args, **kwargs)
 
+    def sliceby(self, *args, **kwargs):
+        from meerkat.ops.sliceby.sliceby import sliceby
+
+        return sliceby(self, *args, **kwargs)
+
     def clusterby(self, *args, **kwargs):
         from meerkat.ops.sliceby.clusterby import clusterby
 
         return clusterby(self, *args, **kwargs)
+
+    def explainby(self, *args, **kwargs):
+        from meerkat.ops.sliceby.explainby import explainby
+
+        return explainby(self, *args, **kwargs)
 
     def aggregate(
         self, function: Union[str, Callable], nuisance: str = "drop", *args, **kwargs

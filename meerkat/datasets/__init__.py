@@ -8,6 +8,7 @@ from .expw import expw
 from .fer import fer
 from .imagenet import imagenet
 from .imagenette import imagenette
+from .lvis import lvis
 from .mirflickr import mirflickr
 from .ngoa import ngoa
 from .pascal import pascal
@@ -20,6 +21,7 @@ __all__ = [
     "imagenette",
     "mirflickr",
     "pascal",
+    "lvis",
     "expw",
     "fer",
     "rfw",

@@ -69,7 +69,7 @@
 
 <div class="h-full">
 	<!-- Main (main) element -->
-	<div class="h-4/5 w-max hover:opacity-50 ">
+	<div class="h-4/5 w-max hover:opacity-50">
 		<!-- Main item -->
 		<Cell {...main} />
 

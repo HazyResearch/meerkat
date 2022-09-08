@@ -35,11 +35,12 @@ def match(
     dp = box.obj
     if not isinstance(dp, DataPanel):
         raise HTTPException(
-            status_code=404, detail="`match` expects a box containing a datapanel"
+            status_code=400, detail="`match` expects a box containing a datapanel"
         )
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
         f.write(query)
+
     try:
         dp, match_columns = mk.match(
             data=dp, query=query, input=input, return_column_names=True
