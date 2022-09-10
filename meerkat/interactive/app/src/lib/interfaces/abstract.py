@@ -1,17 +1,16 @@
 import code
 import sys
-from typing import List
+from functools import partial, wraps
+from typing import Callable, List
 
 from IPython.display import IFrame
 from pydantic import BaseModel
 
-from meerkat.interactive import PivotConfig
 from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentConfig,
 )
-from meerkat.interactive.graph import Pivot
-from meerkat.interactive.startup import is_notebook, output_startup_message
+from meerkat.interactive.graph import Pivot, PivotConfig
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -47,6 +46,15 @@ def call_function_get_frame(func, *args, **kwargs):
     return frame, result
 
 
+def interface(fn: Callable):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        interface = Interface(layout=partial(fn, *args, **kwargs))
+        return interface.launch()
+
+    return wrapper
+
+
 class InterfaceMeta(type):
     def __call__(cls, *args, **kwargs):
         instance = super().__call__(*args, **kwargs)
@@ -72,7 +80,6 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
 
     def _layout(self):
         frame, _ = call_function_get_frame(self.layout)
-
         if len(self.components) == 0:
             # Inspect the local frame of the layout function
             # and add all the components to self.components
@@ -85,6 +92,7 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
         raise NotImplementedError("Must be implemented by subclass.")
 
     def launch(self, return_url: bool = False):
+        from meerkat.interactive.startup import is_notebook, output_startup_message
 
         if state.network_info is None:
             raise ValueError(

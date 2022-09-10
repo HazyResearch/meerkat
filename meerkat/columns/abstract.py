@@ -5,14 +5,13 @@ import logging
 import pathlib
 import reprlib
 from copy import copy
-from typing import Any, Callable, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
 import torch
 
 import meerkat.config
-from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -25,6 +24,10 @@ from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.materialize import MaterializationMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
+
+if TYPE_CHECKING:
+    from meerkat.interactive.formatter import Formatter
+
 
 logger = logging.getLogger(__name__)
 
@@ -222,7 +225,7 @@ class AbstractColumn(
     def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
-    def _get_default_formatter(self) -> Formatter:
+    def _get_default_formatter(self) -> "Formatter":
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.formatter import BasicFormatter
@@ -230,11 +233,11 @@ class AbstractColumn(
         return BasicFormatter()
 
     @property
-    def formatter(self) -> Formatter:
+    def formatter(self) -> "Formatter":
         return self._formatter
 
     @formatter.setter
-    def formatter(self, formatter: Formatter):
+    def formatter(self, formatter: "Formatter"):
         self._formatter = formatter
 
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:

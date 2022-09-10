@@ -150,10 +150,6 @@ def edit(
     return modifications
 
 
-# TODO: (Sabri/Arjun) Make this more robust and less hacky
-curr_dp: mk.DataPanel = None
-
-
 @router.post("/{datapanel_id}/sort/")
 def sort(datapanel_id: str, by: str = EmbeddedBody()):
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)

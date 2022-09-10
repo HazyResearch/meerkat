@@ -5,6 +5,7 @@ from meerkat.logging.utils import initialize_logging
 
 initialize_logging()
 
+import meerkat.interactive as gui
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.cells.volume import MedicalVolumeCell
@@ -23,7 +24,9 @@ from meerkat.columns.tensor_column import TensorColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
 from meerkat.datapanel import DataPanel
 from meerkat.datasets import get
-from meerkat.interactive.startup import interactive_mode
+
+# TODO: backwards compat remove before release
+from meerkat.interactive.startup import start as interactive_mode
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
 from meerkat.ops.match import match
@@ -69,4 +72,5 @@ __all__ = [
     "provenance",
     "config",
     "interactive_mode",
+    "gui",
 ]

@@ -44,6 +44,17 @@ def nested_getattr(obj, attr, *args):
     return reduce(lambda o, a: getattr(o, a, *args), [obj] + attr.split("."))
 
 
+def nested_apply(obj: object, fn: callable):
+    if isinstance(obj, list):
+        return [nested_apply(v, fn=fn) for v in obj]
+    elif isinstance(obj, tuple):
+        return tuple(nested_apply(v, fn=fn) for v in obj)
+    elif isinstance(obj, dict):
+        return {k: nested_apply(v, fn=fn) for k, v in obj.items()}
+    else:
+        return fn(obj)
+
+
 class MeerkatLoader(yaml.FullLoader):
     """PyYaml does not load unimported modules for safety reasons.
 
@@ -244,6 +255,7 @@ def translate_index(index, length: int):
         raise TypeError("Object of type {} is not a valid index".format(type(index)))
     return indices
 
+
 def choose_device(device: str = "auto"):
     """Choose the device to use for a Meerkat operation."""
     from meerkat.config import config
@@ -256,5 +268,5 @@ def choose_device(device: str = "auto"):
             device = "cuda"
         else:
             device = "cpu"
-    
-    return device 
+
+    return device

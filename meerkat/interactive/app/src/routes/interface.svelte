@@ -191,6 +191,7 @@
 					}
 					component.props[k] = global_stores.get(v.store_id);
 				} else if (v.box_id !== undefined) {
+					console.log(component, k, v.box_id)
 					if (!global_stores.has(v.box_id)) {
 						// add it to the global_stores Map if it isn't already there
 						global_stores.set(v.box_id, writable(v));
@@ -215,8 +216,8 @@
 
 	const cols = [[1200, 6]];
 </script>
-
-<!-- <div class="w-full">
+<!-- 
+<div class="w-full">
 	<Grid
 		bind:items={grid_items}
 		rowHeight={50}
@@ -239,7 +240,8 @@
 		{/if}
 	</Grid>
 </div> -->
-<div class="flex flex-col space-y-3 h-screen">
+
+ <div class="flex flex-col space-y-2 h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 		<StoreComponent

@@ -155,10 +155,6 @@ def match(
     return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
 
 
-# TODO: (Sabri/Arjun) Make this more robust and less hacky
-curr_dp: mk.DataPanel = None
-
-
 @router.post("/{datapanel_id}/sort/")
 def sort(datapanel_id: str, by: str = EmbeddedBody()):
     dp = state.identifiables.get(group="datapanels", id=datapanel_id)

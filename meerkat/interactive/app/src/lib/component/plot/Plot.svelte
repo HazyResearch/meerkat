@@ -2,6 +2,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
+	import BarPlot from '$lib/components/plot/layercake/BarPlot.svelte';
 	import type { Point2D } from '$lib/components/plot/types';
 
 	const { get_rows } = getContext('Interface');
@@ -17,17 +18,20 @@
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the datapanel for the columns to be plotted
 		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y]);
+		console.log(rows)
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
 				x: parseFloat(row[0]),
-				y: parseFloat(row[1]),
+				y: row[1],
 				id: rows.indices[index]
 			});
 		});
 		return datum;
 	};
 	$: datum_promise = get_datum($dp.box_id);
+
+	$: console.log("plot:",  $selection)
 
 </script>
 
@@ -41,7 +45,7 @@
 			height="300px"
 		/>
 	{:then datum}
-		<ScatterPlot
+		<BarPlot
 			data={datum}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}

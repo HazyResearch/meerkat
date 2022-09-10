@@ -72,13 +72,12 @@
 		</svg>
 	</div>
 </div>
-<div class="h-full overflow-hidden">
+<div class="h-full">
 
 	<div
-		class="panel overflow-y-scroll"
+		class="panel h-full"
 		class:panel-masonry={layout === 'masonry'}
 		class:panel-gimages={layout === 'gimages'}
-		style:height={layout === 'gimages' ? '720px' : 'auto'}
 		style:columns={layout === 'gimages' ? null : num_columns}
 	>
 		{#each rows.rows as row, i}
@@ -126,25 +125,6 @@
 			>
 				<div slot="pivot-tooltip">Double-click to see example</div>
 			</Card>
-			<!-- Labeling selection widget -->
-			<div 
-				class="w-2 self-center"
-				style="height: {!selected_indices.includes(i) ? 0.5 * pivot_height : 0.9 * pivot_height}vh;"
-				on:click={() => {
-					if (selected_indices.includes(i)) {
-						selected_indices = without(selected_indices, i);
-					} else if (!selected_indices.includes(i) && selected_indices.length < 2) {
-						selected_indices.push(i); 
-						selected_indices.sort((a, b) => a - b);
-					}
-					selected_indices = selected_indices;
-				}}
-			>
-				<div 
-					class="rounded-full bg-slate-600 hover:bg-violet-400 h-full w-1" 
-					class:threshold_selector--clicked="{selected_indices.includes(i) || (selected_indices.length === 2 && i < selected_indices[1] && i > selected_indices[0])}"
-				/>
-			</div>
 		{/each}
 	</div>
 </div>

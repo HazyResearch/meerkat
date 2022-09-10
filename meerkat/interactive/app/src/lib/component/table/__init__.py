@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from meerkat.interactive import Box
-from meerkat.interactive.graph import Pivot
+from meerkat.interactive.graph import Box, Pivot
 
 from ..abstract import Component
 

@@ -1,6 +1,8 @@
 from typing import Union
 
-from meerkat.interactive import Pivot, Store, make_store
+from meerkat.datapanel import DataPanel
+from meerkat.interactive.graph import Pivot, Store, make_store
+from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Component
 
@@ -10,7 +12,7 @@ class Plot(Component):
 
     def __init__(
         self,
-        dp: Pivot,
+        data: Pivot[DataPanel],
         selection: Union[list, Store],
         x: Union[str, Store],
         y: Union[str, Store],
@@ -19,7 +21,7 @@ class Plot(Component):
         type: str = "scatter",
     ) -> None:
         super().__init__()
-        self.dp = dp
+        self.data = data
         self.selection = make_store(selection)
         self.x = make_store(x)
         self.y = make_store(y)
@@ -30,7 +32,7 @@ class Plot(Component):
     @property
     def props(self):
         return {
-            "dp": self.dp.config,
+            "dp": self.data.config,
             "selection": self.selection.config,
             "x": self.x.config,
             "y": self.y.config,

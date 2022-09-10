@@ -8,10 +8,10 @@ from fastapi import FastAPI, HTTPException
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.datapanel import DataPanel
-from meerkat.interactive.server import Server
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
+    from meerkat.interactive.server import Server
     from meerkat.mixins.identifiable import IdentifiableMixin
 
 
@@ -59,7 +59,7 @@ class NetworkInfo:
 
     api: FastAPI
     api_server_port: int
-    api_server: Server
+    api_server: "Server"
     npm_server_port: int
     npm_process: subprocess.Popen = None
     api_server_name: str = "localhost"

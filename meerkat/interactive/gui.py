@@ -11,7 +11,6 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
 
-from .api.routers.interface import Interface
 from .app.src.lib.interfaces.match_table import MatchTableInterface
 from .app.src.lib.interfaces.sliceby import SliceByInterface
 from .startup import is_notebook

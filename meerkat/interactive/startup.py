@@ -73,7 +73,7 @@ def get_first_available_port(initial: int, final: int) -> int:
     )
 
 
-def interactive_mode(
+def start(
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
@@ -147,17 +147,21 @@ def interactive_mode(
     MAX_WAIT = 10
     for i in range(MAX_WAIT):
         time.sleep(0.5)
-            
+
         # this is a hack to address the issue that the vite skips over a port that we
         # deem to be open per `get_first_available_port`
         # TODO: remove this once we figure out how to properly check for unavailable ports
         # in a way that is compatible with vite's port selection logic
-        match = re.search("Local:   http://localhost:(.*)/", network_info.npm_server_out)
+        match = re.search(
+            "Local:   http://localhost:(.*)/", network_info.npm_server_out
+        )
         if match is not None:
-            break 
+            break
 
     if match is None:
-        raise ValueError(f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}")
+        raise ValueError(
+            f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}"
+        )
     network_info.npm_server_port = int(match.group(1))
 
     # Back to the original directory

@@ -31,14 +31,17 @@ export async function post(url: string, data: any): Promise<any> {
 
 export async function modify(url: string, data: any): Promise<any> {
     let modifications = await post(url, data);
+    console.log(modifications)
 
     // url must hit an endpoint that returns a list of modifications 
     for (let modification of modifications) {
         if (modification.type === 'box') {
             // Box modification
+            console.log(modification.id)
             if (!global_stores.has(modification.id)) {
                 // derived objects may not be maintained on the frontend 
                 // TODO: consider adding a mechanism to add new derived objects to the frontend
+                console.log("skipping")
                 continue
             }
             let store = global_stores.get(modification.id)

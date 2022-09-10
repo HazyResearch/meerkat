@@ -7,6 +7,8 @@
 	import { get } from 'svelte/store';
 	import { createEventDispatcher } from 'svelte';
 	import type { ColumnInfo } from '$lib/api/datapanel.ts';
+	import { BarLoader } from 'svelte-loading-spinners'
+
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
@@ -34,14 +36,18 @@
 	}
 </script>
 
-<div class="bg-slate-100 h-4/5">
+<div class="h-full">
 	{#await schema_promise}
-		waiting....
+	<div class="flex justify-center items-center h-full">
+		<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+	</div>
 	{:then schema}
-		<div class="h-full">
-			<div class="h-full overflow-y-scroll">
+		<div class="h-full flex flex-col">
+			<div class="grow overflow-y-scroll bg-slate-400">
 				{#await rows_promise}
-					waiting for rows...
+				<div class="justify-center items-center">
+					<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+				</div>
 				{:then rows}
 					<Gallery {schema} {rows} main_column={$main_column} tag_columns={$tag_columns} />
 				{:catch error}
@@ -49,7 +55,7 @@
 				{/await}
 			</div>
 
-			<div class="z-10 top-0 m-0 h-20">
+			<div class="z-10 top-0 m-0 h-20 px-10">
 				<Pagination
 					bind:page
 					bind:per_page

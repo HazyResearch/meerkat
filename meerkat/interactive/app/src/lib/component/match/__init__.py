@@ -1,6 +1,6 @@
 from typing import Union
 
-from meerkat.interactive import Pivot, Store, make_store
+from meerkat.interactive.graph import Pivot, Store, make_store
 
 from ..abstract import Component
 

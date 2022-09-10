@@ -19,6 +19,8 @@ from typing import (
 from pydantic import BaseModel
 
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.ops.sliceby.sliceby import SliceBy
+from meerkat.tools.utils import nested_apply
 
 if TYPE_CHECKING:
     from meerkat.datapanel import DataPanel
@@ -40,7 +42,13 @@ class NodeMixin:
 
 
 Primitive = Union[int, str, float, bool]
-Storeable = Union[Primitive, List[Primitive], Dict[Primitive, Primitive], Dict[Primitive, List[Primitive]], List[Dict[Primitive, Primitive]]]
+Storeable = Union[
+    Primitive,
+    List[Primitive],
+    Dict[Primitive, Primitive],
+    Dict[Primitive, List[Primitive]],
+    List[Dict[Primitive, Primitive]],
+]
 
 
 class BoxConfig(BaseModel):
@@ -98,7 +106,7 @@ class PivotConfig(BoxConfig):
     pass
 
 
-class Pivot(Box):
+class Pivot(Box, Generic[T]):
     pass
 
 
@@ -147,21 +155,41 @@ class Operation(NodeMixin):
         self.args = args
         self.kwargs = kwargs
         self.result = result
+        nested_apply(self.result, self.children.add)
 
     def __call__(self):
         unpacked_args, unpacked_kwargs, _, _ = _unpack_boxes_and_stores(
             *self.args, **self.kwargs
         )
-        result = self.fn(*unpacked_args, **unpacked_kwargs)
-        # TODO: result may be multiple
-        self.result.obj = result
+        update = self.fn(*unpacked_args, **unpacked_kwargs)
 
-        from meerkat.datapanel import DataPanel
+        modifications = []
+        _update_result(self.result, update, modifications=modifications)
 
-        if isinstance(result, DataPanel):
-            return BoxModification(id=self.result.id, scope=result.columns)
+        return modifications
 
-        return BoxModification(id=self.result.id, scope=[])
+
+def _update_result(result: object, update: object, modifications: List[Modification]):
+    from meerkat.datapanel import DataPanel
+
+    if isinstance(result, list):
+        return [_update_result(r, u) for r, u in zip(result, update)]
+    elif isinstance(result, tuple):
+        return tuple(_update_result(r, u) for r, u in zip(result, update))
+    elif isinstance(result, dict):
+        return {k: _update_result(v, update[k]) for k, v in result.items()}
+    elif isinstance(result, Box):
+        result.obj = update
+        if isinstance(result.obj, DataPanel):
+            modifications.append(
+                BoxModification(id=result.id, scope=result.obj.columns)
+            )
+        return result
+    elif isinstance(result, Store):
+        result.value = update
+        return result
+    else:
+        return update
 
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
@@ -210,7 +238,7 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
     ]
 
-    new_modifications = [op() for op in order]
+    new_modifications = [mod for op in order for mod in op()]
     return modifications + new_modifications
 
 
@@ -243,6 +271,17 @@ def _unpack_boxes_and_stores(*args, **kwargs):
     return unpacked_args, unpacked_kwargs, boxes, stores
 
 
+def _pack_boxes_and_stores(obj):
+    from meerkat.datapanel import DataPanel
+    from meerkat.ops.sliceby.sliceby import SliceBy
+
+    if isinstance(obj, (DataPanel, SliceBy)):
+        return Derived(obj)
+    if isinstance(obj, Storeable):
+        return Store(obj)
+    return obj
+
+
 def interface_op(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -254,15 +293,14 @@ def interface_op(fn: Callable):
         result = fn(*unpacked_args, **unpacked_kwargs)
 
         if len(boxes) > 0 or len(stores) > 0:
-            derived = Derived(result)
-            # this `fn` explicitly shouldn't be the wrapped version!
+            derived = nested_apply(result, fn=_pack_boxes_and_stores)
             op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+
             for input_box in boxes:
                 input_box.children.add(op)
             for input_store in stores:
                 input_store.children.add(op)
-            op.children.add(derived)
-            # TODO(Sabri): this should be nested
+
             return derived
 
         return result

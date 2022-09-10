@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from meerkat.interactive import Box, make_store
-from meerkat.interactive.graph import Pivot
+from meerkat.interactive.graph import Box, Pivot, make_store
 
 from ..abstract import Component
 

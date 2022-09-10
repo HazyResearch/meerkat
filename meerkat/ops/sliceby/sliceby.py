@@ -174,6 +174,6 @@ def sliceby(
 
     return SliceBy(
         data=data,
-        by=by,
+        by="slice",
         sets={curr_by: np.where(data[curr_by] == 1)[0] for curr_by in by},
     )
