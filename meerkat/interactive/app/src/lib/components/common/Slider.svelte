@@ -7,7 +7,7 @@
 	export let size: 'small' | 'large';
 
 	let inputClass: string =
-		'mx-1 w-full bg-slate-200 rounded-lg cursor-pointer self-center accent-violet-600';
+		' w-full bg-slate-200 rounded-lg cursor-pointer self-center accent-violet-600';
 
 </script>
 

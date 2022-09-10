@@ -10,19 +10,18 @@
 	}
 </script>
 
-<div class="themed flex w-60">
+<div class="themed flex">
 	<div
-		class="inline-flex justify-center w-9/10 py-3.5 px-2 text-sm rounded-l-lg dark:bg-gray-800 dark:text-gray-100"
+		class="inline-flex self-center justify-center w-9/10 px-2 text-sm rounded-l-lg dark:bg-gray-800 dark:text-gray-100"
 	>
 		{hint_text}
 	</div>
 	<Select 
 		value={selection.value}
 		items={options}
-		containerClasses="w-1/10"
 		placeholder={hint_text}
 		isClearable={false}
-		showIndicator={true}
+		showIndicator={false}
 		on:select={handleSelect}
 	/>
 </div>

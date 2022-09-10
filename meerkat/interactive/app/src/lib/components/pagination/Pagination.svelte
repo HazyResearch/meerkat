@@ -95,23 +95,23 @@
 		<li>
 			<button
 				on:click={on_page_left}
-				class="group w-12 h-10 rounded-l-lg border hover:border-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="group w-8 h-8 rounded-lg border hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronLeft class="group-hover:stroke-violet-600 ml-2" width={24} height={24} />
+				<ChevronLeft class="group-hover:stroke-white ml-2" width={16} height={16} />
 				
 			</button>
 		</li>
 		<li>
-			<button class="w-24 h-10 border dark:border-gray-700  dark:bg-gray-700 dark:text-white">
+			<button class="w-20 h-8  dark:border-gray-700  dark:bg-gray-700 dark:text-white">
 				{page + 1} / {page_count}
 			</button>
 		</li>
 		<li>
 			<button
 				on:click={on_page_right}
-				class="group w-12 h-10 rounded-r-lg border  hover:border-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="group w-8 h-8 rounded-lg border  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronRight class="group-hover:stroke-violet-600 ml-3" width={24} height={24} />
+				<ChevronRight class="group-hover:stroke-white ml-2" width={16} height={16} />
 			</button>
 		</li>
 	</ul>

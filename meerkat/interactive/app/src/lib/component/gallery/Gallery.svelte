@@ -1,14 +1,10 @@
 <script lang="ts">
-	import { api_url } from '$network/stores.js';
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
 	import Gallery from '$lib/components/gallery/Gallery.svelte';
+	import GallerySlider from '$lib/component/gallery/GallerySlider.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import { get } from 'svelte/store';
-	import { createEventDispatcher } from 'svelte';
-	import type { ColumnInfo } from '$lib/api/datapanel.ts';
-	import { BarLoader } from 'svelte-loading-spinners'
-
+	import { BarLoader } from 'svelte-loading-spinners';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
@@ -19,6 +15,8 @@
 
 	export let page: number = 0;
 	export let per_page: number = 100;
+
+	export let cell_size: number = 12;
 
 	$: schema_promise = $get_schema($dp.box_id);
 	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
@@ -36,26 +34,35 @@
 	}
 </script>
 
-<div class="flex-1">
+<div class="flex-1 rounded-lg mx-3 overflow-hidden bg-slate-100">
 	{#await schema_promise}
 		<div class="flex justify-center items-center h-full">
-			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
 	{:then schema}
-		<div class="h-full flex flex-col">
-			<div class="grow overflow-y-scroll">
-				{#await rows_promise}
-				<div class="justify-center items-center">
-					<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+		<div class="h-full relative">
+			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-200">
+				<div class="font-semibold self-center">
+					
 				</div>
+				<span class="font-bold text-xl text-slate-600 self-center justify-self-center"> Gallery </span>
+				<span class="font-semibold self-center justify-self-end"> 
+					<GallerySlider bind:size={cell_size} />	 
+				</span>
+			</div>
+			<div class="h-full overflow-y-scroll">
+				{#await rows_promise}
+					<div class="h-full flex items-center justify-center">
+						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
+					</div>
 				{:then rows}
-					<Gallery {schema} {rows} main_column={$main_column} tag_columns={$tag_columns} />
+					<Gallery {schema} {rows} main_column={$main_column} tag_columns={$tag_columns} bind:cell_size={cell_size} />
 				{:catch error}
 					{error}
 				{/await}
 			</div>
 
-			<div class="z-10 top-0 m-0 h-20 px-10">
+			<div class="absolute z-10 bottom-0 w-full m-0 px-14 pb-5">
 				<Pagination
 					bind:page
 					bind:per_page
