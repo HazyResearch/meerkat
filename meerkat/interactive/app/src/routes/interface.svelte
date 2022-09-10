@@ -216,8 +216,8 @@
 
 	const cols = [[1200, 6]];
 </script>
-<!-- 
-<div class="w-full">
+
+<!-- <div class="w-full">
 	<Grid
 		bind:items={grid_items}
 		rowHeight={50}
@@ -241,9 +241,10 @@
 	</Grid>
 </div> -->
 
- <div class="flex flex-col space-y-2 h-screen">
+<!-- TODO: Things that are not in the computation graph should have a blank callback. -->
+
+ <div class="grid dynamic-grid space-y-2 h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
-		<!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 		<StoreComponent
 			{store_id}
 			store={global_stores.get(store_id)}
@@ -260,5 +261,9 @@
 <style>
 	.dragger {
 		@apply opacity-0 hover:opacity-100 absolute top-0 left-0 select-none cursor-grab bg-violet-200 text-violet-600;
+	}
+	.dynamic-grid {
+		grid-template-rows: auto;
+		grid-auto-rows: minmax(0,1fr);
 	}
 </style>

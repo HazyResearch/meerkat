@@ -53,8 +53,8 @@
 
 	<Slider
 		id="range1"
-		min={layout === 'gimages' ? 5 : 1}
-		max={layout === 'gimages' ? 95 : 12}
+		min={layout === 'gimages' ? 6 : 1}
+		max={layout === 'gimages' ? 48 : 6}
 		bind:value={cell_size_variable}
 	/>
 	<div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg">
@@ -75,7 +75,7 @@
 <div class="h-full">
 
 	<div
-		class="panel h-full"
+		class="dark:bg-slate-600 h-full"
 		class:panel-masonry={layout === 'masonry'}
 		class:panel-gimages={layout === 'gimages'}
 		style:columns={layout === 'gimages' ? null : num_columns}
@@ -132,9 +132,6 @@
 <style>
 	.threshold_selector--clicked{
 		@apply bg-violet-400;
-	}
-	.panel {
-		@apply dark:bg-slate-600;
 	}
 
 	.panel-masonry {

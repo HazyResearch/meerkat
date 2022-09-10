@@ -35,7 +35,7 @@
 
 </script>
 
-<div class="flex flex-col items-center pb-8">
+<div class="flex-1 flex flex-col items-center pb-8">
 	{#await datum_promise}
 		<ScatterPlot
 			data={[{ x: 0, y: 0, id: 0 }]}

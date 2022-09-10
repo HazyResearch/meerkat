@@ -36,14 +36,14 @@
 	}
 </script>
 
-<div class="h-full">
+<div class="flex-1">
 	{#await schema_promise}
-	<div class="flex justify-center items-center h-full">
-		<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
-	</div>
+		<div class="flex justify-center items-center h-full">
+			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
+		</div>
 	{:then schema}
 		<div class="h-full flex flex-col">
-			<div class="grow overflow-y-scroll bg-slate-400">
+			<div class="grow overflow-y-scroll">
 				{#await rows_promise}
 				<div class="justify-center items-center">
 					<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
