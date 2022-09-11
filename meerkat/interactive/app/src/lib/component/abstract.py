@@ -7,7 +7,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 
 class ComponentConfig(BaseModel):
     component_id: str
-    component: str
+    name: str
     props: Dict
 
 
@@ -19,9 +19,7 @@ class Component(IdentifiableMixin):
 
     @property
     def config(self):
-        return ComponentConfig(
-            component_id=self.id, component=self.name, props=self.props
-        )
+        return ComponentConfig(component_id=self.id, name=self.name, props=self.props)
 
     @property
     def props(self):

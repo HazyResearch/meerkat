@@ -5,7 +5,7 @@ from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.match import Match
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.table import EditTarget, Table
-from .app.src.lib.interfaces.abstract import Interface, interface
+from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .graph import (
     Box,
     BoxConfig,
@@ -46,4 +46,5 @@ __all__ = [
     "interface",
     "interface_op",
     "start",
+    "Layout",
 ]

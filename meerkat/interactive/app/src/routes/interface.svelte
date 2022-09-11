@@ -1,7 +1,7 @@
 <script context="module">
 	/** @type {import('./__types/[slug]').Load} */
 	export async function load({ url, fetch }) {
-		let api_server_url = import.meta.env['VITE_API_URL']
+		let api_server_url = import.meta.env['VITE_API_URL'];
 		const id = url.searchParams.get('id');
 		const response = await fetch(`${api_server_url}/interface/${id}/config`);
 
@@ -15,7 +15,6 @@
 </script>
 
 <script lang="ts">
-
 	import { get, writable, type Writable } from 'svelte/store';
 	import { setContext } from 'svelte';
 
@@ -29,12 +28,11 @@
 	import gridHelp from 'svelte-grid/build/helper/index';
 	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
+	import { OpenPanelFilledRight } from 'carbon-icons-svelte';
 
-	let api_url = writable(import.meta.env["VITE_API_URL"]);
-
+	let api_url = writable(import.meta.env['VITE_API_URL']);
 
 	export let config: any;
-
 
 	$: store_trigger = async (store_id: string, value: any) => {
 		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
@@ -152,32 +150,35 @@
 	};
 	$: setContext('Interface', context);
 
-	let component_refs = new Map();
-	for (let { component_id } of config.components) {
-		component_refs[component_id] = undefined;
+	// check if config.components is an array
+	let component_array: Array<any>;
+	if (Array.isArray(config.components)) {
+		component_array = config.components;
+	} else {
+		component_array = Object.entries(config.components).map(([key, value]) => value);
 	}
 
-	let document_container;
+	let imported_layout: any;
 	let imported_components: any = {};
 	onMount(async () => {
+		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
 		// for loop
-		for (let i = 0; i < config.components.length; i++) {
-			let component = config.components[i];
-			let component_name = component.component;
+		for (let i = 0; i < component_array.length; i++) {
+			let component = component_array[i];
+			let component_name = component.name;
 			imported_components[component_name] = (
 				await import(`$lib/component/${component_name.toLowerCase()}/${component_name}.svelte`)
 			).default;
-			//component.component = imported_components[component_name];
+			component.component = imported_components[component_name];
 		}
 
-		document_container = document.documentElement;
 		document.title = config.name;
 	});
 
 	let grid_items = [];
 
-	for (let i = 0; i < config.components.length; i++) {
-		let component = config.components[i];
+	for (let i = 0; i < component_array.length; i++) {
+		let component = component_array[i];
 		// Define the stores
 		for (let [k, v] of Object.entries(component.props)) {
 			if (v) {
@@ -192,7 +193,6 @@
 					}
 					component.props[k] = global_stores.get(v.store_id);
 				} else if (v.box_id !== undefined) {
-					console.log(component, k, v.box_id)
 					if (!global_stores.has(v.box_id)) {
 						// add it to the global_stores Map if it isn't already there
 						global_stores.set(v.box_id, writable(v));
@@ -244,7 +244,7 @@
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 
- <div class="grid dynamic-grid space-y-2 h-screen">
+<div class="h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<StoreComponent
 			{store_id}
@@ -252,20 +252,15 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
-	<Mocha components={config.components}></Mocha>
-
-	<!-- {#each config.components as { component, component_id, props }}
-		{@const Component = imported_components[component]}
-		<svelte:component this={Component} {...props} />
-	{/each} -->
+	<svelte:component
+		this={imported_layout}
+		components={config.components}
+		{...config.layout.props}
+	/>
 </div>
 
 <style>
 	.dragger {
 		@apply opacity-0 hover:opacity-100 absolute top-0 left-0 select-none cursor-grab bg-violet-200 text-violet-600;
-	}
-	.dynamic-grid {
-		grid-template-rows: auto;
-		grid-auto-rows: minmax(0,1fr);
 	}
 </style>

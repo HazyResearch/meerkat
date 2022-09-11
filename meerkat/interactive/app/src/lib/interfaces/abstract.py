@@ -1,7 +1,8 @@
 import code
 import sys
+from dataclasses import dataclass, field
 from functools import partial, wraps
-from typing import Callable, List
+from typing import Callable, Dict, List, Union
 
 from IPython.display import IFrame
 from pydantic import BaseModel
@@ -13,13 +14,7 @@ from meerkat.interactive.app.src.lib.component.abstract import (
 from meerkat.interactive.graph import Pivot, PivotConfig
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
-
-
-class InterfaceConfig(BaseModel):
-
-    pivots: List[PivotConfig]
-    components: List[ComponentConfig]
-    name: str = "Interface"
+from meerkat.tools.utils import nested_apply
 
 
 def call_function_get_frame(func, *args, **kwargs):
@@ -53,43 +48,68 @@ def interface(fn: Callable):
         return interface.launch()
 
     return wrapper
+    # frame, out = call_function_get_frame(self.build)
+
+    # if out is not None:
+
+    # if components is not None:
+    #     self.components = components
+
+    # if len(self.components) == 0:
+    #     # Inspect the local frame of the build function
+    #     # and add all the components to self.components
+    #     # in the order in which they were defined
+    #     for _, val in frame.f_locals.items():
+    #         if isinstance(val, Component):
+    #             self.components.append(val)
 
 
-class InterfaceMeta(type):
-    def __call__(cls, *args, **kwargs):
-        instance = super().__call__(*args, **kwargs)
-        # Automatically call the layout method when the
-        # interface is created
-        instance._layout()
-        return instance
+class LayoutConfig(BaseModel):
+    name: str
+    props: Dict
 
 
-class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
+@dataclass
+class Layout:
+    name: str = "DefaultLayout"
+    props: Dict[str, any] = field(default_factory=dict)
+
+    @property
+    def config(self):
+        return LayoutConfig(name=self.name, props=self.props)
+
+
+class InterfaceConfig(BaseModel):
+
+    layout: LayoutConfig
+    components: Union[List[ComponentConfig], Dict[str, ComponentConfig]]
+    name: str
+
+
+class Interface(IdentifiableMixin):
     # TODO (all): I think this should probably be a subclassable thing that people
     # implement. e.g. TableInterface
 
     identifiable_group: str = "interfaces"
 
-    def __init__(self, layout: callable = None):
-        if layout is not None:
-            self.layout = layout
+    def __init__(
+        self,
+        name: str = "Interface",
+        components: Union[List[Component], Dict[str, Component]] = None,
+        layout: Layout = None,
+    ):
+
         super().__init__()
 
-        self.pivots = []
-        self.components = []
+        self.name = name
 
-    def _layout(self):
-        frame, _ = call_function_get_frame(self.layout)
-        if len(self.components) == 0:
-            # Inspect the local frame of the layout function
-            # and add all the components to self.components
-            # in the order in which they were defined
-            for _, val in frame.f_locals.items():
-                if isinstance(val, Component):
-                    self.components.append(val)
+        self.layout = layout
+        if self.layout is None:
+            self.layout = Layout()
 
-    def layout(self):
-        raise NotImplementedError("Must be implemented by subclass.")
+        self.components = components
+        if self.components is None:
+            self.components = []
 
     def launch(self, return_url: bool = False):
         from meerkat.interactive.startup import is_notebook, output_startup_message
@@ -97,8 +117,7 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
         if state.network_info is None:
             raise ValueError(
                 "Interactive mode not initialized."
-                "Run `network, register_api = mk.interactive_mode()` followed by "
-                "`register_api()` first."
+                "Run `network = mk.gui.start()` first."
             )
 
         url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
@@ -118,17 +137,10 @@ class Interface(IdentifiableMixin, metaclass=InterfaceMeta):
 
             code.interact(local=__main__.__dict__)
 
-    def pivot(self, obj):
-        # checks whether the object is valid pivot
-
-        pivot = Pivot(obj)
-        self.pivots.append(pivot)
-
-        return pivot
-
     @property
     def config(self):
         return InterfaceConfig(
-            pivots=[pivot.config for pivot in self.pivots],
-            components=[component.config for component in self.components],
+            name=self.name,
+            layout=self.layout.config,
+            components=nested_apply(self.components, lambda c: c.config),
         )

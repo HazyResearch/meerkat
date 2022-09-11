@@ -31,7 +31,7 @@ class Gallery(Component):
         main_column: str,
         tag_columns: List[str],
         edit_target: EditTarget = None,
-        slot: str = None 
+        slot: str = None,
     ) -> None:
         super().__init__()
         self.dp = dp
@@ -51,4 +51,3 @@ class Gallery(Component):
         if self.slot is not None:
             props["slot"] = self.slot
         return props
-

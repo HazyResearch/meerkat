@@ -31,7 +31,6 @@ export async function post(url: string, data: any): Promise<any> {
 
 export async function modify(url: string, data: any): Promise<any> {
     let modifications = await post(url, data);
-    console.log(modifications)
 
     // url must hit an endpoint that returns a list of modifications 
     for (let modification of modifications) {
