@@ -67,7 +67,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/carbon-components-svelte/css/g90.css" />
 </svelte:head> -->
 
-<ul class="flex justify-between py-2 px-2 bg-slate-100 rounded-xl shadow-lg">
+<ul class="flex justify-between py-1 px-2 bg-slate-200 rounded-xl drop-shadow-lg">
 	<li class="inline-flex self-center">
 		<NumberSelect
 			bind:selection
@@ -91,27 +91,27 @@
 		</span>
 		total
 	</div>
-	<ul class="inline-flex self-center">
+	<ul class="inline-flex self-center items-center">
 		<li>
 			<button
 				on:click={on_page_left}
-				class="group w-8 h-8 rounded-lg border hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="flex items-center justify-center group w-6 h-6 rounded-lg border border-slate-500 hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronLeft class="group-hover:stroke-white ml-2" width={16} height={16} />
+				<ChevronLeft class="group-hover:stroke-white" width={16} height={16} />
 				
 			</button>
 		</li>
 		<li>
-			<button class="w-20 h-8  dark:border-gray-700  dark:bg-gray-700 dark:text-white">
+			<button class="w-18 px-1 h-8  dark:border-gray-700  dark:bg-gray-700 dark:text-white">
 				{page + 1} / {page_count}
 			</button>
 		</li>
 		<li>
 			<button
 				on:click={on_page_right}
-				class="group w-8 h-8 rounded-lg border  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="flex items-center justify-center group w-6 h-6 rounded-lg border border-slate-500  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 			>
-				<ChevronRight class="group-hover:stroke-white ml-2" width={16} height={16} />
+				<ChevronRight class="group-hover:stroke-white" width={16} height={16} />
 			</button>
 		</li>
 	</ul>

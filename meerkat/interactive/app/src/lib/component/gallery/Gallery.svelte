@@ -40,7 +40,7 @@
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
 	{:then schema}
-		<div class="h-full relative">
+		<div class="h-full grid grid-rows-[auto_1fr] relative">
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-200">
 				<div class="font-semibold self-center">
 					
@@ -62,7 +62,7 @@
 				{/await}
 			</div>
 
-			<div class="absolute z-10 bottom-0 w-full m-0 px-14 pb-5">
+			<div class="absolute z-10 bottom-0 w-full m-0 px-14 pb-3">
 				<Pagination
 					bind:page
 					bind:per_page

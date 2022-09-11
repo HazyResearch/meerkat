@@ -151,7 +151,7 @@
 	}
 
 	.pivot:hover {
-		@apply border-2 border-solid border-violet-600;
+		@apply border-2 opacity-50;
 	}
 
 	/* CSS for the tooltips */

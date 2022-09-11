@@ -15,12 +15,12 @@
 	export let wrap_content: boolean = false;
 </script>
 
-<div class="card" class:flex-grow={card_flex_grow} class:modal={as_modal}>
-	<div class="pivot">
+<div class="bg-gray-100 p-2 rounded-lg grid-rows-2 overflow-x-hidden" class:flex-grow={card_flex_grow} class:modal={as_modal}>
+	<div class="self-center">
 		<Pill header={pivot_header} layout={'wide-header'} />
 		<Cell {...pivot} />
 	</div>
-	<div class="content" class:wrap-content={wrap_content}>
+	<div class="overflow-y-scroll mt-8 p-2 border-t-2 border-solid" class:wrap-content={wrap_content}>
 		{#each zip(content_headers, content) as [header, subcontent], j}
 			<Pill {header} content={subcontent} layout={'wide-content'} />
 		{/each}
@@ -29,26 +29,7 @@
 
 <style>
 	.modal {
-		@apply max-h-[95vh] max-w-[90vw];
-	}
-
-	.card {
-		/* min-width: var(--card-width, ''); */
-		@apply bg-gray-400;
-		@apply p-2 rounded-lg;
-		@apply flex flex-col;
-		@apply overflow-y-auto overflow-x-hidden;
-	}
-
-	.pivot {
-		@apply self-center;
-	}
-
-	.content {
-		/* Take up atleast 30% of the height of the card */
-		@apply min-h-[30%];
-		@apply mt-8 p-2 border-t-2 border-solid;
-		@apply overflow-y-auto;
+		@apply max-h-[95vh] max-w-[90vw] z-20;
 	}
 
 	.wrap-content {

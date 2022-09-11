@@ -16,14 +16,16 @@
 	>
 		{hint_text}
 	</div>
-	<Select 
-		value={selection.value}
-		items={options}
-		placeholder={hint_text}
-		isClearable={false}
-		showIndicator={false}
-		on:select={handleSelect}
-	/>
+	<div class="self-center">
+		<Select 
+			value={selection.value}
+			items={options}
+			placeholder={hint_text}
+			isClearable={false}
+			showIndicator={false}
+			on:select={handleSelect}
+		/>
+	</div>
 </div>
 
 <style>
@@ -35,14 +37,19 @@
 	.themed {
 		@apply rounded-md;
 		--tw-bg-opacity: 1;
-		--background: theme(colors.slate.100);
+		--background: theme(colors.slate.200);
 		--borderHoverColor: theme(colors.violet.600);
 		--borderFocusColor: theme(colors.violet.600);
 		--itemColor: theme(colors.gray.600);
 		--itemHoverColor: theme(colors.gray.600);
 		--itemActiveBackground: theme(colors.gray.800);
 		--listBackground: theme(colors.gray.400);
+		--listLeft: 0;
 		--itemHoverBG: theme(colors.gray.200);
 		--itemIsActiveBG: theme(colors.violet.600);
+		--padding: 5px;
+		--itemPadding: 2px;
+		--selectedItemPadding: 0px;
+		--height: 25px;
 	}
 </style>
