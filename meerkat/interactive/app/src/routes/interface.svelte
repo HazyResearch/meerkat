@@ -21,7 +21,7 @@
 
 	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
-
+	import Mocha from '$lib/layouts/Mocha.svelte';
 	import { onMount } from 'svelte';
 	import { modify, post, get_request } from '$lib/utils/requests';
 
@@ -167,6 +167,7 @@
 			imported_components[component_name] = (
 				await import(`$lib/component/${component_name.toLowerCase()}/${component_name}.svelte`)
 			).default;
+			//component.component = imported_components[component_name];
 		}
 
 		document_container = document.documentElement;
@@ -251,11 +252,12 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
+	<Mocha components={config.components}></Mocha>
 
-	{#each config.components as { component, component_id, props }}
+	<!-- {#each config.components as { component, component_id, props }}
 		{@const Component = imported_components[component]}
 		<svelte:component this={Component} {...props} />
-	{/each}
+	{/each} -->
 </div>
 
 <style>

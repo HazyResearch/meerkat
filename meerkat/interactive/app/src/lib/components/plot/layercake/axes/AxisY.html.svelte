@@ -36,6 +36,8 @@
         typeof ticks === 'function' ?
           ticks($yScale.ticks()) :
             $yScale.ticks(ticks);
+    
+    console.log(tickVals)
   </script>
   
   <div class='axis y-axis' style='transform:translate(-{$padding.left/2}px, 0)'>
@@ -76,9 +78,8 @@
       height: 100%;
     }
     .tick {
-      font-size: 12px;
+      @apply font-lg;
       width: 100%;
-      font-weight: 100;
     }
   
     .gridline {

@@ -31,18 +31,24 @@ class Gallery(Component):
         main_column: str,
         tag_columns: List[str],
         edit_target: EditTarget = None,
+        slot: str = None 
     ) -> None:
         super().__init__()
         self.dp = dp
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
         self.edit_target = edit_target
+        self.slot = slot
 
     @property
     def props(self):
-        return {
+        props = {
             "dp": self.dp.config,
             "main_column": self.main_column.config,
             "tag_columns": self.tag_columns.config,
             "edit_target": self.edit_target.config,
         }
+        if self.slot is not None:
+            props["slot"] = self.slot
+        return props
+

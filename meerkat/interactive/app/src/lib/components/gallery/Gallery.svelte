@@ -92,6 +92,7 @@
 			</Card>
 		{/each}
 	</div>
+	
 </div>
 
 <style>

@@ -19,6 +19,7 @@ class Plot(Component):
         x_label: Union[str, Store],
         y_label: Union[str, Store],
         type: str = "scatter",
+        slot: str = None,
     ) -> None:
         super().__init__()
         self.data = data
@@ -28,10 +29,11 @@ class Plot(Component):
         self.x_label = make_store(x_label)
         self.y_label = make_store(y_label)
         self.type = type
+        self.slot = slot
 
     @property
     def props(self):
-        return {
+        props = {
             "dp": self.data.config,
             "selection": self.selection.config,
             "x": self.x.config,
@@ -40,3 +42,6 @@ class Plot(Component):
             "y_label": self.y_label.config,
             "type": self.type,
         }
+        if self.slot is not None:
+            props["slot"] = self.slot
+        return props
