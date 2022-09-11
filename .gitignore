@@ -1,5 +1,5 @@
 
-scratch/sabri/
+scratch/sabri/**.ipynb
 meerkat/interactive
 # Jupyter notebooks
 notebooks/
