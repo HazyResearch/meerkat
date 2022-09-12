@@ -4,6 +4,7 @@ from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.match import Match
 from .app.src.lib.component.plot import Plot
+from .app.src.lib.component.slicebycards import SliceByCards
 from .app.src.lib.component.table import EditTarget, Table
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .graph import (
@@ -19,6 +20,7 @@ from .graph import (
     interface_op,
     make_store,
     trigger,
+    
 )
 from .startup import start
 
@@ -40,6 +42,7 @@ __all__ = [
     "Gallery",
     "Match",
     "Plot",
+    "SliceByCards",
     "EditTarget",
     "Table",
     "Interface",

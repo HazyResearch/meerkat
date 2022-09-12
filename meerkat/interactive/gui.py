@@ -7,6 +7,7 @@ from IPython.display import IFrame
 from pydantic import BaseModel
 
 import meerkat as mk
+from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
@@ -61,12 +62,13 @@ class SliceByGUI(GUI):
         Returns:
             IFrame: _description_
         """
-        return SliceByInterface(
+        component = SliceByCards(
             sliceby=self.sb,
             main_column=main_column,
             tag_columns=tag_columns,
             aggregations=aggregations,
-        ).launch()
+        )
+        return mk.gui.Interface(components=[component]).launch()
 
 
 class Aggregation(IdentifiableMixin):

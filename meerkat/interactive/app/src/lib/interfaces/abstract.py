@@ -94,9 +94,9 @@ class Interface(IdentifiableMixin):
 
     def __init__(
         self,
-        name: str = "Interface",
         components: Union[List[Component], Dict[str, Component]] = None,
         layout: Layout = None,
+        name: str = "Interface",
     ):
 
         super().__init__()
