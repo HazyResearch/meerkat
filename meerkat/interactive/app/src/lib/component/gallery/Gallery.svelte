@@ -34,7 +34,7 @@
 	}
 </script>
 
-<div class="flex-1 rounded-lg mx-3 overflow-hidden bg-slate-100">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-100">
 	{#await schema_promise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
