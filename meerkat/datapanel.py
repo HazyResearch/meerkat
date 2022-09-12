@@ -7,6 +7,7 @@ import pathlib
 from typing import (
     Any,
     Callable,
+    Collection,
     Dict,
     Iterable,
     List,
@@ -805,6 +806,24 @@ class DataPanel(
             weights=weights,
             random_state=random_state,
         )
+
+    def drop(self, columns: Union[str, Collection[str]]) -> DataPanel:
+        """Return a new DataPanel with the specified columns dropped.
+
+        Args:
+            columns (Union[str, Collection[str]]): The columns to drop.
+
+        Return:
+            DataPanel: A new DataPanel with the specified columns dropped.
+        """
+        if isinstance(columns, str):
+            columns = [columns]
+        for c in columns:
+            if c not in self.columns:
+                raise ValueError(
+                    f"Cannot drop nonexistent column '{c}' from DataPanel."
+                )
+        return self[[c for c in self.columns if c not in columns]]
 
     def items(self):
         for name in self.columns:

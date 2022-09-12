@@ -145,6 +145,11 @@ def make_store(value: Union[str, Storeable]):
         return value
     return Store(value)
 
+def make_box(value: Union[any, Box]):
+    if isinstance(value, Box):
+        return value
+    return Pivot(value)
+
 
 class Operation(NodeMixin):
     def __init__(

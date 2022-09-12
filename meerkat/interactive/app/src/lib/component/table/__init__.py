@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from meerkat.interactive.graph import Box, Pivot
+from meerkat.interactive.graph import Box, Pivot, make_box
+import numpy as np
 
 from ..abstract import Component
 
@@ -26,7 +27,11 @@ class Table(Component):
 
     def __init__(self, dp: Box, edit_target: EditTarget = None) -> None:
         super().__init__()
-        self.dp = dp
+    
+        self.dp = make_box(dp)
+        if edit_target is None:
+            dp["_edit_id"] = np.arange(len(dp))
+            edit_target = EditTarget(self.dp, "_edit_id", "_edit_id")
         self.edit_target = edit_target
 
     @property
