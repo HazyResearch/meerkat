@@ -1,13 +1,8 @@
-from typing import List
-
-import numpy as np
-
 import meerkat as mk
-from meerkat.interactive.graph import Store
 
 dp = mk.get("imagenette")
 dp = dp.sample(n=1000, replace=False)
-dp = mk.embed(dp, input="img")
+# dp = mk.embed(dp, input="img")
 
 
 def match(dp: mk.DataPanel, against: str, id_column: str) -> mk.gui.Interface:

@@ -15,24 +15,22 @@
 </script>
 
 <script lang="ts">
-	import { get, writable, type Writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { setContext } from 'svelte';
 
 	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
-	import Mocha from '$lib/layouts/Mocha.svelte';
 	import { onMount } from 'svelte';
 	import { modify, post, get_request } from '$lib/utils/requests';
+	import type { Interface, Layout} from '$lib/utils/types';
 
 	import Grid from 'svelte-grid';
 	import gridHelp from 'svelte-grid/build/helper/index';
-	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
-	import { OpenPanelFilledRight } from 'carbon-icons-svelte';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
 
-	export let config: any;
+	export let config: Interface;
 
 	$: store_trigger = async (store_id: string, value: any) => {
 		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
@@ -159,19 +157,8 @@
 	}
 
 	let imported_layout: any;
-	let imported_components: any = {};
 	onMount(async () => {
 		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
-		// for loop
-		for (let i = 0; i < component_array.length; i++) {
-			let component = component_array[i];
-			let component_name = component.name;
-			imported_components[component_name] = (
-				await import(`$lib/component/${component_name.toLowerCase()}/${component_name}.svelte`)
-			).default;
-			component.component = imported_components[component_name];
-		}
-
 		document.title = config.name;
 	});
 
