@@ -124,7 +124,7 @@ class StoreConfig(BaseModel):
     has_children: bool
 
 
-class Store(IdentifiableMixin, NodeMixin):
+class Store(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "stores"
 
     def __init__(self, value: Any):

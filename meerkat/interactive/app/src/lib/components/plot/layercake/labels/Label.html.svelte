@@ -34,12 +34,12 @@
 
     .label {
         @apply absolute;
-        @apply text-center font-mono font-light text-sm text-violet-500;
+        @apply text-center font-bold text-slate-500;
     }
 
     .xlabel {
-        @apply w-1/2 left-1/4 bottom-0;
-        transform: translate(0px, 45px);
+        @apply bottom-0 left-1/2;
+        transform: translate(-55px, 55px);
     }
 
 	.ylabel {

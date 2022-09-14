@@ -142,7 +142,6 @@ class SliceBy(IdentifiableMixin):
             return self.__class__(
                 data=self.data[column], scores=self.slices, by=self.by
             )
-    
 
 
 class SliceIndexer:

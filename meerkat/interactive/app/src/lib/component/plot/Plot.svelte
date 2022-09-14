@@ -14,6 +14,7 @@
     export let x_label: Writable;
     export let y_label: Writable;
 	export let type: string;
+	export let padding: number = 10;
 
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the datapanel for the columns to be plotted
@@ -32,7 +33,8 @@
 
 </script>
 
-<div class="flex-1 flex flex-col items-center pb-8">
+<!-- TODO: Figure out the padding to put here.  -->
+<div class="flex-1 flex flex-col items-center ml-16">
 	{#await datum_promise}
 		<ScatterPlot
 			data={[{ x: 0, y: 0, id: 0 }]}
@@ -48,6 +50,7 @@
 			bind:ylabel={$y_label}
 			width="90%"
 			height="300px"
+			padding={padding}
 			on:selection-change={(e) => {
 				$selection = Array.from(e.detail.selected_points);
 			}}

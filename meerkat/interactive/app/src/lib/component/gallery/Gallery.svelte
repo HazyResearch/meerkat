@@ -34,14 +34,14 @@
 	}
 </script>
 
-<div class="flex-1 rounded-lg overflow-hidden bg-slate-100">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
 	{#await schema_promise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
 	{:then schema}
 		<div class="h-full grid grid-rows-[auto_1fr] relative">
-			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-200">
+			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
 				<div class="font-semibold self-center">
 					
 				</div>

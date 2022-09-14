@@ -51,7 +51,7 @@ REQUIRED = [
     "IPython",
     "fastapi",
     "uvicorn",
-    "rich"
+    "rich",
 ]
 
 # What packages are optional?
