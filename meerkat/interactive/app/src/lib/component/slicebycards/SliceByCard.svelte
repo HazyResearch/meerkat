@@ -4,7 +4,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
-	import type { SliceByBox } from '$lib/utils/graph';
+	import type { SliceByBox } from '$lib/utils/types';
 	import RowCard from './RowCard.svelte';
 	import LoadButton from '$lib/components/common/LoadButton.svelte';
 	import Pill from '$lib/components/common/Pill.svelte';
@@ -21,7 +21,6 @@
 	let columns = schema.columns.map((col: any) => col.name);
 	let tag_indices: Array<number> = tag_columns.map((tag) => columns.indexOf(tag));
 	let main_index: number = columns.indexOf(main_column);
-	console.log(main_column)
 	let main_component = schema.columns[main_index].cell_component;
 	let main_props = schema.columns[main_index].cell_props;
 

@@ -50,7 +50,8 @@ REQUIRED = [
     "ipywidgets>=7.0.0",
     "IPython",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "rich"
 ]
 
 # What packages are optional?

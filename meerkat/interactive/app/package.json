@@ -55,6 +55,7 @@
 		"d3": "^7.6.1",
 		"d3-brush": "^3.0.0",
 		"d3-quadtree": "^3.0.1",
+		"d3-scale-chromatic": "^3.0.0",
 		"d3-selection": "^3.0.0",
 		"daisyui": "^2.22.0",
 		"flowbite": "^1.5.2",
