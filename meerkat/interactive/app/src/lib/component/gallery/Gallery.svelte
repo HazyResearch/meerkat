@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Gallery from '$lib/components/gallery/Gallery.svelte';
-	import GallerySlider from '$lib/component/gallery/GallerySlider.svelte';
+	import Gallery from './Cards.svelte';
+	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';

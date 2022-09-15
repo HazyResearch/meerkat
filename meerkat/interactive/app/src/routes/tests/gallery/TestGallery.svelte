@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { get_rows } from '$lib/api/datapanel';
 
-	import Gallery from '$lib/components/gallery/Gallery.svelte';
+	import Gallery from '$lib/components/gallery/Cards.svelte';
 	import { api_url } from '$network/stores';
 
 	let column_infos: Array<any> = [];
