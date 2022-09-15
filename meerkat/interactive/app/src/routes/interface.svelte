@@ -22,7 +22,7 @@
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
 	import { onMount } from 'svelte';
 	import { modify, post, get_request } from '$lib/utils/requests';
-	import type { Interface, Layout} from '$lib/utils/types';
+	import type { EditTarget, Interface, Layout} from '$lib/utils/types';
 
 	import Grid from 'svelte-grid';
 	import gridHelp from 'svelte-grid/build/helper/index';
@@ -78,6 +78,22 @@
 		return modifications;
 	};
 
+	$: edit_target = async (
+		box_id: string, 
+		target: EditTarget,
+		value: any,
+		column: string,
+		row_indices: Array<number>,
+	) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/edit_target`, {
+			target: target,
+			value: value,
+			column: column,
+			row_indices: row_indices
+		});
+		return modifications;
+	};
+
 	$: match = async (box_id: string, input: string, query: string, col_out: Writable<string>) => {
 		let modifications = await modify(`${$api_url}/ops/${box_id}/match`, {
 			input: input,
@@ -120,6 +136,7 @@
 	const _match = writable(match);
 	const _get_rows = writable(get_rows);
 	const _edit = writable(edit);
+	const _edit_target = writable(edit_target);
 	const _store_trigger = writable(store_trigger);
 	const _get_sliceby_info = writable(get_sliceby_info);
 	const _aggregate_sliceby = writable(aggregate_sliceby);
@@ -130,6 +147,7 @@
 	$: $_match = match;
 	$: $_get_rows = get_rows;
 	$: $_edit = edit;
+	$: $_edit_target = edit_target;
 	$: $_store_trigger = store_trigger;
 	$: $_get_sliceby_info = get_sliceby_info;
 	$: $_aggregate_sliceby = aggregate_sliceby;
@@ -141,6 +159,7 @@
 		match: _match,
 		get_rows: _get_rows,
 		edit: _edit,
+		edit_target: _edit_target,
 		store_trigger: _store_trigger,
 		get_sliceby_info: _get_sliceby_info,
 		aggregate_sliceby: _aggregate_sliceby,

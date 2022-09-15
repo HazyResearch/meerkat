@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
+from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
 
@@ -147,6 +148,34 @@ def edit(
     dp[column][mask] = value
 
     modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
+    return modifications
+
+
+@router.post("/{box_id}/edit_target/")
+def edit_target(
+    box_id: str,
+    target: EditTargetConfig = Body(),
+    value=Body(),  # don't set type
+    column: str = Body(),
+    row_indices: List[int] = Body(),
+):
+
+    dp = state.identifiables.get(group="boxes", id=box_id).obj
+
+    target_dp = state.identifiables.get(group="boxes", id=target.target.box_id).obj
+
+    mask = target_dp[target.target_id_column].isin(
+        dp[target.source_id_column][row_indices]
+    )
+    if mask.sum() != len(row_indices):
+        raise HTTPException(
+            status_code=500, detail=f"Target datapanel does not contain all source ids."
+        )
+    target_dp[column][mask] = value
+
+    modifications = trigger(
+        modifications=[BoxModification(id=target.target.box_id, scope=[column])]
+    )
     return modifications
 
 

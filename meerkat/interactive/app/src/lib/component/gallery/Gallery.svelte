@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Gallery from './Cards.svelte';
+	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
@@ -12,6 +12,7 @@
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let edit_target: Any;
+	export let selected: Writable<Array<string>>;
 
 	export let page: number = 0;
 	export let per_page: number = 100;
@@ -42,12 +43,12 @@
 	{:then schema}
 		<div class="h-full grid grid-rows-[auto_1fr] relative">
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
-				<div class="font-semibold self-center">
-					
-				</div>
-				<span class="font-bold text-xl text-slate-600 self-center justify-self-center"> Gallery </span>
-				<span class="font-semibold self-center justify-self-end"> 
-					<GallerySlider bind:size={cell_size} />	 
+				<div class="font-semibold self-center" />
+				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">
+					Gallery
+				</span>
+				<span class="font-semibold self-center justify-self-end">
+					<GallerySlider bind:size={cell_size} />
 				</span>
 			</div>
 			<div class="h-full overflow-y-scroll">
@@ -56,7 +57,14 @@
 						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 					</div>
 				{:then rows}
-					<Gallery {schema} {rows} main_column={$main_column} tag_columns={$tag_columns} bind:cell_size={cell_size} />
+					<Cards
+						{schema}
+						{rows}
+						main_column={$main_column}
+						tag_columns={$tag_columns}
+						bind:cell_size
+						bind:selected
+					/>
 				{:catch error}
 					{error}
 				{/await}

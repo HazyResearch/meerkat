@@ -14,20 +14,22 @@ def filter(dp: mk.DataPanel):
 
 filtered_dp = filter(dp)
 
-editor = mk.gui.Editor(
-    dp=filtered_dp,
-    edit_target=mk.gui.EditTarget(
-        pivot=dp, pivot_id_column="img_path", id_column="img_path"
-    ),
+target = mk.gui.EditTarget(
+    target=dp, target_id_column="img_path", source_id_column="img_path"
 )
 
 gallery = mk.gui.Gallery(
     dp=filtered_dp,
     main_column="img",
     tag_columns=["label"],
-    edit_target=mk.gui.EditTarget(
-        pivot=dp, pivot_id_column="img_path", id_column="img_path"
-    ),
+    edit_target=target,
+)
+
+editor = mk.gui.Editor(
+    dp=filtered_dp,
+    target=target,
+    col="car",
+    selected=gallery.selected
 )
 
 mk.gui.start()
