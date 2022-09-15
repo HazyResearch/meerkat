@@ -6,7 +6,8 @@ from .app.src.lib.component.match import Match
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.stats import Stats
 from .app.src.lib.component.slicebycards import SliceByCards
-from .app.src.lib.component.table import EditTarget, Table
+from .app.src.lib.component.table import Table
+from .app.src.lib.component.editor import Editor
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .graph import (
     Box,
@@ -21,7 +22,9 @@ from .graph import (
     interface_op,
     make_store,
     trigger,
-    
+)
+from .edit import (
+    EditTarget,
 )
 from .startup import start
 
@@ -52,4 +55,5 @@ __all__ = [
     "interface_op",
     "start",
     "Layout",
+    "Editor",
 ]
