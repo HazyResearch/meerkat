@@ -22,11 +22,10 @@
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
 	import { onMount } from 'svelte';
 	import { modify, post, get_request } from '$lib/utils/requests';
-	import type { EditTarget, Interface, Layout} from '$lib/utils/types';
-
-	import Grid from 'svelte-grid';
-	import gridHelp from 'svelte-grid/build/helper/index';
+	import type { EditTarget, Interface } from '$lib/utils/types';
+	import { nestedMap } from '$lib/utils/tools';
 	import type { SliceKey } from '$lib/api/sliceby';
+import { base } from '$app/paths';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
 
@@ -79,11 +78,11 @@
 	};
 
 	$: edit_target = async (
-		box_id: string, 
+		box_id: string,
 		target: EditTarget,
 		value: any,
 		column: string,
-		row_indices: Array<number>,
+		row_indices: Array<number>
 	) => {
 		let modifications = await modify(`${$api_url}/dp/${box_id}/edit_target`, {
 			target: target,
@@ -181,44 +180,70 @@
 		document.title = config.name;
 	});
 
-	let grid_items = [];
 
 	for (let i = 0; i < component_array.length; i++) {
 		let component = component_array[i];
+
 		// Define the stores
-		for (let [k, v] of Object.entries(component.props)) {
-			if (v) {
-				if (v.store_id !== undefined) {
-					// unpack the store
-					if (!global_stores.has(v.store_id)) {
-						// add it to the global_stores Map if it isn't already there
-						let store = meerkat_writable(v.value);
-						store.store_id = v.store_id;
-						store.backend_store = v.has_children;
-						global_stores.set(v.store_id, store);
-					}
-					component.props[k] = global_stores.get(v.store_id);
-				} else if (v.box_id !== undefined) {
-					if (!global_stores.has(v.box_id)) {
-						// add it to the global_stores Map if it isn't already there
-						global_stores.set(v.box_id, writable(v));
-					}
-					component.props[k] = global_stores.get(v.box_id);
-				}
+		component.props = nestedMap(component.props, (v: any) => {
+			if (!v) {
+				return v;
 			}
-		}
+			if (v.store_id !== undefined) {
+				// unpack the store
+				if (!global_stores.has(v.store_id)) {
+					// add it to the global_stores Map if it isn't already there
+					let store = meerkat_writable(v.value);
+					store.store_id = v.store_id;
+					store.backend_store = v.has_children;
+					global_stores.set(v.store_id, store);
+				}
+				return global_stores.get(v.store_id);
+			} else if (v.box_id !== undefined) {
+				if (!global_stores.has(v.box_id)) {
+					// add it to the global_stores Map if it isn't already there
+					global_stores.set(v.box_id, writable(v));
+				}
+				return global_stores.get(v.box_id);
+			}
+			return v;
+		});
+		console.log(component.props)
+
+		// for (let [k, v] of Object.entries(component.props)) {
+		// 	if (v) {
+		// 		if (v.store_id !== undefined) {
+		// 			// unpack the store
+		// 			if (!global_stores.has(v.store_id)) {
+		// 				// add it to the global_stores Map if it isn't already there
+		// 				let store = meerkat_writable(v.value);
+		// 				store.store_id = v.store_id;
+		// 				store.backend_store = v.has_children;
+		// 				global_stores.set(v.store_id, store);
+		// 			}
+		// 			component.props[k] = global_stores.get(v.store_id);
+		// 		} else if (v.box_id !== undefined) {
+		// 			if (!global_stores.has(v.box_id)) {
+		// 				// add it to the global_stores Map if it isn't already there
+		// 				global_stores.set(v.box_id, writable(v));
+		// 			}
+		// 			component.props[k] = global_stores.get(v.box_id);
+		// 		}
+		// 	}
+		// }
 
 		// Setup for responsive grid layout
-		grid_items.push({
-			6: gridHelp.item({
-				x: 0,
-				y: 2 * i,
-				w: 6,
-				h: 2,
-				customDragger: true
-			}),
-			id: i
-		});
+		//		let grid_items = [];
+		// grid_items.push({
+		// 	6: gridHelp.item({
+		// 		x: 0,
+		// 		y: 2 * i,
+		// 		w: 6,
+		// 		h: 2,
+		// 		customDragger: true
+		// 	}),
+		// 	id: i
+		// });
 	}
 
 	const cols = [[1200, 6]];

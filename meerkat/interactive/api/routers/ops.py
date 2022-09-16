@@ -37,16 +37,14 @@ def match(
         raise HTTPException(
             status_code=400, detail="`match` expects a box containing a datapanel"
         )
-    # write the query to a file
-    with open("/tmp/query.txt", "w") as f:
-        f.write(query)
 
     try:
         dp, match_columns = mk.match(
             data=dp, query=query, input=input, return_column_names=True
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
     modifications = [
         BoxModification(id=box_id, scope=match_columns),

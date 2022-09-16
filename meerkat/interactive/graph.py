@@ -54,6 +54,7 @@ Storeable = Union[
 class BoxConfig(BaseModel):
     box_id: str
     type: str = "DataPanel"
+    is_store: bool = True
 
 
 T = TypeVar("T", "DataPanel", "SliceBy")
@@ -122,6 +123,7 @@ class StoreConfig(BaseModel):
     store_id: str
     value: Any
     has_children: bool
+    is_store: bool = True 
 
 
 class Store(IdentifiableMixin, NodeMixin, Generic[T]):
@@ -178,11 +180,11 @@ def _update_result(result: object, update: object, modifications: List[Modificat
     from meerkat.datapanel import DataPanel
 
     if isinstance(result, list):
-        return [_update_result(r, u) for r, u in zip(result, update)]
+        return [_update_result(r, u, modifications) for r, u in zip(result, update)]
     elif isinstance(result, tuple):
-        return tuple(_update_result(r, u) for r, u in zip(result, update))
+        return tuple(_update_result(r, u, modifications) for r, u in zip(result, update))
     elif isinstance(result, dict):
-        return {k: _update_result(v, update[k]) for k, v in result.items()}
+        return {k: _update_result(v, update[k], modifications) for k, v in result.items()}
     elif isinstance(result, Box):
         result.obj = update
         if isinstance(result.obj, DataPanel):

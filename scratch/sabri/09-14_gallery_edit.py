@@ -21,7 +21,7 @@ target = mk.gui.EditTarget(
 gallery = mk.gui.Gallery(
     dp=filtered_dp,
     main_column="img",
-    tag_columns=["label"],
+    tag_columns=["label", "car"],
     edit_target=target,
 )
 
