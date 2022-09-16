@@ -1,9 +1,11 @@
 
 scratch/sabri/**.ipynb
-meerkat/interactive
+
 # Jupyter notebooks
 notebooks/
 scratch/sabri/data
+
+*.mjs
 
 # Note files
 notes.md
