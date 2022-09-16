@@ -157,17 +157,34 @@ def edit_target(
     target: EditTargetConfig = Body(),
     value=Body(),  # don't set type
     column: str = Body(),
-    row_indices: List[int] = Body(),
+    row_indices: List[int] = Body(None),
+    row_keys: List[Union[int, str]] = Body(None),
+    primary_key: str = Body(None),
 ):
+    if (row_indices is None) == (row_keys is None):
+        raise HTTPException(
+            status_code=400,
+            detail="Exactly one of row_indices or row_keys must be specified",
+        )
 
     dp = state.identifiables.get(group="boxes", id=box_id).obj
 
     target_dp = state.identifiables.get(group="boxes", id=target.target.box_id).obj
 
-    mask = target_dp[target.target_id_column].isin(
-        dp[target.source_id_column][row_indices]
-    )
-    if mask.sum() != len(row_indices):
+    if row_indices is not None:
+        source_ids = dp[target.source_id_column][row_indices]
+    else:
+        if primary_key is None:
+            # TODO(): make this work once we've implemented primary_key
+            raise NotImplementedError()
+            # primary_key = target_dp.primary_key
+        print(row_keys)
+        print(dp[primary_key])
+        source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
+    print(source_ids)
+
+    mask = target_dp[target.target_id_column].isin(source_ids)
+    if mask.sum() != len(source_ids):
         raise HTTPException(
             status_code=500, detail=f"Target datapanel does not contain all source ids."
         )

@@ -123,6 +123,44 @@ def test_edit_target(column_type):
     assert target_dp["value"][18] == "100"
 
 
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit_target_keys(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id_s": column_type(list(map(str, np.arange(10, 20)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+
+    target_dp = mk.DataPanel(
+        {
+            "row_id_t": column_type(list(map(str, np.arange(0, 20)))),
+            "value": column_type(list(map(str, np.arange(0, 20)))),
+        }
+    )
+
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+    target_pivot = Pivot(target_dp)
+
+    data = {
+        "target": EditTargetConfig(
+            target=target_pivot.config,
+            target_id_column="row_id_t",
+            source_id_column="row_id_s",
+        ).dict(),
+        "value": "100",
+        "column": "value",
+        "row_keys": [15, 16, 18],
+        "primary_key": "row_id_s",
+    }
+    response = client.post(f"/dp/{pivot.id}/edit_target/", json=data)
+
+    assert response.status_code == 200, response.json()
+    assert target_dp["value"][15] == "100"
+    assert target_dp["value"][16] == "100"
+    assert target_dp["value"][18] == "100"
+
 
 @pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
 def test_edit_target_missing_id(column_type):

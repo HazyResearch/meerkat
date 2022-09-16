@@ -32,12 +32,14 @@ class Gallery(Component):
         tag_columns: List[str],
         edit_target: EditTarget = None,
         selected: Store[List[int]] = None,
+        primary_key: str = None,
     ) -> None:
         super().__init__()
         self.dp = dp
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
         self.edit_target = edit_target
+        self.primary_key = primary_key
         if selected is None:
             selected = []
         self.selected = make_store(selected)
@@ -50,5 +52,6 @@ class Gallery(Component):
             "tag_columns": self.tag_columns.config,
             "edit_target": self.edit_target.config,
             "selected": self.selected.config,
+            "primary_key": self.primary_key,
         }
         return props

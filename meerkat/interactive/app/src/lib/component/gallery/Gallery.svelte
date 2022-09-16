@@ -12,6 +12,7 @@
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let edit_target: Any;
+	export let primary_key: string;
 	export let selected: Writable<Array<string>>;
 
 	export let page: number = 0;
@@ -60,6 +61,7 @@
 					<Cards
 						{schema}
 						{rows}
+						{primary_key}
 						main_column={$main_column}
 						tag_columns={$tag_columns}
 						bind:cell_size

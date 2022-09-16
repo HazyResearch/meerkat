@@ -82,13 +82,17 @@ import { base } from '$app/paths';
 		target: EditTarget,
 		value: any,
 		column: string,
-		row_indices: Array<number>
+		row_indices: Array<number>,
+		row_keys: Array<string>,
+		primary_key: string
 	) => {
 		let modifications = await modify(`${$api_url}/dp/${box_id}/edit_target`, {
 			target: target,
 			value: value,
 			column: column,
-			row_indices: row_indices
+			row_indices: row_indices,
+			row_keys: row_keys,
+			primary_key: primary_key
 		});
 		return modifications;
 	};
