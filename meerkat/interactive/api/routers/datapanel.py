@@ -178,13 +178,11 @@ def edit_target(
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_dp.primary_key
-        print(row_keys)
-        print(dp[primary_key])
+
         source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
-    print(source_ids)
 
     mask = target_dp[target.target_id_column].isin(source_ids)
-    if mask.sum() != len(source_ids):
+    if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
         raise HTTPException(
             status_code=500, detail=f"Target datapanel does not contain all source ids."
         )
