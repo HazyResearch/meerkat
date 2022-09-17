@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from meerkat.interactive.graph import Box, Pivot, Store, make_store
+from meerkat.interactive.graph import Box, Pivot, Store, make_store, make_box
 
 from ..abstract import Component
 
@@ -35,10 +35,18 @@ class Gallery(Component):
         primary_key: str = None,
     ) -> None:
         super().__init__()
-        self.dp = dp
+        self.dp = make_box(dp)
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
+        self.primary_key = primary_key
+        
+        if edit_target is None:
+            # TODO: primary key - make this based on primary keys once that is 
+            # implemented
+            edit_target = EditTarget(self.dp, self.primary_key, self.primary_key)
         self.edit_target = edit_target
+        
+        
         self.primary_key = primary_key
         if selected is None:
             selected = []

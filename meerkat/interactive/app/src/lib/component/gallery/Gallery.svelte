@@ -5,6 +5,7 @@
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';
+import Selected from './Selected.svelte';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
@@ -34,6 +35,8 @@
 
 		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
 	}
+
+	$: console.log($selected)
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
@@ -44,7 +47,12 @@
 	{:then schema}
 		<div class="h-full grid grid-rows-[auto_1fr] relative">
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
-				<div class="font-semibold self-center" />
+				<div class="font-semibold self-center px-10 flex space-x-2">
+					{#if $selected.length > 0}
+						<Selected></Selected>
+						<div class="text-violet-600">{$selected.length} </div> 
+					{/if}
+				</div>
 				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">
 					Gallery
 				</span>

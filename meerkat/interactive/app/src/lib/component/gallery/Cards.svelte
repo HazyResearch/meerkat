@@ -51,6 +51,8 @@
 			return row[primary_key_index];
 		}
 	};
+
+	let idxs = rows.rows.map(get_idx)
 </script>
 
 <div class="h-full">
@@ -60,7 +62,7 @@
 		class:panel-gimages={layout === 'gimages'}
 		style:columns={layout === 'gimages' ? null : num_columns}
 	>
-		{#each rows.rows.map((row, i) => [row, get_idx(row, i)]) as [row, idx]}
+		{#each rows.rows.map((row, i) => [row, idxs[i]]) as [row, idx]}
 			<Card
 				id={idx}
 				pivot={{
@@ -100,16 +102,18 @@
 							$selected.push(idx);
 						} else {
 							let last_idx = $selected[$selected.length - 1];
-							if (idx > last_idx) {
-								for (let j = last_idx; j <= idx; j++) {
-									if (!$selected.includes(j)) {
-										$selected.push(j);
+							let last_i = idxs.indexOf(last_idx);
+							let i = idxs.indexOf(idx);
+							if (i > last_i) {
+								for (let j = last_i; j <= i; j++) {
+									if (!$selected.includes(idxs[j])) {
+										$selected.push(idxs[j]);
 									}
 								}
 							} else {
-								for (let j = last_idx; j >= idx; j--) {
-									if (!$selected.includes(j)) {
-										$selected.push(j);
+								for (let j = last_i; j >= i; j--) {
+									if (!$selected.includes(idxs[j])) {
+										$selected.push(idxs[j]);
 									}
 								}
 							}

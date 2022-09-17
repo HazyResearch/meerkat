@@ -212,7 +212,6 @@ import { base } from '$app/paths';
 			}
 			return v;
 		});
-		console.log(component.props)
 
 		// for (let [k, v] of Object.entries(component.props)) {
 		// 	if (v) {

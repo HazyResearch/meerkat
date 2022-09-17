@@ -8,7 +8,6 @@
 	for (let [k, v] of Object.entries(data)) {
 
 		v.subscribe(() => {
-            console.log("new value", v)
 			data = data;
 		});
 	}

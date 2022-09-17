@@ -3,7 +3,7 @@ from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
 from fastapi import APIRouter, Body, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
@@ -158,7 +158,7 @@ def edit_target(
     value=Body(),  # don't set type
     column: str = Body(),
     row_indices: List[int] = Body(None),
-    row_keys: List[Union[int, str]] = Body(None),
+    row_keys: List[Union[StrictInt, StrictStr]] = Body(None),
     primary_key: str = Body(None),
 ):
     if (row_indices is None) == (row_keys is None):
@@ -182,6 +182,7 @@ def edit_target(
         source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
 
     mask = target_dp[target.target_id_column].isin(source_ids)
+
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
         raise HTTPException(
             status_code=500, detail=f"Target datapanel does not contain all source ids."
