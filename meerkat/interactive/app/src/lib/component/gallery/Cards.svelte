@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
-	import { OrderDetails } from 'carbon-icons-svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { get, map, without } from 'underscore';
 	import Card from './Card.svelte';
