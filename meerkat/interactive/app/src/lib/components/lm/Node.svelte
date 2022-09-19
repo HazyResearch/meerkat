@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { get_categorization } from '$lib/api/llm';
-	// import { Draggable, MagicWand, Subtract } from 'carbon-icons-svelte';
+	import { Draggable, MagicWand, Subtract } from 'carbon-icons-svelte';
 	import { getContext, setContext } from 'svelte';
 	import { dndzone, SHADOW_PLACEHOLDER_ITEM_ID } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';

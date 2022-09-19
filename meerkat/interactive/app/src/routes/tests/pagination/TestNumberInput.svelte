@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NumberInput from '$lib/components/pagination/NumberInput.svelte';
-	// import { CloudDownload } from 'carbon-icons-svelte';
+	import { CloudDownload } from 'carbon-icons-svelte';
 
 	let load_more_pages: number = 1;
 </script>
