@@ -71,6 +71,8 @@ def explain(
     method.fit(embeddings=data_embedding.data, **target)
     slices = method.predict(
         embeddings=data_embedding.data,
+        targets=None, 
+        pred_probs=None,
     )
 
     if isinstance(data, DataPanel):

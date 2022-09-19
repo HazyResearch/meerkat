@@ -2,7 +2,7 @@ import numpy as np
 
 import meerkat as mk
 
-dp = mk.get("imagenette")
+dp = mk.get("imagenette", version="160px")
 dp["car"] = np.zeros(len(dp))
 dp = mk.gui.Pivot(dp)
 

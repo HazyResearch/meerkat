@@ -78,6 +78,8 @@
 		$col = '';
 	}
 	$: col_item = { value: $col, label: $col };
+
+	let select_div;
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
@@ -86,7 +88,7 @@
 			<div class="px-3">
 				<Status {status} />
 			</div>
-			<div class="themed pr-2 w-48">
+			<div class="themed pr-2 w-48" bind:this={select_div}>
 				{#await items_promise}
 					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 				{:then items}
@@ -99,6 +101,7 @@
 						listPlacement="auto"
 						on:select={handleSelect}
 						on:clear={handleClear}
+						appendListTarget={select_div}
 					/>
 				{/await}
 			</div>

@@ -70,11 +70,6 @@ EXTRAS = {
         "sphinx-autobuild",
         "twine",
     ],
-    "interactive": [
-        "plotly",
-        "bokeh",
-        "kaleido",
-    ],
     "embeddings-mac": [
         "faiss-cpu",
         "umap-learn[plot]",
@@ -95,7 +90,6 @@ EXTRAS = {
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
-    "ml": ["pytorch_lightning"],
 }
 EXTRAS["all"] = list(set(sum(EXTRAS.values(), [])))
 
