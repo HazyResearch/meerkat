@@ -1,15 +1,17 @@
 from dataclasses import dataclass
 from ..abstract import Component
-from typing import Dict, Any, Sequence
+from typing import TYPE_CHECKING, Dict, Any, Sequence
 from meerkat.interactive.graph import Box, Store
 
 from typing import List, Union, Any
 
-from meerkat import AbstractColumn, DataPanel, PandasSeriesColumn, NumpyArrayColumn
 from meerkat.interactive.graph import interface_op
-import meerkat as mk
 import functools
 import numpy as np
+
+if TYPE_CHECKING:
+    from meerkat import AbstractColumn, DataPanel
+
 
 # Map a string operator to a function that takes a value and returns a boolean.
 _operator_str_to_func = {
@@ -35,7 +37,7 @@ class FilterCriterion:
 
 @interface_op
 def filter_by_operator(
-    data: Union[DataPanel, AbstractColumn],
+    data: Union["DataPanel", "AbstractColumn"],
     criteria: Sequence[Dict[str, Any]]
 ):
     """Filter data based on operations.
@@ -60,6 +62,8 @@ def filter_by_operator(
         mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
+    import meerkat as mk
+
     criteria: List[FilterCriterion] = [FilterCriterion(**criterion) for criterion in criteria]
 
     # Filter out criteria that are disabled.
@@ -82,7 +86,7 @@ def filter_by_operator(
     for criterion in criteria:
         col = data[criterion.column]
         value = col.dtype.type(criterion.value)
-        if isinstance(col, NumpyArrayColumn):
+        if isinstance(col, mk.NumpyArrayColumn):
             value = np.asarray(value, dtype=col.dtype)
 
         df = _operator_str_to_func[criterion.op](col, value)
@@ -105,7 +109,7 @@ class Filter(Component):
     """
     name = "Filter"
 
-    def __init__(self, dp: Box):
+    def __init__(self, dp: Box["DataPanel"]):
         super().__init__()
         self.dp = dp
 

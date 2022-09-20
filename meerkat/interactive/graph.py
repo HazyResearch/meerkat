@@ -284,7 +284,9 @@ def _pack_boxes_and_stores(obj):
 
     if isinstance(obj, (DataPanel, SliceBy)):
         return Derived(obj)
-    if isinstance(obj, Storeable):
+
+    # TODO(Sabri): we should think more deeply about how to handle nested outputes
+    if isinstance(obj, (int, float, str, bool)):
         return Store(obj)
     return obj
 
