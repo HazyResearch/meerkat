@@ -48,6 +48,7 @@ export async function modify(url: string, data: any): Promise<any> {
             }
             )
         } else if (modification.type === 'store') {
+            console.log("In modification", modification.id, modification.value)
             // Store modification
             //get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);

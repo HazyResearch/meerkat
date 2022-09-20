@@ -2,7 +2,7 @@ from abc import ABC
 from collections import defaultdict
 from copy import copy
 from dataclasses import dataclass
-from functools import wraps
+from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -12,6 +12,7 @@ from typing import (
     Hashable,
     List,
     Set,
+    Type,
     TypeVar,
     Union,
 )
@@ -123,7 +124,7 @@ class StoreConfig(BaseModel):
     store_id: str
     value: Any
     has_children: bool
-    is_store: bool = True 
+    is_store: bool = True
 
 
 class Store(IdentifiableMixin, NodeMixin, Generic[T]):
@@ -146,6 +147,7 @@ def make_store(value: Union[str, Storeable]):
     if isinstance(value, Store):
         return value
     return Store(value)
+
 
 def make_box(value: Union[any, Box]):
     if isinstance(value, Box):
@@ -182,9 +184,13 @@ def _update_result(result: object, update: object, modifications: List[Modificat
     if isinstance(result, list):
         return [_update_result(r, u, modifications) for r, u in zip(result, update)]
     elif isinstance(result, tuple):
-        return tuple(_update_result(r, u, modifications) for r, u in zip(result, update))
+        return tuple(
+            _update_result(r, u, modifications) for r, u in zip(result, update)
+        )
     elif isinstance(result, dict):
-        return {k: _update_result(v, update[k], modifications) for k, v in result.items()}
+        return {
+            k: _update_result(v, update[k], modifications) for k, v in result.items()
+        }
     elif isinstance(result, Box):
         result.obj = update
         if isinstance(result.obj, DataPanel):
@@ -194,6 +200,7 @@ def _update_result(result: object, update: object, modifications: List[Modificat
         return result
     elif isinstance(result, Store):
         result.value = update
+        modifications.append(StoreModification(id=result.id, value=update))
         return result
     else:
         return update
@@ -285,36 +292,66 @@ def _pack_boxes_and_stores(obj):
     if isinstance(obj, (DataPanel, SliceBy)):
         return Derived(obj)
 
-    # TODO(Sabri): we should think more deeply about how to handle nested outputes
+    # TODO(Sabri): we should think more deeply about how to handle nested outputs
     if isinstance(obj, (int, float, str, bool)):
         return Store(obj)
     return obj
 
 
-def interface_op(fn: Callable):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        # TODO(Sabri): this should be nested
-        unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
-            *args, **kwargs
-        )
+def interface_op(fn: Callable = None, nested_return: bool = True) -> Callable:
+    """
+    Functions decorated with this will create nodes in the operation graph.
 
-        result = fn(*unpacked_args, **unpacked_kwargs)
+    Args:
+        fn: The function to decorate.
+        nested_return: Whether the function returns an object (e.g. List, Dict) with
+            a nested structure. If True, a `Store` or `Derived` will be created for
+            every element in the nested structure. If False, a single `Store` or
+            `Derived` wrapping the entire object will be created. For example, if the
+            function returns two DataPanels in a tuple, then `nested_return` should be
+            `True`. However, if the functions returns a variable length list of ints,
+            then `nested_return` should likely be `False`.
+    """
+    if fn is None:
+        # need to make passing args to the args optional
+        # note: all of the args passed to the decorator MUST be optional
+        return partial(interface_op, nested_return=nested_return)
 
-        if len(boxes) > 0 or len(stores) > 0:
-            derived = nested_apply(result, fn=_pack_boxes_and_stores)
-            op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+    def _interface_op(fn: Callable):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            # TODO(Sabri): this should be nested
+            unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
+                *args, **kwargs
+            )
 
-            for input_box in boxes:
-                input_box.children.add(op)
-            for input_store in stores:
-                input_store.children.add(op)
+            result = fn(*unpacked_args, **unpacked_kwargs)
 
-            return derived
+            if (result is not None) and (len(boxes) > 0 or len(stores) > 0):
+                from meerkat.datapanel import DataPanel
+                from meerkat.ops.sliceby.sliceby import SliceBy
 
-        return result
+                if nested_return:
+                    derived = nested_apply(result, fn=_pack_boxes_and_stores)
+                elif isinstance(result, (DataPanel, SliceBy)):
+                    derived = Derived(result)
+                else:
+                    derived = Store(result)
 
-    return wrapper
+                op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+
+                for input_box in boxes:
+                    input_box.children.add(op)
+                for input_store in stores:
+                    input_store.children.add(op)
+
+                return derived
+
+            return result
+
+        return wrapper
+
+    return _interface_op(fn)
 
 
 @interface_op

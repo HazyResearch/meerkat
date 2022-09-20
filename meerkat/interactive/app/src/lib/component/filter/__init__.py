@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from ..abstract import Component
 from typing import TYPE_CHECKING, Dict, Any, Sequence
-from meerkat.interactive.graph import Box, Store
+from meerkat.interactive.graph import Box, Store, make_store
 
 from typing import List, Union, Any
 
 from meerkat.interactive.graph import interface_op
 import functools
 import numpy as np
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from meerkat import AbstractColumn, DataPanel
@@ -27,8 +28,7 @@ _operator_str_to_func = {
 }
 
 
-@dataclass
-class FilterCriterion:
+class FilterCriterion(BaseModel):
     is_enabled: bool
     column: str
     op: str
@@ -38,7 +38,7 @@ class FilterCriterion:
 @interface_op
 def filter_by_operator(
     data: Union["DataPanel", "AbstractColumn"],
-    criteria: Sequence[Dict[str, Any]]
+    criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
 ):
     """Filter data based on operations.
 
@@ -64,7 +64,14 @@ def filter_by_operator(
     """
     import meerkat as mk
 
-    criteria: List[FilterCriterion] = [FilterCriterion(**criterion) for criterion in criteria]
+    # since the criteria can either be a list of dictionary or of FilterCriterion 
+    # we need to convert them to FilterCriterion
+    criteria = [
+        criterion
+        if isinstance(criterion, FilterCriterion)
+        else FilterCriterion(**criterion)
+        for criterion in criteria
+    ]
 
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
@@ -79,7 +86,7 @@ def filter_by_operator(
     #     isinstance(data[column], supported_column_types) for column in input_columns
     # ):
     #     raise ValueError(f"All columns must be one of {supported_column_types}")
-    
+
     # Filter pandas series columns.
     # TODO (arjundd): Make this more efficient to perform filtering sequentially.
     all_series = []
@@ -107,14 +114,21 @@ class Filter(Component):
     We recommend performing filtering before other out-of-place operations,
     like sorting, to avoid unnecessary computation.
     """
+
     name = "Filter"
 
-    def __init__(self, dp: Box["DataPanel"]):
+    def __init__(
+        self,
+        dp: Box["DataPanel"],
+        criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
+    ):
         super().__init__()
         self.dp = dp
 
-        criteria: List[Dict[str, Any]] = []
-        self.criteria = Store(criteria)  # Dict[str, List[Any]]
+        if criteria is None:
+            criteria = []
+
+        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
         self.operations = list(_operator_str_to_func.keys())
 
     def derived(self):
@@ -126,5 +140,5 @@ class Filter(Component):
         return {
             "dp": self.dp.config,
             "criteria": self.criteria.config,
-            "operations": self.operations
+            "operations": self.operations,
         }

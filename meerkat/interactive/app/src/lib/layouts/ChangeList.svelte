@@ -12,13 +12,16 @@
 	let gallery_match = components.gallery_match;
 	let gallery_filter = components.gallery_filter;
 	let gallery_editor = components.gallery_editor;
+	let plot_component = components.plot;
 </script>
-
-<div class="grid grid-rows-[1fr_2fr] py-10 h-screen gap-5">
-	<div>
-		<Match {...gallery_match.props} />
-		<Filter {...gallery_filter.props} />
-		<Editor {...gallery_editor.props} />
+<div class="grid grid-cols-[1fr_2fr] py-10 h-screen gap-5">
+	<Plot {...plot_component.props} />
+	<div class="grid grid-rows-[1fr_2fr] py-10 h-screen gap-5">
+		<div>
+			<Match {...gallery_match.props} />
+			<Filter {...gallery_filter.props} />
+			<Editor {...gallery_editor.props} />
+		</div>
+		<Gallery {...gallery_component.props} />
 	</div>
-	<Gallery {...gallery_component.props} />
 </div>

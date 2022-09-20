@@ -36,7 +36,6 @@ import Selected from './Selected.svelte';
 		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
 	}
 
-	$: console.log($selected)
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
