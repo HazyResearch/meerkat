@@ -33,7 +33,7 @@
 		});
 	}
 
-	const onKeyPress = (e) => {
+	const on_key_press = (e) => {
 		if (e.charCode === 13) on_edit();
 		else status = 'waiting';
 	};
@@ -70,11 +70,11 @@
 			});
 	};
 
-	function handleSelect(event) {
+	function handle_select(event) {
 		$col = event.detail.value;
 	}
 
-	function handleClear() {
+	function handle_clear() {
 		$col = '';
 	}
 	$: col_item = { value: $col, label: $col };
@@ -82,36 +82,32 @@
 	let select_div;
 </script>
 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
-	<div class="form-control w-full">
-		<div class="input-group w-100% flex items-center">
-			<div class="px-3">
-				<Status {status} />
-			</div>
-			<div class="themed pr-2 w-48" bind:this={select_div}>
-				{#await items_promise}
-					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
-				{:then items}
-					<Select
-						id="column"
-						placeholder="...a column."
-						value={col_item}
-						{items}
-						showIndicator={true}
-						listPlacement="auto"
-						on:select={handleSelect}
-						on:clear={handleClear}
-						appendListTarget={select_div}
-					/>
-				{/await}
-			</div>
-			<input
-				type="number"
-				bind:value={$text}
-				placeholder="Enter a value..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={onKeyPress}
-			/>
-		</div>
+<div class="w-full flex items-center bg-slate-100 py-3 rounded-lg drop-shadow-md z-20">
+	<div class="px-3">
+		<Status {status} />
 	</div>
+	<div class="themed pr-2 w-48" bind:this={select_div}>
+		{#await items_promise}
+			<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
+		{:then items}
+			<Select
+				id="column"
+				placeholder="...a column."
+				value={col_item}
+				{items}
+				showIndicator={true}
+				listPlacement="auto"
+				on:select={handle_select}
+				on:clear={handle_clear}
+				appendListTarget={select_div}
+			/>
+		{/await}
+	</div>
+	<input
+		type="number"
+		bind:value={$text}
+		placeholder="Enter a value..."
+		class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
+		on:keypress={on_key_press}
+	/>
 </div>
