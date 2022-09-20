@@ -21,7 +21,7 @@ export async function get_categories(
     );
 }
 
-export async function get_categorization(
+export async function get_lm_categorization(
     api_url: string,
     description: string,
     existing_categories: Array<string>,

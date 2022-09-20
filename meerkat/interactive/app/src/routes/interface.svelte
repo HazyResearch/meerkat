@@ -29,6 +29,7 @@
 	import gridHelp from 'svelte-grid/build/helper/index';
 	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
+	import { get_lm_categorization as __get_lm_categorization } from '$lib/api/llm';
 
 	let api_url = writable(import.meta.env["VITE_API_URL"]);
 
@@ -119,6 +120,15 @@
 		return out;
 	};
 
+	$: get_lm_categorization = async (description: string, existing_categories: Array<string>) => {
+		return await __get_lm_categorization($api_url, description, existing_categories);
+	}
+
+	$: add_rows = async (box_id: string, rows: Array<any>) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/add_rows`, { rows: rows });
+		return modifications;
+	};
+
 	const _get_schema = writable(get_schema);
 	const _add = writable(add);
 	const _match = writable(match);
@@ -128,6 +138,8 @@
 	const _get_sliceby_info = writable(get_sliceby_info);
 	const _aggregate_sliceby = writable(aggregate_sliceby);
 	const _get_sliceby_rows = writable(get_sliceby_rows);
+	const _get_lm_categorization = writable(get_lm_categorization);
+	const _add_rows = writable(add_rows);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
@@ -138,6 +150,8 @@
 	$: $_get_sliceby_info = get_sliceby_info;
 	$: $_aggregate_sliceby = aggregate_sliceby;
 	$: $_get_sliceby_rows = get_sliceby_rows;
+	$: $_get_lm_categorization = get_lm_categorization;
+	$: $_add_rows = add_rows;
 
 	$: context = {
 		get_schema: _get_schema,
@@ -148,7 +162,9 @@
 		store_trigger: _store_trigger,
 		get_sliceby_info: _get_sliceby_info,
 		aggregate_sliceby: _aggregate_sliceby,
-		get_sliceby_rows: _get_sliceby_rows
+		get_sliceby_rows: _get_sliceby_rows,
+		get_lm_categorization: _get_lm_categorization,
+		add_rows: _add_rows
 	};
 	$: setContext('Interface', context);
 
