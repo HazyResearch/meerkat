@@ -44,6 +44,7 @@ class NodeMixin:
 
 Primitive = Union[int, str, float, bool]
 Storeable = Union[
+    None, 
     Primitive,
     List[Primitive],
     Dict[Primitive, Primitive],
@@ -293,7 +294,7 @@ def _pack_boxes_and_stores(obj):
         return Derived(obj)
 
     # TODO(Sabri): we should think more deeply about how to handle nested outputs
-    if isinstance(obj, (int, float, str, bool)):
+    if obj is None or isinstance(obj, (int, float, str, bool)):
         return Store(obj)
     return obj
 
@@ -327,7 +328,7 @@ def interface_op(fn: Callable = None, nested_return: bool = True) -> Callable:
 
             result = fn(*unpacked_args, **unpacked_kwargs)
 
-            if (result is not None) and (len(boxes) > 0 or len(stores) > 0):
+            if len(boxes) > 0 or len(stores) > 0:
                 from meerkat.datapanel import DataPanel
                 from meerkat.ops.sliceby.sliceby import SliceBy
 

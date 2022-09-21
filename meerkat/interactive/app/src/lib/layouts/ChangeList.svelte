@@ -5,20 +5,23 @@
 	import Match from '$lib/component/match/Match.svelte';
 	import Filter from '$lib/component/filter/Filter.svelte';
 	import Editor from '$lib/component/editor/Editor.svelte';
+	import Row from '$lib/component/row/Row.svelte';
 
 	export let components;
 
-	let gallery_component = components.gallery;
+	let gallery = components.gallery;
 	let gallery_match = components.gallery_match;
 	let gallery_filter = components.gallery_filter;
 	let gallery_editor = components.gallery_editor;
-	let plot_component = components.plot;
+	let plot = components.plot;
+	let active_slice = components.active_slice;
 </script>
 <div class="grid grid-cols-[33%_1fr] p-5 h-screen gap-5">
-	<Plot {...plot_component.props} />
+	<Plot {...plot.props} />
 	<div class="grid grid-rows-[auto_1fr] h-full gap-5">
 		<div class="grid grid-rows-1 grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
+				<Row {...active_slice.props} />
 				<Editor {...gallery_editor.props} />
 			</div>
 			<div class="flex flex-col space-y-3">
@@ -27,6 +30,6 @@
 				<Filter {...gallery_filter.props} />
 			</div>
 		</div>
-		<Gallery {...gallery_component.props} />
+		<Gallery {...gallery.props} />
 	</div>
 </div>
