@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import Brush from '$lib/components/plot/layercake/interaction/Brush.svg.svelte';
-	import { createEventDispatcher } from 'svelte';
-	import {interpolatePiYG} from "d3-scale-chromatic";
-import { interpolate } from 'd3';
+	import { interpolatePiYG } from 'd3-scale-chromatic';
+	import { createEventDispatcher, getContext } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 	const { data, xGet, yGet, xScale, yScale, x } = getContext('LayerCake');
@@ -49,7 +47,7 @@ import { interpolate } from 'd3';
 			selected_points.add(id);
 		}
 		selected_points = selected_points; // trigger re-render
-        dispatch_selection_change();
+		dispatch_selection_change();
 	};
 
 	// Event handler to clear manually selected points
@@ -58,16 +56,14 @@ import { interpolate } from 'd3';
 		selected_points.clear();
 		selected_points = selected_points; // trigger re-render
 	};
-
 </script>
-
 
 <g class="w-full h-full" on:contextmenu={clear_points}>
 	<Brush {brushed} fire_on="start brush end" />
 	<g class="bar-group">
 		{#each $data as d}
-			{@const x = ($x(d) >= 0) ? $xGet({x: 0}) : $xGet(d)}
-			{@const width = Math.abs($xGet(d) - $xGet({x: 0}))}
+			{@const x = $x(d) >= 0 ? $xGet({ x: 0 }) : $xGet(d)}
+			{@const width = Math.abs($xGet(d) - $xGet({ x: 0 }))}
 
 			<rect
 				class={selected_points.has(d.id) || manual_selected_points.has(d.id)
@@ -77,11 +73,11 @@ import { interpolate } from 'd3';
 						? `scatter-point--scanned`
 						: `scatter-point`
 					: `scatter-point`}
-				x="{x}"
-                y="{$yGet(d)}"
-                height={$yScale.bandwidth()}
-                width="{width}"
-				rx=3
+				{x}
+				y={$yGet(d)}
+				height={$yScale.bandwidth()}
+				{width}
+				rx="3"
 				on:click={select_point(d.id)}
 				style="fill: {interpolatePiYG((d.x + 1) / 2)};"
 			/>
@@ -91,23 +87,23 @@ import { interpolate } from 'd3';
 
 <style>
 	.scatter-point {
-        @apply fill-slate-400;
+		@apply fill-slate-400;
 		stroke-width: 1px;
 	}
 
 	.scatter-point:hover {
-        @apply fill-violet-200;
+		@apply fill-violet-200;
 		@apply opacity-50;
 		stroke-width: 1px;
 	}
 
 	.scatter-point--scanned {
-        @apply fill-violet-200;
+		@apply fill-violet-200;
 		stroke-width: 1px;
 	}
 
 	.scatter-point--selected {
-        @apply fill-violet-600;
+		@apply fill-violet-600;
 		@apply border stroke-violet-600;
 		stroke-width: 3px;
 	}
