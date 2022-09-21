@@ -18,7 +18,7 @@
 </script>
 <div class="grid grid-cols-[33%_1fr] p-5 h-screen gap-5">
 	<Plot {...plot.props} />
-	<div class="grid grid-rows-[auto_1fr] h-full gap-5">
+	<div class="grid grid-rows-[auto_1fr] h-screen gap-5">
 		<div class="grid grid-rows-1 grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
 				<Row {...active_slice.props} />

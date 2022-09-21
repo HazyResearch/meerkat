@@ -184,6 +184,7 @@ def edit_target(
     mask = target_dp[target.target_id_column].isin(source_ids)
 
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
+        breakpoint()
         raise HTTPException(
             status_code=500, detail=f"Target datapanel does not contain all source ids."
         )

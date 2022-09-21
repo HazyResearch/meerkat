@@ -51,21 +51,25 @@
 		Loading...
 	{:then schema}
 		{#each schema.columns as column, column_idx}
-			<div class="flex">
+			<div class="">
 				<div class="text-gray-600 font-mono">
 					{column.name}
 				</div>
-				<div>
+				<div class="w-full flex">
 					{#await rows_promise}
 						Loading...
 					{:then rows}
-						<Cell
-							data={rows.rows[0][column_idx]}
-							cell_component={column.cell_component}
-							cell_props={column.cell_props}
-							editable={true}
-                            on:edit={event => on_edit(event, column.name)}
-						/>
+                        {#if rows == null}
+                            No selection
+                        {:else}
+                            <Cell
+                                data={rows.rows[0][column_idx]}
+                                cell_component={column.cell_component}
+                                cell_props={column.cell_props}
+                                editable={true}
+                                on:edit={event => on_edit(event, column.name)}
+                            />
+                        {/if}
 					{/await}
 				</div>
 			</div>

@@ -38,7 +38,7 @@ import Selected from './Selected.svelte';
 
 </script>
 
-<div class="h-full flex-1 rounded-lg overflow-hidden bg-slate-50">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
 	{#await schema_promise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
