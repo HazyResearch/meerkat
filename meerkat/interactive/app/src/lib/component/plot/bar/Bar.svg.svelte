@@ -59,7 +59,6 @@ import { interpolate } from 'd3';
 		selected_points = selected_points; // trigger re-render
 	};
 
-	console.log(interpolatePiYG(0));
 </script>
 
 

@@ -22,7 +22,11 @@
 
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
-	$: criteria_frontend = $criteria;
+	let criteria_frontend: FilterCriterion[] = [];
+	criteria.subscribe((value) => {
+		console.log('criteria changed', value);
+		criteria_frontend = $criteria;
+	});
 
 	let schema_promise;
 	let items_promise;
@@ -117,7 +121,6 @@
 			criteria.set(criteria_frontend);
 		}
 	};
-
 </script>
 
 <div class="bg-slate-100 py-2 rounded-lg drop-shadow-md">

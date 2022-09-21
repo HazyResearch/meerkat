@@ -48,11 +48,18 @@ export async function modify(url: string, data: any): Promise<any> {
             }
             )
         } else if (modification.type === 'store') {
-            console.log("In modification", modification.id, modification.value)
             // Store modification
             //get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);
+            console.log("In modification", modification.id, modification.value, store)
 
+            if (store === undefined) {
+                console.log(
+                    "Store is not maintained on the frontend. Only stores passed as props to a component are maintained in `global_stores`.",
+                    modification.id
+                )
+                continue;
+            }
             // set with trigger=false so that the store change doesn't trigger backend 
             if (!("trigger_store" in store)) {
                 throw "Must use `meerkat_writable` for backend stores."
