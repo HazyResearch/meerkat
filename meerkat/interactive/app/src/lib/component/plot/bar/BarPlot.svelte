@@ -13,11 +13,13 @@
 
 	export let radius = 3;
     export let padding: number = 10;
+	export let selection: Array<number> = [];
 
     export let xlabel: string = 'x label';
     export let ylabel: string = 'y label';
     
 	let height = 40 * data.length;
+
 
 
 </script>
@@ -40,7 +42,7 @@
 		<Svg>
 			<SvgAxisX />
 			<SvgAxisY gridlines={false}/>
-			<SvgBar {radius} on:selection-change />
+			<SvgBar {radius} on:selection-change/>
 		</Svg>
         
 	</LayerCake>
