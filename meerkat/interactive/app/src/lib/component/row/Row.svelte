@@ -11,11 +11,10 @@
 	export let dp: Writable<DataPanelBox>;
 	export let idx: Writable<number>;
 	export let target: EditTarget;
+	export let cell_specs: Any = {};
 
-    // TODO(sabri): we need to make sure that there is an entry for each column
-    // in the datapanel. 
-	export let props: Any = {};
-
+	$: schema_promise = $get_schema($dp.box_id);
+       
 
 	$: target.target = get(target.target);
 
@@ -43,6 +42,8 @@
 			console.log(error);
 		});
 	};
+    console.log(cell_specs)
+
 </script>
 
 <div class="bg-slate-100 py-3 px-2 rounded-lg drop-shadow-md flex flex-col space-y-1">
@@ -54,7 +55,8 @@
 		Loading...
 	{:then schema}
 		{#each schema.columns as column, column_idx}
-			{#if props[column.name].type !== 'stat'}
+        
+			{#if cell_specs[column.name].type !== 'stat'}
 				<div class="">
 					<div class="text-gray-600 font-mono">
 						{column.name}
@@ -70,7 +72,7 @@
 									data={rows.rows[0][column_idx]}
 									cell_component={column.cell_component}
 									cell_props={column.cell_props}
-									editable={props[column.name].type === 'editable'}
+									editable={cell_specs[column.name].type === 'editable'}
 									on:edit={(event) => on_edit(event, column.name)}
 								/>
 							{/if}
@@ -81,11 +83,11 @@
 		{/each}
 		<div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2 pt-2">
 			{#each schema.columns as column, column_idx}
-				{#if props[column.name].type === 'stat'}
+				{#if cell_specs[column.name].type === 'stat'}
 					<div class="bg-white rounded-md flex flex-col shadow-lg">
 						<div class="text-slate-400 px-3 py-1 self-center">
-							{#if props[column.name].name}
-								{props[column.name].name}
+							{#if cell_specs[column.name].name}
+								{cell_specs[column.name].name}
 							{:else}
 								{column.name}
 							{/if}
