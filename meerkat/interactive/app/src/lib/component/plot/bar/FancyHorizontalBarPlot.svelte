@@ -40,7 +40,7 @@
 	>
 		<Html>
 			<!-- <HtmlAxisY /> -->
-			<FancyHtmlAxisY width={ywidth} tickMarks={true} />
+			<FancyHtmlAxisY width={ywidth} tickMarks={true} on:remove />
 		</Html>
 	</LayerCake>
 	<LayerCake

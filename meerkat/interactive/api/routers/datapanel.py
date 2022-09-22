@@ -1,7 +1,7 @@
 import functools
-from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
+import numpy as np
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
@@ -130,6 +130,24 @@ def rows(
     )
 
 
+@router.post("/{box_id}/remove_row_by_index/")
+def remove_row_by_index(
+    box_id: str, row_index: int = EmbeddedBody()
+) -> List[Modification]:
+    box = state.identifiables.get(group="boxes", id=box_id)
+
+    dp = box.obj
+    dp = dp.lz[np.arange(len(dp)) != row_index]
+    # this is an out-of-place operation, so the box should be updated
+    # TODO(karan): double check this
+    box.obj = dp
+
+    modifications = trigger(
+        modifications=[BoxModification(id=box_id, scope=dp.columns)]
+    )
+    return modifications
+
+
 @router.post("/{box_id}/edit/")
 def edit(
     box_id: str,
@@ -186,7 +204,7 @@ def edit_target(
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
         breakpoint()
         raise HTTPException(
-            status_code=500, detail=f"Target datapanel does not contain all source ids."
+            status_code=500, detail="Target datapanel does not contain all source ids."
         )
     target_dp[column][mask] = value
 

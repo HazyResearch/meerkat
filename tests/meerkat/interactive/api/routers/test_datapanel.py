@@ -162,6 +162,19 @@ def test_edit_target_keys(column_type):
     assert target_dp["value"][18] == "100"
 
 
+def test_remove_row_by_index(dp_testbed):
+    dp = dp_testbed["dp"]
+
+    pivot = Pivot(dp)
+    data = {
+        "row_index": "5",
+    }
+
+    response = client.post(f"/dp/{pivot.id}/remove_row_by_index/", json=data)
+
+    assert response.status_code == 200, response.json()
+
+
 @pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
 def test_edit_target_missing_id(column_type):
     dp = mk.DataPanel(

@@ -6,7 +6,7 @@
 	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
 	import type { Point2D } from '$lib/components/plot/types';
 
-	const { get_rows } = getContext('Interface');
+	const { get_rows, remove_row_by_index } = getContext('Interface');
 
 	export let dp: Writable;
 	export let selection: Writable;
@@ -53,6 +53,9 @@
 			padding={padding}
 			on:selection-change={(e) => {
 				$selection = Array.from(e.detail.selected_points);
+			}}
+			on:remove={async (e) => {
+				$remove_row_by_index($dp.box_id, e.detail);
 			}}
 		/>
 	{/await}

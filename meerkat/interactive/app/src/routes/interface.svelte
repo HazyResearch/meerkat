@@ -15,17 +15,16 @@
 </script>
 
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
 	import { setContext } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
-	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
-	import StoreComponent from '$lib/component/StoreComponent.svelte';
-	import { onMount } from 'svelte';
-	import { modify, post, get_request } from '$lib/utils/requests';
-	import type { EditTarget, Interface } from '$lib/utils/types';
-	import { nestedMap } from '$lib/utils/tools';
 	import type { SliceKey } from '$lib/api/sliceby';
-import { base } from '$app/paths';
+	import StoreComponent from '$lib/component/StoreComponent.svelte';
+	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
+	import { get_request, modify, post } from '$lib/utils/requests';
+	import { nestedMap } from '$lib/utils/tools';
+	import type { EditTarget, Interface } from '$lib/utils/types';
+	import { onMount } from 'svelte';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
 
@@ -134,6 +133,13 @@ import { base } from '$app/paths';
 		return out;
 	};
 
+	$: remove_row_by_index = async (box_id: string, row_index: number) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/remove_row_by_index`, {
+			row_index: row_index
+		});
+		return modifications;
+	};
+
 	const _get_schema = writable(get_schema);
 	const _add = writable(add);
 	const _match = writable(match);
@@ -144,6 +150,7 @@ import { base } from '$app/paths';
 	const _get_sliceby_info = writable(get_sliceby_info);
 	const _aggregate_sliceby = writable(aggregate_sliceby);
 	const _get_sliceby_rows = writable(get_sliceby_rows);
+	const _remove_row_by_index = writable(remove_row_by_index);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
@@ -155,6 +162,7 @@ import { base } from '$app/paths';
 	$: $_get_sliceby_info = get_sliceby_info;
 	$: $_aggregate_sliceby = aggregate_sliceby;
 	$: $_get_sliceby_rows = get_sliceby_rows;
+	$: $_remove_row_by_index = remove_row_by_index;
 
 	$: context = {
 		get_schema: _get_schema,
@@ -166,7 +174,8 @@ import { base } from '$app/paths';
 		store_trigger: _store_trigger,
 		get_sliceby_info: _get_sliceby_info,
 		aggregate_sliceby: _aggregate_sliceby,
-		get_sliceby_rows: _get_sliceby_rows
+		get_sliceby_rows: _get_sliceby_rows,
+		remove_row_by_index: _remove_row_by_index
 	};
 	$: setContext('Interface', context);
 
@@ -183,7 +192,6 @@ import { base } from '$app/paths';
 		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
 		document.title = config.name;
 	});
-
 
 	for (let i = 0; i < component_array.length; i++) {
 		let component = component_array[i];

@@ -68,17 +68,6 @@
 					style="top:0;left:-6px;width:6px;"
 				/>
 			{/if}
-			<!-- <div
-				class="text h-full"
-				style="
-            top:{yTick}px;
-            left:{isBandwidth ? $padding.left + xTick - 4 : 0}px;
-			width:{width}px;
-			transform: translate(
-				{isBandwidth ? '-100%' : 0}, 
-				{isBandwidth ? -50 - Math.floor($yScale.bandwidth() / -2) : '-100'}%);
-			"
-			>	 -->
 			<div
 				class="text h-full z-20"
 				style="
@@ -88,7 +77,11 @@
 				{isBandwidth ? -50 - Math.floor($yScale.bandwidth() / -2) : '-100'}%);
 			"
 			>	
-				<FancyTick width="{width}px" name={tick} size={10} on:remove={() => console.log("remove", i)} />
+				<!-- 
+					Make a FancyTick, which represents any component that should be shown on the left 
+					side of the plot. This has a fixed width in pixels. 
+				-->
+				<FancyTick width="{width}px" name={tick} id={i} size={10} on:remove />
 			</div>
 		</div>
 	{/each}

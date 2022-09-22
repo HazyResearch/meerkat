@@ -1,77 +1,51 @@
 <script lang="ts">
-	import Brush from '$lib/components/plot/layercake/interaction/Brush.svg.svelte';
 	import { interpolatePiYG } from 'd3-scale-chromatic';
 	import { createEventDispatcher, getContext } from 'svelte';
 
 	const dispatch = createEventDispatcher();
-	const { data, xGet, yGet, xScale, yScale, x } = getContext('LayerCake');
+	const { data, xGet, yGet, yScale, x } = getContext('LayerCake');
 
-	export let scanned_points = new Set();
-	export let selected_points = new Set();
-	export let show_scanned = false;
+	export let selected_bars = new Set();
 
-	// Bind to Quadtree component (d3 quadtree)
-	let quadtree: any;
+	// Allow the user to only select one bar at a time
+	export let single_selection = true;
 
 	function dispatch_selection_change() {
 		dispatch('selection-change', {
-			selected_points: selected_points
+			selected_points: selected_bars
 		});
 	}
 
-	// Event handler for brush events
-	export let brushed = function (event: any) {
-		// Clear out the scanned points
-		scanned_points.clear();
-		// No Ctrl key pressed, so clear out the selected points
-		if (!event.sourceEvent.ctrlKey) {
-			selected_points.clear();
-			[selected_points, scanned_points] = [selected_points, scanned_points]; // trigger re-render
-		}
-		if (event.selection) {
-			let [_selected, _scanned] = quadtree.search(event.selection);
-			selected_points = new Set([...selected_points, ..._selected]);
-			scanned_points = new Set([...scanned_points, ..._scanned]);
-		}
-		// Dispatch the selection change event only on end of brushing
-		if (event.type === 'end') dispatch_selection_change();
-	};
-
 	// Selected scatter points
-	let manual_selected_points = new Set();
 	let select_point = (id: number) => (e: MouseEvent) => {
-		if (selected_points.has(id)) {
-			selected_points.delete(id);
+		if (selected_bars.has(id)) {
+			selected_bars.delete(id);
 		} else {
-			selected_points.add(id);
+			if (single_selection) {
+				selected_bars.clear();
+			}
+			selected_bars.add(id);
 		}
-		selected_points = selected_points; // trigger re-render
+		selected_bars = selected_bars; // trigger re-render
 		dispatch_selection_change();
 	};
 
 	// Event handler to clear manually selected points
 	let clear_points = (e: MouseEvent) => {
 		if (e.ctrlKey) return; // this event fires on MacOS if ctrl + left click is used
-		selected_points.clear();
-		selected_points = selected_points; // trigger re-render
+		selected_bars.clear();
+		selected_bars = selected_bars; // trigger re-render
 	};
 </script>
 
 <g class="w-full h-full" on:contextmenu={clear_points}>
-	<Brush {brushed} fire_on="start brush end" />
 	<g class="bar-group">
 		{#each $data as d}
 			{@const x = $x(d) >= 0 ? $xGet({ x: 0 }) : $xGet(d)}
 			{@const width = Math.abs($xGet(d) - $xGet({ x: 0 }))}
 
 			<rect
-				class={selected_points.has(d.id) || manual_selected_points.has(d.id)
-					? `scatter-point--selected`
-					: scanned_points.has(d.id)
-					? show_scanned
-						? `scatter-point--scanned`
-						: `scatter-point`
-					: `scatter-point`}
+				class={selected_bars.has(d.id) ? `bar--selected` : `bar`}
 				{x}
 				y={$yGet(d)}
 				height={$yScale.bandwidth()}
@@ -85,23 +59,18 @@
 </g>
 
 <style>
-	.scatter-point {
+	.bar {
 		@apply fill-slate-400;
 		stroke-width: 1px;
 	}
 
-	.scatter-point:hover {
+	.bar:hover {
 		@apply fill-violet-200;
 		@apply opacity-50;
 		stroke-width: 1px;
 	}
 
-	.scatter-point--scanned {
-		@apply fill-violet-200;
-		stroke-width: 1px;
-	}
-
-	.scatter-point--selected {
+	.bar--selected {
 		@apply fill-violet-600;
 		@apply border stroke-violet-600;
 		stroke-width: 3px;
