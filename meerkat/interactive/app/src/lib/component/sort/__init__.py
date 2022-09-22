@@ -13,6 +13,7 @@ import numpy as np
 from pydantic import BaseModel
 
 class SortCriterion(BaseModel):
+    id: str
     is_enabled: bool
     column: str
     ascending: bool

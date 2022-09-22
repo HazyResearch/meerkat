@@ -3,6 +3,9 @@
 	import type { SortCriterion, DataPanelSchema } from '$lib/api/datapanel';
 	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
+	import {flip} from "svelte/animate";
+    import {dndzone} from "svelte-dnd-action";
+    import { v4 as uuidv4 } from 'uuid';
 
 	const { get_schema, filter } = getContext('Interface');
 	export let dp: Writable;
@@ -21,7 +24,7 @@
 
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
-	let criteria_frontend: FilterCriterion[] = [];
+	let criteria_frontend: SortCriterion[] = [];
 	criteria.subscribe((value) => {
 		criteria_frontend = $criteria;
 	});
@@ -78,8 +81,9 @@
 
 	const addCriterion = () => {
 		// Add a new filter criteria.
+        const uuid_gen = uuidv4(); 
 		criteria_frontend = [
-            { is_enabled: false, column: '', ascending: true, },
+            { id: uuid_gen, is_enabled: false, column: '', ascending: true, },
 			...criteria_frontend
 		];
 	};
@@ -109,12 +113,24 @@
 		}
 	};
 
+    const flipDurationMs = 300;
+    function handleDndConsider(e) {
+        console.log("consider", e);
+        criteria_frontend = e.detail.items;
+    }
+    function handleDndFinalize(e) {
+        console.log("finalize", e);
+        criteria_frontend = e.detail.items;
+        trigger_sort();
+    }
+
 </script>
 
 <div class="bg-slate-100 py-2 rounded-lg drop-shadow-md">
 	<div class="form-control w-full">
-		{#each criteria_frontend as criterion, i}
-			<div class="py-2 input-group w-full flex items-center">
+        <section use:dndzone={{items: criteria_frontend, flipDurationMs: flipDurationMs}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
+		{#each criteria_frontend as criterion, i (criterion.id)}
+			<div class="py-2 input-group w-full flex items-center" animate:flip="{{duration: flipDurationMs}}">
 				<div class="px-3">
 					<input
 						id={'' + i}
@@ -161,6 +177,7 @@
 				</div>
 			</div>
 		{/each}
+        </section>
 		<div>
 			<button on:click={addCriterion} class="px-3 hover:font-bold">+ Add Sort</button>
 			<button on:click={handleClear} class="px-3 hover:font-bold">Clear All</button>
