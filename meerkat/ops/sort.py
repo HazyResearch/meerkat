@@ -31,28 +31,18 @@ def sort(
     """
     by = [by] if isinstance(by, str) else by
 
-    if len(by) > 1:  # Sort with multiple column
-        if isinstance(ascending, bool):
-            ascending = [ascending] * len(by)
-        
-        if len(ascending) != len(by):
-            raise ValueError(
-                f"Length of `ascending` ({len(ascending)}) must be the same as "
-                f"length of `by` ({len(by)})."
-            )
+    if isinstance(ascending, bool):
+        ascending = [ascending] * len(by)
 
-        df = data[by].to_pandas()
-        df["_sort_idx"] = np.arange(len(df))
-        df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)
-        sorted_indices = df["_sort_idx"]
-        # keys = []
-        # for col, a in zip(by[::-1], ascending[::-1]):
-        #     keys.append(data[col].to_numpy() * (1 if a else -1))
-        # sorted_indices = np.lexsort(keys=keys)
+    if len(ascending) != len(by):
+        raise ValueError(
+            f"Length of `ascending` ({len(ascending)}) must be the same as "
+            f"length of `by` ({len(by)})."
+        )
 
-    else:  # Sort with single column
-        if isinstance(ascending, Sequence):
-            ascending = ascending[0]
-        sorted_indices = data[by[0]].argsort(ascending=ascending, kind=kind)
+    df = data[by].to_pandas()
+    df["_sort_idx_"] = np.arange(len(df))
+    df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)
+    sorted_indices = df["_sort_idx_"]
 
     return data.lz[sorted_indices]
