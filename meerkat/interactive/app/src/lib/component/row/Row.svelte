@@ -11,23 +11,11 @@
 	export let dp: Writable<DataPanelBox>;
 	export let idx: Writable<number>;
 	export let target: EditTarget;
-	let props: Any = {
-		name: {
-			type: 'editable'
-		},
-		description: {
-			type: 'editable'
-		},
-		recall_delta: {
-			type: 'stat',
-			name: 'Accuracy Change'
-		},
-		key: {
-			type: 'stat'
-		}
-	};
 
-	$: schema_promise = $get_schema($dp.box_id);
+    // TODO(sabri): we need to make sure that there is an entry for each column
+    // in the datapanel. 
+	export let props: Any = {};
+
 
 	$: target.target = get(target.target);
 
