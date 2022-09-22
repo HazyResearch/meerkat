@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "svelte-select": "^4.4.7",
-    "uuid": "^9.0.0"
-  }
-}
