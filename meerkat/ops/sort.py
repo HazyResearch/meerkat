@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from typing import List, Union
 
 import numpy as np
@@ -31,14 +32,21 @@ def sort(
     by = [by] if isinstance(by, str) else by
 
     if len(by) > 1:  # Sort with multiple column
+        if isinstance(ascending, bool):
+            ascending = [ascending] * len(by)
+        
+        if len(ascending) != len(by):
+            raise ValueError(
+                f"Length of `ascending` ({len(ascending)}) must be the same as "
+                f"length of `by` ({len(by)})."
+            )
+            
+        
         keys = []
-        for col in by[::-1]:
-            keys.append(data[col].to_numpy())
+        for col, a in zip(by[::-1], ascending[::-1]):
+            keys.append(data[col].to_numpy() * (1 if a else -1))
 
         sorted_indices = np.lexsort(keys=keys)
-
-        if ascending is False:
-            sorted_indices = sorted_indices[::-1].copy()
 
     else:  # Sort with single column
         sorted_indices = data[by[0]].argsort(ascending=ascending, kind=kind)
