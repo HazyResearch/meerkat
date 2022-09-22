@@ -37,17 +37,10 @@ def sort_by_criteria(
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
     if len(criteria) == 0:
-        # FIXME: Do we need to return a new DataPanel so that it does not point
-        # to the pivot?
         return data
 
     sort_by = [criterion.column for criterion in criteria]
-    # FIXME: mk.sort does not properly support ascending as a list.
     ascending = [criterion.ascending for criterion in criteria]
-    print("=="*40)
-    print(sort_by)
-    print(ascending)
-    print("=="*40)
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 

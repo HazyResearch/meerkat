@@ -49,9 +49,14 @@
 	};
 
 	const onInputChange = (criterion: SortCriterion, input_id: string, value: any) => {
+        const is_same_value = criterion[input_id] === value;
 		criterion[input_id] = value;
         // Required for reactivity.
         criteria_frontend = criteria_frontend;
+        if (!is_same_value) {
+            criterion.is_enabled = true;
+            trigger_sort();
+        }
 	};
 
 	const setCheckbox = (
