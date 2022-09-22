@@ -43,6 +43,10 @@ def sort_by_criteria(
     sort_by = [criterion.column for criterion in criteria]
     # FIXME: mk.sort does not properly support ascending as a list.
     ascending = [criterion.ascending for criterion in criteria]
+    print("=="*40)
+    print(sort_by)
+    print(ascending)
+    print("=="*40)
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 

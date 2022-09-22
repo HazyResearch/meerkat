@@ -1,5 +1,5 @@
 from multiprocessing.sharedctypes import Value
-from typing import List, Union
+from typing import List, Sequence, Union
 
 import numpy as np
 
@@ -45,10 +45,12 @@ def sort(
         keys = []
         for col, a in zip(by[::-1], ascending[::-1]):
             keys.append(data[col].to_numpy() * (1 if a else -1))
-
+        # TODO (sabri): make this work for text
         sorted_indices = np.lexsort(keys=keys)
 
     else:  # Sort with single column
+        if isinstance(ascending, Sequence):
+            ascending = ascending[0]
         sorted_indices = data[by[0]].argsort(ascending=ascending, kind=kind)
 
     return data.lz[sorted_indices]

@@ -67,6 +67,7 @@
         value: boolean
     ) => {
         criterion.ascending = value;
+        criterion.is_enabled = true;
         trigger_sort();
     }
 
@@ -125,7 +126,7 @@
 					/>
 				</div>
 
-				<div class="themed pr-2 w-48">
+				<div class="themed pr-2 w-flex">
 					{#await items_promise}
 						<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 					{:then items}
