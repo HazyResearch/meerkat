@@ -6,12 +6,14 @@
 	import Filter from '$lib/component/filter/Filter.svelte';
 	import Editor from '$lib/component/editor/Editor.svelte';
 	import Row from '$lib/component/row/Row.svelte';
+	import Sort from '$lib/component/sort/Sort.svelte';
 
 	export let components;
 
 	let gallery = components.gallery;
 	let gallery_match = components.gallery_match;
 	let gallery_filter = components.gallery_filter;
+	let gallery_sort = components.gallery_sort;
 	let gallery_editor = components.gallery_editor;
 	let plot = components.plot;
 	let active_slice = components.active_slice;
@@ -28,6 +30,7 @@
 				<Match {...gallery_match.props} />
 
 				<Filter {...gallery_filter.props} />
+				<Sort {...gallery_sort.props} />
 			</div>
 		</div>
 		<Gallery {...gallery.props} />

@@ -25,6 +25,12 @@ export interface FilterCriterion {
     value: any;
 }
 
+export interface SortCriterion {
+    is_enabled: boolean;
+    column: string;
+    ascending: boolean;
+}
+
 export class MatchCriterion {
     constructor(readonly column: string, readonly query: string) { }
 }

@@ -9,6 +9,7 @@ from .app.src.lib.component.slicebycards import SliceByCards
 from .app.src.lib.component.table import Table
 from .app.src.lib.component.editor import Editor
 from .app.src.lib.component.filter import Filter 
+from .app.src.lib.component.sort import Sort
 from .app.src.lib.component.row import Row
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .graph import (
@@ -60,4 +61,5 @@ __all__ = [
     "start",
     "Layout",
     "Editor",
+    "Sort"
 ]
