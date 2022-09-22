@@ -8,7 +8,6 @@
 
 	export let scanned_points = new Set();
 	export let selected_points = new Set();
-	export let radius = 5;
 	export let show_scanned = false;
 
 	// Bind to Quadtree component (d3 quadtree)

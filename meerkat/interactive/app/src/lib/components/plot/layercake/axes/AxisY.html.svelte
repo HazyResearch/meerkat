@@ -78,7 +78,6 @@
       height: 100%;
     }
     .tick {
-      @apply font-lg;
       width: 100%;
     }
   

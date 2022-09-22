@@ -3,16 +3,14 @@
 	import { scaleBand } from 'd3-scale';
 	import { Html, LayerCake, Svg } from 'layercake';
 
+	import SvgAxisX from '$lib/components/plot/layercake/axes/AxisX.svg.svelte';
+	import SvgAxisY from '$lib/components/plot/layercake/axes/AxisY.svg.svelte';
+	import SvgBar from '$lib/components/plot/layercake/bar/Bar.svg.svelte';
 	import Label from '$lib/components/plot/layercake/labels/Label.html.svelte';
-	import SvgAxisX from './axes/AxisX.svg.svelte';
-	import SvgAxisY from './axes/AxisY.svg.svelte';
-	import SvgBar from './Bar.svg.svelte';
 
 	export let data: Array<Point2D>;
 
-	export let radius = 3;
 	export let padding: number = 10;
-	export let selection: Array<number> = [];
 
 	export let xlabel: string = 'x label';
 	export let ylabel: string = 'y label';
@@ -20,7 +18,7 @@
 	let height = 40 * data.length;
 </script>
 
-<div class="w-full" style:height={`${height}px`}>
+<div class="relative w-full" style:height={`${height}px`}>
 	<LayerCake
 		ssr={false}
 		percentRange={false}
@@ -30,6 +28,7 @@
 		yScale={scaleBand().paddingInner([0.05])}
 		{data}
 		xDomain={[-0.4, 0.4]}
+		position="absolute"
 	>
 		<Html>
 			<Label axis="x" label={xlabel} />
@@ -38,7 +37,7 @@
 		<Svg>
 			<SvgAxisX />
 			<SvgAxisY gridlines={false} />
-			<SvgBar {radius} on:selection-change />
+			<SvgBar on:selection-change />
 		</Svg>
 	</LayerCake>
 </div>

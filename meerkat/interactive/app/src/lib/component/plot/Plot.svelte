@@ -2,7 +2,8 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
-	import BarPlot from './bar/BarPlot.svelte';
+	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
+	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
 	import type { Point2D } from '$lib/components/plot/types';
 
 	const { get_rows } = getContext('Interface');
@@ -44,12 +45,11 @@
 			height="300px"
 		/>
 	{:then datum}
-		<BarPlot
+		<FancyHorizontalBarPlot
 			data={datum}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}
-			width="90%"
-			height="300px"
+			ywidth={128}
 			padding={padding}
 			on:selection-change={(e) => {
 				$selection = Array.from(e.detail.selected_points);
