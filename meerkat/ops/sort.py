@@ -40,13 +40,15 @@ def sort(
                 f"Length of `ascending` ({len(ascending)}) must be the same as "
                 f"length of `by` ({len(by)})."
             )
-            
-        
-        keys = []
-        for col, a in zip(by[::-1], ascending[::-1]):
-            keys.append(data[col].to_numpy() * (1 if a else -1))
-        # TODO (sabri): make this work for text
-        sorted_indices = np.lexsort(keys=keys)
+
+        df = data[by].to_pandas()
+        df["_sort_idx"] = np.arange(len(df))
+        df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)
+        sorted_indices = df["_sort_idx"]
+        # keys = []
+        # for col, a in zip(by[::-1], ascending[::-1]):
+        #     keys.append(data[col].to_numpy() * (1 if a else -1))
+        # sorted_indices = np.lexsort(keys=keys)
 
     else:  # Sort with single column
         if isinstance(ascending, Sequence):
