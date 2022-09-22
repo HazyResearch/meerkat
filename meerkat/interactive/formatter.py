@@ -96,26 +96,26 @@ class ObjectFormatter(Formatter):
         return str(cell)
 
 
-class NumpyArrayFormatter(Formatter):
+class NumpyArrayFormatter(BasicFormatter):
     cell_component = "basic"
 
     def encode(self, cell: Any):
         if isinstance(cell, np.ndarray):
             return str(cell)
-        return format_array(np.array([cell]), formatter=None)[0]
+        return super().encode(cell)
 
     def html(self, cell: Any):
         cell = self.encode(cell)
         return cell
 
 
-class TensorFormatter(Formatter):
+class TensorFormatter(BasicFormatter):
     cell_component = "basic"
 
     def encode(self, cell: Any):
         if isinstance(cell, torch.Tensor):
             return str(cell)
-        return format_array(np.array([cell]), formatter=None)[0]
+        return super().encode(cell)
 
     def html(self, cell: Any):
         cell = self.encode(cell)

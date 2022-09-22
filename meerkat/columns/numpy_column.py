@@ -18,7 +18,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.interactive.formatter import NumpyArrayFormatter
+from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
 
@@ -185,8 +185,18 @@ class NumpyArrayColumn(
         else:
             return self[index]
 
-    @staticmethod
-    def _get_default_formatter() -> Callable:
+    def _get_default_formatter(self) -> Formatter:
+
+        if len(self) == 0:
+            return NumpyArrayFormatter()
+
+        if self.dtype.type is np.str_:
+            return NumpyArrayFormatter(dtype="str")
+
+        cell = self[0]
+        if isinstance(cell, np.generic):
+            return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
+
         return NumpyArrayFormatter()
 
     def sort(

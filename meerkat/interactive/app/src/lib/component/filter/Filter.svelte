@@ -24,7 +24,6 @@
 	// let criteria_frontend: FilterCriterion[] = $criteria;
 	let criteria_frontend: FilterCriterion[] = [];
 	criteria.subscribe((value) => {
-		console.log('criteria changed', value);
 		criteria_frontend = $criteria;
 	});
 
@@ -43,10 +42,6 @@
 	}
 
 	const trigger_filter = () => {
-		console.log('triggering');
-		console.log(criteria);
-		console.log($criteria);
-
 		// // We have to unpack the values of the dropdown values.
 		// // TODO: Figure out how to bind the dropdown item.value only
 		// let new_criteria = $criteria.map((criterion) => {
@@ -69,9 +64,7 @@
 	};
 
 	const onInputChange = (criterion: FilterCriterion, input_id: string, value: any) => {
-		console.log(criterion, input_id, value);
 		criterion[input_id] = value;
-		console.log(criterion);
 	};
 
 	const setCheckbox = (
@@ -80,7 +73,6 @@
 		ignore_check: boolean = false
 	) => {
 		// Setting to the same value, do nothing.
-		console.log('setting checkbox', criterion.is_enabled, '->', value);
 		criterion.is_enabled = value;
 		trigger_filter();
 	};

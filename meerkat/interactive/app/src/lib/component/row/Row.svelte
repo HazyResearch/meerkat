@@ -4,6 +4,7 @@
 	import type { DataPanelBox, EditTarget } from '$lib/utils/types';
 	import { get } from 'svelte/store';
 	import Cell from '$lib/components/cell/Cell.svelte';
+	import BasicCell from '$lib/components/cell/basic/Basic.svelte';
 
 	const { get_rows, get_schema, edit_target } = getContext('Interface');
 
@@ -18,10 +19,11 @@
 			type: 'editable'
 		},
 		recall_delta: {
-			type: 'stat'
+			type: 'stat',
+			name: 'Accuracy Change'
 		},
 		key: {
-			type: 'fixed'
+			type: 'stat'
 		}
 	};
 
@@ -89,20 +91,25 @@
 				</div>
 			{/if}
 		{/each}
-		<div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2">
+		<div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2 pt-2">
 			{#each schema.columns as column, column_idx}
 				{#if props[column.name].type === 'stat'}
-					<div class="bg-white rounded-md flex flex-col shadow-sm">
-						<div class="text-slate-400 px-3 py-1 self-center">{column.name}</div>
-						<div class="font-bold text-2xl self-center ">
+					<div class="bg-white rounded-md flex flex-col shadow-lg">
+						<div class="text-slate-400 px-3 py-1 self-center">
+							{#if props[column.name].name}
+								{props[column.name].name}
+							{:else}
+								{column.name}
+							{/if}
+						</div>
+						<div class="font-bold text-2xl px-3 self-center ">
 							{#await rows_promise}
 								Loading...
 							{:then rows}
 								{#if rows == null}
 									No selection
 								{:else}
-                                    {console.log(rows)}
-									{rows.rows[0][column_idx]}
+									<BasicCell data={rows.rows[0][column_idx]} {...column.cell_props} percentage={true}/>
 								{/if}
 							{/await}
 						</div>

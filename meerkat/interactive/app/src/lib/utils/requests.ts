@@ -51,7 +51,6 @@ export async function modify(url: string, data: any): Promise<any> {
             // Store modification
             //get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);
-            console.log("In modification", modification.id, modification.value, store)
 
             if (store === undefined) {
                 console.log(
