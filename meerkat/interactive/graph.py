@@ -17,6 +17,7 @@ from typing import (
     Union,
 )
 
+from tqdm import tqdm
 from pydantic import BaseModel
 
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -44,7 +45,7 @@ class NodeMixin:
 
 Primitive = Union[int, str, float, bool]
 Storeable = Union[
-    None, 
+    None,
     Primitive,
     List[Primitive],
     Dict[Primitive, Primitive],
@@ -253,7 +254,15 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
     ]
 
-    new_modifications = [mod for op in order for mod in op()]
+    print(f"trigged pipeline: {'->'.join([node.fn.__name__ for node in order])}")
+    new_modifications = []
+    with tqdm(total=len(order)) as pbar:
+        for op in order:
+            pbar.set_postfix_str(f"Running {op.fn.__name__}")
+            mods = op()
+            new_modifications.extend(mods)
+            pbar.update(1)
+
     return modifications + new_modifications
 
 

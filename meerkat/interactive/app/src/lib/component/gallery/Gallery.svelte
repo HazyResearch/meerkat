@@ -17,9 +17,9 @@ import Selected from './Selected.svelte';
 	export let selected: Writable<Array<string>>;
 
 	export let page: number = 0;
-	export let per_page: number = 100;
+	export let per_page: number = 20;
 
-	export let cell_size: number = 12;
+	export let cell_size: number = 24;
 
 	$: schema_promise = $get_schema($dp.box_id);
 	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
