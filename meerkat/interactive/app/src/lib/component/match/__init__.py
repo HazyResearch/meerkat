@@ -1,3 +1,4 @@
+import warnings
 from typing import Union
 
 from meerkat.interactive.graph import Pivot, Store, make_store
@@ -13,6 +14,8 @@ class Match(Component):
         self, pivot: Pivot, against: Union[Store, str], col: Union[Store, str] = ""
     ):
         super().__init__()
+        if not isinstance(pivot, Pivot):
+            warnings.warn("input is not a Pivot - this may cause errors")
         self.pivot = pivot
         self.against: Store = make_store(against)
         self.col = make_store(col)
