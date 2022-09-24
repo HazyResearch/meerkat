@@ -97,6 +97,8 @@ def rows(
     start: int = Body(None),
     end: int = Body(None),
     indices: List[int] = Body(None),
+    key_column: str = Body(None),
+    keys: List[Union[StrictInt, StrictStr]] = Body(None),
     columns: List[str] = Body(None),
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
@@ -116,6 +118,14 @@ def rows(
             end = len(dp)
         dp = dp.lz[start:end]
         indices = list(range(start, end))
+    elif keys is not None:
+        if key_column is None:
+            # TODO(sabri): when we add support for primary keys this should defualt to 
+            # the primary key
+            raise ValueError("Must provide key_column if keys are provided")
+        
+        # FIXME(sabri): this will only work if key_column is a pandas column
+        dp = dp.lz[dp[key_column].isin(keys)]
     else:
         raise ValueError()
 

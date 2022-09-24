@@ -28,6 +28,3 @@
 </script>
 
 {data}
-{#if dtype === "float"}
-    (-5.61%, +0.01%)
-{/if}

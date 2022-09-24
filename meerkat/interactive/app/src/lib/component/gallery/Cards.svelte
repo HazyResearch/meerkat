@@ -22,7 +22,7 @@
 	// Columns size to display
 	export let cell_size: number = 6;
 
-	// Columns to display
+	// Selected columns 
 	export let selected: Writable<Array<number>> = writable([]);
 
 	let columns = column_infos.map((col: any) => col.name);
@@ -51,7 +51,8 @@
 		}
 	};
 
-	let idxs = rows.rows.map(get_idx)
+	$: idxs = rows.rows.map(get_idx)
+
 </script>
 
 <div class="h-full">

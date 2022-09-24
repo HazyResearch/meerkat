@@ -44,12 +44,16 @@
 		start?: number,
 		end?: number,
 		indices?: Array<number>,
-		columns?: Array<string>
+		columns?: Array<string>,
+		key_column?: string,
+		keys?: Array<string | number>,
 	) => {
 		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
+			key_column: key_column,
+			keys: keys, 
 			columns: columns
 		});
 		return result;
