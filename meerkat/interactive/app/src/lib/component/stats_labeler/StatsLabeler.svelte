@@ -50,6 +50,8 @@
 		let metadata = null;
 		if ($mode === 'train') {
 			metadata = {"split": {"value": "train", "default": ""}};
+		} else {
+			metadata = {"split": {"value": "test", "default": ""}};
 		}
 		console.log(metadata)
 		let modifications_promise;
