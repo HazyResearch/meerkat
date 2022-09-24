@@ -47,7 +47,10 @@
 		status = 'working';
 
 		// All labeled examples should be part of the test set.
-		let metadata = {"split": {"value": "train", "default": "test"}};
+		let metadata = null;
+		if ($mode === 'train') {
+			metadata = {"split": {"value": "train", "default": ""}};
+		}
 		console.log(metadata)
 		let modifications_promise;
 		if (primary_key === undefined) {
