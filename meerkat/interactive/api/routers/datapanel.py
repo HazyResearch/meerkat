@@ -6,12 +6,14 @@ from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
 import meerkat as mk
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
-
+import pandas as pd
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
@@ -178,7 +180,15 @@ def edit_target(
     row_indices: List[int] = Body(None),
     row_keys: List[Union[StrictInt, StrictStr]] = Body(None),
     primary_key: str = Body(None),
+    metadata: Dict[str, Any] = Body(None),
 ):
+    """Edit a target datapanel.
+
+    Args:
+        metadata (optional): Additional metadata to write.
+            This should be a mapping from column_name -> value.
+            Currently only unitary values are supported.
+    """
     if (row_indices is None) == (row_keys is None):
         raise HTTPException(
             status_code=400,
@@ -207,6 +217,30 @@ def edit_target(
             status_code=500, detail="Target datapanel does not contain all source ids."
         )
     target_dp[column][mask] = value
+
+    # TODO: support making a column if the column does not exist.
+    # This requires deducing the column type and the default value
+    # to fill in.
+    if metadata is not None:
+        for column_name, col_value in metadata.items():
+            value = col_value
+            default = None
+            if isinstance(value, dict):
+                value = col_value["value"]
+                default = col_value["default"]
+            if column_name not in target_dp.columns:
+                if default is None:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Column {column_name} does not exist in target datapanel",
+                    )
+                default_col = np.full(len(target_dp), default)
+                if isinstance(default, str):
+                    default_col = PandasSeriesColumn([default] * len(target_dp))
+                else:
+                    default_col = NumpyArrayColumn(np.full(len(target_dp), default))
+                target_dp[column_name] = default_col
+            target_dp[column_name][mask] = value
 
     modifications = trigger(
         modifications=[BoxModification(id=target.target.box_id, scope=[column])]

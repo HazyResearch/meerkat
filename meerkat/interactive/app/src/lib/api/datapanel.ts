@@ -23,6 +23,8 @@ export interface FilterCriterion {
     column: string;
     op: string;
     value: any;
+    source: string;
+    is_fixed: boolean;
 }
 
 export interface SortCriterion {

@@ -12,6 +12,7 @@ from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.sort import Sort
 from .app.src.lib.component.row import Row
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
+from .app.src.lib.component.stats_labeler import StatsLabeler
 from .graph import (
     Box,
     BoxConfig,
@@ -61,5 +62,6 @@ __all__ = [
     "start",
     "Layout",
     "Editor",
-    "Sort"
+    "Sort",
+    "StatsLabeler",
 ]

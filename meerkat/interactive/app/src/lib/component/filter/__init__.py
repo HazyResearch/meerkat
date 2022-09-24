@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from ..abstract import Component
-from typing import TYPE_CHECKING, Dict, Any, Sequence
+from typing import TYPE_CHECKING, Dict, Any, Optional, Sequence
 from meerkat.interactive.graph import Box, Store, make_store
 
 from typing import List, Union, Any
@@ -33,6 +33,8 @@ class FilterCriterion(BaseModel):
     column: str
     op: str
     value: Any
+    source: Optional[str] = ""
+    is_fixed: bool = False
 
 
 @interface_op

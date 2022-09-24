@@ -5,6 +5,7 @@
 	import Match from '$lib/component/match/Match.svelte';
 	import Filter from '$lib/component/filter/Filter.svelte';
 	import Editor from '$lib/component/editor/Editor.svelte';
+	import StatsLabeler from '$lib/component/stats_labeler/StatsLabeler.svelte';
 	import Row from '$lib/component/row/Row.svelte';
 	import Sort from '$lib/component/sort/Sort.svelte';
 
@@ -30,7 +31,7 @@
 		<div class="grid grid-rows-1 grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
 				<Row {...active_slice.props} />
-				<Editor {...gallery_editor.props} />
+				<StatsLabeler {...gallery_editor.props} />
 			</div>
 			<div class="flex flex-col space-y-3">
 				<Match {...gallery_match.props} />
