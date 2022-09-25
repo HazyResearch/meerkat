@@ -8,6 +8,7 @@
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
 	import Phases from './Phases.svelte';
+	import Interval from '$lib/components/cell/interval/Interval.svelte';
 
 	const { edit_target, get_rows } = getContext('Interface');
 
@@ -18,6 +19,7 @@
 	export let phase: Writable<string>;
 	export let selected: Writable<Array<number>>;
 	export let active_key: Writable<string>;
+	export let precision_estimate: Writable<Array<number>>;
 
 	$: col = `label(${$active_key})`;
 
@@ -25,7 +27,6 @@
 
 	$: label_target.target = get(label_target.target);
 	$: phase_target.target = get(phase_target.target);
-
 
 	let counts_promise: any;
 	$: {
@@ -104,12 +105,12 @@
 			phase_target.target.box_id,
 			phase_target,
 			new_phase,
-			col="phase",
+			(col = 'phase'),
 			null,
 			[$active_key],
-			"key",
-			null 
-		)
+			'key',
+			null
+		);
 	}
 
 	function count_values(values: Array<number>) {
@@ -122,69 +123,69 @@
 	}
 </script>
 
-<div class="w-full bg-slate-100 py-2 rounded-lg drop-shadow-md z-20">
-	<div class="font-bold text-xl text-slate-600 text-center w-full">
-		<!-- TODO(Sabri): This should be a customizable name in the future. -->
-		Attribution
+<div class="flex flex-col space-y-3 w-full bg-slate-100 py-2 rounded-lg drop-shadow-md z-20">
+	<div class="flex px-5 space-x-3">
+		<div class="font-bold text-xl text-slate-600 ">
+			<!-- TODO(Sabri): This should be a customizable name in the future. -->
+			Attribution
+		</div>
+		<Phases on:phase_change={handle_phase_change} active_phase={$phase} />
 	</div>
 
-	<div class="flex items-center">
-		{#if $active_key === "_no_selection"}
+	<div class="flex items-center space-x-5 px-10">
+		{#if $active_key === '_no_selection'}
 			<div class="text-center w-full text-slate-400">No slice selected.</div>
 		{:else}
-			<Phases on:phase_change={handle_phase_change} active_phase={$phase}/>
-			<div class="px-3">
+			<!-- <div class="px-3">
 				<Status {status} />
-			</div>
-			<!-- <div class="themed pr-2 w-26">
-				<Select
-					id="mode"
-					value={mode_item}
-					placeholder="...a mode."
-					items={modes}
-					clearable={false}
-					listAutoWidth={false}
-					listPlacement="auto"
-					on:select={handle_mode_select}
-				/>
 			</div> -->
 
-			<div class="flex space-x-1">
+			
+			<div class="grid grid-cols-[auto_auto_auto] grid-rows-3 grid-flow-col gap-y-1 gap-x-2">
+				<div class="text-slate-500 font-bold">Positive</div>
+				<div class="text-slate-500 font-bold">Negative</div>
+				<div class="text-slate-500 font-bold">Unlabeled</div>
+				{#each ["1", "0", "-1"] as num}
+					<div class="flex font-bold text-slate-500 w-6">
+						{#await counts_promise}
+							<div class="text-center">-</div>
+						{:then counts}
+							<div class="text-center">{counts[num]}</div>
+						{/await}
+					</div>
+
+				{/each}
 				<button
-					on:click={() => on_edit(-1)}
-					class="flex items-center justify-center group w-10 h-8 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
+					on:click={() => on_edit(1)}
+					class="flex items-center justify-center group w-10 h-6 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
 				>
-					<EraserFill class="" width={24} height={24} />
+					<Check2 class="" width={24} height={24} />
 				</button>
 				<button
 					on:click={() => on_edit(0)}
-					class="flex items-center justify-center group w-10 h-8 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
+					class="flex items-center justify-center group w-10 h-6 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
 				>
 					<X class="" width={24} height={24} />
 				</button>
 				<button
-					on:click={() => on_edit(1)}
-					class="flex items-center justify-center group w-10 h-8 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
+					on:click={() => on_edit(-1)}
+					class="flex items-center justify-center group w-10 h-6 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
 				>
-					<Check2 class="" width={24} height={24} />
+					<EraserFill class="" width={24} height={24} />
 				</button>
+				
 			</div>
-			{#await counts_promise}
-				Loading...
-			{:then counts}
-				<div class="flex space-x-2">
-					<div>{counts['-1']}</div>
-					<div>{counts['0']}</div>
-					<div>{counts['1']}</div>
-				</div>
-			{/await}
-			<!-- <input
-				type="number"
-				bind:value={$text}
-				placeholder="Enter a value..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={on_key_press}
-			/> -->
+
+			<div class="bg-white rounded-md flex flex-col shadow-lg">
+				<div class="text-slate-400 px-3 py-1 self-center">Precision</div>
+				{#if $precision_estimate === null}
+					<div class="text-center text-slate-400 px-3 py-1 self-center">No estimate.</div>
+				{:else}
+					<div class="font-bold text-2xl px-3 self-center">
+						<Interval data={$precision_estimate} percentage={true} />
+					</div>
+				{/if}
+			</div>
 		{/if}
 	</div>
 </div>

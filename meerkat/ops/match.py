@@ -55,7 +55,7 @@ def match(
     # Text cannot be embedded with num_workers > 0 because the clip text encoder
     # is not pickleable.
     to_embedding = embed(
-        data=query, encoder=encoder, num_workers=0, modality=query_modality
+        data=query, encoder=encoder, num_workers=0, modality=query_modality, pbar=False
     )
 
     scores = data_embedding @ to_embedding.T

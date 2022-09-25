@@ -38,6 +38,7 @@ def embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
+    pbar: bool = True, 
     **kwargs,
 ) -> Union[mk.DataPanel, mk.AbstractColumn]:
     """Embed a column of data with an encoder from the encoder registry.
@@ -118,6 +119,7 @@ def embed(
         mmap_dir=mmap_dir,
         num_workers=num_workers,
         batch_size=batch_size,
+        pbar=pbar,
     )
 
     if isinstance(data, mk.DataPanel):
@@ -136,6 +138,7 @@ def _embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
+    pbar: bool = True
 ):
     def _encode(x):
         return encode(_prepare_input(x)).cpu().detach().numpy()
@@ -161,7 +164,7 @@ def _embed(
     with torch.no_grad():
         out = embed_input.map(
             _encode,
-            pbar=True,
+            pbar=pbar,
             is_batched_fn=True,
             batch_size=batch_size,
             num_workers=num_workers,

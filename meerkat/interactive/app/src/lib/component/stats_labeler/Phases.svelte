@@ -2,6 +2,7 @@
 	import OneCircle from 'svelte-bootstrap-icons/lib/_1Circle.svelte';
 	import TwoCircle from 'svelte-bootstrap-icons/lib/_2Circle.svelte';
 	import ThreeCircle from 'svelte-bootstrap-icons/lib/_3Circle.svelte';
+    import CheckCircle from 'svelte-bootstrap-icons/lib/CheckCircle.svelte';
     import { createEventDispatcher } from 'svelte';
 
     const dispatch = createEventDispatcher();
@@ -32,7 +33,9 @@
             disabled={phases.indexOf(phase) != phases.indexOf(active_phase) + 1}
             on:click={() => dispatch("phase_change", phase)}
 		>
-			{#if i === 0}
+			{#if phases.indexOf(phase) < phases.indexOf(active_phase)}
+                <CheckCircle class="" width={18} height={18} />
+            {:else if i === 0}
 				<OneCircle class="" width={18} height={18} />
 			{:else if i === 1}
 				<TwoCircle class="" width={18} height={18} />
