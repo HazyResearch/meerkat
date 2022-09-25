@@ -129,7 +129,7 @@
 
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md">
+<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30">
 	<div class="form-control w-full">
         <section use:dndzone={{items: criteria_frontend, flipDurationMs: flipDurationMs}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
 		{#each criteria_frontend as criterion, i (criterion.id)}

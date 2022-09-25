@@ -117,8 +117,8 @@
 	};
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md">
-	<div class="form-control w-full">
+<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-40">
+	<div class="form-control w-full z-21">
 		{#each criteria_frontend as criterion, i}
 			<div class="py-2 input-group w-full flex items-center">
 				<div class="px-1">
