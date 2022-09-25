@@ -18,7 +18,8 @@ class StatsLabeler(Component):
         active_key: Union[Store[str], str] = None,
         selected: Store[List[int]] = None,
         primary_key: str = None,
-        precision_estimate: Store[List[float]] = None,
+        precision_estimate: List[Store[float]] = None,
+        recall_estimate: List[Store[float]] = None,
     ) -> None:
         super().__init__()
         self.dp = make_box(dp)
@@ -28,7 +29,8 @@ class StatsLabeler(Component):
         self.active_key = make_store(active_key)
         self.selected = make_store(selected)
         self.primary_key = primary_key
-        self.precision_estimate = make_store(precision_estimate)
+        self.precision_estimate = precision_estimate
+        self.recall_estimate = recall_estimate
 
 
     @property
@@ -41,5 +43,6 @@ class StatsLabeler(Component):
             "active_key": self.active_key.config,
             "selected": self.selected.config,
             "primary_key": self.primary_key,
-            "precision_estimate": self.precision_estimate.config,
+            "precision_estimate": [est.config for est in self.precision_estimate],
+            "recall_estimate":  [est.config for est in self.recall_estimate],
         }

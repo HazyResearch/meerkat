@@ -61,7 +61,7 @@
 	$: against_item ={value: $against, label: $against};
 </script>
 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
+<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50">
 	<div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">

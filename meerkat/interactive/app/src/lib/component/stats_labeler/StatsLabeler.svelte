@@ -9,6 +9,7 @@
 	import { get, type Writable } from 'svelte/store';
 	import Phases from './Phases.svelte';
 	import Interval from '$lib/components/cell/interval/Interval.svelte';
+	import { map } from 'underscore';
 
 	const { edit_target, get_rows } = getContext('Interface');
 
@@ -20,17 +21,23 @@
 	export let selected: Writable<Array<number>>;
 	export let active_key: Writable<string>;
 	export let precision_estimate: Writable<Array<number>>;
+	export let recall_estimate: Writable<Array<number>>;
 
 	$: col = `label(${$active_key})`;
+
+	
 
 	let status: string = 'waiting';
 
 	$: label_target.target = get(label_target.target);
 	$: phase_target.target = get(phase_target.target);
 
+	$: console.log(precision_estimate)
+
 	let counts_promise: any;
 	$: {
 		$dp; // needed to trigger on dp change
+		console.log(col)
 		counts_promise = $get_rows(
 			label_target.target.box_id,
 			undefined,
@@ -63,6 +70,7 @@
 		}
 
 		let modifications_promise;
+		console.log(col, value )
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
 				$dp.box_id,
@@ -105,7 +113,7 @@
 			phase_target.target.box_id,
 			phase_target,
 			new_phase,
-			(col = 'phase'),
+			'phase',
 			null,
 			[$active_key],
 			'key',
@@ -176,13 +184,27 @@
 				
 			</div>
 
-			<div class="bg-white rounded-md flex flex-col shadow-lg">
+			<div class="bg-white rounded-md flex flex-col shadow-lg  h-full">
 				<div class="text-slate-400 px-3 py-1 self-center">Precision</div>
-				{#if $precision_estimate === null}
+				{#if get(precision_estimate[0]) === null}
 					<div class="text-center text-slate-400 px-3 py-1 self-center">No estimate.</div>
 				{:else}
 					<div class="font-bold text-2xl px-3 self-center">
-						<Interval data={$precision_estimate} percentage={true} />
+						<Interval data={
+							precision_estimate.map((x) => get(x))
+						} percentage={true} />
+					</div>
+				{/if}
+			</div>
+			<div class="bg-white rounded-md flex flex-col shadow-lg h-full">
+				<div class="text-slate-400 px-3 py-1 self-center">Recall</div>
+				{#if get(recall_estimate[0]) === null}
+					<div class="text-center text-slate-400 px-3 py-1 self-center">No estimate.</div>
+				{:else}
+					<div class="font-bold text-2xl px-3 self-center">
+						<Interval data={
+							recall_estimate.map((x) => get(x))
+						} percentage={true} />
 					</div>
 				{/if}
 			</div>

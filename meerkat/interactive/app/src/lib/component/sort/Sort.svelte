@@ -65,7 +65,6 @@
 		ignore_check: boolean = false
 	) => {
 		// Setting to the same value, do nothing.
-		console.log('setting checkbox', criterion.is_enabled, '->', value);
 		criterion.is_enabled = value;
 		trigger_sort();
 	};
@@ -80,7 +79,6 @@
     }
 
 	const cellDisabled = (criterion: SortCriterion) => {
-        console.log("not criterion col:", !criterion.column);
 		return !criterion.column;
 	};
 
@@ -131,7 +129,7 @@
 
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md">
+<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30">
 	<div class="form-control w-full">
         <section use:dndzone={{items: criteria_frontend, flipDurationMs: flipDurationMs}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
 		{#each criteria_frontend as criterion, i (criterion.id)}
