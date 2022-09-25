@@ -6,7 +6,7 @@
 	import {flip} from "svelte/animate";
     import {dndzone} from "svelte-dnd-action";
     import { v4 as uuidv4 } from 'uuid';
-
+	import SvelteTooltip from 'svelte-tooltip';
 	const { get_schema, filter } = getContext('Interface');
 	export let dp: Writable;
 	// TODO: Figure out if we should have a frontend_criteria
@@ -134,7 +134,7 @@
         <section use:dndzone={{items: criteria_frontend, flipDurationMs: flipDurationMs}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
 		{#each criteria_frontend as criterion, i (criterion.id)}
 			<div class="py-2 input-group w-full flex items-center" animate:flip="{{duration: flipDurationMs}}">
-				<div class="px-3">
+				<div class="px-1">
 					<input
 						id={'' + i}
 						type="checkbox"
@@ -145,7 +145,7 @@
 					/>
 				</div>
 
-				<div class="themed pr-2 w-flex">
+				<div class="themed px-1 grow">
 					{#await items_promise}
 						<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 					{:then items}
@@ -161,8 +161,9 @@
 					{/await}
 				</div>
 
-				<div class="themed pr-2">
+				<div class="px-1">
 					<button disabled='{cellDisabled(criterion)}' on:click={() => setAscending(criterion, !criterion.ascending)}>
+						<SvelteTooltip tip={criterion.ascending ? "ascending" : "descending"} bottom color="#E2E8F0">
                         {#if criterion.ascending}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
@@ -171,12 +172,16 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
                             </svg>
-                          
                         {/if}
+						</SvelteTooltip>
                     </button>
 				</div>
-				<div>
-					<button class="themed" on:click={() => deleteCriterion(i)}>x</button>
+				<div  class="px-1">
+					<button class="" on:click={() => deleteCriterion(i)}>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>  
+					</button>
 				</div>
 			</div>
 		{/each}
@@ -199,15 +204,5 @@
 		--itemColor: '#7c3aed';
 		@apply rounded-md w-40 border-0;
 		@apply z-[1000000];
-	}
-
-	.btn {
-		@apply font-bold py-2 px-4 rounded;
-	}
-	.btn-blue {
-		@apply bg-blue-500 text-white;
-	}
-	.btn-blue:hover {
-		@apply bg-blue-700;
 	}
 </style>

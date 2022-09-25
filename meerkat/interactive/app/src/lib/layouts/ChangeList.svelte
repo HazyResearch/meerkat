@@ -21,14 +21,14 @@
 	let slice_sort = components.slice_sort;
 	let slice_match = components.slice_match;
 </script>
-<div class="grid grid-cols-[33%_1fr] p-5 h-screen gap-5">
-	<div class="grid grid-rows-[auto_1fr] h-screen gap-5">
+<div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
+	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
 		<Match {...slice_match.props} />
 		<Sort {...slice_sort.props} />
 		<Plot {...plot.props} />
 	</div>
 	<div class="grid grid-rows-[auto_1fr] h-screen gap-5">
-		<div class="grid grid-rows-1 grid-flow-col gap-3">
+		<div class="grid grid-rows-auto grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
 				<Row {...active_slice.props} />
 				<StatsLabeler {...gallery_editor.props} />
