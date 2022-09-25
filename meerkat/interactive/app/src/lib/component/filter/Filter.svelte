@@ -4,7 +4,9 @@
 	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
 	import { toast } from '@zerodevx/svelte-toast';
-
+	// Bootstrap icons
+	import XCircle from 'svelte-bootstrap-icons/lib/XCircle.svelte';
+	import X from 'svelte-bootstrap-icons/lib/X.svelte';
 	const { get_schema, filter } = getContext('Interface');
 	export let dp: Writable;
 	// TODO: Figure out if we should have a frontend_criteria
@@ -119,7 +121,7 @@
 	<div class="form-control w-full">
 		{#each criteria_frontend as criterion, i}
 			<div class="py-2 input-group w-full flex items-center">
-				<div class="px-3">
+				<div class="px-1">
 					<input
 						id={'' + i}
 						type="checkbox"
@@ -130,7 +132,7 @@
 					/>
 				</div>
 
-				<div class="themed pr-2 w-48">
+				<div class="px-1 grow">
 					{#await items_promise}
 						<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 					{:then items}
@@ -146,7 +148,7 @@
 					{/await}
 				</div>
 
-				<div class="themed pr-2">
+				<div class="px-1">
 					<Select
 						id="op"
 						placeholder="...an operation."
@@ -158,7 +160,7 @@
 					/>
 				</div>
 
-				<div class="themed pr-5">
+				<div class="px-1 grow-[1]">
 					<input
 						type="text"
 						id="value"
@@ -170,11 +172,15 @@
 								trigger_filter();
 							}
 						}}
-						class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
+						class="input-bordered w-full rounded-md shadow-md"
 					/>
 				</div>
-				<div>
-					<button class="themed" on:click={() => deleteCriterion(i)}>x</button>
+				<div  class="px-1">
+					<button class="" on:click={() => deleteCriterion(i)}>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>  
+					</button>
 				</div>
 			</div>
 		{/each}
@@ -192,19 +198,9 @@
 	*/
 
 	.themed {
-		--itemPadding: 0.1rem;
+		--itemPadding: 0.05rem;
 		--itemColor: '#7c3aed';
-		@apply rounded-md w-40 border-0;
+		@apply rounded-md border-0;
 		@apply z-[1000000];
-	}
-
-	.btn {
-		@apply font-bold py-2 px-4 rounded;
-	}
-	.btn-blue {
-		@apply bg-blue-500 text-white;
-	}
-	.btn-blue:hover {
-		@apply bg-blue-700;
 	}
 </style>
