@@ -91,17 +91,17 @@ def filter_by_operator(
 
     # Filter pandas series columns.
     # TODO (arjundd): Make this more efficient to perform filtering sequentially.
-    all_series = []
+    all_masks = []
     for criterion in criteria:
         col = data[criterion.column]
         value = col.dtype.type(criterion.value)
         if isinstance(col, mk.NumpyArrayColumn):
             value = np.asarray(value, dtype=col.dtype)
 
-        df = _operator_str_to_func[criterion.op](col, value)
-        all_series.append(np.asarray(df))
+        mask = _operator_str_to_func[criterion.op](col, value)
+        all_masks.append(np.asarray(mask))
+    mask = np.stack(all_masks, axis=1).all(axis=1)
 
-    mask = functools.reduce(lambda x, y: x & y, all_series)
     return data.lz[mask]
 
 

@@ -5,45 +5,46 @@
 	import Check2 from 'svelte-bootstrap-icons/lib/Check2.svelte';
 
 	import Status from '$lib/components/common/Status.svelte';
-	import Select from 'svelte-select';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
-	import AxisX from '$lib/components/plot/layercake/axes/AxisX.svg.svelte';
-	import AxisY from '$lib/components/plot/layercake/axes/AxisY.svg.svelte';
-	import { WatsonHealthAiStatusInProgress } from 'carbon-icons-svelte';
-	import LoadButton from '$lib/components/common/LoadButton.svelte';
+	import Phases from './Phases.svelte';
 
 	const { edit_target, get_rows } = getContext('Interface');
 
 	export let dp: Writable;
-	export let target: EditTarget;
+	export let label_target: EditTarget;
+	export let phase_target: EditTarget;
 	export let primary_key: string;
+	export let phase: Writable<string>;
 	export let selected: Writable<Array<number>>;
-	export let col: Writable<string>;
-	export let mode: Writable<string>;
+	export let active_key: Writable<string>;
+
+	$: col = `label(${$active_key})`;
 
 	let status: string = 'waiting';
-	
-	$: target.target = get(target.target);
+
+	$: label_target.target = get(label_target.target);
+	$: phase_target.target = get(phase_target.target);
+
 
 	let counts_promise: any;
 	$: {
-		$dp // needed to trigger on dp change
+		$dp; // needed to trigger on dp change
 		counts_promise = $get_rows(
-			target.target.box_id,
+			label_target.target.box_id,
 			undefined,
 			undefined,
 			undefined,
-			[primary_key, $col],
+			[primary_key, col],
 			primary_key,
 			$selected
-		).then(
-			(rows: any) => {return count_values(rows.rows)}
-		);
+		).then((rows: any) => {
+			return count_values(rows.rows);
+		});
 	}
 
 	let on_edit = async (value: number) => {
-		if ($col === '') {
+		if (col === '') {
 			status = 'error';
 			return;
 		}
@@ -54,19 +55,19 @@
 
 		// All labeled examples should be part of the test set.
 		let metadata = null;
-		if ($mode === 'train') {
-			metadata = {"split": {"value": "train", "default": ""}};
+		if ($phase === 'train') {
+			metadata = { split: { value: 'train', default: '' } };
 		} else {
-			metadata = {"split": {"value": "test", "default": ""}};
+			metadata = { split: { value: 'test', default: '' } };
 		}
-		console.log(metadata)
+
 		let modifications_promise;
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
 				$dp.box_id,
-				target,
+				label_target,
 				value,
-				$col,
+				col,
 				$selected,
 				null,
 				null,
@@ -75,9 +76,9 @@
 		} else {
 			modifications_promise = $edit_target(
 				$dp.box_id,
-				target,
+				label_target,
 				value,
-				$col,
+				col,
 				null,
 				$selected,
 				primary_key,
@@ -96,21 +97,29 @@
 	};
 
 	// Modes
-	function handle_mode_select(event) {
-		$mode = event.detail.value;
+
+	function handle_phase_change(event: CustomEvent) {
+		let new_phase: string = event.detail;
+		$edit_target(
+			phase_target.target.box_id,
+			phase_target,
+			new_phase,
+			col="phase",
+			null,
+			[$active_key],
+			"key",
+			null 
+		)
 	}
-	$: mode_item = { value: $mode, label: $mode };
-	const modes = ['train', 'precision', 'recall'];
 
 	function count_values(values: Array<number>) {
-		let counts = {"-1": 0, "0": 0, "1": 0};
+		let counts = { '-1': 0, '0': 0, '1': 0 };
 		for (let i = 0; i < values.length; i++) {
 			let num = values[i][1];
 			counts[num] = counts[num] ? counts[num] + 1 : 1;
 		}
 		return counts;
 	}
-
 </script>
 
 <div class="w-full bg-slate-100 py-2 rounded-lg drop-shadow-md z-20">
@@ -120,13 +129,14 @@
 	</div>
 
 	<div class="flex items-center">
-		{#if $col === null}
+		{#if $active_key === "_no_selection"}
 			<div class="text-center w-full text-slate-400">No slice selected.</div>
 		{:else}
+			<Phases on:phase_change={handle_phase_change} active_phase={$phase}/>
 			<div class="px-3">
 				<Status {status} />
 			</div>
-			<div class="themed pr-2 w-26">
+			<!-- <div class="themed pr-2 w-26">
 				<Select
 					id="mode"
 					value={mode_item}
@@ -137,7 +147,8 @@
 					listPlacement="auto"
 					on:select={handle_mode_select}
 				/>
-			</div>
+			</div> -->
+
 			<div class="flex space-x-1">
 				<button
 					on:click={() => on_edit(-1)}
@@ -160,11 +171,11 @@
 			</div>
 			{#await counts_promise}
 				Loading...
-			{:then counts} 
+			{:then counts}
 				<div class="flex space-x-2">
-					<div>{counts["-1"]}</div>
-					<div>{counts["0"]}</div>
-					<div>{counts["1"]}</div>
+					<div>{counts['-1']}</div>
+					<div>{counts['0']}</div>
+					<div>{counts['1']}</div>
 				</div>
 			{/await}
 			<!-- <input

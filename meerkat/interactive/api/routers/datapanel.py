@@ -216,7 +216,6 @@ def edit_target(
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_dp.primary_key
-
         source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
 
     mask = target_dp[target.target_id_column].isin(source_ids)

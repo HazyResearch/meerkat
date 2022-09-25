@@ -18,7 +18,7 @@ from typing import (
 )
 
 from tqdm import tqdm
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr, StrictFloat, StrictBool
 
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
@@ -43,7 +43,7 @@ class NodeMixin:
         return len(self.children) > 0
 
 
-Primitive = Union[int, str, float, bool]
+Primitive = Union[StrictInt, StrictStr, StrictFloat, StrictBool]
 Storeable = Union[
     None,
     Primitive,
