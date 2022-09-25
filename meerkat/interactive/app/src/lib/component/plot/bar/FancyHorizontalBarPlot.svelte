@@ -24,6 +24,19 @@
 	export let ylabel: string = 'y label';
 
 	let height = 40 * data.length;
+
+	const floor = (x: number, decimals: number): number => {
+		return Math.floor(x * Math.pow(10, decimals)) / Math.pow(10, decimals);
+	};
+	const ceil = (x: number, decimals: number): number => {
+		return Math.floor(x * Math.pow(10, decimals)) / Math.pow(10, decimals);
+	};
+
+	let get_x_domain = () => {
+		let min = Math.min(...data.map((d) => d.x));
+		let max = Math.max(...data.map((d) => d.x));
+		return [floor(min, 1), ceil(max, 1)];
+	}
 </script>
 
 <div class="relative w-full" style:height={`${height}px`}>
@@ -35,7 +48,7 @@
 		y="y"
 		yScale={scaleBand().paddingInner(0.05)}
 		{data}
-		xDomain={[-0.4, 0.4]}
+		xDomain={get_x_domain()}
 		position="absolute"
 	>
 		<Html>
@@ -51,7 +64,7 @@
 		y="y"
 		yScale={scaleBand().paddingInner(0.05)}
 		{data}
-		xDomain={[-0.4, 0.4]}
+		xDomain={get_x_domain()}
 		position="absolute"
 	>
 		<Html>
