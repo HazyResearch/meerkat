@@ -65,7 +65,6 @@
 		ignore_check: boolean = false
 	) => {
 		// Setting to the same value, do nothing.
-		console.log('setting checkbox', criterion.is_enabled, '->', value);
 		criterion.is_enabled = value;
 		trigger_sort();
 	};
@@ -80,7 +79,6 @@
     }
 
 	const cellDisabled = (criterion: SortCriterion) => {
-        console.log("not criterion col:", !criterion.column);
 		return !criterion.column;
 	};
 

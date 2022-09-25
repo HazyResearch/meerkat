@@ -308,7 +308,11 @@ def _pack_boxes_and_stores(obj):
     return obj
 
 
-def interface_op(fn: Callable = None, nested_return: bool = True) -> Callable:
+def interface_op(
+    fn: Callable = None, 
+    nested_return: bool = True,
+    return_format: type = None
+) -> Callable:
     """
     Functions decorated with this will create nodes in the operation graph.
 
