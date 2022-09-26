@@ -17,6 +17,7 @@ class SortCriterion(BaseModel):
     is_enabled: bool
     column: str
     ascending: bool
+    source: str = ""
 
 @interface_op
 def sort_by_criteria(
