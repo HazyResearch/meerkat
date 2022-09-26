@@ -60,6 +60,7 @@ class Sort(Component):
         self,
         dp: Box["DataPanel"],
         criteria: Union[Store[List[str]], List[str]] = None,
+        title: str = "",
     ):
         super().__init__()
         self.dp = dp
@@ -68,6 +69,7 @@ class Sort(Component):
             criteria = []
 
         self.criteria = make_store(criteria)  # Dict[str, List[Any]]
+        self.title = title
 
     def derived(self):
         # TODO (arjundd): Add option to configure ascending / descending.
@@ -78,4 +80,5 @@ class Sort(Component):
         return {
             "dp": self.dp.config,
             "criteria": self.criteria.config,
+            "title": self.title,
         }

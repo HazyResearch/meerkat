@@ -23,11 +23,21 @@
 </script>
 <div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
+		<div class="bg-violet-300 py-2 rounded-lg drop-shadow-md z-40 flex flex-col">
+			<div class="font-bold text-2xl text-slate-800 self-center justify-self-center">
+				Slice View
+			</div>
+		</div>
 		<Match {...slice_match.props} />
 		<Sort {...slice_sort.props} />
 		<Plot {...plot.props} />
 	</div>
 	<div class="grid grid-rows-[auto_1fr] h-screen gap-5">
+		<div class="bg-violet-300 py-2 rounded-lg drop-shadow-md z-40 flex flex-col">
+			<div class="font-bold text-2xl text-slate-800 self-center justify-self-center">
+				Example View
+			</div>
+		</div>
 		<div class="grid grid-rows-auto grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
 				<Row {...active_slice.props} />

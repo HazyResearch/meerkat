@@ -12,6 +12,7 @@
 	export let idx: Writable<number>;
 	export let target: EditTarget;
 	export let cell_specs: Any = {};
+	export let title: string = "";
 
 	$: schema_promise = $get_schema($dp.box_id);
        
@@ -47,10 +48,11 @@
 </script>
 
 <div class="bg-slate-100 py-3 px-2 rounded-lg drop-shadow-md flex flex-col space-y-1">
-	<div class="font-bold text-xl text-slate-600 self-center justify-self-center">
-		<!-- TODO(Sabri): This should be a customizable name in the future. -->
-		Active Slice
+	{#if title != ""}
+	<div class="font-bold text-xl text-slate-600 self-start pl-2">
+		{title}
 	</div>
+	{/if}
 	{#await schema_promise}
 		Loading...
 	{:then schema}

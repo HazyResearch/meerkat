@@ -21,6 +21,7 @@
 	// backend.
 	export let criteria: Writable<SortCriterion[]>;
 	export let operations: string[];
+	export let title: string = "";
 
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
@@ -129,7 +130,12 @@
 
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30">
+<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30 flex flex-col">
+	{#if title != ""}
+	<div class="font-bold text-xl text-slate-600 self-start pl-2">
+		{title}
+	</div>
+	{/if}
 	<div class="form-control w-full">
         <section use:dndzone={{items: criteria_frontend, flipDurationMs: flipDurationMs}} on:consider={handleDndConsider} on:finalize={handleDndFinalize}>
 		{#each criteria_frontend as criterion, i (criterion.id)}

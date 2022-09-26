@@ -11,7 +11,8 @@ class Match(Component):
     name = "Match"
 
     def __init__(
-        self, pivot: Pivot, against: Union[Store, str], col: Union[Store, str] = ""
+        self, pivot: Pivot, against: Union[Store, str], col: Union[Store, str] = "",
+        title: str = ""
     ):
         super().__init__()
         if not isinstance(pivot, Pivot):
@@ -20,6 +21,7 @@ class Match(Component):
         self.against: Store = make_store(against)
         self.col = make_store(col)
         self.text = make_store("")
+        self.title = title
 
     @property
     def props(self):
@@ -28,4 +30,5 @@ class Match(Component):
             "dp": self.pivot.config,
             "col": self.col.config,
             "text": self.text.config,
+            "title": self.title
         }

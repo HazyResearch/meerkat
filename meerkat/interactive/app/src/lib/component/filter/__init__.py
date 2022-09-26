@@ -123,6 +123,7 @@ class Filter(Component):
         self,
         dp: Box["DataPanel"],
         criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
+        title: str = "",
     ):
         super().__init__()
         self.dp = dp
@@ -132,6 +133,7 @@ class Filter(Component):
 
         self.criteria = make_store(criteria)  # Dict[str, List[Any]]
         self.operations = list(_operator_str_to_func.keys())
+        self.title = title
 
     def derived(self):
         """Return a derived object that filters the pivot datapanel."""
@@ -143,4 +145,5 @@ class Filter(Component):
             "dp": self.dp.config,
             "criteria": self.criteria.config,
             "operations": self.operations,
+            "title": self.title
         }
