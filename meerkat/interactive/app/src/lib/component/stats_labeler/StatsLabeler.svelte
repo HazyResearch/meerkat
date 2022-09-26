@@ -25,8 +25,6 @@
 
 	$: col = `label(${$active_key})`;
 
-	
-
 	let status: string = 'waiting';
 
 	$: label_target.target = get(label_target.target);
@@ -70,7 +68,7 @@
 		}
 
 		let modifications_promise;
-		console.log(col, value )
+
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
 				$dp.box_id,
@@ -186,24 +184,24 @@
 
 			<div class="bg-white rounded-md flex flex-col shadow-lg  h-full">
 				<div class="text-slate-400 px-3 py-1 self-center">Precision</div>
-				{#if get(precision_estimate[0]) === null}
+				{#if $precision_estimate === null}
 					<div class="text-center text-slate-400 px-3 py-1 self-center">No estimate.</div>
 				{:else}
 					<div class="font-bold text-2xl px-3 self-center">
 						<Interval data={
-							precision_estimate.map((x) => get(x))
+							$precision_estimate
 						} percentage={true} />
 					</div>
 				{/if}
 			</div>
 			<div class="bg-white rounded-md flex flex-col shadow-lg h-full">
 				<div class="text-slate-400 px-3 py-1 self-center">Recall</div>
-				{#if get(recall_estimate[0]) === null}
+				{#if $recall_estimate === null}
 					<div class="text-center text-slate-400 px-3 py-1 self-center">No estimate.</div>
 				{:else}
 					<div class="font-bold text-2xl px-3 self-center">
 						<Interval data={
-							recall_estimate.map((x) => get(x))
+							$recall_estimate
 						} percentage={true} />
 					</div>
 				{/if}

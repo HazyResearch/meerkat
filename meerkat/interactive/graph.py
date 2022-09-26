@@ -12,6 +12,7 @@ from typing import (
     Hashable,
     List,
     Set,
+    Tuple,
     Type,
     TypeVar,
     Union,
@@ -295,9 +296,38 @@ def _unpack_boxes_and_stores(*args, **kwargs):
     return unpacked_args, unpacked_kwargs, boxes, stores
 
 
-def _pack_boxes_and_stores(obj):
+def _nested_apply(obj: object, fn: callable, return_type: type = None):
+    if return_type is Store or return_type is Box:
+        return fn(obj, return_type=return_type)
+
+    if isinstance(obj, list):
+        if return_type is not None:
+            assert return_type.__origin__ is list
+            return_type = return_type.__args__[0]
+        return [_nested_apply(v, fn=fn, return_type=return_type) for v in obj]
+    elif isinstance(obj, tuple):
+        if return_type is not None:
+            assert return_type.__origin__ is tuple
+            return_type = return_type.__args__[0]
+        return tuple(_nested_apply(v, fn=fn, return_type=return_type) for v in obj)
+    elif isinstance(obj, dict):
+        if return_type is not None:
+            assert return_type.__origin__ is dict
+            return_type = return_type.__args__[1]
+        return {
+            k: _nested_apply(v, fn=fn, return_type=return_type) for k, v in obj.items()
+        }
+    else:
+        return fn(obj, return_type=return_type)
+
+
+def _pack_boxes_and_stores(obj, return_type: type = None):
     from meerkat.datapanel import DataPanel
     from meerkat.ops.sliceby.sliceby import SliceBy
+    if return_type is Store:
+        return Store(obj)
+    elif return_type is Derived:
+        return Derived(obj)
 
     if isinstance(obj, (DataPanel, SliceBy)):
         return Derived(obj)
@@ -309,9 +339,7 @@ def _pack_boxes_and_stores(obj):
 
 
 def interface_op(
-    fn: Callable = None, 
-    nested_return: bool = True,
-    return_format: type = None
+    fn: Callable = None, nested_return: bool = True, return_type: type = None
 ) -> Callable:
     """
     Functions decorated with this will create nodes in the operation graph.
@@ -329,7 +357,7 @@ def interface_op(
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(interface_op, nested_return=nested_return)
+        return partial(interface_op, nested_return=nested_return, return_type=return_type)
 
     def _interface_op(fn: Callable):
         @wraps(fn)
@@ -346,7 +374,9 @@ def interface_op(
                 from meerkat.ops.sliceby.sliceby import SliceBy
 
                 if nested_return:
-                    derived = nested_apply(result, fn=_pack_boxes_and_stores)
+                    derived = _nested_apply(
+                        result, fn=_pack_boxes_and_stores, return_type=return_type
+                    )
                 elif isinstance(result, (DataPanel, SliceBy)):
                     derived = Derived(result)
                 else:

@@ -29,8 +29,8 @@ class StatsLabeler(Component):
         self.active_key = make_store(active_key)
         self.selected = make_store(selected)
         self.primary_key = primary_key
-        self.precision_estimate = precision_estimate
-        self.recall_estimate = recall_estimate
+        self.precision_estimate = make_store(precision_estimate)
+        self.recall_estimate = make_store(recall_estimate)
 
 
     @property
@@ -43,6 +43,6 @@ class StatsLabeler(Component):
             "active_key": self.active_key.config,
             "selected": self.selected.config,
             "primary_key": self.primary_key,
-            "precision_estimate": [est.config for est in self.precision_estimate],
-            "recall_estimate":  [est.config for est in self.recall_estimate],
+            "precision_estimate": self.precision_estimate.config,
+            "recall_estimate": self.recall_estimate.config,
         }
