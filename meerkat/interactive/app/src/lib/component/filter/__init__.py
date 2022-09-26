@@ -37,6 +37,33 @@ class FilterCriterion(BaseModel):
     is_fixed: bool = False
 
 
+def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
+    """Parse the filter criterion from the string.
+
+    Args:
+        criterion: The string representation of the criterion.
+            Examples: "label == data"
+    
+    Returns:
+        Dict[str, Any]: The column, op, and value dicts required
+            to construct the FilterCriterion.
+    """
+    # Parse all the longer op keys first.
+    # This is to avoid split on a shorter key that could be a substring of a larger key.
+    operators = sorted(_operator_str_to_func.keys(), key=lambda x: len(x), reverse=True)
+    column = None
+    value = None
+    for op in operators:
+        if op not in criterion:
+            continue
+        candidates = criterion.split(op)
+        if len(candidates) != 2:
+            raise ValueError("Expected format: <column> <op> <value> (e.g. 'label == car').")
+        column, value = tuple(candidates)
+        return dict(column=column.strip(), value=value.strip(), op=op)
+    raise ValueError(f"Could not find any operation in the string {criterion}")
+
+
 @interface_op
 def filter_by_operator(
     data: Union["DataPanel", "AbstractColumn"],
