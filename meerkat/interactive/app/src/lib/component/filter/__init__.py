@@ -1,17 +1,25 @@
-from dataclasses import dataclass
-from ..abstract import Component
-from typing import TYPE_CHECKING, Dict, Any, Optional, Sequence
-from meerkat.interactive.graph import Box, Store, make_store
-
-from typing import List, Union, Any
-
-from meerkat.interactive.graph import interface_op
 import functools
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
+
 import numpy as np
 from pydantic import BaseModel
 
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.interactive.graph import Box, Store, interface_op, make_store
+
+from ..abstract import Component
+
 if TYPE_CHECKING:
     from meerkat import AbstractColumn, DataPanel
+
+
+def _in(column, value):
+    if not isinstance(column, PandasSeriesColumn):
+        raise ValueError("In operator only works on PandasSeriesColumn.")
+    if not isinstance(value, (tuple, list)):
+        value = [value]
+    return column.data.isin(value)
 
 
 # Map a string operator to a function that takes a value and returns a boolean.
@@ -23,8 +31,8 @@ _operator_str_to_func = {
     ">=": lambda x, y: x >= y,  # greater than or equal to
     "<=": lambda x, y: x <= y,  # less than or equal to
     # TODO (arjundd): Add support for "in" and "not in" operators.
-    # "in": lambda x, y: x in y,  # in
-    # "not in": lambda x, y: x not in y,  # not in
+    "in": _in,
+    "not in": lambda x, y: ~_in(x, y),
 }
 
 
@@ -43,7 +51,7 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
     Args:
         criterion: The string representation of the criterion.
             Examples: "label == data"
-    
+
     Returns:
         Dict[str, Any]: The column, op, and value dicts required
             to construct the FilterCriterion.
@@ -58,10 +66,16 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
             continue
         candidates = criterion.split(op)
         if len(candidates) != 2:
-            raise ValueError("Expected format: <column> <op> <value> (e.g. 'label == car').")
+            raise ValueError(
+                "Expected format: <column> <op> <value> (e.g. 'label == car')."
+            )
+
         column, value = tuple(candidates)
-        return dict(column=column.strip(), value=value.strip(), op=op)
-    return None 
+        value = value.strip()
+        if "," in value:
+            value = [x.strip() for x in value.split(",")]
+        return dict(column=column.strip(), value=value, op=op)
+    return None
     # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
@@ -94,7 +108,7 @@ def filter_by_operator(
     """
     import meerkat as mk
 
-    # since the criteria can either be a list of dictionary or of FilterCriterion 
+    # since the criteria can either be a list of dictionary or of FilterCriterion
     # we need to convert them to FilterCriterion
     criteria = [
         criterion
@@ -173,5 +187,5 @@ class Filter(Component):
             "dp": self.dp.config,
             "criteria": self.criteria.config,
             "operations": self.operations,
-            "title": self.title
+            "title": self.title,
         }
