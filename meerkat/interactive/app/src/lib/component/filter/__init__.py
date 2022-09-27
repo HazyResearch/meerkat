@@ -61,7 +61,8 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
             raise ValueError("Expected format: <column> <op> <value> (e.g. 'label == car').")
         column, value = tuple(candidates)
         return dict(column=column.strip(), value=value.strip(), op=op)
-    raise ValueError(f"Could not find any operation in the string {criterion}")
+    return None 
+    # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
 @interface_op
