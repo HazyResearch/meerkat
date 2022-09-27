@@ -20,9 +20,10 @@
 	let active_slice = components.active_slice;
 	let slice_sort = components.slice_sort;
 	let slice_match = components.slice_match;
+	let global_stats = components.global_stats
 </script>
 <div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
-	<div class="grid grid-rows-[auto_auto_auto_1fr] h-screen gap-5">
+	<div class="grid grid-rows-[auto_auto_auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
 			<div class="font-bold text-xl text-slate-800 self-center justify-self-center">
 				Slice View
@@ -30,6 +31,7 @@
 		</div>
 		<Match {...slice_match.props} />
 		<Sort {...slice_sort.props} />
+		<Stats {...global_stats.props} />
 		<Plot {...plot.props} />
 	</div>
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
