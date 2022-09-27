@@ -20,6 +20,7 @@ class Plot(Component):
         y_label: Union[str, Store],
         type: str = "scatter",
         slot: str = None,
+        keys_to_remove: Union[str, Store] = None,
     ) -> None:
         super().__init__()
         self.data = data
@@ -31,6 +32,10 @@ class Plot(Component):
         self.type = type
         self.slot = slot
 
+        if keys_to_remove is None:
+            keys_to_remove = []
+        self.keys_to_remove = make_store(keys_to_remove)
+
     @property
     def props(self):
         props = {
@@ -41,6 +46,7 @@ class Plot(Component):
             "x_label": self.x_label.config,
             "y_label": self.y_label.config,
             "type": self.type,
+            "keys_to_remove": self.keys_to_remove.config,
         }
         if self.slot is not None:
             props["slot"] = self.slot
