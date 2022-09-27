@@ -7,6 +7,9 @@
 	import FancyTick from './FancyTick.svelte';
 
 	const { padding, xRange, yScale } = getContext('LayerCake');
+	const { metadata } = getContext('FancyHorizontalBarPlotMetadata');
+	console.log("padding", metadata);
+	console.log("metadata", metadata);
 
 	/** @type {Boolean} [gridlines=true] - Extend lines from the ticks into the chart space */
 	export let gridlines = true;
@@ -80,8 +83,10 @@
 				<!-- 
 					Make a FancyTick, which represents any component that should be shown on the left 
 					side of the plot. This has a fixed width in pixels. 
+
+					TODO (arjundd): Make a default value of count so that it doesn't display.
 				-->
-				<FancyTick width="{width}px" name={tick} id={i} size={10} on:remove />
+				<FancyTick width="{width}px" name={tick} id={i} size={metadata[i]["count"] || 0} on:remove />
 			</div>
 		</div>
 	{/each}
