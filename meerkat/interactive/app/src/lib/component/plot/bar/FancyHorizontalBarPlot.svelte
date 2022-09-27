@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { setContext } from 'svelte';
 	import type { Point2D } from '$lib/components/plot/types';
 	import { scaleBand } from 'd3-scale';
 	import { Html, LayerCake, Svg } from 'layercake';
@@ -12,6 +13,7 @@
 	import FancyLabelY from './labels/FancyLabelY.html.svelte';
 
 	export let data: Array<Point2D>;
+	export let metadata: Array<any>;
 
 	export let padding: number = 10;
 
@@ -36,8 +38,12 @@
 		let min = Math.min(...data.map((d) => d.x));
 		let max = Math.max(...data.map((d) => d.x));
 		return [min - 0.05, max + 0.05];
-		return [floor(min, 1), ceil(max, 1)];
+		// return [floor(min, 1), ceil(max, 1)];
 	}
+
+	// Set a context to allow passing of metadata.
+	console.log(metadata);
+	const metadataContext = setContext("FancyHorizontalBarPlotMetadata", { metadata } );
 </script>
 
 <div class="relative w-full" style:height={`${height}px`}>

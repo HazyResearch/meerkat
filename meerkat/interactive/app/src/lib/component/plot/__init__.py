@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Sequence, Union
 
 from meerkat.datapanel import DataPanel
 from meerkat.interactive.graph import Pivot, Store, make_store
@@ -21,6 +21,7 @@ class Plot(Component):
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
+        metadata_columns: Sequence[str] = None,
     ) -> None:
         super().__init__()
         self.data = data
@@ -31,6 +32,7 @@ class Plot(Component):
         self.y_label = make_store(y_label)
         self.type = type
         self.slot = slot
+        self.metadata_columns = metadata_columns
 
         if keys_to_remove is None:
             keys_to_remove = []
@@ -50,4 +52,6 @@ class Plot(Component):
         }
         if self.slot is not None:
             props["slot"] = self.slot
+        if self.metadata_columns is not None:
+            props["metadata_columns"] = self.metadata_columns
         return props

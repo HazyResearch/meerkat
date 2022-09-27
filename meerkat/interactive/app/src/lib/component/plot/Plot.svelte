@@ -17,10 +17,15 @@
 	export let type: string;
 	export let padding: number = 10;
 	export let keys_to_remove: Writable;
+	// The columns corresponding to metadata to track.
+	export let metadata_columns: Array<string> = [];
+	// Array of metadata objects. Each metadata object can have any arbitrary number
+	// of key-value pairs.
+	let metadata: Array<any> = [];
 
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the datapanel for the columns to be plotted
-		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, 'key']);
+		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, 'key', ...metadata_columns]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -30,6 +35,21 @@
 				key: row[2]
 			});
 		});
+
+		// Update the metadata array.
+		if (metadata_columns.length > 0) {
+			metadata = [];
+			rows.rows?.forEach((row: any) => {
+				const metadata_obj = metadata_columns.reduce((accumulator: any, column: string, index: number) => {
+					accumulator[column] = row[index + 3];
+					return accumulator;
+				}, {});
+				metadata.push(metadata_obj);
+			});
+		} else {
+			metadata = new Array(datum.length).fill([]);
+		}
+
 		return datum;
 	};
 	$: datum_promise = get_datum($dp.box_id);
@@ -40,6 +60,7 @@
 	{#await datum_promise}
 		<ScatterPlot
 			data={[{ x: 0, y: 0, id: 0, key: 0 }]}
+			metadata={[]}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}
 			width="90%"
@@ -48,6 +69,7 @@
 	{:then datum}
 		<FancyHorizontalBarPlot
 			data={datum}
+			metadata={metadata}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}
 			ywidth={128}
