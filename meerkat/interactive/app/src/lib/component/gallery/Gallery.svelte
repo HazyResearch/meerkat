@@ -53,7 +53,7 @@ import Selected from './Selected.svelte';
 					{/if}
 				</div>
 				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">
-					Gallery
+					Examples
 				</span>
 				<span class="font-semibold self-center justify-self-end">
 					<GallerySlider bind:size={cell_size} />
