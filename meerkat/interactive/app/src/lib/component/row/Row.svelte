@@ -101,7 +101,7 @@
 								{#if rows == null}
 									No selection
 								{:else}
-									<BasicCell data={rows.rows[0][column_idx]} {...column.cell_props} percentage={true}/>
+									<BasicCell data={rows.rows[0][column_idx]} {...column.cell_props} percentage={false}/>
 								{/if}
 							{/await}
 						</div>
