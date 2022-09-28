@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
+import pandas as pd
 from pydantic import BaseModel
 
+from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.interactive.graph import Box, Store, interface_op, make_store
 
@@ -14,12 +16,14 @@ if TYPE_CHECKING:
     from meerkat import AbstractColumn, DataPanel
 
 
-def _in(column, value):
-    if not isinstance(column, PandasSeriesColumn):
-        raise ValueError("In operator only works on PandasSeriesColumn.")
+def _in(column: AbstractColumn, value):
     if not isinstance(value, (tuple, list)):
         value = [value]
-    return column.data.isin(value)
+    if not isinstance(column, PandasSeriesColumn):
+        data = pd.Series(column.data)
+    else:
+        data = column.data
+    return data.isin(value)
 
 
 # Map a string operator to a function that takes a value and returns a boolean.
@@ -136,9 +140,16 @@ def filter_by_operator(
     all_masks = []
     for criterion in criteria:
         col = data[criterion.column]
-        value = col.dtype.type(criterion.value)
-        if isinstance(col, mk.NumpyArrayColumn):
-            value = np.asarray(value, dtype=col.dtype)
+
+        # values should be split by "," when using in/not-in operators.
+        if "in" in criterion.op:
+            value = [x.strip() for x in criterion.value.split(",")]
+            if isinstance(col, mk.NumpyArrayColumn):
+                value = np.asarray(value, dtype=col.dtype).tolist()
+        else:
+            value = col.dtype.type(criterion.value)
+            if isinstance(col, mk.NumpyArrayColumn):
+                value = np.asarray(value, dtype=col.dtype)
 
         mask = _operator_str_to_func[criterion.op](col, value)
         all_masks.append(np.asarray(mask))
