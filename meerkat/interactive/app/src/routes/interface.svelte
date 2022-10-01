@@ -15,24 +15,20 @@
 </script>
 
 <script lang="ts">
-	import { get, writable, type Writable } from 'svelte/store';
 	import { setContext } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
-	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
-	import StoreComponent from '$lib/component/StoreComponent.svelte';
-	import Mocha from '$lib/layouts/Mocha.svelte';
-	import { onMount } from 'svelte';
-	import { modify, post, get_request } from '$lib/utils/requests';
-
-	import Grid from 'svelte-grid';
-	import gridHelp from 'svelte-grid/build/helper/index';
-	import Draggable from 'carbon-icons-svelte/lib/Draggable.svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
-	import { OpenPanelFilledRight } from 'carbon-icons-svelte';
+	import StoreComponent from '$lib/component/StoreComponent.svelte';
+	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
+	import { get_request, modify, post } from '$lib/utils/requests';
+	import { nestedMap } from '$lib/utils/tools';
+	import type { EditTarget, Interface } from '$lib/utils/types';
+	import { onMount } from 'svelte';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
 
-	export let config: any;
+	export let config: Interface;
 
 	$: store_trigger = async (store_id: string, value: any) => {
 		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
@@ -48,12 +44,16 @@
 		start?: number,
 		end?: number,
 		indices?: Array<number>,
-		columns?: Array<string>
+		columns?: Array<string>,
+		key_column?: string,
+		keys?: Array<string | number>,
 	) => {
 		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
+			key_column: key_column,
+			keys: keys, 
 			columns: columns
 		});
 		return result;
@@ -76,6 +76,28 @@
 			column: column,
 			row_id: row_id,
 			id_column: id_column
+		});
+		return modifications;
+	};
+
+	$: edit_target = async (
+		box_id: string,
+		target: EditTarget,
+		value: any,
+		column: string,
+		row_indices: Array<number>,
+		row_keys: Array<string>,
+		primary_key: string,
+		metadata: any
+	) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/edit_target`, {
+			target: target,
+			value: value,
+			column: column,
+			row_indices: row_indices,
+			row_keys: row_keys,
+			primary_key: primary_key,
+			metadata: metadata
 		});
 		return modifications;
 	};
@@ -117,25 +139,36 @@
 		return out;
 	};
 
+	$: remove_row_by_index = async (box_id: string, row_index: number) => {
+		let modifications = await modify(`${$api_url}/dp/${box_id}/remove_row_by_index`, {
+			row_index: row_index
+		});
+		return modifications;
+	};
+
 	const _get_schema = writable(get_schema);
 	const _add = writable(add);
 	const _match = writable(match);
 	const _get_rows = writable(get_rows);
 	const _edit = writable(edit);
+	const _edit_target = writable(edit_target);
 	const _store_trigger = writable(store_trigger);
 	const _get_sliceby_info = writable(get_sliceby_info);
 	const _aggregate_sliceby = writable(aggregate_sliceby);
 	const _get_sliceby_rows = writable(get_sliceby_rows);
+	const _remove_row_by_index = writable(remove_row_by_index);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
 	$: $_match = match;
 	$: $_get_rows = get_rows;
 	$: $_edit = edit;
+	$: $_edit_target = edit_target;
 	$: $_store_trigger = store_trigger;
 	$: $_get_sliceby_info = get_sliceby_info;
 	$: $_aggregate_sliceby = aggregate_sliceby;
 	$: $_get_sliceby_rows = get_sliceby_rows;
+	$: $_remove_row_by_index = remove_row_by_index;
 
 	$: context = {
 		get_schema: _get_schema,
@@ -143,10 +176,12 @@
 		match: _match,
 		get_rows: _get_rows,
 		edit: _edit,
+		edit_target: _edit_target,
 		store_trigger: _store_trigger,
 		get_sliceby_info: _get_sliceby_info,
 		aggregate_sliceby: _aggregate_sliceby,
-		get_sliceby_rows: _get_sliceby_rows
+		get_sliceby_rows: _get_sliceby_rows,
+		remove_row_by_index: _remove_row_by_index
 	};
 	$: setContext('Interface', context);
 
@@ -159,60 +194,73 @@
 	}
 
 	let imported_layout: any;
-	let imported_components: any = {};
 	onMount(async () => {
 		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
-		// for loop
-		for (let i = 0; i < component_array.length; i++) {
-			let component = component_array[i];
-			let component_name = component.name;
-			imported_components[component_name] = (
-				await import(`$lib/component/${component_name.toLowerCase()}/${component_name}.svelte`)
-			).default;
-			component.component = imported_components[component_name];
-		}
-
 		document.title = config.name;
 	});
 
-	let grid_items = [];
-
 	for (let i = 0; i < component_array.length; i++) {
 		let component = component_array[i];
+
 		// Define the stores
-		for (let [k, v] of Object.entries(component.props)) {
-			if (v) {
-				if (v.store_id !== undefined) {
-					// unpack the store
-					if (!global_stores.has(v.store_id)) {
-						// add it to the global_stores Map if it isn't already there
-						let store = meerkat_writable(v.value);
-						store.store_id = v.store_id;
-						store.backend_store = v.has_children;
-						global_stores.set(v.store_id, store);
-					}
-					component.props[k] = global_stores.get(v.store_id);
-				} else if (v.box_id !== undefined) {
-					if (!global_stores.has(v.box_id)) {
-						// add it to the global_stores Map if it isn't already there
-						global_stores.set(v.box_id, writable(v));
-					}
-					component.props[k] = global_stores.get(v.box_id);
-				}
+		component.props = nestedMap(component.props, (v: any) => {
+			if (!v) {
+				return v;
 			}
-		}
+			if (v.store_id !== undefined) {
+				// unpack the store
+				if (!global_stores.has(v.store_id)) {
+					// add it to the global_stores Map if it isn't already there
+					let store = meerkat_writable(v.value);
+					store.store_id = v.store_id;
+					store.backend_store = v.has_children;
+					global_stores.set(v.store_id, store);
+				}
+				return global_stores.get(v.store_id);
+			} else if (v.box_id !== undefined) {
+				if (!global_stores.has(v.box_id)) {
+					// add it to the global_stores Map if it isn't already there
+					global_stores.set(v.box_id, writable(v));
+				}
+				return global_stores.get(v.box_id);
+			}
+			return v;
+		});
+
+		// for (let [k, v] of Object.entries(component.props)) {
+		// 	if (v) {
+		// 		if (v.store_id !== undefined) {
+		// 			// unpack the store
+		// 			if (!global_stores.has(v.store_id)) {
+		// 				// add it to the global_stores Map if it isn't already there
+		// 				let store = meerkat_writable(v.value);
+		// 				store.store_id = v.store_id;
+		// 				store.backend_store = v.has_children;
+		// 				global_stores.set(v.store_id, store);
+		// 			}
+		// 			component.props[k] = global_stores.get(v.store_id);
+		// 		} else if (v.box_id !== undefined) {
+		// 			if (!global_stores.has(v.box_id)) {
+		// 				// add it to the global_stores Map if it isn't already there
+		// 				global_stores.set(v.box_id, writable(v));
+		// 			}
+		// 			component.props[k] = global_stores.get(v.box_id);
+		// 		}
+		// 	}
+		// }
 
 		// Setup for responsive grid layout
-		grid_items.push({
-			6: gridHelp.item({
-				x: 0,
-				y: 2 * i,
-				w: 6,
-				h: 2,
-				customDragger: true
-			}),
-			id: i
-		});
+		//		let grid_items = [];
+		// grid_items.push({
+		// 	6: gridHelp.item({
+		// 		x: 0,
+		// 		y: 2 * i,
+		// 		w: 6,
+		// 		h: 2,
+		// 		customDragger: true
+		// 	}),
+		// 	id: i
+		// });
 	}
 
 	const cols = [[1200, 6]];

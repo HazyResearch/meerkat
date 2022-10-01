@@ -23,6 +23,15 @@ export interface FilterCriterion {
     column: string;
     op: string;
     value: any;
+    source: string;
+    is_fixed: boolean;
+}
+
+export interface SortCriterion {
+    id: string;
+    is_enabled: boolean;
+    column: string;
+    ascending: boolean;
 }
 
 export class MatchCriterion {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DataPanelBox, SliceByBox } from '$lib/utils/graph';
+	import type { DataPanelBox, SliceByBox } from '$lib/utils/types';
 
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';

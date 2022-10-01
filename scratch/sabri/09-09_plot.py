@@ -74,6 +74,11 @@ def plot(dp: mk.DataPanel) -> mk.gui.Interface:
         slot="gallery",
     )
 
+    # cards = mk.gui.SliceByCards(
+    #     sliceby=sb,
+    #     main_column="image"
+    # )
+    # return mk.gui.Interface(components=[cards])
     return mk.gui.Interface(
         layout=mk.gui.Layout("Mocha"), components={"gallery": gallery, "plot": plot}
     )

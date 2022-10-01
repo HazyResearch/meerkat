@@ -32,7 +32,11 @@ class LVISDataset:
         tags = mk.DataPanel.from_pandas(tags).merge(
             self.categories["id", "synset"], left_on="category_id", right_on="id"
         )
-        tags.remove_column("id")
+        tags["id"] = (
+            tags["image_id"].to_pandas().astype(str)
+            + "_"
+            + tags["category_id"].astype(str)
+        )
         return tags
 
 

@@ -1,23 +1,26 @@
-from typing import Callable, Dict, List, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Union
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
-from meerkat.interactive.graph import Box, make_store
+from meerkat.interactive.graph import Box, make_box, make_store
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Component
+
+if TYPE_CHECKING:
+    from meerkat.datapanel import DataPanel
 
 
 class Aggregation(IdentifiableMixin):
 
     identifiable_group: str = "aggregations"
 
-    def __init__(self, func: Callable[[mk.DataPanel], Union[int, float, str]]):
+    def __init__(self, func: Callable[["DataPanel"], Union[int, float, str]]):
         self.func = func
         super().__init__()
 
-    def __call__(self, dp: mk.DataPanel) -> Union[int, float, str]:
+    def __call__(self, dp: "DataPanel") -> Union[int, float, str]:
         return self.func(dp)
 
     @property
@@ -34,18 +37,22 @@ class SliceByCards(Component):
     def __init__(
         self,
         sliceby: Box[SliceBy],
-        dp: Box[DataPanel],
         main_column: str,
         tag_columns: List[str] = None,
         aggregations: Dict[
-            str, Callable[[mk.DataPanel], Union[int, float, str]]
+            str, Callable[["DataPanel"], Union[int, float, str]]
         ] = None,
+        dp: Box["DataPanel"] = None,  # required to support passing in an external box
     ) -> None:
-        assert sliceby.obj.data is dp.obj
-
         super().__init__()
-        self.sliceby = sliceby
-        self.dp = dp
+        self.sliceby = make_box(sliceby)
+
+        if dp is None:
+            dp = self.sliceby.obj.data
+        else:
+            assert self.sliceby.obj.data is (dp.obj if isinstance(dp, Box) else dp)
+
+        self.dp = make_box(dp)
 
         if aggregations is None:
             aggregations = {}
@@ -53,6 +60,10 @@ class SliceByCards(Component):
         self.aggregations = {k: Aggregation(v) for k, v in aggregations.items()}
 
         self.main_column = make_store(main_column)
+
+        if tag_columns is None:
+            tag_columns = []
+
         self.tag_columns = make_store(tag_columns)
 
     @property

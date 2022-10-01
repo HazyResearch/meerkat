@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { store_lock } from '$lib/components/blanks/stores';
 	import { getContext } from 'svelte';
 
 	const { store_trigger } = getContext('Interface');

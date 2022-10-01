@@ -29,6 +29,8 @@ def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
         return []
 
     # Set the new value of the store
+    # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type 
+    # of the store. 
     store_modification.node.value = value
 
     # Trigger on the store modification: leads to modifications on the graph

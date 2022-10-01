@@ -95,9 +95,9 @@
 		<li>
 			<button
 				on:click={on_page_left}
-				class="flex items-center justify-center group w-6 h-6 rounded-lg border border-slate-500 hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="flex items-center justify-center group w-6 h-6 rounded-lg bg-violet-200 text-violet-800  hover:shadow-lg "
 			>
-				<ChevronLeft class="group-hover:stroke-white" width={16} height={16} />
+				<ChevronLeft class="group-hover:stroke-2" width={16} height={16} />
 				
 			</button>
 		</li>
@@ -109,9 +109,9 @@
 		<li>
 			<button
 				on:click={on_page_right}
-				class="flex items-center justify-center group w-6 h-6 rounded-lg border border-slate-500  hover:bg-violet-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+				class="flex items-center justify-center group w-6 h-6 rounded-lg bg-violet-200 text-violet-800 hover:shadow-lg "
 			>
-				<ChevronRight class="group-hover:stroke-white" width={16} height={16} />
+				<ChevronRight class="" width={16} height={16} />
 			</button>
 		</li>
 	</ul>

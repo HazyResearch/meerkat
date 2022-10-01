@@ -11,7 +11,7 @@
 	import DummyBlock from './components/blocks/DummyBlock.svelte';
 import Everything from './components/blocks/Everything.svelte';
 	import FilterHeader from './components/filter_header/FilterHeader.svelte';
-	import Gallery from './components/gallery/Gallery.svelte';
+	import Gallery from './components/gallery/Cards.svelte';
 	import CategoryGenerator from './components/lm/CategoryGenerator.svelte';
 
 	export let datapanel_id: string;

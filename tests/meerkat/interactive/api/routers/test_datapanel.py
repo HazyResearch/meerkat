@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 import meerkat as mk
 from meerkat.interactive import Pivot
 from meerkat.interactive.api.main import app
+from meerkat.interactive.edit import EditTargetConfig
 
 client = TestClient(app)
 
@@ -82,6 +83,131 @@ def test_edit(column_type):
     assert response.status_code == 200
     assert dp["value"][4] == "100"
     assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "box"}]
+
+
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit_target(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id_s": column_type(list(map(str, np.arange(10, 20)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+
+    target_dp = mk.DataPanel(
+        {
+            "row_id_t": column_type(list(map(str, np.arange(0, 20)))),
+            "value": column_type(list(map(str, np.arange(0, 20)))),
+        }
+    )
+
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+    target_pivot = Pivot(target_dp)
+
+    data = {
+        "target": EditTargetConfig(
+            target=target_pivot.config,
+            target_id_column="row_id_t",
+            source_id_column="row_id_s",
+        ).dict(),
+        "value": "100",
+        "column": "value",
+        "row_indices": [5, 6, 8],
+    }
+    response = client.post(f"/dp/{pivot.id}/edit_target/", json=data)
+
+    assert response.status_code == 200, response.json()
+    assert target_dp["value"][15] == "100"
+    assert target_dp["value"][16] == "100"
+    assert target_dp["value"][18] == "100"
+
+
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit_target_keys(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id_s": column_type(list(map(str, np.arange(10, 20)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+
+    target_dp = mk.DataPanel(
+        {
+            "row_id_t": column_type(list(map(str, np.arange(0, 20)))),
+            "value": column_type(list(map(str, np.arange(0, 20)))),
+        }
+    )
+
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+    target_pivot = Pivot(target_dp)
+
+    data = {
+        "target": EditTargetConfig(
+            target=target_pivot.config,
+            target_id_column="row_id_t",
+            source_id_column="row_id_s",
+        ).dict(),
+        "value": "100",
+        "column": "value",
+        "row_keys": [15, 16, 18],
+        "primary_key": "row_id_s",
+    }
+    response = client.post(f"/dp/{pivot.id}/edit_target/", json=data)
+
+    assert response.status_code == 200, response.json()
+    assert target_dp["value"][15] == "100"
+    assert target_dp["value"][16] == "100"
+    assert target_dp["value"][18] == "100"
+
+
+def test_remove_row_by_index(dp_testbed):
+    dp = dp_testbed["dp"]
+
+    pivot = Pivot(dp)
+    data = {
+        "row_index": "5",
+    }
+
+    response = client.post(f"/dp/{pivot.id}/remove_row_by_index/", json=data)
+
+    assert response.status_code == 200, response.json()
+
+
+@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+def test_edit_target_missing_id(column_type):
+    dp = mk.DataPanel(
+        {
+            "row_id_s": column_type(list(map(str, np.arange(0, 10)))),
+            "value": column_type(list(map(str, np.arange(10)))),
+        }
+    )
+
+    target_dp = mk.DataPanel(
+        {
+            "row_id_t": column_type(list(map(str, np.arange(5, 20)))),
+            "value": column_type(list(map(str, np.arange(5, 20)))),
+        }
+    )
+
+    dp.data.consolidate()
+    pivot = Pivot(dp)
+    target_pivot = Pivot(target_dp)
+
+    data = {
+        "target": EditTargetConfig(
+            target=target_pivot.config,
+            target_id_column="row_id_t",
+            source_id_column="row_id_s",
+        ).dict(),
+        "value": "100",
+        "column": "value",
+        "row_indices": [2, 6, 8],
+    }
+    response = client.post(f"/dp/{pivot.id}/edit_target/", json=data)
+
+    assert response.status_code == 500, response.json()
 
 
 def test_add(dp_testbed):

@@ -1,4 +1,5 @@
-from typing import List, Union
+from multiprocessing.sharedctypes import Value
+from typing import List, Sequence, Union
 
 import numpy as np
 
@@ -30,17 +31,18 @@ def sort(
     """
     by = [by] if isinstance(by, str) else by
 
-    if len(by) > 1:  # Sort with multiple column
-        keys = []
-        for col in by[::-1]:
-            keys.append(data[col].to_numpy())
+    if isinstance(ascending, bool):
+        ascending = [ascending] * len(by)
 
-        sorted_indices = np.lexsort(keys=keys)
+    if len(ascending) != len(by):
+        raise ValueError(
+            f"Length of `ascending` ({len(ascending)}) must be the same as "
+            f"length of `by` ({len(by)})."
+        )
 
-        if ascending is False:
-            sorted_indices = sorted_indices[::-1].copy()
-
-    else:  # Sort with single column
-        sorted_indices = data[by[0]].argsort(ascending=ascending, kind=kind)
+    df = data[by].to_pandas()
+    df["_sort_idx_"] = np.arange(len(df))
+    df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)
+    sorted_indices = df["_sort_idx_"]
 
     return data.lz[sorted_indices]

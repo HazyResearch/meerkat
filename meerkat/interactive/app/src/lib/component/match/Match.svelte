@@ -11,6 +11,7 @@
 	export let against: Writable<string>;
 	export let col: Writable<string>;
 	export let text: Writable<string>;
+	export let title: string = '';
 
 	let status: string = 'waiting';
 
@@ -61,8 +62,13 @@
 	$: against_item ={value: $against, label: $against};
 </script>
 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md">
-	<div class="form-control w-full">
+<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
+	{#if title != ""}
+	<div class="font-bold text-xl text-slate-600 self-start pl-2">
+		{title}
+	</div>
+	{/if}
+	<div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
 				<Status {status} />

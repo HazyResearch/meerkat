@@ -50,7 +50,8 @@ REQUIRED = [
     "ipywidgets>=7.0.0",
     "IPython",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "rich",
 ]
 
 # What packages are optional?
@@ -68,11 +69,6 @@ EXTRAS = {
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
         "twine",
-    ],
-    "interactive": [
-        "plotly",
-        "bokeh",
-        "kaleido",
     ],
     "embeddings-mac": [
         "faiss-cpu",
@@ -94,7 +90,6 @@ EXTRAS = {
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
-    "ml": ["pytorch_lightning"],
 }
 EXTRAS["all"] = list(set(sum(EXTRAS.values(), [])))
 

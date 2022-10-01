@@ -135,6 +135,19 @@ def test_sort_numpy_and_pandas_ascending():
     )
 
 
+def test_sort_numpy_and_pandas_ascending_variable():
+    """Testing all columns after sorting with multiple ascending columns (numpy
+    and tensor)"""
+    test = make_tiebreaker_test_dp(
+        by=["numpy", "pandas"], ascending=[True, False]
+    )
+    assert (
+        (test["tensor"] == mk.TensorColumn([3, 2, 1])).all()
+        and (test["pandas"] == mk.PandasSeriesColumn([9, 7, 9])).all()
+        and (test["numpy"] == mk.NumpyArrayColumn([4, 4, 6])).all()
+    )
+
+
 def test_sort_numpy_and_pandas_and_tensor_ascending():
     """Testing all columns after sorting with multiple ascending columns (numpy
     and pandas and tensor)"""

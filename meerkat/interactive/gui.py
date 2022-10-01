@@ -7,6 +7,7 @@ from IPython.display import IFrame
 from pydantic import BaseModel
 
 import meerkat as mk
+from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.state import state
@@ -14,6 +15,7 @@ from meerkat.state import state
 from .app.src.lib.interfaces.match_table import MatchTableInterface
 from .app.src.lib.interfaces.sliceby import SliceByInterface
 from .startup import is_notebook
+from . import Interface
 
 
 class GUI:
@@ -32,8 +34,17 @@ class DataPanelGUI(GUI):
         interface = MatchTableInterface(dp=self.dp, *args, **kwargs)
         return interface.launch()
 
-    def gallery(self):
-        pass
+    def gallery(self, main_column: str, tag_columns: List[str], **kwargs):
+        return Interface(
+            components=[
+                mk.gui.Gallery(
+                    dp=self.dp,
+                    main_column=main_column,
+                    tag_columns=tag_columns,
+                    **kwargs,
+                )
+            ]
+        ).launch()
 
 
 class SliceByGUI(GUI):
@@ -61,12 +72,13 @@ class SliceByGUI(GUI):
         Returns:
             IFrame: _description_
         """
-        return SliceByInterface(
+        component = SliceByCards(
             sliceby=self.sb,
             main_column=main_column,
             tag_columns=tag_columns,
             aggregations=aggregations,
-        ).launch()
+        )
+        return mk.gui.Interface(components=[component]).launch()
 
 
 class Aggregation(IdentifiableMixin):

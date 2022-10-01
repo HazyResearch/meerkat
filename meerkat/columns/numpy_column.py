@@ -18,7 +18,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.interactive.formatter import NumpyArrayFormatter
+from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
 
@@ -185,8 +185,18 @@ class NumpyArrayColumn(
         else:
             return self[index]
 
-    @staticmethod
-    def _get_default_formatter() -> Callable:
+    def _get_default_formatter(self) -> Formatter:
+
+        if len(self) == 0:
+            return NumpyArrayFormatter()
+
+        if self.dtype.type is np.str_:
+            return NumpyArrayFormatter(dtype="str")
+
+        cell = self[0]
+        if isinstance(cell, np.generic):
+            return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
+
         return NumpyArrayFormatter()
 
     def sort(
@@ -212,14 +222,13 @@ class NumpyArrayColumn(
         return self[sorted_index]
 
     def argsort(
-        self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
+        self, ascending: bool = True, kind: str = "quicksort"
     ) -> NumpyArrayColumn:
         """Return indices that would sorted the column.
 
         Args:
-            ascending (Union[bool, List[bool]]): Whether to sort in ascending or
-                descending order. If a list, must be the same length as `by`. Defaults
-                to True.
+            ascending (bool): Whether to sort in ascending or
+                descending order.
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
@@ -230,14 +239,14 @@ class NumpyArrayColumn(
         num_columns = len(np.shape(self))
         # Raise error if array has more than one column
         if num_columns > 1:
-            raise Exception("No implementation for array with more than one column.")
+            idxs = np.lexsort(self.data)
+        else:
+            idxs = np.argsort(self.data, axis=0, kind=kind, order=None)
 
-        # returns indices of descending order of array
         if not ascending:
-            return np.argsort(-1 * self.data, axis=0, kind=kind, order=None)
+            idxs = idxs[::-1]
 
-        # returns indices of ascending order of array
-        return np.argsort(self.data, axis=0, kind=kind, order=None)
+        return idxs
 
     def to_tensor(self) -> torch.Tensor:
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is

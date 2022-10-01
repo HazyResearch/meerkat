@@ -2,7 +2,7 @@ from abc import ABC
 from collections import defaultdict
 from copy import copy
 from dataclasses import dataclass
-from functools import wraps
+from functools import partial, wraps
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -12,11 +12,14 @@ from typing import (
     Hashable,
     List,
     Set,
+    Tuple,
+    Type,
     TypeVar,
     Union,
 )
 
-from pydantic import BaseModel
+from tqdm import tqdm
+from pydantic import BaseModel, StrictInt, StrictStr, StrictFloat, StrictBool
 
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
@@ -41,8 +44,9 @@ class NodeMixin:
         return len(self.children) > 0
 
 
-Primitive = Union[int, str, float, bool]
+Primitive = Union[StrictInt, StrictStr, StrictFloat, StrictBool]
 Storeable = Union[
+    None,
     Primitive,
     List[Primitive],
     Dict[Primitive, Primitive],
@@ -54,6 +58,7 @@ Storeable = Union[
 class BoxConfig(BaseModel):
     box_id: str
     type: str = "DataPanel"
+    is_store: bool = True
 
 
 T = TypeVar("T", "DataPanel", "SliceBy")
@@ -122,9 +127,10 @@ class StoreConfig(BaseModel):
     store_id: str
     value: Any
     has_children: bool
+    is_store: bool = True
 
 
-class Store(IdentifiableMixin, NodeMixin):
+class Store(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "stores"
 
     def __init__(self, value: Any):
@@ -144,6 +150,7 @@ def make_store(value: Union[str, Storeable]):
     if isinstance(value, Store):
         return value
     return Store(value)
+
 
 def make_box(value: Union[any, Box]):
     if isinstance(value, Box):
@@ -178,11 +185,15 @@ def _update_result(result: object, update: object, modifications: List[Modificat
     from meerkat.datapanel import DataPanel
 
     if isinstance(result, list):
-        return [_update_result(r, u) for r, u in zip(result, update)]
+        return [_update_result(r, u, modifications) for r, u in zip(result, update)]
     elif isinstance(result, tuple):
-        return tuple(_update_result(r, u) for r, u in zip(result, update))
+        return tuple(
+            _update_result(r, u, modifications) for r, u in zip(result, update)
+        )
     elif isinstance(result, dict):
-        return {k: _update_result(v, update[k]) for k, v in result.items()}
+        return {
+            k: _update_result(v, update[k], modifications) for k, v in result.items()
+        }
     elif isinstance(result, Box):
         result.obj = update
         if isinstance(result.obj, DataPanel):
@@ -192,6 +203,7 @@ def _update_result(result: object, update: object, modifications: List[Modificat
         return result
     elif isinstance(result, Store):
         result.value = update
+        modifications.append(StoreModification(id=result.id, value=update))
         return result
     else:
         return update
@@ -243,7 +255,15 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
     ]
 
-    new_modifications = [mod for op in order for mod in op()]
+    print(f"trigged pipeline: {'->'.join([node.fn.__name__ for node in order])}")
+    new_modifications = []
+    with tqdm(total=len(order)) as pbar:
+        for op in order:
+            pbar.set_postfix_str(f"Running {op.fn.__name__}")
+            mods = op()
+            new_modifications.extend(mods)
+            pbar.update(1)
+
     return modifications + new_modifications
 
 
@@ -276,41 +296,106 @@ def _unpack_boxes_and_stores(*args, **kwargs):
     return unpacked_args, unpacked_kwargs, boxes, stores
 
 
-def _pack_boxes_and_stores(obj):
+def _nested_apply(obj: object, fn: callable, return_type: type = None):
+    if return_type is Store or return_type is Box:
+        return fn(obj, return_type=return_type)
+
+    if isinstance(obj, list):
+        if return_type is not None:
+            assert return_type.__origin__ is list
+            return_type = return_type.__args__[0]
+        return [_nested_apply(v, fn=fn, return_type=return_type) for v in obj]
+    elif isinstance(obj, tuple):
+        if return_type is not None:
+            assert return_type.__origin__ is tuple
+            return_type = return_type.__args__[0]
+        return tuple(_nested_apply(v, fn=fn, return_type=return_type) for v in obj)
+    elif isinstance(obj, dict):
+        if return_type is not None:
+            assert return_type.__origin__ is dict
+            return_type = return_type.__args__[1]
+        return {
+            k: _nested_apply(v, fn=fn, return_type=return_type) for k, v in obj.items()
+        }
+    else:
+        return fn(obj, return_type=return_type)
+
+
+def _pack_boxes_and_stores(obj, return_type: type = None):
     from meerkat.datapanel import DataPanel
     from meerkat.ops.sliceby.sliceby import SliceBy
+    if return_type is Store:
+        return Store(obj)
+    elif return_type is Derived:
+        return Derived(obj)
 
     if isinstance(obj, (DataPanel, SliceBy)):
         return Derived(obj)
-    if isinstance(obj, Storeable):
+
+    # TODO(Sabri): we should think more deeply about how to handle nested outputs
+    if obj is None or isinstance(obj, (int, float, str, bool)):
         return Store(obj)
     return obj
 
 
-def interface_op(fn: Callable):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        # TODO(Sabri): this should be nested
-        unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
-            *args, **kwargs
-        )
+def interface_op(
+    fn: Callable = None, nested_return: bool = True, return_type: type = None
+) -> Callable:
+    """
+    Functions decorated with this will create nodes in the operation graph.
 
-        result = fn(*unpacked_args, **unpacked_kwargs)
+    Args:
+        fn: The function to decorate.
+        nested_return: Whether the function returns an object (e.g. List, Dict) with
+            a nested structure. If True, a `Store` or `Derived` will be created for
+            every element in the nested structure. If False, a single `Store` or
+            `Derived` wrapping the entire object will be created. For example, if the
+            function returns two DataPanels in a tuple, then `nested_return` should be
+            `True`. However, if the functions returns a variable length list of ints,
+            then `nested_return` should likely be `False`.
+    """
+    if fn is None:
+        # need to make passing args to the args optional
+        # note: all of the args passed to the decorator MUST be optional
+        return partial(interface_op, nested_return=nested_return, return_type=return_type)
 
-        if len(boxes) > 0 or len(stores) > 0:
-            derived = nested_apply(result, fn=_pack_boxes_and_stores)
-            op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+    def _interface_op(fn: Callable):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            # TODO(Sabri): this should be nested
+            unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
+                *args, **kwargs
+            )
 
-            for input_box in boxes:
-                input_box.children.add(op)
-            for input_store in stores:
-                input_store.children.add(op)
+            result = fn(*unpacked_args, **unpacked_kwargs)
 
-            return derived
+            if len(boxes) > 0 or len(stores) > 0:
+                from meerkat.datapanel import DataPanel
+                from meerkat.ops.sliceby.sliceby import SliceBy
 
-        return result
+                if nested_return:
+                    derived = _nested_apply(
+                        result, fn=_pack_boxes_and_stores, return_type=return_type
+                    )
+                elif isinstance(result, (DataPanel, SliceBy)):
+                    derived = Derived(result)
+                else:
+                    derived = Store(result)
 
-    return wrapper
+                op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+
+                for input_box in boxes:
+                    input_box.children.add(op)
+                for input_store in stores:
+                    input_store.children.add(op)
+
+                return derived
+
+            return result
+
+        return wrapper
+
+    return _interface_op(fn)
 
 
 @interface_op

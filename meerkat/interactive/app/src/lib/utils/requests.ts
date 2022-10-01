@@ -36,11 +36,9 @@ export async function modify(url: string, data: any): Promise<any> {
     for (let modification of modifications) {
         if (modification.type === 'box') {
             // Box modification
-            console.log(modification.id)
             if (!global_stores.has(modification.id)) {
                 // derived objects may not be maintained on the frontend 
                 // TODO: consider adding a mechanism to add new derived objects to the frontend
-                console.log("skipping")
                 continue
             }
             let store = global_stores.get(modification.id)
@@ -54,6 +52,13 @@ export async function modify(url: string, data: any): Promise<any> {
             //get_store(store_lock).add(modification.id);
             let store = global_stores.get(modification.id);
 
+            if (store === undefined) {
+                console.log(
+                    "Store is not maintained on the frontend. Only stores passed as props to a component are maintained in `global_stores`.",
+                    modification.id
+                )
+                continue;
+            }
             // set with trigger=false so that the store change doesn't trigger backend 
             if (!("trigger_store" in store)) {
                 throw "Must use `meerkat_writable` for backend stores."

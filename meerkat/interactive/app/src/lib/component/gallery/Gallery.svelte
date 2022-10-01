@@ -1,10 +1,11 @@
 <script lang="ts">
 	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Gallery from '$lib/components/gallery/Gallery.svelte';
-	import GallerySlider from '$lib/component/gallery/GallerySlider.svelte';
+	import Cards from './Cards.svelte';
+	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';
+import Selected from './Selected.svelte';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
@@ -12,11 +13,13 @@
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let edit_target: Any;
+	export let primary_key: string;
+	export let selected: Writable<Array<string>>;
 
 	export let page: number = 0;
-	export let per_page: number = 100;
+	export let per_page: number = 20;
 
-	export let cell_size: number = 12;
+	export let cell_size: number = 24;
 
 	$: schema_promise = $get_schema($dp.box_id);
 	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
@@ -32,22 +35,28 @@
 
 		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
 	}
+
 </script>
 
-<div class="flex-1 rounded-lg mx-3 overflow-hidden bg-slate-100">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
 	{#await schema_promise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
 	{:then schema}
 		<div class="h-full grid grid-rows-[auto_1fr] relative">
-			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-200">
-				<div class="font-semibold self-center">
-					
+			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
+				<div class="font-semibold self-center px-10 flex space-x-2">
+					{#if $selected.length > 0}
+						<Selected></Selected>
+						<div class="text-violet-600">{$selected.length} </div> 
+					{/if}
 				</div>
-				<span class="font-bold text-xl text-slate-600 self-center justify-self-center"> Gallery </span>
-				<span class="font-semibold self-center justify-self-end"> 
-					<GallerySlider bind:size={cell_size} />	 
+				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">
+					Examples
+				</span>
+				<span class="font-semibold self-center justify-self-end">
+					<GallerySlider bind:size={cell_size} />
 				</span>
 			</div>
 			<div class="h-full overflow-y-scroll">
@@ -56,7 +65,15 @@
 						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 					</div>
 				{:then rows}
-					<Gallery {schema} {rows} main_column={$main_column} tag_columns={$tag_columns} bind:cell_size={cell_size} />
+					<Cards
+						{schema}
+						{rows}
+						{primary_key}
+						main_column={$main_column}
+						tag_columns={$tag_columns}
+						bind:cell_size
+						bind:selected
+					/>
 				{:catch error}
 					{error}
 				{/await}

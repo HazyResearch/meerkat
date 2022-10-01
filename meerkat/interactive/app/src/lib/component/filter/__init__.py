@@ -1,15 +1,30 @@
-from dataclasses import dataclass
-from ..abstract import Component
-from typing import Dict, Any, Sequence
-from meerkat.interactive.graph import Box, Store
-
-from typing import List, Union, Any
-
-from meerkat import AbstractColumn, DataPanel, PandasSeriesColumn, NumpyArrayColumn
-from meerkat.interactive.graph import interface_op
-import meerkat as mk
 import functools
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
+
 import numpy as np
+import pandas as pd
+from pydantic import BaseModel
+
+from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.interactive.graph import Box, Store, interface_op, make_store
+
+from ..abstract import Component
+
+if TYPE_CHECKING:
+    from meerkat import AbstractColumn, DataPanel
+
+
+def _in(column: AbstractColumn, value):
+    if not isinstance(value, (tuple, list)):
+        value = [value]
+    if not isinstance(column, PandasSeriesColumn):
+        data = pd.Series(column.data)
+    else:
+        data = column.data
+    return data.isin(value)
+
 
 # Map a string operator to a function that takes a value and returns a boolean.
 _operator_str_to_func = {
@@ -20,23 +35,58 @@ _operator_str_to_func = {
     ">=": lambda x, y: x >= y,  # greater than or equal to
     "<=": lambda x, y: x <= y,  # less than or equal to
     # TODO (arjundd): Add support for "in" and "not in" operators.
-    # "in": lambda x, y: x in y,  # in
-    # "not in": lambda x, y: x not in y,  # not in
+    "in": _in,
+    "not in": lambda x, y: ~_in(x, y),
 }
 
 
-@dataclass
-class FilterCriterion:
+class FilterCriterion(BaseModel):
     is_enabled: bool
     column: str
     op: str
     value: Any
+    source: Optional[str] = ""
+    is_fixed: bool = False
+
+
+def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
+    """Parse the filter criterion from the string.
+
+    Args:
+        criterion: The string representation of the criterion.
+            Examples: "label == data"
+
+    Returns:
+        Dict[str, Any]: The column, op, and value dicts required
+            to construct the FilterCriterion.
+    """
+    # Parse all the longer op keys first.
+    # This is to avoid split on a shorter key that could be a substring of a larger key.
+    operators = sorted(_operator_str_to_func.keys(), key=lambda x: len(x), reverse=True)
+    column = None
+    value = None
+    for op in operators:
+        if op not in criterion:
+            continue
+        candidates = criterion.split(op)
+        if len(candidates) != 2:
+            raise ValueError(
+                "Expected format: <column> <op> <value> (e.g. 'label == car')."
+            )
+
+        column, value = tuple(candidates)
+        value = value.strip()
+        if "," in value:
+            value = [x.strip() for x in value.split(",")]
+        return dict(column=column.strip(), value=value, op=op)
+    return None
+    # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
 @interface_op
 def filter_by_operator(
-    data: Union[DataPanel, AbstractColumn],
-    criteria: Sequence[Dict[str, Any]]
+    data: Union["DataPanel", "AbstractColumn"],
+    criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
 ):
     """Filter data based on operations.
 
@@ -60,7 +110,16 @@ def filter_by_operator(
         mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
-    criteria: List[FilterCriterion] = [FilterCriterion(**criterion) for criterion in criteria]
+    import meerkat as mk
+
+    # since the criteria can either be a list of dictionary or of FilterCriterion
+    # we need to convert them to FilterCriterion
+    criteria = [
+        criterion
+        if isinstance(criterion, FilterCriterion)
+        else FilterCriterion(**criterion)
+        for criterion in criteria
+    ]
 
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
@@ -75,20 +134,27 @@ def filter_by_operator(
     #     isinstance(data[column], supported_column_types) for column in input_columns
     # ):
     #     raise ValueError(f"All columns must be one of {supported_column_types}")
-    
+
     # Filter pandas series columns.
     # TODO (arjundd): Make this more efficient to perform filtering sequentially.
-    all_series = []
+    all_masks = []
     for criterion in criteria:
         col = data[criterion.column]
-        value = col.dtype.type(criterion.value)
-        if isinstance(col, NumpyArrayColumn):
-            value = np.asarray(value, dtype=col.dtype)
 
-        df = _operator_str_to_func[criterion.op](col, value)
-        all_series.append(np.asarray(df))
+        # values should be split by "," when using in/not-in operators.
+        if "in" in criterion.op:
+            value = [x.strip() for x in criterion.value.split(",")]
+            if isinstance(col, mk.NumpyArrayColumn):
+                value = np.asarray(value, dtype=col.dtype).tolist()
+        else:
+            value = col.dtype.type(criterion.value)
+            if isinstance(col, mk.NumpyArrayColumn):
+                value = np.asarray(value, dtype=col.dtype)
 
-    mask = functools.reduce(lambda x, y: x & y, all_series)
+        mask = _operator_str_to_func[criterion.op](col, value)
+        all_masks.append(np.asarray(mask))
+    mask = np.stack(all_masks, axis=1).all(axis=1)
+
     return data.lz[mask]
 
 
@@ -103,15 +169,24 @@ class Filter(Component):
     We recommend performing filtering before other out-of-place operations,
     like sorting, to avoid unnecessary computation.
     """
+
     name = "Filter"
 
-    def __init__(self, dp: Box):
+    def __init__(
+        self,
+        dp: Box["DataPanel"],
+        criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
+        title: str = "",
+    ):
         super().__init__()
         self.dp = dp
 
-        criteria: List[Dict[str, Any]] = []
-        self.criteria = Store(criteria)  # Dict[str, List[Any]]
+        if criteria is None:
+            criteria = []
+
+        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
         self.operations = list(_operator_str_to_func.keys())
+        self.title = title
 
     def derived(self):
         """Return a derived object that filters the pivot datapanel."""
@@ -122,5 +197,6 @@ class Filter(Component):
         return {
             "dp": self.dp.config,
             "criteria": self.criteria.config,
-            "operations": self.operations
+            "operations": self.operations,
+            "title": self.title,
         }

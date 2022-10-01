@@ -17,6 +17,7 @@
 	export let data: any;
 	export let cell_component: string = '';
 	export let cell_props: object = {};
+	export let editable: boolean = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -32,6 +33,14 @@
 {:else if cell_component === 'code'}
 	<Code {data} {...cell_props} />
 {:else}
-	<BasicType {data} {...cell_props}/>
-	<!-- <input class="bg-transparent w-fit" on:change={edit} bind:value={data} /> -->
+	{#if editable}
+		<!-- TODO(Sabri): Make this work with the BasicType formatting -->
+		<input 				
+			class="input input-bordered grow h-7 px-3 rounded-md shadow-md"
+			on:change={edit} 
+			bind:value={data} 
+		/>
+	{:else}
+		<BasicType {data} {...cell_props} />
+	{/if}
 {/if}

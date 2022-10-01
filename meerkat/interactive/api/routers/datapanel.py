@@ -1,16 +1,19 @@
 import functools
-from multiprocessing.sharedctypes import Value
 from typing import Any, Dict, List, Union
 
+import numpy as np
 from fastapi import APIRouter, Body, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictInt, StrictStr
 
 import meerkat as mk
+from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
+from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
-
+import pandas as pd
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
@@ -94,6 +97,8 @@ def rows(
     start: int = Body(None),
     end: int = Body(None),
     indices: List[int] = Body(None),
+    key_column: str = Body(None),
+    keys: List[Union[StrictInt, StrictStr]] = Body(None),
     columns: List[str] = Body(None),
 ) -> RowsResponse:
     """Get rows from a DataPanel as a JSON object."""
@@ -113,6 +118,14 @@ def rows(
             end = len(dp)
         dp = dp.lz[start:end]
         indices = list(range(start, end))
+    elif keys is not None:
+        if key_column is None:
+            # TODO(sabri): when we add support for primary keys this should defualt to 
+            # the primary key
+            raise ValueError("Must provide key_column if keys are provided")
+        
+        # FIXME(sabri): this will only work if key_column is a pandas column
+        dp = dp.lz[dp[key_column].isin(keys)]
     else:
         raise ValueError()
 
@@ -127,6 +140,24 @@ def rows(
         full_length=full_length,
         indices=indices,
     )
+
+
+@router.post("/{box_id}/remove_row_by_index/")
+def remove_row_by_index(
+    box_id: str, row_index: int = EmbeddedBody()
+) -> List[Modification]:
+    box = state.identifiables.get(group="boxes", id=box_id)
+
+    dp = box.obj
+    dp = dp.lz[np.arange(len(dp)) != row_index]
+    # this is an out-of-place operation, so the box should be updated
+    # TODO(karan): double check this
+    box.obj = dp
+
+    modifications = trigger(
+        modifications=[BoxModification(id=box_id, scope=dp.columns)]
+    )
+    return modifications
 
 
 @router.post("/{box_id}/edit/")
@@ -147,6 +178,82 @@ def edit(
     dp[column][mask] = value
 
     modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
+    return modifications
+
+
+@router.post("/{box_id}/edit_target/")
+def edit_target(
+    box_id: str,
+    target: EditTargetConfig = Body(),
+    value=Body(),  # don't set type
+    column: str = Body(),
+    row_indices: List[int] = Body(None),
+    row_keys: List[Union[StrictInt, StrictStr]] = Body(None),
+    primary_key: str = Body(None),
+    metadata: Dict[str, Any] = Body(None),
+):
+    """Edit a target datapanel.
+
+    Args:
+        metadata (optional): Additional metadata to write.
+            This should be a mapping from column_name -> value.
+            Currently only unitary values are supported.
+    """
+    if (row_indices is None) == (row_keys is None):
+        raise HTTPException(
+            status_code=400,
+            detail="Exactly one of row_indices or row_keys must be specified",
+        )
+
+    dp = state.identifiables.get(group="boxes", id=box_id).obj
+
+    target_dp = state.identifiables.get(group="boxes", id=target.target.box_id).obj
+
+    if row_indices is not None:
+        source_ids = dp[target.source_id_column][row_indices]
+    else:
+        if primary_key is None:
+            # TODO(): make this work once we've implemented primary_key
+            raise NotImplementedError()
+            # primary_key = target_dp.primary_key
+        source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
+
+    mask = target_dp[target.target_id_column].isin(source_ids)
+
+    if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
+        breakpoint()
+        raise HTTPException(
+            status_code=500, detail="Target datapanel does not contain all source ids."
+        )
+    target_dp[column][mask] = value
+
+    # TODO: support making a column if the column does not exist.
+    # This requires deducing the column type and the default value
+    # to fill in.
+    if metadata is not None:
+        for column_name, col_value in metadata.items():
+            value = col_value
+            default = None
+            if isinstance(value, dict):
+                value = col_value["value"]
+                default = col_value["default"]
+            if column_name not in target_dp.columns:
+                if default is None:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Column {column_name} does not exist in target datapanel",
+                    )
+                default_col = np.full(len(target_dp), default)
+                if isinstance(default, str):
+                    default_col = PandasSeriesColumn([default] * len(target_dp))
+                else:
+                    default_col = NumpyArrayColumn(np.full(len(target_dp), default))
+                target_dp[column_name] = default_col
+            target_dp[column_name][mask] = value
+
+    modifications = trigger(
+        modifications=[BoxModification(id=target.target.box_id, scope=[column])]
+    )
     return modifications
 
 

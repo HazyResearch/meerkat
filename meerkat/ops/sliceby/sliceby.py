@@ -34,6 +34,7 @@ class SliceBy(IdentifiableMixin):
         by: Union[List[str], str],
         sets: Dict[Union[SliceKey, Tuple[SliceKey]], np.ndarray] = None,
         scores: Dict[Union[SliceKey, Tuple[SliceKey], np.ndarray]] = None,
+        masks: Dict[Union[SliceKey, Tuple[SliceKey]], np.ndarray] = None,
     ):
         super().__init__()
         # exactly one of sets and scores must be provided
@@ -171,7 +172,6 @@ def sliceby(
     """
     if isinstance(by, str):
         by = [by]
-
     return SliceBy(
         data=data,
         by="slice",

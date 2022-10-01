@@ -1,5 +1,6 @@
 import functools
-from typing import Any, Dict, List, Union
+import re
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
@@ -20,6 +21,48 @@ router = APIRouter(
     tags=["ops"],
     responses={404: {"description": "Not found"}},
 )
+_SUPPORTED_MATCH_OPS = {
+    "+": lambda x, y: x + y,
+    "-": lambda x, y: x - y,
+    "*": lambda x, y: x * y,
+    "/": lambda x, y: x / y,
+    "**": lambda x, y: x**y,
+}
+
+
+def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
+    """Parse a query string into a list of columns and operations to perform.
+
+    This parser is not exhaustive and should only be used to parse simple
+    operations (e.g. addition, subtraction, division, multiplication) between
+    two columns.
+
+    To run an operation between two query results, each query must be wrapped
+    in double quotation marks (e.g. "query1" + "query2"). Single quotation marks
+    will be ignored.
+    """
+
+    def _process_queries(queries):
+        # Remove quotation marks from queries.
+        return [q.replace('"', "") for q in queries]
+
+    queries = re.findall('"[^"]*"', query)
+    if not queries:
+        return [query], None
+
+    # Remove quotation marks from queries.
+    if len(queries) == 1:
+        return _process_queries(queries), None
+
+    if len(queries) != 2:
+        raise ValueError(
+            f"Invalid query string - expected two columns, got {len(queries)}"
+        )
+    op = query.replace(queries[0], "").replace(queries[1], "").replace('"', "").strip()
+    if op not in _SUPPORTED_MATCH_OPS:
+        raise ValueError(f"Invalid query string - unsupported operation {op}")
+    queries = _process_queries(queries)
+    return queries, op
 
 
 @router.post("/{box_id}/match/")
@@ -37,16 +80,25 @@ def match(
         raise HTTPException(
             status_code=400, detail="`match` expects a box containing a datapanel"
         )
-    # write the query to a file
-    with open("/tmp/query.txt", "w") as f:
-        f.write(query)
 
     try:
+        # Parse the string to see if we should be running some operation on it.
+        # TODO (arjundd): Support more than one op. Potentially parse the string in order?
+        queries, op = _regex_parse_query(query)
         dp, match_columns = mk.match(
-            data=dp, query=query, input=input, return_column_names=True
+            data=dp, query=queries, input=input, return_column_names=True
         )
+        if len(match_columns) > 1:
+            assert op is not None
+            col = f"_match_{input}_{query}"
+            dp[col] = _SUPPORTED_MATCH_OPS[op](
+                dp[match_columns[0]], dp[match_columns[1]]
+            )
+            match_columns = [col] + match_columns
+
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(e)
+        raise HTTPException(status_code=404, detail=str(e))
 
     modifications = [
         BoxModification(id=box_id, scope=match_columns),

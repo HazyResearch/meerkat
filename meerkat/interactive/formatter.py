@@ -96,30 +96,53 @@ class ObjectFormatter(Formatter):
         return str(cell)
 
 
-class NumpyArrayFormatter(Formatter):
+class NumpyArrayFormatter(BasicFormatter):
     cell_component = "basic"
 
     def encode(self, cell: Any):
         if isinstance(cell, np.ndarray):
             return str(cell)
-        return format_array(np.array([cell]), formatter=None)[0]
+        return super().encode(cell)
 
     def html(self, cell: Any):
-        cell = self.encode(cell)
-        return cell
+        if isinstance(cell, np.ndarray):
+            return str(cell)
+        return format_array(np.array([cell]), formatter=None)[0]
 
 
-class TensorFormatter(Formatter):
+class IntervalFormatter(NumpyArrayFormatter):
+    cell_component = "interval"
+
+    def encode(self, cell: Any):
+        if cell is not np.ndarray:
+            return super().encode(cell)
+        
+        if cell.shape[0] != 3:
+            raise ValueError(
+                "Cell used with `IntervalFormatter` must be np.ndarray length 3 "
+                "length 3. Got shape {}".format(cell.shape)
+            )
+
+        return [super().encode(v) for v in cell] 
+
+    def html(self, cell: Any):
+        if isinstance(cell, np.ndarray):
+            return str(cell)
+        return format_array(np.array([cell]), formatter=None)[0]
+
+
+class TensorFormatter(BasicFormatter):
     cell_component = "basic"
 
     def encode(self, cell: Any):
         if isinstance(cell, torch.Tensor):
             return str(cell)
-        return format_array(np.array([cell]), formatter=None)[0]
+        return super().encode(cell)
 
     def html(self, cell: Any):
-        cell = self.encode(cell)
-        return cell
+        if isinstance(cell, torch.Tensor):
+            return str(cell)
+        return format_array(np.array([cell]), formatter=None)[0]
 
 
 class PILImageFormatter(Formatter):

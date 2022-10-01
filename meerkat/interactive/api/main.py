@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import box, datapanel, interface, llm, ops, sliceby, store
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 app.include_router(interface.router)
 app.include_router(datapanel.router)

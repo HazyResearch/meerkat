@@ -20,6 +20,7 @@
 	{max}
 	bind:value
 	{step}
+	{size}
 	class={inputClass}
 	on:change
 	on:click
