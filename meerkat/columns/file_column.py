@@ -90,7 +90,7 @@ class FileLoader:
                         f'`cache_dir="{cache_dir}"` contains an undefined environment'
                         "variable."
                     )
-                dst = os.path.join(self.cache_dir, parse.netloc + parse.path)
+                dst = os.path.join(cache_dir, parse.netloc + parse.path)
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
             else:
                 # if there's no cache_dir, we just download to a temporary directory
