@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import urllib
 
 import meerkat as mk
 
@@ -14,7 +15,6 @@ REPO = "https://github.com/NationalGalleryOfArt/opendata.git"
 
 @datasets.register()
 class ngoa(DatasetBuilder):
-    from meerkat.columns.file_column import Downloader
 
     VERSIONS = ["main"]
 
@@ -41,7 +41,10 @@ class ngoa(DatasetBuilder):
         )
         db["published_images"]["image"] = mk.ImageColumn.from_filepaths(
             db["published_images"]["iiifthumburl"],
-            loader=Downloader(cache_dir=os.path.join(base_dir, "iiifthumburl")),
+            loader=mk.FileLoader(
+                downlaoder=urllib.request.urlretrieve,
+                cache_dir=os.path.join(base_dir, "iiifthumburl")
+            ),
         )
         return db
 

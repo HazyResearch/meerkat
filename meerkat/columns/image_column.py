@@ -1,15 +1,21 @@
 from __future__ import annotations
+from io import BytesIO
 
 import logging
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Union
 
 from meerkat.columns.file_column import FileColumn
 from meerkat.interactive.formatter import PILImageFormatter
 from meerkat.tools.lazy_loader import LazyLoader
-
-folder = LazyLoader("torchvision.datasets.folder")
+from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+
+def load_image(f: Union[str, BytesIO, Path]):
+    img = Image.open(f)
+    return img.convert("RGB")
 
 
 class ImageColumn(FileColumn):
@@ -47,4 +53,4 @@ class ImageColumn(FileColumn):
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
-        return folder.default_loader(*args, **kwargs)
+        return load_image(*args, **kwargs)

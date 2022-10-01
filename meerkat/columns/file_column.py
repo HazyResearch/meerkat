@@ -1,11 +1,14 @@
 from __future__ import annotations
+from ctypes import Union
+import io
+import functools
 
 import logging
 import os
 import urllib.request
 import warnings
 from string import Template
-from typing import Sequence
+from typing import BinaryIO, BinaryIO, Callable, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlparse
 
@@ -28,22 +31,42 @@ class FileLoader:
         self,
         transform: callable = None,
         loader: callable = None,
+        downloader: Union[str, Callable] = None,
+        cache_dir: str = None,
         base_dir: str = None,
     ):
+        """
+        Args:
+            downloader (callable): a callable that accepts two positional arguments -
+                a URI and a destination (which could be either a string or file object)
+        """
         self.transform = transform
         self.loader = loader
         self.base_dir = base_dir
+        if downloader == "url":
+            self.downloader = download_url
+        elif downloader == "gcs":
+            self.downloader = download_gcs
+        else:
+            self.downloader = downloader
+        self.cache_dir = cache_dir
 
     def __call__(self, filepath: str):
-        # support invluding environment varaiables in the base_dir so that DataPanels
+        """
+        Args:
+            filepath (str): If `downloader` is None, this is interpreted as a local
+                filepath. Otherwise, it is interpreted as a URI from which the file can
+                be downloaded.
+        """
+        # support including environment varaiables in the base_dir so that DataPanels
         # can be easily moved between machines
-        # we don't use os.expanvars because it doesn't raise an error
         if self.base_dir is not None:
 
             # need to convert Path objects to strings for Template to work
             base_dir = str(self.base_dir)
 
             try:
+                # we don't use os.expanvars because it raises an error
                 base_dir = Template(base_dir).substitute(os.environ)
             except KeyError:
                 raise ValueError(
@@ -52,11 +75,35 @@ class FileLoader:
                 )
             filepath = os.path.join(base_dir, filepath)
 
-        image = self.loader(filepath)
+        if self.downloader is not None:
+            parse = urlparse(filepath)
+
+            if self.cache_dir is not None:
+                # need to convert Path objects to strings for Template to work
+                cache_dir = str(self.cache_dir)
+
+                try:
+                    # we don't use os.expanvars because it raises an error
+                    cache_dir = Template(cache_dir).substitute(os.environ)
+                except KeyError:
+                    raise ValueError(
+                        f'`cache_dir="{cache_dir}"` contains an undefined environment'
+                        "variable."
+                    )
+                dst = os.path.join(self.cache_dir, parse.netloc + parse.path)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+            else:
+                # if there's no cache_dir, we just download to a temporary directory
+                dst = io.BytesIO()
+
+            self.downloader(filepath, dst)
+            filepath = dst
+
+        data = self.loader(filepath)
 
         if self.transform is not None:
-            image = self.transform(image)
-        return image
+            data = self.transform(data)
+        return data
 
     def __eq__(self, other: FileLoader) -> bool:
         return (
@@ -146,11 +193,17 @@ class FileColumn(LambdaColumn):
         *args,
         **kwargs,
     ):
-        fn = FileLoader(
-            transform=transform,
-            loader=self.default_loader if loader is None else loader,
-            base_dir=base_dir,
-        )
+        if isinstance(loader, FileLoader):
+            fn = loader
+            if fn.loader is None:
+                fn.loader = self.default_loader
+
+        else:
+            fn = FileLoader(
+                transform=transform,
+                loader=self.default_loader if loader is None else loader,
+                base_dir=base_dir,
+            )
 
         if not isinstance(data, PandasSeriesColumn):
             data = PandasSeriesColumn(data)
@@ -255,33 +308,35 @@ class FileColumn(LambdaColumn):
         return (other.__class__ == self.__class__) and self.data.is_equal(other.data)
 
 
-def download_image(url: str, cache_dir: str):
-    parse = urlparse(url)
-    local_path = os.path.join(cache_dir, parse.netloc + parse.path)
+def download_url(url: str, dst: Union[str, io.BytesIO]):
+    if isinstance(dst, str):
+        return urllib.request.urlretrieve(url=url, filename=dst)
+    else:
+        import requests
 
-    if not os.path.exists(local_path):
-        os.makedirs(os.path.dirname(local_path), exist_ok=True)
-        try:
-            urllib.request.urlretrieve(url, local_path)
-        except (HTTPError, ConnectionResetError):
-            logger.warning(f"Could not download {url}. Skipping.")
-            return None
-
-    return folder.default_loader(local_path)
+        response = requests.get(url)
+        dst.write(response.content)
+        dst.seek(0)
+        return dst
 
 
-class Downloader:
-    def __init__(
-        self,
-        cache_dir: str,
-        downloader: callable = None,
-    ):
-        self.cache_dir = cache_dir
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir)
+@functools.lru_cache
+def _get_gcs_bucket(bucket_name: str, project: str = None):
+    """Get a GCS bucket."""
+    from google.cloud import storage
 
-        if downloader is None:
-            self.downloader = download_image
+    client = storage.Client(project=project)
+    return client.bucket(bucket_name)
 
-    def __call__(self, url: str):
-        return self.downloader(url, self.cache_dir)
+
+def download_gcs(uri: str, dst: Union[str, io.BytesIO]):
+    """Download a file from GCS."""
+    bucket, blob_name = urlparse(uri).netloc, urlparse(uri).path.lstrip("/")
+    bucket = _get_gcs_bucket(bucket_name=uri.split("/")[2])
+    if isinstance(dst, io.BytesIO):
+        dst.write(bucket.blob(str(blob_name)).download_as_bytes())
+        dst.seek(0)
+        return dst
+    else:
+        bucket.blob(str(blob_name)).download_to_filename(dst)
+        return dst
