@@ -95,8 +95,9 @@ class FileLoader:
             else:
                 # if there's no cache_dir, we just download to a temporary directory
                 dst = io.BytesIO()
-
-            self.downloader(filepath, dst)
+            
+            if isinstance(dst, io.BytesIO) or not os.path.exists(dst):
+                self.downloader(filepath, dst)
             filepath = dst
 
         data = self.loader(filepath)
@@ -331,12 +332,20 @@ def _get_gcs_bucket(bucket_name: str, project: str = None):
 
 def download_gcs(uri: str, dst: Union[str, io.BytesIO]):
     """Download a file from GCS."""
+    from google.cloud import exceptions
     bucket, blob_name = urlparse(uri).netloc, urlparse(uri).path.lstrip("/")
     bucket = _get_gcs_bucket(bucket_name=uri.split("/")[2])
-    if isinstance(dst, io.BytesIO):
-        dst.write(bucket.blob(str(blob_name)).download_as_bytes())
-        dst.seek(0)
-        return dst
-    else:
-        bucket.blob(str(blob_name)).download_to_filename(dst)
-        return dst
+
+    try:
+        if isinstance(dst, io.BytesIO):
+            dst.write(bucket.blob(str(blob_name)).download_as_bytes())
+            dst.seek(0)
+            return dst
+        else:
+            bucket.blob(str(blob_name)).download_to_filename(dst)
+            return dst
+    except exceptions.NotFound:
+        os.remove(dst)
+
+        raise FileNotFoundError(uri)
+
