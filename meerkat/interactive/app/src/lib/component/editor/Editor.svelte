@@ -104,7 +104,7 @@
 		{/await}
 	</div>
 	<input
-		type="number"
+		type="text"
 		bind:value={$text}
 		placeholder="Enter a value..."
 		class="input input-bordered grow h-10 px-3 rounded-md shadow-md"

@@ -18,6 +18,7 @@ class Plot(Component):
         y: Union[str, Store],
         x_label: Union[str, Store],
         y_label: Union[str, Store],
+        id: str = "key", 
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
@@ -28,10 +29,14 @@ class Plot(Component):
         self.selection = make_store(selection)
         self.x = make_store(x)
         self.y = make_store(y)
+        self.id = id
         self.x_label = make_store(x_label)
         self.y_label = make_store(y_label)
         self.type = type
         self.slot = slot
+        
+        if metadata_columns is None:
+            metadata_columns = []
         self.metadata_columns = metadata_columns
 
         if keys_to_remove is None:
@@ -48,6 +53,7 @@ class Plot(Component):
             "x_label": self.x_label.config,
             "y_label": self.y_label.config,
             "type": self.type,
+            "id": self.id,
             "keys_to_remove": self.keys_to_remove.config,
         }
         if self.slot is not None:

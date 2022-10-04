@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { interpolatePiYG } from 'd3-scale-chromatic';
+	import { interpolatePuOr } from 'd3-scale-chromatic';
 	import { createEventDispatcher, getContext } from 'svelte';
 
 	const dispatch = createEventDispatcher();
@@ -52,7 +52,7 @@
 				{width}
 				rx="3"
 				on:click={select_point(d.id)}
-				style="fill: {interpolatePiYG((d.x + 1) / 2)};"
+				style="fill: {interpolatePuOr((-d.x + 1) / 2)};"
 			/>
 		{/each}
 	</g>
