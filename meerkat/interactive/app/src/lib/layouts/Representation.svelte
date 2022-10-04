@@ -11,6 +11,7 @@
 	export let components;
 
 	let gallery = components.gallery;
+	let filter = components.filter;
 	let gallery_match = components.match;
 	let gallery_editor = components.gallery_editor;
 	let plot = components.plot;
@@ -18,5 +19,6 @@
 
 <div class="h-screen grid grid-rows-[auto_1fr] gap-4" >
     <Match {...gallery_match.props} />
+	<Filter {...filter.props} />
     <Gallery {...gallery.props} />
 </div>
