@@ -216,9 +216,9 @@ def edit_target(
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_dp.primary_key
-        source_ids = dp[target.source_id_column].lz[dp[primary_key].isin(row_keys)]
+        source_ids = dp[target.source_id_column].lz[np.isin(dp[primary_key], row_keys)]
 
-    mask = target_dp[target.target_id_column].isin(source_ids)
+    mask = np.isin(target_dp[target.target_id_column], source_ids)
 
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
         breakpoint()
