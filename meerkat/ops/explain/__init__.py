@@ -63,7 +63,7 @@ def explain(
 
     if isinstance(target, str):
         # TODO: make this generalizable – this is a hack to make it work for RFW
-        target = {"targets": data[target], "pred_probs": np.zeros_like(target)}
+        target = {"targets": data[target], "pred_probs": None}
 
     elif isinstance(target, Mapping):
         target = {k: data[v] for k, v in target.items()}
