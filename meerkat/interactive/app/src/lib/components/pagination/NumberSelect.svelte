@@ -10,13 +10,13 @@
 	}
 </script>
 
-<div class="themed flex">
+<div class="flex">
 	<div
 		class="inline-flex self-center justify-center w-9/10 px-2 text-sm rounded-l-lg dark:bg-gray-800 dark:text-gray-100"
 	>
 		{hint_text}
 	</div>
-	<div class="self-center">
+	<div class="self-center themed">
 		<Select 
 			value={selection.value}
 			items={options}
@@ -35,7 +35,6 @@
 	*/
 
 	.themed {
-		@apply rounded-md;
 		--tw-bg-opacity: 1;
 		--background: theme(colors.slate.200);
 		--borderHoverColor: theme(colors.violet.600);
@@ -50,6 +49,6 @@
 		--padding: 5px;
 		--itemPadding: 2px;
 		--selectedItemPadding: 0px;
-		--height: 25px;
+		--height: 6px;
 	}
 </style>

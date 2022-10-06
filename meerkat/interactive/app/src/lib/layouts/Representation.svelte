@@ -18,8 +18,8 @@
 	let plot = components.plot;
 </script>
 
-<div class="h-screen grid grid-rows-[auto_1fr] gap-4 py-6">
-	<div class="grid grid-cols-[1fr_1fr] gap-x-3">
+<div class="h-screen grid grid-rows-[auto_1fr] gap-4 py-6 px-6">
+	<div class="grid grid-cols-[1fr_1fr] gap-x-6">
 		<Plot {...plot.props} />
 		<div class="grid grid-rows-[auto_auto_auto] gap-4">
 			<Match {...gallery_match.props} />

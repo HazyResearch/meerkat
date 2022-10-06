@@ -25,6 +25,8 @@
 	export let xlabel: string = 'x label';
 	export let ylabel: string = 'y label';
 
+	export let can_remove: boolean = true;
+
 	let height = 40 * data.length;
 
 	const floor = (x: number, decimals: number): number => {
@@ -45,6 +47,7 @@
 	// Set a context to allow passing of metadata.
 	console.log(metadata);
 	const metadataContext = setContext("FancyHorizontalBarPlotMetadata", { metadata } );
+	const can_remove_context = setContext("can_remove", can_remove)
 </script>
 
 <div class="relative w-full" style:height={`${height}px`}>

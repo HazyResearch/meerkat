@@ -18,6 +18,8 @@
 	export let type: string;
 	export let padding: number = 10;
 	export let keys_to_remove: Writable;
+	export let can_remove: boolean = true;
+
 	// The columns corresponding to metadata to track.
 	export let metadata_columns: Array<string> = [];
 	// Array of metadata objects. Each metadata object can have any arbitrary number
@@ -43,9 +45,10 @@
 			metadata = [];
 			rows.rows?.forEach((row: any) => {
 				const metadata_obj = metadata_columns.reduce((accumulator: any, column: string, index: number) => {
-					accumulator[column] = row[index + 3];
+					accumulator[index] = row[index + 3];
 					return accumulator;
 				}, {});
+				console.log(metadata_obj)
 				metadata.push(metadata_obj);
 			});
 		} else {
@@ -76,6 +79,7 @@
 			bind:ylabel={$y_label}
 			ywidth={128}
 			{padding}
+			{can_remove}
 			on:selection-change={(e) => {
 				$selection = Array.from(e.detail.selected_points);
 			}}

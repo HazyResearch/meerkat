@@ -38,7 +38,7 @@
 	}
 </script>
 
-<div class="bg-slate-100 h-4/5">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
 	{#await schema_promise}
 		waiting....
 	{:then schema}

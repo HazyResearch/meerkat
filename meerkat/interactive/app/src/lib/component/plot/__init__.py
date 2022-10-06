@@ -23,6 +23,7 @@ class Plot(Component):
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
         metadata_columns: Sequence[str] = None,
+        can_remove: bool = True,
     ) -> None:
         super().__init__()
         self.data = data
@@ -34,6 +35,7 @@ class Plot(Component):
         self.y_label = make_store(y_label)
         self.type = type
         self.slot = slot
+        self.can_remove = can_remove
         
         if metadata_columns is None:
             metadata_columns = []
@@ -42,6 +44,7 @@ class Plot(Component):
         if keys_to_remove is None:
             keys_to_remove = []
         self.keys_to_remove = make_store(keys_to_remove)
+
 
     @property
     def props(self):
@@ -55,6 +58,7 @@ class Plot(Component):
             "type": self.type,
             "id": self.id,
             "keys_to_remove": self.keys_to_remove.config,
+            "can_remove": self.can_remove,
         }
         if self.slot is not None:
             props["slot"] = self.slot

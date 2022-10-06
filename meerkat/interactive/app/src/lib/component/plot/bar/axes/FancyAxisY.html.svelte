@@ -7,9 +7,9 @@
 	import FancyTick from './FancyTick.svelte';
 
 	const { padding, xRange, yScale } = getContext('LayerCake');
-	const { metadata } = getContext('FancyHorizontalBarPlotMetadata');
-	console.log("padding", metadata);
-	console.log("metadata", metadata);
+
+	$: metadata = getContext('FancyHorizontalBarPlotMetadata').metadata;
+	
 
 	/** @type {Boolean} [gridlines=true] - Extend lines from the ticks into the chart space */
 	export let gridlines = true;
@@ -31,6 +31,8 @@
 
 	export let width = 128;
 
+	export let close = true;
+
 	$: isBandwidth = typeof $yScale.bandwidth === 'function';
 
 	$: tickVals = Array.isArray(ticks)
@@ -40,6 +42,7 @@
 		: typeof ticks === 'function'
 		? ticks($yScale.ticks())
 		: $yScale.ticks(ticks);
+	
 </script>
 
 <div class="axis y-axis">
@@ -86,7 +89,7 @@
 
 					TODO (arjundd): Make a default value of count so that it doesn't display.
 				-->
-				<FancyTick width="{width}px" name={tick} id={i} size={metadata[i]["count"] || 0} on:remove />
+				<FancyTick width="{width}px" name={tick} id={i} size={metadata[i][0] || 0} on:remove />
 			</div>
 		</div>
 	{/each}

@@ -28,11 +28,16 @@ class DataPanelGUI(GUI):
 
     def table(
         self,
-        *args,
         **kwargs,
     ) -> IFrame:
-        interface = MatchTableInterface(dp=self.dp, *args, **kwargs)
-        return interface.launch()
+        return Interface(
+            components=[
+                mk.gui.Table(
+                    dp=self.dp,
+                    **kwargs,
+                )
+            ]
+        ).launch()
 
     def gallery(self, main_column: str, tag_columns: List[str], **kwargs):
         return Interface(

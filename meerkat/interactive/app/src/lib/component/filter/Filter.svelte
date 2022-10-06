@@ -190,9 +190,9 @@
 				</div>
 			</div>
 		{/each}
-		<div>
-			<button on:click={addCriterion} class="px-3 hover:font-bold">+ Add Filter</button>
-			<button on:click={handleClear} class="px-3 hover:font-bold">Clear All</button>
+		<div class="flex space-x-6 px-2">
+			<button on:click={addCriterion} class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md">+ Add Filter</button>
+			<!-- <button on:click={handleClear} class="px-3 hover:font-bold">Clear All</button> -->
 		</div>
 	</div>
 </div>

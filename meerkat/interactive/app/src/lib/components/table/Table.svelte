@@ -106,7 +106,7 @@
 		</div>
 	</div>
 
-	<div class="table-row-group bg-white">
+	<div class="table-row-group">
 		{#if rows}
 			{#each zip(rows.rows, rows.indices) as [row, index]}
 				<div class="table-row">
