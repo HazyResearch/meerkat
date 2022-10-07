@@ -83,7 +83,7 @@ EXTRAS = {
         "spacy>=3.0.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
-    "audio": ["torchaudio"],
+    "audio": ["librosa"],
     "medimg": [
         "dosma>=0.0.13",
         "kaggle",

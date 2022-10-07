@@ -3,12 +3,13 @@
 1.
 """
 import base64
+import tempfile
 from abc import ABC, abstractmethod
 from io import BytesIO
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
-import PIL
+import soundfile as sf
 import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
@@ -116,14 +117,14 @@ class IntervalFormatter(NumpyArrayFormatter):
     def encode(self, cell: Any):
         if cell is not np.ndarray:
             return super().encode(cell)
-        
+
         if cell.shape[0] != 3:
             raise ValueError(
                 "Cell used with `IntervalFormatter` must be np.ndarray length 3 "
                 "length 3. Got shape {}".format(cell.shape)
             )
 
-        return [super().encode(v) for v in cell] 
+        return [super().encode(v) for v in cell]
 
     def html(self, cell: Any):
         if isinstance(cell, np.ndarray):
@@ -212,3 +213,31 @@ class CodeFormatter(Formatter):
     @property
     def cell_props(self):
         return {"language": self.language}
+
+
+class AudioFormatter(Formatter):
+
+    cell_component = "audio"
+
+    def encode(self, cell) -> str:
+        from meerkat.columns.lambda_column import LambdaCell
+
+        if isinstance(cell, LambdaCell):
+            cell = cell.get()
+
+        data = cell['data']
+        sample_rate = cell['sample_rate']
+        return self._encode(data, sample_rate)
+
+    def _encode(self, data: np.array, sample_rate: int) -> str:
+        with tempfile.NamedTemporaryFile(prefix='mk_') as f:
+            sf.write(f.name, data, sample_rate, format='wav')
+            # HACK: bug in SoundFile where on certain systems (e.g. Apple Silicon)
+            # you can't write to buffer with executable permissions
+            with open(f.name, 'rb') as f:
+                buf = BytesIO(f.read())
+            return f'data:audio/wav;base64,{base64.b64encode(buf.getvalue()).decode()}'
+
+    def html(self, cell: Union["FileCell", Image]) -> str:
+        encoded = self.encode(cell)
+        return f'<audio controls><source src={encoded} type="audio/wav"></audio>'

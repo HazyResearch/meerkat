@@ -1,12 +1,10 @@
 from typing import Callable
 
-import torch
+import librosa
 
-from ..display import audio_file_formatter
 from ..tools.lazy_loader import LazyLoader
+from meerkat.interactive.formatter import AudioFormatter
 from .file_column import FileColumn
-
-torchaudio = LazyLoader("torchaudio")
 
 
 class AudioColumn(FileColumn):
@@ -40,17 +38,9 @@ class AudioColumn(FileColumn):
 
     @staticmethod
     def _get_default_formatter() -> Callable:
-        return audio_file_formatter
+        return AudioFormatter()
 
     @classmethod
     def default_loader(cls, *args, **kwargs):
-        return torchaudio.load(*args, **kwargs)[0]
-
-    def _repr_cell(self, idx):
-        return self.lz[idx]
-
-    def collate(self, batch):
-        tensors = [b.t() for b in batch]
-        tensors = torch.nn.utils.rnn.pad_sequence(tensors, batch_first=True)
-        tensors = tensors.transpose(1, -1)
-        return tensors
+        data, sr = librosa.load(*args, **kwargs)
+        return {'data': data, 'sample_rate': sr}
