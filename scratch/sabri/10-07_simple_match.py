@@ -1,14 +1,16 @@
 
 import meerkat as mk
 
-dp = mk.get("imagenette")
+dp = mk.get("imagenette").lz[:1000]
 dp_pivot = mk.gui.Pivot(dp)
 
 # TODO: do the embedding so you can actually match 
 # if 
-# dp = mk.embed(
-
-# )
+dp = mk.embed(
+    dp,
+    input="img",
+    batch_size=128,
+)
 # dp.write("")
 
 match: mk.gui.Component = mk.gui.Match(

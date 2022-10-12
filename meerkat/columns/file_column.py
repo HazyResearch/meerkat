@@ -117,6 +117,12 @@ class FileLoader:
     def __hash__(self) -> int:
         # needs to be hasable for block signature
         return hash((self.loader, self.transform, self.base_dir))
+    
+    def __setstate__(self, state):
+        # need to add downloader if it is missing from state, for backwards compatibility
+        if "downloader" not in state:
+            state["downloader"] = None
+        self.__dict__.update(state)
 
 
 class FileCell(LambdaCell):
