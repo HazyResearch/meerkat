@@ -120,7 +120,6 @@ class Interface(IdentifiableMixin):
                 "Run `network = mk.gui.start()` first."
             )
 
-        print(state.network_info.shareable_npm_server_name)
         if state.network_info.shareable_npm_server_name is not None:
             url = f"{state.network_info.shareable_npm_server_url}/interface?id={self.id}"
         else:

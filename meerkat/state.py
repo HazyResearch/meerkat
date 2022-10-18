@@ -65,6 +65,7 @@ class NetworkInfo:
     api_server_name: str = "localhost"
     npm_server_name: str = "localhost"
     shareable_npm_server_name: str = None
+    shareable_api_server_name: str = None
     npm_out_path: str = None
     npm_err_path: str = None
 
@@ -79,6 +80,12 @@ class NetworkInfo:
         if self.shareable_npm_server_name is None:
             return None 
         return f"http://{self.shareable_npm_server_name}"
+    
+    @property
+    def shareable_api_server_url(self):
+        if self.shareable_api_server_name is None:
+            return None 
+        return f"http://{self.shareable_api_server_name}"
     
     @property
     def npm_server_url(self):

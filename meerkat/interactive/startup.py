@@ -81,6 +81,8 @@ def start(
     subdomain: str = None 
 ):
     """Start Meerkat interactive mode in a Jupyter notebook."""
+    if subdomain is None:
+        subdomain = "app"
 
     api_server_name = api_server_name or LOCALHOST_NAME
 
@@ -97,7 +99,6 @@ def start(
         Config(MeerkatAPI, port=api_port, host=api_server_name, log_level="warning")
     )
     api_server.run_in_thread()
-
 
     # Start the npm server
     if npm_port is None:
@@ -120,9 +121,17 @@ def start(
         npm_server_port=npm_port,
     )
 
+    if shareable:
+        domain = setup_tunnel(network_info.api_server_port, subdomain=f"{subdomain}server")
+        network_info.shareable_api_server_name = domain
+        
+
     # npm run dev -- --port {npm_port}
     current_env = os.environ.copy()
-    current_env.update({"VITE_API_URL": network_info.api_server_url})
+    if shareable:
+        current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
+    else:
+        current_env.update({"VITE_API_URL": network_info.api_server_url})
 
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
@@ -168,7 +177,7 @@ def start(
     network_info.npm_server_port = int(match.group(1))
 
     if shareable:
-        domain = setup_tunnel(network_info.npm_server_port, subdomain="testnpm")
+        domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)
         network_info.shareable_npm_server_name = domain
 
     # Back to the original directory
@@ -187,6 +196,7 @@ def setup_tunnel(local_port: int, subdomain: str) -> str:
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
     err_file, err_path = mkstemp(suffix=".err")
+    print(f"{subdomain}:80:localhost:{local_port}",)
     subprocess.Popen(
         [
             "ssh",
@@ -216,7 +226,7 @@ def setup_tunnel(local_port: int, subdomain: str) -> str:
         raise ValueError(
             f"Failed to establish tunnel: out={open(out_path, 'r').read()} err={open(err_path, 'r').read()}"
         )
-    actual_subdomain = int(match.group(1))
+    actual_subdomain = match.group(1)
     
     if actual_subdomain != subdomain:
         # need to check because the requested subdomain may already be in use
