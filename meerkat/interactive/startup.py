@@ -153,7 +153,7 @@ def start(
         # TODO: remove this once we figure out how to properly check for unavailable ports
         # in a way that is compatible with vite's port selection logic
         match = re.search(
-            "Local:   http://localhost:(.*)/", network_info.npm_server_out
+            "Local:   http://127.0.0.1:(.*)/", network_info.npm_server_out
         )
         if match is not None:
             break
