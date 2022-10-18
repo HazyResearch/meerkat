@@ -77,6 +77,8 @@ def start(
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
+    shareable: bool = None,
+    subdomain: str = None 
 ):
     """Start Meerkat interactive mode in a Jupyter notebook."""
 
@@ -95,6 +97,7 @@ def start(
         Config(MeerkatAPI, port=api_port, host=api_server_name, log_level="warning")
     )
     api_server.run_in_thread()
+
 
     # Start the npm server
     if npm_port is None:
@@ -164,6 +167,10 @@ def start(
         )
     network_info.npm_server_port = int(match.group(1))
 
+    if shareable:
+        domain = setup_tunnel(network_info.npm_server_port, subdomain="testnpm")
+        network_info.shareable_npm_server_name = domain
+
     # Back to the original directory
     os.chdir(currdir)
 
@@ -173,18 +180,52 @@ def start(
     return network_info
 
 
-def setup_tunnel(local_server_port: int, endpoint: str) -> str:
-    response = requests.get(
-        endpoint + "/v1/tunnel-request" if endpoint is not None else MEERKAT_API_SERVER
+def setup_tunnel(local_port: int, subdomain: str) -> str:
+    PORT = "2222"
+    DOMAIN = "meerkat.wiki"
+
+    # open a temporary file to write the output of the npm process
+    out_file, out_path = mkstemp(suffix=".out")
+    err_file, err_path = mkstemp(suffix=".err")
+    subprocess.Popen(
+        [
+            "ssh",
+            "-p",
+            PORT,
+            "-R",
+            f"{subdomain}:80:localhost:{local_port}",
+            DOMAIN
+        ],
+        stdout=out_file,
+        stderr=err_file,
     )
-    if response and response.status_code == 200:
-        try:
-            payload = response.json()[0]
-            return create_tunnel(payload, LOCALHOST_NAME, local_server_port)
-        except Exception as e:
-            raise RuntimeError(str(e))
-    else:
-        raise RuntimeError("Could not get share link from Meerkat API Server.")
+
+    MAX_WAIT = 10
+    for i in range(MAX_WAIT):
+        time.sleep(0.5)
+
+        # this checks whether or not the tunnel has successfully been established
+        # and the subdomain is printed to out 
+        match = re.search(
+            f"http://(.*).{DOMAIN}", open(out_path, "r").read()
+        )
+        if match is not None:
+            break
+    
+    if match is None:
+        raise ValueError(
+            f"Failed to establish tunnel: out={open(out_path, 'r').read()} err={open(err_path, 'r').read()}"
+        )
+    actual_subdomain = int(match.group(1))
+    
+    if actual_subdomain != subdomain:
+        # need to check because the requested subdomain may already be in use
+        print(
+            f"Subdomain {subdomain} is not available. " 
+            f"Using {actual_subdomain} instead."
+        )
+
+    return f"{actual_subdomain}.{DOMAIN}"
 
 
 def output_startup_message(url: str):

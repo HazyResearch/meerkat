@@ -12,7 +12,7 @@ gallery = mk.gui.Gallery(
     tag_columns=["label"],
 )
 
-mk.gui.start()
+mk.gui.start(shareable=True)
 mk.gui.Interface(
     components=[gallery],
 ).launch()
