@@ -52,6 +52,8 @@ REQUIRED = [
     "fastapi",
     "uvicorn",
     "rich",
+    "cryptography",
+    "fastapi",
 ]
 
 # What packages are optional?
