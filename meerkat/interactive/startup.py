@@ -9,21 +9,18 @@ import re
 import socket
 import subprocess
 import time
-from contextlib import closing
-from tempfile import mkstemp, mktemp
+from tempfile import mkstemp
 
-import requests
 from uvicorn import Config
 
 from meerkat.interactive.api import MeerkatAPI
 from meerkat.interactive.server import (
     INITIAL_PORT_VALUE,
     LOCALHOST_NAME,
-    MEERKAT_API_SERVER,
     TRY_NUM_PORTS,
     Server,
 )
-from meerkat.interactive.tunneling import create_tunnel
+from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import NetworkInfo, state
 
 
@@ -194,57 +191,6 @@ def start(
         and GUI server on {network_info.npm_server_url}."
     )
     return network_info
-
-
-def setup_tunnel(local_port: int, subdomain: str) -> str:
-    PORT = "2222"
-    DOMAIN = "meerkat.wiki"
-
-    # open a temporary file to write the output of the npm process
-    out_file, out_path = mkstemp(suffix=".out")
-    err_file, err_path = mkstemp(suffix=".err")
-    print(f"{subdomain}:80:localhost:{local_port}",)
-    subprocess.Popen(
-        [
-            "ssh",
-            "-p",
-            PORT,
-            "-o", 
-            "ControlMaster=no", 
-            "-R",
-            f"{subdomain}:80:localhost:{local_port}",
-            DOMAIN
-        ],
-        stdout=out_file,
-        stderr=err_file,
-    )
-
-    MAX_WAIT = 10
-    for i in range(MAX_WAIT):
-        time.sleep(0.5)
-
-        # this checks whether or not the tunnel has successfully been established
-        # and the subdomain is printed to out 
-        match = re.search(
-            f"http://(.*).{DOMAIN}", open(out_path, "r").read()
-        )
-        if match is not None:
-            break
-    
-    if match is None:
-        raise ValueError(
-            f"Failed to establish tunnel: out={open(out_path, 'r').read()} err={open(err_path, 'r').read()}"
-        )
-    actual_subdomain = match.group(1)
-    
-    if actual_subdomain != subdomain:
-        # need to check because the requested subdomain may already be in use
-        print(
-            f"Subdomain {subdomain} is not available. " 
-            f"Using {actual_subdomain} instead."
-        )
-
-    return f"{actual_subdomain}.{DOMAIN}"
 
 
 def output_startup_message(url: str):

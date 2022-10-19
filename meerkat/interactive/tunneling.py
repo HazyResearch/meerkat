@@ -1,105 +1,66 @@
-"""This file provides remote port forwarding functionality using paramiko
-package, Inspired by:
-
-https://github.com/paramiko/paramiko/blob/master/demos/rforward.py Taken from:
-https://github.com/gradio-app/gradio/blob/main/gradio/tunneling.py.
 """
+This file providdes remote forwarding 
+"""
+import re
+import subprocess
+import time
+from tempfile import mkstemp
 
-import select
-import socket
-import sys
-import threading
-import warnings
-from io import StringIO
+PORT = "2222"
+DOMAIN = "meerkat.wiki"
 
-from cryptography.utils import CryptographyDeprecationWarning
+def setup_tunnel(local_port: int, subdomain: str) -> str:
+    """
+    """
+    PORT = "2222"
+    DOMAIN = "meerkat.wiki"
 
-from meerkat.tools.lazy_loader import LazyLoader
-
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
-    paramiko = LazyLoader("paramiko")
-
-
-def handler(chan, host, port):
-    sock = socket.socket()
-    try:
-        sock.connect((host, port))
-    except Exception as e:
-        verbose(f"Forwarding request to {host}:{port} failed: {e}")
-        return
-
-    verbose(
-        "Connected! Tunnel open "
-        f"{chan.origin_addr} -> {chan.getpeername()} -> {(host, port)}"
+    # open a temporary file to write the output of the npm process
+    out_file, out_path = mkstemp(suffix=".out")
+    err_file, err_path = mkstemp(suffix=".err")
+    subprocess.Popen(
+        [
+            "ssh",
+            # need to use the -T arg to avoid corruption of the users terminal
+            "-T",
+            "-p",
+            PORT,
+            # sish does not support ControlMaster as discussed in this issue
+            # https://github.com/antoniomika/sish/issues/252
+            "-o", 
+            "ControlMaster=no", 
+            "-R",
+            f"{subdomain}:80:localhost:{local_port}",
+            DOMAIN
+        ],
+        stdout=out_file,
+        stderr=err_file,
     )
 
-    while True:
-        r, w, x = select.select([sock, chan], [], [])
-        if sock in r:
-            data = sock.recv(1024)
-            if len(data) == 0:
-                break
-            chan.send(data)
-        if chan in r:
-            data = chan.recv(1024)
-            if len(data) == 0:
-                break
-            sock.send(data)
-    chan.close()
-    sock.close()
-    verbose(f"Tunnel closed from {chan.origin_addr}")
+    MAX_WAIT = 10
+    for i in range(MAX_WAIT):
+        time.sleep(0.5)
 
+        # this checks whether or not the tunnel has successfully been established
+        # and the subdomain is printed to out 
+        match = re.search(
+            f"http://(.*).{DOMAIN}", open(out_path, "r").read()
+        )
+        if match is not None:
+            break
+    
+    if match is None:
+        raise ValueError(
+            f"Failed to establish tunnel: out={open(out_path, 'r').read()} err={open(err_path, 'r').read()}"
+        )
+    actual_subdomain = match.group(1)
+    
+    if actual_subdomain != subdomain:
+        # need to check because the requested subdomain may already be in use
+        print(
+            f"Subdomain {subdomain} is not available. " 
+            f"Using {actual_subdomain} instead."
+        )
 
-def reverse_forward_tunnel(server_port, remote_host, remote_port, transport):
-    transport.request_port_forward("", server_port)
-    while True:
-        chan = transport.accept(1000)
-        if chan is None:
-            continue
-        thr = threading.Thread(target=handler, args=(chan, remote_host, remote_port))
-        thr.setDaemon(True)
-        thr.start()
+    return f"{actual_subdomain}.{DOMAIN}"
 
-
-def verbose(s, debug_mode=False):
-    if debug_mode:
-        print(s)
-
-
-def create_tunnel(payload, local_server, local_server_port):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.WarningPolicy())
-
-    verbose(f'Conecting to ssh host {payload["host"]}:{payload["port"]} ...')
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            client.connect(
-                hostname=payload["host"],
-                port=int(payload["port"]),
-                username=payload["user"],
-                pkey=paramiko.RSAKey.from_private_key(StringIO(payload["key"])),
-            )
-    except Exception as e:
-        print(f'*** Failed to connect to {payload["host"]}:{payload["port"]}: {e}')
-        sys.exit(1)
-
-    verbose(
-        f'Now forwarding remote port {payload["remote_port"]}'
-        f"to {local_server}:{local_server_port} ..."
-    )
-
-    thread = threading.Thread(
-        target=reverse_forward_tunnel,
-        args=(
-            int(payload["remote_port"]),
-            local_server,
-            local_server_port,
-            client.get_transport(),
-        ),
-        daemon=True,
-    )
-    thread.start()
-
-    return payload["share_url"]
