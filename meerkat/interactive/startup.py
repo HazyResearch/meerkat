@@ -202,6 +202,8 @@ def setup_tunnel(local_port: int, subdomain: str) -> str:
             "ssh",
             "-p",
             PORT,
+            "-o", 
+            "ControlMaster=no", 
             "-R",
             f"{subdomain}:80:localhost:{local_port}",
             DOMAIN
