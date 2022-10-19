@@ -166,6 +166,8 @@ def start(
         # in a way that is compatible with vite's port selection logic
         match = re.search(
             "Local:   http://127.0.0.1:(.*)/", network_info.npm_server_out
+        ) or re.search(
+            "Local:   http://localhost:(.*)/", network_info.npm_server_out
         )
         if match is not None:
             break
@@ -186,6 +188,11 @@ def start(
     # Store in global state
     state.network_info = network_info
 
+    # Print a message
+    print(
+        f"Meerkat interactive mode started! API on {network_info.api_server_url}, \
+        and GUI server on {network_info.npm_server_url}."
+    )
     return network_info
 
 
