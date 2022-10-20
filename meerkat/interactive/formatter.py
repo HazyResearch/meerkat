@@ -191,6 +191,7 @@ class CodeFormatter(Formatter):
         "js",
         "css",
         "html",
+        "python",
     ]
 
     def __init__(self, language: str):

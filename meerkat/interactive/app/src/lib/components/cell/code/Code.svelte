@@ -10,9 +10,9 @@
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="../../../../node_modules/prismjs/themes/prism-okaidia.css">    
+	<link rel="stylesheet" href="../../../../node_modules/prismjs/themes/prism-okaidia.css">
 </svelte:head>
 
-<div class="whitespace-pre overflow-scroll h-32 my-1 font-mono rounded-lg px-4 bg-slate-800">
+<div class="whitespace-pre overflow-scroll h-32 my-1 font-mono rounded-lg px-4 bg-slate-600">
 	<pre><code class="{language}">{@html html}</code></pre>
 </div>
