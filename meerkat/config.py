@@ -38,7 +38,6 @@ class MeerkatConfig:
 
         return config
 
-
 @dataclass
 class DisplayConfig:
     max_rows: int = 10

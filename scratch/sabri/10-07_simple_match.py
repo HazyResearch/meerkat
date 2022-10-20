@@ -1,7 +1,7 @@
 
 import meerkat as mk
 
-dp = mk.get("imagenette").lz[:1000]
+dp = mk.get("imagenette").lz[:2000]
 dp_pivot = mk.gui.Pivot(dp)
 
 dp = mk.embed(
@@ -28,3 +28,4 @@ mk.gui.start(shareable=True)
 mk.gui.Interface(
     components=[match, gallery]
 ).launch()
+
