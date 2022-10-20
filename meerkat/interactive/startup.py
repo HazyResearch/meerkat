@@ -87,8 +87,10 @@ def start(
             file at f"{config.system.ssh_identity_file}, or set the option 
             `mk.config.system.ssh_identity_file` to the file where they are stored. If 
             you don't yet have a key, you can request access by emailing 
-            eyuboglu@stanford.edu. See `subdomain` arg for controlling the domain name 
-            of the shared link. Defaults to False.
+            eyuboglu@stanford.edu. Remember to ensure after downloading it that the 
+            identity file is read/write only by the user (e.g. with 
+            `chmod 600 path/to/id_file`). See `subdomain` arg for controlling the 
+            domain name of the shared link. Defaults to False.
         subdomain (str): the subdomain to use for the shared link. For example, if
             `subdomain="myinterface"`, then the shareable link will have the domain
             `myinterface.meerkat.wiki`. Defaults to None, in which case a random 
