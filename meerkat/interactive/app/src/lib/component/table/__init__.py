@@ -11,7 +11,13 @@ class Table(Component):
 
     name = "Table"
 
-    def __init__(self, dp: Box, edit_target: EditTarget = None) -> None:
+    def __init__(
+        self, 
+        dp: Box, 
+        edit_target: EditTarget = None,
+        per_page: int = 100,
+        column_widths: list = None,
+    ) -> None:
         super().__init__()
 
         self.dp = make_box(dp)
@@ -20,9 +26,14 @@ class Table(Component):
             edit_target = EditTarget(self.dp, "_edit_id", "_edit_id")
         self.edit_target = edit_target
 
+        self.per_page = per_page
+        self.column_widths = column_widths
+
     @property
     def props(self):
         return {
             "dp": self.dp.config,
             "edit_target": self.edit_target.config,
+            "per_page": self.per_page,
+            "column_widths": self.column_widths,
         }

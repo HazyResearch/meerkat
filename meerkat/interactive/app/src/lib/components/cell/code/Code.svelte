@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import Prism from 'prismjs';
-
+	import 'prismjs/components/prism-python.js';
+	
 	export let data: string;
-	export let language: any = "js";
-
+	export let language: any = 'python';
 
 	let html = Prism.highlight(data, Prism.languages[language]);
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="../../../../node_modules/prismjs/themes/prism-okaidia.css">
+	<link rel="stylesheet" href="../../../../node_modules/prismjs/themes/prism-okaidia.css" />
 </svelte:head>
 
-<div class="whitespace-pre overflow-scroll h-32 my-1 font-mono rounded-lg px-4 bg-slate-600">
-	<pre><code class="{language}">{@html html}</code></pre>
+<div class="whitespace-pre overflow-auto h-full my-1 rounded-lg py-2 px-4 bg-slate-600">
+	<pre><code class={language}>{@html html}</code></pre>
 </div>
