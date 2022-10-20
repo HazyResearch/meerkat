@@ -22,7 +22,7 @@ class Table(Component):
 
         self.dp = make_box(dp)
         if edit_target is None:
-            dp["_edit_id"] = np.arange(len(dp))
+            self.dp.obj["_edit_id"] = np.arange(len(self.dp.obj))
             edit_target = EditTarget(self.dp, "_edit_id", "_edit_id")
         self.edit_target = edit_target
 
