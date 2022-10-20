@@ -71,13 +71,33 @@ def get_first_available_port(initial: int, final: int) -> int:
 
 
 def start(
+    shareable: bool = False,
+    subdomain: str = None,
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
-    shareable: bool = None,
-    subdomain: str = None 
 ):
-    """Start Meerkat interactive mode in a Jupyter notebook."""
+    """Start a Meerkat interactive server.
+    
+    Args:
+        shareable (bool): whether to share the interface at a publicly accesible link.
+            This feature works by establishing a reverse SSH tunnel to a Meerkat server. 
+            Do not use this feature with private data. In order to use this feature, you
+            will need an SSH key for the server. If you already have one, add it to the 
+            file at f"{config.system.ssh_identity_file}, or set the option 
+            `mk.config.system.ssh_identity_file` to the file where they are stored. If 
+            you don't yet have a key, you can request access by emailing 
+            eyuboglu@stanford.edu. See `subdomain` arg for controlling the domain name 
+            of the shared link. Defaults to False.
+        subdomain (str): the subdomain to use for the shared link. For example, if
+            `subdomain="myinterface"`, then the shareable link will have the domain
+            `myinterface.meerkat.wiki`. Defaults to None, in which case a random 
+            subdomain will be generated.
+        api_port (int): the port to use for the Meerkat API server. Defaults to None,
+            in which case a random port will be used.
+        npm_port (int): the port to use for the Meerkat Vite server. Defaults to None,
+            in which case a random port will be used.
+    """
     if subdomain is None:
         subdomain = "app"
 

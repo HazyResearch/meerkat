@@ -3,8 +3,10 @@ This file providdes remote forwarding
 """
 import re
 import subprocess
+import os
 import time
 from tempfile import mkstemp
+from meerkat.config import config
 
 PORT = "2222"
 DOMAIN = "meerkat.wiki"
@@ -14,6 +16,16 @@ def setup_tunnel(local_port: int, subdomain: str) -> str:
     """
     PORT = "2222"
     DOMAIN = "meerkat.wiki"
+
+    if not os.path.exists(config.system.ssh_identity_file):
+        raise ConnectionError(
+            f"No SSH keys found at {config.system.ssh_identity_file}. "
+            "Request access to Meerkat's shareable link feature by emailing "
+            "eyuboglu@stanford.edu. "
+            "Once you have a key add it to the file at "
+            f"{config.system.ssh_identity_file}, or set the "
+            "`mk.config.system.ssh_identity_file` to the file where they are stored."
+        )
 
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
@@ -29,6 +41,8 @@ def setup_tunnel(local_port: int, subdomain: str) -> str:
             # https://github.com/antoniomika/sish/issues/252
             "-o", 
             "ControlMaster=no", 
+            "-i", 
+            config.system.ssh_identity_file,
             "-R",
             f"{subdomain}:80:localhost:{local_port}",
             DOMAIN
