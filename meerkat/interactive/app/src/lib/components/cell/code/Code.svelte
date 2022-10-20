@@ -12,6 +12,6 @@
 	<link rel="stylesheet" href="../../../../node_modules/prismjs/themes/prism-okaidia.css" />
 </svelte:head>
 
-<div class="whitespace-pre overflow-auto h-full my-1 rounded-lg py-2 px-4 bg-slate-600">
+<div class="whitespace-pre overflow-auto h-full max-h-[50vh] my-1 rounded-lg py-2 px-4 bg-slate-600">
 	<pre><code class={language}>{@html html}</code></pre>
 </div>
