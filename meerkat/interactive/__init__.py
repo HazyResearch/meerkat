@@ -2,6 +2,7 @@ import pathlib
 
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.gallery import Gallery
+from .app.src.lib.component.markdown import Markdown
 from .app.src.lib.component.match import Match
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.stats import Stats
@@ -48,6 +49,7 @@ __all__ = [
     "trigger",
     "Component",
     "Gallery",
+    "Markdown",
     "Match",
     "Row",
     "Plot",

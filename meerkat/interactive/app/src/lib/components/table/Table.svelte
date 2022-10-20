@@ -1,21 +1,17 @@
 <script lang="ts">
-	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
+	import type { ColumnInfo, DataPanelRows, DataPanelSchema } from '$lib/api/datapanel';
 	import Cell from '$lib/components/cell/Cell.svelte';
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
 	import { zip } from 'underscore';
-	import { BarLoader } from 'svelte-loading-spinners'
-	import { createEventDispatcher } from 'svelte';
 
-	
 	const dispatch = createEventDispatcher();
-
-
 
 	export let rows: DataPanelRows | null;
 	export let schema: DataPanelSchema;
-	let column_infos: Array<ColumnInfo> = schema.columns; 
+	let column_infos: Array<ColumnInfo> = schema.columns;
 
-	let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 256);
+	export let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 256);
 	let column_unit: string = 'px';
 
 	let resize_props = {
@@ -72,30 +68,27 @@
 	});
 
 	function handle_edit(event: any, row: number, column: string) {
-		dispatch(
-			'edit',
-			{
-				row: row,
-				column: column,
-				value: event.detail.value
-			}
-		);
+		dispatch('edit', {
+			row: row,
+			column: column,
+			value: event.detail.value
+		});
 	}
-
-
-
 </script>
 
-<div class="table pl-4 pr-4 table-fixed overflow-x-scroll text-sm w-fit dark:text-gray-300 dark:bg-gray-700">
+<div
+	class="table pl-4 pr-4 table-fixed overflow-x-scroll text-sm w-fit dark:text-gray-300 dark:bg-gray-700"
+>
 	<div class="table-header-group">
 		<div class="table-row" bind:clientWidth={table_width}>
 			{#each column_infos as column, col_index}
 				<div class="table-cell" style="width:{column_widths[col_index]}{column_unit}">
-
 					<slot id="header-cell">
 						<div class="flex flex-col items-center">
 							<div class="pb-1 font-bold">{column.name}</div>
-							<div class="text-clip bg-violet-200 font-mono text-xs text-slate-500 rounded-full px-3 py-0.5">
+							<div
+								class="text-clip bg-violet-200 font-mono text-xs text-slate-500 rounded-full px-3 py-0.5"
+							>
 								{column.type}
 							</div>
 						</div>
@@ -112,9 +105,9 @@
 				<div class="table-row">
 					{#each zip(row, rows.column_infos) as [value, column_info]}
 						<div class="table-cell align-middle p-5">
-							<Cell 
-								data={value} 
-								cell_component={column_info.cell_component} 
+							<Cell
+								data={value}
+								cell_component={column_info.cell_component}
 								cell_props={column_info.cell_props}
 								on:edit={(event) => handle_edit(event, index, column_info.name)}
 							/>
@@ -126,9 +119,9 @@
 	</div>
 </div>
 {#if !rows}
-<div class="flex justify-center items-center h-full">
-	<BarLoader size="80" color="#7c3aed" unit="px" duration="1s"></BarLoader>
-</div>
+	<div class="flex justify-center items-center h-full">
+		<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
+	</div>
 {/if}
 
 <style>
