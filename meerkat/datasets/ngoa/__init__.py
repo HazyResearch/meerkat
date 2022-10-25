@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-import urllib
 
 import meerkat as mk
 
@@ -29,6 +28,7 @@ class ngoa(DatasetBuilder):
     )
 
     def build(self):
+        from meerkat.columns.file_column import Downloader
 
         base_dir = os.path.join(self.dataset_dir, "data")
         db = {}
@@ -40,10 +40,7 @@ class ngoa(DatasetBuilder):
         )
         db["published_images"]["image"] = mk.ImageColumn.from_filepaths(
             db["published_images"]["iiifthumburl"],
-            loader=mk.FileLoader(
-                downloader="url",
-                cache_dir=os.path.join(base_dir, "iiifthumburl")
-            ),
+            loader=Downloader(cache_dir=os.path.join(base_dir, "iiifthumburl")),
         )
         return db
 
