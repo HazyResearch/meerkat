@@ -111,7 +111,7 @@ def rows(
     full_length = len(dp)
     column_infos = _get_column_infos(dp, columns)
 
-    dp = dp[[info.name for info in column_infos]]
+    dp = dp.lz[[info.name for info in column_infos]]
 
     if indices is not None:
         dp = dp.lz[indices]

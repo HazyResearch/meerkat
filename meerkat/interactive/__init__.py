@@ -31,6 +31,7 @@ from .graph import (
 from .edit import (
     EditTarget,
 )
+from .app.src.lib.component.choice import Choice
 from .startup import start
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
@@ -66,4 +67,5 @@ __all__ = [
     "Editor",
     "Sort",
     "StatsLabeler",
+    "Choice",
 ]

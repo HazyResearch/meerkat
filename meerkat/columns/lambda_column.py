@@ -148,7 +148,8 @@ class LambdaColumn(AbstractColumn):
 
     @staticmethod
     def _get_default_formatter() -> Callable:
-        return lambda_cell_formatter
+        from meerkat.interactive.formatter import BasicFormatter
+        return BasicFormatter()
 
     def _repr_cell(self, idx):
         return self.lz[idx]

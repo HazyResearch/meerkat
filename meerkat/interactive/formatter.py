@@ -70,6 +70,8 @@ class BasicFormatter(Formatter):
     def encode(self, cell: Any):
         if isinstance(cell, np.generic):
             return cell.item()
+        elif hasattr(cell, "as_py"):
+            return cell.as_py()
         return cell
 
     def html(self, cell: Any):
