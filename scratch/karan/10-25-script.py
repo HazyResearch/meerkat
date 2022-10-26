@@ -6,10 +6,12 @@ from meerkat.interactive.graph import Box, Store, interface_op, make_store
 from meerkat.ops.sliceby.groupby import groupby
 
 ngoa = mk.get(
-    'ngoa',
-    '/data/datasets/opendata/',
+    "ngoa",
+    "/data/datasets/opendata/",
 )
-ngoa_images = ngoa['published_images'].lz[:100].lz['uuid', 'image']
+ngoa_images = ngoa["published_images"].lz[:100].lz["uuid", "image"]
+print(ngoa_images.columns)
+print(ngoa_images.columns)
 
 # The column with the unique id for the example.
 ID_COLUMN = "uuid"
@@ -33,16 +35,23 @@ ngoa_images["label"] = ["undefined"] * len(ngoa_images)
 #  'assistivetext',
 #  'image']
 
+
 @interface_op
-def groupby_and_count(data: mk.DataPanel, by: Union[str, Sequence[str]], label: str) -> mk.DataPanel:
+def groupby_and_count(
+    data: mk.DataPanel, by: Union[str, Sequence[str]], label: str
+) -> mk.DataPanel:
     """Group examples by key and count the fraction of the group for this label."""
     groups = groupby(data=data, by=by)
-    dp = groups.aggregate(lambda x: len(x.lz[x[LABEL_COLUMN] == label]) / len(x), accepts_dp=True)
+    dp = groups.aggregate(
+        lambda x: len(x.lz[x[LABEL_COLUMN] == label]) / len(x), accepts_dp=True
+    )
     return mk.DataPanel({by: dp[by], label: dp["dp"]})
+
 
 @interface_op
 def get_dp_columns(dp: mk.DataPanel) -> Sequence[str]:
     return dp.columns
+
 
 @interface_op
 def get_labels(dp: mk.DataPanel) -> Sequence[str]:
@@ -56,9 +65,7 @@ filter = mk.gui.Filter(ngoa_images, criteria="", title="Filter Examples")
 current_examples = filter.derived()
 
 # Match
-match = mk.gui.Match(
-    ngoa_images, against="image", col=ID_COLUMN, title="Search Slices"
-)
+match = mk.gui.Match(ngoa_images, against="image", col=ID_COLUMN, title="Search Slices")
 
 # Sort
 sorted_examples = mk.sort(current_examples, by=match.col, ascending=False)
@@ -76,7 +83,8 @@ edit_target = mk.gui.EditTarget(
     target=ngoa_images, target_id_column=ID_COLUMN, source_id_column=ID_COLUMN
 )
 editor = mk.gui.Editor(
-    sorted_examples, col=LABEL_COLUMN,
+    sorted_examples,
+    col=LABEL_COLUMN,
     selected=gallery.selected,
     target=edit_target,
     primary_key=ID_COLUMN,
