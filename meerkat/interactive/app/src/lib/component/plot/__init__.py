@@ -18,7 +18,7 @@ class Plot(Component):
         y: Union[str, Store],
         x_label: Union[str, Store],
         y_label: Union[str, Store],
-        id: str = "key", 
+        id: Union[str, Store] = "key", 
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
@@ -56,7 +56,7 @@ class Plot(Component):
             "x_label": self.x_label.config,
             "y_label": self.y_label.config,
             "type": self.type,
-            "id": self.id,
+            "id": self.id if isinstance(self.id, str) else self.id.config,
             "keys_to_remove": self.keys_to_remove.config,
             "can_remove": self.can_remove,
         }
