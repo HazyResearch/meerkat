@@ -12,7 +12,7 @@ import PIL
 import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
-
+import pandas as pd
 if TYPE_CHECKING:
     from meerkat.columns.file_column import FileCell
 
@@ -69,8 +69,10 @@ class BasicFormatter(Formatter):
 
     def encode(self, cell: Any):
         if isinstance(cell, np.generic):
+            if pd.isna(cell):
+                return "nan"
             return cell.item()
-        elif hasattr(cell, "as_py"):
+        if hasattr(cell, "as_py"):
             return cell.as_py()
         return cell
 

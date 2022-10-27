@@ -73,6 +73,9 @@ class ngoa(DatasetBuilder):
         db['locations'] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "locations.csv"),
         )
+        db['objects_text_entries'] = mk.DataPanel.from_csv(
+            os.path.join(base_dir, "objects_text_entries.csv"),
+        )
         return db
 
     def download(self):

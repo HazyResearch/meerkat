@@ -13,12 +13,12 @@
 
 </script>
 
-<div class="w-full flex items-center bg-slate-100 py-3 rounded-lg drop-shadow-md z-20">
-	<div class="themed pr-2 w-48">
+<div class="w-full flex items-center bg-slate-100 py-1 rounded-lg drop-shadow-md z-20">
+	<div class="themed px-2 flex-grow">
 		<Select
 			id="column"
 			value={$value}
-			choices={$choices}
+			items={$choices}
 			showIndicator={true}
 			listPlacement="auto"
 			on:select={handleSelect}

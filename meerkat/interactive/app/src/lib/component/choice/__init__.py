@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 class Choice(Component):
     """A choice box."""
+    name: str = "Choice"
     def __init__(self, value: Union[str, int, float, Store], choices: Union[list, tuple, Store], gui_type: str = "dropdown"):
+        super().__init__()
         self.value = make_store(value)
         self.choices = make_store(choices)
         self.gui_type = "dropdown"
@@ -20,6 +22,7 @@ class Choice(Component):
         if gui_type not in ["dropdown"]:
             raise ValueError("gui_type must be 'dropdown'")
 
+    @property
     def props(self):
         return {
             "value": self.value.config,
