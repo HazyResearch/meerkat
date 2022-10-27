@@ -1,5 +1,6 @@
 from __future__ import annotations
 from ctypes import Union
+from email.policy import default
 import io
 import functools
 
@@ -32,13 +33,16 @@ class FileLoader:
         transform: callable = None,
         loader: callable = None,
         downloader: Union[str, Callable] = None,
+        fallback_downloader: Callable = None,
         cache_dir: str = None,
         base_dir: str = None,
     ):
         """
         Args:
-            downloader (callable): a callable that accepts two positional arguments -
-                a URI and a destination (which could be either a string or file object)
+            downloader (callable): a callable that accepts at least two positional
+                arguments - a URI and a destination (which could be either a string or
+                file object). Optionally, it can accept a `fallback_downloader` argument, which
+                the
         """
         self.transform = transform
         self.loader = loader
@@ -49,6 +53,7 @@ class FileLoader:
             self.downloader = download_gcs
         else:
             self.downloader = downloader
+        self.fallback_downloader = fallback_downloader
         self.cache_dir = cache_dir
 
     def __call__(self, filepath: str):
@@ -95,9 +100,22 @@ class FileLoader:
             else:
                 # if there's no cache_dir, we just download to a temporary directory
                 dst = io.BytesIO()
-            
+
             if isinstance(dst, io.BytesIO) or not os.path.exists(dst):
-                self.downloader(filepath, dst)
+                try:
+                    self.downloader(filepath, dst)
+                except Exception as e:
+                    if self.fallback_downloader is not None:
+                        # if user passes fallback_downloader, then on any failed download, we
+                        # write the default data to the destination and continue
+                        warnings.warn(
+                            f"Failed to download {filepath} with error {e}. Falling "
+                            "back to default data."
+                        )
+                        self.fallback_downloader(dst)
+                    else:
+                        raise e
+
             filepath = dst
 
         data = self.loader(filepath)
@@ -117,11 +135,13 @@ class FileLoader:
     def __hash__(self) -> int:
         # needs to be hasable for block signature
         return hash((self.loader, self.transform, self.base_dir))
-    
+
     def __setstate__(self, state):
         # need to add downloader if it is missing from state, for backwards compatibility
         if "downloader" not in state:
             state["downloader"] = None
+        if "fallback_downloader" not in state:
+            state["fallback_downloader"] = None
         self.__dict__.update(state)
 
 
@@ -322,7 +342,8 @@ def download_url(url: str, dst: Union[str, io.BytesIO]):
         import requests
 
         response = requests.get(url)
-        dst.write(response.content)
+        data = response.content
+        dst.write(data)
         dst.seek(0)
         return dst
 
@@ -339,6 +360,7 @@ def _get_gcs_bucket(bucket_name: str, project: str = None):
 def download_gcs(uri: str, dst: Union[str, io.BytesIO]):
     """Download a file from GCS."""
     from google.cloud import exceptions
+
     bucket, blob_name = urlparse(uri).netloc, urlparse(uri).path.lstrip("/")
     bucket = _get_gcs_bucket(bucket_name=uri.split("/")[2])
 
@@ -354,4 +376,3 @@ def download_gcs(uri: str, dst: Union[str, io.BytesIO]):
         os.remove(dst)
 
         raise FileNotFoundError(uri)
-

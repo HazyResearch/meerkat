@@ -22,6 +22,7 @@ gallery = mk.gui.Gallery(
     sorted_box,
     main_column="img",
     tag_columns=["label"],
+    primary_key="img_path"
 )
 
 mk.gui.start(shareable=True)
