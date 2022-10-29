@@ -71,10 +71,6 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     columns = [
         column for column in columns if not column.startswith("_")
     ]
-    # TODO: remove this and fix
-    columns = [
-        column for column in columns if column not in ["clip(img)", "clip(image)"]
-    ]
 
     return [
         ColumnInfo(

@@ -190,7 +190,10 @@ def start(
         )
         if match is not None:
             break
-
+    
+    # TODO(Sabri): add check for Vite actually being installed, and provide instructions
+    # in the error message for fixing 
+    
     if match is None:
         raise ValueError(
             f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}"
