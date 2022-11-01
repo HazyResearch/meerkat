@@ -181,16 +181,17 @@ def start(
 
         # this is a hack to address the issue that the vite skips over a port that we
         # deem to be open per `get_first_available_port`
-        # TODO: remove this once we figure out how to properly check for unavailable ports
-        # in a way that is compatible with vite's port selection logic
+        # TODO: remove this once we figure out how to properly check for unavailable 
+        # ports in a way that is compatible with vite's port selection logic
         match = re.search(
-            "Local:   http://127.0.0.1:(.*)/", network_info.npm_server_out
-        ) or re.search(
-            "Local:   http://localhost:(.*)/", network_info.npm_server_out
+            "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/", network_info.npm_server_out
         )
         if match is not None:
             break
-
+    
+    # TODO(Sabri): add check for Vite actually being installed, and provide instructions
+    # in the error message for fixing 
+    
     if match is None:
         raise ValueError(
             f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}"
