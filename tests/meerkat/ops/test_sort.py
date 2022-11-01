@@ -1,8 +1,4 @@
-import os
-from typing import Callable, Dict, Iterable, List, Set, Tuple, Union
-
-import numpy as np
-import pandas as pd
+from typing import List, Union
 
 import meerkat as mk
 
@@ -138,9 +134,7 @@ def test_sort_numpy_and_pandas_ascending():
 def test_sort_numpy_and_pandas_ascending_variable():
     """Testing all columns after sorting with multiple ascending columns (numpy
     and tensor)"""
-    test = make_tiebreaker_test_dp(
-        by=["numpy", "pandas"], ascending=[True, False]
-    )
+    test = make_tiebreaker_test_dp(by=["numpy", "pandas"], ascending=[True, False])
     assert (
         (test["tensor"] == mk.TensorColumn([3, 2, 1])).all()
         and (test["pandas"] == mk.PandasSeriesColumn([9, 7, 9])).all()

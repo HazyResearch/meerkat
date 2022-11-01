@@ -1,11 +1,8 @@
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
-from meerkat.interactive.app.src.lib.component.plot import Plot
 from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head, interface_op
-from meerkat.state import state
+from meerkat.interactive.graph import interface_op
 
 from ..abstract import Interface, InterfaceConfig
 

@@ -92,7 +92,6 @@ def _build_image_dp(dataset_dir: str):
 
 
 def _build_relationships_dp(dataset_dir: str):
-
     with open(os.path.join(dataset_dir, "relationships.json")) as f:
         relationships = json.load(f)
 

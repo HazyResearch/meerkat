@@ -10,7 +10,6 @@ import meerkat as mk
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import download_url, extract
 
 
 @datasets.register()

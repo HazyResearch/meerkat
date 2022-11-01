@@ -1,15 +1,11 @@
-from typing import TYPE_CHECKING, Callable, Dict, List, Union
+from typing import Callable, Dict, List, Union
 
-import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.interactive.graph import Box, make_box, make_store
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Component
-
-if TYPE_CHECKING:
-    from meerkat.datapanel import DataPanel
 
 
 class Aggregation(IdentifiableMixin):
@@ -39,9 +35,7 @@ class SliceByCards(Component):
         sliceby: Box[SliceBy],
         main_column: str,
         tag_columns: List[str] = None,
-        aggregations: Dict[
-            str, Callable[["DataPanel"], Union[int, float, str]]
-        ] = None,
+        aggregations: Dict[str, Callable[["DataPanel"], Union[int, float, str]]] = None,
         dp: Box["DataPanel"] = None,  # required to support passing in an external box
     ) -> None:
         super().__init__()

@@ -1,20 +1,12 @@
-from copy import copy
-from dataclasses import dataclass
-from functools import wraps
-from typing import Any, Callable, Dict, List, Union
+from typing import Callable, Dict, List, Union
 
 from IPython.display import IFrame
-from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.state import state
 
-from .app.src.lib.interfaces.match_table import MatchTableInterface
-from .app.src.lib.interfaces.sliceby import SliceByInterface
-from .startup import is_notebook
 from . import Interface
 
 

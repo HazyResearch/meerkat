@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 import numpy as np
-import sklearn
 from sklearn.base import ClusterMixin
 
 from meerkat.datapanel import DataPanel

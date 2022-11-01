@@ -2,7 +2,6 @@ from typing import Sequence, Union
 
 from meerkat.datapanel import DataPanel
 from meerkat.interactive.graph import Pivot, Store, make_store
-from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Component
 
@@ -18,7 +17,7 @@ class Plot(Component):
         y: Union[str, Store],
         x_label: Union[str, Store],
         y_label: Union[str, Store],
-        id: Union[str, Store] = "key", 
+        id: Union[str, Store] = "key",
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
@@ -36,7 +35,7 @@ class Plot(Component):
         self.type = type
         self.slot = slot
         self.can_remove = can_remove
-        
+
         if metadata_columns is None:
             metadata_columns = []
         self.metadata_columns = metadata_columns
@@ -44,7 +43,6 @@ class Plot(Component):
         if keys_to_remove is None:
             keys_to_remove = []
         self.keys_to_remove = make_store(keys_to_remove)
-
 
     @property
     def props(self):

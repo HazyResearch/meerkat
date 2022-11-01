@@ -2,14 +2,14 @@ from typing import List
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.filter import Filter
 from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
-from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head, interface_op
-from meerkat.state import state
+from meerkat.interactive.app.src.lib.component.table import EditTarget
+from meerkat.interactive.graph import Pivot, interface_op
 
 from ..abstract import Interface, InterfaceConfig
-from meerkat.interactive.app.src.lib.component.filter import Filter
+
 
 @interface_op
 def simple_op(col: str):

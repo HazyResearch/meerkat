@@ -1,13 +1,11 @@
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.plot import Plot
 from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head, interface_op
-from meerkat.state import state
+from meerkat.interactive.graph import Store, interface_op
 
-from ..abstract import Interface, InterfaceConfig
+from ..abstract import Interface
 
 
 @interface_op
@@ -50,19 +48,19 @@ class PlotInterface(Interface):
         merge_derived = mk.merge(left=dp_pivot, right=selection_dp, on=self.id_column)
         sort_derived = mk.sort(dp_pivot, by=match_x.col, ascending=False)
 
-        result = simple_op(against)
+        simple_op(against)
 
-        gallery: Component = Table(
+        gallery: Component = Table(  # noqa: F841
             sort_derived,
             edit_target=EditTarget(dp_pivot, self.id_column, self.id_column),
         )
 
-        selected_table: Component = Table(
+        selected_table: Component = Table(  # noqa: F841
             merge_derived,
             edit_target=EditTarget(dp_pivot, self.id_column, self.id_column),
         )
 
-        plot: Component = Plot(
+        plot: Component = Plot(  # noqa: F841
             dp_pivot,
             selection=selection,
             x=match_x.col,

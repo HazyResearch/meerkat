@@ -1,6 +1,5 @@
 from typing import Dict, Mapping, Union
 
-from meerkat.datapanel import DataPanel
 from meerkat.interactive.graph import Store, make_store
 
 from ..abstract import Component

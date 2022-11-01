@@ -1,16 +1,6 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Dict, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 

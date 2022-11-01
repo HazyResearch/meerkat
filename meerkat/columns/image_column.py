@@ -1,14 +1,14 @@
 from __future__ import annotations
-from io import BytesIO
 
 import logging
+from io import BytesIO
 from pathlib import Path
 from typing import Callable, Union
 
+from PIL import Image
+
 from meerkat.columns.file_column import FileColumn
 from meerkat.interactive.formatter import PILImageFormatter
-from meerkat.tools.lazy_loader import LazyLoader
-from PIL import Image
 
 logger = logging.getLogger(__name__)
 

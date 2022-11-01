@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Callable, Sequence
+from typing import Sequence
 
 import cytoolz as tz
 from yaml.representer import Representer
@@ -27,7 +27,6 @@ class ListColumn(AbstractColumn):
         if data is not None:
             data = list(data)
         super(ListColumn, self).__init__(data=data, *args, **kwargs)
-
 
     @classmethod
     def from_list(cls, data: Sequence):

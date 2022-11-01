@@ -1,11 +1,9 @@
 import functools
-from typing import Any, Dict, List, Union
+from typing import List
 
 from fastapi import APIRouter, Body
 
 from meerkat.interactive.graph import Modification, StoreModification, trigger
-
-from ....tools.utils import convert_to_python
 
 router = APIRouter(
     prefix="/store",
@@ -29,8 +27,8 @@ def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
         return []
 
     # Set the new value of the store
-    # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type 
-    # of the store. 
+    # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
+    # of the store.
     store_modification.node.value = value
 
     # Trigger on the store modification: leads to modifications on the graph

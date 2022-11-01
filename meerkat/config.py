@@ -38,6 +38,7 @@ class MeerkatConfig:
 
         return config
 
+
 @dataclass
 class DisplayConfig:
     max_rows: int = 10
@@ -48,15 +49,14 @@ class DisplayConfig:
 
     show_audio: bool = True
 
+
 @dataclass
 class SystemConfig:
     use_gpu: bool = True
     ssh_identity_file: str = os.path.join(Path.home(), ".meerkat/ssh/id_rsa")
 
 
-
 class DatasetsConfig:
-
     def __init__(self, root_dir: str = None):
         if root_dir is None:
             self.root_dir: str = os.path.join(Path.home(), ".meerkat/datasets")

@@ -55,7 +55,6 @@ class pascal(DatasetBuilder):
 
 
 def build_pascal_2012_dp(dataset_dir: str):
-
     base_dir = os.path.join(dataset_dir, "VOCdevkit/VOC2012")
 
     train_dp = mk.DataPanel.from_csv(

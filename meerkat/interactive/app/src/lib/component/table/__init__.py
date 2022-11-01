@@ -1,8 +1,7 @@
-from dataclasses import dataclass
-
-from meerkat.interactive.graph import Box, make_box
-from meerkat.interactive.edit import EditTarget
 import numpy as np
+
+from meerkat.interactive.edit import EditTarget
+from meerkat.interactive.graph import Box, make_box
 
 from ..abstract import Component
 
@@ -12,8 +11,8 @@ class Table(Component):
     name = "Table"
 
     def __init__(
-        self, 
-        dp: Box, 
+        self,
+        dp: Box,
         edit_target: EditTarget = None,
         per_page: int = 100,
         column_widths: list = None,

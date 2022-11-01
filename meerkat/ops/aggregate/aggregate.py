@@ -1,5 +1,4 @@
 import warnings
-from ast import Call
 from typing import Any, Callable, Dict, Union
 
 import meerkat as mk
@@ -20,7 +19,7 @@ def aggregate(
         raise ValueError(f"{nuisance} is not a valid nuisance option")
 
     if accepts_dp and not isinstance(function, Callable):
-        raise ValueError(f"Must pass a callable to aggregate if accepts_dp is True")
+        raise ValueError("Must pass a callable to aggregate if accepts_dp is True")
 
     if accepts_dp:
         return {"dp": function(data, *args, **kwargs)}

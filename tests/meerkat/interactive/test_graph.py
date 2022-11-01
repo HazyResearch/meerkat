@@ -1,7 +1,4 @@
-from ast import unaryop
-
 import numpy as np
-import pytest
 
 import meerkat as mk
 from meerkat.interactive.graph import BoxModification, Pivot, interface_op, trigger

@@ -1,19 +1,19 @@
 import os
 import subprocess
-import PIL 
-import io
+
+import PIL
 
 import meerkat as mk
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import download_url, extract
 
 REPO = "https://github.com/NationalGalleryOfArt/opendata.git"
 
+
 def _write_empty_image(dst):
-    img = PIL.Image.new('RGB', (32, 32), color='black')  
+    img = PIL.Image.new("RGB", (32, 32), color="black")
     img.save(dst, format="JPEG")
 
 
@@ -48,12 +48,14 @@ class ngoa(DatasetBuilder):
                 downloader="url",
                 # replace images for which the download fails with a black image
                 fallback_downloader=_write_empty_image,
-                cache_dir=os.path.join(base_dir, "iiifthumburl")
+                cache_dir=os.path.join(base_dir, "iiifthumburl"),
             ),
         )
 
         db["published_images"]["image_224"] = mk.ImageColumn.from_filepaths(
-            db["published_images"]["iiifurl"].apply(lambda x: f"{x}/full/!224,224/0/default.jpg"),
+            db["published_images"]["iiifurl"].apply(
+                lambda x: f"{x}/full/!224,224/0/default.jpg"
+            ),
             loader=mk.FileLoader(
                 downloader="url",
                 cache_dir=os.path.join(base_dir, "iiifimage"),
@@ -61,19 +63,19 @@ class ngoa(DatasetBuilder):
                 fallback_downloader=_write_empty_image,
             ),
         )
-        db['objects_constituents'] = mk.DataPanel.from_csv(
+        db["objects_constituents"] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "objects_constituents.csv"),
         )
-        db['constituents'] = mk.DataPanel.from_csv(
+        db["constituents"] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "constituents.csv"),
         )
-        db['constituents_text_entries'] = mk.DataPanel.from_csv(
+        db["constituents_text_entries"] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "constituents_text_entries.csv"),
         )
-        db['locations'] = mk.DataPanel.from_csv(
+        db["locations"] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "locations.csv"),
         )
-        db['objects_text_entries'] = mk.DataPanel.from_csv(
+        db["objects_text_entries"] = mk.DataPanel.from_csv(
             os.path.join(base_dir, "objects_text_entries.csv"),
         )
         return db

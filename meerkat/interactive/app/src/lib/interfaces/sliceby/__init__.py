@@ -2,12 +2,10 @@ from typing import Callable, Dict, List, Union
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
-from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head, interface_op
+from meerkat.interactive.graph import interface_op
 from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.state import state
 
-from ..abstract import Interface, InterfaceConfig
+from ..abstract import Interface
 
 
 @interface_op
@@ -52,7 +50,7 @@ class SliceByInterface(Interface):
         # Setup pivots
         sliceby = self.pivot(self.sliceby)
         dp = self.pivot(self.sliceby.data)
-        component = SliceByCards(
+        SliceByCards(
             sliceby=sliceby,
             dp=dp,
             main_column=self.main_column,

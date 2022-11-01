@@ -143,7 +143,6 @@ def test_group_by_integer_type_as_prop():
 
 
 def test_group_by_tensor_key():
-
     dp = DataPanel(
         {
             "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),

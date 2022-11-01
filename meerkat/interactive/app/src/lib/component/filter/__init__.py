@@ -1,5 +1,3 @@
-import functools
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
@@ -13,7 +11,7 @@ from meerkat.interactive.graph import Box, Store, interface_op, make_store
 from ..abstract import Component
 
 if TYPE_CHECKING:
-    from meerkat import AbstractColumn, DataPanel
+    from meerkat import DataPanel
 
 
 def _in(column: AbstractColumn, value):
@@ -129,7 +127,7 @@ def filter_by_operator(
         # to the pivot?
         return data
 
-    supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
+    (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     # if not all(
     #     isinstance(data[column], supported_column_types) for column in input_columns
     # ):

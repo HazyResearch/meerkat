@@ -1,8 +1,9 @@
 from typing import List, Union
-from ..abstract import Component
-from meerkat.interactive.graph import Box, Store, make_box, make_store
+
 from meerkat.interactive.edit import EditTarget
-import numpy as np
+from meerkat.interactive.graph import Box, Store, make_box, make_store
+
+from ..abstract import Component
 
 
 class StatsLabeler(Component):
@@ -31,7 +32,6 @@ class StatsLabeler(Component):
         self.primary_key = primary_key
         self.precision_estimate = make_store(precision_estimate)
         self.recall_estimate = make_store(recall_estimate)
-
 
     @property
     def props(self):

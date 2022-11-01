@@ -45,7 +45,6 @@ def nested_getattr(obj, attr, *args):
 
 
 def nested_apply(obj: object, fn: callable):
-
     if isinstance(obj, list):
         return [nested_apply(v, fn=fn) for v in obj]
     elif isinstance(obj, tuple):

@@ -11,7 +11,6 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentConfig,
 )
-from meerkat.interactive.graph import Pivot, PivotConfig
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 from meerkat.tools.utils import nested_apply
@@ -19,9 +18,11 @@ from meerkat.tools.utils import nested_apply
 
 def call_function_get_frame(func, *args, **kwargs):
     """https://stackoverflow.com/questions/4214936/how-can-i-get-the-values-of-
-    the-locals-of-a-function-after-it-has-been-executed Calls the function
+    the-locals-of-a-function-after-it-has-been-executed Calls the function.
+
     *func* with the specified arguments and keyword arguments and snatches its
-    local frame before it actually executes."""
+    local frame before it actually executes.
+    """
 
     frame = None
     trace = sys.gettrace()
@@ -122,10 +123,12 @@ class Interface(IdentifiableMixin):
             )
 
         if state.network_info.shareable_npm_server_name is not None:
-            url = f"{state.network_info.shareable_npm_server_url}/interface?id={self.id}"
+            url = (
+                f"{state.network_info.shareable_npm_server_url}/interface?id={self.id}"
+            )
         else:
             url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
-        
+
         if return_url:
             return url
         if is_notebook():

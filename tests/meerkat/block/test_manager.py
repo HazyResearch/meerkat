@@ -142,7 +142,6 @@ def test_apply_get_multiple(num_blocks, consolidated):
     product([1, 2, 3], [True, False]),
 )
 def test_apply_get_single(num_blocks, consolidated):
-
     mgr = BlockManager()
 
     for dtype in [int, float]:
@@ -191,7 +190,6 @@ def call_count(monkeypatch):
 
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_single_lambda(call_count, consolidated):
-
     mgr = BlockManager()
 
     base_col = mk.NumpyArrayColumn(np.arange(10))
@@ -210,7 +208,6 @@ def test_apply_get_single_lambda(call_count, consolidated):
 
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_multiple_lambda(call_count, consolidated):
-
     mgr = BlockManager()
 
     base_col = mk.NumpyArrayColumn(np.arange(10))

@@ -1,7 +1,5 @@
 from typing import Optional, Tuple, Union
 
-import numpy as np
-import sklearn
 import sklearn.cluster as skcluster
 from sklearn.base import ClusterMixin
 
@@ -22,9 +20,9 @@ def cluster(
     Args:
         data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel
             containing the column to cluster.
-        input (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
-            be embedded using the ``encoder`` and the resulting embedding will be used.
-            Ignored if ``data`` is a Column.
+        input (Union[str, Sequence[str]]): The column(s) to cluster by. These columns
+            will be embedded using the ``encoder`` and the resulting embedding
+            will be used. Ignored if ``data`` is a Column.
         method (Union[str, ClusterMixin]): The clustering method to use.
         encoder (str): The encoder to use for the embedding. Defaults to ``clip``.
         modality (Union[str, Sequence[str])): The modality to of the

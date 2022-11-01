@@ -1,18 +1,14 @@
 import functools
 import re
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple
 
 from fastapi import APIRouter, Body, HTTPException
-from pydantic import BaseModel
 
 import meerkat as mk
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.graph import BoxModification, StoreModification
 from meerkat.state import state
-
-from ....tools.utils import convert_to_python
-from .datapanel import SchemaResponse
 
 EmbeddedBody = functools.partial(Body, embed=True)
 
@@ -26,7 +22,7 @@ _SUPPORTED_MATCH_OPS = {
     "-": lambda x, y: x - y,
     "*": lambda x, y: x * y,
     "/": lambda x, y: x / y,
-    "**": lambda x, y: x**y,
+    "**": lambda x, y: x ** y,
 }
 
 
@@ -83,7 +79,8 @@ def match(
 
     try:
         # Parse the string to see if we should be running some operation on it.
-        # TODO (arjundd): Support more than one op. Potentially parse the string in order?
+        # TODO (arjundd): Support more than one op.
+        # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
         dp, match_columns = mk.match(
             data=dp, query=queries, input=input, return_column_names=True
@@ -115,7 +112,10 @@ def match(
 
     modifications = trigger(modifications)
     return modifications
-    # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
+    # return SchemaResponse(
+    #     id=pivot.datapanel_id,
+    #     columns=_get_column_infos(dp, match_columns)
+    # )
 
 
 @router.post("/{pivot_id}/add/")

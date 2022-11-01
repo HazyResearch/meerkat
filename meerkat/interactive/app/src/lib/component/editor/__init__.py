@@ -1,7 +1,9 @@
 from typing import List, Union
-from meerkat.interactive.graph import Box, Store, make_box, make_store
-from meerkat.interactive.edit import EditTarget
+
 import numpy as np
+
+from meerkat.interactive.edit import EditTarget
+from meerkat.interactive.graph import Box, Store, make_box, make_store
 
 from ..abstract import Component
 
@@ -16,7 +18,7 @@ class Editor(Component):
         col: Union[Store, str],
         target: EditTarget = None,
         selected: Store[List[int]] = None,
-        primary_key: str = None
+        primary_key: str = None,
     ) -> None:
         super().__init__()
         self.col = make_store(col)

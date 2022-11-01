@@ -1,8 +1,5 @@
-import numpy as np
-import pytest
 from fastapi.testclient import TestClient
 
-import meerkat as mk
 from meerkat.interactive.api.main import app
 
 client = TestClient(app)
@@ -23,7 +20,8 @@ def test_get_categories():
         "/llm/generate/categories",
         json={
             "dataset_description": "face images of people",
-            "hint": "i'm interested in exploring unusual correlations between attributes",
+            "hint": "i'm interested in exploring unusual correlations \
+                between attributes",
         },
     )
     assert response.status_code == 200

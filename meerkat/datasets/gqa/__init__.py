@@ -21,7 +21,6 @@ def crop_object(row: Mapping[str, object]):
 
 
 def build_gqa_dps(dataset_dir: str, write: bool = False) -> Dict[str, mk.DataPanel]:
-
     objects = []
     images = []
     relations = []

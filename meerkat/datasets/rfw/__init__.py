@@ -1,9 +1,5 @@
 import os
-import subprocess
-from multiprocessing.sharedctypes import Value
-from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 import meerkat as mk
@@ -11,7 +7,6 @@ import meerkat as mk
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import download_url, extract
 
 
 @datasets.register()

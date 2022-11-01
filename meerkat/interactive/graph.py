@@ -1,33 +1,15 @@
 from abc import ABC
 from collections import defaultdict
-from copy import copy
-from dataclasses import dataclass
 from functools import partial, wraps
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    Hashable,
-    List,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Dict, Generic, List, Set, TypeVar, Union
 
+from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
 from tqdm import tqdm
-from pydantic import BaseModel, StrictInt, StrictStr, StrictFloat, StrictBool
 
+from meerkat.datapanel import DataPanel
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.tools.utils import nested_apply
-
-if TYPE_CHECKING:
-    from meerkat.datapanel import DataPanel
-    from meerkat.ops.sliceby.sliceby import SliceByCards
 
 
 class NodeMixin:
@@ -323,7 +305,7 @@ def _nested_apply(obj: object, fn: callable, return_type: type = None):
 
 def _pack_boxes_and_stores(obj, return_type: type = None):
     from meerkat.datapanel import DataPanel
-    from meerkat.ops.sliceby.sliceby import SliceBy
+
     if return_type is Store:
         return Store(obj)
     elif return_type is Derived:
@@ -341,8 +323,7 @@ def _pack_boxes_and_stores(obj, return_type: type = None):
 def interface_op(
     fn: Callable = None, nested_return: bool = True, return_type: type = None
 ) -> Callable:
-    """
-    Functions decorated with this will create nodes in the operation graph.
+    """Functions decorated with this will create nodes in the operation graph.
 
     Args:
         fn: The function to decorate.
@@ -357,7 +338,9 @@ def interface_op(
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(interface_op, nested_return=nested_return, return_type=return_type)
+        return partial(
+            interface_op, nested_return=nested_return, return_type=return_type
+        )
 
     def _interface_op(fn: Callable):
         @wraps(fn)
@@ -371,7 +354,6 @@ def interface_op(
 
             if len(boxes) > 0 or len(stores) > 0:
                 from meerkat.datapanel import DataPanel
-                from meerkat.ops.sliceby.sliceby import SliceBy
 
                 if nested_return:
                     derived = _nested_apply(

@@ -18,7 +18,6 @@ __all__ = ["clip", "bit", "transformers", "robust", "embed"]
 
 
 def infer_modality(col: mk.AbstractColumn):
-
     if isinstance(col, mk.ImageColumn):
         return "image"
     elif isinstance(col, (mk.PandasSeriesColumn, str)):
@@ -38,7 +37,7 @@ def embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
-    pbar: bool = True, 
+    pbar: bool = True,
     **kwargs,
 ) -> Union[mk.DataPanel, mk.AbstractColumn]:
     """Embed a column of data with an encoder from the encoder registry.
@@ -138,7 +137,7 @@ def _embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
-    pbar: bool = True
+    pbar: bool = True,
 ):
     def _encode(x):
         return encode(_prepare_input(x)).cpu().detach().numpy()

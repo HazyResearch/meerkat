@@ -3,15 +3,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 import meerkat as mk
-from meerkat.interactive import Pivot
 from meerkat.interactive.api.main import app
-from meerkat.interactive.graph import (
-    BoxModification,
-    Pivot,
-    Store,
-    interface_op,
-    trigger,
-)
+from meerkat.interactive.graph import Store, interface_op
 
 client = TestClient(app)
 
@@ -26,7 +19,6 @@ def dp_testbed():
 
 
 def test_store():
-
     store = Store(0)
     derived = unary_op(store)
     response = client.post(f"/store/{store.id}/trigger/", json={"value": 2})

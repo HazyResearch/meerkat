@@ -1,16 +1,12 @@
-from dataclasses import dataclass
+from typing import Any, Dict, List, Sequence, Union
+
+from pydantic import BaseModel
 
 from meerkat.datapanel import DataPanel
+from meerkat.interactive.graph import Box, Store, interface_op, make_store
+
 from ..abstract import Component
-from typing import TYPE_CHECKING, Dict, Any, Sequence
-from meerkat.interactive.graph import Box, Store, make_store
 
-from typing import List, Union, Any
-
-from meerkat.interactive.graph import interface_op
-import functools
-import numpy as np
-from pydantic import BaseModel
 
 class SortCriterion(BaseModel):
     id: str
@@ -19,6 +15,7 @@ class SortCriterion(BaseModel):
     ascending: bool
     source: str = ""
 
+
 @interface_op
 def sort_by_criteria(
     data: DataPanel,
@@ -26,7 +23,8 @@ def sort_by_criteria(
 ):
     """Wrapper around mk.sort that adds unpacking of store to the DAG."""
     import meerkat as mk
-    # since the criteria can either be a list of dictionary or of FilterCriterion 
+
+    # since the criteria can either be a list of dictionary or of FilterCriterion
     # we need to convert them to FilterCriterion
     criteria = [
         criterion
@@ -55,6 +53,7 @@ class Sort(Component):
     view of the datapanel. The sort operation is out-of-place, so a
     new datapanel will be returned as a result of the op.
     """
+
     name = "Sort"
 
     def __init__(

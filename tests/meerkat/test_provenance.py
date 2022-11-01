@@ -50,7 +50,6 @@ def custom_fn(dp1, dp2, x):
 
 
 def test_custom_fn():
-
     with provenance():
         dp1 = DataPanel.from_batch(
             {
@@ -88,7 +87,6 @@ def test_custom_fn():
 
 
 def test_get_provenance():
-
     with provenance():
         dp1 = DataPanel.from_batch(
             {

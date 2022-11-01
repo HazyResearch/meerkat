@@ -14,7 +14,6 @@ from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
 
 # flake8: noqa: E501
-from ..columns.test_common import column_testbed
 
 
 @pytest.mark.parametrize(
@@ -22,7 +21,6 @@ from ..columns.test_common import column_testbed
     product([True, False], [1, 2, 3]),
 )
 def test_datapanel_row_concat(use_visible_columns, n):
-
     mock_dp = MockDatapanel(
         length=16,
         use_visible_columns=use_visible_columns,
@@ -38,7 +36,6 @@ def test_datapanel_row_concat(use_visible_columns, n):
 
 
 def test_datapanel_column_concat():
-
     mock_dp = MockDatapanel(
         length=16,
         use_visible_columns=False,

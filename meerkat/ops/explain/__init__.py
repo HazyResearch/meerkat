@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Tuple, Union
-
-import numpy as np
+from typing import TYPE_CHECKING, Mapping, Tuple, Union
 
 from meerkat import AbstractColumn, DataPanel, NumpyArrayColumn, embed
 
@@ -17,15 +15,15 @@ def explain(
     modality: str = None,
     **kwargs,
 ) -> Tuple[NumpyArrayColumn, "Slicer"]:
-    """Cluster the data in a column. If the column is an unstructured type, (e.g.
-    image), the column is first embedded then clustered.
+    """Cluster the data in a column. If the column is an unstructured type,
+    (e.g. image), the column is first embedded then clustered.
 
     Args:
         data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel
             containing the column to cluster.
-        input (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
-            be embedded using the ``encoder`` and the resulting embedding will be used.
-            Ignored if ``data`` is a Column.
+        input (Union[str, Sequence[str]]): The column(s) to cluster by. These
+            columns will be embedded using the ``encoder`` and the resulting
+            embedding will be used. Ignored if ``data`` is a Column.
         method (Union[str, Slicer]): The clustering method to use.
         encoder (str): The encoder to use for the embedding. Defaults to ``clip``.
         modality (Union[str, Sequence[str])): The modality to of the
@@ -71,7 +69,7 @@ def explain(
     method.fit(embeddings=data_embedding.data, **target)
     slices = method.predict(
         embeddings=data_embedding.data,
-        targets=None, 
+        targets=None,
         pred_probs=None,
     )
 

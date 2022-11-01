@@ -42,7 +42,6 @@ class MockModel(pl.LightningModule):
 
 
 def generate_input(num_inputs, input_size: tuple, output_size: tuple):
-
     dp = DataPanel(
         {
             "input": torch.randn(num_inputs, *input_size),

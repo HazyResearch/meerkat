@@ -6,14 +6,14 @@ from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
 import meerkat as mk
-from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.datapanel import DataPanel
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.graph import BoxModification
 from meerkat.state import state
-import pandas as pd
+
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
@@ -68,9 +68,7 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
                 ),
             )
 
-    columns = [
-        column for column in columns if not column.startswith("_")
-    ]
+    columns = [column for column in columns if not column.startswith("_")]
 
     return [
         ColumnInfo(
@@ -121,10 +119,10 @@ def rows(
         indices = list(range(start, end))
     elif keys is not None:
         if key_column is None:
-            # TODO(sabri): when we add support for primary keys this should defualt to 
+            # TODO(sabri): when we add support for primary keys this should defualt to
             # the primary key
             raise ValueError("Must provide key_column if keys are provided")
-        
+
         # FIXME(sabri): this will only work if key_column is a pandas column
         dp = dp.lz[dp[key_column].isin(keys)]
     else:
@@ -242,7 +240,8 @@ def edit_target(
                 if default is None:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Column {column_name} does not exist in target datapanel",
+                        detail=f"Column {column_name} \
+                            does not exist in target datapanel",
                     )
                 default_col = np.full(len(target_dp), default)
                 if isinstance(default, str):

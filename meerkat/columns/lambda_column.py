@@ -13,7 +13,6 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.display import lambda_cell_formatter
 from meerkat.errors import ConcatWarning, ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -149,6 +148,7 @@ class LambdaColumn(AbstractColumn):
     @staticmethod
     def _get_default_formatter() -> Callable:
         from meerkat.interactive.formatter import BasicFormatter
+
         return BasicFormatter()
 
     def _repr_cell(self, idx):

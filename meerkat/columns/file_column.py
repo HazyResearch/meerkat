@@ -1,16 +1,14 @@
 from __future__ import annotations
-from ctypes import Union
-from email.policy import default
-import io
-import functools
 
+import functools
+import io
 import logging
 import os
 import urllib.request
 import warnings
+from ctypes import Union
 from string import Template
-from typing import BinaryIO, BinaryIO, Callable, Sequence
-from urllib.error import HTTPError
+from typing import Callable, Sequence
 from urllib.parse import urlparse
 
 import dill
@@ -41,8 +39,9 @@ class FileLoader:
         Args:
             downloader (callable): a callable that accepts at least two positional
                 arguments - a URI and a destination (which could be either a string or
-                file object). Optionally, it can accept a `fallback_downloader` argument, which
-                the
+                file object). Optionally, it can accept a `fallback_downloader`
+                argument, which the
+                TODO(karan): finish this docstring
         """
         self.transform = transform
         self.loader = loader
@@ -106,8 +105,9 @@ class FileLoader:
                     self.downloader(filepath, dst)
                 except Exception as e:
                     if self.fallback_downloader is not None:
-                        # if user passes fallback_downloader, then on any failed download, we
-                        # write the default data to the destination and continue
+                        # if user passes fallback_downloader, then on any
+                        # failed download, we write the default data to the
+                        # destination and continue
                         warnings.warn(
                             f"Failed to download {filepath} with error {e}. Falling "
                             "back to default data."
@@ -137,7 +137,8 @@ class FileLoader:
         return hash((self.loader, self.transform, self.base_dir))
 
     def __setstate__(self, state):
-        # need to add downloader if it is missing from state, for backwards compatibility
+        # need to add downloader if it is missing from state,
+        # for backwards compatibility
         if "downloader" not in state:
             state["downloader"] = None
         if "fallback_downloader" not in state:
