@@ -1,7 +1,7 @@
 
 import meerkat as mk
 
-dp = mk.get("imagenette").lz[:2000]
+dp = mk.get("imagenette", version="160px").lz[:2000]
 dp_pivot = mk.gui.Pivot(dp)
 
 dp = mk.embed(

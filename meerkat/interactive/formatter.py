@@ -3,6 +3,7 @@
 1.
 """
 import base64
+import math 
 from abc import ABC, abstractmethod
 from io import BytesIO
 from typing import TYPE_CHECKING, Any, Union
@@ -68,10 +69,15 @@ class BasicFormatter(Formatter):
         self.dtype = dtype
 
     def encode(self, cell: Any):
+        # check for native python nan
+        if isinstance(cell, float) and math.isnan(cell):
+            return "NaN"
+            
         if isinstance(cell, np.generic):
             if pd.isna(cell):
-                return "nan"
+                return "NaN"
             return cell.item()
+
         if hasattr(cell, "as_py"):
             return cell.as_py()
         return cell
@@ -101,6 +107,7 @@ class ObjectFormatter(Formatter):
 
 
 class NumpyArrayFormatter(BasicFormatter):
+    
     cell_component = "basic"
 
     def encode(self, cell: Any):
