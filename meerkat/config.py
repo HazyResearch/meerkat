@@ -38,7 +38,6 @@ class MeerkatConfig:
 
         return config
 
-
 @dataclass
 class DisplayConfig:
     max_rows: int = 10
@@ -52,6 +51,7 @@ class DisplayConfig:
 @dataclass
 class SystemConfig:
     use_gpu: bool = True
+    ssh_identity_file: str = os.path.join(Path.home(), ".meerkat/ssh/id_rsa")
 
 
 

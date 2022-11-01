@@ -9,21 +9,18 @@ import re
 import socket
 import subprocess
 import time
-from contextlib import closing
-from tempfile import mkstemp, mktemp
+from tempfile import mkstemp
 
-import requests
 from uvicorn import Config
 
 from meerkat.interactive.api import MeerkatAPI
 from meerkat.interactive.server import (
     INITIAL_PORT_VALUE,
     LOCALHOST_NAME,
-    MEERKAT_API_SERVER,
     TRY_NUM_PORTS,
     Server,
 )
-from meerkat.interactive.tunneling import create_tunnel
+from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import NetworkInfo, state
 
 
@@ -74,11 +71,37 @@ def get_first_available_port(initial: int, final: int) -> int:
 
 
 def start(
+    shareable: bool = False,
+    subdomain: str = None,
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
 ):
-    """Start Meerkat interactive mode in a Jupyter notebook."""
+    """Start a Meerkat interactive server.
+    
+    Args:
+        shareable (bool): whether to share the interface at a publicly accesible link.
+            This feature works by establishing a reverse SSH tunnel to a Meerkat server. 
+            Do not use this feature with private data. In order to use this feature, you
+            will need an SSH key for the server. If you already have one, add it to the 
+            file at f"{config.system.ssh_identity_file}, or set the option 
+            `mk.config.system.ssh_identity_file` to the file where they are stored. If 
+            you don't yet have a key, you can request access by emailing 
+            eyuboglu@stanford.edu. Remember to ensure after downloading it that the 
+            identity file is read/write only by the user (e.g. with 
+            `chmod 600 path/to/id_file`). See `subdomain` arg for controlling the 
+            domain name of the shared link. Defaults to False.
+        subdomain (str): the subdomain to use for the shared link. For example, if
+            `subdomain="myinterface"`, then the shareable link will have the domain
+            `myinterface.meerkat.wiki`. Defaults to None, in which case a random 
+            subdomain will be generated.
+        api_port (int): the port to use for the Meerkat API server. Defaults to None,
+            in which case a random port will be used.
+        npm_port (int): the port to use for the Meerkat Vite server. Defaults to None,
+            in which case a random port will be used.
+    """
+    if subdomain is None:
+        subdomain = "app"
 
     api_server_name = api_server_name or LOCALHOST_NAME
 
@@ -117,9 +140,17 @@ def start(
         npm_server_port=npm_port,
     )
 
+    if shareable:
+        domain = setup_tunnel(network_info.api_server_port, subdomain=f"{subdomain}server")
+        network_info.shareable_api_server_name = domain
+        
+
     # npm run dev -- --port {npm_port}
     current_env = os.environ.copy()
-    current_env.update({"VITE_API_URL": network_info.api_server_url})
+    if shareable:
+        current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
+    else:
+        current_env.update({"VITE_API_URL": network_info.api_server_url})
 
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
@@ -157,12 +188,19 @@ def start(
         )
         if match is not None:
             break
-
+    
+    # TODO(Sabri): add check for Vite actually being installed, and provide instructions
+    # in the error message for fixing 
+    
     if match is None:
         raise ValueError(
             f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}"
         )
     network_info.npm_server_port = int(match.group(1))
+
+    if shareable:
+        domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)
+        network_info.shareable_npm_server_name = domain
 
     # Back to the original directory
     os.chdir(currdir)
@@ -170,21 +208,12 @@ def start(
     # Store in global state
     state.network_info = network_info
 
-    return network_info
-
-
-def setup_tunnel(local_server_port: int, endpoint: str) -> str:
-    response = requests.get(
-        endpoint + "/v1/tunnel-request" if endpoint is not None else MEERKAT_API_SERVER
+    # Print a message
+    print(
+        f"Meerkat interactive mode started! API on {network_info.api_server_url}, \
+        and GUI server on {network_info.npm_server_url}."
     )
-    if response and response.status_code == 200:
-        try:
-            payload = response.json()[0]
-            return create_tunnel(payload, LOCALHOST_NAME, local_server_port)
-        except Exception as e:
-            raise RuntimeError(str(e))
-    else:
-        raise RuntimeError("Could not get share link from Meerkat API Server.")
+    return network_info
 
 
 def output_startup_message(url: str):

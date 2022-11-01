@@ -84,7 +84,7 @@
 			{/await}
 		</div>
 
-		<div class="flex overflow-x-scroll no-scrollbar mx-2 items-center space-x-4">
+		<div class="flex overflow-x-scroll mx-2 items-center space-x-4"> 
 			{#if rows.rows.length < 1}
 				<LoadButton status="loading" on:load={load_rows} />
 			{:else}

@@ -20,12 +20,9 @@
 	$: {
 		schema_promise = $get_schema($dp.box_id);
 		items_promise = schema_promise.then((schema: DataPanelSchema) => {
-			return schema.columns.map((column) => {
-				return {
-					value: column.name,
-					label: column.name
-				};
-			});
+			return schema.columns.filter((column) => {
+				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
+			}).map(column =>  ({value: column.name, label: column.name}))
 		});
 	}
 
@@ -48,7 +45,7 @@
 			})
 			.catch((error: TypeError) => {
 				status = 'error';
-				console.log(error)
+				console.log(error);
 			});
 	};
 
@@ -59,14 +56,14 @@
 	function handleClear() {
 		$against = '';
 	}
-	$: against_item ={value: $against, label: $against};
+	$: against_item = { value: $against, label: $against };
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
-	{#if title != ""}
-	<div class="font-bold text-xl text-slate-600 self-start pl-2">
-		{title}
-	</div>
+	{#if title != ''}
+		<div class="font-bold text-xl text-slate-600 self-start pl-2">
+			{title}
+		</div>
 	{/if}
 	<div class="form-control">
 		<div class="input-group w-100% flex items-center">

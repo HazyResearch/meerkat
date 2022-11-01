@@ -97,9 +97,10 @@ class Interface(IdentifiableMixin):
         components: Union[List[Component], Dict[str, Component]] = None,
         layout: Layout = None,
         name: str = "Interface",
+        id: str = None,
     ):
 
-        super().__init__()
+        super().__init__(id=id)
 
         self.name = name
 
@@ -120,7 +121,11 @@ class Interface(IdentifiableMixin):
                 "Run `network = mk.gui.start()` first."
             )
 
-        url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
+        if state.network_info.shareable_npm_server_name is not None:
+            url = f"{state.network_info.shareable_npm_server_url}/interface?id={self.id}"
+        else:
+            url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
+        
         if return_url:
             return url
         if is_notebook():

@@ -55,6 +55,8 @@ def get(
             even if it exists, "extract" will reuse any downloaded archives but
             force extracting those archives, and "skip" will not download the dataset
             if it doesn't yet exist. Defaults to `reuse`.
+        registry (str): The registry to use. If None, then checks each supported registry in turn. 
+            Currently, supported registries include `meerkat` and `huggingface`.
         **kwargs: Additional arguments passed to the dataset.
     """
     if download_mode not in DOWNLOAD_MODES:
@@ -71,15 +73,6 @@ def get(
     errors = []
     for registry in registry_order:
         if registry == "meerkat":
-
-            dataset = datasets.get(
-                name=name,
-                dataset_dir=dataset_dir,
-                version=version,
-                download_mode=download_mode,
-                **kwargs,
-            )
-            return dataset
             try:
                 dataset = datasets.get(
                     name=name,
@@ -125,7 +118,8 @@ def get(
 
 
 def versions(name: str) -> List[str]:
-    """Get the versions of a dataset. These can be passed to the ``version``
+    """
+    Get the versions of a dataset. These can be passed to the ``version``
     argument of the :func:`~meerkat.get` function.
 
     Args:

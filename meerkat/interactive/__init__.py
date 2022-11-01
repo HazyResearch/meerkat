@@ -2,6 +2,7 @@ import pathlib
 
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.gallery import Gallery
+from .app.src.lib.component.markdown import Markdown
 from .app.src.lib.component.match import Match
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.stats import Stats
@@ -30,6 +31,7 @@ from .graph import (
 from .edit import (
     EditTarget,
 )
+from .app.src.lib.component.choice import Choice
 from .startup import start
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
@@ -48,6 +50,7 @@ __all__ = [
     "trigger",
     "Component",
     "Gallery",
+    "Markdown",
     "Match",
     "Row",
     "Plot",
@@ -64,4 +67,5 @@ __all__ = [
     "Editor",
     "Sort",
     "StatsLabeler",
+    "Choice",
 ]
