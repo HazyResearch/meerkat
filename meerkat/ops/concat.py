@@ -40,6 +40,13 @@ def concat(
         return DataPanel()
 
     if not all([type(objs[0]) == type(obj) for obj in objs[1:]]):
+        _any_object_empty = any([len(obj) == 0 for obj in objs])
+        if _any_object_empty:
+            raise ConcatError(
+                """All objects passed to concat must be of same type.
+This error may be because you have empty `objs`.
+Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
+            )
         raise ConcatError("All objects passed to concat must be of same type.")
 
     if isinstance(objs[0], DataPanel):

@@ -807,7 +807,9 @@ class DataPanel(
             random_state=random_state,
         )
 
-    def drop(self, columns: Union[str, Collection[str]]) -> DataPanel:
+    def drop(
+        self, columns: Union[str, Collection[str]], check_exists=True
+    ) -> DataPanel:
         """Return a new DataPanel with the specified columns dropped.
 
         Args:
@@ -819,7 +821,7 @@ class DataPanel(
         if isinstance(columns, str):
             columns = [columns]
         for c in columns:
-            if c not in self.columns:
+            if c not in self.columns and check_exists:
                 raise ValueError(
                     f"Cannot drop nonexistent column '{c}' from DataPanel."
                 )
