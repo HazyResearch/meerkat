@@ -28,7 +28,12 @@ def infer_modality(col: mk.AbstractColumn):
         if isinstance(col[0], pyarrow.lib.StringScalar):
             return "text"
     else:
-        raise ValueError(f"Cannot infer modality from column of type {type(col)}.")
+        raise ValueError(
+            f"Cannot infer modality \
+            from column of type {type(col)}. \
+            Please pass in the modality argument explicitly \
+            with `modality=text` or `modality=image`."
+        )
 
 
 # @cache(params=["encoder", "modality", ""])
