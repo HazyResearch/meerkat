@@ -2,6 +2,7 @@ import pathlib
 
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.choice import Choice
+from .app.src.lib.component.document import Document
 from .app.src.lib.component.editor import Editor
 from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
@@ -42,6 +43,7 @@ __all__ = [
     "PivotConfig",
     "Derived",
     "DerivedConfig",
+    "Document",
     "Store",
     "StoreConfig",
     "make_store",
