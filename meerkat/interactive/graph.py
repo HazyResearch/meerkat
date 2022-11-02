@@ -46,18 +46,6 @@ class BoxConfig(BaseModel):
 T = TypeVar("T", "DataPanel", "SliceBy")
 
 
-class Box(IdentifiableMixin, NodeMixin, Generic[T]):
-    identifiable_group: str = "boxes"
-
-    def __init__(self, obj):
-        super().__init__()
-        self.obj = obj
-
-    @property
-    def config(self):
-        return BoxConfig(box_id=self.id, type="DataPanel")
-
-
 class Modification(BaseModel, ABC):
     id: str
 
@@ -93,8 +81,30 @@ class PivotConfig(BoxConfig):
     pass
 
 
+class Box(IdentifiableMixin, NodeMixin, Generic[T]):
+    identifiable_group: str = "boxes"
+
+    def __init__(self, obj):
+        super().__init__()
+        self.obj = obj
+
+    @property
+    def config(self):
+        return BoxConfig(box_id=self.id, type="DataPanel")
+
+    def __getattr__(self, name):
+        return getattr(self.obj, name)
+
+    def __getitem__(self, key):
+        return self.obj[key]
+
+    def __repr__(self):
+        return f"Box({self.obj})"
+
+
 class Pivot(Box, Generic[T]):
-    pass
+    def __repr__(self):
+        return f"Pivot({self.obj})"
 
 
 class DerivedConfig(BoxConfig):
