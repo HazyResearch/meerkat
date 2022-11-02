@@ -98,10 +98,13 @@ def get(
                     raise ValueError(
                         "Download mode `skip` isn't supported for HuggingFace datasets."
                     )
+
+                # Add version argument if specified
+                if version is not None:
+                    kwargs["version"] = version
                 dataset = DataPanel.from_huggingface(
                     path=name,
                     download_mode=mapping[download_mode],
-                    version=version,
                     cache_dir=dataset_dir,
                     **kwargs,
                 )
