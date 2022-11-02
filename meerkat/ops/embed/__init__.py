@@ -22,6 +22,11 @@ def infer_modality(col: mk.AbstractColumn):
         return "image"
     elif isinstance(col, (mk.PandasSeriesColumn, str)):
         return "text"
+    elif isinstance(col, mk.ArrowArrayColumn):
+        import pyarrow
+
+        if isinstance(col[0], pyarrow.lib.StringScalar):
+            return "text"
     else:
         raise ValueError(f"Cannot infer modality from column of type {type(col)}.")
 
@@ -93,14 +98,21 @@ def embed(
     """
     col = data if isinstance(data, mk.AbstractColumn) else data[input]
 
+    if len(data) == 0:
+        return data
+
     device = choose_device(device)
 
     if out_col is None:
         out_col = f"{encoder}({input})"
 
     if modality is None:
-
         modality = infer_modality(col=col)
+
+        # TODO(karan): a hacky way to handle error with processing
+        # pyarrow.lib.StringScalars in a mk.ArrowArrayColumn
+        if modality == "text" and isinstance(col, mk.ArrowArrayColumn):
+            col = mk.PandasSeriesColumn(col.to_pandas())
 
     encoder = encoders.get(encoder, device=device, **kwargs)
 
