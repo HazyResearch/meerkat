@@ -201,7 +201,7 @@ def start(
             f"Failed to start dev server: \
             out={network_info.npm_server_out} err={network_info.npm_server_err}"
         )
-    network_info.npm_server_port = int(match.group(1))
+    network_info.npm_server_port = int(match.group(2))
 
     if shareable:
         domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)
