@@ -124,7 +124,10 @@ doc_id_choice = mk.gui.Choice(
     choices=list(story_doc_dp["id"]),  # choices are the document ids
 )
 # ...access the chosen document id with `choice.value`
-# this is a Store object whose value can be accessed with `<store>.value`
+# this is a `Store` object whose value can be accessed with `<store>.value`
+# Stores are a way to keep track of state that is changing as the user interacts
+# with the frontend. Their value will automatically be synced by Meerkat
+# with the frontend.
 
 # Hacky way to get the index of the chosen document id
 # We're adding support for primary keys in Meerkat, so this will be
@@ -144,7 +147,10 @@ def choose_doc(doc_id):
     - return the corresponding row from the `story_doc_dp` DataPanel,
     for column `section_dp`
 
-    Important: this code needs to be inside a function
+    Important: this code needs to be inside a function, e.g. if you
+    copy and paste this code outside of the function, it won't work.
+    This is because the `@mk.gui.interface_op` decorator does some
+    work to unwrap the `doc_id` Store.
     """
     # Get the document index
     doc_idx = _index[doc_id]
