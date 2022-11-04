@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Cell,{ type CellInterface } from '$lib/components/cell/Cell.svelte';
+	import Cell,{ type CellInterface } from '$lib/shared/cell/Cell.svelte';
 	import { zip } from 'underscore';
-	import Pill from '$lib/components/common/Pill.svelte';
+	import Pill from '$lib/shared/common/Pill.svelte';
 
 	export let pivot: CellInterface;
 	export let pivot_header: string;

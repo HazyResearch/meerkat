@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class Formatter(ABC):
 
     # one of the front end cell components implemented here:
-    # meerkat/interactive/app/src/lib/components/item
+    # meerkat/interactive/app/src/lib/shared/item
     # (e.g. "image", "code")
     cell_component: str
 

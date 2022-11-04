@@ -8,8 +8,8 @@ const config = {
 	resolve: {
 		alias: {
 			// these are the aliases and paths to them
-			$components: path.resolve('./src/lib/components'),
-			$layout: path.resolve('./src/lib/components/layout'),
+			$shared: path.resolve('./src/lib/shared'),
+			$layout: path.resolve('./src/lib/shared/layout'),
 			$layouts: path.resolve('./src/lib/layouts'),
 			$utils: path.resolve('./src/lib/utils'),
 			$styles: path.resolve('./src/lib/styles'),

@@ -10,18 +10,18 @@
 		sort,
 		type DataPanelSchema
 	} from '$lib/api/datapanel';
-	import Tab from '$lib/components/header/Tab.svelte';
-	import Tabs from '$lib/components/header/Tabs.svelte';
-	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import PlotHeader from '$lib/components/plot_header/PlotHeader.svelte';
-	import Table from '$lib/components/table/Table.svelte';
+	import Tab from '$lib/shared/header/Tab.svelte';
+	import Tabs from '$lib/shared/header/Tabs.svelte';
+	import MatchHeader from '$lib/shared/match_header/MatchHeader.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
+	import PlotHeader from '$lib/shared/plot_header/PlotHeader.svelte';
+	import Table from '$lib/shared/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import DummyBlock from './components/blocks/DummyBlock.svelte';
-	import Everything from './components/blocks/Everything.svelte';
-	import FilterHeader from './components/filter_header/FilterHeader.svelte';
-	import Gallery from './components/gallery/Cards.svelte';
-	import CategoryGenerator from './components/lm/CategoryGenerator.svelte';
+	import DummyBlock from './shared/blocks/DummyBlock.svelte';
+	import Everything from './shared/blocks/Everything.svelte';
+	import FilterHeader from './shared/filter_header/FilterHeader.svelte';
+	import Gallery from './shared/gallery/Cards.svelte';
+	import CategoryGenerator from './shared/lm/CategoryGenerator.svelte';
 
 	export let datapanel_id: string;
 	export let nrows: number = 0;

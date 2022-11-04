@@ -3,8 +3,8 @@
 	import { getContext } from 'svelte';
 	import type { DataPanelBox, EditTarget } from '$lib/utils/types';
 	import { get } from 'svelte/store';
-	import Cell from '$lib/components/cell/Cell.svelte';
-	import BasicCell from '$lib/components/cell/basic/Basic.svelte';
+	import Cell from '$lib/shared/cell/Cell.svelte';
+	import BasicCell from '$lib/shared/cell/basic/Basic.svelte';
 
 	const { get_rows, get_schema, edit_target } = getContext('Interface');
 

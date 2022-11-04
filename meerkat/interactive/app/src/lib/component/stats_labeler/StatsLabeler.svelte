@@ -4,11 +4,11 @@
 	import X from 'svelte-bootstrap-icons/lib/X.svelte';
 	import Check2 from 'svelte-bootstrap-icons/lib/Check2.svelte';
 
-	import Status from '$lib/components/common/Status.svelte';
+	import Status from '$lib/shared/common/Status.svelte';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
 	import Phases from './Phases.svelte';
-	import Interval from '$lib/components/cell/interval/Interval.svelte';
+	import Interval from '$lib/shared/cell/interval/Interval.svelte';
 	import { map } from 'underscore';
 
 	const { edit_target, get_rows } = getContext('Interface');

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
+	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
 	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
-	import type { Point2D } from '$lib/components/plot/types';
+	import type { Point2D } from '$lib/shared/plot/types';
 
 	const { get_rows, remove_row_by_index } = getContext('Interface');
 

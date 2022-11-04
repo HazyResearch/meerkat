@@ -6,8 +6,8 @@
 	import type { SliceKey } from '$lib/api/sliceby';
 	import type { SliceByBox } from '$lib/utils/types';
 	import RowCard from './RowCard.svelte';
-	import LoadButton from '$lib/components/common/LoadButton.svelte';
-	import Pill from '$lib/components/common/Pill.svelte';
+	import LoadButton from '$lib/shared/common/LoadButton.svelte';
+	import Pill from '$lib/shared/common/Pill.svelte';
 
 	const { get_sliceby_rows } = getContext('Interface');
 

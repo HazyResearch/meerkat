@@ -1,4 +1,4 @@
-import { global_stores, store_lock } from "$lib/components/blanks/stores";
+import { global_stores, store_lock } from "$lib/shared/blanks/stores";
 import { get as get_store } from "svelte/store";
 
 

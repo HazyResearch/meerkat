@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';

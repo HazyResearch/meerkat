@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Table from '$lib/components/table/Table.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
+	import Table from '$lib/shared/table/Table.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 

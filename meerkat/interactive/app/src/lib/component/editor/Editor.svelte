@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import Status from '$lib/components/common/Status.svelte';
+	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';

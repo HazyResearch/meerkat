@@ -2,7 +2,7 @@
 	import { get, writable, type Writable } from 'svelte/store';
 	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
 	import { getContext } from 'svelte';
-	import Status from '$lib/components/common/Status.svelte';
+	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 
 	const { get_schema, match } = getContext('Interface');

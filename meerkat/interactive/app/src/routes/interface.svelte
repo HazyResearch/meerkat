@@ -20,7 +20,7 @@
 
 	import type { SliceKey } from '$lib/api/sliceby';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
-	import { global_stores, meerkat_writable } from '$lib/components/blanks/stores';
+	import { global_stores, meerkat_writable } from '$lib/shared/blanks/stores';
 	import { get_request, modify, post } from '$lib/utils/requests';
 	import { nestedMap } from '$lib/utils/tools';
 	import type { EditTarget, Interface } from '$lib/utils/types';
