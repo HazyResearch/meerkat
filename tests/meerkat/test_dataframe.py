@@ -908,7 +908,7 @@ def test_to_pandas():
 
     df_pd = df.to_pandas()
     assert isinstance(df_pd, pd.DataFrame)
-    assert all(list(df.columns) == list(df_pd.columns))
+    assert list(df.columns) == list(df_pd.columns)
     assert len(df) == len(df_pd)
 
     assert (df_pd["a"].values == df["a"].data).all()
