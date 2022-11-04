@@ -1,6 +1,6 @@
 from typing import Dict, List, Union
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 from .celeba import celeba
 from .coco import coco
@@ -42,7 +42,7 @@ def get(
     download_mode: str = "reuse",
     registry: str = None,
     **kwargs,
-) -> Union[DataPanel, Dict[str, DataPanel]]:
+) -> Union[DataFrame, Dict[str, DataFrame]]:
     """Load a dataset into .
 
     Args:
@@ -102,7 +102,7 @@ def get(
                 # Add version argument if specified
                 if version is not None:
                     kwargs["version"] = version
-                dataset = DataPanel.from_huggingface(
+                dataset = DataFrame.from_huggingface(
                     path=name,
                     download_mode=mapping[download_mode],
                     cache_dir=dataset_dir,

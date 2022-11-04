@@ -20,7 +20,7 @@ from .ref import BlockRef
 
 
 class BlockManager(MutableMapping):
-    """Manages all blocks in a DataPanel."""
+    """Manages all blocks in a DataFrame."""
 
     def __init__(self) -> None:
         self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7
@@ -369,7 +369,7 @@ class BlockManager(MutableMapping):
         columns: Sequence[str] = None,
         **kwargs,
     ) -> BlockManager:
-        """Load a DataPanel stored on disk."""
+        """Load a DataFrame stored on disk."""
 
         # Load the metadata
         meta = dict(

@@ -1,6 +1,6 @@
 from typing import Sequence, Union
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Pivot, Store, make_store
 
 from ..abstract import Component
@@ -11,7 +11,7 @@ class Plot(Component):
 
     def __init__(
         self,
-        data: Pivot[DataPanel],
+        data: Pivot[DataFrame],
         selection: Union[list, Store],
         x: Union[str, Store],
         y: Union[str, Store],
@@ -47,7 +47,7 @@ class Plot(Component):
     @property
     def props(self):
         props = {
-            "dp": self.data.config,
+            "df": self.data.config,
             "selection": self.selection.config,
             "x": self.x.config,
             "y": self.y.config,

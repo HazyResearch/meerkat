@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import box, datapanel, interface, llm, ops, sliceby, store
+from .routers import box, dataframe, interface, llm, ops, sliceby, store
 
 app = FastAPI(debug=True)
 
 app.include_router(interface.router)
-app.include_router(datapanel.router)
+app.include_router(dataframe.router)
 app.include_router(sliceby.router)
 app.include_router(llm.router)
 app.include_router(box.router)

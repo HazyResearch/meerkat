@@ -1,12 +1,12 @@
 
-DataPanel Internals: Blocks
+DataFrame Internals: Blocks
 ============================
-In Meerkat, the columns of a DataPanel are grouped together into *blocks*, sets of columns with similar underlying storage (*e.g.* NumPy arrays). Organizing columns into blocks enables:
+In Meerkat, the columns of a DataFrame are grouped together into *blocks*, sets of columns with similar underlying storage (*e.g.* NumPy arrays). Organizing columns into blocks enables:
 
 1. Vectorized row-wise operations (*e.g.* slicing, reduction)
 2. Simplified I/O and improved latency
 
-The most important internal piece of the Meerkat :class:`~meerkat.DataPanel` implementation is the :class:`~meerkat.block.manager.BlockManager`, a dict-like object that maps column names to columns. The  :class:`~meerkat.block.manager.BlockManager` manages links between a DataPanel's columns and data blocks (`AbstractBlock`, `NumpyBlock`) where the data is actually stored. It implements `consolidate`, which takes columns of similar type in a DataPanel and stores their data together in a block, and `apply` which applies row-wise operations (e.g. __getitem__) to the blocks in a vectorized fashion. Other important classes:  
+The most important internal piece of the Meerkat :class:`~meerkat.DataFrame` implementation is the :class:`~meerkat.block.manager.BlockManager`, a dict-like object that maps column names to columns. The  :class:`~meerkat.block.manager.BlockManager` manages links between a DataFrame's columns and data blocks (`AbstractBlock`, `NumpyBlock`) where the data is actually stored. It implements `consolidate`, which takes columns of similar type in a DataFrame and stores their data together in a block, and `apply` which applies row-wise operations (e.g. __getitem__) to the blocks in a vectorized fashion. Other important classes:  
 
 - :class:`~meerkat.block.ref.BlockRef` objects link a block with the  :class:`~meerkat.block.manager.BlockManager`. These are critical to the functioning of the BlockManager and are the primary type of object passed between the blocks and the block manager. They consists of two things:
 
@@ -19,8 +19,8 @@ The most important internal piece of the Meerkat :class:`~meerkat.DataPanel` imp
 :class:`~meerkat.block.manager.BlockManager`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Manages all the columns in a :class:`~meerkat.DataPanel` and holds references
-(:class:`~meerkat.block.ref.BlockRef`) to all the blocks in a :class:`~meerkat.DataPanel`. This is done with
+Manages all the columns in a :class:`~meerkat.DataFrame` and holds references
+(:class:`~meerkat.block.ref.BlockRef`) to all the blocks in a :class:`~meerkat.DataFrame`. This is done with
 two collections:
 
 -  ``_columns``, a dictionary mapping from column names to
@@ -71,7 +71,7 @@ block \***\*
 ``BlockRef``
 ~~~~~~~~~~~~
 
-A ``BlockRef`` is the link between a DataPanel and a single block. It
+A ``BlockRef`` is the link between a DataFrame and a single block. It
 consists of two things:
 
 -  A reference to the block (``self._block``)

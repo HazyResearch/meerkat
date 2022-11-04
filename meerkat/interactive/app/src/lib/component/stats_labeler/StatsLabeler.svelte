@@ -13,7 +13,7 @@
 
 	const { edit_target, get_rows } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let label_target: EditTarget;
 	export let phase_target: EditTarget;
 	export let primary_key: string;
@@ -34,7 +34,7 @@
 
 	let counts_promise: any;
 	$: {
-		$dp; // needed to trigger on dp change
+		$df; // needed to trigger on df change
 		console.log(col)
 		counts_promise = $get_rows(
 			label_target.target.box_id,
@@ -71,7 +71,7 @@
 
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
-				$dp.box_id,
+				$df.box_id,
 				label_target,
 				value,
 				col,
@@ -82,7 +82,7 @@
 			);
 		} else {
 			modifications_promise = $edit_target(
-				$dp.box_id,
+				$df.box_id,
 				label_target,
 				value,
 				col,

@@ -12,17 +12,17 @@ class Table(Component):
 
     def __init__(
         self,
-        dp: Box,
+        df: Box,
         edit_target: EditTarget = None,
         per_page: int = 100,
         column_widths: list = None,
     ) -> None:
         super().__init__()
 
-        self.dp = make_box(dp)
+        self.df = make_box(df)
         if edit_target is None:
-            self.dp.obj["_edit_id"] = np.arange(len(self.dp.obj))
-            edit_target = EditTarget(self.dp, "_edit_id", "_edit_id")
+            self.df.obj["_edit_id"] = np.arange(len(self.df.obj))
+            edit_target = EditTarget(self.df, "_edit_id", "_edit_id")
         self.edit_target = edit_target
 
         self.per_page = per_page
@@ -31,7 +31,7 @@ class Table(Component):
     @property
     def props(self):
         return {
-            "dp": self.dp.config,
+            "df": self.df.config,
             "edit_target": self.edit_target.config,
             "per_page": self.per_page,
             "column_widths": self.column_widths,

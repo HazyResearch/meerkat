@@ -1,6 +1,6 @@
 <script lang="ts">
 	// import Description from './Description.svelte';
-	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
+	import type { DataFrameRows, ColumnInfo, DataFrameSchema } from '$lib/api/dataframe';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import type { SliceKey } from '$lib/api/sliceby';
@@ -13,7 +13,7 @@
 
 	export let sliceby: Writable<SliceByBox>;
 	export let slice_key: SliceKey;
-	export let schema: DataPanelSchema;
+	export let schema: DataFrameSchema;
 	export let main_column: string;
 	export let tag_columns: Array<string>;
 	export let aggregations_promise: any;
@@ -28,7 +28,7 @@
 	let page: number = 0;
 	const per_page: number = 25;
 
-	let rows: DataPanelRows = {
+	let rows: DataFrameRows = {
 		rows: [],
 		indices: [],
 		full_length: 0
@@ -76,7 +76,7 @@
 					<Pill 
 						layout="wide-content" 
 						header={name} 
-						content={aggregation.dp[slice_key]} 
+						content={aggregation.df[slice_key]} 
 					/>
 				{/each}
 			{:catch error}

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
 import meerkat as mk
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.state import state
 
 from ....tools.utils import convert_to_python
@@ -36,24 +36,24 @@ class SchemaResponse(BaseModel):
     columns: List[ColumnInfo]
 
 
-@router.post("/{datapanel_id}/schema/")
-def get_schema(datapanel_id: str, request: SchemaRequest) -> SchemaResponse:
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
-    columns = dp.columns if request is None else request.columns
-    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, columns))
+@router.post("/{dataframe_id}/schema/")
+def get_schema(dataframe_id: str, request: SchemaRequest) -> SchemaResponse:
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
+    columns = df.columns if request is None else request.columns
+    return SchemaResponse(id=dataframe_id, columns=_get_column_infos(df, columns))
 
 
-def _get_column_infos(dp: DataPanel, columns: List[str] = None):
+def _get_column_infos(df: DataFrame, columns: List[str] = None):
     if columns is None:
-        columns = dp.columns
+        columns = df.columns
     else:
-        missing_columns = set(columns) - set(dp.columns)
+        missing_columns = set(columns) - set(df.columns)
         if len(missing_columns) > 0:
             raise HTTPException(
                 status_code=404,
                 detail=(
-                    f"Requested columns {columns} do not exist in datapanel"
-                    f" with id {dp.id}"
+                    f"Requested columns {columns} do not exist in dataframe"
+                    f" with id {df.id}"
                 ),
             )
 
@@ -65,9 +65,9 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     return [
         ColumnInfo(
             name=col,
-            type=type(dp[col]).__name__,
-            cell_component=dp[col].formatter.cell_component,
-            cell_props=dp[col].formatter.cell_props,
+            type=type(df[col]).__name__,
+            cell_component=df[col].formatter.cell_component,
+            cell_props=df[col].formatter.cell_props,
         )
         for col in columns
     ]
@@ -93,33 +93,33 @@ def get_rows(
     box_id: str,
     request: RowsRequest,
 ) -> RowsResponse:
-    """Get rows from a DataPanel as a JSON object."""
+    """Get rows from a DataFrame as a JSON object."""
     box = state.identifiables.get(group="boxes", id=box_id)
 
-    if not isinstance(box.obj, DataPanel):
+    if not isinstance(box.obj, DataFrame):
         raise HTTPException("`get_rows` expects a box holding a Datapanel.")
-    dp = box.obj
+    df = box.obj
 
-    full_length = len(dp)
-    column_infos = _get_column_infos(dp, request.columns)
+    full_length = len(df)
+    column_infos = _get_column_infos(df, request.columns)
 
-    dp = dp[[info.name for info in column_infos]]
+    df = df[[info.name for info in column_infos]]
 
     if request.indices is not None:
-        dp = dp.lz[request.indices]
+        df = df.lz[request.indices]
         indices = request.indices
     elif request.start is not None:
         if request.end is None:
-            request.end = len(dp)
-        dp = dp.lz[request.start : request.end]
+            request.end = len(df)
+        df = df.lz[request.start : request.end]
         indices = list(range(request.start, request.end))
     else:
         raise ValueError()
 
     rows = []
-    for row in dp.lz:
+    for row in df.lz:
         rows.append(
-            [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
+            [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
     return RowsResponse(
         column_infos=column_infos,
@@ -134,48 +134,48 @@ class MatchRequest(BaseModel):
     query: str  # The query text to match against.
 
 
-@router.post("/{datapanel_id}/match/")
+@router.post("/{dataframe_id}/match/")
 def match(
-    datapanel_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
+    dataframe_id: str, input: str = EmbeddedBody(), query: str = EmbeddedBody()
 ) -> SchemaResponse:
-    """Match a query string against a DataPanel column.
+    """Match a query string against a DataFrame column.
 
-    The `datapanel_id` remains the same as the original request.
+    The `dataframe_id` remains the same as the original request.
     """
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
     # write the query to a file
     with open("/tmp/query.txt", "w") as f:
         f.write(query)
     try:
-        dp, match_columns = mk.match(
-            data=dp, query=query, input=input, return_column_names=True
+        df, match_columns = mk.match(
+            data=df, query=query, input=input, return_column_names=True
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    return SchemaResponse(id=datapanel_id, columns=_get_column_infos(dp, match_columns))
+    return SchemaResponse(id=dataframe_id, columns=_get_column_infos(df, match_columns))
 
 
-@router.post("/{datapanel_id}/sort/")
-def sort(datapanel_id: str, by: str = EmbeddedBody()):
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
-    dp = mk.sort(data=dp, by=by, ascending=False)
-    global curr_dp
-    curr_dp = dp
-    return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))
+@router.post("/{dataframe_id}/sort/")
+def sort(dataframe_id: str, by: str = EmbeddedBody()):
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
+    df = mk.sort(data=df, by=by, ascending=False)
+    global curr_df
+    curr_df = df
+    return SchemaResponse(id=df.id, columns=_get_column_infos(df))
 
 
-@router.post("/{datapanel_id}/aggregate/")
+@router.post("/{dataframe_id}/aggregate/")
 def aggregate(
-    datapanel_id: str,
+    dataframe_id: str,
     aggregation_id: str = Body(None),
     aggregation: str = Body(None),
-    accepts_dp: bool = Body(False),
+    accepts_df: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Union[float, int, str]:
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
 
     if columns is not None:
-        dp = dp[columns]
+        df = df[columns]
 
     if (aggregation_id is None) == (aggregation is None):
         raise HTTPException(
@@ -185,14 +185,14 @@ def aggregate(
 
     if aggregation_id is not None:
         aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
-        value = dp.aggregate(aggregation, accepts_dp=accepts_dp)
+        value = df.aggregate(aggregation, accepts_df=accepts_df)
 
     else:
         if aggregation not in ["mean", "sum", "min", "max"]:
             raise HTTPException(
                 status_code=400, detail=f"Invalid aggregation {aggregation}"
             )
-        value = dp.aggregate(aggregation)
+        value = df.aggregate(aggregation)
 
     # convert value to native python type
     value = convert_to_python(value)
@@ -222,19 +222,19 @@ _operator_str_to_func = {
 
 
 def _filter(
-    dp: DataPanel, columns: List[str], values: List[Any], ops: List[str]
-) -> DataPanel:
+    df: DataFrame, columns: List[str], values: List[Any], ops: List[str]
+) -> DataFrame:
     supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
-    if not all(isinstance(dp[column], supported_column_types) for column in columns):
+    if not all(isinstance(df[column], supported_column_types) for column in columns):
         raise HTTPException(
             f"Only {supported_column_types} are supported for filtering."
         )
     all_series = [
-        _operator_str_to_func[op](dp[col], value)
+        _operator_str_to_func[op](df[col], value)
         for col, value, op in zip(columns, values, ops)
     ]
     mask = functools.reduce(lambda x, y: x & y, all_series)
-    return dp.lz[mask]
+    return df.lz[mask]
 
 
 class Op(BaseModel):

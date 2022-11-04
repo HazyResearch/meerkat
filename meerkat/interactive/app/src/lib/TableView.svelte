@@ -8,8 +8,8 @@
 		match,
 		MatchCriterion,
 		sort,
-		type DataPanelSchema
-	} from '$lib/api/datapanel';
+		type DataFrameSchema
+	} from '$lib/api/dataframe';
 	import Tab from '$lib/shared/header/Tab.svelte';
 	import Tabs from '$lib/shared/header/Tabs.svelte';
 	import MatchHeader from '$lib/shared/match_header/MatchHeader.svelte';
@@ -23,29 +23,29 @@
 	import Gallery from './shared/gallery/Cards.svelte';
 	import CategoryGenerator from './shared/lm/CategoryGenerator.svelte';
 
-	export let datapanel_id: string;
+	export let dataframe_id: string;
 	export let nrows: number = 0;
 	export let page: number = 0;
 	export let per_page: number = 100;
 
-	const base_datapanel_id: string = datapanel_id;
+	const base_dataframe_id: string = dataframe_id;
 	let filter_criteria: Array<FilterCriterion> = [];
 	let match_criterion: MatchCriterion = new MatchCriterion('', ''); // TODO: clean this up to be null.
 
 	const refresh: RefreshCallback = async () => {
-		let curr_datapanel_id = base_datapanel_id;
+		let curr_dataframe_id = base_dataframe_id;
 		console.log(match_criterion);
 		console.log(filter_criteria);
 
 		// Run operations: match -> sort -> filter.
-		// match is performed first to ensure columns are added to the base datapanel.
+		// match is performed first to ensure columns are added to the base dataframe.
 		// TODO (arjundd): Figure out a way to put sorting after filtering for time efficiency.
 
 		let run_match: boolean = match_criterion.query !== '' && match_criterion.column !== '';
 		let run_filter: boolean = filter_criteria.length > 0;
 		let sort_by_column: string = '';
 
-		console.log('dp id start: ', curr_datapanel_id);
+		console.log('df id start: ', curr_dataframe_id);
 		console.log('run_match: ', run_match);
 
 		type PromiseLambda = {
@@ -56,20 +56,20 @@
 		let op_names: Array<string> = [];
 		// Match.
 		if (run_match) {
-			// Push a promise that matches --> sorts --> updates datapanel_id
+			// Push a promise that matches --> sorts --> updates dataframe_id
 			op_promises.push(async () => {
 				// Run match
-				let schema_after_match = await match($api_url, curr_datapanel_id, match_criterion);
+				let schema_after_match = await match($api_url, curr_dataframe_id, match_criterion);
 
-				const previous_dp_id = curr_datapanel_id;
-				curr_datapanel_id = schema_after_match.id;
+				const previous_df_id = curr_dataframe_id;
+				curr_dataframe_id = schema_after_match.id;
 				sort_by_column = schema_after_match.columns[0].name;
-				console.log('match: ', previous_dp_id, ' -> ', curr_datapanel_id, sort_by_column);
+				console.log('match: ', previous_df_id, ' -> ', curr_dataframe_id, sort_by_column);
 
-				let schema_after_sort = await sort($api_url, curr_datapanel_id, sort_by_column);
+				let schema_after_sort = await sort($api_url, curr_dataframe_id, sort_by_column);
 
-				console.log('sort: ', curr_datapanel_id, ' -> ', schema_after_sort.id);
-				curr_datapanel_id = schema_after_sort.id;
+				console.log('sort: ', curr_dataframe_id, ' -> ', schema_after_sort.id);
+				curr_dataframe_id = schema_after_sort.id;
 			});
 
 			op_names.push('match');
@@ -77,10 +77,10 @@
 		// Filter.
 		if (run_filter) {
 			op_promises.push(() =>
-				filter($api_url, curr_datapanel_id, filter_criteria).then((schema: DataPanelSchema) => {
-					let previous_dp_id = curr_datapanel_id;
-					curr_datapanel_id = schema.id;
-					console.log('filter: ', previous_dp_id, ' -> ', curr_datapanel_id);
+				filter($api_url, curr_dataframe_id, filter_criteria).then((schema: DataFrameSchema) => {
+					let previous_df_id = curr_dataframe_id;
+					curr_dataframe_id = schema.id;
+					console.log('filter: ', previous_df_id, ' -> ', curr_dataframe_id);
 				})
 			);
 			op_names.push('filter');
@@ -88,16 +88,16 @@
 		// Sort.
 		// if (run_match) {
 		// 	op_promises.push(sort(
-		// 		$api_url, curr_datapanel_id, sort_by_column
-		// 	).then((schema: DataPanelSchema) => {
+		// 		$api_url, curr_dataframe_id, sort_by_column
+		// 	).then((schema: DataFrameSchema) => {
 		// 		console.log("sort, sort by col: ", sort_by_column)
-		// 		curr_datapanel_id = schema.id;
-		// 		console.log("sort: ", curr_datapanel_id);
+		// 		curr_dataframe_id = schema.id;
+		// 		console.log("sort: ", curr_dataframe_id);
 		// 	}));
 		// }
 		if (op_promises.length == 0) {
 			let promise = new Promise(() => {
-				datapanel_id = base_datapanel_id;
+				dataframe_id = base_dataframe_id;
 			});
 			return promise;
 		}
@@ -110,25 +110,25 @@
 			op_promise = op_promise.then(op_promises[i]);
 		}
 		op_promise.then(() => {
-			datapanel_id = curr_datapanel_id;
+			dataframe_id = curr_dataframe_id;
 		});
 		return op_promise;
 	};
 
-	$: schema_promise = get_schema($api_url, datapanel_id).then((schema) => {
+	$: schema_promise = get_schema($api_url, dataframe_id).then((schema) => {
 		schema.columns = schema.columns.filter((column: any) => {
 			return !column.name.startsWith('__');
 		});
 		return schema;
 	});
-	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
+	$: rows_promise = get_rows($api_url, dataframe_id, page * per_page, (page + 1) * per_page);
 
 	let on_selection_change = async (event: CustomEvent) => {
 		/* Triggered when brush selection on scatter plot changes. */
 		// Update rows_promise: call get_rows again with the new selection (indices)
 		rows_promise = get_rows(
 			$api_url,
-			base_datapanel_id,
+			base_dataframe_id,
 			undefined,
 			undefined,
 			Array.from(event.detail.selected_points)
@@ -176,7 +176,7 @@
 	<Tab label="Plot" id="plot">
 		<PlotHeader
 			bind:match_criterion
-			datapanel_id={base_datapanel_id}
+			dataframe_id={base_dataframe_id}
 			{rows_promise}
 			{schema_promise}
 			refresh_callback={refresh}

@@ -1,4 +1,4 @@
-"""DataPanel class."""
+"""DataFrame class."""
 from __future__ import annotations
 
 import logging
@@ -45,10 +45,10 @@ logger = logging.getLogger(__name__)
 
 Example = Dict
 Batch = Dict[str, Union[List, AbstractColumn]]
-BatchOrDataset = Union[Batch, "DataPanel"]
+BatchOrDataset = Union[Batch, "DataFrame"]
 
 
-class DataPanel(
+class DataFrame(
     CloneableMixin,
     FunctionInspectorMixin,
     IdentifiableMixin,
@@ -57,9 +57,9 @@ class DataPanel(
     MaterializationMixin,
     ProvenanceMixin,
 ):
-    """Meerkat DataPanel class."""
+    """Meerkat DataFrame class."""
 
-    identifiable_group: str = "datapanels"
+    identifiable_group: str = "dataframes"
 
     # Path to a log directory
     logdir: pathlib.Path = pathlib.Path.home() / "meerkat/"
@@ -73,19 +73,19 @@ class DataPanel(
         *args,
         **kwargs,
     ):
-        super(DataPanel, self).__init__(
+        super(DataFrame, self).__init__(
             *args,
             **kwargs,
         )
-        logger.debug("Creating DataPanel.")
+        logger.debug("Creating DataFrame.")
 
         self.data = data
 
     @property
     def gui(self):
-        from meerkat.interactive.gui import DataPanelGUI
+        from meerkat.interactive.gui import DataFrameGUI
 
-        return DataPanelGUI(self)
+        return DataFrameGUI(self)
 
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
@@ -136,7 +136,7 @@ class DataPanel(
         elif isinstance(value, Sequence):
             if not isinstance(value[0], Mapping):
                 raise ValueError(
-                    "Cannot set DataPanel `data` to a Sequence containing object of "
+                    "Cannot set DataFrame `data` to a Sequence containing object of "
                     f" type {type(value[0])}. Must be a Sequence of Mapping."
                 )
             gen = (list(x.keys()) for x in value)
@@ -149,7 +149,7 @@ class DataPanel(
             self._data = BlockManager()
         else:
             raise ValueError(
-                f"Cannot set DataPanel `data` to object of type {type(value)}."
+                f"Cannot set DataFrame `data` to object of type {type(value)}."
             )
 
     @data.setter
@@ -158,30 +158,30 @@ class DataPanel(
 
     @property
     def columns(self):
-        """Column names in the DataPanel."""
+        """Column names in the DataFrame."""
         return list(self.data.keys())
 
     @property
     def nrows(self):
-        """Number of rows in the DataPanel."""
+        """Number of rows in the DataFrame."""
         if self.ncols == 0:
             return 0
         return self.data.nrows
 
     @property
     def ncols(self):
-        """Number of rows in the DataPanel."""
+        """Number of rows in the DataFrame."""
         return self.data.ncols
 
     @property
     def shape(self):
-        """Shape of the DataPanel (num_rows, num_columns)."""
+        """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
 
     def add_column(
         self, name: str, data: AbstractColumn.Columnable, overwrite=False
     ) -> None:
-        """Add a column to the DataPanel."""
+        """Add a column to the DataFrame."""
 
         assert isinstance(
             name, str
@@ -219,26 +219,26 @@ class DataPanel(
     @capture_provenance(capture_args=["axis"])
     def append(
         self,
-        dp: DataPanel,
+        df: DataFrame,
         axis: Union[str, int] = "rows",
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Append a batch of data to the dataset.
 
         `example_or_batch` must have the same columns as the dataset
         (regardless of what columns are visible).
         """
         return meerkat.concat(
-            [self, dp], axis=axis, suffixes=suffixes, overwrite=overwrite
+            [self, df], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
 
-    def head(self, n: int = 5) -> DataPanel:
-        """Get the first `n` examples of the DataPanel."""
+    def head(self, n: int = 5) -> DataFrame:
+        """Get the first `n` examples of the DataFrame."""
         return self.lz[:n]
 
-    def tail(self, n: int = 5) -> DataPanel:
-        """Get the last `n` examples of the DataPanel."""
+    def tail(self, n: int = 5) -> DataFrame:
+        """Get the last `n` examples of the DataFrame."""
         return self.lz[-n:]
 
     def _get(self, index, materialize: bool = False):
@@ -255,14 +255,14 @@ class DataPanel(
                 for k in self.columns
             }
 
-        # cases where `index` returns a datapanel
+        # cases where `index` returns a dataframe
         index_type = None
         if isinstance(index, slice):
-            # slice index => multiple row selection (DataPanel)
+            # slice index => multiple row selection (DataFrame)
             index_type = "row"
 
         elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
-            # tuple or list index => multiple row selection (DataPanel)
+            # tuple or list index => multiple row selection (DataFrame)
             if isinstance(index[0], str):
                 index_type = "column"
             else:
@@ -273,7 +273,7 @@ class DataPanel(
                 raise ValueError(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
-            # numpy array index => multiple row selection (DataPanel)
+            # numpy array index => multiple row selection (DataFrame)
             index_type = "row"
 
         elif torch.is_tensor(index):
@@ -281,14 +281,14 @@ class DataPanel(
                 raise ValueError(
                     "Index must have 1 axis, not {}".format(len(index.shape))
                 )
-            # torch tensor index => multiple row selection (DataPanel)
+            # torch tensor index => multiple row selection (DataFrame)
             index_type = "row"
 
         elif isinstance(index, pd.Series):
             index_type = "row"
 
         elif isinstance(index, AbstractColumn):
-            # column index => multiple row selection (DataPanel)
+            # column index => multiple row selection (DataFrame)
             index_type = "row"
 
         else:
@@ -297,10 +297,10 @@ class DataPanel(
         if index_type == "column":
             if not set(index).issubset(self.columns):
                 missing_cols = set(index) - set(self.columns)
-                raise KeyError(f"DataPanel does not have columns {missing_cols}")
+                raise KeyError(f"DataFrame does not have columns {missing_cols}")
 
-            dp = self._clone(data=self.data[index])
-            return dp
+            df = self._clone(data=self.data[index])
+            return df
         elif index_type == "row":  # pragma: no cover
             return self._clone(
                 data=self.data.apply("_get", index=index, materialize=materialize)
@@ -318,7 +318,7 @@ class DataPanel(
 
     @classmethod
     def from_huggingface(cls, *args, **kwargs):
-        """Load a Huggingface dataset as a DataPanel.
+        """Load a Huggingface dataset as a DataFrame.
 
         Use this to replace `datasets.load_dataset`, so
 
@@ -326,7 +326,7 @@ class DataPanel(
 
         becomes
 
-        >>> dict_of_datapanels = DataPanel.from_huggingface('boolq')
+        >>> dict_of_dataframes = DataFrame.from_huggingface('boolq')
         """
         import datasets
 
@@ -348,7 +348,7 @@ class DataPanel(
     def from_jsonl(
         cls,
         json_path: str,
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Load a dataset from a .jsonl file on disk, where each line of the
         json file consists of a single example."""
         return cls.from_pandas(pd.read_json(json_path, orient="records", lines=True))
@@ -358,7 +358,7 @@ class DataPanel(
     def from_batch(
         cls,
         batch: Batch,
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Convert a batch to a Dataset."""
         return cls(batch)
 
@@ -367,7 +367,7 @@ class DataPanel(
     def from_batches(
         cls,
         batches: Sequence[Batch],
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Convert a list of batches to a dataset."""
 
         return cls.from_batch(
@@ -382,7 +382,7 @@ class DataPanel(
     def from_dict(
         cls,
         d: Dict,
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Convert a dictionary to a dataset.
 
         Alias for Dataset.from_batch(..).
@@ -431,7 +431,7 @@ class DataPanel(
             **kwargs: Keyword arguments for :func:`pandas.read_csv`.
 
         Returns:
-            DataPanel: The constructed datapanel.
+            DataFrame: The constructed dataframe.
         """
         return cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
 
@@ -470,8 +470,8 @@ class DataPanel(
         new_batch = {}
         for name, values in batch.items():
             new_batch[name] = column_to_collate[name](values)
-        dp = self._clone(data=new_batch)
-        return dp
+        df = self._clone(data=new_batch)
+        return df
 
     @staticmethod
     def _convert_to_batch_fn(
@@ -536,9 +536,9 @@ class DataPanel(
             )
 
         if cell_columns:
-            dp = self[cell_columns] if not shuffle else self[cell_columns].lz[indices]
+            df = self[cell_columns] if not shuffle else self[cell_columns].lz[indices]
             cell_dl = torch.utils.data.DataLoader(
-                dp if materialize else dp.lz,
+                df if materialize else df.lz,
                 batch_size=batch_size,
                 collate_fn=self._collate,
                 drop_last=drop_last_batch,
@@ -573,7 +573,7 @@ class DataPanel(
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
-    ) -> DataPanel:
+    ) -> DataFrame:
         """Update the columns of the dataset."""
         # TODO(karan): make this fn go faster
         # most of the time is spent on the merge, speed it up further
@@ -584,8 +584,8 @@ class DataPanel(
             return self
 
         # Get some information about the function
-        dp = self[input_columns] if input_columns is not None else self
-        function_properties = dp._inspect_function(
+        df = self[input_columns] if input_columns is not None else self
+        function_properties = df._inspect_function(
             function, with_indices, is_batched_fn, materialize=materialize, **kwargs
         )
         assert (
@@ -603,10 +603,10 @@ class DataPanel(
         logger.info("Running update, a new dataset will be returned.")
 
         # Copy the ._data dict with a reference to the actual columns
-        new_dp = self.view()
+        new_df = self.view()
 
         # Calculate the values for the new columns using a .map()
-        output = new_dp.map(
+        output = new_df.map(
             function=function,
             with_indices=with_indices,
             is_batched_fn=True,
@@ -623,15 +623,15 @@ class DataPanel(
 
         # Add new columns for the update
         for col, vals in output.data.items():
-            new_dp.add_column(col, vals, overwrite=True)
+            new_df.add_column(col, vals, overwrite=True)
 
         # Remove columns
         if remove_columns:
             for col in remove_columns:
-                new_dp.remove_column(col)
+                new_df.remove_column(col)
             logger.info(f"Removed columns {remove_columns}.")
 
-        return new_dp
+        return new_df
 
     @capture_provenance()
     def map(
@@ -651,8 +651,8 @@ class DataPanel(
         **kwargs,
     ) -> Optional[Union[Dict, List, AbstractColumn]]:
         input_columns = self.columns if input_columns is None else input_columns
-        dp = self[input_columns]
-        return super(DataPanel, dp).map(
+        df = self[input_columns]
+        return super(DataFrame, df).map(
             function=function,
             with_indices=with_indices,
             is_batched_fn=is_batched_fn,
@@ -680,17 +680,17 @@ class DataPanel(
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
-    ) -> Optional[DataPanel]:
-        """Filter operation on the DataPanel."""
+    ) -> Optional[DataFrame]:
+        """Filter operation on the DataFrame."""
 
         # Return if `self` has no examples
         if not len(self):
-            logger.info("DataPanel empty, returning None.")
+            logger.info("DataFrame empty, returning None.")
             return None
 
         # Get some information about the function
-        dp = self[input_columns] if input_columns is not None else self
-        function_properties = dp._inspect_function(
+        df = self[input_columns] if input_columns is not None else self
+        function_properties = df._inspect_function(
             function,
             with_indices,
             is_batched_fn=is_batched_fn,
@@ -700,7 +700,7 @@ class DataPanel(
         assert function_properties.bool_output, "function must return boolean."
 
         # Map to get the boolean outputs and indices
-        logger.info("Running `filter`, a new DataPanel will be returned.")
+        logger.info("Running `filter`, a new DataFrame will be returned.")
         outputs = self.map(
             function=function,
             with_indices=with_indices,
@@ -715,12 +715,12 @@ class DataPanel(
         )
         indices = np.where(outputs)[0]
 
-        # filter returns a new datapanel
+        # filter returns a new dataframe
         return self.lz[indices]
 
     def merge(
         self,
-        right: meerkat.DataPanel,
+        right: meerkat.DataFrame,
         how: str = "inner",
         on: Union[str, List[str]] = None,
         left_on: Union[str, List[str]] = None,
@@ -748,8 +748,8 @@ class DataPanel(
         by: Union[str, List[str]],
         ascending: Union[bool, List[bool]] = True,
         kind: str = "quicksort",
-    ) -> DataPanel:
-        """Sort the DataPanel by the values in the specified columns. Similar
+    ) -> DataFrame:
+        """Sort the DataFrame by the values in the specified columns. Similar
         to ``sort_values`` in pandas.
 
         Args:
@@ -761,7 +761,7 @@ class DataPanel(
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
 
         Return:
-            DataPanel: A sorted view of DataPanel.
+            DataFrame: A sorted view of DataFrame.
         """
         from meerkat import sort
 
@@ -774,8 +774,8 @@ class DataPanel(
         replace: bool = False,
         weights: Union[str, np.ndarray] = None,
         random_state: Union[int, np.random.RandomState] = None,
-    ) -> DataPanel:
-        """Select a random sample of rows from DataPanel. Roughly equivalent to
+    ) -> DataFrame:
+        """Select a random sample of rows from DataFrame. Roughly equivalent to
         ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
         s.DataFrame.sample.html.
 
@@ -794,7 +794,7 @@ class DataPanel(
                 use for sampling.
 
         Return:
-            DataPanel: A random sample of rows from the DataPanel.
+            DataFrame: A random sample of rows from the DataFrame.
         """
         from meerkat import sample
 
@@ -809,21 +809,21 @@ class DataPanel(
 
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
-    ) -> DataPanel:
-        """Return a new DataPanel with the specified columns dropped.
+    ) -> DataFrame:
+        """Return a new DataFrame with the specified columns dropped.
 
         Args:
             columns (Union[str, Collection[str]]): The columns to drop.
 
         Return:
-            DataPanel: A new DataPanel with the specified columns dropped.
+            DataFrame: A new DataFrame with the specified columns dropped.
         """
         if isinstance(columns, str):
             columns = [columns]
         for c in columns:
             if c not in self.columns and check_exists:
                 raise ValueError(
-                    f"Cannot drop nonexistent column '{c}' from DataPanel."
+                    f"Cannot drop nonexistent column '{c}' from DataFrame."
                 )
         return self[[c for c in self.columns if c not in columns]]
 
@@ -844,8 +844,8 @@ class DataPanel(
         path: str,
         *args,
         **kwargs,
-    ) -> DataPanel:
-        """Load a DataPanel stored on disk."""
+    ) -> DataFrame:
+        """Load a DataFrame stored on disk."""
 
         # Load the metadata
         metadata = dict(
@@ -853,34 +853,34 @@ class DataPanel(
         )
 
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
-        dp = cls.__new__(cls)
-        dp._set_id()  # TODO: consider if we want to persist this id
-        dp._set_state(state)
+        df = cls.__new__(cls)
+        df._set_id()  # TODO: consider if we want to persist this id
+        df._set_state(state)
 
         # Load the the manager
         mgr_dir = os.path.join(path, "mgr")
         if os.path.exists(mgr_dir):
             data = BlockManager.read(mgr_dir, **kwargs)
         else:
-            # backwards compatability to pre-manager datapanels
+            # backwards compatability to pre-manager dataframes
             data = {
                 name: dtype.read(os.path.join(path, "columns", name), *args, **kwargs)
                 for name, dtype in metadata["column_dtypes"].items()
             }
 
-        dp._set_data(data)
+        df._set_data(data)
 
-        return dp
+        return df
 
     def write(
         self,
         path: str,
     ) -> None:
-        """Save a DataPanel to disk."""
+        """Save a DataFrame to disk."""
         # Make all the directories to the path
         os.makedirs(path, exist_ok=True)
 
-        # Get the DataPanel state
+        # Get the DataFrame state
         state = self._get_state()
 
         # Get the metadata

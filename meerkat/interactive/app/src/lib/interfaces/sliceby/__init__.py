@@ -14,10 +14,10 @@ def simple_op(col: str):
 
 
 @interface_op
-def make_selection_dp(dp, id, selection):
+def make_selection_df(df, id, selection):
     """An out of place operation to take a store and make it a derived
-    datapanel."""
-    return mk.DataPanel({id: dp[id][selection]})
+    dataframe."""
+    return mk.DataFrame({id: df[id][selection]})
 
 
 class SliceByInterface(Interface):
@@ -27,7 +27,7 @@ class SliceByInterface(Interface):
         main_column: str,
         tag_columns: List[str] = None,
         aggregations: Dict[
-            str, Callable[[mk.DataPanel], Union[int, float, str]]
+            str, Callable[[mk.DataFrame], Union[int, float, str]]
         ] = None,
     ):
 
@@ -49,10 +49,10 @@ class SliceByInterface(Interface):
     def layout(self):
         # Setup pivots
         sliceby = self.pivot(self.sliceby)
-        dp = self.pivot(self.sliceby.data)
+        df = self.pivot(self.sliceby.data)
         SliceByCards(
             sliceby=sliceby,
-            dp=dp,
+            df=df,
             main_column=self.main_column,
             tag_columns=self.tag_columns,
             aggregations=self.aggregations,

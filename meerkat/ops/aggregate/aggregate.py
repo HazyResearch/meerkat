@@ -7,10 +7,10 @@ from ...mixins.aggregate import AggregationError
 
 
 def aggregate(
-    data: mk.DataPanel,
+    data: mk.DataFrame,
     function: Union[Callable, str],
     nuisance: str = "drop",
-    accepts_dp: bool = False,
+    accepts_df: bool = False,
     *args,
     **kwargs,
 ) -> Dict[str, Any]:
@@ -18,11 +18,11 @@ def aggregate(
     if nuisance not in ["drop", "raise", "warn"]:
         raise ValueError(f"{nuisance} is not a valid nuisance option")
 
-    if accepts_dp and not isinstance(function, Callable):
-        raise ValueError("Must pass a callable to aggregate if accepts_dp is True")
+    if accepts_df and not isinstance(function, Callable):
+        raise ValueError("Must pass a callable to aggregate if accepts_df is True")
 
-    if accepts_dp:
-        return {"dp": function(data, *args, **kwargs)}
+    if accepts_df:
+        return {"df": function(data, *args, **kwargs)}
 
     result = {}
 

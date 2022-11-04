@@ -6,7 +6,7 @@ import cytoolz as tz
 import torch
 
 from meerkat.columns.list_column import ListColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ml.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -73,7 +73,7 @@ class HuggingfaceModel(Model):
 
         return output_dict
 
-    def encode_batch(self, batch: DataPanel, columns: List[str], **kwargs):
+    def encode_batch(self, batch: DataFrame, columns: List[str], **kwargs):
         # TODO(karan): Automatically writing this encoder for a variety of tasks
         return self.tokenizer(
             *[list(batch[key]) for key in columns],
@@ -82,7 +82,7 @@ class HuggingfaceModel(Model):
             **kwargs,
         )
 
-    def process_batch(self, batch: DataPanel, input_columns: List[str]):
+    def process_batch(self, batch: DataFrame, input_columns: List[str]):
 
         # Tokenize the batch
         input_batch = self.encode_batch(batch=batch, columns=input_columns)
@@ -96,10 +96,10 @@ class HuggingfaceModel(Model):
         return input_batch
 
     def summarization(
-        self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
-    ) -> DataPanel:
+        self, dataset: DataFrame, input_columns: List[str], batch_size: int = 32
+    ) -> DataFrame:
 
-        output_dp = dataset.map(
+        output_df = dataset.map(
             function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
@@ -107,13 +107,13 @@ class HuggingfaceModel(Model):
             input_cols=input_columns,
         )
 
-        dataset.add_column("preds", output_dp["preds"])
+        dataset.add_column("preds", output_df["preds"])
 
-        return output_dp
+        return output_df
 
     def output(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         input_columns: List[str],
         batch_size: int = 32,
         num_classes: int = None,

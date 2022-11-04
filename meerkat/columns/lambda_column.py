@@ -118,7 +118,7 @@ class LambdaColumn(AbstractColumn):
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
-            # support old DataPanels.
+            # support old DataFrames.
             warnings.warn(
                 "Reading a LambdaColumn stored in a format that will soon be"
                 " deprecated. Please re-write the column to the new format."
@@ -132,7 +132,7 @@ class LambdaColumn(AbstractColumn):
                 col = AbstractColumn.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
-                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                    "Support for LambdaColumns based on a DataFrame is deprecated."
                 )
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))

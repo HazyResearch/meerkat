@@ -1,13 +1,12 @@
-
 import meerkat as mk
 
-dp = mk.get("imagenette", version="160px")
+df = mk.get("imagenette", version="160px")
 
 
-dp_pivot = mk.gui.Pivot(dp)
+df_pivot = mk.gui.Pivot(df)
 
 gallery = mk.gui.Gallery(
-    dp_pivot,
+    df_pivot,
     main_column="img",
     tag_columns=["label"],
 )

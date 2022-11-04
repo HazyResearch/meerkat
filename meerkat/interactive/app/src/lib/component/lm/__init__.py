@@ -9,13 +9,13 @@ class SchemaTree(Component):
 
     def __init__(
         self,
-        dp: Box,
+        df: Box,
     ) -> None:
         super().__init__()
-        self.dp = dp
+        self.df = df
 
     @property
     def props(self):
         return {
-            "dp": self.dp.config,
+            "df": self.df.config,
         }

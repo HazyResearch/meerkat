@@ -7,7 +7,7 @@
 
 	const { get_schema, edit_target } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let target: EditTarget;
 	export let primary_key: string;
 	export let selected: Writable<Array<number>>;
@@ -23,7 +23,7 @@
 
 	$: {
 		schema_promise = $get_schema(target.target.box_id);
-		items_promise = schema_promise.then((schema: DataPanelSchema) => {
+		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
 					value: column.name,
@@ -47,10 +47,10 @@
 
 		let modifications_promise;
 		if (primary_key === undefined) {
-			modifications_promise = $edit_target($dp.box_id, target, $text, $col, $selected);
+			modifications_promise = $edit_target($df.box_id, target, $text, $col, $selected);
 		} else {
 			modifications_promise = $edit_target(
-				$dp.box_id,
+				$df.box_id,
 				target,
 				$text,
 				$col,

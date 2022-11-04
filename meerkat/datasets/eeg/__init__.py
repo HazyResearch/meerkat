@@ -18,7 +18,7 @@ from .data_utils import (
 logger = logging.getLogger(__name__)
 
 
-def build_eeg_dp(
+def build_eeg_df(
     dataset_dir: str,
     raw_dataset_dir: str,
     splits=["train", "dev"],
@@ -26,7 +26,7 @@ def build_eeg_dp(
     step_size: int = 1,
     stride: int = 60,
 ):
-    """Builds a `DataPanel` for accessing EEG data.
+    """Builds a `DataFrame` for accessing EEG data.
 
     Currently only supports TUH dataset for seq-seq prediction.
     Future TODO: integrating stanford dataset with weak seq-seq labels
@@ -80,21 +80,21 @@ def build_eeg_dp(
 
             data.append(row_df)
 
-    dp = mk.DataPanel(data)
+    df = mk.DataFrame(data)
 
     eeg_loader = partial(
         compute_slice_matrix, time_step_size=step_size, clip_len=clip_len, stride=stride
     )
 
-    eeg_input_col = dp[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
+    eeg_input_col = df[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
 
-    dp.add_column(
+    df.add_column(
         "eeg_input",
         eeg_input_col,
         overwrite=True,
     )
 
-    return dp
+    return df
 
 
 def download_tusz(download_dir, version="1.5.2"):
@@ -118,7 +118,7 @@ def download_tusz(download_dir, version="1.5.2"):
     os.system(rsync_command)
 
 
-def build_stanford_eeg_dp(
+def build_stanford_eeg_df(
     stanford_dataset_dir: str,
     lpch_dataset_dir: str,
     file_marker_dir: str,
@@ -126,7 +126,7 @@ def build_stanford_eeg_dp(
     reports_pth=None,
     clip_len: int = 60,
 ):
-    """Builds a `DataPanel` for accessing EEG data.
+    """Builds a `DataFrame` for accessing EEG data.
 
     This is for accessing private stanford data.
     The stanford data is limited to specific researchers on IRB.
@@ -159,13 +159,13 @@ def build_stanford_eeg_dp(
         }
         data.append(row_df)
 
-    dp = mk.DataPanel(data)
+    df = mk.DataFrame(data)
 
-    eeg_input_col = dp[["sz_start_index", "filepath", "split"]].to_lambda(
+    eeg_input_col = df[["sz_start_index", "filepath", "split"]].to_lambda(
         fn=partial(stanford_eeg_loader, clip_len=clip_len)
     )
 
-    dp.add_column(
+    df.add_column(
         "eeg_input",
         eeg_input_col,
         overwrite=True,
@@ -173,7 +173,7 @@ def build_stanford_eeg_dp(
 
     if reports_pth:
         raw_reports_pth = os.path.join(reports_pth, "reports_unique_for_hl_mm.txt")
-        raw_reports_dp = mk.DataPanel.from_csv(raw_reports_pth, sep="\t")
+        raw_reports_df = mk.DataFrame.from_csv(raw_reports_pth, sep="\t")
 
         parsed_reports_pth = os.path.join(reports_pth, "parsed_eeg_notes.dill")
         with open(parsed_reports_pth, "rb") as dill_f:
@@ -182,14 +182,14 @@ def build_stanford_eeg_dp(
         doc_data = []
         for doc in parsed_reports:
             uuid = doc.doc_id
-            mask_id = raw_reports_dp["note_uuid"] == uuid
+            mask_id = raw_reports_df["note_uuid"] == uuid
             if mask_id.sum() == 1 and "findings" in doc.sections:
-                file_id = raw_reports_dp[mask_id]["edf_file_name"][0].split(".edf")[0]
+                file_id = raw_reports_df[mask_id]["edf_file_name"][0].split(".edf")[0]
                 findings = doc.sections["findings"]["text"]
                 row_df = {"file_id": file_id, "findings": findings}
                 doc_data.append(row_df)
-        reports_dp = mk.DataPanel(doc_data)
+        reports_df = mk.DataFrame(doc_data)
 
-        dp = dp.merge(reports_dp, how="left", on="file_id")
+        df = df.merge(reports_df, how="left", on="file_id")
 
-    return dp
+    return df

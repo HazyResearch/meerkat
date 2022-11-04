@@ -9,7 +9,7 @@ import Selected from './Selected.svelte';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let edit_target: Any;
@@ -21,8 +21,8 @@ import Selected from './Selected.svelte';
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = $get_schema($dp.box_id);
-	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
+	$: schema_promise = $get_schema($df.box_id);
+	$: rows_promise = $get_rows($df.box_id, page * per_page, (page + 1) * per_page);
 
 	async function handle_edit(event: any) {
 		let { pivot, pivot_id_column, id_column } = edit_target;

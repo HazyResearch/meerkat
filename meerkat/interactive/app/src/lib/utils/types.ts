@@ -26,13 +26,13 @@ export interface EditTarget {
 
 export interface Box {
     box_id: string
-    type: "SliceBy" | "DataPanel"
+    type: "SliceBy" | "DataFrame"
 }
 
 export interface SliceByBox extends Box {
     type: "SliceBy"
 }
 
-export interface DataPanelBox extends Box {
-    type: "DataPanel"
+export interface DataFrameBox extends Box {
+    type: "DataFrame"
 }

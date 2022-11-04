@@ -6,8 +6,8 @@ from meerkat.ops.sample import sample
 
 
 @pytest.fixture
-def simple_dp():
-    return mk.DataPanel(
+def simple_df():
+    return mk.DataFrame(
         {
             "tensor": mk.TensorColumn([1, 2, 3, 4]),
             "pandas": mk.PandasSeriesColumn([8, 7, 9, 6]),
@@ -21,8 +21,8 @@ def simple_column():
     return mk.NumpyArrayColumn([4, 6, 5, 7])
 
 
-def test_sample_dp_w_n(simple_dp):
-    out = simple_dp.sample(
+def test_sample_df_w_n(simple_df):
+    out = simple_df.sample(
         n=2,
         random_state=42,
     )
@@ -32,8 +32,8 @@ def test_sample_dp_w_n(simple_dp):
     assert (out["numpy"] == mk.NumpyArrayColumn([6, 7])).all()
 
 
-def test_sample_dp_w_frac(simple_dp):
-    out = simple_dp.sample(
+def test_sample_df_w_frac(simple_df):
+    out = simple_df.sample(
         frac=0.5,
         random_state=42,
     )
@@ -43,8 +43,8 @@ def test_sample_dp_w_frac(simple_dp):
     assert (out["numpy"] == mk.NumpyArrayColumn([6, 7])).all()
 
 
-def test_sample_dp_w_weights(simple_dp):
-    out = simple_dp.sample(
+def test_sample_df_w_weights(simple_df):
+    out = simple_df.sample(
         n=2,
         weights=np.array([0.5, 0.1, 0.2, 0.2]),
         random_state=42,
@@ -54,8 +54,8 @@ def test_sample_dp_w_weights(simple_dp):
     assert (out["numpy"] == mk.NumpyArrayColumn([4, 7])).all()
 
 
-def test_sample_dp_w_weights_as_str(simple_dp):
-    out = simple_dp.sample(
+def test_sample_df_w_weights_as_str(simple_df):
+    out = simple_df.sample(
         n=2,
         weights="tensor",
         random_state=42,

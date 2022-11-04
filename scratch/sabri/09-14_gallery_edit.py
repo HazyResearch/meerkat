@@ -2,34 +2,31 @@ import numpy as np
 
 import meerkat as mk
 
-dp = mk.get("imagenette", version="160px")
-dp["car"] = np.zeros(len(dp))
-dp = mk.gui.Pivot(dp)
+df = mk.get("imagenette", version="160px")
+df["car"] = np.zeros(len(df))
+df = mk.gui.Pivot(df)
 
 
 @mk.gui.interface_op
-def filter(dp: mk.DataPanel):
-    return dp.lz[dp["label"] == "gas pump"]
+def filter(df: mk.DataFrame):
+    return df.lz[df["label"] == "gas pump"]
 
 
-filtered_dp = filter(dp)
+filtered_df = filter(df)
 
 target = mk.gui.EditTarget(
-    target=dp, target_id_column="img_path", source_id_column="img_path"
+    target=df, target_id_column="img_path", source_id_column="img_path"
 )
 
 gallery = mk.gui.Gallery(
-    dp=filtered_dp,
+    df=filtered_df,
     main_column="img",
     tag_columns=["label", "car"],
     edit_target=target,
 )
 
 editor = mk.gui.Editor(
-    dp=filtered_dp,
-    target=target,
-    col="car",
-    selected=gallery.selected
+    df=filtered_df, target=target, col="car", selected=gallery.selected
 )
 
 mk.gui.start()

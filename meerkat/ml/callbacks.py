@@ -5,7 +5,7 @@ from typing import List
 from numpy.lib.format import open_memmap
 
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ml.activation import ActivationOp
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -28,7 +28,7 @@ class ActivationCallback(pl.callbacks.Callback):
                 For nested submodules, specify a path separated by "." (e.g.
                 `ActivationCachedOp(model, "block4.conv")`).
             val_len (int): Number of inputs in the validation dataset
-            logdir (str): Directory to store the activation datapanels.
+            logdir (str): Directory to store the activation dataframes.
                 Not required if trainer.log_dir is to be used
             mmap (bool): If true, activations are stored as memmapped numpy arrays
         """
@@ -80,7 +80,7 @@ class ActivationCallback(pl.callbacks.Callback):
     def on_validation_epoch_end(self, trainer, pl_module):
         if not trainer.sanity_checking:
             activations = {f"activation_{self.target_module}": self.writer.finalize()}
-            activations = DataPanel.from_batch(activations)
+            activations = DataFrame.from_batch(activations)
 
             if not self.mmap:
                 file = f"activations_{self.target_module}_{trainer.current_epoch}.mk"
@@ -93,9 +93,9 @@ def load_activations(
     epochs: List[int],
     mmap: bool = False,
     mmap_mode: str = "r",
-) -> DataPanel:
+) -> DataFrame:
 
-    activations_dp = None
+    activations_df = None
 
     for epoch in epochs:
 
@@ -109,15 +109,15 @@ def load_activations(
         if mmap:
             activations = open_memmap(path, mode=mmap_mode)
         else:
-            activations = DataPanel.read(path)[f"activation_{target_module}"]
+            activations = DataFrame.read(path)[f"activation_{target_module}"]
 
-        if activations_dp is None:
-            activations_dp = DataPanel(
+        if activations_df is None:
+            activations_df = DataFrame(
                 {f"activation_{target_module}_{epoch}": activations}
             )
         else:
-            activations_dp.add_column(
+            activations_df.add_column(
                 f"activation_{target_module}_{epoch}", activations
             )
 
-    return activations_dp
+    return activations_df

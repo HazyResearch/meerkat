@@ -12,18 +12,18 @@ class Row(Component):
 
     def __init__(
         self,
-        dp: Pivot,
+        df: Pivot,
         idx: Store[int],
         target: EditTarget = None,
         cell_specs: dict = None,
         title: str = "",
     ):
         super().__init__()
-        self.dp = dp
+        self.df = df
         self.idx = idx
         if target is None:
-            dp["_edit_id"] = np.arange(len(dp))
-            target = EditTarget(self.dp, "_edit_id", "_edit_id")
+            df["_edit_id"] = np.arange(len(df))
+            target = EditTarget(self.df, "_edit_id", "_edit_id")
         self.target = target
 
         if cell_specs is None:
@@ -34,7 +34,7 @@ class Row(Component):
     @property
     def props(self):
         return {
-            "dp": self.dp.config,
+            "df": self.df.config,
             "idx": self.idx.config,
             "target": self.target.config,
             "cell_specs": self.cell_specs,

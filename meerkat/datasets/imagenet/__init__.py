@@ -61,10 +61,10 @@ class imagenet(DatasetBuilder):
         )
         valid_df["split"] = "valid"
 
-        dp = mk.DataPanel.from_pandas(
+        df = mk.DataFrame.from_pandas(
             pd.concat([train_df, valid_df.drop(columns="PredictionString")])
         )
-        dp["image"] = mk.ImageColumn.from_filepaths(dp["path"])
+        df["image"] = mk.ImageColumn.from_filepaths(df["path"])
 
         # mapping from synset to english
         with open(os.path.join(self.dataset_dir, "LOC_synset_mapping.txt")) as f:
@@ -74,15 +74,15 @@ class imagenet(DatasetBuilder):
             .str.split(" ", expand=True, n=1)
             .rename(columns={0: "synset", 1: "name"})
         )
-        mapping_dp = mk.DataPanel.from_pandas(df)
+        mapping_df = mk.DataFrame.from_pandas(df)
 
         # torchvision models use class indices corresponding to the order of the
         # LOC_synset_mapping.txt file, which we confirmed using the mapping provided here
         # https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a
-        mapping_dp["class_idx"] = np.arange(len(mapping_dp))
-        dp = dp.merge(mapping_dp, how="left", on="synset")
+        mapping_df["class_idx"] = np.arange(len(mapping_df))
+        df = df.merge(mapping_df, how="left", on="synset")
 
-        return dp
+        return df
 
     def download(self):
         curr_dir = os.getcwd()
@@ -103,9 +103,9 @@ class imagenet(DatasetBuilder):
         os.chdir(curr_dir)
 
 
-def build_imagenet_dps(
+def build_imagenet_dfs(
     dataset_dir: str, download: bool = False
-) -> Dict[str, mk.DataPanel]:
+) -> Dict[str, mk.DataFrame]:
 
     if download:
         curr_dir = os.getcwd()
@@ -148,10 +148,10 @@ def build_imagenet_dps(
     )
     valid_df["split"] = "valid"
 
-    dp = mk.DataPanel.from_pandas(
+    df = mk.DataFrame.from_pandas(
         pd.concat([train_df, valid_df.drop(columns="PredictionString")])
     )
-    dp["image"] = mk.ImageColumn.from_filepaths(dp["path"])
+    df["image"] = mk.ImageColumn.from_filepaths(df["path"])
 
     # mapping from synset to english
     with open(os.path.join(dataset_dir, "LOC_synset_mapping.txt")) as f:
@@ -161,12 +161,12 @@ def build_imagenet_dps(
         .str.split(" ", expand=True, n=1)
         .rename(columns={0: "synset", 1: "name"})
     )
-    mapping_dp = mk.DataPanel.from_pandas(df)
+    mapping_df = mk.DataFrame.from_pandas(df)
 
     # torchvision models use class indices corresponding to the order of the
     # LOC_synset_mapping.txt file, which we confirmed using the mapping provided here
     # https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a
-    mapping_dp["class_idx"] = np.arange(len(mapping_dp))
-    dp = dp.merge(mapping_dp, how="left", on="synset")
+    mapping_df["class_idx"] = np.arange(len(mapping_df))
+    df = df.merge(mapping_df, how="left", on="synset")
 
-    return dp
+    return df

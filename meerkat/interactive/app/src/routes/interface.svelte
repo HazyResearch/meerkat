@@ -36,7 +36,7 @@
 	};
 
 	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
-		return await post(`${$api_url}/dp/${box_id}/schema`, { columns: columns });
+		return await post(`${$api_url}/df/${box_id}/schema`, { columns: columns });
 	};
 
 	$: get_rows = async (
@@ -48,7 +48,7 @@
 		key_column?: string,
 		keys?: Array<string | number>,
 	) => {
-		let result = await post(`${$api_url}/dp/${box_id}/rows`, {
+		let result = await post(`${$api_url}/df/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
@@ -60,7 +60,7 @@
 	};
 
 	$: add = async (box_id: string, column_name: string) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/add`, { column: column_name });
+		let modifications = await modify(`${$api_url}/df/${box_id}/add`, { column: column_name });
 		return modifications;
 	};
 
@@ -71,7 +71,7 @@
 		row_id: string | number,
 		id_column: string
 	) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/edit`, {
+		let modifications = await modify(`${$api_url}/df/${box_id}/edit`, {
 			value: value,
 			column: column,
 			row_id: row_id,
@@ -90,7 +90,7 @@
 		primary_key: string,
 		metadata: any
 	) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/edit_target`, {
+		let modifications = await modify(`${$api_url}/df/${box_id}/edit_target`, {
 			target: target,
 			value: value,
 			column: column,
@@ -133,14 +133,14 @@
 		for (const [name, aggregation] of Object.entries(aggregations)) {
 			out[name] = await post(`${$api_url}/sliceby/${box_id}/aggregate/`, {
 				aggregation_id: aggregation.id,
-				accepts_dp: true
+				accepts_df: true
 			});
 		}
 		return out;
 	};
 
 	$: remove_row_by_index = async (box_id: string, row_index: number) => {
-		let modifications = await modify(`${$api_url}/dp/${box_id}/remove_row_by_index`, {
+		let modifications = await modify(`${$api_url}/df/${box_id}/remove_row_by_index`, {
 			row_index: row_index
 		});
 		return modifications;

@@ -1,7 +1,7 @@
 import pytest
 
 from meerkat import LambdaColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
@@ -119,6 +119,6 @@ def test_map_return_multiple(
         materialize=materialize,
         output_type=list(map_specs.values())[0].get("output_type", None),
     )
-    assert isinstance(result, DataPanel)
+    assert isinstance(result, DataFrame)
     for key, map_spec in map_specs.items():
         assert result[key].is_equal(map_spec["expected_result"])

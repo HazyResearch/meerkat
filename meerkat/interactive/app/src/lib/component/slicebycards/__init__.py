@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Union
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Box, make_box, make_store
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
@@ -12,12 +12,12 @@ class Aggregation(IdentifiableMixin):
 
     identifiable_group: str = "aggregations"
 
-    def __init__(self, func: Callable[["DataPanel"], Union[int, float, str]]):
+    def __init__(self, func: Callable[["DataFrame"], Union[int, float, str]]):
         self.func = func
         super().__init__()
 
-    def __call__(self, dp: "DataPanel") -> Union[int, float, str]:
-        return self.func(dp)
+    def __call__(self, df: "DataFrame") -> Union[int, float, str]:
+        return self.func(df)
 
     @property
     def config(self):
@@ -35,18 +35,18 @@ class SliceByCards(Component):
         sliceby: Box[SliceBy],
         main_column: str,
         tag_columns: List[str] = None,
-        aggregations: Dict[str, Callable[["DataPanel"], Union[int, float, str]]] = None,
-        dp: Box["DataPanel"] = None,  # required to support passing in an external box
+        aggregations: Dict[str, Callable[["DataFrame"], Union[int, float, str]]] = None,
+        df: Box["DataFrame"] = None,  # required to support passing in an external box
     ) -> None:
         super().__init__()
         self.sliceby = make_box(sliceby)
 
-        if dp is None:
-            dp = self.sliceby.obj.data
+        if df is None:
+            df = self.sliceby.obj.data
         else:
-            assert self.sliceby.obj.data is (dp.obj if isinstance(dp, Box) else dp)
+            assert self.sliceby.obj.data is (df.obj if isinstance(df, Box) else df)
 
-        self.dp = make_box(dp)
+        self.df = make_box(df)
 
         if aggregations is None:
             aggregations = {}
@@ -64,7 +64,7 @@ class SliceByCards(Component):
     def props(self):
         return {
             "sliceby": self.sliceby.config,
-            "dp": self.dp.config,
+            "df": self.df.config,
             "main_column": self.main_column.config,
             "tag_columns": self.tag_columns.config,
             "aggregations": {k: v.config for k, v in self.aggregations.items()},

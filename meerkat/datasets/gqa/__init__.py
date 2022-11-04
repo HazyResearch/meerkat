@@ -20,7 +20,7 @@ def crop_object(row: Mapping[str, object]):
     return img.crop(box)
 
 
-def build_gqa_dps(dataset_dir: str, write: bool = False) -> Dict[str, mk.DataPanel]:
+def build_gqa_dfs(dataset_dir: str, write: bool = False) -> Dict[str, mk.DataFrame]:
     objects = []
     images = []
     relations = []
@@ -48,44 +48,44 @@ def build_gqa_dps(dataset_dir: str, write: bool = False) -> Dict[str, mk.DataPan
                 objects.append({"object_id": object_id, "image_id": image_id, **obj})
             images.append({"image_id": image_id, **graph})
 
-    # prepare DataPanels
-    print("Preparing DataPanels...")
-    image_dp = mk.DataPanel(images)
-    image_dp["image"] = mk.ImageColumn(
-        image_dp["image_id"].map(
+    # prepare DataFrames
+    print("Preparing DataFrames...")
+    image_df = mk.DataFrame(images)
+    image_df["image"] = mk.ImageColumn(
+        image_df["image_id"].map(
             lambda x: os.path.join(dataset_dir, "images", f"{x}.jpg")
         )
     )
-    object_dp = mk.DataPanel(objects).merge(
-        image_dp[["image_id", "image", "height", "width"]], on="image_id"
+    object_df = mk.DataFrame(objects).merge(
+        image_df[["image_id", "image", "height", "width"]], on="image_id"
     )
-    object_dp["object_image"] = object_dp.to_lambda(crop_object)
+    object_df["object_image"] = object_df.to_lambda(crop_object)
     # filter out objects with no width or height
-    object_dp = object_dp.lz[(object_dp["h"] != 0) & (object_dp["w"] != 0)]
+    object_df = object_df.lz[(object_df["h"] != 0) & (object_df["w"] != 0)]
     # filter out objects whose bounding boxes are not contained within the image
-    object_dp = object_dp.lz[
-        (object_dp["x"] < object_dp["width"]) & (object_dp["y"] < object_dp["height"])
+    object_df = object_df.lz[
+        (object_df["x"] < object_df["width"]) & (object_df["y"] < object_df["height"])
     ]
 
-    dps = {
-        "images": image_dp,
-        "objects": object_dp,
-        "relations": mk.DataPanel(relations),
-        "attributes": mk.DataPanel(attributes),
+    dfs = {
+        "images": image_df,
+        "objects": object_df,
+        "relations": mk.DataFrame(relations),
+        "attributes": mk.DataFrame(attributes),
     }
 
     if write:
-        write_gqa_dps(dps=dps, dataset_dir=dataset_dir)
-    return dps
+        write_gqa_dfs(dfs=dfs, dataset_dir=dataset_dir)
+    return dfs
 
 
-def read_gqa_dps(dataset_dir: str) -> Dict[str, mk.DataPanel]:
+def read_gqa_dfs(dataset_dir: str) -> Dict[str, mk.DataFrame]:
     return {
-        key: mk.DataPanel.read(os.path.join(dataset_dir, f"{key}.mk"))
+        key: mk.DataFrame.read(os.path.join(dataset_dir, f"{key}.mk"))
         for key in ["attributes", "relations", "objects", "images"]
     }
 
 
-def write_gqa_dps(dps: Mapping[str, mk.DataPanel], dataset_dir: str):
-    for key, dp in dps.items():
-        dp.write(os.path.join(dataset_dir, f"{key}.mk"))
+def write_gqa_dfs(dfs: Mapping[str, mk.DataFrame], dataset_dir: str):
+    for key, df in dfs.items():
+        df.write(os.path.join(dataset_dir, f"{key}.mk"))

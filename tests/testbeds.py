@@ -12,7 +12,7 @@ from PIL import Image
 
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 
 class AbstractColumnTestBed:
@@ -76,16 +76,16 @@ class MockDatapanel:
             self.img_col = MockImageColumn(length=length, tmpdir=tmpdir)
             batch["img"] = self.img_col.col
 
-        self.dp = DataPanel.from_batch(batch)
+        self.df = DataFrame.from_batch(batch)
 
         self.visible_rows = [0, 4, 6, 11] if use_visible_rows else np.arange(length)
         if use_visible_rows:
-            for column in self.dp.values():
+            for column in self.df.values():
                 column.visible_rows = self.visible_rows
 
-        self.visible_columns = ["a", "b"] if use_visible_columns else self.dp.columns
+        self.visible_columns = ["a", "b"] if use_visible_columns else self.df.columns
         if use_visible_columns:
-            self.dp.visible_columns = self.visible_columns
+            self.df.visible_columns = self.visible_columns
 
 
 class MockColumn:
@@ -140,7 +140,7 @@ class MockImageColumn:
 
         Args:
             wrap_dataset (bool, optional): If `True`, create a
-            `meerkat.DataPanel`
+            `meerkat.DataFrame`
             ,
                 otherwise create a
                 `meerkat.core.dataformats.vision.VisionDataPane`

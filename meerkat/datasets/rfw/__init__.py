@@ -50,11 +50,11 @@ class rfw(DatasetBuilder):
         # drop duplicate rows with the same image_id
         df = df.drop_duplicates(subset=["image_id"], keep=False)
 
-        dp = mk.DataPanel.from_pandas(df)
-        dp["image"] = mk.ImageColumn.from_filepaths(
-            dp["image_path"], base_dir=self.dataset_dir
+        df = mk.DataFrame.from_pandas(df)
+        df["image"] = mk.ImageColumn.from_filepaths(
+            df["image_path"], base_dir=self.dataset_dir
         )
-        return dp[["image_id", "identity", "ethnicity", "image"]]
+        return df[["image_id", "identity", "ethnicity", "image"]]
 
         return None
 

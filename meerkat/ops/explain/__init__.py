@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING, Mapping, Tuple, Union
 
-from meerkat import AbstractColumn, DataPanel, NumpyArrayColumn, embed
+from meerkat import AbstractColumn, DataFrame, NumpyArrayColumn, embed
 
 if TYPE_CHECKING:
     from domino import Slicer
 
 
 def explain(
-    data: Union[AbstractColumn, DataPanel],
+    data: Union[AbstractColumn, DataFrame],
     input: str,
     target: Union[str, Mapping[str, str]],
     method: Union[str, "Slicer"] = "MixtureSlicer",
@@ -19,7 +19,7 @@ def explain(
     (e.g. image), the column is first embedded then clustered.
 
     Args:
-        data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel
+        data (Union[DataFrame, AbstractColumn]): The column to cluster or a dataframe
             containing the column to cluster.
         input (Union[str, Sequence[str]]): The column(s) to cluster by. These
             columns will be embedded using the ``encoder`` and the resulting
@@ -30,11 +30,11 @@ def explain(
         **kwargs: Additional keyword arguments to pass to the clustering method.
 
     Returns:
-        (Union[NumpyArrayColumn, DataPanel], Slicer): A tuple containing the
-            clustered column and the fit clusterer. If ``data`` is a DataPanel, the
-            clustered column is added to the DataPanel and it is returned.
+        (Union[NumpyArrayColumn, DataFrame], Slicer): A tuple containing the
+            clustered column and the fit clusterer. If ``data`` is a DataFrame, the
+            clustered column is added to the DataFrame and it is returned.
     """
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
         output_column = f"{method}({input},{target})"
         embed_col = f"{encoder}({input})"
@@ -73,7 +73,7 @@ def explain(
         pred_probs=None,
     )
 
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         data[output_column] = slices
         return data, method
     return slices, method

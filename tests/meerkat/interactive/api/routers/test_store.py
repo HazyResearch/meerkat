@@ -10,12 +10,12 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def dp_testbed():
-    dp = mk.DataPanel(
+def df_testbed():
+    df = mk.DataFrame(
         {"a": np.arange(10), "b": np.arange(10, 20), "clip(a)": np.zeros((10, 4))}
     )
 
-    return {"dp": dp}
+    return {"df": df}
 
 
 def test_store():
@@ -24,7 +24,7 @@ def test_store():
     response = client.post(f"/store/{store.id}/trigger/", json={"value": 2})
 
     assert response.status_code == 200
-    assert derived.obj == 5
+    assert derived.value == 5
     assert store.value == 2
 
 

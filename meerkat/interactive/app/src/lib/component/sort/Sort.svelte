@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import type { SortCriterion, DataPanelSchema } from '$lib/api/datapanel';
+	import type { SortCriterion, DataFrameSchema } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
 	import {flip} from "svelte/animate";
@@ -8,7 +8,7 @@
     import { v4 as uuidv4 } from 'uuid';
 	import SvelteTooltip from 'svelte-tooltip';
 	const { get_schema, filter } = getContext('Interface');
-	export let dp: Writable;
+	export let df: Writable;
 	// TODO: Figure out if we should have a frontend_criteria
 	// to control the frontend display of criteria, which allows
 	// us to separate updating the backend store
@@ -33,8 +33,8 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($dp.box_id);
-		items_promise = schema_promise.then((schema: DataPanelSchema) => {
+		schema_promise = $get_schema($df.box_id);
+		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
 					value: column.name,

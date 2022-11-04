@@ -13,29 +13,29 @@ def simple_op(col: str):
 
 
 class MatchTableInterface(Interface):
-    def __init__(self, dp: mk.DataPanel, id_column: str, against: str = None):
+    def __init__(self, df: mk.DataFrame, id_column: str, against: str = None):
         super().__init__()
         self.id_column = id_column
         self.against = against
 
         self.pivots = []
-        self.dp = dp
+        self.df = df
 
         # with context
         self._layout()
 
     def _layout(self):
         # Setup pivots
-        dp_pivot = self.pivot(self.dp)
+        df_pivot = self.pivot(self.df)
 
         # Setup components
-        match: Component = Match(dp_pivot, against=self.against, col=self.id_column)
+        match: Component = Match(df_pivot, against=self.against, col=self.id_column)
 
-        sort_derived = mk.sort(dp_pivot, by=match.col, ascending=False)
+        sort_derived = mk.sort(df_pivot, by=match.col, ascending=False)
 
         gallery: Component = Table(
             sort_derived,
-            edit_target=EditTarget(dp_pivot, self.id_column, self.id_column),
+            edit_target=EditTarget(df_pivot, self.id_column, self.id_column),
         )
 
         # TODO: make this more magic

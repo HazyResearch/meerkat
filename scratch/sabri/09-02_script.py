@@ -8,5 +8,5 @@ import meerkat as mk
 network = mk.interactive_mode()
 
 
-dp = mk.get("rfw")
-dp.gui.table(id_column="image_id")
+df = mk.get("rfw")
+df.gui.table(id_column="image_id")

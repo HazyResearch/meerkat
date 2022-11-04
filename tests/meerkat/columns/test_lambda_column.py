@@ -16,7 +16,7 @@ class LambdaColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "batched": [True, False],
-        "from_dp": [True, False],
+        "from_df": [True, False],
         "multiple_outputs": [True, False],
     }
 
@@ -25,7 +25,7 @@ class LambdaColumnTestBed(AbstractColumnTestBed):
     def __init__(
         self,
         batched: bool,
-        from_dp: bool,
+        from_df: bool,
         multiple_outputs: bool,
         length: int = 16,
         seed: int = 123,
@@ -114,16 +114,16 @@ def test_column_to_lambda(col_type: Type):
     "use_visible_columns",
     [True, False],
 )
-def test_dp_to_lambda(use_visible_columns: bool):
+def test_df_to_lambda(use_visible_columns: bool):
     length = 16
     testbed = MockDatapanel(
         use_visible_columns=use_visible_columns,
         length=length,
     )
-    dp = testbed.dp
+    df = testbed.df
 
     # Build a dataset from a batch
-    lambda_col = dp.to_lambda(lambda x: x["a"] + 1)
+    lambda_col = df.to_lambda(lambda x: x["a"] + 1)
 
     assert isinstance(lambda_col, LambdaColumn)
     assert (lambda_col[:].data == np.arange(length)[testbed.visible_rows] + 1).all()
@@ -143,24 +143,24 @@ def test_composed_lambda_columns(col_type: Type):
     assert (lambda_col[:] == testbed.array[testbed.visible_rows] + 2).all()
 
 
-def test_dp_concat():
+def test_df_concat():
     length = 16
     testbed = MockDatapanel(length=length)
-    dp = testbed.dp
+    df = testbed.df
 
     def fn(x):
         return x["a"] + 1
 
-    col_a = dp.to_lambda(fn)
-    col_b = dp.to_lambda(fn)
+    col_a = df.to_lambda(fn)
+    col_b = df.to_lambda(fn)
 
     out = mk.concat([col_a, col_b])
 
     assert isinstance(out, LambdaColumn)
     assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
-    col_a = dp.to_lambda(fn)
-    col_b = dp.to_lambda(lambda x: x["a"])
+    col_a = df.to_lambda(fn)
+    col_b = df.to_lambda(lambda x: x["a"])
     with pytest.warns(ConcatWarning):
         out = mk.concat([col_a, col_b])
 

@@ -27,7 +27,7 @@ class Gallery(Component):
 
     def __init__(
         self,
-        dp: Box,
+        df: Box,
         main_column: str,
         tag_columns: List[str],
         edit_target: EditTarget = None,
@@ -35,7 +35,7 @@ class Gallery(Component):
         primary_key: str = None,
     ) -> None:
         super().__init__()
-        self.dp = make_box(dp)
+        self.df = make_box(df)
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
         self.primary_key = primary_key
@@ -43,7 +43,7 @@ class Gallery(Component):
         if edit_target is None:
             # TODO: primary key - make this based on primary keys once that is
             # implemented
-            edit_target = EditTarget(self.dp, self.primary_key, self.primary_key)
+            edit_target = EditTarget(self.df, self.primary_key, self.primary_key)
         self.edit_target = edit_target
 
         self.primary_key = primary_key
@@ -54,7 +54,7 @@ class Gallery(Component):
     @property
     def props(self):
         props = {
-            "dp": self.dp.config,
+            "df": self.df.config,
             "main_column": self.main_column.config,
             "tag_columns": self.tag_columns.config,
             "edit_target": self.edit_target.config,

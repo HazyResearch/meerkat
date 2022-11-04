@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get_rows } from '$lib/api/datapanel';
+	import { get_rows } from '$lib/api/dataframe';
 
 	import Gallery from '$lib/component/gallery/Cards.svelte';
 	import { api_url } from '$network/stores';

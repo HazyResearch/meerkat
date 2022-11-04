@@ -1,5 +1,5 @@
 
-Subclassing DataPanel and AbstractColumn
+Subclassing DataFrame and AbstractColumn
 =========================================
 
 
@@ -11,7 +11,7 @@ Subclassing AbstractColumn
     Fill in this stub.
 
 
-Subclassing DataPanel
+Subclassing DataFrame
 ----------------------
 
 .. todo::

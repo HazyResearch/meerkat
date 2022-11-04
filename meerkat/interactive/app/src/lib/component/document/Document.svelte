@@ -12,10 +12,10 @@
     // This is a prop for our component. It is a Writable store, which means that it can be
     // read from and written to.
     // *** To access the value of the store, use $store_name, so e.g. $data ***
-	export let dp: Writable;
+	export let df: Writable;
     export let doc_column: Writable<string>;
 
-    $: rows_promise = $get_rows($dp.box_id, 0, null, null, [$doc_column]);
+    $: rows_promise = $get_rows($df.box_id, 0, null, null, [$doc_column]);
 
 
 	// let highlight_pred = (p: number) => {
@@ -67,9 +67,9 @@
 
 {#await rows_promise}
     Waiting...
-{:then dprows}
-	{dprows.rows}
-    <!-- {#each dprows.rows as document}
+{:then dfrows}
+	{dfrows.rows}
+    <!-- {#each dfrows.rows as document}
         <div id="document">
             <div class="paragraph">
                 {#each paragraph as sentence}

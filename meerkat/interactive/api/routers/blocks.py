@@ -3,8 +3,8 @@ import functools
 from fastapi import APIRouter, Body
 
 router = APIRouter(
-    prefix="/dp",
-    tags=["dp"],
+    prefix="/df",
+    tags=["df"],
     responses={404: {"description": "Not found"}},
 )
 

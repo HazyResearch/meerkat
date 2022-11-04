@@ -4,7 +4,7 @@ from typing import Dict, List, Sequence, Tuple, Union
 
 import numpy as np
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 from .sliceby import SliceBy
 
@@ -12,7 +12,7 @@ from .sliceby import SliceBy
 class GroupBy(SliceBy):
     def __init__(
         self,
-        data: DataPanel,
+        data: DataFrame,
         by: Union[List[str], str],
         sets: Dict[Union[str, Tuple[str]], np.ndarray] = None,
     ):
@@ -20,19 +20,19 @@ class GroupBy(SliceBy):
 
 
 def groupby(
-    data: DataPanel,
+    data: DataFrame,
     by: Union[str, Sequence[str]] = None,
 ) -> GroupBy:
-    """Perform a groupby operation on a DataPanel or Column (similar to a
+    """Perform a groupby operation on a DataFrame or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).j.
 
     Args:
-        data (Union[DataPanel, AbstractColumn]): The data to group.
+        data (Union[DataFrame, AbstractColumn]): The data to group.
         by (Union[str, Sequence[str]]): The column(s) to group by. Ignored if ``data``
             is a Column.
 
     Returns:
-        Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
+        Union[DataFrameGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
     if isinstance(by, str):
         by = [by]

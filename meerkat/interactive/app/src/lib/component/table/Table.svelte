@@ -6,7 +6,7 @@
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let edit_target: Any;
 
 	export let page: number = 0;
@@ -14,8 +14,8 @@
 
 	export let column_widths: Array<number>;
 
-	$: schema_promise = $get_schema($dp.box_id);
-	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
+	$: schema_promise = $get_schema($df.box_id);
+	$: rows_promise = $get_rows($df.box_id, page * per_page, (page + 1) * per_page);
 
 	$: schema_promise.then((s: any) => {
 		if (column_widths == null) {

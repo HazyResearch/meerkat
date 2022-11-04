@@ -3,11 +3,11 @@ from typing import Optional, Tuple, Union
 import sklearn.cluster as skcluster
 from sklearn.base import ClusterMixin
 
-from meerkat import AbstractColumn, DataPanel, NumpyArrayColumn, embed
+from meerkat import AbstractColumn, DataFrame, NumpyArrayColumn, embed
 
 
 def cluster(
-    data: Union[AbstractColumn, DataPanel],
+    data: Union[AbstractColumn, DataFrame],
     input: Optional[str] = None,
     method: Union[str, ClusterMixin] = "KMeans",
     encoder: str = "clip",  # add support for auto selection of encoder
@@ -18,7 +18,7 @@ def cluster(
     (e.g. image), the column is first embedded then clustered.
 
     Args:
-        data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel
+        data (Union[DataFrame, AbstractColumn]): The column to cluster or a dataframe
             containing the column to cluster.
         input (Union[str, Sequence[str]]): The column(s) to cluster by. These columns
             will be embedded using the ``encoder`` and the resulting embedding
@@ -29,11 +29,11 @@ def cluster(
         **kwargs: Additional keyword arguments to pass to the clustering method.
 
     Returns:
-        (Union[NumpyArrayColumn, DataPanel], ClusterMixin): A tuple containing the
-            clustered column and the fit clusterer. If ``data`` is a DataPanel, the
-            clustered column is added to the DataPanel and it is returned.
+        (Union[NumpyArrayColumn, DataFrame], ClusterMixin): A tuple containing the
+            clustered column and the fit clusterer. If ``data`` is a DataFrame, the
+            clustered column is added to the DataFrame and it is returned.
     """
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
         cluster_column = f"{method}({input})"
         embed_col = f"{encoder}({input})"
@@ -57,7 +57,7 @@ def cluster(
 
     clusters = method.fit_predict(data_embedding.data)
 
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         data[cluster_column] = clusters
         return data, method
     return clusters, method

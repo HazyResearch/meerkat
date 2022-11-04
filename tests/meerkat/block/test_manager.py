@@ -415,7 +415,7 @@ def test_io_lambda_args(tmpdir, column_type, column_order):
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
 
-    # ensure that in the loaded dp, the lambda column points to the same
+    # ensure that in the loaded df, the lambda column points to the same
     # underlying data as the base column
     assert new_mgr[col_name].data.args[0] is new_mgr[base_col_name]
 
@@ -451,7 +451,7 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
 
-    # ensure that in the loaded dp, the lambda column points to the same
+    # ensure that in the loaded df, the lambda column points to the same
     # underlying data as the base column
     # TODO: this should work once we get topological sort correct
     assert new_mgr["c"].data.args[0] is new_mgr["b"]

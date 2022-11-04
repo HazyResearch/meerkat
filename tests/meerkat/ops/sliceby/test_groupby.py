@@ -1,7 +1,7 @@
 import numpy as np
 
 from meerkat import ListColumn, NumpyArrayColumn, TensorColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ops.sliceby.groupby import GroupBy, groupby
 
 # Comment for meeting 5/19: Testing group by multiple columns,
@@ -20,7 +20,7 @@ def assertNumpyArrayEquality(arr1, arr2):
 
 
 def test_group_by_type():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -34,13 +34,13 @@ def test_group_by_type():
         }
     )
 
-    df = groupby(dp, "name")
+    df = groupby(df, "name")
 
     assert isinstance(df, GroupBy)
 
 
 def test_tensor_column_by():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -51,7 +51,7 @@ def test_tensor_column_by():
         }
     )
 
-    df = groupby(dp, "a")
+    df = groupby(df, "a")
     out = df["b"].mean()
 
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
@@ -59,7 +59,7 @@ def test_tensor_column_by():
 
 
 def test_group_by_integer_type():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -70,7 +70,7 @@ def test_group_by_integer_type():
         }
     )
 
-    df = groupby(dp, "a")
+    df = groupby(df, "a")
     out = df["b"].mean()
 
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
@@ -81,7 +81,7 @@ def test_group_by_integer_type_md():
     b = np.zeros((7, 4))
     b[0, 0] = 4
     b[1, 1] = 3
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -92,7 +92,7 @@ def test_group_by_integer_type_md():
         }
     )
 
-    df = dp.groupby("a")
+    df = df.groupby("a")
     out = df["b"].mean(axis=0)
 
     assertNumpyArrayEquality(out["b"][0], np.array([2, 0, 0, 0]))
@@ -105,7 +105,7 @@ def test_group_by_integer_type_md():
 
 
 def test_group_by_integer_type_axis_passed():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -116,7 +116,7 @@ def test_group_by_integer_type_axis_passed():
         }
     )
 
-    df = groupby(dp, "a")
+    df = groupby(df, "a")
     out = df["b"].mean(axis=0)
 
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
@@ -124,7 +124,7 @@ def test_group_by_integer_type_axis_passed():
 
 
 def test_group_by_integer_type_as_prop():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -135,7 +135,7 @@ def test_group_by_integer_type_as_prop():
         }
     )
 
-    df = dp.groupby("a")
+    df = df.groupby("a")
     out = df["b"].mean()
 
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
@@ -143,7 +143,7 @@ def test_group_by_integer_type_as_prop():
 
 
 def test_group_by_tensor_key():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -154,7 +154,7 @@ def test_group_by_tensor_key():
         }
     )
 
-    df = groupby(dp, "a")
+    df = groupby(df, "a")
     out = df["b"].mean()
 
     assertNumpyArrayEquality(out["b"].data, np.array([2.5, (2 + 3 + 6) / 3, 6]))
@@ -162,7 +162,7 @@ def test_group_by_tensor_key():
 
 
 def test_group_by_string_type():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -173,14 +173,14 @@ def test_group_by_string_type():
         }
     )
 
-    df = groupby(dp, "name")
+    df = groupby(df, "name")
     out = df["b"].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
     assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_string_type_multiple_keys():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -191,7 +191,7 @@ def test_group_by_string_type_multiple_keys():
         }
     )
 
-    df = groupby(dp, "name")
+    df = groupby(df, "name")
     out = df[["b", "a"]].mean()
     assert (np.linalg.norm(out["a"].data - np.array([1.5, 2.5, 1, 2.5]))) < 1e-10
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
@@ -199,7 +199,7 @@ def test_group_by_string_type_multiple_keys():
 
 
 def test_group_by_by_string_type_as_list():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -210,14 +210,14 @@ def test_group_by_by_string_type_as_list():
         }
     )
 
-    df = groupby(dp, ["name"])
+    df = groupby(df, ["name"])
     out = df["b"].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
     assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_by_string_type_as_list_key_as_list():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -228,14 +228,14 @@ def test_group_by_by_string_type_as_list_key_as_list():
         }
     )
 
-    df = groupby(dp, ["name"])
+    df = groupby(df, ["name"])
     out = df[["b"]].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
     assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_float_should_fail():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -246,14 +246,14 @@ def test_group_by_float_should_fail():
         }
     )
     try:
-        groupby(dp, ["c"])
+        groupby(df, ["c"])
         assert False
     except Exception:
         assert True
 
 
 def test_group_by_float_should_fail_nonexistent_column():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -264,14 +264,14 @@ def test_group_by_float_should_fail_nonexistent_column():
         }
     )
     try:
-        groupby(dp, ["d"])
+        groupby(df, ["d"])
         assert False
     except Exception:
         assert True
 
 
 def test_group_by_by_string_type_as_list_key_as_list_mult_key_by_name():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "name": NumpyArrayColumn(
@@ -282,7 +282,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_by_name():
         }
     )
 
-    df = groupby(dp, ["name"])
+    df = groupby(df, ["name"])
     out = df[["b", "c"]].mean()
     assert np.linalg.norm(out["c"].data - np.array([1.55, 3.75, 4.3, 7.05]) < 1e-10)
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
@@ -290,7 +290,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_by_name():
 
 
 def test_group_by_by_string_type_as_list_key_as_list_mult_key():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
             "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
@@ -302,7 +302,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key():
         }
     )
 
-    df = groupby(dp, ["a", "a_diff"])
+    df = groupby(df, ["a", "a_diff"])
     out = df[["b"]].mean()
     assertNumpyArrayEquality(out["a"].data, np.array([1, 1, 2, 3]))
     assertNumpyArrayEquality(out["a_diff"].data, np.array([1, 2, 2, 3]))
@@ -310,7 +310,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key():
 
 
 def test_group_by_by_string_type_as_list_key_as_list_mult_key_tensor():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
             "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
@@ -322,7 +322,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_tensor():
         }
     )
 
-    df = groupby(dp, ["a", "a_diff"])
+    df = groupby(df, ["a", "a_diff"])
     out = df[["b"]].mean()
     assertNumpyArrayEquality(out["a"].data, np.array([1, 1, 2, 3]))
     assertNumpyArrayEquality(out["a_diff"].data, np.array([1, 2, 2, 3]))
@@ -330,7 +330,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_tensor():
 
 
 def test_simple_list_column():
-    dp = DataPanel(
+    df = DataFrame(
         {
             "a": ListColumn([1, 2, 2, 1, 3, 2, 3]),
             "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
@@ -342,7 +342,7 @@ def test_simple_list_column():
         }
     )
 
-    df = groupby(dp, ["a", "a_diff"])
+    df = groupby(df, ["a", "a_diff"])
     out = df[["b"]].mean()
     assertNumpyArrayEquality(out["a"].data, np.array([1, 1, 2, 3]))
     assertNumpyArrayEquality(out["a_diff"].data, np.array([1, 2, 2, 3]))

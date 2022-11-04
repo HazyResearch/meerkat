@@ -73,7 +73,7 @@ class GCSImageColumn(ImageColumn):
 
     def _get_formatter(self) -> callable:
         # downloading the images from gcp for every visualization is probably not
-        # what we want as it makes datapanel visualization very slow
+        # what we want as it makes dataframe visualization very slow
         return None
 
     def _create_cell(self, data: object) -> LambdaCell:

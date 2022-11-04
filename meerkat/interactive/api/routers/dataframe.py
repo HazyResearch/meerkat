@@ -8,7 +8,7 @@ from pydantic import BaseModel, StrictInt, StrictStr
 import meerkat as mk
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.graph import BoxModification
@@ -17,8 +17,8 @@ from meerkat.state import state
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
-    prefix="/dp",
-    tags=["dp"],
+    prefix="/df",
+    tags=["df"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -47,24 +47,24 @@ class SchemaResponse(BaseModel):
 def schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
     pivot = state.identifiables.get(group="boxes", id=pivot_id)
 
-    dp = state.identifiables.get(group="datapanels", id=pivot.obj.id)
-    columns = dp.columns if request is None else request.columns
+    df = state.identifiables.get(group="dataframes", id=pivot.obj.id)
+    columns = df.columns if request is None else request.columns
     return SchemaResponse(
-        id=pivot.obj.id, columns=_get_column_infos(dp, columns), nrows=len(dp)
+        id=pivot.obj.id, columns=_get_column_infos(df, columns), nrows=len(df)
     )
 
 
-def _get_column_infos(dp: DataPanel, columns: List[str] = None):
+def _get_column_infos(df: DataFrame, columns: List[str] = None):
     if columns is None:
-        columns = dp.columns
+        columns = df.columns
     else:
-        missing_columns = set(columns) - set(dp.columns)
+        missing_columns = set(columns) - set(df.columns)
         if len(missing_columns) > 0:
             raise HTTPException(
                 status_code=404,
                 detail=(
-                    f"Requested columns {columns} do not exist in datapanel"
-                    f" with id {dp.id}"
+                    f"Requested columns {columns} do not exist in dataframe"
+                    f" with id {df.id}"
                 ),
             )
 
@@ -73,9 +73,9 @@ def _get_column_infos(dp: DataPanel, columns: List[str] = None):
     return [
         ColumnInfo(
             name=col,
-            type=type(dp[col]).__name__,
-            cell_component=dp[col].formatter.cell_component,
-            cell_props=dp[col].formatter.cell_props,
+            type=type(df[col]).__name__,
+            cell_component=df[col].formatter.cell_component,
+            cell_props=df[col].formatter.cell_props,
         )
         for col in columns
     ]
@@ -98,24 +98,24 @@ def rows(
     keys: List[Union[StrictInt, StrictStr]] = Body(None),
     columns: List[str] = Body(None),
 ) -> RowsResponse:
-    """Get rows from a DataPanel as a JSON object."""
+    """Get rows from a DataFrame as a JSON object."""
     box = state.identifiables.get(group="boxes", id=box_id)
-    dp = box.obj
+    df = box.obj
 
-    full_length = len(dp)
-    column_infos = _get_column_infos(dp, columns)
+    full_length = len(df)
+    column_infos = _get_column_infos(df, columns)
 
-    dp = dp.lz[[info.name for info in column_infos]]
+    df = df.lz[[info.name for info in column_infos]]
 
     if indices is not None:
-        dp = dp.lz[indices]
+        df = df.lz[indices]
         indices = indices
     elif start is not None:
         if end is None:
-            end = len(dp)
+            end = len(df)
         else:
-            end = min(end, len(dp))
-        dp = dp.lz[start:end]
+            end = min(end, len(df))
+        df = df.lz[start:end]
         indices = list(range(start, end))
     elif keys is not None:
         if key_column is None:
@@ -124,14 +124,14 @@ def rows(
             raise ValueError("Must provide key_column if keys are provided")
 
         # FIXME(sabri): this will only work if key_column is a pandas column
-        dp = dp.lz[dp[key_column].isin(keys)]
+        df = df.lz[df[key_column].isin(keys)]
     else:
         raise ValueError()
 
     rows = []
-    for row in dp.lz:
+    for row in df.lz:
         rows.append(
-            [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
+            [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
     return RowsResponse(
         column_infos=column_infos,
@@ -147,14 +147,14 @@ def remove_row_by_index(
 ) -> List[Modification]:
     box = state.identifiables.get(group="boxes", id=box_id)
 
-    dp = box.obj
-    dp = dp.lz[np.arange(len(dp)) != row_index]
+    df = box.obj
+    df = df.lz[np.arange(len(df)) != row_index]
     # this is an out-of-place operation, so the box should be updated
     # TODO(karan): double check this
-    box.obj = dp
+    box.obj = df
 
     modifications = trigger(
-        modifications=[BoxModification(id=box_id, scope=dp.columns)]
+        modifications=[BoxModification(id=box_id, scope=df.columns)]
     )
     return modifications
 
@@ -169,12 +169,12 @@ def edit(
 ) -> List[Modification]:
 
     box = state.identifiables.get(group="boxes", id=box_id)
-    dp = box.obj
+    df = box.obj
 
-    mask = dp[id_column] == row_id
+    mask = df[id_column] == row_id
     if mask.sum() == 0:
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
-    dp[column][mask] = value
+    df[column][mask] = value
 
     modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
     return modifications
@@ -191,7 +191,7 @@ def edit_target(
     primary_key: str = Body(None),
     metadata: Dict[str, Any] = Body(None),
 ):
-    """Edit a target datapanel.
+    """Edit a target dataframe.
 
     Args:
         metadata (optional): Additional metadata to write.
@@ -204,27 +204,27 @@ def edit_target(
             detail="Exactly one of row_indices or row_keys must be specified",
         )
 
-    dp = state.identifiables.get(group="boxes", id=box_id).obj
+    df = state.identifiables.get(group="boxes", id=box_id).obj
 
-    target_dp = state.identifiables.get(group="boxes", id=target.target.box_id).obj
+    target_df = state.identifiables.get(group="boxes", id=target.target.box_id).obj
 
     if row_indices is not None:
-        source_ids = dp[target.source_id_column][row_indices]
+        source_ids = df[target.source_id_column][row_indices]
     else:
         if primary_key is None:
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
-            # primary_key = target_dp.primary_key
-        source_ids = dp[target.source_id_column].lz[np.isin(dp[primary_key], row_keys)]
+            # primary_key = target_df.primary_key
+        source_ids = df[target.source_id_column].lz[np.isin(df[primary_key], row_keys)]
 
-    mask = np.isin(target_dp[target.target_id_column], source_ids)
+    mask = np.isin(target_df[target.target_id_column], source_ids)
 
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
         breakpoint()
         raise HTTPException(
-            status_code=500, detail="Target datapanel does not contain all source ids."
+            status_code=500, detail="Target dataframe does not contain all source ids."
         )
-    target_dp[column][mask] = value
+    target_df[column][mask] = value
 
     # TODO: support making a column if the column does not exist.
     # This requires deducing the column type and the default value
@@ -236,20 +236,20 @@ def edit_target(
             if isinstance(value, dict):
                 value = col_value["value"]
                 default = col_value["default"]
-            if column_name not in target_dp.columns:
+            if column_name not in target_df.columns:
                 if default is None:
                     raise HTTPException(
                         status_code=400,
                         detail=f"Column {column_name} \
-                            does not exist in target datapanel",
+                            does not exist in target dataframe",
                     )
-                default_col = np.full(len(target_dp), default)
+                default_col = np.full(len(target_df), default)
                 if isinstance(default, str):
-                    default_col = PandasSeriesColumn([default] * len(target_dp))
+                    default_col = PandasSeriesColumn([default] * len(target_df))
                 else:
-                    default_col = NumpyArrayColumn(np.full(len(target_dp), default))
-                target_dp[column_name] = default_col
-            target_dp[column_name][mask] = value
+                    default_col = NumpyArrayColumn(np.full(len(target_df), default))
+                target_df[column_name] = default_col
+            target_df[column_name][mask] = value
 
     modifications = trigger(
         modifications=[BoxModification(id=target.target.box_id, scope=[column])]
@@ -257,27 +257,27 @@ def edit_target(
     return modifications
 
 
-@router.post("/{datapanel_id}/sort/")
-def sort(datapanel_id: str, by: str = EmbeddedBody()):
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
-    dp = mk.sort(data=dp, by=by, ascending=False)
-    global curr_dp
-    curr_dp = dp
-    return SchemaResponse(id=dp.id, columns=_get_column_infos(dp))
+@router.post("/{dataframe_id}/sort/")
+def sort(dataframe_id: str, by: str = EmbeddedBody()):
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
+    df = mk.sort(data=df, by=by, ascending=False)
+    global curr_df
+    curr_df = df
+    return SchemaResponse(id=df.id, columns=_get_column_infos(df))
 
 
-@router.post("/{datapanel_id}/aggregate/")
+@router.post("/{dataframe_id}/aggregate/")
 def aggregate(
-    datapanel_id: str,
+    dataframe_id: str,
     aggregation_id: str = Body(None),
     aggregation: str = Body(None),
-    accepts_dp: bool = Body(False),
+    accepts_df: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Union[float, int, str]:
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
 
     if columns is not None:
-        dp = dp[columns]
+        df = df[columns]
 
     if (aggregation_id is None) == (aggregation is None):
         raise HTTPException(
@@ -287,14 +287,14 @@ def aggregate(
 
     if aggregation_id is not None:
         aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
-        value = dp.aggregate(aggregation, accepts_dp=accepts_dp)
+        value = df.aggregate(aggregation, accepts_df=accepts_df)
 
     else:
         if aggregation not in ["mean", "sum", "min", "max"]:
             raise HTTPException(
                 status_code=400, detail=f"Invalid aggregation {aggregation}"
             )
-        value = dp.aggregate(aggregation)
+        value = df.aggregate(aggregation)
 
     # convert value to native python type
     value = convert_to_python(value)
@@ -323,15 +323,15 @@ _operator_str_to_func = {
 }
 
 
-@router.post("/{datapanel_id}/filter")
-def filter(datapanel_id: str, request: FilterRequest) -> SchemaResponse:
+@router.post("/{dataframe_id}/filter")
+def filter(dataframe_id: str, request: FilterRequest) -> SchemaResponse:
     # TODO(karan): untested change as earlier version called a function
     # that didn't exist
-    dp = state.identifiables.get(group="datapanels", id=datapanel_id)
+    df = state.identifiables.get(group="dataframes", id=dataframe_id)
 
     supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     if not all(
-        isinstance(dp[column], supported_column_types) for column in request.columns
+        isinstance(df[column], supported_column_types) for column in request.columns
     ):
         raise HTTPException(
             f"Only {supported_column_types} are supported for filtering."
@@ -339,14 +339,14 @@ def filter(datapanel_id: str, request: FilterRequest) -> SchemaResponse:
 
     # Filter pandas series columns.
     all_series = [
-        _operator_str_to_func[op](dp[col], value)
+        _operator_str_to_func[op](df[col], value)
         for col, value, op in zip(request.columns, request.values, request.ops)
     ]
     mask = functools.reduce(lambda x, y: x & y, all_series)
-    dp = dp.lz[mask]
+    df = df.lz[mask]
 
-    global curr_dp
-    curr_dp = dp
+    global curr_df
+    curr_df = df
     return SchemaResponse(
-        id=dp.id, columns=_get_column_infos(dp, ["img", "path", "label"])
+        id=df.id, columns=_get_column_infos(df, ["img", "path", "label"])
     )

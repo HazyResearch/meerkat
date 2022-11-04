@@ -16,16 +16,16 @@ def get_torchvision_dataset(dataset_name, download_dir, is_train):
 
 
 def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True):
-    """Load CIFAR10 as a Meerkat DataPanel.
+    """Load CIFAR10 as a Meerkat DataFrame.
 
     Args:
         download_dir: download directory
         frac_val: fraction of training set to use for validation
 
     Returns:
-        a DataPanel containing columns `raw_image`, `image` and `label`
+        a DataFrame containing columns `raw_image`, `image` and `label`
     """
-    dps = []
+    dfs = []
     for split in ["train", "test"]:
         dataset = CIFAR10(
             root=download_dir,
@@ -33,7 +33,7 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
             download=download,
         )
 
-        dp = mk.DataPanel(
+        df = mk.DataFrame(
             {
                 "raw_image": dataset.data,
                 "label": mk.TensorColumn(dataset.targets),
@@ -44,20 +44,20 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
             # sample indices for splitting off val
             val_indices = set(
                 random.sample(
-                    range(len(dp)),
-                    int(frac_val * len(dp)),
+                    range(len(df)),
+                    int(frac_val * len(df)),
                 )
             )
 
-            dp["split"] = [
-                "train" if i not in val_indices else "val" for i in range(len(dp))
+            df["split"] = [
+                "train" if i not in val_indices else "val" for i in range(len(df))
             ]
         else:
-            dp["split"] = [split] * len(dataset)
+            df["split"] = [split] * len(dataset)
 
-        dps.append(dp)
-    dp = mk.concat(dps)
+        dfs.append(df)
+    df = mk.concat(dfs)
 
-    dp["image"] = mk.LambdaColumn(dp["raw_image"], Image.fromarray)
+    df["image"] = mk.LambdaColumn(df["raw_image"], Image.fromarray)
 
-    return dp
+    return df

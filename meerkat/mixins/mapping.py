@@ -31,7 +31,7 @@ class MappableMixin:
         **kwargs,
     ):
         from meerkat.columns.abstract import AbstractColumn
-        from meerkat.datapanel import DataPanel
+        from meerkat.dataframe import DataFrame
 
         """Map a function over the elements of the column."""
 
@@ -172,8 +172,8 @@ class MappableMixin:
             # class signature explicit.
             outputs = (
                 self._clone(data=outputs)
-                if isinstance(self, DataPanel)
-                else DataPanel.from_batch(outputs)
+                if isinstance(self, DataFrame)
+                else DataFrame.from_batch(outputs)
             )
             outputs._visible_columns = None
         return outputs

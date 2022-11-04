@@ -36,10 +36,10 @@ class ngoa(DatasetBuilder):
 
         base_dir = os.path.join(self.dataset_dir, "data")
         db = {}
-        db["objects"] = mk.DataPanel.from_csv(
+        db["objects"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "objects.csv"), low_memory=False
         )
-        db["published_images"] = mk.DataPanel.from_csv(
+        db["published_images"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "published_images.csv"),
         )
         db["published_images"]["image"] = mk.ImageColumn.from_filepaths(
@@ -63,19 +63,19 @@ class ngoa(DatasetBuilder):
                 fallback_downloader=_write_empty_image,
             ),
         )
-        db["objects_constituents"] = mk.DataPanel.from_csv(
+        db["objects_constituents"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "objects_constituents.csv"),
         )
-        db["constituents"] = mk.DataPanel.from_csv(
+        db["constituents"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "constituents.csv"),
         )
-        db["constituents_text_entries"] = mk.DataPanel.from_csv(
+        db["constituents_text_entries"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "constituents_text_entries.csv"),
         )
-        db["locations"] = mk.DataPanel.from_csv(
+        db["locations"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "locations.csv"),
         )
-        db["objects_text_entries"] = mk.DataPanel.from_csv(
+        db["objects_text_entries"] = mk.DataFrame.from_csv(
             os.path.join(base_dir, "objects_text_entries.csv"),
         )
         return db

@@ -14,7 +14,7 @@ class Editor(Component):
 
     def __init__(
         self,
-        dp: Box,
+        df: Box,
         col: Union[Store, str],
         target: EditTarget = None,
         selected: Store[List[int]] = None,
@@ -25,17 +25,17 @@ class Editor(Component):
         self.text = make_store("")
         self.primary_key = primary_key
 
-        self.dp = make_box(dp)
+        self.df = make_box(df)
         if target is None:
-            dp["_edit_id"] = np.arange(len(dp))
-            target = EditTarget(self.dp, "_edit_id", "_edit_id")
+            df["_edit_id"] = np.arange(len(df))
+            target = EditTarget(self.df, "_edit_id", "_edit_id")
         self.target = target
         self.selected = selected
 
     @property
     def props(self):
         return {
-            "dp": self.dp.config,
+            "df": self.df.config,
             "target": self.target.config,
             "col": self.col.config,
             "text": self.text.config,

@@ -38,7 +38,7 @@ def infer_modality(col: mk.AbstractColumn):
 
 # @cache(params=["encoder", "modality", ""])
 def embed(
-    data: Union[mk.DataPanel, mk.AbstractColumn, str, PIL.Image.Image],
+    data: Union[mk.DataFrame, mk.AbstractColumn, str, PIL.Image.Image],
     input: str = None,
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
@@ -49,32 +49,32 @@ def embed(
     batch_size: int = 128,
     pbar: bool = True,
     **kwargs,
-) -> Union[mk.DataPanel, mk.AbstractColumn]:
+) -> Union[mk.DataFrame, mk.AbstractColumn]:
     """Embed a column of data with an encoder from the encoder registry.
 
     Examples
     --------
     Suppose you have an Image dataset (e.g. Imagenette, CIFAR-10) loaded into a
-    `Meerkat DataPanel <https://github.com/robustness-gym/meerkat>`_. You can embed the
+    `Meerkat DataFrame <https://github.com/robustness-gym/meerkat>`_. You can embed the
     images in the dataset with CLIP using a code snippet like:
 
     .. code-block:: python
 
         import meerkat as mk
 
-        dp = mk.datasets.get("imagenette")
+        df = mk.datasets.get("imagenette")
 
-        dp = mk.embed(
-            data=dp,
+        df = mk.embed(
+            data=df,
             input_col="img",
             encoder="clip"
         )
 
 
     Args:
-        data (Union[mk.DataPanel, mk.AbstractColumn]): A datapanel or column
+        data (Union[mk.DataFrame, mk.AbstractColumn]): A dataframe or column
             containing the data to embed.
-        input_col (str, optional): If ``data`` is a datapanel, the name of the column
+        input_col (str, optional): If ``data`` is a dataframe, the name of the column
             to embed. If ``data`` is a column, then the parameter is ignored. Defaults
             to None.
         encoder (Union[str, Encoder], optional): Name of the encoder to use. List
@@ -98,7 +98,7 @@ def embed(
             :func:`~domino._embed.clip`).
 
     Returns:
-        mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
+        mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
     col = data if isinstance(data, mk.AbstractColumn) else data[input]
@@ -138,7 +138,7 @@ def embed(
         pbar=pbar,
     )
 
-    if isinstance(data, mk.DataPanel):
+    if isinstance(data, mk.DataFrame):
         data[out_col] = out
         return data
     else:

@@ -62,7 +62,7 @@ class FileLoader:
                 filepath. Otherwise, it is interpreted as a URI from which the file can
                 be downloaded.
         """
-        # support including environment varaiables in the base_dir so that DataPanels
+        # support including environment varaiables in the base_dir so that DataFrames
         # can be easily moved between machines
         if self.base_dir is not None:
 
@@ -298,7 +298,7 @@ class FileColumn(LambdaColumn):
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
-            # support old DataPanels.
+            # support old DataFrames.
             warnings.warn(
                 "Reading a LambdaColumn stored in a format that will not be"
                 " supported in the future. Please re-write the column to the new"
@@ -313,7 +313,7 @@ class FileColumn(LambdaColumn):
                 col = AbstractColumn.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
-                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                    "Support for LambdaColumns based on a DataFrame is deprecated."
                 )
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))

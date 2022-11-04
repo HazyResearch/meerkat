@@ -39,7 +39,7 @@ class pascal(DatasetBuilder):
 
     def build(self):
         if self.version == "2012":
-            return build_pascal_2012_dp(dataset_dir=self.dataset_dir)
+            return build_pascal_2012_df(dataset_dir=self.dataset_dir)
         else:
             raise ValueError()
 
@@ -54,29 +54,29 @@ class pascal(DatasetBuilder):
         )
 
 
-def build_pascal_2012_dp(dataset_dir: str):
+def build_pascal_2012_df(dataset_dir: str):
     base_dir = os.path.join(dataset_dir, "VOCdevkit/VOC2012")
 
-    train_dp = mk.DataPanel.from_csv(
+    train_df = mk.DataFrame.from_csv(
         os.path.join(base_dir, "ImageSets/Main/train.txt"), header=None, names=["id"]
     )
-    train_dp["split"] = ["train"] * len(train_dp)
+    train_df["split"] = ["train"] * len(train_df)
 
-    val_dp = mk.DataPanel.from_csv(
+    val_df = mk.DataFrame.from_csv(
         os.path.join(base_dir, "ImageSets/Main/val.txt"), header=None, names=["id"]
     )
-    val_dp["split"] = ["val"] * len(val_dp)
+    val_df["split"] = ["val"] * len(val_df)
 
-    dp = mk.concat([train_dp, val_dp], axis=0)
+    df = mk.concat([train_df, val_df], axis=0)
 
     # create filename column
-    dp["file_name"] = dp["id"] + ".jpg"
-    dp["image"] = mk.ImageColumn.from_filepaths(
-        dp["file_name"], base_dir=os.path.join(base_dir, "JPEGImages")
+    df["file_name"] = df["id"] + ".jpg"
+    df["image"] = mk.ImageColumn.from_filepaths(
+        df["file_name"], base_dir=os.path.join(base_dir, "JPEGImages")
     )
 
     for class_name in PASCAL_CLASSES:
-        label_dp = mk.DataPanel.from_csv(
+        label_df = mk.DataFrame.from_csv(
             os.path.join(
                 base_dir, f"ImageSets/Main/{class_name}_trainval.txt".format(class_name)
             ),
@@ -85,10 +85,10 @@ def build_pascal_2012_dp(dataset_dir: str):
             names=["id", class_name],
             engine="python",
         )
-        label_dp[class_name] = (label_dp[class_name] == 1).astype(int)
-        dp = dp.merge(label_dp, on="id", validate="one_to_one")
+        label_df[class_name] = (label_df[class_name] == 1).astype(int)
+        df = df.merge(label_df, on="id", validate="one_to_one")
 
-    return dp
+    return df
 
 
 PASCAL_CLASSES = [
@@ -107,7 +107,7 @@ PASCAL_CLASSES = [
     "horse",
     "motorbike",
     "person",
-    "pottedplant",
+    "pottedflant",
     "sheep",
     "sofa",
     "train",

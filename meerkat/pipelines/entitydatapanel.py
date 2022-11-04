@@ -1,4 +1,4 @@
-"""EntityDataPanel Class."""
+"""EntityDataFrame Class."""
 from __future__ import annotations
 
 import logging
@@ -8,13 +8,13 @@ import datasets
 import numpy as np
 import torch
 
-from meerkat import DataPanel, ListColumn, NumpyArrayColumn, TensorColumn
+from meerkat import DataFrame, ListColumn, NumpyArrayColumn, TensorColumn
 from meerkat.ml import EmbeddingColumn
 
 logger = logging.getLogger(__name__)
 
 
-class EntityDataPanel(DataPanel):
+class EntityDataFrame(DataFrame):
     def __init__(
         self,
         data: Union[dict, list, datasets.Dataset] = None,
@@ -24,7 +24,7 @@ class EntityDataPanel(DataPanel):
         **kwargs,
     ):
         """
-        EntityDataPanel: A data panel with "atomic" unit semantics.
+        EntityDataFrame: A data panel with "atomic" unit semantics.
         This means each row represents a unique "atom" or thing.
         Each row has an index column that is used in merges.
         Further, each row can get one or more embedding columns
@@ -55,7 +55,7 @@ class EntityDataPanel(DataPanel):
                 self._check_index_unique()
             self._check_columns_exist([self._index_column])
             self._index_to_rowid = {idx: i for i, idx in enumerate(self.index)}
-        else:  # Initializing empty EntityDataPanel DP - needed when loading
+        else:  # Initializing empty EntityDataFrame DP - needed when loading
             self._embedding_columns = []
             self._index_column = None
             self._index_to_rowid = {}
@@ -70,34 +70,34 @@ class EntityDataPanel(DataPanel):
         assert len(columns) == len(set(columns))
 
     @classmethod
-    def from_datapanel(
+    def from_dataframe(
         cls,
-        datapanel: DataPanel,
+        dataframe: DataFrame,
         embedding_columns: List[str] = None,
         index_column: str = None,
     ):
-        """Returns EntityDataPanel DP from standard DP."""
+        """Returns EntityDataFrame DP from standard DP."""
         return cls(
-            data=datapanel.data,
+            data=dataframe.data,
             embedding_columns=embedding_columns,
             index_column=index_column,
         )
 
-    def to_datapanel(self, klass: type = None):
-        """Casts to a DataPanel.
+    def to_dataframe(self, klass: type = None):
+        """Casts to a DataFrame.
 
         Args:
             klass (type): If specified, casts to this class.
-                This class must be a subclass of :ref:`meerkat.datapanel.DataPanel`.
-                If not specified, defaults to :ref:`meerkat.datapanel.DataPanel`.
+                This class must be a subclass of :ref:`meerkat.dataframe.DataFrame`.
+                If not specified, defaults to :ref:`meerkat.dataframe.DataFrame`.
 
         Returns:
-            DataPanel: The datapanel.
+            DataFrame: The dataframe.
         """
         if klass is None:
-            klass = DataPanel
-        elif not issubclass(klass, DataPanel):
-            raise ValueError("`klass` must be a subclass of DataPanel")
+            klass = DataFrame
+        elif not issubclass(klass, DataFrame):
+            raise ValueError("`klass` must be a subclass of DataFrame")
         return klass.from_batch({k: self[k] for k in self.columns})
 
     @property
@@ -145,7 +145,7 @@ class EntityDataPanel(DataPanel):
     def _add_ent_index(self):
         """Add an integer index to the dataset.
 
-        Not using index from DataPanel as ids need to be integers to
+        Not using index from DataFrame as ids need to be integers to
         serve as embedding row indices
         """
         # TODO: Why do you have a string index...feels weird and expensive.
@@ -189,45 +189,45 @@ class EntityDataPanel(DataPanel):
         Assert index column is not removed
         """
         assert column != self.index_column, "Can't remove an index column"
-        super(EntityDataPanel, self).remove_column(column)
+        super(EntityDataFrame, self).remove_column(column)
         if column in self._embedding_columns:
             self._embedding_columns.remove(column)
 
     def append(
         self,
-        dp: EntityDataPanel,
+        df: EntityDataFrame,
         axis: Union[str, int] = "rows",
         suffixes: Tuple[str] = None,
         overwrite: bool = False,
-    ) -> EntityDataPanel:
-        """Append an EntityDataPanel."""
+    ) -> EntityDataFrame:
+        """Append an EntityDataFrame."""
         if axis == 0 or axis == "rows":
             # append new rows
-            return super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
+            return super(EntityDataFrame, self).append(df, axis, suffixes, overwrite)
         elif axis == 1 or axis == "columns":
             # append new columns; must make sure the entities are in the same order
             # data property takes `visible_rows` into account
-            if not (self.index.data == dp.index.data).all():
+            if not (self.index.data == df.index.data).all():
                 raise ValueError(
                     "Can only append along axis 1 (columns) if the entity indexes match"
                 )
             new_embedding_cols = self._get_merged_embedding_columns(
-                dp, overwrite, suffixes
+                df, overwrite, suffixes
             )
-            # Save the new index column for saving EntityDataPanel
+            # Save the new index column for saving EntityDataFrame
             new_index_column = self.index_column
-            if self.index_column in dp.columns and not overwrite:
+            if self.index_column in df.columns and not overwrite:
                 new_index_column += suffixes[0]
-            ret = super(EntityDataPanel, self).append(dp, axis, suffixes, overwrite)
+            ret = super(EntityDataFrame, self).append(df, axis, suffixes, overwrite)
             ret._embedding_columns = new_embedding_cols
             ret._index_column = new_index_column
             return ret
         else:
-            raise ValueError("DataPanel `axis` must be either 0 or 1.")
+            raise ValueError("DataFrame `axis` must be either 0 or 1.")
 
     def merge(
         self,
-        right: "EntityDataPanel",
+        right: "EntityDataFrame",
         how: str = "inner",
         left_on: str = None,
         sort: bool = False,
@@ -259,12 +259,12 @@ class EntityDataPanel(DataPanel):
                     "Must provide suffixes"
                 )
                 new_index_column += suffixes[0]
-        # Merge calls append and EntityDataPanel append ensures
+        # Merge calls append and EntityDataFrame append ensures
         # indexes are aligned. When merging, we adopt the index of
         # the left, making it okay that indexes are unaligned. To avoid
-        # this, we cast to DataPanel.
-        ret = self.to_datapanel().merge(
-            right.to_datapanel(),
+        # this, we cast to DataFrame.
+        ret = self.to_dataframe().merge(
+            right.to_dataframe(),
             how=how,
             left_on=left_on,
             right_on=right.index_column,
@@ -272,45 +272,45 @@ class EntityDataPanel(DataPanel):
             suffixes=suffixes,
             validate=validate,
         )
-        return EntityDataPanel.from_datapanel(
-            datapanel=ret,
+        return EntityDataFrame.from_dataframe(
+            dataframe=ret,
             embedding_columns=new_embedding_cols,
             index_column=new_index_column,
         )
 
-    def _get_merged_embedding_columns(self, dp, overwrite, suffixes):
-        """In order to create EntityDataPanel post merge/append, we need to
+    def _get_merged_embedding_columns(self, df, overwrite, suffixes):
+        """In order to create EntityDataFrame post merge/append, we need to
         have the embedding columns.
 
-        This calculates the new EntityDataPanel embedding columns in the
+        This calculates the new EntityDataFrame embedding columns in the
         case of suffix changes.
         """
-        new_embedding_cols = self.embedding_columns + dp.embedding_columns
+        new_embedding_cols = self.embedding_columns + df.embedding_columns
         # Capture the new embedding columns before merging
-        if len(set(self.embedding_columns).intersection(dp.embedding_columns)) > 0:
+        if len(set(self.embedding_columns).intersection(df.embedding_columns)) > 0:
             if overwrite:
                 new_embedding_cols = self.embedding_columns + [
-                    c for c in dp.embedding_columns if c not in self.embedding_columns
+                    c for c in df.embedding_columns if c not in self.embedding_columns
                 ]
             else:
                 assert (
                     suffixes is not None and len(suffixes) == 2
                 ), "Suffixes must be tuple of len 2 when columns share names"
                 new_embedding_cols = (
-                    [c for c in self.embedding_columns if c not in dp.embedding_columns]
+                    [c for c in self.embedding_columns if c not in df.embedding_columns]
                     + [
                         c
-                        for c in dp.embedding_columns
+                        for c in df.embedding_columns
                         if c not in self.embedding_columns
                     ]
                     + [
                         c + suffixes[0]
                         for c in self.embedding_columns
-                        if c in dp.embedding_columns
+                        if c in df.embedding_columns
                     ]
                     + [
                         c + suffixes[1]
-                        for c in dp.embedding_columns
+                        for c in df.embedding_columns
                         if c in self.embedding_columns
                     ]
                 )
@@ -332,7 +332,7 @@ class EntityDataPanel(DataPanel):
                 return self._index_to_rowid[seq]
 
         assert isinstance(column, (ListColumn, TensorColumn, NumpyArrayColumn)), (
-            "We only support DataPanel list column types "
+            "We only support DataFrame list column types "
             "(ListColumn, TensorColumn, NumpyArrayColumn)"
         )
         return column.map(lambda x: recursive_map(x))

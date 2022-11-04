@@ -32,6 +32,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -46,11 +47,11 @@ def getattr_decorator(fn: Callable):
         if isinstance(out, pd.Series):
             return PandasSeriesColumn(out)
         elif isinstance(out, pd.DataFrame):
-            from meerkat import DataPanel
+            from meerkat import DataFrame
 
             # column names must be str in meerkat
             out = out.rename(mapper=str, axis="columns")
-            return DataPanel.from_pandas(out)
+            return DataFrame.from_pandas(out)
         else:
             return out
 
@@ -66,9 +67,9 @@ class _ReturnColumnMixin:
             elif isinstance(attr, pd.Series):
                 return PandasSeriesColumn(attr)
             elif isinstance(attr, pd.DataFrame):
-                from meerkat import DataPanel
+                from meerkat import DataFrame
 
-                return DataPanel.from_pandas(attr)
+                return DataFrame.from_pandas(attr)
             else:
                 return attr
         except AttributeError:
