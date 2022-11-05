@@ -26,21 +26,6 @@
 	export let label_column: Writable<string>;
 	export let edit_target: EditTarget;
 
-	import { createTippy } from 'svelte-tippy';
-	import { followCursor } from 'tippy.js';
-
-	let pivot_tippy = (node: HTMLElement, parameters: any = null) => {};
-	pivot_tippy = createTippy({
-		placement: 'auto',
-		allowHTML: true,
-		theme: 'pivot-tooltip',
-		// followCursor: true,
-		// plugins: [followCursor],
-		duration: [0, 0],
-		maxWidth: '95vw',
-		interactive: true
-	});
-
 	$: text_df_promise = $get_rows($df.box_id, 0, null, null, [$text_column]);
 
 	let paragraph_df_promise: any;
@@ -112,7 +97,6 @@
 										class:bg-orange-300={label === 2}
 										class:sentence
 									>
-									<!-- use:pivot_tippy={{ content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }} -->
 										{sentence}
 										<div class="text_interactions">
 											<div class="selecting">
@@ -152,45 +136,6 @@
 											</div>
 										</div>
 									</span>
-									<!-- <div id="{id}-pivot-tooltip" class="hidden">
-										<div on:click={() => {console.log("clicked.")}}>abc</div>
-										<div class="selecting">
-											<i
-												class="text-red-500 rounded-full hover:bg-slate-400"
-												class:bg-red-500={label === 0}
-												class:text-red-100={label === 0}
-												on:click={() => {
-													label = 0;
-													console.log("click");
-													$edit(get(edit_target.target).box_id, 0, $label_column, id, id_column);
-												}}
-											>
-												<CloseOutline size={32} />
-											</i>
-											<i
-												class="text-emerald-500 rounded-full hover:bg-slate-400"
-												class:bg-emerald-400={label === 1}
-												class:text-emerald-100={label === 1}
-												on:click={() => {
-													label = 1;
-													$edit(get(edit_target.target).box_id, 1, $label_column, id, id_column);
-												}}
-											>
-												<CheckmarkOutline size={32} />
-											</i>
-											<i
-												class="text-orange-500 rounded-full hover:bg-slate-400"
-												class:bg-orange-400={label === 2}
-												class:text-orange-100={label === 2}
-												on:click={() => {
-													label = 2;
-													$edit(get(edit_target.target).box_id, 2, $label_column, id, id_column);
-												}}
-											>
-												<Help size={32} />
-											</i>
-										</div>
-									</div> -->
 								{/each}
 							</p>
 						</div>
