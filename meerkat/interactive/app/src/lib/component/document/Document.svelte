@@ -6,8 +6,8 @@
 
 	// Icons
 	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte';
-	import Help from 'carbon-icons-svelte/lib/Help.svelte';
 	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
+	import Help from 'carbon-icons-svelte/lib/Help.svelte';
 
 	import type { EditTarget } from '$lib/utils/types';
 
@@ -15,10 +15,13 @@
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
 	const { get_rows, edit } = getContext('Interface');
+	// the `$get_rows` function is used to fetch data from a dataframe in the Python backend
+	// the `$edit` function is used to send edits to a dataframe in the Python backend
 
-	// This is a prop for our component. It is a Writable store, which means that it can be
-	// read from and written to.
-	// *** To access the value of the store, use $store_name, so e.g. $data ***
+	// Below are props (attributes) for our component.
+	// These match what's in the Document class on the Python side.
+	// These are Writable store objects, which means that it can be read from and written to.
+	// *** To access the value of the store, use $store_name, so e.g. $data or get(store_name), so e.g. get(data)***
 	export let df: Writable;
 	// More component props
 	export let text_column: Writable<string>;
@@ -26,20 +29,30 @@
 	export let label_column: Writable<string>;
 	export let edit_target: EditTarget;
 
+	// Fetch data for the `df` dataframe
+	// This fetches all the data from the $text_column
 	$: text_df_promise = $get_rows($df.box_id, 0, null, null, [$text_column]);
 
+	// Fetch data for the `df` dataframe
+	// This fetches all the data from the $paragraph_column if it's not null
 	let paragraph_df_promise: any;
 	$: if ($paragraph_column) {
 		paragraph_df_promise = $get_rows($df.box_id, 0, null, null, [$paragraph_column]);
 	}
 
+	// Fetch data for the `df` dataframe
+	// This fetches all the data from the $label_column and id_column
 	let label_id_df_promise: any;
 	let id_column: string;
 	$: if ($label_column) {
+		// The name of the id_column was told to us by the edit_target
 		id_column = edit_target.source_id_column;
 		label_id_df_promise = $get_rows($df.box_id, 0, null, null, [$label_column, id_column]);
 	}
 
+	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)
+	// and an array containing [label, id] pairs for each sentence
+	// It returns an array of objects, each of which contains the sentence, sentence_index, label and id
 	let create_paragraphs = (sentences: any, paragraph_indices: any, labels_and_ids: any) => {
 		// Make a list of lists of paragraphs
 		let paragraphs: Array<any> = [];
@@ -54,7 +67,6 @@
 			}
 			paragraphs[curr_paragraph_index].push({
 				sentence: sentence,
-				sentence_index: i,
 				label: label,
 				id: id
 			});
@@ -76,14 +88,14 @@
 				{#if paragraph_df}
 					<!-- Create an array of paragraphs. 
 					Each element is an array of objects. 
-					Each object contains 'sentence', 'paragraph_index', 'sentence_index' -->
+					Each object contains 'sentence', 'id', 'label' -->
 					{@const paragraphs = create_paragraphs(text_df.rows, paragraph_df.rows, label_df.rows)}
 
 					{#each paragraphs as paragraph, i}
 						<div class="flex">
 							<div class="font-mono pr-6 whitespace-nowrap self-center">Paragraph {i + 1}</div>
 							<p>
-								{#each paragraph as { sentence, sentence_index, label, id } (id)}
+								{#each paragraph as { sentence, label, id } (id)}
 									<!-- Apply conditional styling to the sentence, depending on what the label is. -->
 									<span
 										{id}
