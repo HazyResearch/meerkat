@@ -2,198 +2,250 @@
 	// Load in getContext from svelte (always)
 	import { getContext } from 'svelte';
 	// Load in the type Writable from svelte/store (always)
-	import type { Writable } from 'svelte/store';
+	import { get, type Writable } from 'svelte/store';
+
+	// Icons
+	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte';
+	import Help from 'carbon-icons-svelte/lib/Help.svelte';
+	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
+
+	import type { EditTarget } from '$lib/utils/types';
 
 	// Running getContext('Interface') returns an object which contains useful functions
 	// for interacting with the Python backend.
-    // Each of these functions can be accessed by running $function_name
-	const { get_schema, get_rows, edit } = getContext('Interface');
+	// Each of these functions can be accessed by running $function_name
+	const { get_rows, edit } = getContext('Interface');
 
-    // This is a prop for our component. It is a Writable store, which means that it can be
-    // read from and written to.
-    // *** To access the value of the store, use $store_name, so e.g. $data ***
+	// This is a prop for our component. It is a Writable store, which means that it can be
+	// read from and written to.
+	// *** To access the value of the store, use $store_name, so e.g. $data ***
 	export let df: Writable;
-    export let doc_column: Writable<string>;
+	// More component props
+	export let text_column: Writable<string>;
+	export let paragraph_column: Writable<string>;
+	export let label_column: Writable<string>;
+	export let edit_target: EditTarget;
 
-    $: rows_promise = $get_rows($df.box_id, 0, null, null, [$doc_column]);
+	import { createTippy } from 'svelte-tippy';
+	import { followCursor } from 'tippy.js';
 
+	let pivot_tippy = (node: HTMLElement, parameters: any = null) => {};
+	pivot_tippy = createTippy({
+		placement: 'auto',
+		allowHTML: true,
+		theme: 'pivot-tooltip',
+		// followCursor: true,
+		// plugins: [followCursor],
+		duration: [0, 0],
+		maxWidth: '95vw',
+		interactive: true
+	});
 
-	// let highlight_pred = (p: number) => {
-	// 	if (p == 1) {
-	// 		return 'deepskyblue';
-	// 	} else {
-	// 		return 'transparent';
-	// 	}
-	// };
+	$: text_df_promise = $get_rows($df.box_id, 0, null, null, [$text_column]);
 
-	// let update_color = (c: string) => {
-	// 	if (c == 'pos') {
-	// 		return 'deepskyblue';
-	// 	} else if (c == 'neg') {
-	// 		return 'indianred';
-	// 	} else {
-	// 		return 'orange';
-	// 	}
-	// };
-
-	// let update_color_light = (c: string) => {
-	// 	if (c == 'pos') {
-	// 		return '#c2ecff';
-	// 	} else if (c == 'neg') {
-	// 		return '#ffc2c2';
-	// 	} else {
-	// 		return '#ffe0a6';
-	// 	}
-	// };
-
-	// function update_select(d, c) {
-	// 	console.log(d);
-
-	// 	let selected = document.getElementById('s' + d);
-	// 	selected.style.background = update_color_light(c);
-	// 	selected.style.color = '#000';
-
-	// 	['pos', 'neg', 'que'].forEach(function (e) {
-	// 		if (c == e) {
-	// 			selected.querySelector('.i' + e).style.background = update_color(e);
-	// 			selected.querySelector('.i' + e).style.color = '#fff';
-	// 		} else {
-	// 			selected.querySelector('.i' + e).style.background = '';
-	// 			selected.querySelector('.i' + e).style.color = update_color(e);
-	// 		}
-	// 	});
-	// }
-</script>
-
-{#await rows_promise}
-    Waiting...
-{:then dfrows}
-	{dfrows.rows}
-    <!-- {#each dfrows.rows as document}
-        <div id="document">
-            <div class="paragraph">
-                {#each paragraph as sentence}
-                    <div id="s${e.id}" class="sentence" style="border-color: ${highlight_pred(e.prediction)};">
-                        ${e.sentence.replace('.', '')}.
-                        <div class="text_interactions">
-                            <div class="selecting" style="border-color: ${highlight_pred(e.prediction)};">
-                                <i class="fa fa-check ipos" on:click={() => update_select('${e.id}', 'pos')} />
-                                <i class="fa fa-times ineg" on:click={() => update_select('${e.id}', 'neg')} />
-                                <i class="fa fa-question ique" on:click={() => update_select('${e.id}', 'que')} />
-                            </div>
-                        </div>
-                    </div>
-                {/each}
-            </div>
-        </div>
-    {/each} -->
-    
-{/await}
-
-
-<style>
-	/* * {
-		font-family: 'IBM Plex Sans', sans-serif;
-	} */
-
-	#document {
-		position: fixed;
-		left: 0;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	let paragraph_df_promise: any;
+	$: if ($paragraph_column) {
+		paragraph_df_promise = $get_rows($df.box_id, 0, null, null, [$paragraph_column]);
 	}
 
-	/* #text_space {
-		max-width: 50vw;
-	} */
+	let label_id_df_promise: any;
+	let id_column: string;
+	$: if ($label_column) {
+		id_column = edit_target.source_id_column;
+		label_id_df_promise = $get_rows($df.box_id, 0, null, null, [$label_column, id_column]);
+	}
 
-	.paragraph {
-		margin-bottom: 15px;
+	let create_paragraphs = (sentences: any, paragraph_indices: any, labels_and_ids: any) => {
+		// Make a list of lists of paragraphs
+		let paragraphs: Array<any> = [];
+		let curr_paragraph_index = -1;
+		for (let i = 0; i < sentences.length; i++) {
+			let paragraph_index = paragraph_indices[i];
+			let sentence = sentences[i];
+			let [label, id] = labels_and_ids[i];
+			if (paragraph_index > curr_paragraph_index) {
+				paragraphs.push([]);
+				curr_paragraph_index = paragraph_index;
+			}
+			paragraphs[curr_paragraph_index].push({
+				sentence: sentence,
+				sentence_index: i,
+				label: label,
+				id: id
+			});
+		}
+		return paragraphs;
+	};
+</script>
+
+<div class="document">
+	{#await text_df_promise}
+		Waiting...
+	{:then text_df}
+		{#await paragraph_df_promise}
+			Waiting
+		{:then paragraph_df}
+			{#await label_id_df_promise}
+				Waiting
+			{:then label_df}
+				{#if paragraph_df}
+					<!-- Create an array of paragraphs. 
+					Each element is an array of objects. 
+					Each object contains 'sentence', 'paragraph_index', 'sentence_index' -->
+					{@const paragraphs = create_paragraphs(text_df.rows, paragraph_df.rows, label_df.rows)}
+
+					{#each paragraphs as paragraph, i}
+						<div class="flex">
+							<div class="font-mono pr-6 whitespace-nowrap self-center">Paragraph {i + 1}</div>
+							<p>
+								{#each paragraph as { sentence, sentence_index, label, id } (id)}
+									<!-- Apply conditional styling to the sentence, depending on what the label is. -->
+									<span
+										{id}
+										class:border-slate-700={label === -1}
+										class:border-red-700={label === 0}
+										class:border-emerald-700={label === 1}
+										class:border-orange-700={label === 2}
+										class:bg-slate-300={label === -1}
+										class:bg-red-300={label === 0}
+										class:bg-emerald-300={label === 1}
+										class:bg-orange-300={label === 2}
+										class:sentence
+									>
+									<!-- use:pivot_tippy={{ content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }} -->
+										{sentence}
+										<div class="text_interactions">
+											<div class="selecting">
+												<i
+													class="text-red-500 rounded-full hover:bg-slate-400"
+													class:bg-red-500={label === 0}
+													class:text-red-100={label === 0}
+													on:click={() => {
+														label = 0;
+														$edit(get(edit_target.target).box_id, 0, $label_column, id, id_column);
+													}}
+												>
+													<CloseOutline size={32} />
+												</i>
+												<i
+													class="text-emerald-500 rounded-full hover:bg-slate-400"
+													class:bg-emerald-400={label === 1}
+													class:text-emerald-100={label === 1}
+													on:click={() => {
+														label = 1;
+														$edit(get(edit_target.target).box_id, 1, $label_column, id, id_column);
+													}}
+												>
+													<CheckmarkOutline size={32} />
+												</i>
+												<i
+													class="text-orange-500 rounded-full hover:bg-slate-400"
+													class:bg-orange-400={label === 2}
+													class:text-orange-100={label === 2}
+													on:click={() => {
+														label = 2;
+														$edit(get(edit_target.target).box_id, 2, $label_column, id, id_column);
+													}}
+												>
+													<Help size={32} />
+												</i>
+											</div>
+										</div>
+									</span>
+									<!-- <div id="{id}-pivot-tooltip" class="hidden">
+										<div on:click={() => {console.log("clicked.")}}>abc</div>
+										<div class="selecting">
+											<i
+												class="text-red-500 rounded-full hover:bg-slate-400"
+												class:bg-red-500={label === 0}
+												class:text-red-100={label === 0}
+												on:click={() => {
+													label = 0;
+													console.log("click");
+													$edit(get(edit_target.target).box_id, 0, $label_column, id, id_column);
+												}}
+											>
+												<CloseOutline size={32} />
+											</i>
+											<i
+												class="text-emerald-500 rounded-full hover:bg-slate-400"
+												class:bg-emerald-400={label === 1}
+												class:text-emerald-100={label === 1}
+												on:click={() => {
+													label = 1;
+													$edit(get(edit_target.target).box_id, 1, $label_column, id, id_column);
+												}}
+											>
+												<CheckmarkOutline size={32} />
+											</i>
+											<i
+												class="text-orange-500 rounded-full hover:bg-slate-400"
+												class:bg-orange-400={label === 2}
+												class:text-orange-100={label === 2}
+												on:click={() => {
+													label = 2;
+													$edit(get(edit_target.target).box_id, 2, $label_column, id, id_column);
+												}}
+											>
+												<Help size={32} />
+											</i>
+										</div>
+									</div> -->
+								{/each}
+							</p>
+						</div>
+					{/each}
+				{:else}
+					<!-- no paragraph index -->
+					{#each text_df.rows as paragraph, i}
+						<div class="flex">
+							<div class="font-mono pr-6 whitespace-nowrap self-center">Paragraph {i + 1}</div>
+							<p>{paragraph}</p>
+						</div>
+					{/each}
+				{/if}
+			{/await}
+		{/await}
+	{/await}
+</div>
+
+<style>
+	.document {
+		@apply w-3/4 flex flex-col self-center gap-2 p-4 bg-purple-100 rounded-lg;
 	}
 
 	.sentence {
-		display: inline;
-		margin-right: 3px;
-		font-size: 16px;
-		line-height: 25px;
-		position: relative;
-		padding: 0;
-		background: none;
-		color: #8c8c8c;
-		border: dotted 1px transparent;
+		@apply relative inline p-0 mr-0.5 bg-none text-base leading-6 text-gray-800;
+		@apply border border-dotted;
 	}
 
 	.text_interactions {
-		display: inline-flex;
-		position: relative;
-		width: 0;
-		height: 0;
-		overflow: hidden;
+		@apply relative inline-flex w-0 h-0 overflow-hidden;
 	}
 
 	.selecting {
-		position: absolute;
-		left: 0;
-		top: 0;
-		margin-top: -17px;
-		display: flex;
-		align-items: center;
-		right: 0;
-		top: 0;
-		z-index: 999;
-		width: 60px;
-		z-index: 99;
-		background: #eaeaea;
-		border-right: dotted 1px transparent;
-		border-top: dotted 1px transparent;
-		border-bottom: dotted 1px transparent;
+		@apply absolute right-0 left-0 top-0 -mt-4 flex items-center z-[999] w-16 bg-gray-100;
+		@apply border-r border-t border-b border-dotted border-transparent;
 	}
 
 	.selecting i {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 14px;
-		height: 20px;
-		width: 20px;
-		justify-content: center;
-		align-items: center;
+		@apply flex justify-center items-center text-base h-5 w-5;
 	}
 
 	i::before {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+		@apply flex justify-center items-center;
 	}
 
 	.sentence:hover {
-		color: #000;
-		background: #eaeaea;
-		/*    box-shadow: 0 0 1000px 1000px rgb(255, 255, 255, 0.9);*/
-		z-index: 999;
+		@apply text-black bg-gray-100 z-[999];
 	}
 
 	.sentence:hover > .text_interactions {
-		overflow: visible;
+		@apply overflow-visible;
 	}
 
-	.selecting > i:hover {
-		background: #d1d1d1;
-	}
-
-	.selecting > .fa-check {
-		color: deepskyblue;
-	}
-
-	.selecting > .fa-times {
-		color: indianred;
-	}
-
-	.selecting > .fa-question {
-		color: orange;
+	:global(.tippy-box[data-theme='pivot-tooltip']) {
+		@apply py-1 px-1 text-xs font-mono rounded-lg shadow-sm;
+		@apply text-white bg-violet-500;
 	}
 </style>

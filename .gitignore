@@ -1,5 +1,6 @@
-
 scratch/sabri/**.ipynb
+# Meerkat written
+*.mk
 
 # Jupyter notebooks
 notebooks/
