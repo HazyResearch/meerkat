@@ -188,9 +188,4 @@
 	.sentence:hover > .text_interactions {
 		@apply overflow-visible;
 	}
-
-	:global(.tippy-box[data-theme='pivot-tooltip']) {
-		@apply py-1 px-1 text-xs font-mono rounded-lg shadow-sm;
-		@apply text-white bg-violet-500;
-	}
 </style>
