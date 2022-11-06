@@ -156,6 +156,22 @@ class TensorFormatter(BasicFormatter):
         return format_array(np.array([cell]), formatter=None)[0]
 
 
+class ImageURLFormatter(Formatter):
+
+    cell_component = "image"
+
+    def encode(self, cell: Any):
+        if isinstance(cell, str):
+            return cell
+        elif isinstance(cell, FileCell):
+            return cell.url
+        else:
+            raise ValueError("ImageURLFormatter can only be used with str or FileCell")
+
+    def html(self, cell: Any):
+        return f"""<img src="{self.encode(cell)}" />"""
+
+
 class PILImageFormatter(Formatter):
 
     cell_component = "image"

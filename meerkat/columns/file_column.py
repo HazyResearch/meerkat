@@ -289,6 +289,23 @@ class FileColumn(LambdaColumn):
         )
 
     @classmethod
+    def from_urls(
+        cls,
+        urls: Sequence[str],
+        transform: callable = None,
+    ):
+        from PIL import Image
+
+        return cls(
+            data=urls,
+            loader=FileLoader(
+                loader=lambda bytes_io: Image.open(bytes_io).convert("RGB"),
+                downloader="url",
+            ),
+            transform=transform,
+        )
+
+    @classmethod
     def default_loader(cls, *args, **kwargs):
         return folder.default_loader(*args, **kwargs)
 

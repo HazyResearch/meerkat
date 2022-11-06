@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Prism from 'prismjs';
-	import 'prismjs/shared/prism-python.js';
+	import 'prismjs/components/prism-python.js';
 	
 	export let data: string;
 	export let language: any = 'python';

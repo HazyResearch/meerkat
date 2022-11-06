@@ -1,7 +1,7 @@
 import warnings
 from typing import Union
 
-from meerkat.interactive.graph import Pivot, Store, make_store
+from meerkat.interactive.graph import Pivot, Store, make_box, make_store
 
 from ..abstract import Component
 
@@ -20,7 +20,7 @@ class Match(Component):
         super().__init__()
         if not isinstance(pivot, Pivot):
             warnings.warn("input is not a Pivot - this may cause errors")
-        self.pivot = pivot
+        self.pivot = make_box(pivot)
         self.against: Store = make_store(against)
         self.col = make_store(col)
         self.text = make_store("")
