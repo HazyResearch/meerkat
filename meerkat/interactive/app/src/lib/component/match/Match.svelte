@@ -59,9 +59,9 @@
 	$: against_item = { value: $against, label: $against };
 </script>
 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
+<div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
 	{#if title != ''}
-		<div class="font-bold text-xl text-slate-600 self-start pl-2">
+		<div class="font-bold text-md text-slate-600 pl-2 text-center">
 			{title}
 		</div>
 	{/if}

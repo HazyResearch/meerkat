@@ -5,7 +5,7 @@
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';
-import Selected from './Selected.svelte';
+	import Selected from './Selected.svelte';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
@@ -22,7 +22,17 @@ import Selected from './Selected.svelte';
 	export let cell_size: number = 24;
 
 	$: schema_promise = $get_schema($dp.box_id);
-	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
+
+	// create an array with the main_column and the tag_columns
+	$: rows_promise = $get_rows(
+		$dp.box_id,
+		page * per_page,
+		(page + 1) * per_page,
+		// TODO (Sabri): we should limit the columns only to the main_column and the 
+		// tag_columns and primary_key as described below
+		// null,
+		// [$main_column, primary_key].concat($tag_columns)
+	);
 
 	async function handle_edit(event: any) {
 		let { pivot, pivot_id_column, id_column } = edit_target;
@@ -35,7 +45,6 @@ import Selected from './Selected.svelte';
 
 		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
 	}
-
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
@@ -48,8 +57,8 @@ import Selected from './Selected.svelte';
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
 				<div class="font-semibold self-center px-10 flex space-x-2">
 					{#if $selected.length > 0}
-						<Selected></Selected>
-						<div class="text-violet-600">{$selected.length} </div> 
+						<Selected />
+						<div class="text-violet-600">{$selected.length}</div>
 					{/if}
 				</div>
 				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">

@@ -13,12 +13,12 @@ class Plot(Component):
     def __init__(
         self,
         data: Pivot[DataPanel],
-        selection: Union[list, Store],
         x: Union[str, Store],
         y: Union[str, Store],
-        x_label: Union[str, Store],
-        y_label: Union[str, Store],
-        id: Union[str, Store] = "key", 
+        x_label: Union[str, Store] = None,
+        y_label: Union[str, Store] = None,
+        id: Union[str, Store] = "key",
+        selection: Union[list, Store] = None,
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
@@ -26,17 +26,20 @@ class Plot(Component):
         can_remove: bool = True,
     ) -> None:
         super().__init__()
+        if selection is None:
+            selection = []
+
         self.data = data
         self.selection = make_store(selection)
         self.x = make_store(x)
         self.y = make_store(y)
-        self.id = id
-        self.x_label = make_store(x_label)
-        self.y_label = make_store(y_label)
+        self.id_col = id
+        self.x_label = self.x if x_label is None else make_store(x_label)
+        self.y_label = self.y if y_label is None else make_store(y_label)
         self.type = type
         self.slot = slot
         self.can_remove = can_remove
-        
+
         if metadata_columns is None:
             metadata_columns = []
         self.metadata_columns = metadata_columns
@@ -44,7 +47,6 @@ class Plot(Component):
         if keys_to_remove is None:
             keys_to_remove = []
         self.keys_to_remove = make_store(keys_to_remove)
-
 
     @property
     def props(self):
@@ -56,7 +58,7 @@ class Plot(Component):
             "x_label": self.x_label.config,
             "y_label": self.y_label.config,
             "type": self.type,
-            "id": self.id if isinstance(self.id, str) else self.id.config,
+            "id": self.id_col if isinstance(self.id_col, str) else self.id_col.config,
             "keys_to_remove": self.keys_to_remove.config,
             "can_remove": self.can_remove,
         }

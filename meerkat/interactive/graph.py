@@ -70,6 +70,13 @@ class Box(IdentifiableMixin, NodeMixin, Generic[T]):
     def __init__(self, obj):
         super().__init__()
         self.obj = obj
+    
+    @property
+    def columns(self):
+        @interface_op(nested_return=False)
+        def _get_columns(dp: "DataPanel") -> List[str]:
+            return dp.columns
+        return _get_columns(self)
 
     @property
     def config(self):

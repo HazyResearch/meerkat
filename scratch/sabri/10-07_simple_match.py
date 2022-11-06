@@ -8,6 +8,7 @@ dp = mk.embed(
     dp,
     input="img",
     batch_size=128,
+    encoder="clip"
 )
 
 match: mk.gui.Component = mk.gui.Match(
@@ -25,7 +26,7 @@ gallery = mk.gui.Gallery(
     primary_key="img_path"
 )
 
-mk.gui.start(shareable=True)
+mk.gui.start(shareable=False)
 mk.gui.Interface(
     components=[match, gallery]
 ).launch()

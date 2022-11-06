@@ -15,7 +15,7 @@
 	export let data: Array<Point2D>;
 	export let metadata: Array<any>;
 
-	export let padding: number = 10;
+	export let padding: number = 0;
 
 	// Width of the "fancy" y ticks in pixels
 	export let ywidth: number = 128;
@@ -27,7 +27,7 @@
 
 	export let can_remove: boolean = true;
 
-	let height = 40 * data.length;
+	let height = 20 * data.length;
 
 	const floor = (x: number, decimals: number): number => {
 		return Math.floor(x * Math.pow(10, decimals)) / Math.pow(10, decimals);
@@ -39,9 +39,9 @@
 	let get_x_domain = () => {
 		let min = Math.min(...data.map((d) => d.x));
 		let max = Math.max(...data.map((d) => d.x));
-		// return [0, max]
-		return [min - 0.05, max + 0.05];
-		return [floor(min, 1), ceil(max, 1)];
+		return [0, max]
+		// return [min - 0.05, max + 0.05];
+		// return [floor(min, 1), ceil(max, 1)];
 	}
 
 	// Set a context to allow passing of metadata.
@@ -50,7 +50,7 @@
 	const can_remove_context = setContext("can_remove", can_remove)
 </script>
 
-<div class="relative w-full" style:height={`${height}px`}>
+<div class="relative w-full h-full">
 	<LayerCake
 		ssr={true}
 		percentRange={true}

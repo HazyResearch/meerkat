@@ -26,10 +26,9 @@
 	// of key-value pairs.
 	let metadata: Array<any> = [];
 	
-	console.log(metadata_columns)
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the datapanel for the columns to be plotted
-		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
+		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, $id, ...metadata_columns]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -48,7 +47,6 @@
 					accumulator[index] = row[index + 3];
 					return accumulator;
 				}, {});
-				console.log(metadata_obj)
 				metadata.push(metadata_obj);
 			});
 		} else {
@@ -77,7 +75,7 @@
 			metadata={metadata}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}
-			ywidth={128}
+			ywidth={60}
 			{padding}
 			{can_remove}
 			on:selection-change={(e) => {

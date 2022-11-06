@@ -13,6 +13,7 @@
 	export let selected: Writable<Array<number>>;
 	export let col: Writable<string>;
 	export let text: Writable<string>;
+	export let title: string = '';
 
 	let status: string = 'waiting';
 
@@ -82,32 +83,43 @@
 	let select_div;
 </script>
 
-<div class="w-full flex items-center bg-slate-100 py-3 rounded-lg drop-shadow-md z-20">
-	<div class="px-3">
-		<Status {status} />
+<div class="w-full items-center bg-slate-100 py-1 rounded-lg drop-shadow-md z-20">
+	{#if title != ''}
+		<div class="font-bold text-md text-slate-600 self-start pl-2 text-center">
+			{title}
+		</div>
+	{/if}
+	<div class="flex items-center">
+		<div class="px-3">
+			<Status {status} />
+		</div>
+		<input
+			type="text"
+			bind:value={$text}
+			placeholder="Enter a value..."
+			class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
+			on:keypress={on_key_press}
+		/>
+		<div class="text-slate-400 px-2">for</div>
+
+		<div class="themed pr-2 w-48" bind:this={select_div}>
+			{#await items_promise}
+				<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
+			{:then items}
+				<Select
+					id="column"
+					placeholder="...a column."
+					value={col_item}
+					{items}
+					showIndicator={true}
+					listPlacement="auto"
+					on:select={handle_select}
+					on:clear={handle_clear}
+					appendListTarget={select_div}
+				/>
+			{/await}
+		</div>
+		
+		
 	</div>
-	<div class="themed pr-2 w-48" bind:this={select_div}>
-		{#await items_promise}
-			<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
-		{:then items}
-			<Select
-				id="column"
-				placeholder="...a column."
-				value={col_item}
-				{items}
-				showIndicator={true}
-				listPlacement="auto"
-				on:select={handle_select}
-				on:clear={handle_clear}
-				appendListTarget={select_div}
-			/>
-		{/await}
-	</div>
-	<input
-		type="text"
-		bind:value={$text}
-		placeholder="Enter a value..."
-		class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-		on:keypress={on_key_press}
-	/>
 </div>

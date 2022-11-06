@@ -44,6 +44,7 @@ class coco(DatasetBuilder):
                     "rb",
                 )
             )
+            breakpoint()
 
             dp = mk.DataPanel(dct["images"])
             dp["split"] = [split] * len(dp)

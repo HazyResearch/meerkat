@@ -12,11 +12,20 @@ if TYPE_CHECKING:
 
 class Choice(Component):
     """A choice box."""
+
     name: str = "Choice"
-    def __init__(self, value: Union[str, int, float, Store], choices: Union[list, tuple, Store], gui_type: str = "dropdown"):
+
+    def __init__(
+        self,
+        value: Union[str, int, float, Store],
+        choices: Union[list, tuple, Store],
+        title: str = None,
+        gui_type: str = "dropdown",
+    ):
         super().__init__()
         self.value = make_store(value)
         self.choices = make_store(choices)
+        self.title = title if title is not None else ""
         self.gui_type = "dropdown"
 
         if gui_type not in ["dropdown"]:
@@ -28,4 +37,5 @@ class Choice(Component):
             "value": self.value.config,
             "choices": self.choices.config,
             "gui_type": self.gui_type,
+            "title": self.title,
         }

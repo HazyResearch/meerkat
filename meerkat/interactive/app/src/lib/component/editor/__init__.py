@@ -16,7 +16,8 @@ class Editor(Component):
         col: Union[Store, str],
         target: EditTarget = None,
         selected: Store[List[int]] = None,
-        primary_key: str = None
+        primary_key: str = None,
+        title: str = None,
     ) -> None:
         super().__init__()
         self.col = make_store(col)
@@ -29,6 +30,7 @@ class Editor(Component):
             target = EditTarget(self.dp, "_edit_id", "_edit_id")
         self.target = target
         self.selected = selected
+        self.title = title if title is not None else ""
 
     @property
     def props(self):
@@ -39,4 +41,5 @@ class Editor(Component):
             "text": self.text.config,
             "selected": self.selected.config,
             "primary_key": self.primary_key,
+            "title": self.title,
         }

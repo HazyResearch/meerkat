@@ -52,7 +52,6 @@
 				{width}
 				rx="3"
 				on:click={select_point(d.id)}
-				style="fill: {interpolatePuOr((-d.x + 1) / 2)};"
 			/>
 		{/each}
 	</g>
@@ -60,7 +59,7 @@
 
 <style>
 	.bar {
-		@apply fill-slate-400;
+		@apply fill-slate-400 fill-violet-300;
 		stroke-width: 1px;
 	}
 

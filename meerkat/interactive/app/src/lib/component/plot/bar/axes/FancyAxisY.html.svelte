@@ -29,9 +29,10 @@
 	/** @type {Number} [yTick=-1] - How far up and down to position the text marker. */
 	export let yTick = -1;
 
-	export let width = 128;
+	export let width = 40;
 
 	export let close = true;
+
 
 	$: isBandwidth = typeof $yScale.bandwidth === 'function';
 

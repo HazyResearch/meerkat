@@ -31,9 +31,9 @@
 			<Close />
 		</div>
 	{/if}
- 	<div class="font-mono rounded-sm bg-slate-200 px-0.5">
+ 	<!-- <div class="font-mono rounded-sm bg-slate-200 px-0.5">
 		{size}
-	</div>
+	</div> -->
 	<div class={hover ? 'bg-slate-200' : 'bg-inherit'}>
 		{name} 
 	</div>
