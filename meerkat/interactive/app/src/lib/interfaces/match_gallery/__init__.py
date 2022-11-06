@@ -2,14 +2,14 @@ from typing import List
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.filter import Filter
 from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
-from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Pivot, Store, head, interface_op
-from meerkat.state import state
+from meerkat.interactive.app.src.lib.component.table import EditTarget
+from meerkat.interactive.graph import Pivot, interface_op
 
 from ..abstract import Interface, InterfaceConfig
-from meerkat.interactive.app.src.lib.component.filter import Filter
+
 
 @interface_op
 def simple_op(col: str):
@@ -19,7 +19,7 @@ def simple_op(col: str):
 class MatchGalleryInterface(Interface):
     def __init__(
         self,
-        dp: mk.DataPanel,
+        df: mk.DataFrame,
         id_column: str,
         main_column: str,
         tag_columns: List[str],
@@ -32,7 +32,7 @@ class MatchGalleryInterface(Interface):
         self.tag_columns = tag_columns
 
         self.pivots = []
-        self.dp = dp
+        self.df = df
 
         # with context
         self._layout()
@@ -47,12 +47,12 @@ class MatchGalleryInterface(Interface):
 
     def _layout(self):
         # Setup pivots
-        dp_pivot = self.pivot(self.dp)
+        df_pivot = self.pivot(self.df)
 
         # Setup components
-        match: Component = Match(dp_pivot, against=self.against, col="label")
+        match: Component = Match(df_pivot, against=self.against, col="label")
 
-        filter: Component = Filter(dp_pivot)
+        filter: Component = Filter(df_pivot)
 
         sort_derived = mk.sort(filter.derived(), by=match.col, ascending=False)
 
@@ -60,7 +60,7 @@ class MatchGalleryInterface(Interface):
             sort_derived,
             main_column=self.main_column,
             tag_columns=self.tag_columns,
-            edit_target=EditTarget(dp_pivot, self.id_column, self.id_column),
+            edit_target=EditTarget(df_pivot, self.id_column, self.id_column),
         )
 
         # TODO: make this more magic

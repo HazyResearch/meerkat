@@ -7,19 +7,19 @@ from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
 
-from .datapanel import RowsResponse, _get_column_infos
+from .dataframe import RowsResponse, _get_column_infos
 
 
 def get_sliceby(sliceby_id: str) -> SliceBy:
     try:
 
-        datapanel = state.identifiables.slicebys[sliceby_id]
+        dataframe = state.identifiables.slicebys[sliceby_id]
 
     except KeyError:
         raise HTTPException(
-            status_code=404, detail="No datapanel with id {}".format(sliceby_id)
+            status_code=404, detail="No dataframe with id {}".format(sliceby_id)
         )
-    return datapanel
+    return dataframe
 
 
 router = APIRouter(
@@ -71,7 +71,7 @@ def get_rows(
     box_id: str,
     request: SliceByRowsRequest,
 ) -> RowsResponse:
-    """Get rows from a DataPanel as a JSON object."""
+    """Get rows from a DataFrame as a JSON object."""
     box = state.identifiables.get(group="boxes", id=box_id)
     sb = box.obj
 
@@ -82,18 +82,18 @@ def get_rows(
     sb = sb[[info.name for info in column_infos]]
 
     if request.indices is not None:
-        dp = sb.slice[slice_key, request.indices]
+        df = sb.slice[slice_key, request.indices]
         indices = request.indices
     elif request.start is not None:
-        dp = sb.slice[slice_key, request.start : request.end]
+        df = sb.slice[slice_key, request.start : request.end]
         indices = list(range(request.start, request.end))
     else:
         raise ValueError()
 
     rows = []
-    for row in dp.lz:
+    for row in df.lz:
         rows.append(
-            [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
+            [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
     return RowsResponse(
         column_infos=column_infos,
@@ -108,7 +108,7 @@ def aggregate(
     box_id: str,
     aggregation_id: str = Body(None),
     aggregation: str = Body(None),
-    accepts_dp: bool = Body(False),
+    accepts_df: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Dict:
     box = state.identifiables.get(group="boxes", id=box_id)
@@ -126,7 +126,7 @@ def aggregate(
 
     if aggregation_id is not None:
         aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
-        value = sliceby.aggregate(aggregation, accepts_dp=accepts_dp)
+        value = sliceby.aggregate(aggregation, accepts_df=accepts_df)
 
     else:
         if aggregation not in ["mean", "sum", "min", "max"]:

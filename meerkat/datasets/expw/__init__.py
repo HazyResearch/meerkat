@@ -44,11 +44,11 @@ class expw(DatasetBuilder):
             ],
         )
         df = df.drop_duplicates()
-        dp = mk.DataPanel.from_pandas(df)
+        df = mk.DataFrame.from_pandas(df)
 
         # ensure that all the image files are downloaded
         if (
-            not dp["image_name"]
+            not df["image_name"]
             .apply(
                 lambda name: os.path.exists(
                     os.path.join(self.dataset_dir, "image/origin", name)
@@ -62,16 +62,16 @@ class expw(DatasetBuilder):
             )
 
         # remove file extension and add the face_id
-        dp["example_id"] = (
-            dp["image_name"].str.replace(".jpg", "", regex=False)
+        df["example_id"] = (
+            df["image_name"].str.replace(".jpg", "", regex=False)
             + "_"
-            + dp["face_id_in_image"].astype(str)
+            + df["face_id_in_image"].astype(str)
         )
 
-        dp["image"] = mk.ImageColumn.from_filepaths(
-            "image/origin/" + dp["image_name"], base_dir=self.dataset_dir
+        df["image"] = mk.ImageColumn.from_filepaths(
+            "image/origin/" + df["image_name"], base_dir=self.dataset_dir
         )
-        dp["face_image"] = dp[
+        df["face_image"] = df[
             "image",
             "face_box_top",
             "face_box_left",
@@ -79,7 +79,7 @@ class expw(DatasetBuilder):
             "face_box_bottom",
         ].to_lambda(crop)
 
-        return dp
+        return df
 
     def download(self):
         gdrive_id = self.VERSION_TO_GDRIVE_ID[self.version]

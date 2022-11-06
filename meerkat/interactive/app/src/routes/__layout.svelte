@@ -1,6 +1,6 @@
 <script>
 	import '../app.css';
-	import Modals from '$lib/components/common/Modals.svelte';
+	import Modals from '$lib/shared/common/Modals.svelte';
 </script>
 
 <slot />

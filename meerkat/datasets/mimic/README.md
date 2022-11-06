@@ -1,6 +1,6 @@
 # Meerkat + MIMIC
 
-MIMIC (Medical Information Mart for Intensive Care) is a large database of deidentified EHR and medical imaging data. For more information, see the [MIMIC documentation](https://mimic.mit.edu/docs/about/). This Meerkat integration enables quick exploration the MIMIC database via the `DataPanel`. 
+MIMIC (Medical Information Mart for Intensive Care) is a large database of deidentified EHR and medical imaging data. For more information, see the [MIMIC documentation](https://mimic.mit.edu/docs/about/). This Meerkat integration enables quick exploration the MIMIC database via the `DataFrame`. 
 
 ## Prerequisites
 
@@ -26,12 +26,12 @@ MIMIC (Medical Information Mart for Intensive Care) is a large database of deide
     Forbidden: 403 Access Denied: Table physionet-data:mimic_core.patients: User does not have permission to query table physionet-data:mimic_core.patients.
     ```
 
-## Build a MIMIC DataPanel: `build_mimic_dp`
-This function builds a `DataPanel` for accessing data from the [MIMIC-CXR Database](https://physionet.org/content/mimic-cxr/2.0.0/). The MIMIC-CXR database integrates chest X-ray imaging data with structured EHR datafrom Beth Israel Deaconess Medical Center. The full database has an uncompressedsize of over 5 TB. This function quickly builds a `DataPanel` that can be used to explore, slice and download the database. Building the DataPanel takes ~1 minute (when not downloading the radiology reports). The large CXR DICOM and JPEG files are not downloaded, but lazily pulled from Google Cloud Storage (GCS) only when they are accessed. This makes it possible to inspect and explore that data without downloading the full 5 TB. 
+## Build a MIMIC DataFrame: `build_mimic_df`
+This function builds a `DataFrame` for accessing data from the [MIMIC-CXR Database](https://physionet.org/content/mimic-cxr/2.0.0/). The MIMIC-CXR database integrates chest X-ray imaging data with structured EHR datafrom Beth Israel Deaconess Medical Center. The full database has an uncompressedsize of over 5 TB. This function quickly builds a `DataFrame` that can be used to explore, slice and download the database. Building the DataFrame takes ~1 minute (when not downloading the radiology reports). The large CXR DICOM and JPEG files are not downloaded, but lazily pulled from Google Cloud Storage (GCS) only when they are accessed. This makes it possible to inspect and explore that data without downloading the full 5 TB. 
 
-Note: model training will likely bottleneck on the GCS downloads, so it is recommended that you cache the JPEG images locally bfore training. This can be accomplished by passing `download_jpg=True` to `build_mimic_dp`. The images will be saved in `dataset_dir`. This will take several hours for the full dataset. It's recommended that you save resized versions of the images (_e.g._ (512,512)). To do so, pass `download_resize=(512,512)`. 
+Note: model training will likely bottleneck on the GCS downloads, so it is recommended that you cache the JPEG images locally bfore training. This can be accomplished by passing `download_jpg=True` to `build_mimic_df`. The images will be saved in `dataset_dir`. This will take several hours for the full dataset. It's recommended that you save resized versions of the images (_e.g._ (512,512)). To do so, pass `download_resize=(512,512)`. 
 
-Each row corresponds to a single chest X-ray image (stored in both DICOM format and JPEG in the MIMIC database). Each row is uniquely identified by the "dicom_id" column. Note that a single chest X-ray study (identified by "study_id" column) mayconsist of multiple images and a single patient (identified by "subject_id" column) may have multiple studies in the database. The columns in the DataPanel can be grouped into four categories:
+Each row corresponds to a single chest X-ray image (stored in both DICOM format and JPEG in the MIMIC database). Each row is uniquely identified by the "dicom_id" column. Note that a single chest X-ray study (identified by "study_id" column) mayconsist of multiple images and a single patient (identified by "subject_id" column) may have multiple studies in the database. The columns in the DataFrame can be grouped into four categories:
     
 1. (`PandasSeriesColumn`) Metadata and labels pulled from tables in the MIMIC-IV EHR database (e.g."pneumonia", "ethnicity", "view_position", "gender"). For more information on the tables see: https://mimic.mit.edu/docs/iv/modules/.For more information on the CheXpert labels see: https://physionet.org/content/mimic-cxr-jpg/2.0.0/
     

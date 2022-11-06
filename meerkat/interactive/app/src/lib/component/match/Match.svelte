@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { get, writable, type Writable } from 'svelte/store';
-	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
+	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
-	import Status from '$lib/components/common/Status.svelte';
+	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 
 	const { get_schema, match } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let against: Writable<string>;
 	export let col: Writable<string>;
 	export let text: Writable<string>;
@@ -18,8 +18,8 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($dp.box_id);
-		items_promise = schema_promise.then((schema: DataPanelSchema) => {
+		schema_promise = $get_schema($df.box_id);
+		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.filter((column) => {
 				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
 			}).map(column =>  ({value: column.name, label: column.name}))
@@ -37,7 +37,7 @@
 			return;
 		}
 		status = 'working';
-		let box_id = $dp.box_id;
+		let box_id = $df.box_id;
 		let promise = $match(box_id, $against, $text, col);
 		promise
 			.then(() => {

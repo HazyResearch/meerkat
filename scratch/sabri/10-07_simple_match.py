@@ -1,29 +1,21 @@
-
 import meerkat as mk
 
-dp = mk.get("imagenette", version="160px").lz[:2000]
-dp_pivot = mk.gui.Pivot(dp)
+df = mk.get("imagenette", version="160px").lz[:2000]
+df_pivot = mk.gui.Pivot(df)
 
-dp = mk.embed(
-    dp,
+df = mk.embed(
+    df,
     input="img",
     batch_size=128,
     encoder="clip"
 )
 
-match: mk.gui.Component = mk.gui.Match(
-    dp_pivot, 
-    against="img",
-    col="label"
-)
+match: mk.gui.Component = mk.gui.Match(df_pivot, against="img", col="label")
 
-sorted_box = mk.sort(dp_pivot, by=match.col, ascending=False)
+sorted_box = mk.sort(df_pivot, by=match.col, ascending=False)
 
 gallery = mk.gui.Gallery(
-    sorted_box,
-    main_column="img",
-    tag_columns=["label"],
-    primary_key="img_path"
+    sorted_box, main_column="img", tag_columns=["label"], primary_key="img_path"
 )
 
 mk.gui.start(shareable=False)

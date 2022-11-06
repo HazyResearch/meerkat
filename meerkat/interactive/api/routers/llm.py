@@ -1,15 +1,11 @@
 import functools
 import random
-from typing import Any, Dict, List, Union
+from typing import List
 
 from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
-import meerkat as mk
-from meerkat.datapanel import DataPanel
 from meerkat.state import state
-
-from ....tools.utils import convert_to_python
 
 router = APIRouter(
     prefix="/llm",
@@ -124,7 +120,7 @@ Additional categories:
 Attribute description: {description}
 Existing categories: {", ".join(existing_categories)}
 More categories:
-"""
+"""  # noqa: E501
             ),
             top_k_return=1,
             temperature=0.5,

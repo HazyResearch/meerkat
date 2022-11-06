@@ -22,7 +22,7 @@ from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.spacy_column import SpacyColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.columns.volume_column import MedicalVolumeColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
 
 # TODO: backwards compat remove before release
@@ -40,10 +40,14 @@ from .config import config
 # aliases for core column types
 ArrayColumn = NumpyArrayColumn
 SeriesColumn = PandasSeriesColumn
+ArrowColumn = ArrowArrayColumn
 
+# alias for DataFrame for backwards compatibility
+DataPanel = DataFrame
 
 __all__ = [
     "GlobalState",
+    "DataFrame",
     "DataPanel",
     "AbstractColumn",
     "LambdaColumn",
@@ -54,6 +58,7 @@ __all__ = [
     "PandasSeriesColumn",
     "TensorColumn",
     "ArrowArrayColumn",
+    "ArrowColumn",
     "ImageColumn",
     "AudioColumn",
     "VideoColumn",

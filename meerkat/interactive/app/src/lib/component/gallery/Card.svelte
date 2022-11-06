@@ -2,7 +2,7 @@
 	import { createTippy } from 'svelte-tippy';
 	import { followCursor } from 'tippy.js';
 
-	import Cell, { type CellInterface } from '$lib/components/cell/Cell.svelte';
+	import Cell, { type CellInterface } from '$lib/shared/cell/Cell.svelte';
 	import type { SvelteComponent } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import { createEventDispatcher } from 'svelte';

@@ -30,10 +30,10 @@ meerkat.config module
    :undoc-members:
    :show-inheritance:
 
-meerkat.datapanel module
+meerkat.dataframe module
 ------------------------
 
-.. automodule:: meerkat.datapanel
+.. automodule:: meerkat.dataframe
    :members:
    :undoc-members:
    :show-inheritance:

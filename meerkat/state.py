@@ -1,13 +1,9 @@
 import subprocess
-import weakref
-from ast import Global
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Union
+from typing import TYPE_CHECKING, Any, Dict, Mapping
 
 from fastapi import FastAPI, HTTPException
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.datapanel import DataPanel
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
@@ -78,15 +74,15 @@ class NetworkInfo:
     @property
     def shareable_npm_server_url(self):
         if self.shareable_npm_server_name is None:
-            return None 
+            return None
         return f"http://{self.shareable_npm_server_name}"
-    
+
     @property
     def shareable_api_server_url(self):
         if self.shareable_api_server_name is None:
-            return None 
+            return None
         return f"http://{self.shareable_api_server_name}"
-    
+
     @property
     def npm_server_url(self):
         return f"http://{self.npm_server_name}:{self.npm_server_port}"
@@ -136,7 +132,7 @@ class Identifiables:
     """
 
     columns: WeakMapping = field(default_factory=WeakMapping)
-    datapanels: WeakMapping = field(default_factory=WeakMapping)
+    dataframes: WeakMapping = field(default_factory=WeakMapping)
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)

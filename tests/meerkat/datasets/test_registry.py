@@ -11,7 +11,7 @@ def test_versions():
 
 def test_catalog():
     catalog = mk.datasets.catalog
-    assert isinstance(catalog, mk.DataPanel)
+    assert isinstance(catalog, mk.DataFrame)
     assert len(catalog) > 0
 
 

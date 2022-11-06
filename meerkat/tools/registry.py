@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Sequence
 from fvcore.common.registry import Registry as _Registry
 from tabulate import tabulate
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 
 class Registry(_Registry):
@@ -74,11 +74,11 @@ class Registry(_Registry):
         return list(self._obj_map.keys())
 
     @property
-    def catalog(self) -> DataPanel:
+    def catalog(self) -> DataFrame:
         rows = []
         for name, builder in self:
             rows.append(builder.info.__dict__)
-        return DataPanel(rows)
+        return DataFrame(rows)
 
     def __repr__(self) -> str:
         table = tabulate(self._metadata_map.values(), tablefmt="fancy_grid")

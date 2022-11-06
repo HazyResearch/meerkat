@@ -1,20 +1,10 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Dict, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ops.explain import explain
 
 from .sliceby import SliceBy
@@ -26,7 +16,7 @@ if TYPE_CHECKING:
 class ExplainBy(SliceBy):
     def __init__(
         self,
-        data: DataPanel,
+        data: DataFrame,
         by: Union[List[str], str],
         scores: Dict[Union[str, Tuple[str]], np.ndarray] = None,
         sets: Dict[Union[str, Tuple[str]], np.ndarray] = None,
@@ -35,7 +25,7 @@ class ExplainBy(SliceBy):
 
 
 def explainby(
-    data: DataPanel,
+    data: DataFrame,
     by: Union[str, Sequence[str]],
     target: Union[str, Mapping[str]],
     method: Union[str, "domino.Slicer"] = "MixtureSlicer",
@@ -45,10 +35,10 @@ def explainby(
     use_cache: bool = True,
     **kwargs,
 ) -> ExplainBy:
-    """Perform a clusterby operation on a DataPanel.
+    """Perform a clusterby operation on a DataFrame.
 
     Args:
-        data (DataPanel): The datapanel to cluster.
+        data (DataFrame): The dataframe to cluster.
         by (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
             be embedded using the ``encoder`` and the resulting embedding will be used.
         method (Union[str, domino.Slicer]): The clustering method to use.

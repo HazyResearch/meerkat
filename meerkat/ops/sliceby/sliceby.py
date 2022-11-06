@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from ast import Slice
 from functools import wraps
 from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
 from tqdm import tqdm
 
 import numpy as np
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.mixins.identifiable import IdentifiableMixin
 
 
@@ -31,7 +30,7 @@ class SliceBy(IdentifiableMixin):
 
     def __init__(
         self,
-        data: DataPanel,
+        data: DataFrame,
         by: Union[List[str], str],
         sets: Dict[Union[SliceKey, Tuple[SliceKey]], np.ndarray] = None,
         scores: Dict[Union[SliceKey, Tuple[SliceKey], np.ndarray]] = None,
@@ -58,35 +57,35 @@ class SliceBy(IdentifiableMixin):
     def __len__(self) -> int:
         return len(self.slices)
 
-    def mean(self, *args, **kwargs) -> DataPanel:
+    def mean(self, *args, **kwargs) -> DataFrame:
         return self._aggregate(lambda x: x.mean(*args, **kwargs))
 
     @sets_only
-    def count(self, *args, **kwargs) -> DataPanel:
+    def count(self, *args, **kwargs) -> DataFrame:
         return self._aggregate(lambda x: len(x))
 
     @sets_only
-    def median(self, *args, **kwargs) -> DataPanel:
+    def median(self, *args, **kwargs) -> DataFrame:
         return self._aggregate(lambda x: x.median(*args, **kwargs))
 
     @sets_only
-    def aggregate(self, function: Callable, accepts_dp: bool = False) -> DataPanel:
+    def aggregate(self, function: Callable, accepts_df: bool = False) -> DataFrame:
         """_summary_
 
         Args:
             function (Callable): _description_
-            accepts_dp (bool, optional): _description_. Defaults to False.
+            accepts_df (bool, optional): _description_. Defaults to False.
 
         Returns:
-            DataPanel: _description_
+            DataFrame: _description_
         """
-        return self._aggregate(f=function, accepts_dp=accepts_dp)
+        return self._aggregate(f=function, accepts_df=accepts_df)
 
     @property
     def slice_keys(self):
         return sorted(list(self.slices.keys()))
 
-    def _aggregate(self, f: Callable, accepts_dp: bool = False) -> DataPanel:
+    def _aggregate(self, f: Callable, accepts_df: bool = False) -> DataFrame:
         """self.sets are a dictionary of {labels : [sets]}"""
 
         # means will be a list of dictionaries where each element in the dict
@@ -98,17 +97,17 @@ class SliceBy(IdentifiableMixin):
             if self.slice_type == "scores":
                 raise NotImplementedError
             else:
-                slice_dp = self.data.lz[self.slices[slice_key]]
-                slice_values: Dict[str, Any] = slice_dp.aggregate(
-                    f, accepts_dp=accepts_dp
+                slice_df = self.data.lz[self.slices[slice_key]]
+                slice_values: Dict[str, Any] = slice_df.aggregate(
+                    f, accepts_df=accepts_df
                 )
 
             out.append(slice_values)
 
-        from meerkat.datapanel import DataPanel
+        from meerkat.dataframe import DataFrame
 
-        # create DataPanel as a list of rows.
-        out = DataPanel(out)
+        # create DataFrame as a list of rows.
+        out = DataFrame(out)
 
         # add the by columns.
         if len(self.slice_keys) > 0:
@@ -159,20 +158,20 @@ class SliceIndexer:
 
 
 def sliceby(
-    data: DataPanel,
+    data: DataFrame,
     by: Union[str, Sequence[str]] = None,
     key_mapping: Dict[int, str] = None,
 ) -> SliceBy:
-    """Perform a groupby operation on a DataPanel or Column (similar to a
+    """Perform a groupby operation on a DataFrame or Column (similar to a
     `DataFrame.groupby` and `Series.groupby` operations in Pandas).j.
 
     Args:
-        data (Union[DataPanel, AbstractColumn]): The data to group.
+        data (Union[DataFrame, AbstractColumn]): The data to group.
         by (Union[str, Sequence[str]]): The column(s) to group by. Ignored if ``data``
             is a Column.
 
     Returns:
-        Union[DataPanelGroupBy, AbstractColumnGroupBy]: A GroupBy object.
+        Union[DataFrameGroupBy, AbstractColumnGroupBy]: A GroupBy object.
     """
     if isinstance(by, str):
         by = [by]

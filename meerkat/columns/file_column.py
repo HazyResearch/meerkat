@@ -1,16 +1,14 @@
 from __future__ import annotations
-from ctypes import Union
-from email.policy import default
-import io
-import functools
 
+import functools
+import io
 import logging
 import os
 import urllib.request
 import warnings
+from ctypes import Union
 from string import Template
-from typing import BinaryIO, BinaryIO, Callable, Sequence
-from urllib.error import HTTPError
+from typing import Callable, Sequence
 from urllib.parse import urlparse
 
 import dill
@@ -41,8 +39,9 @@ class FileLoader:
         Args:
             downloader (callable): a callable that accepts at least two positional
                 arguments - a URI and a destination (which could be either a string or
-                file object). Optionally, it can accept a `fallback_downloader` argument, which
-                the
+                file object). Optionally, it can accept a `fallback_downloader`
+                argument, which the
+                TODO(karan): finish this docstring
         """
         self.transform = transform
         self.loader = loader
@@ -63,7 +62,7 @@ class FileLoader:
                 filepath. Otherwise, it is interpreted as a URI from which the file can
                 be downloaded.
         """
-        # support including environment varaiables in the base_dir so that DataPanels
+        # support including environment varaiables in the base_dir so that DataFrames
         # can be easily moved between machines
         if self.base_dir is not None:
 
@@ -106,8 +105,9 @@ class FileLoader:
                     self.downloader(filepath, dst)
                 except Exception as e:
                     if self.fallback_downloader is not None:
-                        # if user passes fallback_downloader, then on any failed download, we
-                        # write the default data to the destination and continue
+                        # if user passes fallback_downloader, then on any
+                        # failed download, we write the default data to the
+                        # destination and continue
                         warnings.warn(
                             f"Failed to download {filepath} with error {e}. Falling "
                             "back to default data."
@@ -137,7 +137,8 @@ class FileLoader:
         return hash((self.loader, self.transform, self.base_dir))
 
     def __setstate__(self, state):
-        # need to add downloader if it is missing from state, for backwards compatibility
+        # need to add downloader if it is missing from state,
+        # for backwards compatibility
         if "downloader" not in state:
             state["downloader"] = None
         if "fallback_downloader" not in state:
@@ -288,6 +289,23 @@ class FileColumn(LambdaColumn):
         )
 
     @classmethod
+    def from_urls(
+        cls,
+        urls: Sequence[str],
+        transform: callable = None,
+    ):
+        from PIL import Image
+
+        return cls(
+            data=urls,
+            loader=FileLoader(
+                loader=lambda bytes_io: Image.open(bytes_io).convert("RGB"),
+                downloader="url",
+            ),
+            transform=transform,
+        )
+
+    @classmethod
     def default_loader(cls, *args, **kwargs):
         return folder.default_loader(*args, **kwargs)
 
@@ -297,7 +315,7 @@ class FileColumn(LambdaColumn):
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
-            # support old DataPanels.
+            # support old DataFrames.
             warnings.warn(
                 "Reading a LambdaColumn stored in a format that will not be"
                 " supported in the future. Please re-write the column to the new"
@@ -312,7 +330,7 @@ class FileColumn(LambdaColumn):
                 col = AbstractColumn.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
-                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                    "Support for LambdaColumns based on a DataFrame is deprecated."
                 )
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))

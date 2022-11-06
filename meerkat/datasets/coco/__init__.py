@@ -34,7 +34,7 @@ class coco(DatasetBuilder):
     )
 
     def build(self):
-        dps = []
+        dfs = []
         for split in ["train", "val"]:
             dct = json.load(
                 open(
@@ -46,19 +46,19 @@ class coco(DatasetBuilder):
             )
             breakpoint()
 
-            dp = mk.DataPanel(dct["images"])
-            dp["split"] = [split] * len(dp)
-            dps.append(dp)
+            df = mk.DataFrame(dct["images"])
+            df["split"] = [split] * len(df)
+            dfs.append(df)
 
-        dp = mk.concat(dps, axis=0)
+        df = mk.concat(dfs, axis=0)
 
-        path = dp["split"] + "2014/" + dp["file_name"]
-        dp["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.var_dataset_dir)
+        path = df["split"] + "2014/" + df["file_name"]
+        df["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.var_dataset_dir)
 
-        dp.data.reorder(
-            ["id", "image"] + [c for c in dp.columns if c not in ["id", "image"]]
+        df.data.reorder(
+            ["id", "image"] + [c for c in df.columns if c not in ["id", "image"]]
         )
-        return dp
+        return df
 
     def download(self):
 
@@ -79,7 +79,7 @@ class coco(DatasetBuilder):
         extract(downloaded_path, self.dataset_dir)
 
 
-def build_coco_2014_dp(dataset_dir: str, download: bool = False):
+def build_coco_2014_df(dataset_dir: str, download: bool = False):
     if download:
         curr_dir = os.getcwd()
         os.makedirs(dataset_dir, exist_ok=True)
@@ -122,7 +122,7 @@ def build_coco_2014_dp(dataset_dir: str, download: bool = False):
 
         os.chdir(curr_dir)
 
-    dps = []
+    dfs = []
     for split in ["train", "val"]:
         dct = json.load(
             open(
@@ -131,17 +131,17 @@ def build_coco_2014_dp(dataset_dir: str, download: bool = False):
             )
         )
 
-        dp = mk.DataPanel(dct["images"])
-        dp["split"] = [split] * len(dp)
-        dps.append(dp)
+        df = mk.DataFrame(dct["images"])
+        df["split"] = [split] * len(df)
+        dfs.append(df)
 
-    dp = mk.concat(dps, axis=0)
+    df = mk.concat(dfs, axis=0)
 
-    path = dp["split"] + "2014/" + dp["file_name"]
-    dp["image"] = mk.ImageColumn.from_filepaths(path, base_dir=dataset_dir)
+    path = df["split"] + "2014/" + df["file_name"]
+    df["image"] = mk.ImageColumn.from_filepaths(path, base_dir=dataset_dir)
 
-    dp.data.reorder(
-        ["id", "image"] + [c for c in dp.columns if c not in ["id", "image"]]
+    df.data.reorder(
+        ["id", "image"] + [c for c in df.columns if c not in ["id", "image"]]
     )
 
-    return dp
+    return df

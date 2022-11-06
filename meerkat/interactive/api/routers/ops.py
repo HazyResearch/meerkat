@@ -1,18 +1,14 @@
 import functools
 import re
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple
 
 from fastapi import APIRouter, Body, HTTPException
-from pydantic import BaseModel
 
 import meerkat as mk
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.graph import BoxModification, StoreModification
 from meerkat.state import state
-
-from ....tools.utils import convert_to_python
-from .datapanel import SchemaResponse
 
 EmbeddedBody = functools.partial(Body, embed=True)
 
@@ -26,7 +22,7 @@ _SUPPORTED_MATCH_OPS = {
     "-": lambda x, y: x - y,
     "*": lambda x, y: x * y,
     "/": lambda x, y: x / y,
-    "**": lambda x, y: x**y,
+    "**": lambda x, y: x ** y,
 }
 
 
@@ -69,30 +65,31 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
 def match(
     box_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
 ) -> List[Modification]:
-    """Match a query string against a DataPanel column.
+    """Match a query string against a DataFrame column.
 
-    The `datapanel_id` remains the same as the original request.
+    The `dataframe_id` remains the same as the original request.
     """
     box = state.identifiables.get(group="boxes", id=box_id)
 
-    dp = box.obj
-    if not isinstance(dp, DataPanel):
+    df = box.obj
+    if not isinstance(df, DataFrame):
         raise HTTPException(
-            status_code=400, detail="`match` expects a box containing a datapanel"
+            status_code=400, detail="`match` expects a box containing a dataframe"
         )
 
     try:
         # Parse the string to see if we should be running some operation on it.
-        # TODO (arjundd): Support more than one op. Potentially parse the string in order?
+        # TODO (arjundd): Support more than one op.
+        # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
-        dp, match_columns = mk.match(
-            data=dp, query=queries, input=input, return_column_names=True
+        df, match_columns = mk.match(
+            data=df, query=queries, input=input, return_column_names=True
         )
         if len(match_columns) > 1:
             assert op is not None
             col = f"_match_{input}_{query}"
-            dp[col] = _SUPPORTED_MATCH_OPS[op](
-                dp[match_columns[0]], dp[match_columns[1]]
+            df[col] = _SUPPORTED_MATCH_OPS[op](
+                df[match_columns[0]], df[match_columns[1]]
             )
             match_columns = [col] + match_columns
 
@@ -115,17 +112,20 @@ def match(
 
     modifications = trigger(modifications)
     return modifications
-    # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
+    # return SchemaResponse(
+    #     id=pivot.dataframe_id,
+    #     columns=_get_column_infos(df, match_columns)
+    # )
 
 
 @router.post("/{pivot_id}/add/")
 def add_column(pivot_id: str, column: str = EmbeddedBody()):
     pivot = state.identifiables.get(group="boxes", id=pivot_id)
-    dp = pivot.obj
+    df = pivot.obj
 
     import numpy as np
 
-    dp[column] = np.zeros(len(dp))
+    df[column] = np.zeros(len(df))
 
     modifications = [Modification(box_id=pivot_id, scope=[column])]
     modifications = trigger(modifications)

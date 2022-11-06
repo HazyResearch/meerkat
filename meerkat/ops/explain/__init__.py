@@ -1,15 +1,13 @@
-from typing import TYPE_CHECKING, Mapping, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Mapping, Tuple, Union
 
-import numpy as np
-
-from meerkat import AbstractColumn, DataPanel, NumpyArrayColumn, embed
+from meerkat import AbstractColumn, DataFrame, NumpyArrayColumn, embed
 
 if TYPE_CHECKING:
     from domino import Slicer
 
 
 def explain(
-    data: Union[AbstractColumn, DataPanel],
+    data: Union[AbstractColumn, DataFrame],
     input: str,
     target: Union[str, Mapping[str, str]],
     method: Union[str, "Slicer"] = "MixtureSlicer",
@@ -17,26 +15,26 @@ def explain(
     modality: str = None,
     **kwargs,
 ) -> Tuple[NumpyArrayColumn, "Slicer"]:
-    """Cluster the data in a column. If the column is an unstructured type, (e.g.
-    image), the column is first embedded then clustered.
+    """Cluster the data in a column. If the column is an unstructured type,
+    (e.g. image), the column is first embedded then clustered.
 
     Args:
-        data (Union[DataPanel, AbstractColumn]): The column to cluster or a datapanel
+        data (Union[DataFrame, AbstractColumn]): The column to cluster or a dataframe
             containing the column to cluster.
-        input (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
-            be embedded using the ``encoder`` and the resulting embedding will be used.
-            Ignored if ``data`` is a Column.
+        input (Union[str, Sequence[str]]): The column(s) to cluster by. These
+            columns will be embedded using the ``encoder`` and the resulting
+            embedding will be used. Ignored if ``data`` is a Column.
         method (Union[str, Slicer]): The clustering method to use.
         encoder (str): The encoder to use for the embedding. Defaults to ``clip``.
         modality (Union[str, Sequence[str])): The modality to of the
         **kwargs: Additional keyword arguments to pass to the clustering method.
 
     Returns:
-        (Union[NumpyArrayColumn, DataPanel], Slicer): A tuple containing the
-            clustered column and the fit clusterer. If ``data`` is a DataPanel, the
-            clustered column is added to the DataPanel and it is returned.
+        (Union[NumpyArrayColumn, DataFrame], Slicer): A tuple containing the
+            clustered column and the fit clusterer. If ``data`` is a DataFrame, the
+            clustered column is added to the DataFrame and it is returned.
     """
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
         output_column = f"{method}({input},{target})"
         embed_col = f"{encoder}({input})"
@@ -71,11 +69,11 @@ def explain(
     method.fit(embeddings=data_embedding.data, **target)
     slices = method.predict(
         embeddings=data_embedding.data,
-        targets=None, 
+        targets=None,
         pred_probs=None,
     )
 
-    if isinstance(data, DataPanel):
+    if isinstance(data, DataFrame):
         data[output_column] = slices
         return data, method
     return slices, method

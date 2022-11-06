@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import torch
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ml.embedding_column import EmbeddingColumn
 from meerkat.ml.metrics import compute_metric
 from meerkat.ml.prediction_column import ClassificationOutputColumn
@@ -71,7 +71,7 @@ class Model(torch.nn.Module):
 
     def activation(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         target_module: str,  # TODO(Priya): Support multiple activation layers
         input_columns: List[str],
         batch_size=32,
@@ -81,7 +81,7 @@ class Model(torch.nn.Module):
         column.
 
         Args:
-            dataset (DataPanel): the meerkat DataPanel containing the model inputs.
+            dataset (DataFrame): the meerkat DataFrame containing the model inputs.
             target_module (str): the name of the submodule of `model` (i.e. an
                 intermediate layer) that outputs the activations we'd like to extract.
                 For nested submodules, specify a path separated by "." (e.g.
@@ -111,14 +111,14 @@ class Model(torch.nn.Module):
 
     def classification(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         input_columns: List[str],
         batch_size: int = 32,
         num_classes: int = None,
         multi_label: bool = False,
         one_hot: bool = None,
         threshold=0.5,
-    ) -> DataPanel:
+    ) -> DataFrame:
 
         # Handles outputs for classification tasks
 
@@ -139,7 +139,7 @@ class Model(torch.nn.Module):
             threshold=threshold,
         )
 
-        output_dp = DataPanel(
+        output_df = DataFrame(
             {
                 "logits": output_col,
                 "probs": output_col.probabilities(),
@@ -151,11 +151,11 @@ class Model(torch.nn.Module):
         dataset.add_column("probs", output_col.probabilities())
         dataset.add_column("preds", output_col.predictions())
 
-        return output_dp
+        return output_df
 
     def evaluate(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         target_column: List[str],  # str?
         pred_column: List[str],  # str?
         metrics: List[str],

@@ -390,7 +390,7 @@ class AbstractColumn(
                 use for sampling.
 
         Return:
-            AbstractColumn: A random sample of rows from the DataPanel.
+            AbstractColumn: A random sample of rows from the DataFrame.
         """
         from meerkat import sample
 

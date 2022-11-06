@@ -1,14 +1,11 @@
-from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Union
 
-from fastapi import APIRouter, HTTPException
-
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceByCards
 
-Boxable = Union[DataPanel, AbstractColumn, SliceByCards]
+Boxable = Union[DataFrame, AbstractColumn, SliceByCards]
 
 
 class BoxOperation(IdentifiableMixin):

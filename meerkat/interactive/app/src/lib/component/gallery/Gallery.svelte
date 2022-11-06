@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
@@ -9,7 +9,7 @@
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let edit_target: Any;
@@ -21,11 +21,11 @@
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = $get_schema($dp.box_id);
+	$: schema_promise = $get_schema($df.box_id);
 
 	// create an array with the main_column and the tag_columns
 	$: rows_promise = $get_rows(
-		$dp.box_id,
+		$df.box_id,
 		page * per_page,
 		(page + 1) * per_page,
 		// TODO (Sabri): we should limit the columns only to the main_column and the 

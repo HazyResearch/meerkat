@@ -1,13 +1,11 @@
-from typing import List, Union
-from meerkat.interactive.graph import Box, Store, make_box, make_store
-from meerkat.interactive.edit import EditTarget
-import numpy as np
-from ..abstract import Component
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
+from meerkat.interactive.graph import Store, make_store
+
+from ..abstract import Component
 
 if TYPE_CHECKING:
-    from meerkat import AbstractColumn, DataPanel
+    pass
 
 
 class Choice(Component):

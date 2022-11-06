@@ -10,7 +10,7 @@ import meerkat as mk
 URL = "http://worksheets.codalab.org/rest/bundles/0x505056d5cdea4e4eaa0e242cbfe2daa4/contents/blob/"
 
 
-def build_waterbirds_dp(
+def build_waterbirds_df(
     dataset_dir: str,
     download: bool = True,
 ):
@@ -20,7 +20,7 @@ def build_waterbirds_dp(
         download_dir (str): The directory to save to.
 
     Returns:
-        a DataPanel containing columns `image`, `y`, "background", and `split`,
+        a DataFrame containing columns `image`, `y`, "background", and `split`,
 
     References:
     """
@@ -29,11 +29,11 @@ def build_waterbirds_dp(
     df = pd.DataFrame(dataset.metadata_array, columns=dataset.metadata_fields)
     df["filepath"] = dataset._input_array
 
-    dp = mk.DataPanel.from_pandas(df)
-    dp["image"] = mk.ImageColumn(
-        dp["filepath"], base_dir=os.path.join(dataset_dir, "waterbirds_v1.0")
+    df = mk.DataFrame.from_pandas(df)
+    df["image"] = mk.ImageColumn(
+        df["filepath"], base_dir=os.path.join(dataset_dir, "waterbirds_v1.0")
     )
-    dp["split"] = pd.Series(dataset._split_array).map(
+    df["split"] = pd.Series(dataset._split_array).map(
         {
             v: k if k != "val" else "valid"
             for k, v in WILDSDataset.DEFAULT_SPLITS.items()
@@ -48,7 +48,7 @@ def build_waterbirds_dp(
         for bground_idx in [0, 1]
     }
 
-    dp["group"] = (dp["y"].astype(str) + dp["background"].data.astype(str)).map(
+    df["group"] = (df["y"].astype(str) + df["background"].data.astype(str)).map(
         group_mapping
     )
-    return dp
+    return df

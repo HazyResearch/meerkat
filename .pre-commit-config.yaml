@@ -9,8 +9,10 @@ repos:
     - id: black
       language_version: python3
       additional_dependencies: ['click==8.0.4']
+      exclude: 'scratch/.*'
 
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
     -   id: flake8
+        exclude: 'scratch/.*'

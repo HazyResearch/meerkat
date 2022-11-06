@@ -9,7 +9,7 @@ import torch
 from tqdm import tqdm
 
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ml.prediction_column import (
     ClassificationOutputColumn,
     _ClassifierOutputType,
@@ -68,7 +68,7 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
 
     @staticmethod
     def rle2mask(
-        dataset: DataPanel,
+        dataset: DataFrame,
         input_columns: List[str],  # TODO(Priya): Support multiple RLE columns?
         orig_dim,
         resize_dim=None,
@@ -96,7 +96,7 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
 
 
 def _convert_rle2mask(
-    batch: DataPanel,
+    batch: DataFrame,
     input_columns: List[str],
     orig_dim,
     resize_dim=None,
@@ -106,7 +106,7 @@ def _convert_rle2mask(
     """Convert run length encoding (RLE) to 2D binary mask.
 
     Args:
-    batch (DataPanel): DataPanel.
+    batch (DataFrame): DataFrame.
     input_columns: List of columns containing Run Length Encodings
     orig_dim (Tuple[int]): Shape of the image.
     resize_dim (Tuple[int]): Shape to resize to.

@@ -10,42 +10,42 @@ import meerkat as mk
 # https://visualgenome.org/VGViz/explore
 
 
-def build_visual_genome_dps(
+def build_visual_genome_dfs(
     dataset_dir: str, write: bool = False
-) -> Dict[str, mk.DataPanel]:
-    dps = {}
+) -> Dict[str, mk.DataFrame]:
+    dfs = {}
     print("Loading objects and attributes...")
-    dps.update(_build_object_dps(dataset_dir))
+    dfs.update(_build_object_dfs(dataset_dir))
 
     print("Loading images...")
-    dps.update(_build_image_dp(dataset_dir=dataset_dir))
+    dfs.update(_build_image_df(dataset_dir=dataset_dir))
 
     print("Loading relationships...")
-    dps.update(_build_relationships_dp(dataset_dir=dataset_dir))
+    dfs.update(_build_relationships_df(dataset_dir=dataset_dir))
 
     if write:
-        write_visual_genome_dps(dps, dataset_dir=dataset_dir)
-    return dps
+        write_visual_genome_dfs(dfs, dataset_dir=dataset_dir)
+    return dfs
 
 
-def read_visual_genome_dps(dataset_dir: str) -> Dict[str, mk.DataPanel]:
+def read_visual_genome_dfs(dataset_dir: str) -> Dict[str, mk.DataFrame]:
     return {
-        key: mk.DataPanel.read(os.path.join(dataset_dir, f"{key}.mk"))
+        key: mk.DataFrame.read(os.path.join(dataset_dir, f"{key}.mk"))
         for key in ["attributes", "relationships", "objects", "images"]
     }
 
 
-def write_visual_genome_dps(dps: Mapping[str, mk.DataPanel], dataset_dir: str):
-    for key, dp in dps.items():
-        dp.write(os.path.join(dataset_dir, f"{key}.mk"))
+def write_visual_genome_dfs(dfs: Mapping[str, mk.DataFrame], dataset_dir: str):
+    for key, df in dfs.items():
+        df.write(os.path.join(dataset_dir, f"{key}.mk"))
 
 
-def _build_object_dps(dataset_dir: str):
+def _build_object_dfs(dataset_dir: str):
     with open(os.path.join(dataset_dir, "attributes.json")) as f:
         objects = json.load(f)
 
-    objects_dp = []  # create one table for objects
-    attributes_dp = []  # create one table of attributes
+    objects_df = []  # create one table for objects
+    attributes_df = []  # create one table of attributes
     for image in objects:
         for obj in image["attributes"]:
             obj["image_id"] = image["image_id"]
@@ -58,7 +58,7 @@ def _build_object_dps(dataset_dir: str):
             attributes = obj.pop("attributes", None)
             if attributes is not None:
                 for attribute in attributes:
-                    attributes_dp.append(
+                    attributes_df.append(
                         {"object_id": obj["object_id"], "attribute": attribute}
                     )
 
@@ -67,43 +67,42 @@ def _build_object_dps(dataset_dir: str):
             synset = obj.pop("synsets")
             obj["syn_name"] = synset[0] if len(synset) > 0 else ""
 
-            objects_dp.append(obj)
+            objects_df.append(obj)
 
     return {
-        "objects": mk.DataPanel(objects_dp),
-        "attributes": mk.DataPanel(attributes_dp),
+        "objects": mk.DataFrame(objects_df),
+        "attributes": mk.DataFrame(attributes_df),
     }
 
 
-def _build_image_dp(dataset_dir: str):
+def _build_image_df(dataset_dir: str):
     with open(os.path.join(dataset_dir, "image_data.json")) as f:
         images = json.load(f)
-    image_dp = mk.DataPanel(images)
-    image_dp.remove_column("coco_id")
-    image_dp.remove_column("flickr_id")
+    image_df = mk.DataFrame(images)
+    image_df.remove_column("coco_id")
+    image_df.remove_column("flickr_id")
 
-    image_dp["local_path"] = dataset_dir + (image_dp["url"].str.split("rak248")).apply(
+    image_df["local_path"] = dataset_dir + (image_df["url"].str.split("rak248")).apply(
         lambda x: x[-1]
     )
 
-    image_dp["image"] = mk.ImageColumn(image_dp["local_path"])
+    image_df["image"] = mk.ImageColumn(image_df["local_path"])
 
-    return {"images": image_dp}
+    return {"images": image_df}
 
 
-def _build_relationships_dp(dataset_dir: str):
-
+def _build_relationships_df(dataset_dir: str):
     with open(os.path.join(dataset_dir, "relationships.json")) as f:
         relationships = json.load(f)
 
-    rel_dp = []
+    rel_df = []
     for image in relationships:
         image_id = image["image_id"]
         for r in image["relationships"]:
             object_synset = r["object"]["synsets"]
             subject_synset = r["subject"]["synsets"]
 
-            rel_dp.append(
+            rel_df.append(
                 {
                     "image_id": image_id,
                     "predicate": r["predicate"],
@@ -119,5 +118,5 @@ def _build_relationships_dp(dataset_dir: str):
                     "object_syn": object_synset[0] if len(object_synset) > 0 else "",
                 }
             )
-    rel_dp = mk.DataPanel(rel_dp)
-    return {"relationships": rel_dp}
+    rel_df = mk.DataFrame(rel_df)
+    return {"relationships": rel_df}

@@ -1,5 +1,5 @@
 # Fixes
-- fix base_datapanel_id bug: on changing app code and live reloading, selection of points on the plot does not work because the base_datpanel_id corresponds to a DP that is no longer available on the backend
+- fix base_dataframe_id bug: on changing app code and live reloading, selection of points on the plot does not work because the base_datpanel_id corresponds to a DP that is no longer available on the backend
 
 # Structure
 
@@ -12,24 +12,24 @@ Modifier | Views
 
 DataState Object
 ---------------
-curent_datapanel_id
+curent_dataframe_id
 current_schema
 ...
 
 
 
-View (datapanel_id) --> visual
+View (dataframe_id) --> visual
     - Visualize DataState object
 
-Modifier (datapanel_id) --> New_Object(new_datapanel_id | new_column)
+Modifier (dataframe_id) --> New_Object(new_dataframe_id | new_column)
     - Update DataState object
 
     - Match
       - Input: MatchSomething object (search text, search column)
       - Update DataState object
         - New schema (inplace) -- with the new column
-        - New datapanel id -- with the new schema and sorted by the new column
-        - Inplace vs. outofplace doesn't realy matter, just need the latest datapanel ID and schema
+        - New dataframe id -- with the new schema and sorted by the new column
+        - Inplace vs. outofplace doesn't realy matter, just need the latest dataframe ID and schema
 
 
 Maintain a sequence of applied Modifiers
@@ -69,13 +69,13 @@ Backend:
         InterfaceState
 
     InterfaceState:
-        base_datapanel_id (the datapanel_id of the DP that is the base for the Interface)
-        datapanel_id (the datapanel_id of the DP that is the current state of the Interface)
+        base_dataframe_id (the dataframe_id of the DP that is the base for the Interface)
+        dataframe_id (the dataframe_id of the DP that is the current state of the Interface)
         lineage: List[Operator] (the list of Operators that have been applied to the base DP to get to the current DP)
 
-        assert base_datapanel_id + lineage == datapanel_id (guarantees that the current DP is the result of applying the lineage to the base DP)
+        assert base_dataframe_id + lineage == dataframe_id (guarantees that the current DP is the result of applying the lineage to the base DP)
 
-        to_code() (convert the list of Operators to a code snippet such that code(base_datapanel_id) == datapanel_id)
+        to_code() (convert the list of Operators to a code snippet such that code(base_dataframe_id) == dataframe_id)
 
         push(Operator) (run an Operator and add it to the lineage)
         pop() (remove the last Operator from the lineage and undo its effect)
@@ -109,7 +109,7 @@ Frontend:
 
 <Interface
 >
-    <Block datapanel_id>
-        <Table> // Get the datapanel_id and base_datapanel_id using getContext()
+    <Block dataframe_id>
+        <Table> // Get the dataframe_id and base_dataframe_id using getContext()
     </Block>
 </Interface>

@@ -11,7 +11,7 @@ client = TestClient(app)
 
 @pytest.fixture
 def sliceby_testbed():
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "a": [1, 2, 2, 1, 3, 2, 3],
             "name": np.array(
@@ -22,14 +22,14 @@ def sliceby_testbed():
             "c": [1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6],
         }
     )
-    gb = dp.groupby(by="name")
+    gb = df.groupby(by="name")
 
-    return {"dp": dp, "sb": gb}
+    return {"df": df, "sb": gb}
 
 
 @pytest.fixture
 def explainby_testbed():
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "a": [1, 2, 2, 1, 3, 2, 3],
             "name": np.array(
@@ -41,14 +41,14 @@ def explainby_testbed():
         }
     )
     eb = ExplainBy(
-        data=dp,
+        data=df,
         by="name",
         scores={
             0: [1, 2, 3, 4, 5, 6, 7],
             1: [7, 6, 5, 4, 3, 2, 1],
         },
     )
-    return {"dp": dp, "sb": eb}
+    return {"df": df, "sb": eb}
 
 
 def test_rows_explainby(explainby_testbed):
@@ -108,15 +108,15 @@ def test_aggregate_w_id(sliceby_testbed):
 
     from meerkat.interactive.gui import Aggregation
 
-    aggregation = lambda dp: (dp["a"] + dp["b"]).mean()  # noqa: E731
+    aggregation = lambda df: (df["a"] + df["b"]).mean()  # noqa: E731
     aggregation = Aggregation(aggregation)
 
     response = client.post(
         f"/sliceby/{sb.id}/aggregate/",
-        json={"aggregation_id": aggregation.id, "accepts_dp": True},
+        json={"aggregation_id": aggregation.id, "accepts_df": True},
     )
 
     assert response.status_code == 200, response.text
     assert response.json() == {
-        "dp": {"connor": " 9.0", "liam": " 6.0", "owen": " 5.0", "sam": " 3.5"}
+        "df": {"connor": " 9.0", "liam": " 6.0", "owen": " 5.0", "sam": " 3.5"}
     }

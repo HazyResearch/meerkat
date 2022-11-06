@@ -1,20 +1,20 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import type { DataPanelBox, EditTarget } from '$lib/utils/types';
+	import type { DataFrameBox, EditTarget } from '$lib/utils/types';
 	import { get } from 'svelte/store';
-	import Cell from '$lib/components/cell/Cell.svelte';
-	import BasicCell from '$lib/components/cell/basic/Basic.svelte';
+	import Cell from '$lib/shared/cell/Cell.svelte';
+	import BasicCell from '$lib/shared/cell/basic/Basic.svelte';
 
 	const { get_rows, get_schema, edit_target } = getContext('Interface');
 
-	export let dp: Writable<DataPanelBox>;
+	export let df: Writable<DataFrameBox>;
 	export let idx: Writable<number>;
 	export let target: EditTarget;
 	export let cell_specs: Any = {};
 	export let title: string = "";
 
-	$: schema_promise = $get_schema($dp.box_id);
+	$: schema_promise = $get_schema($df.box_id);
        
 
 	$: target.target = get(target.target);
@@ -22,7 +22,7 @@
 	let rows_promise: any = null;
 	$: {
 		if ($idx !== null) {
-			rows_promise = $get_rows($dp.box_id, $idx, $idx + 1);
+			rows_promise = $get_rows($df.box_id, $idx, $idx + 1);
 		} else {
 			rows_promise = null;
 		}
@@ -30,7 +30,7 @@
 
 	let on_edit = async (event: any, column: string) => {
 		let modifications_promise = $edit_target(
-			$dp.box_id,
+			$df.box_id,
 			target,
 			event.detail.value,
 			column,

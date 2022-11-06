@@ -1,162 +1,182 @@
 <script lang="ts">
 	import type { RefreshCallback } from '$lib/api/callbacks';
-	import { filter,FilterCriterion,get_rows,get_schema,match,MatchCriterion,sort,type DataPanelSchema } from '$lib/api/datapanel';
-	import Tab from '$lib/components/header/Tab.svelte';
-	import Tabs from '$lib/components/header/Tabs.svelte';
-	import MatchHeader from '$lib/components/match_header/MatchHeader.svelte';
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import PlotHeader from '$lib/components/plot_header/PlotHeader.svelte';
-	import Table from '$lib/components/table/Table.svelte';
+	import {
+		filter,
+		FilterCriterion,
+		get_rows,
+		get_schema,
+		match,
+		MatchCriterion,
+		sort,
+		type DataFrameSchema
+	} from '$lib/api/dataframe';
+	import Tab from '$lib/shared/header/Tab.svelte';
+	import Tabs from '$lib/shared/header/Tabs.svelte';
+	import MatchHeader from '$lib/shared/match_header/MatchHeader.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
+	import PlotHeader from '$lib/shared/plot_header/PlotHeader.svelte';
+	import Table from '$lib/shared/table/Table.svelte';
 	import { api_url } from '../routes/network/stores';
-	import DummyBlock from './components/blocks/DummyBlock.svelte';
-import Everything from './components/blocks/Everything.svelte';
-	import FilterHeader from './components/filter_header/FilterHeader.svelte';
-	import Gallery from './components/gallery/Cards.svelte';
-	import CategoryGenerator from './components/lm/CategoryGenerator.svelte';
+	import DummyBlock from './shared/blocks/DummyBlock.svelte';
+	import Everything from './shared/blocks/Everything.svelte';
+	import FilterHeader from './shared/filter_header/FilterHeader.svelte';
+	import Gallery from './shared/gallery/Cards.svelte';
+	import CategoryGenerator from './shared/lm/CategoryGenerator.svelte';
 
-	export let datapanel_id: string;
+	export let dataframe_id: string;
 	export let nrows: number = 0;
 	export let page: number = 0;
 	export let per_page: number = 100;
 
-	const base_datapanel_id: string = datapanel_id;
+	const base_dataframe_id: string = dataframe_id;
 	let filter_criteria: Array<FilterCriterion> = [];
-	let match_criterion: MatchCriterion = new MatchCriterion("", "");  // TODO: clean this up to be null.
+	let match_criterion: MatchCriterion = new MatchCriterion('', ''); // TODO: clean this up to be null.
 
 	const refresh: RefreshCallback = async () => {
-		let curr_datapanel_id = base_datapanel_id
-		console.log(match_criterion)
-		console.log(filter_criteria)
+		let curr_dataframe_id = base_dataframe_id;
+		console.log(match_criterion);
+		console.log(filter_criteria);
 
 		// Run operations: match -> sort -> filter.
-		// match is performed first to ensure columns are added to the base datapanel.
+		// match is performed first to ensure columns are added to the base dataframe.
 		// TODO (arjundd): Figure out a way to put sorting after filtering for time efficiency.
 
-		let run_match: boolean = (match_criterion.query !== "") && (match_criterion.column !== "");
-		let run_filter: boolean = (filter_criteria.length > 0)
-		let sort_by_column: string = "";
+		let run_match: boolean = match_criterion.query !== '' && match_criterion.column !== '';
+		let run_filter: boolean = filter_criteria.length > 0;
+		let sort_by_column: string = '';
 
-		console.log("dp id start: ", curr_datapanel_id);
-		console.log("run_match: ", run_match);
-		
+		console.log('df id start: ', curr_dataframe_id);
+		console.log('run_match: ', run_match);
+
 		type PromiseLambda = {
 			(): Promise<any>;
-		}
+		};
 
 		let op_promises: Array<PromiseLambda> = [];
 		let op_names: Array<string> = [];
 		// Match.
 		if (run_match) {
+			// Push a promise that matches --> sorts --> updates dataframe_id
+			op_promises.push(async () => {
+				// Run match
+				let schema_after_match = await match($api_url, curr_dataframe_id, match_criterion);
 
-			// Push a promise that matches --> sorts --> updates datapanel_id
-			op_promises.push(
-				async () => {
-					// Run match
-					let schema_after_match = await match(
-						$api_url,
-						curr_datapanel_id,
-						match_criterion
-					)
-					
-					const previous_dp_id = curr_datapanel_id;
-					curr_datapanel_id = schema_after_match.id;
-					sort_by_column = schema_after_match.columns[0].name;
-					console.log("match: ", previous_dp_id, " -> ", curr_datapanel_id, sort_by_column);
+				const previous_df_id = curr_dataframe_id;
+				curr_dataframe_id = schema_after_match.id;
+				sort_by_column = schema_after_match.columns[0].name;
+				console.log('match: ', previous_df_id, ' -> ', curr_dataframe_id, sort_by_column);
 
-					let schema_after_sort = await sort(
-						$api_url, curr_datapanel_id, sort_by_column
-					);
-					
-					console.log("sort: ", curr_datapanel_id, " -> ", schema_after_sort.id);
-					curr_datapanel_id = schema_after_sort.id;
-				}
-			);
+				let schema_after_sort = await sort($api_url, curr_dataframe_id, sort_by_column);
 
-			op_names.push("match");
+				console.log('sort: ', curr_dataframe_id, ' -> ', schema_after_sort.id);
+				curr_dataframe_id = schema_after_sort.id;
+			});
+
+			op_names.push('match');
 		}
 		// Filter.
 		if (run_filter) {
-			op_promises.push(() => filter(
-				$api_url,
-				curr_datapanel_id,
-				filter_criteria
-			).then((schema: DataPanelSchema) => {
-				let previous_dp_id = curr_datapanel_id;
-				curr_datapanel_id = schema.id;
-				console.log("filter: ", previous_dp_id, " -> ", curr_datapanel_id,);
-			}));
-			op_names.push("filter");
+			op_promises.push(() =>
+				filter($api_url, curr_dataframe_id, filter_criteria).then((schema: DataFrameSchema) => {
+					let previous_df_id = curr_dataframe_id;
+					curr_dataframe_id = schema.id;
+					console.log('filter: ', previous_df_id, ' -> ', curr_dataframe_id);
+				})
+			);
+			op_names.push('filter');
 		}
 		// Sort.
 		// if (run_match) {
 		// 	op_promises.push(sort(
-		// 		$api_url, curr_datapanel_id, sort_by_column
-		// 	).then((schema: DataPanelSchema) => {
+		// 		$api_url, curr_dataframe_id, sort_by_column
+		// 	).then((schema: DataFrameSchema) => {
 		// 		console.log("sort, sort by col: ", sort_by_column)
-		// 		curr_datapanel_id = schema.id;
-		// 		console.log("sort: ", curr_datapanel_id);
+		// 		curr_dataframe_id = schema.id;
+		// 		console.log("sort: ", curr_dataframe_id);
 		// 	}));
 		// }
 		if (op_promises.length == 0) {
-			let promise = new Promise(() => {datapanel_id = base_datapanel_id})
-			return promise
+			let promise = new Promise(() => {
+				dataframe_id = base_dataframe_id;
+			});
+			return promise;
 		}
-		
-		console.log("op promise: ", op_promises[0])
-		console.log("Ops: ", op_promises)
-		console.log("Op names: ", op_names)
+
+		console.log('op promise: ', op_promises[0]);
+		console.log('Ops: ', op_promises);
+		console.log('Op names: ', op_names);
 		let op_promise: Promise<any> = op_promises[0]();
 		for (let i = 1; i < op_promises.length; i++) {
 			op_promise = op_promise.then(op_promises[i]);
 		}
-		op_promise.then(() => {datapanel_id = curr_datapanel_id;})
+		op_promise.then(() => {
+			dataframe_id = curr_dataframe_id;
+		});
 		return op_promise;
 	};
 
-	$: schema_promise = get_schema($api_url, datapanel_id).then(
-		(schema) => {
-			schema.columns = schema.columns.filter((column: any) => {
-				return !column.name.startsWith('__');
-			});
+	$: schema_promise = get_schema($api_url, dataframe_id).then((schema) => {
+		schema.columns = schema.columns.filter((column: any) => {
+			return !column.name.startsWith('__');
+		});
 		return schema;
 	});
-	$: rows_promise = get_rows($api_url, datapanel_id, page * per_page, (page + 1) * per_page);
+	$: rows_promise = get_rows($api_url, dataframe_id, page * per_page, (page + 1) * per_page);
 
 	let on_selection_change = async (event: CustomEvent) => {
 		/* Triggered when brush selection on scatter plot changes. */
 		// Update rows_promise: call get_rows again with the new selection (indices)
 		rows_promise = get_rows(
-			$api_url, base_datapanel_id, undefined, undefined, Array.from(event.detail.selected_points)
+			$api_url,
+			base_dataframe_id,
+			undefined,
+			undefined,
+			Array.from(event.detail.selected_points)
 		);
-		console.log("On Selection Change");
+		console.log('On Selection Change');
 		console.log(event.detail.selected_points);
-	}
+	};
 
 	let toggle_button: boolean = false;
 	$: active_view = toggle_button ? 'gallery' : 'table';
-	
 </script>
-
-
 
 <Tabs bind:toggle_button>
 	<Tab label="Match" id="match">
-		<MatchHeader bind:match_criterion={match_criterion} {schema_promise} refresh_callback={refresh} />
+		<MatchHeader bind:match_criterion {schema_promise} refresh_callback={refresh} />
 	</Tab>
 	<Tab label="Filter" id="filter">
-		<FilterHeader bind:filter_criteria={filter_criteria} {schema_promise} refresh_callback={refresh} />
+		<FilterHeader bind:filter_criteria {schema_promise} refresh_callback={refresh} />
 	</Tab>
 	<Tab label="Info" id="info">
-		<CategoryGenerator categories={["age", "ethnicity", "facial expression", "resolution", "blurry", "age", "ethnicity", "facial expression", "resolution", "blurry", "age", "ethnicity", "facial expression", "resolution", "blurry"]}></CategoryGenerator>
+		<CategoryGenerator
+			categories={[
+				'age',
+				'ethnicity',
+				'facial expression',
+				'resolution',
+				'blurry',
+				'age',
+				'ethnicity',
+				'facial expression',
+				'resolution',
+				'blurry',
+				'age',
+				'ethnicity',
+				'facial expression',
+				'resolution',
+				'blurry'
+			]}
+		/>
 	</Tab>
 	<Tab label="Block" id="block">
-		<Everything/>
+		<Everything />
 	</Tab>
 
 	<Tab label="Plot" id="plot">
 		<PlotHeader
 			bind:match_criterion
-			datapanel_id={base_datapanel_id}
+			dataframe_id={base_dataframe_id}
 			{rows_promise}
 			{schema_promise}
 			refresh_callback={refresh}

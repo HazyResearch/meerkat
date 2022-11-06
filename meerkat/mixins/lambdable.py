@@ -8,21 +8,21 @@ from meerkat.block.abstract import BlockView
 if TYPE_CHECKING:
     from meerkat.columns.abstract import AbstractColumn
     from meerkat.columns.lambda_column import LambdaColumn
-    from meerkat.datapanel import DataPanel
+    from meerkat.dataframe import DataFrame
 
 logger = logging.getLogger(__name__)
 
 
 @doc(data="data")
 def to_lambda(
-    data: Union["DataPanel", "AbstractColumn"],
+    data: Union["DataFrame", "AbstractColumn"],
     function: Callable,
     is_batched_fn: bool = False,
     batch_size: int = 1,
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
     output_type: Union[Mapping[str, type], type] = None,
-) -> Union["DataPanel", "LambdaColumn"]:
+) -> Union["DataFrame", "LambdaColumn"]:
     """_summary_
 
     Examples
@@ -41,19 +41,19 @@ def to_lambda(
             ``{data}`` to keyword arguments of ``function``. Ignored if ``{data}`` is a
             column. When calling ``function`` values from the columns will be fed to
             the corresponding keyword arguments. Defaults to None, in which case the
-            entire datapanel.
+            entire dataframe.
         outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the
             output of ``function`` is mapped to the returned
             :class:`LambdaColumn`(s). Defaults to None.
             * If ``None``, a single :class:`LambdaColumn` is returned.
-            * If a ``Dict[any, str]``, then a :class:`DataPanel` containing
+            * If a ``Dict[any, str]``, then a :class:`DataFrame` containing
             :class:`LambdaColumn`s is returned. This is useful when the output of
             ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
-            to column names in the resulting :class:`DataPanel`.
-            * If a ``Tuple[str]``, then a :class:`DataPanel` containing
+            to column names in the resulting :class:`DataFrame`.
+            * If a ``Tuple[str]``, then a :class:`DataFrame` containing
             :class:`LambdaColumn`s is returned. , This is useful when the output of
             ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
-            ``function`` to column names in the resulting :class:`DataPanel`.
+            ``function`` to column names in the resulting :class:`DataFrame`.
         output_type (Union[Dict[str, type], type], optional): _description_. Defaults
             to None.
 
@@ -66,13 +66,13 @@ def to_lambda(
     from meerkat import LambdaColumn
     from meerkat.block.lambda_block import LambdaBlock, LambdaOp
     from meerkat.columns.abstract import AbstractColumn
-    from meerkat.datapanel import DataPanel
+    from meerkat.dataframe import DataFrame
 
     # prepare arguments for LambdaOp
     if isinstance(data, AbstractColumn):
         args = [data]
         kwargs = {}
-    elif isinstance(data, DataPanel):
+    elif isinstance(data, DataFrame):
         if isinstance(inputs, Mapping):
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
@@ -105,7 +105,7 @@ def to_lambda(
         )
         return col
     elif isinstance(outputs, Mapping):
-        return DataPanel(
+        return DataFrame(
             {
                 col: LambdaColumn(
                     data=BlockView(block_index=output_key, block=block),
@@ -115,7 +115,7 @@ def to_lambda(
             }
         )
     elif isinstance(outputs, Sequence):
-        return DataPanel(
+        return DataFrame(
             {
                 col: LambdaColumn(data=BlockView(block_index=output_key, block=block))
                 for output_key, col in enumerate(outputs)
@@ -136,7 +136,7 @@ class LambdaMixin:
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
         output_type: Union[Mapping[str, type], type] = None,
-    ) -> Union["DataPanel", "LambdaColumn"]:
+    ) -> Union["DataFrame", "LambdaColumn"]:
         return to_lambda(
             data=self,
             function=function,

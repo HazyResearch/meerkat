@@ -20,6 +20,7 @@
 		"@types/d3": "^7.4.0",
 		"@types/d3-quadtree": "^3.0.2",
 		"@types/d3-selection": "^3.0.3",
+		"@types/prismjs": "^1.26.0",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
 		"@zerodevx/svelte-toast": "^0.7.2",

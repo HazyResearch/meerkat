@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Slider from '$lib/components/common/Slider.svelte';
+	import Slider from '$lib/shared/common/Slider.svelte';
 
 	export let size: number;
 	export let min_size: number = 6;

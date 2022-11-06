@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 from dataclasses import dataclass
-from typing import Mapping
 
 import numpy as np
 
@@ -22,14 +21,14 @@ LABEL_URL = "https://s3-us-west-2.amazonaws.com/dl.fbaipublicfiles.com/LVIS/lvis
 
 @dataclass
 class LVISDataset:
-    images: mk.DataPanel
-    annotations: mk.DataPanel
-    categories: mk.DataPanel
+    images: mk.DataFrame
+    annotations: mk.DataFrame
+    categories: mk.DataFrame
 
     @property
-    def tags(self) -> mk.DataPanel:
+    def tags(self) -> mk.DataFrame:
         tags = self.annotations["image_id", "category_id"].to_pandas().drop_duplicates()
-        tags = mk.DataPanel.from_pandas(tags).merge(
+        tags = mk.DataFrame.from_pandas(tags).merge(
             self.categories["id", "synset"], left_on="category_id", right_on="id"
         )
         tags["id"] = (
@@ -75,9 +74,9 @@ class lvis(DatasetBuilder):
         if out is not None:
             return out
 
-        image_dps = []
-        annot_dps = []
-        cat_dps = []
+        image_dfs = []
+        annot_dfs = []
+        cat_dfs = []
         for split in ["train", "val"]:
             dct = json.load(
                 open(
@@ -86,44 +85,44 @@ class lvis(DatasetBuilder):
                 )
             )
 
-            image_dp = mk.DataPanel(dct["images"])
-            image_dp["split"] = [split] * len(image_dp)
-            image_dps.append(image_dp)
+            image_df = mk.DataFrame(dct["images"])
+            image_df["split"] = [split] * len(image_df)
+            image_dfs.append(image_df)
 
-            annot_dp = mk.DataPanel(dct["annotations"])
+            annot_df = mk.DataFrame(dct["annotations"])
             if not self.include_segmentations:
-                annot_dp.remove_column("segmentation")
-            annot_dp["bbox"] = np.array(annot_dp["bbox"])
-            annot_dps.append(annot_dp)
+                annot_df.remove_column("segmentation")
+            annot_df["bbox"] = np.array(annot_df["bbox"])
+            annot_dfs.append(annot_df)
 
-            cat_dps.append(mk.DataPanel(dct["categories"]))
+            cat_dfs.append(mk.DataFrame(dct["categories"]))
 
-        image_dp = mk.concat(image_dps, axis=0)
+        image_df = mk.concat(image_dfs, axis=0)
 
         # need to merge in image column from 2014 COCO because splits are not the same
         # with 2017. Eventually, we should just require that people download 2017.
-        coco_dp = mk.get("coco", version="2014")
-        image_dp = image_dp.merge(coco_dp["id", "image"], on="id")
-        image_dp["image"].base_dir = self.var_dataset_dir
-        image_dp.data.reorder(
-            ["id", "image"] + [c for c in image_dp.columns if c not in ["id", "image"]]
+        coco_df = mk.get("coco", version="2014")
+        image_df = image_df.merge(coco_df["id", "image"], on="id")
+        image_df["image"].base_dir = self.var_dataset_dir
+        image_df.data.reorder(
+            ["id", "image"] + [c for c in image_df.columns if c not in ["id", "image"]]
         )
 
-        annot_dp = mk.concat(annot_dps, axis=0)
+        annot_df = mk.concat(annot_dfs, axis=0)
 
-        cat_dp = mk.concat(cat_dps, axis=0)
-        cat_dp = cat_dps[0]
-        cat_dp["val_image_count"] = cat_dps[1]["image_count"]
-        cat_dp["val_instance_count"] = cat_dps[1]["instance_count"]
-        cat_dp["train_image_count"] = cat_dps[0]["image_count"]
-        cat_dp["train_instance_count"] = cat_dps[0]["instance_count"]
-        cat_dp.remove_column("image_count")
-        cat_dp.remove_column("instance_count")
+        cat_df = mk.concat(cat_dfs, axis=0)
+        cat_df = cat_dfs[0]
+        cat_df["val_image_count"] = cat_dfs[1]["image_count"]
+        cat_df["val_instance_count"] = cat_dfs[1]["instance_count"]
+        cat_df["train_image_count"] = cat_dfs[0]["image_count"]
+        cat_df["train_instance_count"] = cat_dfs[0]["instance_count"]
+        cat_df.remove_column("image_count")
+        cat_df.remove_column("instance_count")
 
         out = LVISDataset(
-            images=image_dp,
-            annotations=annot_dp,
-            categories=cat_dp,
+            images=image_df,
+            annotations=annot_df,
+            categories=cat_df,
         )
 
         self._write_build_cache(out)
@@ -147,14 +146,14 @@ class lvis(DatasetBuilder):
             path = self._build_cache_path(k)
             if not os.path.exists(path):
                 return None
-            out[k] = mk.DataPanel.read(path)
+            out[k] = mk.DataFrame.read(path)
 
         return LVISDataset(**out)
 
     def _write_build_cache(self, out: LVISDataset):
         for k in ["images", "annotations", "categories"]:
-            dp = getattr(out, k)
-            dp.write(self._build_cache_path(k))
+            df = getattr(out, k)
+            df.write(self._build_cache_path(k))
 
     def download(self):
         os.makedirs(self.dataset_dir, exist_ok=True)

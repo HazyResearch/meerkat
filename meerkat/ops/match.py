@@ -1,12 +1,12 @@
 from typing import List, Optional, Tuple, Union
 
-from meerkat import AbstractColumn, DataPanel, PandasSeriesColumn
+from meerkat import AbstractColumn, DataFrame, PandasSeriesColumn
 
 from .embed import embed
 
 
 def match(
-    data: Union[DataPanel, AbstractColumn],
+    data: Union[DataFrame, AbstractColumn],
     query: Union[str, List[str], Tuple[str], PandasSeriesColumn],
     input: Optional[str] = None,
     input_modality: Optional[str] = None,
@@ -15,13 +15,13 @@ def match(
 ):
     """Match data to another column.
 
-    This operation adds q columns to the datapanel where q is the number of queries.
-    Note, if data is a datapanel, this operation is performed in-place.
+    This operation adds q columns to the dataframe where q is the number of queries.
+    Note, if data is a dataframe, this operation is performed in-place.
 
     Args:
-        data: A datapanel or column containing the data to embed.
+        data: A dataframe or column containing the data to embed.
         query: A single or multiple query strings to match against.
-        input: If ``data`` is a datapanel, the name of the column
+        input: If ``data`` is a dataframe, the name of the column
             to embed. If ``data`` is a column, then the parameter is ignored.
             Defaults to None.
         input_modality: The input modality. If None, infer from the input column.
@@ -30,7 +30,7 @@ def match(
             on match.
 
     Returns:
-        mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
+        mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
     encoder = "clip"

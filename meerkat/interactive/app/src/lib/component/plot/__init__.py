@@ -1,8 +1,7 @@
 from typing import Sequence, Union
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Pivot, Store, make_store
-from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Component
 
@@ -12,13 +11,13 @@ class Plot(Component):
 
     def __init__(
         self,
-        data: Pivot[DataPanel],
+        data: Pivot[DataFrame],
+        selection: Union[list, Store],
         x: Union[str, Store],
         y: Union[str, Store],
-        x_label: Union[str, Store] = None,
-        y_label: Union[str, Store] = None,
+        x_label: Union[str, Store],
+        y_label: Union[str, Store],
         id: Union[str, Store] = "key",
-        selection: Union[list, Store] = None,
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,
@@ -51,7 +50,7 @@ class Plot(Component):
     @property
     def props(self):
         props = {
-            "dp": self.data.config,
+            "df": self.data.config,
             "selection": self.selection.config,
             "x": self.x.config,
             "y": self.y.config,

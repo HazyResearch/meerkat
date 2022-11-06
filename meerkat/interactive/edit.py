@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from .graph import Pivot, PivotConfig
 from pydantic import BaseModel
+
+from .graph import Pivot, PivotConfig
 
 
 class EditTargetConfig(BaseModel):

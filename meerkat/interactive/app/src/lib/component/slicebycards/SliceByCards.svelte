@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DataPanelBox, SliceByBox } from '$lib/utils/types';
+	import type { DataFrameBox, SliceByBox } from '$lib/utils/types';
 
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
@@ -8,12 +8,12 @@
 	const { get_schema, get_sliceby_info, aggregate_sliceby } = getContext('Interface');
 
 	export let sliceby: Writable<SliceByBox>;
-	export let dp: Writable<DataPanelBox>;
+	export let df: Writable<DataFrameBox>;
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
 	export let aggregations: any;
 
-	$: schema_promise = $get_schema($dp.box_id);
+	$: schema_promise = $get_schema($df.box_id);
 	$: info_promise = $get_sliceby_info($sliceby.box_id);
 	let aggregations_promise = $aggregate_sliceby($sliceby.box_id, (aggregations = aggregations));
 </script>

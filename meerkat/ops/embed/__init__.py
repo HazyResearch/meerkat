@@ -18,18 +18,27 @@ __all__ = ["clip", "bit", "transformers", "robust", "embed"]
 
 
 def infer_modality(col: mk.AbstractColumn):
-
     if isinstance(col, mk.ImageColumn):
         return "image"
     elif isinstance(col, (mk.PandasSeriesColumn, str)):
         return "text"
+    elif isinstance(col, mk.ArrowArrayColumn):
+        import pyarrow
+
+        if isinstance(col[0], pyarrow.lib.StringScalar):
+            return "text"
     else:
-        raise ValueError(f"Cannot infer modality from column of type {type(col)}.")
+        raise ValueError(
+            f"Cannot infer modality \
+            from column of type {type(col)}. \
+            Please pass in the modality argument explicitly \
+            with `modality=text` or `modality=image`."
+        )
 
 
 # @cache(params=["encoder", "modality", ""])
 def embed(
-    data: Union[mk.DataPanel, mk.AbstractColumn, str, PIL.Image.Image],
+    data: Union[mk.DataFrame, mk.AbstractColumn, str, PIL.Image.Image],
     input: str = None,
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
@@ -38,34 +47,34 @@ def embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
-    pbar: bool = True, 
+    pbar: bool = True,
     **kwargs,
-) -> Union[mk.DataPanel, mk.AbstractColumn]:
+) -> Union[mk.DataFrame, mk.AbstractColumn]:
     """Embed a column of data with an encoder from the encoder registry.
 
     Examples
     --------
     Suppose you have an Image dataset (e.g. Imagenette, CIFAR-10) loaded into a
-    `Meerkat DataPanel <https://github.com/robustness-gym/meerkat>`_. You can embed the
+    `Meerkat DataFrame <https://github.com/robustness-gym/meerkat>`_. You can embed the
     images in the dataset with CLIP using a code snippet like:
 
     .. code-block:: python
 
         import meerkat as mk
 
-        dp = mk.datasets.get("imagenette")
+        df = mk.datasets.get("imagenette")
 
-        dp = mk.embed(
-            data=dp,
+        df = mk.embed(
+            data=df,
             input_col="img",
             encoder="clip"
         )
 
 
     Args:
-        data (Union[mk.DataPanel, mk.AbstractColumn]): A datapanel or column
+        data (Union[mk.DataFrame, mk.AbstractColumn]): A dataframe or column
             containing the data to embed.
-        input_col (str, optional): If ``data`` is a datapanel, the name of the column
+        input_col (str, optional): If ``data`` is a dataframe, the name of the column
             to embed. If ``data`` is a column, then the parameter is ignored. Defaults
             to None.
         encoder (Union[str, Encoder], optional): Name of the encoder to use. List
@@ -89,10 +98,13 @@ def embed(
             :func:`~domino._embed.clip`).
 
     Returns:
-        mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
+        mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
     col = data if isinstance(data, mk.AbstractColumn) else data[input]
+
+    if len(data) == 0:
+        return data
 
     device = choose_device(device)
 
@@ -100,8 +112,12 @@ def embed(
         out_col = f"{encoder}({input})"
 
     if modality is None:
-
         modality = infer_modality(col=col)
+
+        # TODO(karan): a hacky way to handle error with processing
+        # pyarrow.lib.StringScalars in a mk.ArrowArrayColumn
+        if modality == "text" and isinstance(col, mk.ArrowArrayColumn):
+            col = mk.PandasSeriesColumn(col.to_pandas())
 
     encoder = encoders.get(encoder, device=device, **kwargs)
 
@@ -122,7 +138,7 @@ def embed(
         pbar=pbar,
     )
 
-    if isinstance(data, mk.DataPanel):
+    if isinstance(data, mk.DataFrame):
         data[out_col] = out
         return data
     else:
@@ -138,7 +154,7 @@ def _embed(
     mmap_dir: str = None,
     num_workers: int = 0,
     batch_size: int = 128,
-    pbar: bool = True
+    pbar: bool = True,
 ):
     def _encode(x):
         return encode(_prepare_input(x)).cpu().detach().numpy()

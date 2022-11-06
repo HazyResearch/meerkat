@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import ScatterPlot from '$lib/components/plot/layercake/ScatterPlot.svelte';
+	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
 	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
-	import type { Point2D } from '$lib/components/plot/types';
+	import type { Point2D } from '$lib/shared/plot/types';
 
 	const { get_rows, remove_row_by_index } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let selection: Writable;
 	export let x: Writable;
 	export let y: Writable;
@@ -27,8 +27,8 @@
 	let metadata: Array<any> = [];
 	
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
-		// Fetch all the data from the datapanel for the columns to be plotted
-		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, $id, ...metadata_columns]);
+		// Fetch all the data from the dataframe for the columns to be plotted
+		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -55,7 +55,7 @@
 
 		return datum;
 	};
-	$: datum_promise = get_datum($dp.box_id);
+	$: datum_promise = get_datum($df.box_id);
 </script>
 
 <!-- TODO: Figure out the padding to put here.  -->
