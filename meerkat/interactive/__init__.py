@@ -1,6 +1,7 @@
 import pathlib
 
 from .app.src.lib.component.abstract import Component
+from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.document import Document
 from .app.src.lib.component.editor import Editor
@@ -70,4 +71,5 @@ __all__ = [
     "StatsLabeler",
     "Choice",
     "Textbox",
+    "Button",
 ]
