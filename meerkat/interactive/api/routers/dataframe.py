@@ -220,7 +220,6 @@ def edit_target(
     mask = np.isin(target_df[target.target_id_column], source_ids)
 
     if mask.sum() != (len(row_keys) if row_keys is not None else len(row_indices)):
-        breakpoint()
         raise HTTPException(
             status_code=500, detail="Target dataframe does not contain all source ids."
         )

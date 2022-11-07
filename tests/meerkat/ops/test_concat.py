@@ -10,10 +10,37 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import ConcatError
 
+
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
+from ..columns.abstract import AbstractColumnTestBed, column_parametrize
+from ..columns.test_arrow_column import ArrowArrayColumnTestBed
+from ..columns.test_cell_column import CellColumnTestBed
+from ..columns.test_image_column import ImageColumnTestBed
+from ..columns.test_lambda_column import LambdaColumnTestBed
+from ..columns.test_numpy_column import NumpyArrayColumnTestBed
+from ..columns.test_pandas_column import PandasSeriesColumnTestBed
+from ..columns.test_tensor_column import TensorColumnTestBed
 
 # flake8: noqa: E501
+
+
+@pytest.fixture(
+    **column_parametrize(
+        [
+            NumpyArrayColumnTestBed,
+            PandasSeriesColumnTestBed,
+            TensorColumnTestBed,
+            LambdaColumnTestBed,
+            ArrowArrayColumnTestBed,
+            CellColumnTestBed,
+            ImageColumnTestBed,
+        ]
+    )
+)
+def column_testbed(request, tmpdir):
+    testbed_class, config = request.param
+    return testbed_class(**config, tmpdir=tmpdir)
 
 
 @pytest.mark.parametrize(

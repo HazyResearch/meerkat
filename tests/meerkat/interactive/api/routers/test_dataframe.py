@@ -34,13 +34,13 @@ def test_get_schema(df_testbed):
                 "name": "a",
                 "type": "NumpyArrayColumn",
                 "cell_component": "basic",
-                "cell_props": {},
+                "cell_props": {"dtype": "int"},
             },
             {
                 "name": "b",
                 "type": "NumpyArrayColumn",
                 "cell_component": "basic",
-                "cell_props": {},
+                "cell_props": {"dtype": "int"},
             },
         ],
         "nrows": 10,
@@ -56,10 +56,10 @@ def test_rows(df_testbed):
     )
     assert response.status_code == 200
     assert response.json()["rows"] == [
-        [" 3", " 13", "[0. 0. 0. 0.]"],
-        [" 4", " 14", "[0. 0. 0. 0.]"],
-        [" 5", " 15", "[0. 0. 0. 0.]"],
-        [" 6", " 16", "[0. 0. 0. 0.]"],
+        [3, 13, "[0. 0. 0. 0.]"],
+        [4, 14, "[0. 0. 0. 0.]"],
+        [5, 15, "[0. 0. 0. 0.]"],
+        [6, 16, "[0. 0. 0. 0.]"],
     ]
     assert response.json()["indices"] == [3, 4, 5, 6]
     assert response.json()["full_length"] == 10
@@ -151,7 +151,7 @@ def test_edit_target_keys(column_type):
         ).dict(),
         "value": "100",
         "column": "value",
-        "row_keys": [15, 16, 18],
+        "row_keys": ["15", "16", "18"],
         "primary_key": "row_id_s",
     }
     response = client.post(f"/df/{pivot.id}/edit_target/", json=data)
@@ -210,16 +210,6 @@ def test_edit_target_missing_id(column_type):
     assert response.status_code == 500, response.json()
 
 
-def test_add(df_testbed):
-    df = df_testbed["df"]
-    df = Pivot(df)
-    response = client.post(
-        f"/df/{df.id}/add/",
-        json={"column": "z"},
-    )
-    assert response.status_code == 200
-
-
 def test_sort(df_testbed):
     df = df_testbed["df"]
     df["c"] = np.random.rand(10)
@@ -231,19 +221,25 @@ def test_sort(df_testbed):
             "name": "a",
             "type": "NumpyArrayColumn",
             "cell_component": "basic",
-            "cell_props": {},
+            "cell_props": {"dtype": "int"},
         },
         {
             "name": "b",
             "type": "NumpyArrayColumn",
             "cell_component": "basic",
-            "cell_props": {},
+            "cell_props": {"dtype": "int"},
+        },
+        {
+            "name": "clip(a)",
+            "type": "NumpyArrayColumn",
+            "cell_component": "basic",
+            "cell_props": {"dtype": "str"},
         },
         {
             "name": "c",
             "type": "NumpyArrayColumn",
             "cell_component": "basic",
-            "cell_props": {},
+            "cell_props": {"dtype": "float"},
         },
     ]
 
@@ -257,7 +253,7 @@ def test_aggregate_w_name(df_testbed, aggregation: str):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"a": 4.5, "b": 14.5}
+    assert response.json() == {"a": 4.5, "b": 14.5, "clip(a)": 0.0}
 
 
 def test_aggregate_w_id_accepts_df(df_testbed):

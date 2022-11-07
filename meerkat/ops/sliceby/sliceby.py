@@ -127,7 +127,7 @@ class SliceBy(IdentifiableMixin):
                 self.slices[slice_key][index], materialize=materialize
             )
         else:
-            sorted = self.data.lz[np.argsort(-self.slices[slice_key])]
+            sorted = self.data.lz[np.argsort(-np.array(self.slices[slice_key]))]
             return sorted._get(index, materialize=materialize)
 
     def get_slice_length(self, slice_key: SliceKey) -> int:

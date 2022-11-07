@@ -193,7 +193,7 @@ class NumpyArrayColumn(
         if self.dtype.type is np.str_:
             return NumpyArrayFormatter(dtype="str")
 
-        cell = self[0]
+        cell = self.data[0]
         if isinstance(cell, np.generic):
             return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
 

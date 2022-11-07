@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 
 from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
-from meerkat.columns.file_column import Downloader, FileCell, FileColumn
+from meerkat.columns.file_column import FileLoader, FileCell, FileColumn
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
@@ -150,7 +150,9 @@ def test_downloader(monkeypatch, tmpdir):
 
     monkeypatch.setattr(urllib.request, "urlretrieve", patched_urlretrieve)
 
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
+    downloader = FileLoader(
+        loader=Image.open, downloader="url", cache_dir=os.path.join(tmpdir, "cache")
+    )
 
     out = downloader("https://test.com/dir/2.jpg")
 
@@ -163,14 +165,8 @@ def test_downloader(monkeypatch, tmpdir):
     out = downloader("https://test.com/dir/3.jpg")
     assert len(ims) == 2
 
-    dill.dump(downloader, open(os.path.join(tmpdir, "cache", "downloader.pkl"), "wb"))
-    downloader = dill.load(open(os.path.join(tmpdir, "cache", "downloader.pkl"), "rb"))
 
-    # reload
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
-
-
-def test_unsuccessful_download(monkeypatch, tmpdir):
+def test_fallback_download(monkeypatch, tmpdir):
     import urllib
 
     def patched_urlretrieve(url, filename):
@@ -178,17 +174,43 @@ def test_unsuccessful_download(monkeypatch, tmpdir):
 
     monkeypatch.setattr(urllib.request, "urlretrieve", patched_urlretrieve)
 
-    downloader = Downloader(cache_dir=os.path.join(tmpdir, "cache"))
+    ims = []
+
+    def fallback(filename):
+        img_array = np.ones((4, 4, 3)).astype(np.uint8)
+        im = Image.fromarray(img_array)
+        ims.append(im)
+        im.save(filename)
+
+    downloader = FileLoader(
+        loader=Image.open,
+        downloader="url",
+        fallback_downloader=fallback,
+        cache_dir=os.path.join(tmpdir, "cache"),
+    )
+    with pytest.warns(UserWarning):
+        out = downloader("https://test.com/dir/2.jpg")
+
+    assert os.path.exists(os.path.join(tmpdir, "cache", "test.com/dir/2.jpg"))
+    assert (np.array(out) == np.array(ims[0])).all()
 
     out = downloader("https://test.com/dir/2.jpg")
-    assert out is None
+    assert len(ims) == 1
+
+    with pytest.warns(UserWarning):
+        out = downloader("https://test.com/dir/3.jpg")
+    assert len(ims) == 2
 
 
 def test_serialize_downloader(tmpdir):
-    downloader = Downloader(cache_dir="cache")
+    downloader = FileLoader(
+        loader=Image.open,
+        downloader="url",
+        cache_dir=os.path.join(tmpdir, "cache"),
+    )
 
     dill.dump(downloader, open(os.path.join(tmpdir, "downloader.pkl"), "wb"))
 
     downloader = dill.load(open(os.path.join(tmpdir, "downloader.pkl"), "rb"))
 
-    assert downloader.cache_dir == "cache"
+    assert downloader.cache_dir == os.path.join(tmpdir, "cache")

@@ -1059,3 +1059,10 @@ def test_repr_pandas(testbed, max_rows: int):
     df, _ = testbed.df._repr_pandas_()
     assert isinstance(df, pd.DataFrame)
     assert len(df) == min(len(df), max_rows + 1)
+
+
+def test_invalid_primary_key():
+    df = DataFrame({"a": NumpyArrayColumn([1, 2, 3])})
+
+    with pytest.raises(ValueError):
+        df.set_primary_key("a")

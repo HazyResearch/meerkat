@@ -270,6 +270,9 @@ class PandasSeriesColumn(
             return BasicFormatter(dtype=type(cell.item()).__name__)
 
         return BasicFormatter()
+    
+    def _is_valid_primary_key(self):
+        return self.data.is_unique
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"

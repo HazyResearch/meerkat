@@ -191,16 +191,15 @@ def call_count(monkeypatch):
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_single_lambda(call_count, consolidated):
     mgr = BlockManager()
-
     base_col = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(base_col, "a")
-    lambda_column = base_col.to_lambda(lambda x: x + 2)
-    mgr.add_column(lambda_column, "b")
+    # lambda_column = base_col.to_lambda(lambda x: x + 2)
+    # mgr.add_column(lambda_column, "b")
 
     if consolidated:
         mgr.consolidate()
 
-    mgr.apply(method_name="_get", index=1, materialize=False)
+    mgr.apply(method_name="_get", index=1, materialize=True)
 
     # we should only call NumpyBlock._get once
     assert call_count["count"] == 1

@@ -102,6 +102,14 @@ class AbstractColumn(
         if self.is_blockable():
             data = self._unpack_block_view(data)
         self._data = data
+    
+    def _is_valid_primary_key(self):
+        """Subclasses should implement checks for ensuring that the column could be used
+        as a valid primary key. Specifically, the check should ensure that the values
+        in the column are unique. If the check does not pass, returns False. 
+        If the subclass has not implemented this method.
+        """
+        return False
 
     @property
     def data(self):

@@ -160,6 +160,41 @@ class DataFrame(
     def columns(self):
         """Column names in the DataFrame."""
         return list(self.data.keys())
+    
+    @property
+    def primary_key(self):
+        if self._primary_key is None:
+            return None 
+
+        return self[self._primary_key]
+    
+    def set_primary_key(
+        self, 
+        column: str
+    ):
+        """ Set the DataFrame's primary key.
+
+        Note: 
+
+        Args:
+
+        """
+        
+        if column not in self.columns:
+            raise ValueError(
+                "Must pass the name of an existing column to `set_primary_key`."
+                f"\"{column}\" not in {self.columns}" 
+            )
+
+        if not self[column]._is_valid_primary_key():
+            raise ValueError(
+                f"Column \"{column}\" cannot be used as a primary key. Ensure that "
+                "columns of this type can be used as primary keys and that the values "
+                "in the column are unique."
+            )
+
+        self._primary_key = column 
+
 
     @property
     def nrows(self):

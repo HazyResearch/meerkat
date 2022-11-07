@@ -53,8 +53,9 @@ def explainby_testbed():
 
 def test_rows_explainby(explainby_testbed):
     sb = explainby_testbed["sb"]
+    sb_box = mk.gui.Pivot(sb)
     response = client.post(
-        f"/sliceby/{sb.id}/rows/",
+        f"/sliceby/{sb_box.id}/rows/",
         json={"slice_key": 0, "start": 0, "end": 2, "columns": ["b"]},
     )
     assert response.status_code == 200, response.text
@@ -64,11 +65,11 @@ def test_rows_explainby(explainby_testbed):
                 "name": "b",
                 "type": "NumpyArrayColumn",
                 "cell_component": "basic",
-                "cell_props": {},
+                "cell_props": {"dtype": "int"},
             }
         ],
         "indices": [0, 1],
-        "rows": [[" 7"], [" 6"]],
+        "rows": [[7], [6]],
         "full_length": 7,
     }
 
@@ -76,35 +77,38 @@ def test_rows_explainby(explainby_testbed):
 @pytest.mark.parametrize("aggregation", ["mean"])
 def test_aggregate_w_name(sliceby_testbed, aggregation: str):
     sb = sliceby_testbed["sb"]
+    sb_box = mk.gui.Pivot(sb)
     response = client.post(
-        f"/sliceby/{sb.id}/aggregate/",
+        f"/sliceby/{sb_box.id}/aggregate/",
         json={"aggregation": aggregation},
     )
 
     assert response.status_code == 200, response.text
     assert response.json() == {
-        "a": {"connor": " 2.5", "liam": " 2.5", "owen": " 1.0", "sam": " 1.5"},
-        "b": {"connor": " 6.5", "liam": " 3.5", "owen": " 4.0", "sam": " 2.0"},
-        "c": {"connor": " 7.05", "liam": " 4.3", "owen": " 4.3", "sam": " 1.55"},
+        "a": {"connor": 2.5, "liam": 2.5, "owen": 1.0, "sam": 1.5},
+        "b": {"connor": 6.5, "liam": 3.5, "owen": 4.0, "sam": 2.0},
+        "c": {"connor": 7.05, "liam": 4.300000000000001, "owen": 4.3, "sam": 1.55},
     }
 
 
 @pytest.mark.parametrize("aggregation", ["mean"])
 def test_aggregate_w_name_w_columns(sliceby_testbed, aggregation: str):
     sb = sliceby_testbed["sb"]
+    sb_box = mk.gui.Pivot(sb)
     response = client.post(
-        f"/sliceby/{sb.id}/aggregate/",
+        f"/sliceby/{sb_box.id}/aggregate/",
         json={"aggregation": aggregation, "columns": ["a"]},
     )
 
     assert response.status_code == 200, response.text
     assert response.json() == {
-        "a": {"connor": " 2.5", "liam": " 2.5", "owen": " 1.0", "sam": " 1.5"}
+        "a": {"connor": 2.5, "liam": 2.5, "owen": 1.0, "sam": 1.5}
     }
 
 
 def test_aggregate_w_id(sliceby_testbed):
     sb = sliceby_testbed["sb"]
+    sb_box = mk.gui.Pivot(sb)
 
     from meerkat.interactive.gui import Aggregation
 
@@ -112,11 +116,11 @@ def test_aggregate_w_id(sliceby_testbed):
     aggregation = Aggregation(aggregation)
 
     response = client.post(
-        f"/sliceby/{sb.id}/aggregate/",
+        f"/sliceby/{sb_box.id}/aggregate/",
         json={"aggregation_id": aggregation.id, "accepts_df": True},
     )
 
     assert response.status_code == 200, response.text
     assert response.json() == {
-        "df": {"connor": " 9.0", "liam": " 6.0", "owen": " 5.0", "sam": " 3.5"}
+        "df": {"connor": 9.0, "liam": 6.0, "owen": 5.0, "sam": 3.5}
     }

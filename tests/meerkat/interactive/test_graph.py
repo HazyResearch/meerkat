@@ -35,7 +35,7 @@ def test_trigger():
         ],
     )
 
-    assert len(modifications) == 4
+    assert len(modifications) == 6
     assert (derived_1.obj["a"] == np.arange(10, 20) * 2).all()
     assert (derived_2.obj["a"] == derived_1.obj["a"] * 3).all()
     assert (derived_3.obj["a"] == derived_2.obj["a"] + derived_1.obj["a"]).all()
