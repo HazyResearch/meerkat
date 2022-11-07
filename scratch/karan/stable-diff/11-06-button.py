@@ -58,5 +58,19 @@ def click_v4(
 
 output = click_v4(button.value, textbox.text)
 
+@mk.gui.interface_op(on=['button', other_button.value])
+def click_v5(
+    button: dict,
+    text: str,
+):
+    """Triggers when either button is clicked or if the textbox changes."""
+    print(button)
+    print(text)
+    print("Clicked!")
+    return button
+
+output = click_v5(button.value, textbox.text)
+breakpoint()
+
 mk.gui.start()
 mk.gui.Interface(components=[button, other_button, textbox]).launch()

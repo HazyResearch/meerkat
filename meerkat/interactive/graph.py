@@ -1,3 +1,4 @@
+import inspect
 from abc import ABC
 from collections import defaultdict
 from functools import partial, wraps
@@ -433,8 +434,8 @@ def interface_op(
     nested_return: bool = True,
     return_type: type = None,
     first_call: Any = None,
-    on: Union[Box, Store, List[Box], List[Store]] = None,
-    also_on: Union[Box, Store, List[Box], List[Store]] = None,
+    on: Union[Box, Store, str, List[Union[Box, Store, str]]] = None,
+    also_on: Union[Box, Store, List[Union[Box, Store]]] = None,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -466,6 +467,11 @@ def interface_op(
         on: A Box or Store, or a list of Boxes or Stores. When these are modified, the
             function will be called. *This will prevent the function from being
             triggered when its inputs are modified.*
+
+            Also accepts strings in addition to Boxes and Stores. If a string is passed,
+            then the function argument with the same name will be used as the Box or
+            Store. For example, if the function has an argument `df`, then you can pass
+            in `on="df"` to trigger the function when `df` is modified.
         also_on: A Box or Store, or a list of Boxes or Stores. When these are modified,
             the function will be called. *The function will continue to be
             triggered when its inputs are modified.*
@@ -558,6 +564,33 @@ def interface_op(
                     if isinstance(on, (Box, Store)):
                         on = [on]
                     _, _, boxes, stores = _unpack_boxes_and_stores(*on)
+                    _add_op_as_child(op, *boxes, *stores)
+
+                    # Find all the str elements in `on`
+                    # These are the names of fn arguments that were passed into `on`
+                    # We can first analyze the fn signature to figure out which
+                    # argument names are bound to what values (e.g. Box, Store, etc.)
+
+                    # Analyze the fn signature to figure out which argument names
+                    # are bound
+                    fn_signature = inspect.signature(fn)
+                    if on:
+                        assert all(
+                            [
+                                e in fn_signature.parameters
+                                for e in on
+                                if isinstance(e, str)
+                            ]
+                        ), "All strings passed into `on` must be arguments of the \
+                            decorated function."
+                    fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
+                    # Now we pull out the values of the arguments that were passed
+                    # into `on` and unpack them to get the boxes and stores
+                    _, _, boxes, stores = _unpack_boxes_and_stores(
+                        *[fn_bound_arguments[e] for e in on if isinstance(e, str)]
+                    )
+                    # ...and add this Operation node as a child of these
+                    # boxes and stores
                     _add_op_as_child(op, *boxes, *stores)
 
                 if also_on is not None:
