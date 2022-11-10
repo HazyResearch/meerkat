@@ -37,7 +37,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
-from meerkat.mixins.materialize import MaterializationMixin
+from meerkat.mixins.indexing import MaterializationMixin, IndexerMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
 
@@ -55,6 +55,7 @@ class DataFrame(
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
+    IndexerMixin,
     ProvenanceMixin,
 ):
     """Meerkat DataFrame class."""
@@ -80,6 +81,8 @@ class DataFrame(
         logger.debug("Creating DataFrame.")
 
         self.data = data
+
+        self._primary_key = None
 
     @property
     def gui(self):
@@ -160,41 +163,46 @@ class DataFrame(
     def columns(self):
         """Column names in the DataFrame."""
         return list(self.data.keys())
-    
+
     @property
-    def primary_key(self):
+    def primary_key(self) -> AbstractColumn:
+        """The column acting as the primary key."""
         if self._primary_key is None:
-            return None 
+            return None
 
         return self[self._primary_key]
-    
-    def set_primary_key(
-        self, 
-        column: str
-    ):
-        """ Set the DataFrame's primary key.
 
-        Note: 
+    def set_primary_key(self, column: str):
+        """ Set the DataFrame's primary key.
+        For more information on primary keys, see the User Guide. 
 
         Args:
-
+            column (str): The name of an existing column to set as the primary key.
         """
-        
+
         if column not in self.columns:
             raise ValueError(
                 "Must pass the name of an existing column to `set_primary_key`."
-                f"\"{column}\" not in {self.columns}" 
+                f'"{column}" not in {self.columns}'
             )
 
         if not self[column]._is_valid_primary_key():
             raise ValueError(
-                f"Column \"{column}\" cannot be used as a primary key. Ensure that "
+                f'Column "{column}" cannot be used as a primary key. Ensure that '
                 "columns of this type can be used as primary keys and that the values "
                 "in the column are unique."
             )
 
-        self._primary_key = column 
+        self._primary_key = column
 
+    def create_primary_key(self, column: str):
+        """Create a primary key of contiguous integers.
+        
+        Args:
+            column (str): The name of the column to create.
+        """
+        self[column] = np.arange(self.nrows)
+        self.set_primary_key(column)
 
     @property
     def nrows(self):
@@ -276,77 +284,95 @@ class DataFrame(
         """Get the last `n` examples of the DataFrame."""
         return self.lz[-n:]
 
-    def _get(self, index, materialize: bool = False):
-        if isinstance(index, str):
-            # str index => column selection (AbstractColumn)
-            if index in self.columns:
-                return self.data[index]
-            raise KeyError(f"Column `{index}` does not exist.")
+    def _get_loc(self, keyidx, materialize: bool = False):
+        if self.primary_key is None:
+            raise ValueError(
+                "Cannot use `loc` without a primary key. Set a primary key using "
+                "`set_primary_key`."
+            )
 
-        elif isinstance(index, int):
+        if isinstance(
+            keyidx, (np.ndarray, list, tuple, pd.Series, torch.Tensor, AbstractColumn)
+        ):
+            posidxs = self.primary_key._keyidxs_to_posidxs(keyidx)
+            return self._clone(
+                data=self.data.apply("_get", index=posidxs, materialize=materialize)
+            )
+
+        else:
+            posidx = self.primary_key._keyidx_to_posidx(keyidx)
+            row = self.data.apply("_get", index=posidx, materialize=materialize)
+            return {k: row[k] for k in self.columns}
+
+    def _get(self, posidx, materialize: bool = False):
+        if isinstance(posidx, str):
+            # str index => column selection (AbstractColumn)
+            if posidx in self.columns:
+                return self.data[posidx]
+            raise KeyError(f"Column `{posidx}` does not exist.")
+
+        elif isinstance(posidx, int):
             # int index => single row (dict)
-            return {
-                k: self.data.apply("_get", index=index, materialize=materialize)[k]
-                for k in self.columns
-            }
+            row = self.data.apply("_get", index=posidx, materialize=materialize)
+            return {k: row[k] for k in self.columns}
 
         # cases where `index` returns a dataframe
         index_type = None
-        if isinstance(index, slice):
+        if isinstance(posidx, slice):
             # slice index => multiple row selection (DataFrame)
             index_type = "row"
 
-        elif (isinstance(index, tuple) or isinstance(index, list)) and len(index):
+        elif (isinstance(posidx, tuple) or isinstance(posidx, list)) and len(posidx):
             # tuple or list index => multiple row selection (DataFrame)
-            if isinstance(index[0], str):
+            if isinstance(posidx[0], str):
                 index_type = "column"
             else:
                 index_type = "row"
 
-        elif isinstance(index, np.ndarray):
-            if len(index.shape) != 1:
+        elif isinstance(posidx, np.ndarray):
+            if len(posidx.shape) != 1:
                 raise ValueError(
-                    "Index must have 1 axis, not {}".format(len(index.shape))
+                    "Index must have 1 axis, not {}".format(len(posidx.shape))
                 )
             # numpy array index => multiple row selection (DataFrame)
             index_type = "row"
 
-        elif torch.is_tensor(index):
-            if len(index.shape) != 1:
+        elif torch.is_tensor(posidx):
+            if len(posidx.shape) != 1:
                 raise ValueError(
-                    "Index must have 1 axis, not {}".format(len(index.shape))
+                    "Index must have 1 axis, not {}".format(len(posidx.shape))
                 )
             # torch tensor index => multiple row selection (DataFrame)
             index_type = "row"
 
-        elif isinstance(index, pd.Series):
+        elif isinstance(posidx, pd.Series):
             index_type = "row"
 
-        elif isinstance(index, AbstractColumn):
+        elif isinstance(posidx, AbstractColumn):
             # column index => multiple row selection (DataFrame)
             index_type = "row"
 
         else:
-            raise TypeError("Invalid index type: {}".format(type(index)))
+            raise TypeError("Invalid index type: {}".format(type(posidx)))
 
         if index_type == "column":
-            if not set(index).issubset(self.columns):
-                missing_cols = set(index) - set(self.columns)
+            if not set(posidx).issubset(self.columns):
+                missing_cols = set(posidx) - set(self.columns)
                 raise KeyError(f"DataFrame does not have columns {missing_cols}")
 
-            df = self._clone(data=self.data[index])
+            df = self._clone(data=self.data[posidx])
             return df
         elif index_type == "row":  # pragma: no cover
             return self._clone(
-                data=self.data.apply("_get", index=index, materialize=materialize)
+                data=self.data.apply("_get", index=posidx, materialize=materialize)
             )
 
     # @capture_provenance(capture_args=[])
-    def __getitem__(self, index):
-        return self._get(index, materialize=True)
+    def __getitem__(self, posidx):
+        return self._get(posidx, materialize=True)
 
-    def __setitem__(self, index, value):
-        self.add_column(name=index, data=value, overwrite=True)
+    def __setitem__(self, posidx, value):
+        self.add_column(name=posidx, data=value, overwrite=True)
 
     def consolidate(self):
         self.data.consolidate()
@@ -940,7 +966,14 @@ class DataFrame(
     @classmethod
     def _state_keys(cls) -> Set[str]:
         """List of attributes that describe the state of the object."""
-        return set()
+        return {"_primary_key"}
+
+    def _set_state(self, state: dict):
+        self.__dict__.update(state)
+
+        # backwards compatibility for old dataframes
+        if "_primary_key" not in state:
+            self._primary_key = None
 
     def _view_data(self) -> object:
         return self.data.view()

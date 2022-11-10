@@ -781,8 +781,8 @@ def test_subclass():
     assert isinstance(df1.merge(df2, left_on="a", right_on="c"), DataFrameSubclass)
     assert isinstance(df1.append(df1), DataFrameSubclass)
 
-    assert df1._state_keys() == set(["name"])
-    assert df1._get_state() == {"name": "subclass"}
+    assert df1._state_keys() == set(["name", "_primary_key"])
+    assert df1._get_state() == {"name": "subclass", "_primary_key": None}
 
 
 def test_from_csv():
@@ -1061,8 +1061,69 @@ def test_repr_pandas(testbed, max_rows: int):
     assert len(df) == min(len(df), max_rows + 1)
 
 
+@product_parametrize(params={"column_type": [PandasSeriesColumn, NumpyArrayColumn]})
+def test_loc_single(testbed, column_type: type):
+    df = testbed.df
+    # int index => single row (dict)
+    index = 2
+    df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
+    df.set_primary_key("pk")
+
+    row = df.loc[str(index + 10)]
+    assert isinstance(row, dict)
+
+    for key, value in row.items():
+        if key == "pk":
+            continue
+        col_testbed = testbed.column_testbeds[key]
+        col_testbed.assert_data_equal(
+            value, col_testbed.get_data(index, materialize=False)
+        )
+
+@product_parametrize(params={"column_type": [PandasSeriesColumn, NumpyArrayColumn]})
+def test_loc_multiple(testbed, column_type):
+    df = testbed.df
+    # int index => single row (dict)
+    indices = np.array([2, 3])
+    df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
+    df.set_primary_key("pk")
+
+    loc_index = (indices + 10).astype(str)
+    new_df = df.loc[loc_index]
+    assert isinstance(new_df, DataFrame)
+
+    for key, value in new_df.items():
+        if key == "pk":
+            continue
+        col_testbed = testbed.column_testbeds[key]
+        data = col_testbed.get_data(indices, materialize=False)
+        col_testbed.assert_data_equal(value.data, data)
+
+
+def test_loc_missing():
+    df = DataFrame(
+        {"x": NumpyArrayColumn([1, 2, 3]), "y": PandasSeriesColumn([4, 5, 6])}
+    )
+    df.set_primary_key("y")
+
+    with pytest.raises(KeyError):
+        df.loc[1,2,4]
+
+
+def test_primary_key_persistence():
+    df = DataFrame(
+        {"a": PandasSeriesColumn(np.arange(16)), "b": PandasSeriesColumn(np.arange(16))}
+    )
+    df.set_primary_key("a")
+
+    df = df[:4]
+    df._primary_key == "a"
+    assert (df.primary_key == PandasSeriesColumn(np.arange(4))).all()
+
+
 def test_invalid_primary_key():
-    df = DataFrame({"a": NumpyArrayColumn([1, 2, 3])})
+    # multidimenmsional
+    df = DataFrame({"a": NumpyArrayColumn([[1, 2, 3]])})
 
     with pytest.raises(ValueError):
         df.set_primary_key("a")
