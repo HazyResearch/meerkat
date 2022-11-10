@@ -7,8 +7,9 @@ from meerkat import DataFrame
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.errors import ConcatError
 from meerkat.provenance import capture_provenance
+from .decorators import check_primary_key
 
-
+@check_primary_key
 @capture_provenance(capture_args=["axis"])
 def concat(
     objs: Union[Sequence[DataFrame], Sequence[AbstractColumn]],

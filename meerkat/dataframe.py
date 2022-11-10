@@ -179,6 +179,9 @@ class DataFrame(
         Args:
             column (str): The name of an existing column to set as the primary key.
         """
+        if column is None:
+            self._primary_key = None
+            return
 
         if column not in self.columns:
             raise ValueError(
@@ -256,6 +259,10 @@ class DataFrame(
 
         # Remove the column
         del self.data[column]
+
+        if column == self._primary_key:
+            # need to reset the primary key if we remove the column 
+            self.set_primary_key(None)
 
         logger.info(f"Removed column `{column}`.")
 

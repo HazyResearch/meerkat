@@ -1080,6 +1080,7 @@ def test_loc_single(testbed, column_type: type):
             value, col_testbed.get_data(index, materialize=False)
         )
 
+
 @product_parametrize(params={"column_type": [PandasSeriesColumn, NumpyArrayColumn]})
 def test_loc_multiple(testbed, column_type):
     df = testbed.df
@@ -1107,7 +1108,7 @@ def test_loc_missing():
     df.set_primary_key("y")
 
     with pytest.raises(KeyError):
-        df.loc[1,2,4]
+        df.loc[1, 2, 4]
 
 
 def test_primary_key_persistence():
@@ -1127,3 +1128,35 @@ def test_invalid_primary_key():
 
     with pytest.raises(ValueError):
         df.set_primary_key("a")
+
+
+def test_primary_key_reset():
+    df = DataFrame(
+        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+    )
+    df.set_primary_key("a")
+
+    df["a"] = NumpyArrayColumn(np.arange(16))
+    assert df._primary_key is None
+
+
+def test_check_primary_key_reset():
+    df = DataFrame(
+        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+    )
+    df.set_primary_key("a")
+
+    assert df.append(df).primary_key is None
+
+
+def test_check_primary_key_no_reset():
+    df = DataFrame(
+        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+    )
+    df.set_primary_key("a")
+
+    df2 = DataFrame(
+        {"a": NumpyArrayColumn(np.arange(16, 32)), "b": NumpyArrayColumn(np.arange(16))}
+    )
+
+    assert df.append(df2).primary_key is None
