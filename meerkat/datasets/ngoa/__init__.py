@@ -4,6 +4,7 @@ import subprocess
 import PIL
 
 import meerkat as mk
+from meerkat.columns.image_column import load_image
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
@@ -46,6 +47,7 @@ class ngoa(DatasetBuilder):
             db["published_images"]["iiifthumburl"],
             loader=mk.FileLoader(
                 downloader="url",
+                loader=load_image,
                 # replace images for which the download fails with a black image
                 fallback_downloader=_write_empty_image,
                 cache_dir=os.path.join(base_dir, "iiifthumburl"),
@@ -58,6 +60,7 @@ class ngoa(DatasetBuilder):
             ),
             loader=mk.FileLoader(
                 downloader="url",
+                loader=load_image,
                 cache_dir=os.path.join(base_dir, "iiifimage"),
                 # replace images for which the download fails with a black image
                 fallback_downloader=_write_empty_image,
