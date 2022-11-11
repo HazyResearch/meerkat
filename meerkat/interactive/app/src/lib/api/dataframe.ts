@@ -52,14 +52,14 @@ export async function get_rows(
     indices?: Array<number>,
     columns?: Array<string>
 ): Promise<DataFrameRows> {
-    console.log(`${api_url}/box/${dataframe_id}/rows`);
+    console.log(`${api_url}/ref/${dataframe_id}/rows`);
     console.log(`start: ${start}`);
     console.log(`end: ${end}`);
     console.log(`indices: ${indices}`);
     console.log(`columns: ${columns}`);
 
     return await post(
-        `${api_url}/box/${dataframe_id}/rows`,
+        `${api_url}/ref/${dataframe_id}/rows`,
         { start: start, end: end, indices: indices, columns: columns }
     );
 }
@@ -86,21 +86,21 @@ export async function filter(
     return await post(`${api_url}/df/${dataframe_id}/filter`, { columns: columns, values: values, ops: ops });
 }
 
-export async function filter_box(
+export async function filter_ref(
     api_url: string, 
-    box_id: string, 
+    ref_id: string, 
     filter_criteria: Array<FilterCriterion>
 ): Promise<DataFrameSchema> {
     const columns: Array<string> = filter_criteria.map(criterion => criterion.column);
     const values: Array<any> = filter_criteria.map(criterion => criterion.value);
     const ops: Array<string> = filter_criteria.map(criterion => criterion.op);
-    return await post(`${api_url}/box/${box_id}/filter`, { columns: columns, values: values, ops: ops });
+    return await post(`${api_url}/ref/${ref_id}/filter`, { columns: columns, values: values, ops: ops });
 }
 
-export async function undo_box(
+export async function undo_ref(
     api_url: string, 
-    box_id: string, 
+    ref_id: string, 
     operation_id: string
 ): Promise<DataFrameSchema> {
-    return await post(`${api_url}/box/${box_id}/undo`, { operation_id: operation_id });
+    return await post(`${api_url}/ref/${ref_id}/undo`, { operation_id: operation_id });
 }

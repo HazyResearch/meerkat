@@ -18,7 +18,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($df.box_id);
+		schema_promise = $get_schema($df.ref_id);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.filter((column) => {
 				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
@@ -37,8 +37,8 @@
 			return;
 		}
 		status = 'working';
-		let box_id = $df.box_id;
-		let promise = $match(box_id, $against, $text, col);
+		let ref_id = $df.ref_id;
+		let promise = $match(ref_id, $against, $text, col);
 		promise
 			.then(() => {
 				status = 'success';

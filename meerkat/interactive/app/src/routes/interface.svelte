@@ -45,12 +45,12 @@
 		return result;
 	};
 
-	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
-		return await post(`${$api_url}/df/${box_id}/schema`, { columns: columns });
+	$: get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
+		return await post(`${$api_url}/df/${ref_id}/schema`, { columns: columns });
 	};
 
 	$: get_rows = async (
-		box_id: string,
+		ref_id: string,
 		start?: number,
 		end?: number,
 		indices?: Array<number>,
@@ -58,7 +58,7 @@
 		key_column?: string,
 		keys?: Array<string | number>
 	) => {
-		let result = await post(`${$api_url}/df/${box_id}/rows`, {
+		let result = await post(`${$api_url}/df/${ref_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
@@ -69,19 +69,19 @@
 		return result;
 	};
 
-	$: add = async (box_id: string, column_name: string) => {
-		let modifications = await modify(`${$api_url}/df/${box_id}/add`, { column: column_name });
+	$: add = async (ref_id: string, column_name: string) => {
+		let modifications = await modify(`${$api_url}/df/${ref_id}/add`, { column: column_name });
 		return modifications;
 	};
 
 	$: edit = async (
-		box_id: string,
+		ref_id: string,
 		value: string | number,
 		column: string,
 		row_id: string | number,
 		id_column: string
 	) => {
-		let modifications = await modify(`${$api_url}/df/${box_id}/edit`, {
+		let modifications = await modify(`${$api_url}/df/${ref_id}/edit`, {
 			value: value,
 			column: column,
 			row_id: row_id,
@@ -91,7 +91,7 @@
 	};
 
 	$: edit_target = async (
-		box_id: string,
+		ref_id: string,
 		target: EditTarget,
 		value: any,
 		column: string,
@@ -100,7 +100,7 @@
 		primary_key: string,
 		metadata: any
 	) => {
-		let modifications = await modify(`${$api_url}/df/${box_id}/edit_target`, {
+		let modifications = await modify(`${$api_url}/df/${ref_id}/edit_target`, {
 			target: target,
 			value: value,
 			column: column,
@@ -112,8 +112,8 @@
 		return modifications;
 	};
 
-	$: match = async (box_id: string, input: string, query: string, col_out: Writable<string>) => {
-		let modifications = await modify(`${$api_url}/ops/${box_id}/match`, {
+	$: match = async (ref_id: string, input: string, query: string, col_out: Writable<string>) => {
+		let modifications = await modify(`${$api_url}/ops/${ref_id}/match`, {
 			input: input,
 			query: query,
 			col_out: col_out.store_id
@@ -121,27 +121,27 @@
 		return modifications;
 	};
 
-	$: get_sliceby_info = async (box_id: string) => {
-		return await get_request(`${$api_url}/sliceby/${box_id}/info`);
+	$: get_sliceby_info = async (ref_id: string) => {
+		return await get_request(`${$api_url}/sliceby/${ref_id}/info`);
 	};
 
 	$: get_sliceby_rows = async (
-		box_id: string,
+		ref_id: string,
 		slice_key: SliceKey,
 		start?: number,
 		end?: number
 	) => {
-		return await post(`${$api_url}/sliceby/${box_id}/rows`, {
+		return await post(`${$api_url}/sliceby/${ref_id}/rows`, {
 			slice_key: slice_key,
 			start: start,
 			end: end
 		});
 	};
 
-	$: aggregate_sliceby = async (box_id: string, aggregations: { string: { id: string } }) => {
+	$: aggregate_sliceby = async (ref_id: string, aggregations: { string: { id: string } }) => {
 		let out = Object();
 		for (const [name, aggregation] of Object.entries(aggregations)) {
-			out[name] = await post(`${$api_url}/sliceby/${box_id}/aggregate/`, {
+			out[name] = await post(`${$api_url}/sliceby/${ref_id}/aggregate/`, {
 				aggregation_id: aggregation.id,
 				accepts_df: true
 			});
@@ -149,8 +149,8 @@
 		return out;
 	};
 
-	$: remove_row_by_index = async (box_id: string, row_index: number) => {
-		let modifications = await modify(`${$api_url}/df/${box_id}/remove_row_by_index`, {
+	$: remove_row_by_index = async (ref_id: string, row_index: number) => {
+		let modifications = await modify(`${$api_url}/df/${ref_id}/remove_row_by_index`, {
 			row_index: row_index
 		});
 		return modifications;
@@ -237,12 +237,12 @@
 					global_stores.set(v.store_id, store);
 				}
 				return global_stores.get(v.store_id);
-			} else if (v.box_id !== undefined) {
-				if (!global_stores.has(v.box_id)) {
+			} else if (v.ref_id !== undefined) {
+				if (!global_stores.has(v.ref_id)) {
 					// add it to the global_stores Map if it isn't already there
-					global_stores.set(v.box_id, writable(v));
+					global_stores.set(v.ref_id, writable(v));
 				}
-				return global_stores.get(v.box_id);
+				return global_stores.get(v.ref_id);
 			}
 			return v;
 		});
@@ -259,12 +259,12 @@
 		// 				global_stores.set(v.store_id, store);
 		// 			}
 		// 			component.props[k] = global_stores.get(v.store_id);
-		// 		} else if (v.box_id !== undefined) {
-		// 			if (!global_stores.has(v.box_id)) {
+		// 		} else if (v.ref_id !== undefined) {
+		// 			if (!global_stores.has(v.ref_id)) {
 		// 				// add it to the global_stores Map if it isn't already there
-		// 				global_stores.set(v.box_id, writable(v));
+		// 				global_stores.set(v.ref_id, writable(v));
 		// 			}
-		// 			component.props[k] = global_stores.get(v.box_id);
+		// 			component.props[k] = global_stores.get(v.ref_id);
 		// 		}
 		// 	}
 		// }

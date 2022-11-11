@@ -33,7 +33,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($df.box_id);
+		schema_promise = $get_schema($df.ref_id);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {

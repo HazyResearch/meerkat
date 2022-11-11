@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Box, Store, interface_op, make_store
+from meerkat.interactive.graph import Reference, Store, interface_op, make_store
 
 from ..abstract import Component
 
@@ -162,7 +162,7 @@ class Filter(Component):
     Filtering criteria are maintained in a Store. On change of values
     in the store, the dataframe is filtered.
 
-    This component will return a Derived object, which can be used downstream.
+    This component will return a Reference object, which can be used downstream.
 
     We recommend performing filtering before other out-of-place operations,
     like sorting, to avoid unnecessary computation.
@@ -172,7 +172,7 @@ class Filter(Component):
 
     def __init__(
         self,
-        df: Box["DataFrame"],
+        df: Reference["DataFrame"],
         criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
         title: str = "",
     ):

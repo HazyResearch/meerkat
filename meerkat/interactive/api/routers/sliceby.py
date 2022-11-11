@@ -41,10 +41,10 @@ class InfoResponse(BaseModel):
         smart_union = True
 
 
-@router.get("/{box_id}/info/")
-def get_info(box_id: str) -> InfoResponse:
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
+@router.get("/{ref_id}/info/")
+def get_info(ref_id: str) -> InfoResponse:
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    sb = ref.obj
 
     return InfoResponse(
         id=sb.id,
@@ -66,14 +66,14 @@ class SliceByRowsRequest(BaseModel):
         smart_union = True
 
 
-@router.post("/{box_id}/rows/")
+@router.post("/{ref_id}/rows/")
 def get_rows(
-    box_id: str,
+    ref_id: str,
     request: SliceByRowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    sb = ref.obj
 
     slice_key = request.slice_key
     full_length = sb.get_slice_length(slice_key)
@@ -103,16 +103,16 @@ def get_rows(
     )
 
 
-@router.post("/{box_id}/aggregate/")
+@router.post("/{ref_id}/aggregate/")
 def aggregate(
-    box_id: str,
+    ref_id: str,
     aggregation_id: str = Body(None),
     aggregation: str = Body(None),
     accepts_df: bool = Body(False),
     columns: List[str] = Body(None),
 ) -> Dict:
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    sb = ref.obj
 
     sliceby = sb
     if columns is not None:

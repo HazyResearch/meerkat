@@ -20,13 +20,9 @@ from .app.src.lib.component.textbox import Textbox
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .edit import EditTarget
 from .graph import (
-    Box,
-    BoxConfig,
-    Derived,
-    DerivedConfig,
     Modification,
-    Pivot,
-    PivotConfig,
+    Reference,
+    ReferenceConfig,
     Store,
     StoreConfig,
     interface_op,
@@ -38,13 +34,9 @@ from .startup import start
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
-    "Box",
-    "BoxConfig",
+    "Reference",
+    "ReferenceConfig",
     "Modification",
-    "Pivot",
-    "PivotConfig",
-    "Derived",
-    "DerivedConfig",
     "Document",
     "Store",
     "StoreConfig",

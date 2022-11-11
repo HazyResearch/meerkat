@@ -29,7 +29,7 @@ export interface EditTarget {
 }
 
 export interface Box {
-    box_id: string
+    ref_id: string
     type: "SliceBy" | "DataFrame"
 }
 

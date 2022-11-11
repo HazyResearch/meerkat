@@ -3,7 +3,7 @@ import meerkat as mk
 df = mk.get("imagenette", version="160px")
 
 
-df_pivot = mk.gui.Pivot(df)
+df_pivot = mk.gui.Reference(df)
 
 gallery = mk.gui.Gallery(
     df_pivot,

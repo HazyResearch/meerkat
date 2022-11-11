@@ -21,11 +21,11 @@
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = $get_schema($df.box_id);
+	$: schema_promise = $get_schema($df.ref_id);
 
 	// create an array with the main_column and the tag_columns
 	$: rows_promise = $get_rows(
-		$df.box_id,
+		$df.ref_id,
 		page * per_page,
 		(page + 1) * per_page,
 		// TODO (Sabri): we should limit the columns only to the main_column and the 
@@ -43,7 +43,7 @@
 		let row_index = rows.indices.indexOf(row);
 		let row_id = rows.rows[row_index][row_id_column_index];
 
-		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
+		$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
 	}
 </script>
 

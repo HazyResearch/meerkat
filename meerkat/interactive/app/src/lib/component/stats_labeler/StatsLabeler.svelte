@@ -37,7 +37,7 @@
 		$df; // needed to trigger on df change
 		console.log(col)
 		counts_promise = $get_rows(
-			label_target.target.box_id,
+			label_target.target.ref_id,
 			undefined,
 			undefined,
 			undefined,
@@ -71,7 +71,7 @@
 
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
-				$df.box_id,
+				$df.ref_id,
 				label_target,
 				value,
 				col,
@@ -82,7 +82,7 @@
 			);
 		} else {
 			modifications_promise = $edit_target(
-				$df.box_id,
+				$df.ref_id,
 				label_target,
 				value,
 				col,
@@ -108,7 +108,7 @@
 	function handle_phase_change(event: CustomEvent) {
 		let new_phase: string = event.detail;
 		$edit_target(
-			phase_target.target.box_id,
+			phase_target.target.ref_id,
 			phase_target,
 			new_phase,
 			'phase',

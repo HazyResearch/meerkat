@@ -37,7 +37,7 @@ export async function modify(url: string, data: any): Promise<any> {
 
 export function apply_modifications(modifications: Array<any>) {
     for (let modification of modifications) {
-        if (modification.type === 'box') {
+        if (modification.type === 'ref') {
             // Box modification
             if (!global_stores.has(modification.id)) {
                 // derived objects may not be maintained on the frontend 

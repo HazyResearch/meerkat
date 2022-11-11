@@ -16,7 +16,7 @@ df["label"] = df["label"].to_pandas()
 # )
 # images = ngoa["published_images"].merge(emb_df, on="uuid")
 
-df_pivot = mk.gui.Pivot(df)
+df_pivot = mk.gui.Reference(df)
 
 df = mk.embed(
     df,

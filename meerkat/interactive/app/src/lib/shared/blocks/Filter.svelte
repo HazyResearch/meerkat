@@ -3,9 +3,9 @@ import type { FilterCriterion } from "$lib/api/dataframe";
 
     import { getContext } from "svelte";
     
-    const { dispatch, get_box } = getContext('Block');
+    const { dispatch, get_ref } = getContext('Block');
 
-    export let df_box_id: string;
+    export let df_ref_id: string;
     // let alias: string = 'df';
 
     let filter_args = {
@@ -36,7 +36,7 @@ import type { FilterCriterion } from "$lib/api/dataframe";
         // Dispatch filter when it's checked
         let return_value;
         if (checked) {
-            return_value = await dispatch("filter", df_box_id, filter_criteria);
+            return_value = await dispatch("filter", df_ref_id, filter_criteria);
             filter_undos[filter_id] = return_value.undo;
             console.log(return_value.undo);
             console.log(filter_undos[filter_id]);
@@ -45,10 +45,10 @@ import type { FilterCriterion } from "$lib/api/dataframe";
             console.log("Calling the unfilter");
             console.log(filter_undos[filter_id]);
             return_value = filter_undos[filter_id]();
-            // dispatch({ type: 'filter', payload: { filter, df_box_id, remove: true } });
+            // dispatch({ type: 'filter', payload: { filter, df_ref_id, remove: true } });
         }
         // Dispatch unfilter when it's unchecked
-        dispatch('filter', df_box_id, filter);
+        dispatch('filter', df_ref_id, filter);
     }
 </script>
 

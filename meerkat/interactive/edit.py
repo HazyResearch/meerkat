@@ -2,18 +2,18 @@ from dataclasses import dataclass
 
 from pydantic import BaseModel
 
-from .graph import Pivot, PivotConfig
+from .graph import Reference, ReferenceConfig
 
 
 class EditTargetConfig(BaseModel):
-    target: PivotConfig
+    target: ReferenceConfig
     target_id_column: str
     source_id_column: str
 
 
 @dataclass
 class EditTarget:
-    target: Pivot
+    target: Reference
     target_id_column: str
     source_id_column: str
 

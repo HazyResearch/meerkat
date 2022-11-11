@@ -20,7 +20,7 @@ class NodeMixin:
     Add this mixin to any class whose objects should be nodes
     in a graph.
 
-    This mixin is used in Box, Store and Operation to make
+    This mixin is used in Reference, Store and Operation to make
     them part of a computation graph.
     """
 
@@ -114,8 +114,8 @@ Storeable = Union[
 ]
 
 
-class BoxConfig(BaseModel):
-    box_id: str
+class ReferenceConfig(BaseModel):
+    ref_id: str
     type: str = "DataFrame"
     is_store: bool = True
 
@@ -123,12 +123,8 @@ class BoxConfig(BaseModel):
 T = TypeVar("T", "DataFrame", "SliceBy")
 
 
-class PivotConfig(BoxConfig):
-    pass
-
-
-class Box(IdentifiableMixin, NodeMixin, Generic[T]):
-    identifiable_group: str = "boxes"
+class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
+    identifiable_group: str = "refs"
 
     def __init__(self, obj):
         super().__init__()
@@ -136,7 +132,7 @@ class Box(IdentifiableMixin, NodeMixin, Generic[T]):
 
     @property
     def config(self):
-        return BoxConfig(box_id=self.id, type="DataFrame")
+        return ReferenceConfig(ref_id=self.id, type="DataFrame")
 
     @property
     def _(self):
@@ -153,7 +149,7 @@ class Box(IdentifiableMixin, NodeMixin, Generic[T]):
     @obj.setter
     def obj(self, obj: object):
         # TODO: make it this
-        # mod = BoxModification(id=self.id, scope=self.obj.columns)
+        # mod = ReferenceModification(id=self.id, scope=self.obj.columns)
         # mod.add_to_queue()
         self._obj = obj
 
@@ -164,21 +160,7 @@ class Box(IdentifiableMixin, NodeMixin, Generic[T]):
         return self.obj[key]
 
     def __repr__(self):
-        return f"Box({self.obj})"
-
-
-class Pivot(Box, Generic[T]):
-    def __repr__(self):
-        return f"Pivot({self.obj})"
-
-
-class DerivedConfig(BoxConfig):
-    pass
-
-
-class Derived(Box):
-    def __repr__(self):
-        return f"Derived({self.obj})"
+        return f"Reference({self.obj})"
 
 
 class StoreConfig(BaseModel):
@@ -280,39 +262,38 @@ def make_store(value: Union[str, Storeable]) -> Store:
     return value if isinstance(value, Store) else Store(value)
 
 
-def make_box(value: Union[any, Box]) -> Box:
+def make_ref(value: Union[any, Reference]) -> Reference:
     """
-    Make a Box.
+    Make a Reference.
 
-    If value is a Box, return it. Otherwise, return a
-    new Box that wraps value.
+    If value is a Reference, return it. Otherwise, return a
+    new Reference that wraps value.
 
     Args:
-        value (Union[any, Box]): The value to wrap.
+        value (Union[any, Reference]): The value to wrap.
 
     Returns:
-        Box: The Box wrapping value.
+        Reference: The Reference wrapping value.
     """
-    # TODO(karan): why is this calling Pivot(value)?
-    return value if isinstance(value, Box) else Pivot(value)
+    return value if isinstance(value, Reference) else Reference(value)
 
 
 class Modification(BaseModel, ABC):
     """
     Base class for modifications.
 
-    Modifications are used to track changes to Box and Store nodes
+    Modifications are used to track changes to Reference and Store nodes
     in the graph.
 
     Attributes:
-        id (str): The id of the Box or Store.
+        id (str): The id of the Reference or Store.
     """
 
     id: str
 
     @property
     def node(self):
-        """The Box or Store node that this modification is for."""
+        """The Reference or Store node that this modification is for."""
         raise NotImplementedError()
 
     def add_to_queue(self):
@@ -323,15 +304,15 @@ class Modification(BaseModel, ABC):
         state.modification_queue.add(self)
 
 
-class BoxModification(Modification):
+class ReferenceModification(Modification):
     scope: List[str]
-    type: str = "box"
+    type: str = "ref"
 
     @property
-    def node(self) -> Box:
+    def node(self) -> Reference:
         from meerkat.state import state
 
-        return state.identifiables.get(group="boxes", id=self.id)
+        return state.identifiables.get(group="refs", id=self.id)
 
 
 class StoreModification(Modification):
@@ -350,9 +331,9 @@ class Operation(NodeMixin):
     def __init__(
         self,
         fn: Callable,
-        args: List[Box],
-        kwargs: Dict[str, Box],
-        result: Derived,
+        args: List[Reference],
+        kwargs: Dict[str, Reference],
+        result: Reference,
         on=None,  # TODO: add support for on
     ):
         super().__init__()
@@ -366,13 +347,13 @@ class Operation(NodeMixin):
     def __call__(self) -> List[Modification]:
         """
         Execute the operation. Unpack the arguments and keyword arguments
-        and call the function. Then, update the result Box with the result
+        and call the function. Then, update the result Reference with the result
         and return a list of modifications.
 
-        These modifications describe the delta changes made to the result Box,
+        These modifications describe the delta changes made to the result Reference,
         and are used to update the state of the GUI.
         """
-        unpacked_args, unpacked_kwargs, _, _ = _unpack_boxes_and_stores(
+        unpacked_args, unpacked_kwargs, _, _ = _unpack_refs_and_stores(
             *self.args, **self.kwargs
         )
         update = self.fn(*unpacked_args, **unpacked_kwargs)
@@ -384,10 +365,10 @@ class Operation(NodeMixin):
 
 
 def _update_result(
-    result: Union[list, tuple, dict, Box, Store, Primitive],
-    update: Union[list, tuple, dict, Box, Store, Primitive],
+    result: Union[list, tuple, dict, Reference, Store, Primitive],
+    update: Union[list, tuple, dict, Reference, Store, Primitive],
     modifications: List[Modification],
-) -> Union[list, tuple, dict, Box, Store, Primitive]:
+) -> Union[list, tuple, dict, Reference, Store, Primitive]:
     """
     Update the result object with the update object. This recursive
     function will perform a nested update to the result with the update.
@@ -416,13 +397,13 @@ def _update_result(
         return {
             k: _update_result(v, update[k], modifications) for k, v in result.items()
         }
-    elif isinstance(result, Box):
-        # If the result is a Box, then we need to update the Box's object
-        # and return a BoxModification
+    elif isinstance(result, Reference):
+        # If the result is a Reference, then we need to update the Reference's object
+        # and return a ReferenceModification
         result.obj = update
         if isinstance(result.obj, DataFrame):
             modifications.append(
-                BoxModification(id=result.id, scope=result.obj.columns)
+                ReferenceModification(id=result.id, scope=result.obj.columns)
             )
         return result
     elif isinstance(result, Store):
@@ -445,7 +426,7 @@ def _update_result(
             modifications.append(StoreModification(id=result.id, value=update))
         return result
     else:
-        # If the result is not a Box or Store, then it is a primitive type
+        # If the result is not a Reference or Store, then it is a primitive type
         # and we can just return the update
         return update
 
@@ -459,7 +440,7 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         List[Modification]: The list of modifications that resulted from running the
             computation graph.
     """
-    # build a graph rooted at the stores and boxes in the modifications list
+    # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
     # Sort the nodes in topological order, and keep the Operation nodes
@@ -479,68 +460,68 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
     return modifications + new_modifications
 
 
-def _unpack_boxes_and_stores(*args, **kwargs):
+def _unpack_refs_and_stores(*args, **kwargs):
     # TODO(Sabri): this should be nested
-    boxes = []
+    refs = []
     stores = []
     unpacked_args = []
     for arg in args:
-        if isinstance(arg, Box):
-            boxes.append(arg)
+        if isinstance(arg, Reference):
+            refs.append(arg)
             unpacked_args.append(arg.obj)
         elif isinstance(arg, Store):
             stores.append(arg)
             unpacked_args.append(arg.value)
         elif isinstance(arg, list) or isinstance(arg, tuple):
-            unpacked_args_i, _, boxes_i, stores_i = _unpack_boxes_and_stores(*arg)
+            unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*arg)
             unpacked_args.append(unpacked_args_i)
-            boxes.extend(boxes_i)
+            refs.extend(refs_i)
             stores.extend(stores_i)
         elif isinstance(arg, dict):
-            _, unpacked_kwargs_i, boxes_i, stores_i = _unpack_boxes_and_stores(**arg)
+            _, unpacked_kwargs_i, refs_i, stores_i = _unpack_refs_and_stores(**arg)
             unpacked_args.append(unpacked_kwargs_i)
-            boxes.extend(boxes_i)
+            refs.extend(refs_i)
             stores.extend(stores_i)
         else:
             unpacked_args.append(arg)
 
     unpacked_kwargs = {}
     for k, v in kwargs.items():
-        if isinstance(v, Box):
-            boxes.append(v)
+        if isinstance(v, Reference):
+            refs.append(v)
             unpacked_kwargs[k] = v.obj
         elif isinstance(v, Store):
             stores.append(v)
             unpacked_kwargs[k] = v.value
         elif isinstance(v, list) or isinstance(v, tuple):
-            unpacked_args_i, _, boxes_i, stores_i = _unpack_boxes_and_stores(*v)
+            unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*v)
             unpacked_kwargs[k] = unpacked_args_i
-            boxes.extend(boxes_i)
+            refs.extend(refs_i)
             stores.extend(stores_i)
         elif isinstance(v, dict):
-            _, unpacked_kwargs_i, boxes_i, stores_i = _unpack_boxes_and_stores(**v)
+            _, unpacked_kwargs_i, refs_i, stores_i = _unpack_refs_and_stores(**v)
             unpacked_kwargs[k] = unpacked_kwargs_i
-            boxes.extend(boxes_i)
+            refs.extend(refs_i)
             stores.extend(stores_i)
         else:
             unpacked_kwargs[k] = v
 
-    return unpacked_args, unpacked_kwargs, boxes, stores
+    return unpacked_args, unpacked_kwargs, refs, stores
 
 
-def _has_box_or_store(arg):
-    if isinstance(arg, Box) or isinstance(arg, Store):
+def _has_ref_or_store(arg):
+    if isinstance(arg, Reference) or isinstance(arg, Store):
         return True
     elif isinstance(arg, list) or isinstance(arg, tuple):
-        return any([_has_box_or_store(a) for a in arg])
+        return any([_has_ref_or_store(a) for a in arg])
     elif isinstance(arg, dict):
-        return any([_has_box_or_store(a) for a in arg.values()])
+        return any([_has_ref_or_store(a) for a in arg.values()])
     else:
         return False
 
 
 def _nested_apply(obj: object, fn: callable, return_type: type = None):
-    if return_type is Store or return_type is Box:
+    if return_type is Store or return_type is Reference:
         return fn(obj, return_type=return_type)
 
     if isinstance(obj, list):
@@ -564,14 +545,14 @@ def _nested_apply(obj: object, fn: callable, return_type: type = None):
         return fn(obj, return_type=return_type)
 
 
-def _pack_boxes_and_stores(obj, return_type: type = None):
+def _pack_refs_and_stores(obj, return_type: type = None):
     if return_type is Store:
         return Store(obj)
-    elif return_type is Derived:
-        return Derived(obj)
+    elif return_type is Reference:
+        return Reference(obj)
 
     if isinstance(obj, (DataFrame, SliceBy)):
-        return Derived(obj)
+        return Reference(obj)
 
     # TODO(Sabri): we should think more deeply about how to handle nested outputs
     if obj is None or isinstance(obj, (int, float, str, bool)):
@@ -581,22 +562,22 @@ def _pack_boxes_and_stores(obj, return_type: type = None):
 
 def _add_op_as_child(
     op: Operation,
-    *boxes_and_stores: Union[Box, Store],
+    *refs_and_stores: Union[Reference, Store],
     triggers: bool = True,
 ):
     """
-    Add the operation as a child of the boxes and stores.
+    Add the operation as a child of the refs and stores.
 
     Args:
         op: The operation to add as a child.
-        boxes_and_stores: The boxes and stores to add the operation as a child
+        refs_and_stores: The refs and stores to add the operation as a child
             of.
-        triggers: Whether the operation is triggered by changes in the boxes
+        triggers: Whether the operation is triggered by changes in the refs
             and stores.
     """
-    for box_or_store in boxes_and_stores:
-        if isinstance(box_or_store, (Box, Store)):
-            box_or_store.add_child(op, triggers=triggers)
+    for ref_or_store in refs_and_stores:
+        if isinstance(ref_or_store, (Reference, Store)):
+            ref_or_store.add_child(op, triggers=triggers)
 
 
 def endpoint(fn: Callable = None):
@@ -605,15 +586,15 @@ def endpoint(fn: Callable = None):
         def wrapper(*args, **kwargs):
             """
             This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Box` object that wraps the output of the
-            function.
+            operation graph and returns a `Reference` object that wraps the
+            output of the function.
 
             Subsequent calls to the function will be handled by the graph.
             """
             # Run the function
             result = fn(*args, **kwargs)
 
-            # Update the boxes and stores and return modifications
+            # Update the refs and stores and return modifications
             # Get the modifications from the queue
             from meerkat.state import state
 
@@ -634,8 +615,8 @@ def interface_op(
     nested_return: bool = True,
     return_type: type = None,
     first_call: Any = None,
-    on: Union[Box, Store, str, List[Union[Box, Store, str]]] = None,
-    also_on: Union[Box, Store, List[Union[Box, Store]]] = None,
+    on: Union[Reference, Store, str, List[Union[Reference, Store, str]]] = None,
+    also_on: Union[Reference, Store, List[Union[Reference, Store]]] = None,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -670,9 +651,9 @@ def interface_op(
     Args:
         fn: The function to decorate.
         nested_return: Whether the function returns an object (e.g. List, Dict) with
-            a nested structure. If True, a `Store` or `Derived` will be created for
+            a nested structure. If True, a `Store` or `Reference` will be created for
             every element in the nested structure. If False, a single `Store` or
-            `Derived` wrapping the entire object will be created. For example, if the
+            `Reference` wrapping the entire object will be created. For example, if the
             function returns two DataFrames in a tuple, then `nested_return` should be
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
@@ -689,16 +670,17 @@ def interface_op(
             You can also pass in a function that returns the first call value. This
             function should take the same arguments as the function being decorated
             (or should absorb arguments with `*args, **kwargs`).
-        on: A Box or Store, or a list of Boxes or Stores. When these are modified, the
-            function will be called. *This will prevent the function from being
-            triggered when its inputs are modified.*
+        on: A Reference or Store, or a list of References or Stores. When these are
+            modified, the function will be called. *This will prevent the function from
+            being triggered when its inputs are modified.*
 
-            Also accepts strings in addition to Boxes and Stores. If a string is passed,
-            then the function argument with the same name will be used as the Box or
-            Store. For example, if the function has an argument `df`, then you can pass
-            in `on="df"` to trigger the function when `df` is modified.
-        also_on: A Box or Store, or a list of Boxes or Stores. When these are modified,
-            the function will be called. *The function will continue to be
+            Also accepts strings in addition to References and Stores. If a string is
+            passed, then the function argument with the same name will be used as the
+            Reference or Store. For example, if the function has an argument `df`,
+            then you can pass in `on="df"` to trigger the function when `df` is
+            modified.
+        also_on: A Reference or Store, or a list of References or Stores. When these are
+            modified, the function will be called. *The function will continue to be
             triggered when its inputs are modified.*
 
     Returns:
@@ -731,8 +713,8 @@ def interface_op(
         def wrapper(*args, **kwargs):
             """
             This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Box` object that wraps the output of the
-            function.
+            operation graph and returns a `Reference` object that wraps the
+            output of the function.
 
             Subsequent calls to the function will be handled by the graph.
             """
@@ -742,7 +724,7 @@ def interface_op(
             nonlocal on, also_on
 
             # TODO(Sabri): this should be nested
-            unpacked_args, unpacked_kwargs, boxes, stores = _unpack_boxes_and_stores(
+            unpacked_args, unpacked_kwargs, refs, stores = _unpack_refs_and_stores(
                 *args, **kwargs
             )
 
@@ -759,23 +741,23 @@ def interface_op(
                 result = fn(*unpacked_args, **unpacked_kwargs)
 
             # Setup an Operation node if any of the
-            # args or kwargs were boxes or stores
+            # args or kwargs were refs or stores
             if (
-                (len(boxes) > 0 or len(stores) > 0)
+                (len(refs) > 0 or len(stores) > 0)
                 or on is not None
                 or also_on is not None
             ):
 
-                # The result should be placed inside a Store or Derived
-                # (or a nested object) containing Stores and Deriveds.
+                # The result should be placed inside a Store or Reference
+                # (or a nested object) containing Stores and References.
                 # Then we can update the contents of this result when the
                 # function is called again.
                 if nested_return:
                     derived = _nested_apply(
-                        result, fn=_pack_boxes_and_stores, return_type=return_type
+                        result, fn=_pack_refs_and_stores, return_type=return_type
                     )
                 elif isinstance(result, (DataFrame, SliceBy)):
-                    derived = Derived(result)
+                    derived = Reference(result)
                 else:
                     derived = Store(result)
 
@@ -783,29 +765,30 @@ def interface_op(
                 op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
 
                 if on is None:
-                    # Add this Operation node as a child of all of the boxes and stores
+                    # Add this Operation node as a child of all of the refs and stores
                     # regardless of the value of `also_on`
-                    _add_op_as_child(op, *boxes, *stores, triggers=True)
+                    _add_op_as_child(op, *refs, *stores, triggers=True)
                 else:
-                    # Add this Operation node as a child of all of the boxes and stores
+                    # Add this Operation node as a child of all of the refs and stores
                     # that are passed into the function. However, these children
                     # are non-triggering, meaning that the Operation node will
-                    # only be called when the boxes and stores in `on` are modified,
+                    # only be called when the refs and stores in `on` are modified,
                     # and not otherwise.
-                    _add_op_as_child(op, *boxes, *stores, triggers=False)
+                    _add_op_as_child(op, *refs, *stores, triggers=False)
 
-                    # Add this Operation node as a child of the boxes and stores
+                    # Add this Operation node as a child of the refs and stores
                     # passed into `on`. These will trigger the Operation!
                     # TODO(Sabri): this should be nested
-                    if isinstance(on, (Box, Store)):
+                    if isinstance(on, (Reference, Store)):
                         on = [on]
-                    _, _, boxes, stores = _unpack_boxes_and_stores(*on)
-                    _add_op_as_child(op, *boxes, *stores, triggers=True)
+                    _, _, refs, stores = _unpack_refs_and_stores(*on)
+                    _add_op_as_child(op, *refs, *stores, triggers=True)
 
                     # Find all the str elements in `on`
                     # These are the names of fn arguments that were passed into `on`
                     # We can first analyze the fn signature to figure out which
-                    # argument names are bound to what values (e.g. Box, Store, etc.)
+                    # argument names are bound to what values
+                    # (e.g. Reference, Store, etc.)
 
                     # Analyze the fn signature to figure out which argument names
                     # are bound
@@ -821,22 +804,22 @@ def interface_op(
                             decorated function."
                     fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
                     # Now we pull out the values of the arguments that were passed
-                    # into `on` and unpack them to get the boxes and stores
-                    _, _, boxes, stores = _unpack_boxes_and_stores(
+                    # into `on` and unpack them to get the refs and stores
+                    _, _, refs, stores = _unpack_refs_and_stores(
                         *[fn_bound_arguments[e] for e in on if isinstance(e, str)]
                     )
                     # ...and add this Operation node as a child of these
-                    # boxes and stores
-                    _add_op_as_child(op, *boxes, *stores, triggers=True)
+                    # refs and stores
+                    _add_op_as_child(op, *refs, *stores, triggers=True)
 
                 if also_on is not None:
-                    # Add this Operation node as a child of the boxes and stores
+                    # Add this Operation node as a child of the refs and stores
                     # passed into `also_on`
                     # TODO(Sabri): this should be nested
-                    if isinstance(also_on, (Box, Store)):
+                    if isinstance(also_on, (Reference, Store)):
                         also_on = [also_on]
-                    _, _, boxes, stores = _unpack_boxes_and_stores(*also_on)
-                    _add_op_as_child(op, *boxes, *stores, triggers=True)
+                    _, _, refs, stores = _unpack_refs_and_stores(*also_on)
+                    _add_op_as_child(op, *refs, *stores, triggers=True)
 
                 return derived
 

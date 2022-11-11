@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List, Union
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Box, make_box, make_store
+from meerkat.interactive.graph import Reference, make_ref, make_store
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
@@ -32,21 +32,25 @@ class SliceByCards(Component):
 
     def __init__(
         self,
-        sliceby: Box[SliceBy],
+        sliceby: Reference[SliceBy],
         main_column: str,
         tag_columns: List[str] = None,
         aggregations: Dict[str, Callable[["DataFrame"], Union[int, float, str]]] = None,
-        df: Box["DataFrame"] = None,  # required to support passing in an external box
+        df: Reference[
+            "DataFrame"
+        ] = None,  # required to support passing in an external ref
     ) -> None:
         super().__init__()
-        self.sliceby = make_box(sliceby)
+        self.sliceby = make_ref(sliceby)
 
         if df is None:
             df = self.sliceby.obj.data
         else:
-            assert self.sliceby.obj.data is (df.obj if isinstance(df, Box) else df)
+            assert self.sliceby.obj.data is (
+                df.obj if isinstance(df, Reference) else df
+            )
 
-        self.df = make_box(df)
+        self.df = make_ref(df)
 
         if aggregations is None:
             aggregations = {}

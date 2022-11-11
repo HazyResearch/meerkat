@@ -7,7 +7,7 @@ from fastapi import APIRouter, Body, HTTPException
 import meerkat as mk
 from meerkat.dataframe import DataFrame
 from meerkat.interactive import Modification, trigger
-from meerkat.interactive.graph import BoxModification, StoreModification
+from meerkat.interactive.graph import ReferenceModification, StoreModification
 from meerkat.state import state
 
 EmbeddedBody = functools.partial(Body, embed=True)
@@ -61,20 +61,20 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     return queries, op
 
 
-@router.post("/{box_id}/match/")
+@router.post("/{ref_id}/match/")
 def match(
-    box_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
+    ref_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
 ) -> List[Modification]:
     """Match a query string against a DataFrame column.
 
     The `dataframe_id` remains the same as the original request.
     """
-    box = state.identifiables.get(group="boxes", id=box_id)
+    ref = state.identifiables.get(group="refs", id=ref_id)
 
-    df = box.obj
+    df = ref.obj
     if not isinstance(df, DataFrame):
         raise HTTPException(
-            status_code=400, detail="`match` expects a box containing a dataframe"
+            status_code=400, detail="`match` expects a ref containing a dataframe"
         )
 
     try:
@@ -98,7 +98,7 @@ def match(
         raise HTTPException(status_code=404, detail=str(e))
 
     modifications = [
-        BoxModification(id=box_id, scope=match_columns),
+        ReferenceModification(id=ref_id, scope=match_columns),
     ]
 
     if col_out is not None:
@@ -120,13 +120,13 @@ def match(
 
 @router.post("/{pivot_id}/add/")
 def add_column(pivot_id: str, column: str = EmbeddedBody()):
-    pivot = state.identifiables.get(group="boxes", id=pivot_id)
+    pivot = state.identifiables.get(group="refs", id=pivot_id)
     df = pivot.obj
 
     import numpy as np
 
     df[column] = np.zeros(len(df))
 
-    modifications = [Modification(box_id=pivot_id, scope=[column])]
+    modifications = [Modification(ref_id=pivot_id, scope=[column])]
     modifications = trigger(modifications)
     return modifications

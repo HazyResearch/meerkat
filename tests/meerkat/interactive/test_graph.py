@@ -1,7 +1,12 @@
 import numpy as np
 
 import meerkat as mk
-from meerkat.interactive.graph import BoxModification, Pivot, interface_op, trigger
+from meerkat.interactive.graph import (
+    Reference,
+    ReferenceModification,
+    interface_op,
+    trigger,
+)
 
 
 @interface_op
@@ -18,20 +23,20 @@ def test_trigger():
     df_1 = mk.DataFrame({"a": np.arange(10)})
     df_2 = mk.DataFrame({"a": np.arange(10)})
 
-    box_1 = Pivot(df_1)
-    box_2 = Pivot(df_2)
+    ref_1 = Reference(df_1)
+    ref_2 = Reference(df_2)
 
-    derived_1 = binary_op(box_1, box_2)
+    derived_1 = binary_op(ref_1, ref_2)
     derived_2 = unary_op(derived_1)
     derived_3 = binary_op(derived_1, derived_2)
-    derived_4 = binary_op(derived_3, box_2)
+    derived_4 = binary_op(derived_3, ref_2)
 
-    box_1.obj = mk.DataFrame({"a": np.arange(10, 20)})
-    box_2.obj = mk.DataFrame({"a": np.arange(10, 20)})
+    ref_1.obj = mk.DataFrame({"a": np.arange(10, 20)})
+    ref_2.obj = mk.DataFrame({"a": np.arange(10, 20)})
     modifications = trigger(
         [
-            BoxModification(id=box_1.id, scope=[]),
-            BoxModification(id=box_2.id, scope=[]),
+            ReferenceModification(id=ref_1.id, scope=[]),
+            ReferenceModification(id=ref_2.id, scope=[]),
         ],
     )
 
