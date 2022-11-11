@@ -227,6 +227,16 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
     def __call__(self, *args, **kwargs):
+        # Any Stores or References that are passed in as arguments
+        # should have this Endpoint as a non-triggering child
+        for arg in args:
+            if isinstance(arg, (Store, Reference)):
+                arg.add_child(self, triggers=False)
+
+        for kwarg in kwargs.values():
+            if isinstance(kwarg, (Store, Reference)):
+                kwarg.add_child(self, triggers=False)
+
         return partial(self.fn, *args, **kwargs)
 
     @staticmethod
