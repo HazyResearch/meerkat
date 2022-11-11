@@ -581,6 +581,58 @@ def _add_op_as_child(
 
 
 def endpoint(fn: Callable = None):
+    """
+    Decorator to mark a function as an endpoint.
+
+    An endpoint is a function that can be called to
+        - update the value of a Store (e.g. incrementing a counter)
+        - update an object referenced by a Reference (e.g. editing the
+            contents of a DataFrame)
+        - run a computation and return its result to the frontend
+        - run a function in response to a frontend event (e.g. button
+            click)
+
+    Endpoints differ from operations in that they are not automatically
+    triggered by changes in their inputs. Instead, they are triggered by
+    explicit calls to the endpoint function.
+
+    The Store and Reference objects that are modified inside the endpoint
+    function will automatically trigger operations in the graph that
+    depend on them.
+
+    Warning: Due to this, we do not recommend running endpoints manually
+    in your Python code. This can lead to unexpected behavior e.g.
+    running an endpoint inside an operation may change a Store or
+    Reference  that causes the operation to be triggered repeatedly,
+    leading to an infinite loop.
+
+    Almost all use cases can be handled by using the frontend to trigger
+    endpoints.
+
+    .. code-block:: python
+
+        @endpoint
+        def increment(count: Store, step: int = 1):
+            count._ += step
+            # ^ update the count Store, which will trigger operations
+            #   that depend on it
+
+            # return the updated value to the frontend
+            return count._
+
+        # Now you can create a button that calls the increment endpoint
+        counter = Store(0)
+        button = Button(on_click=increment(counter))
+        # ^ read this as: call the increment endpoint with the counter
+        # Store when the button is clicked
+
+    Args:
+        fn: The function to decorate.
+
+    Returns:
+        The decorated function, as an Endpoint object.
+    """
+
     def _endpoint(fn: Callable):
         @wraps(fn)
         def wrapper(*args, **kwargs):
