@@ -238,6 +238,9 @@ class DataFrame(
             f"set `overwrite=True` to overwrite."
         )
 
+        if not is_listlike(data):
+            data = [data] * self.nrows
+
         if name in self.columns:
             self.remove_column(name)
 
@@ -1022,3 +1025,17 @@ class DataFrame(
         from meerkat.ops.aggregate.aggregate import aggregate
 
         return aggregate(self, function="mean", nuisance=nuisance, *args, **kwargs)
+
+
+def is_listlike(obj) -> bool:
+    """Check if the object is listlike.
+
+    Args:
+        obj (object): The object to check.
+    
+    Return:
+        bool: True if the object is listlike, False otherwise.
+    """
+    is_column = isinstance(obj, AbstractColumn)
+    is_sequential = (hasattr(obj, "__len__") and hasattr(obj, "__getitem__") and not isinstance(obj, str))
+    return is_column or is_sequential

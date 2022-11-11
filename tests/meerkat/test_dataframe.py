@@ -1160,3 +1160,24 @@ def test_check_primary_key_no_reset():
     )
 
     assert df.append(df2).primary_key is None
+
+
+@pytest.mark.parametrize("x", [0, 0., "hello world", np.nan, np.inf])
+def test_scalar_setitem(x):
+    df = DataFrame(
+        {"a": NumpyArrayColumn(np.arange(16))}
+    )
+    df["extra_column"] = x
+
+    assert len(df["extra_column"]) == len(df)
+    if isinstance(x, str):
+        assert isinstance(df["extra_column"], PandasSeriesColumn)
+    else:
+        assert isinstance(df["extra_column"], NumpyArrayColumn)
+    if not isinstance(x, str) and (np.isnan(x) or np.isinf(x)):
+        if np.isnan(x):
+            assert np.all(np.isnan(df["extra_column"]))
+        elif np.isinf(x):
+            assert np.all(np.isinf(df["extra_column"]))
+    else:
+        assert all(df["extra_column"] == x)
