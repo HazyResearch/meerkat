@@ -10,6 +10,7 @@ from tqdm import tqdm
 from meerkat.dataframe import DataFrame
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
+from meerkat.state import state
 from meerkat.tools.utils import nested_apply
 
 
@@ -24,7 +25,8 @@ class NodeMixin:
     them part of a computation graph.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # The children of this node: this is a dictionary
         # mapping children to a boolean indicating whether
         # the child is triggered when this node is triggered.
@@ -126,7 +128,7 @@ T = TypeVar("T", "DataFrame", "SliceBy")
 class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "refs"
 
-    def __init__(self, obj):
+    def __init__(self, obj: T):
         super().__init__()
         self._obj = obj
 
@@ -139,7 +141,7 @@ class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
         return self.obj
 
     @_.setter
-    def _(self, obj: object):
+    def _(self, obj: T):
         self.obj = obj
 
     @property
@@ -147,17 +149,19 @@ class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
         return self._obj
 
     @obj.setter
-    def obj(self, obj: object):
+    def obj(self, obj: T):
         # TODO: make it this
         # mod = ReferenceModification(id=self.id, scope=self.obj.columns)
         # mod.add_to_queue()
         self._obj = obj
 
-    def __getattr__(self, name):
-        return getattr(self.obj, name)
+    # def __getattr__(self, name):
+    #     if name == "_obj":
+    #         return self._obj
+    #     return getattr(self.obj, name)
 
-    def __getitem__(self, key):
-        return self.obj[key]
+    # def __getitem__(self, key):
+    #     return self.obj[key]
 
     def __repr__(self):
         return f"Reference({self.obj})"
@@ -676,8 +680,16 @@ def endpoint(fn: Callable = None):
             args, kwargs, _, _ = _unpack_refs_and_stores(**fn_args_to_unpack)
 
             # Don't unpack the refs and stores that were type hinted
+            # Pull them out of the bound arguments, and if they were
+            # passed in as ids, convert them to the actual objects
             fn_args_as_is = {
                 k: v
+                if isinstance(v, (Store, Reference))
+                else (
+                    state.identifiables.get(v, group="stores")
+                    if k in stores
+                    else state.identifiables.get(v, group="refs")
+                )
                 for k, v in fn_bound_arguments.items()
                 if k in stores or k in references
             }
@@ -689,10 +701,7 @@ def endpoint(fn: Callable = None):
             # Run the function
             result = fn(*args, **{**kwargs, **fn_args_as_is})
 
-            # Update the refs and stores and return modifications
             # Get the modifications from the queue
-            from meerkat.state import state
-
             modifications = state.modification_queue.queue
 
             # Trigger the modifications
@@ -700,7 +709,11 @@ def endpoint(fn: Callable = None):
             return result
 
         # Register the endpoint and return it
-        return Endpoint(wrapper)
+        from pydantic import validate_arguments
+
+        return Endpoint(
+            validate_arguments(config=dict(arbitrary_types_allowed=True))(wrapper)
+        )
 
     return _endpoint(fn)
 
