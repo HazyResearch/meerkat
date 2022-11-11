@@ -79,10 +79,10 @@ class DataFrame(
             **kwargs,
         )
         logger.debug("Creating DataFrame.")
+        self._primary_key = None
 
         self.data = data
 
-        self._primary_key = None
 
     @property
     def gui(self):
@@ -154,6 +154,11 @@ class DataFrame(
             raise ValueError(
                 f"Cannot set DataFrame `data` to object of type {type(value)}."
             )
+        
+        # check that the primary key is still valid after data reset
+        if self._primary_key is not None:
+            if self._primary_key not in self or not self.primary_key._is_valid_primary_key():
+                self.set_primary_key(None)
 
     @data.setter
     def data(self, value):

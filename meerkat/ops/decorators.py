@@ -12,7 +12,7 @@ def check_primary_key(fn: callable):
         out = fn(*args, **kwargs)
 
         if isinstance(out, DataFrame) and out.primary_key is not None:
-            if not out.primary_key._is_valid_primary_key():
+            if out._primary_key not in out or not out.primary_key._is_valid_primary_key():
                 out.set_primary_key(None)
         return out 
 
