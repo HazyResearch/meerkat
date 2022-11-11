@@ -634,6 +634,15 @@ def endpoint(fn: Callable = None):
     """
 
     def _endpoint(fn: Callable):
+
+        stores = set()
+        references = set()
+        for name, annot in inspect.getfullargspec(fn).annotations.items():
+            if isinstance(annot, type) and issubclass(annot, Store):
+                stores.add(name)
+            if isinstance(annot, type) and issubclass(annot, Reference):
+                references.add(name)
+
         @wraps(fn)
         def wrapper(*args, **kwargs):
             """
@@ -643,8 +652,32 @@ def endpoint(fn: Callable = None):
 
             Subsequent calls to the function will be handled by the graph.
             """
+            # Keep the arguments that were not annotated to be stores or
+            # references
+            fn_signature = inspect.signature(fn)
+            fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
+
+            # Unpack the args and kwargs to get the refs and stores
+            fn_args_to_unpack = {
+                k: v
+                for k, v in fn_bound_arguments.items()
+                if k not in stores and k not in references
+            }
+            args, kwargs, _, _ = _unpack_refs_and_stores(**fn_args_to_unpack)
+
+            # Don't unpack the refs and stores that were type hinted
+            fn_args_as_is = {
+                k: v
+                for k, v in fn_bound_arguments.items()
+                if k in stores or k in references
+            }
+            assert all(
+                [isinstance(v, (Store, Reference)) for v in fn_args_as_is.values()]
+            ), "All arguments that are type hinted as stores or references \
+                must be Store or Reference objects."
+
             # Run the function
-            result = fn(*args, **kwargs)
+            result = fn(*args, **{**kwargs, **fn_args_as_is})
 
             # Update the refs and stores and return modifications
             # Get the modifications from the queue

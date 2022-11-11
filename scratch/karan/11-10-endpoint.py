@@ -10,7 +10,7 @@ def increment(count: mk.gui.Store, step: int):
 
 store = mk.gui.Store(0)
 choice = mk.gui.Choice(value=1, choices=[1, 2, 3])
-button = mk.gui.Button(on_click=increment(store, choice.value._))
+button = mk.gui.Button(on_click=increment(store, choice.value))
 
 
 @mk.gui.interface_op
