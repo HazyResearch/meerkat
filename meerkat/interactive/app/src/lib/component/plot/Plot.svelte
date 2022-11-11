@@ -26,9 +26,9 @@
 	// of key-value pairs.
 	let metadata: Array<any> = [];
 	
-	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
+	let get_datum = async (ref_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
+		let rows = await $get_rows(ref_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -55,7 +55,7 @@
 
 		return datum;
 	};
-	$: datum_promise = get_datum($df.box_id);
+	$: datum_promise = get_datum($df.ref_id);
 </script>
 
 <!-- TODO: Figure out the padding to put here.  -->

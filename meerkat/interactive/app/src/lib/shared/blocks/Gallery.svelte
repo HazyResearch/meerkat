@@ -1,26 +1,26 @@
 <script lang="ts">
     import { getContext } from "svelte";
-    import { _data, _boxes } from './stores.js';
+    import { _data, _refs } from './stores.js';
 
-    const { get_box } = getContext('Block');
+    const { get_ref } = getContext('Block');
 
-    export let df_box_id: string;
+    export let df_ref_id: string;
     
     // letValue: str;
-    // _boxes[df_box_id].subscribe(
+    // _refs[df_ref_id].subscribe(
     //     value => {
     //         console.log(value);
     //         store_value = value;
     //     }
     // );
 
-    // $: df_box_id_store = _boxes.get(df_box_id);
-    $: df_promise = $get_box(df_box_id); //console.log(letValue)}
+    // $: df_ref_id_store = _refs.get(df_ref_id);
+    $: df_promise = $get_ref(df_ref_id); //console.log(letValue)}
 
-    // // Why is there a $ in front of get_box?
-    // // neither get_box nor df_box_id are changing, so we wouldn't expected
+    // // Why is there a $ in front of get_ref?
+    // // neither get_ref nor df_ref_id are changing, so we wouldn't expected
     // // df_promise to be updated
-    // $: df_promise = $get_box(df_box_id);
+    // $: df_promise = $get_ref(df_ref_id);
 
 </script>
 

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class Choice(Component):
-    """A choice box."""
+    """A choice ref."""
 
     name: str = "Choice"
 

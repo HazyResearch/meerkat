@@ -11,7 +11,7 @@ from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive import Modification, trigger
 from meerkat.interactive.edit import EditTargetConfig
-from meerkat.interactive.graph import BoxModification
+from meerkat.interactive.graph import ReferenceModification
 from meerkat.state import state
 
 from ....tools.utils import convert_to_python
@@ -45,7 +45,7 @@ class SchemaResponse(BaseModel):
 
 @router.post("/{pivot_id}/schema/")
 def schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
-    pivot = state.identifiables.get(group="boxes", id=pivot_id)
+    pivot = state.identifiables.get(group="refs", id=pivot_id)
 
     df = state.identifiables.get(group="dataframes", id=pivot.obj.id)
     columns = df.columns if request is None else request.columns
@@ -88,9 +88,9 @@ class RowsResponse(BaseModel):
     full_length: int
 
 
-@router.post("/{box_id}/rows/")
+@router.post("/{ref_id}/rows/")
 def rows(
-    box_id: str,
+    ref_id: str,
     start: int = Body(None),
     end: int = Body(None),
     indices: List[int] = Body(None),
@@ -99,8 +99,8 @@ def rows(
     columns: List[str] = Body(None),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    box = state.identifiables.get(group="boxes", id=box_id)
-    df = box.obj
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    df = ref.obj
 
     full_length = len(df)
     column_infos = _get_column_infos(df, columns)
@@ -141,48 +141,50 @@ def rows(
     )
 
 
-@router.post("/{box_id}/remove_row_by_index/")
+@router.post("/{ref_id}/remove_row_by_index/")
 def remove_row_by_index(
-    box_id: str, row_index: int = EmbeddedBody()
+    ref_id: str, row_index: int = EmbeddedBody()
 ) -> List[Modification]:
-    box = state.identifiables.get(group="boxes", id=box_id)
+    ref = state.identifiables.get(group="refs", id=ref_id)
 
-    df = box.obj
+    df = ref.obj
     df = df.lz[np.arange(len(df)) != row_index]
-    # this is an out-of-place operation, so the box should be updated
+    # this is an out-of-place operation, so the ref should be updated
     # TODO(karan): double check this
-    box.obj = df
+    ref.obj = df
 
     modifications = trigger(
-        modifications=[BoxModification(id=box_id, scope=df.columns)]
+        modifications=[ReferenceModification(id=ref_id, scope=df.columns)]
     )
     return modifications
 
 
-@router.post("/{box_id}/edit/")
+@router.post("/{ref_id}/edit/")
 def edit(
-    box_id: str,
+    ref_id: str,
     value=Body(),  # don't set type
     column: str = Body(),
     row_id=Body(),
     id_column: str = Body(),
 ) -> List[Modification]:
 
-    box = state.identifiables.get(group="boxes", id=box_id)
-    df = box.obj
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    df = ref.obj
 
     mask = df[id_column] == row_id
     if mask.sum() == 0:
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
     df[column][mask] = value
 
-    modifications = trigger(modifications=[BoxModification(id=box_id, scope=[column])])
+    modifications = trigger(
+        modifications=[ReferenceModification(id=ref_id, scope=[column])]
+    )
     return modifications
 
 
-@router.post("/{box_id}/edit_target/")
+@router.post("/{ref_id}/edit_target/")
 def edit_target(
-    box_id: str,
+    ref_id: str,
     target: EditTargetConfig = Body(),
     value=Body(),  # don't set type
     column: str = Body(),
@@ -204,9 +206,9 @@ def edit_target(
             detail="Exactly one of row_indices or row_keys must be specified",
         )
 
-    df = state.identifiables.get(group="boxes", id=box_id).obj
+    df = state.identifiables.get(group="refs", id=ref_id).obj
 
-    target_df = state.identifiables.get(group="boxes", id=target.target.box_id).obj
+    target_df = state.identifiables.get(group="refs", id=target.target.ref_id).obj
 
     if row_indices is not None:
         source_ids = df[target.source_id_column][row_indices]
@@ -251,7 +253,7 @@ def edit_target(
             target_df[column_name][mask] = value
 
     modifications = trigger(
-        modifications=[BoxModification(id=target.target.box_id, scope=[column])]
+        modifications=[ReferenceModification(id=target.target.ref_id, scope=[column])]
     )
     return modifications
 

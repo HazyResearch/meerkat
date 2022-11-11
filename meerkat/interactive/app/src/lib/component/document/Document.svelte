@@ -31,13 +31,13 @@
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the $text_column
-	$: text_df_promise = $get_rows($df.box_id, 0, null, null, [$text_column]);
+	$: text_df_promise = $get_rows($df.ref_id, 0, null, null, [$text_column]);
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the $paragraph_column if it's not null
 	let paragraph_df_promise: any;
 	$: if ($paragraph_column) {
-		paragraph_df_promise = $get_rows($df.box_id, 0, null, null, [$paragraph_column]);
+		paragraph_df_promise = $get_rows($df.ref_id, 0, null, null, [$paragraph_column]);
 	}
 
 	// Fetch data for the `df` dataframe
@@ -47,7 +47,7 @@
 	$: if ($label_column) {
 		// The name of the id_column was told to us by the edit_target
 		id_column = edit_target.source_id_column;
-		label_id_df_promise = $get_rows($df.box_id, 0, null, null, [$label_column, id_column]);
+		label_id_df_promise = $get_rows($df.ref_id, 0, null, null, [$label_column, id_column]);
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)
@@ -118,7 +118,7 @@
 													class:text-red-100={label === 0}
 													on:click={() => {
 														label = 0;
-														$edit(get(edit_target.target).box_id, 0, $label_column, id, id_column);
+														$edit(get(edit_target.target).ref_id, 0, $label_column, id, id_column);
 													}}
 												>
 													<CloseOutline size={32} />
@@ -129,7 +129,7 @@
 													class:text-emerald-100={label === 1}
 													on:click={() => {
 														label = 1;
-														$edit(get(edit_target.target).box_id, 1, $label_column, id, id_column);
+														$edit(get(edit_target.target).ref_id, 1, $label_column, id, id_column);
 													}}
 												>
 													<CheckmarkOutline size={32} />
@@ -140,7 +140,7 @@
 													class:text-orange-100={label === 2}
 													on:click={() => {
 														label = 2;
-														$edit(get(edit_target.target).box_id, 2, $label_column, id, id_column);
+														$edit(get(edit_target.target).ref_id, 2, $label_column, id, id_column);
 													}}
 												>
 													<Help size={32} />

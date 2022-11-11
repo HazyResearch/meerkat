@@ -3,12 +3,12 @@ import { get_rows } from "$lib/api/dataframe.js";
 
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
-    import { filter_box, undo_box } from "$lib/api/dataframe";
+    import { filter_ref, undo_ref } from "$lib/api/dataframe";
     import { api_url } from '$lib/../routes/network/stores.js';
 
-    import { _data, _boxes } from './stores.js';
+    import { _data, _refs } from './stores.js';
 
-    // export let alias_to_box_id = new Map();
+    // export let alias_to_ref_id = new Map();
 
     // DataFrames that will be used by shared in this block
     // Should be an object, mapping 
@@ -33,27 +33,27 @@ import { get_rows } from "$lib/api/dataframe.js";
     // The dispatch function will make all calls to the backend
     // (called `actions`)
     // TODO: add an object containing all possible dispatchable actions
-    let dispatch = async (action, box_id, args) => {
-        console.log("dispatch", action, box_id, args);
+    let dispatch = async (action, ref_id, args) => {
+        console.log("dispatch", action, ref_id, args);
         let update;
         if (action === 'filter') {
-            // Set of updated box ids are returned by teh backend
-            update = await filter_box($api_url, box_id, args);
+            // Set of updated ref ids are returned by teh backend
+            update = await filter_ref($api_url, ref_id, args);
             console.log(update)
         } else if (action === 'unfilter') {
-            // Set of updated box ids are returned by teh backend
-            update = await undo_box($api_url, box_id, args);
+            // Set of updated ref ids are returned by teh backend
+            update = await undo_ref($api_url, ref_id, args);
         }
-        console.log(_boxes);
-        let box_store = _boxes[update.box_id];
-        console.log(box_store);
-        box_store.set(update.op_id);
+        console.log(_refs);
+        let ref_store = _refs[update.ref_id];
+        console.log(ref_store);
+        ref_store.set(update.op_id);
         console.log("Went through dispatch");
-        console.log(get(box_store))
+        console.log(get(ref_store))
 
         return {
             'undo': () => {
-                dispatch('unfilter', update.box_id, update.op_id)
+                dispatch('unfilter', update.ref_id, update.op_id)
             }
         }
     };
@@ -61,22 +61,22 @@ import { get_rows } from "$lib/api/dataframe.js";
     // let dispatch = (action, alias, args) => {
     //     console.log("dispatch", action, alias, args);
 
-    //     const box_id = alias_to_box_id.get(alias);
+    //     const ref_id = alias_to_ref_id.get(alias);
 
     //     if (action === 'filter') {
-    //         // Set of updated box ids are returned by teh backend
-    //         let updated_boxes = filter(box_id, args);
+    //         // Set of updated ref ids are returned by teh backend
+    //         let updated_refs = filter(ref_id, args);
     //     } else if (action === 'unfilter') {
-    //         // Set of updated box ids are returned by teh backend
-    //         let updated_boxes = unfilter(box_id, args);
+    //         // Set of updated ref ids are returned by teh backend
+    //         let updated_refs = unfilter(ref_id, args);
     //     }
     // };
 
     let store_value;
-    // let subscribed_boxes = new Set();
-    // // subscribed_boxes.add(box_id);
+    // let subscribed_refs = new Set();
+    // // subscribed_refs.add(ref_id);
     
-    _boxes['box_1'].subscribe(
+    _refs['ref_1'].subscribe(
         value => {
             console.log("VALUE", value);
             store_value = value;
@@ -85,46 +85,46 @@ import { get_rows } from "$lib/api/dataframe.js";
     
     
     import { get } from 'svelte/store';
-    $: get_box = async (box_id: string, args: string)  => {
+    $: get_ref = async (ref_id: string, args: string)  => {
     
-        // Get the box store
-        // let box_store = _boxes.get(box_id);
-        // let _box_id = get(box_store);
+        // Get the ref store
+        // let ref_store = _refs.get(ref_id);
+        // let _ref_id = get(ref_store);
 
-        console.log("get_box", box_id, args, box_id, $api_url);
+        console.log("get_ref", ref_id, args, ref_id, $api_url);
         store_value = store_value;
 
-        // Get the data for the box
+        // Get the data for the ref
         // args should help run an action like get_rows
-        let return_value = await get_rows($api_url, box_id, 0, 10);
+        let return_value = await get_rows($api_url, ref_id, 0, 10);
         console.log("return_value", return_value);
         return return_value;
     };
 
     // // A reactive function declaration, so that the function body is 
     // // reactive to changes in the _dataframes store
-    // $: get_box = (alias: string, args: string)  => {
-    //     console.log("get_box", alias, args);
-    //     // Map alias -> box id
-    //     let box_id = alias_to_box_id.get(alias);
+    // $: get_ref = (alias: string, args: string)  => {
+    //     console.log("get_ref", alias, args);
+    //     // Map alias -> ref id
+    //     let ref_id = alias_to_ref_id.get(alias);
 
-    //     // Get the box store
-    //     let box_store = $_boxes.get(box_id);
-    //     let _box_id = $box_store;
+    //     // Get the ref store
+    //     let ref_store = $_refs.get(ref_id);
+    //     let _ref_id = $ref_store;
 
-    //     // Get the data for the box
+    //     // Get the data for the ref
     //     // args should help run an action like get_rows
-    //     return get_rows(_box_id, args);
+    //     return get_rows(_ref_id, args);
     // };
     // Use a store with setContext so that the context is reactive
-    const _get_box = writable(get_box);
+    const _get_ref = writable(get_ref);
     // Bind the store value to the function as a reactive statement to keep it in sync
-    $: $_get_box = get_box;
+    $: $_get_ref = get_ref;
 
     // The Block provides its shared some common functionality
     $: context = {
         dispatch: dispatch,
-        get_box: _get_box,
+        get_ref: _get_ref,
     };
     $: setContext("Block", context);
 </script>

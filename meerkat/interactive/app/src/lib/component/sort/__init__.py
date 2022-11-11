@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Sequence, Union
 from pydantic import BaseModel
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Box, Store, interface_op, make_store
+from meerkat.interactive.graph import Reference, Store, interface_op, make_store
 
 from ..abstract import Component
 
@@ -49,7 +49,7 @@ class Sort(Component):
     Sorting criteria are maintained in a Store. On change of these
     values, the dataframe is sorted.
 
-    This component will return a Derived object, which is a sorted
+    This component will return a Reference object, which is a sorted
     view of the dataframe. The sort operation is out-of-place, so a
     new dataframe will be returned as a result of the op.
     """
@@ -58,7 +58,7 @@ class Sort(Component):
 
     def __init__(
         self,
-        df: Box["DataFrame"],
+        df: Reference["DataFrame"],
         criteria: Union[Store[List[str]], List[str]] = None,
         title: str = "",
     ):

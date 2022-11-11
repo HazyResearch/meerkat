@@ -230,33 +230,33 @@ def endpoint(
         def wrapper(*args, **kwargs):
             """
             This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Box` object that wraps the output of the
+            operation graph and returns a `Reference` object that wraps the output of the
             function.
 
             Subsequent calls to the function will be handled by the graph.
             """
             # TODO(Sabri): this should be nested
-            # Unpack the args and kwargs from the boxes and stores
-            unpacked_args, unpacked_kwargs, _, _ = _unpack_boxes_and_stores(
+            # Unpack the args and kwargs from the refs and stores
+            unpacked_args, unpacked_kwargs, _, _ = _unpack_refs_and_stores(
                 *args, **kwargs
             )
 
-            # Now, we need to figure out which boxes and stores were updated
+            # Now, we need to figure out which refs and stores were updated
             # and create Modifications for them
             # visitor.targets contains strings of the names of the variables
             nonlocal fn_signature
             fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
 
-            # Run through the targets and check which ones are boxes and stores
+            # Run through the targets and check which ones are refs and stores
             # in the function signature
             modified = {}
             for target in targets:
                 if target in fn_bound_arguments:
                     arg = fn_bound_arguments[target]
-                    if _has_box_or_store(arg):
+                    if _has_ref_or_store(arg):
                         modified[target] = arg
 
-            # fn will update some of the boxes and/or stores
+            # fn will update some of the refs and/or stores
             frame, result = call_function_get_frame(fn, *unpacked_args, **unpacked_kwargs)
 
             # Inspect the local frame of the build function
@@ -269,7 +269,7 @@ def endpoint(
             # print("result", result)
             # print("targets", targets)
 
-            # Update the boxes and stores and return modifications
+            # Update the refs and stores and return modifications
             modifications = []
             _update_result(
                 result=modified,
@@ -283,7 +283,7 @@ def endpoint(
 
             if return_into is not None:
                 # Stateless function, so return values
-                # need to be used to update the boxes and stores
+                # need to be used to update the refs and stores
                 _update_result(result=return_into, update=result, modifications=modifications)
             else:
                 # Function with side effects, so return values

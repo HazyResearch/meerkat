@@ -3,7 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import meerkat as mk
-from meerkat.interactive import Pivot
+from meerkat.interactive import Reference
 from meerkat.interactive.api.main import app
 from meerkat.interactive.edit import EditTargetConfig
 
@@ -21,14 +21,14 @@ def df_testbed():
 
 def test_get_schema(df_testbed):
     df = df_testbed["df"]
-    box = Pivot(df)
+    ref = Reference(df)
     response = client.post(
-        f"/df/{box.id}/schema/",
+        f"/df/{ref.id}/schema/",
         json={"columns": ["a", "b"]},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": box.obj.id,
+        "id": ref.obj.id,
         "columns": [
             {
                 "name": "a",
@@ -49,9 +49,9 @@ def test_get_schema(df_testbed):
 
 def test_rows(df_testbed):
     df = df_testbed["df"]
-    box = Pivot(df)
+    ref = Reference(df)
     response = client.post(
-        f"/df/{box.id}/rows/",
+        f"/df/{ref.id}/rows/",
         json={"start": 3, "end": 7},
     )
     assert response.status_code == 200
@@ -74,7 +74,7 @@ def test_edit(column_type):
         }
     )
     df.data.consolidate()
-    pivot = Pivot(df)
+    pivot = Reference(df)
 
     response = client.post(
         f"/df/{pivot.id}/edit/",
@@ -82,7 +82,7 @@ def test_edit(column_type):
     )
     assert response.status_code == 200
     assert df["value"][4] == "100"
-    assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "box"}]
+    assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "ref"}]
 
 
 @pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
@@ -102,8 +102,8 @@ def test_edit_target(column_type):
     )
 
     df.data.consolidate()
-    pivot = Pivot(df)
-    target_pivot = Pivot(target_df)
+    pivot = Reference(df)
+    target_pivot = Reference(target_df)
 
     data = {
         "target": EditTargetConfig(
@@ -140,8 +140,8 @@ def test_edit_target_keys(column_type):
     )
 
     df.data.consolidate()
-    pivot = Pivot(df)
-    target_pivot = Pivot(target_df)
+    pivot = Reference(df)
+    target_pivot = Reference(target_df)
 
     data = {
         "target": EditTargetConfig(
@@ -165,7 +165,7 @@ def test_edit_target_keys(column_type):
 def test_remove_row_by_index(df_testbed):
     df = df_testbed["df"]
 
-    pivot = Pivot(df)
+    pivot = Reference(df)
     data = {
         "row_index": "5",
     }
@@ -192,8 +192,8 @@ def test_edit_target_missing_id(column_type):
     )
 
     df.data.consolidate()
-    pivot = Pivot(df)
-    target_pivot = Pivot(target_df)
+    pivot = Reference(df)
+    target_pivot = Reference(target_df)
 
     data = {
         "target": EditTargetConfig(

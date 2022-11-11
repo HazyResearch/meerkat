@@ -9,7 +9,7 @@ df = mk.get("celeba")
 
 
 def plot(df: mk.DataFrame) -> mk.gui.Interface:
-    pivot = mk.gui.Pivot(df)
+    pivot = mk.gui.Reference(df)
     selection = mk.gui.Store([])
 
     @mk.gui.interface_op

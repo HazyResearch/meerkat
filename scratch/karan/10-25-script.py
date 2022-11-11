@@ -7,7 +7,7 @@ import pandas as pd
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.sort import SortCriterion
-from meerkat.interactive.graph import Box, Store, interface_op, make_store
+from meerkat.interactive.graph import Reference, Store, interface_op, make_store
 from meerkat.ops.sliceby.groupby import groupby
 
 #### New Dataloading
@@ -139,7 +139,7 @@ def get_labels(df: mk.DataFrame) -> Sequence[str]:
     return df["label"].unique().tolist()
 
 
-ngoa_images = mk.gui.Pivot(ngoa_images)
+ngoa_images = mk.gui.Reference(ngoa_images)
 
 # Match
 match = mk.gui.Match(

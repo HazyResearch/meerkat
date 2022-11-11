@@ -1,7 +1,7 @@
 from typing import List, Union
 
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Box, Store, make_box, make_store
+from meerkat.interactive.graph import Reference, Store, make_ref, make_store
 
 from ..abstract import Component
 
@@ -12,7 +12,7 @@ class StatsLabeler(Component):
 
     def __init__(
         self,
-        df: Box,
+        df: Reference,
         label_target: EditTarget = None,
         phase_target: EditTarget = None,
         phase: Union[Store[str], str] = "train",
@@ -23,7 +23,7 @@ class StatsLabeler(Component):
         recall_estimate: List[Store[float]] = None,
     ) -> None:
         super().__init__()
-        self.df = make_box(df)
+        self.df = make_ref(df)
         self.label_target = label_target
         self.phase_target = phase_target
         self.phase = make_store(phase)

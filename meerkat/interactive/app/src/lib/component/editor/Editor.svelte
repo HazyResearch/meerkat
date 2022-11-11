@@ -23,7 +23,7 @@
 	$: target.target = get(target.target);
 
 	$: {
-		schema_promise = $get_schema(target.target.box_id);
+		schema_promise = $get_schema(target.target.ref_id);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
@@ -48,10 +48,10 @@
 
 		let modifications_promise;
 		if (primary_key === undefined) {
-			modifications_promise = $edit_target($df.box_id, target, $text, $col, $selected);
+			modifications_promise = $edit_target($df.ref_id, target, $text, $col, $selected);
 		} else {
 			modifications_promise = $edit_target(
-				$df.box_id,
+				$df.ref_id,
 				target,
 				$text,
 				$col,

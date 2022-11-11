@@ -1,4 +1,4 @@
-from meerkat.interactive import Box
+from meerkat.interactive import Reference
 
 from ..abstract import Component
 
@@ -9,7 +9,7 @@ class SchemaTree(Component):
 
     def __init__(
         self,
-        df: Box,
+        df: Reference,
     ) -> None:
         super().__init__()
         self.df = df

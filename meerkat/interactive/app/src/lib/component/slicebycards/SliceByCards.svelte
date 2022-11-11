@@ -13,9 +13,9 @@
 	export let tag_columns: Writable<Array<string>>;
 	export let aggregations: any;
 
-	$: schema_promise = $get_schema($df.box_id);
-	$: info_promise = $get_sliceby_info($sliceby.box_id);
-	let aggregations_promise = $aggregate_sliceby($sliceby.box_id, (aggregations = aggregations));
+	$: schema_promise = $get_schema($df.ref_id);
+	$: info_promise = $get_sliceby_info($sliceby.ref_id);
+	let aggregations_promise = $aggregate_sliceby($sliceby.ref_id, (aggregations = aggregations));
 </script>
 
 <div class="isolate bg-white container mx-auto space-y-2 p-2">

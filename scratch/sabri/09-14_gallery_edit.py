@@ -4,7 +4,7 @@ import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
 df["car"] = np.zeros(len(df))
-df = mk.gui.Pivot(df)
+df = mk.gui.Reference(df)
 
 
 @mk.gui.interface_op

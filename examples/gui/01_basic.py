@@ -8,7 +8,7 @@ df = df.sample(n=1000, replace=False)
 def match(df: mk.DataFrame, against: str, id_column: str) -> mk.gui.Interface:
 
     # Setup pivots
-    df_pivot = mk.gui.Pivot(df)
+    df_pivot = mk.gui.Reference(df)
 
     # Setup components
     match = mk.gui.Match(df_pivot, against=against, col=id_column)

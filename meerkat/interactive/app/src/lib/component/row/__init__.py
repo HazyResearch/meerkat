@@ -1,7 +1,7 @@
 import numpy as np
 
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Pivot, Store
+from meerkat.interactive.graph import Reference, Store
 
 from ..abstract import Component
 
@@ -12,7 +12,7 @@ class Row(Component):
 
     def __init__(
         self,
-        df: Pivot,
+        df: Reference,
         idx: Store[int],
         target: EditTarget = None,
         cell_specs: dict = None,

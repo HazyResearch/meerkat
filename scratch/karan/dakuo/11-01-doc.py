@@ -26,9 +26,9 @@ story_doc_df = doc_data.story_doc_df
 # Start the Meerkat GUI server
 gui_info = mk.gui.start(shareable=False)
 
-# Wrap the DataFrame with a `Pivot`
+# Wrap the DataFrame with a `Reference`
 # This makes it a starting point for the interface
-story_doc_df = mk.gui.Pivot(story_doc_df)
+story_doc_df = mk.gui.Reference(story_doc_df)
 
 # Make a Choice component: this allows us to choose a document
 doc_id_choice = mk.gui.Choice(

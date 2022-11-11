@@ -137,10 +137,10 @@ class Identifiables:
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)
-    boxes: WeakMapping = field(default_factory=WeakMapping)
+    refs: WeakMapping = field(default_factory=WeakMapping)
     box_operations: WeakMapping = field(default_factory=WeakMapping)
     components: WeakMapping = field(default_factory=WeakMapping)
-    boxes: WeakMapping = field(default_factory=WeakMapping)
+    refs: WeakMapping = field(default_factory=WeakMapping)
     stores: WeakMapping = field(default_factory=WeakMapping)
     endpoints: WeakMapping = field(default_factory=WeakMapping)
 

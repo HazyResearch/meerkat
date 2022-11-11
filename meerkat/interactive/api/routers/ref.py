@@ -11,8 +11,8 @@ from meerkat.state import state
 from ....tools.utils import convert_to_python
 
 router = APIRouter(
-    prefix="/box",
-    tags=["box"],
+    prefix="/ref",
+    tags=["ref"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -88,17 +88,17 @@ class RowsRequest(BaseModel):
     columns: List[str] = None
 
 
-@router.post("/{box_id}/rows/")
+@router.post("/{ref_id}/rows/")
 def get_rows(
-    box_id: str,
+    ref_id: str,
     request: RowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    box = state.identifiables.get(group="boxes", id=box_id)
+    ref = state.identifiables.get(group="refs", id=ref_id)
 
-    if not isinstance(box.obj, DataFrame):
-        raise HTTPException("`get_rows` expects a box holding a Datapanel.")
-    df = box.obj
+    if not isinstance(ref.obj, DataFrame):
+        raise HTTPException("`get_rows` expects a ref holding a Datapanel.")
+    df = ref.obj
 
     full_length = len(df)
     column_infos = _get_column_infos(df, request.columns)
@@ -238,25 +238,25 @@ def _filter(
 
 
 class Op(BaseModel):
-    box_id: str
+    ref_id: str
     op_id: str
 
 
-@router.post("/{box_id}/filter")
-def filter(box_id: str, request: FilterRequest) -> Op:
+@router.post("/{ref_id}/filter")
+def filter(ref_id: str, request: FilterRequest) -> Op:
     # TODO(karan): untested change as earlier version called a function
     # that didn't exist
-    box = state.identifiables.get(group="boxes", id=box_id)
+    ref = state.identifiables.get(group="refs", id=ref_id)
 
-    op = box.apply(
+    op = ref.apply(
         _filter, columns=request.columns, values=request.values, ops=request.ops
     )
 
-    return Op(box_id=box.id, op_id=op.id)
+    return Op(ref_id=ref.id, op_id=op.id)
 
 
-@router.post("/{box_id}/undo")
-def undo(box_id: str, operation_id: str = EmbeddedBody()) -> Op:
-    box = state.identifiables.get(group="boxes", id=box_id)
-    box.undo(operation_id=operation_id)
-    return Op(box_id=box_id, op_id="meerkat")  # TODO fix this
+@router.post("/{ref_id}/undo")
+def undo(ref_id: str, operation_id: str = EmbeddedBody()) -> Op:
+    ref = state.identifiables.get(group="refs", id=ref_id)
+    ref.undo(operation_id=operation_id)
+    return Op(ref_id=ref_id, op_id="meerkat")  # TODO fix this

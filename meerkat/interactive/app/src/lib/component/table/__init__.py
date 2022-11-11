@@ -1,7 +1,7 @@
 import numpy as np
 
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Box, make_box
+from meerkat.interactive.graph import Reference, make_ref
 
 from ..abstract import Component
 
@@ -12,14 +12,14 @@ class Table(Component):
 
     def __init__(
         self,
-        df: Box,
+        df: Reference,
         edit_target: EditTarget = None,
         per_page: int = 100,
         column_widths: list = None,
     ) -> None:
         super().__init__()
 
-        self.df = make_box(df)
+        self.df = make_ref(df)
         if edit_target is None:
             self.df.obj["_edit_id"] = np.arange(len(self.df.obj))
             edit_target = EditTarget(self.df, "_edit_id", "_edit_id")

@@ -38,7 +38,7 @@
 	let load_rows = async () => {
 		load_status = 'loading';
 		let new_rows = await $get_sliceby_rows(
-			$sliceby.box_id,
+			$sliceby.ref_id,
 			slice_key,
 			page * per_page,
 			(page + 1) * per_page

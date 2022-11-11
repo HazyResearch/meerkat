@@ -14,7 +14,7 @@
 	export let cell_specs: Any = {};
 	export let title: string = "";
 
-	$: schema_promise = $get_schema($df.box_id);
+	$: schema_promise = $get_schema($df.ref_id);
        
 
 	$: target.target = get(target.target);
@@ -22,7 +22,7 @@
 	let rows_promise: any = null;
 	$: {
 		if ($idx !== null) {
-			rows_promise = $get_rows($df.box_id, $idx, $idx + 1);
+			rows_promise = $get_rows($df.ref_id, $idx, $idx + 1);
 		} else {
 			rows_promise = null;
 		}
@@ -30,7 +30,7 @@
 
 	let on_edit = async (event: any, column: string) => {
 		let modifications_promise = $edit_target(
-			$df.box_id,
+			$df.ref_id,
 			target,
 			event.detail.value,
 			column,

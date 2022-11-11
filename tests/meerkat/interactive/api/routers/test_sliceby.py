@@ -53,9 +53,9 @@ def explainby_testbed():
 
 def test_rows_explainby(explainby_testbed):
     sb = explainby_testbed["sb"]
-    sb_box = mk.gui.Pivot(sb)
+    sb_ref = mk.gui.Reference(sb)
     response = client.post(
-        f"/sliceby/{sb_box.id}/rows/",
+        f"/sliceby/{sb_ref.id}/rows/",
         json={"slice_key": 0, "start": 0, "end": 2, "columns": ["b"]},
     )
     assert response.status_code == 200, response.text
@@ -77,9 +77,9 @@ def test_rows_explainby(explainby_testbed):
 @pytest.mark.parametrize("aggregation", ["mean"])
 def test_aggregate_w_name(sliceby_testbed, aggregation: str):
     sb = sliceby_testbed["sb"]
-    sb_box = mk.gui.Pivot(sb)
+    sb_ref = mk.gui.Reference(sb)
     response = client.post(
-        f"/sliceby/{sb_box.id}/aggregate/",
+        f"/sliceby/{sb_ref.id}/aggregate/",
         json={"aggregation": aggregation},
     )
 
@@ -94,9 +94,9 @@ def test_aggregate_w_name(sliceby_testbed, aggregation: str):
 @pytest.mark.parametrize("aggregation", ["mean"])
 def test_aggregate_w_name_w_columns(sliceby_testbed, aggregation: str):
     sb = sliceby_testbed["sb"]
-    sb_box = mk.gui.Pivot(sb)
+    sb_ref = mk.gui.Reference(sb)
     response = client.post(
-        f"/sliceby/{sb_box.id}/aggregate/",
+        f"/sliceby/{sb_ref.id}/aggregate/",
         json={"aggregation": aggregation, "columns": ["a"]},
     )
 
@@ -108,7 +108,7 @@ def test_aggregate_w_name_w_columns(sliceby_testbed, aggregation: str):
 
 def test_aggregate_w_id(sliceby_testbed):
     sb = sliceby_testbed["sb"]
-    sb_box = mk.gui.Pivot(sb)
+    sb_ref = mk.gui.Reference(sb)
 
     from meerkat.interactive.gui import Aggregation
 
@@ -116,7 +116,7 @@ def test_aggregate_w_id(sliceby_testbed):
     aggregation = Aggregation(aggregation)
 
     response = client.post(
-        f"/sliceby/{sb_box.id}/aggregate/",
+        f"/sliceby/{sb_ref.id}/aggregate/",
         json={"aggregation_id": aggregation.id, "accepts_df": True},
     )
 

@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 
-from meerkat.interactive.graph import Box, Pivot, Store, make_box, make_store
+from meerkat.interactive.graph import Reference, Store, make_ref, make_store
 
 from ..abstract import Component
 
 
 @dataclass
 class EditTarget:
-    pivot: Pivot
+    pivot: Reference
     pivot_id_column: str
     id_column: str
 
@@ -27,7 +27,7 @@ class Gallery(Component):
 
     def __init__(
         self,
-        df: Box,
+        df: Reference,
         main_column: str,
         tag_columns: List[str],
         edit_target: EditTarget = None,
@@ -35,7 +35,7 @@ class Gallery(Component):
         primary_key: str = None,
     ) -> None:
         super().__init__()
-        self.df = make_box(df)
+        self.df = make_ref(df)
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
         self.primary_key = primary_key
