@@ -7,6 +7,10 @@ export interface Component {
     props: any; 
 }
 
+export interface Endpoint {
+    endpoint_id: string;
+}
+
 export interface Layout {
     name: string
     props: any;

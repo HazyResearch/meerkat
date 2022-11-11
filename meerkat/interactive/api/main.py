@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import box, dataframe, interface, llm, ops, sliceby, store
+from .routers import box, dataframe, endpoint, interface, llm, ops, sliceby, store
 
 app = FastAPI(debug=True)
 
@@ -12,6 +12,7 @@ app.include_router(llm.router)
 app.include_router(box.router)
 app.include_router(ops.router)
 app.include_router(store.router)
+app.include_router(endpoint.router)
 
 
 app.add_middleware(

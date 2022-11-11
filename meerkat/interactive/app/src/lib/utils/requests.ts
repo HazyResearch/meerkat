@@ -29,10 +29,13 @@ export async function post(url: string, data: any): Promise<any> {
 }
 
 
+
 export async function modify(url: string, data: any): Promise<any> {
     let modifications = await post(url, data);
+    return apply_modifications(modifications);
+}
 
-    // url must hit an endpoint that returns a list of modifications 
+export function apply_modifications(modifications: Array<any>) {
     for (let modification of modifications) {
         if (modification.type === 'box') {
             // Box modification
@@ -67,4 +70,3 @@ export async function modify(url: string, data: any): Promise<any> {
         }
     }
 }
-

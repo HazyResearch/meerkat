@@ -21,7 +21,7 @@
 	import type { SliceKey } from '$lib/api/sliceby';
 	import StoreComponent from '$lib/component/StoreComponent.svelte';
 	import { global_stores, meerkat_writable } from '$lib/shared/blanks/stores';
-	import { get_request, modify, post } from '$lib/utils/requests';
+	import { apply_modifications, get_request, modify, post } from '$lib/utils/requests';
 	import { nestedMap } from '$lib/utils/tools';
 	import type { EditTarget, Interface } from '$lib/utils/types';
 	import { onMount } from 'svelte';
@@ -35,6 +35,16 @@
 		return modifications;
 	};
 
+	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any) => {
+		if (endpoint_id === null) { return; }
+		let [result, modifications] = await post(`${$api_url}/endpoint/${endpoint_id}/dispatch`, {
+				kwargs: kwargs,
+				payload: payload
+			});
+		apply_modifications(modifications);
+		return result;
+	};
+
 	$: get_schema = async (box_id: string, columns: Array<string> | null = null) => {
 		return await post(`${$api_url}/df/${box_id}/schema`, { columns: columns });
 	};
@@ -46,14 +56,14 @@
 		indices?: Array<number>,
 		columns?: Array<string>,
 		key_column?: string,
-		keys?: Array<string | number>,
+		keys?: Array<string | number>
 	) => {
 		let result = await post(`${$api_url}/df/${box_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
 			key_column: key_column,
-			keys: keys, 
+			keys: keys,
 			columns: columns
 		});
 		return result;
@@ -157,6 +167,7 @@
 	const _aggregate_sliceby = writable(aggregate_sliceby);
 	const _get_sliceby_rows = writable(get_sliceby_rows);
 	const _remove_row_by_index = writable(remove_row_by_index);
+	const _dispatch = writable(dispatch);
 
 	$: $_get_schema = get_schema;
 	$: $_add = add;
@@ -169,6 +180,7 @@
 	$: $_aggregate_sliceby = aggregate_sliceby;
 	$: $_get_sliceby_rows = get_sliceby_rows;
 	$: $_remove_row_by_index = remove_row_by_index;
+	$: $_dispatch = dispatch;
 
 	$: context = {
 		get_schema: _get_schema,
@@ -181,7 +193,8 @@
 		get_sliceby_info: _get_sliceby_info,
 		aggregate_sliceby: _aggregate_sliceby,
 		get_sliceby_rows: _get_sliceby_rows,
-		remove_row_by_index: _remove_row_by_index
+		remove_row_by_index: _remove_row_by_index,
+		dispatch: _dispatch
 	};
 	$: setContext('Interface', context);
 
@@ -200,6 +213,7 @@
 	});
 
 	for (let i = 0; i < component_array.length; i++) {
+		// Pull out the ith component
 		let component = component_array[i];
 
 		// Define the stores
@@ -213,6 +227,12 @@
 					// add it to the global_stores Map if it isn't already there
 					let store = meerkat_writable(v.value);
 					store.store_id = v.store_id;
+					// Only stores that have children i.e. are part of the
+					// computation graph are considered to be backend stores
+					// If the store is not a backend store, then its value
+					// will not be synchronized with the backend
+					// Frontend only stores are useful to synchronize values
+					// between frontend components
 					store.backend_store = v.has_children;
 					global_stores.set(v.store_id, store);
 				}

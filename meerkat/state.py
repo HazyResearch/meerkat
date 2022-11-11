@@ -1,12 +1,13 @@
 import subprocess
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, Mapping
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping
 
 from fastapi import FastAPI, HTTPException
 
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
+    from meerkat.interactive.graph import Modification
     from meerkat.interactive.server import Server
     from meerkat.mixins.identifiable import IdentifiableMixin
 
@@ -141,6 +142,7 @@ class Identifiables:
     components: WeakMapping = field(default_factory=WeakMapping)
     boxes: WeakMapping = field(default_factory=WeakMapping)
     stores: WeakMapping = field(default_factory=WeakMapping)
+    endpoints: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
@@ -159,12 +161,23 @@ class Identifiables:
 
 
 @dataclass
+class ModificationQueue:
+    """A queue of modifications to be applied to a dataframe."""
+
+    queue: List["Modification"] = field(default_factory=list)
+
+    def add(self, modification: "Modification"):
+        self.queue.append(modification)
+
+
+@dataclass
 class GlobalState:
 
     network_info: NetworkInfo = None
     identifiables: Identifiables = field(default_factory=Identifiables)
     secrets: Secrets = field(default_factory=Secrets)
     llm: LanguageModel = field(default_factory=LanguageModel)
+    modification_queue: ModificationQueue = field(default_factory=ModificationQueue)
 
 
 global state

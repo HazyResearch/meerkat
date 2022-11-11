@@ -2,7 +2,7 @@ import inspect
 from abc import ABC
 from collections import defaultdict
 from functools import partial, wraps
-from typing import Any, Callable, Dict, Generic, List, Set, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, List, TypeVar, Union
 
 from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
 from tqdm import tqdm
@@ -25,8 +25,29 @@ class NodeMixin:
     """
 
     def __init__(self):
-        # The children of this node
-        self.children: Set[Operation] = set()
+        # The children of this node: this is a dictionary
+        # mapping children to a boolean indicating whether
+        # the child is triggered when this node is triggered.
+        self.children: Dict[Operation, bool] = dict()
+
+    def add_child(self, child, triggers=True):
+        """Adds a child to this node.
+
+        Args:
+            child: The child to add.
+            triggers: If True, this child is triggered
+                when this node is triggered.
+        """
+        if child not in self.children:
+            self.children[child] = triggers
+
+        # Don't overwrite triggers=True with triggers=False
+        self.children[child] = triggers | self.children[child]
+
+    @property
+    def trigger_children(self):
+        """Returns the children that are triggered."""
+        return [child for child, triggers in self.children.items() if triggers]
 
     def __hash__(self):
         """Hash is based on the id of the node."""
@@ -40,6 +61,10 @@ class NodeMixin:
         """Returns True if this node has children."""
         return len(self.children) > 0
 
+    def has_trigger_children(self):
+        """Returns True if this node has children that are triggered."""
+        return any(self.children.values())
+
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     """
@@ -52,11 +77,14 @@ def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
         List[NodeMixin]: The topologically sorted nodes.
     """
     # get a mapping from node to the children of each node
+    # only get the children that are triggered by the node
+    # i.e. ignore children that use the node as a dependency
+    # but are not triggered by the node
     parents = defaultdict(set)
     nodes = set()
     while root_nodes:
         node = root_nodes.pop(0)
-        for child in node.children:
+        for child in node.trigger_children:
             parents[child].add(node)
             nodes.add(node)
             root_nodes.append(child)
@@ -66,10 +94,10 @@ def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     ]  # get a set of all the nodes without an incoming edge
 
     while current:
-        node = current.pop(0)
+        node: NodeMixin = current.pop(0)
         yield node
 
-        for child in node.children:
+        for child in node.trigger_children:
             parents[child].remove(node)
             if not parents[child]:
                 current.append(child)
@@ -104,13 +132,31 @@ class Box(IdentifiableMixin, NodeMixin, Generic[T]):
 
     def __init__(self, obj):
         super().__init__()
-        self.obj = obj
+        self._obj = obj
 
     @property
     def config(self):
         return BoxConfig(box_id=self.id, type="DataFrame")
 
-    # TODO: wrap these in interface ops
+    @property
+    def _(self):
+        return self.obj
+
+    @_.setter
+    def _(self, obj: object):
+        self.obj = obj
+
+    @property
+    def obj(self):
+        return self._obj
+
+    @obj.setter
+    def obj(self, obj: object):
+        # TODO: make it this
+        # mod = BoxModification(id=self.id, scope=self.obj.columns)
+        # mod.add_to_queue()
+        self._obj = obj
+
     def __getattr__(self, name):
         return getattr(self.obj, name)
 
@@ -142,12 +188,16 @@ class StoreConfig(BaseModel):
     is_store: bool = True
 
 
+class EndpointConfig(BaseModel):
+    endpoint_id: Union[str, None]
+
+
 class Store(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "stores"
 
     def __init__(self, value: Any):
         super().__init__()
-        self.value = value
+        self._value = value
 
     @property
     def config(self):
@@ -156,6 +206,62 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T]):
             value=self.value,
             has_children=self.has_children(),
         )
+
+    @property
+    def _(self):
+        return self.value
+
+    @_.setter
+    def _(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        mod = StoreModification(id=self.id, value=value)
+        self._value = value
+        mod.add_to_queue()
+
+    def __repr__(self) -> str:
+        return f"Store({self._})"
+
+
+class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
+    identifiable_group: str = "endpoints"
+
+    def __init__(self, fn: Callable = None):
+        super().__init__()
+        if fn is None:
+            self.id = None
+        self.fn = fn
+
+    @property
+    def config(self):
+        return EndpointConfig(
+            endpoint_id=self.id,
+        )
+
+    def __call__(self, *args, **kwargs):
+        return partial(self.fn, *args, **kwargs)
+
+    @staticmethod
+    def get(id: str) -> Store:
+        """Get an Endpoint using its id."""
+        from meerkat.state import state
+
+        return state.identifiables.get(group="endpoints", id=id)
+
+
+def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:
+    """Make an Endpoint."""
+    return (
+        endpoint_or_fn
+        if isinstance(endpoint_or_fn, Endpoint)
+        else Endpoint(endpoint_or_fn)
+    )
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
@@ -209,6 +315,13 @@ class Modification(BaseModel, ABC):
         """The Box or Store node that this modification is for."""
         raise NotImplementedError()
 
+    def add_to_queue(self):
+        """Add this modification to the queue."""
+        # Get the queue
+        from meerkat.state import state
+
+        state.modification_queue.add(self)
+
 
 class BoxModification(Modification):
     scope: List[str]
@@ -222,7 +335,8 @@ class BoxModification(Modification):
 
 
 class StoreModification(Modification):
-    value: Storeable
+    value: Any  # : Storeable # TODO(karan): Storeable prevents
+    # us from storing objects in the store
     type: str = "store"
 
     @property
@@ -247,7 +361,7 @@ class Operation(NodeMixin):
         self.kwargs = kwargs
         self.result = result
         self.on = on
-        nested_apply(self.result, self.children.add)
+        nested_apply(self.result, self.add_child)
 
     def __call__(self) -> List[Modification]:
         """
@@ -314,8 +428,21 @@ def _update_result(
     elif isinstance(result, Store):
         # If the result is a Store, then we need to update the Store's value
         # and return a StoreModification
-        result.value = update
-        modifications.append(StoreModification(id=result.id, value=update))
+        # TODO(karan): now checking if the value is the same
+        # This is assuming that all values put into Stores have an __eq__ method
+        # defined that can be used to check if the value has changed.
+        # print(result.value, update)
+        if isinstance(result.value, (str, int, float, bool, type(None), tuple)):
+            # We can just check if the value is the same
+            if result.value != update:
+                result.value = update
+                modifications.append(StoreModification(id=result.id, value=update))
+        else:
+            # We can't just check if the value is the same if the Store contains
+            # a list, dict or object, since they are mutable (and it would just
+            # return True).
+            result.value = update
+            modifications.append(StoreModification(id=result.id, value=update))
         return result
     else:
         # If the result is not a Box or Store, then it is a primitive type
@@ -346,9 +473,9 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         for op in order:
             pbar.set_postfix_str(f"Running {op.fn.__name__}")
             mods = op()
+            mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
             pbar.update(1)
-
     return modifications + new_modifications
 
 
@@ -364,6 +491,16 @@ def _unpack_boxes_and_stores(*args, **kwargs):
         elif isinstance(arg, Store):
             stores.append(arg)
             unpacked_args.append(arg.value)
+        elif isinstance(arg, list) or isinstance(arg, tuple):
+            unpacked_args_i, _, boxes_i, stores_i = _unpack_boxes_and_stores(*arg)
+            unpacked_args.append(unpacked_args_i)
+            boxes.extend(boxes_i)
+            stores.extend(stores_i)
+        elif isinstance(arg, dict):
+            _, unpacked_kwargs_i, boxes_i, stores_i = _unpack_boxes_and_stores(**arg)
+            unpacked_args.append(unpacked_kwargs_i)
+            boxes.extend(boxes_i)
+            stores.extend(stores_i)
         else:
             unpacked_args.append(arg)
 
@@ -375,10 +512,31 @@ def _unpack_boxes_and_stores(*args, **kwargs):
         elif isinstance(v, Store):
             stores.append(v)
             unpacked_kwargs[k] = v.value
+        elif isinstance(v, list) or isinstance(v, tuple):
+            unpacked_args_i, _, boxes_i, stores_i = _unpack_boxes_and_stores(*v)
+            unpacked_kwargs[k] = unpacked_args_i
+            boxes.extend(boxes_i)
+            stores.extend(stores_i)
+        elif isinstance(v, dict):
+            _, unpacked_kwargs_i, boxes_i, stores_i = _unpack_boxes_and_stores(**v)
+            unpacked_kwargs[k] = unpacked_kwargs_i
+            boxes.extend(boxes_i)
+            stores.extend(stores_i)
         else:
             unpacked_kwargs[k] = v
 
     return unpacked_args, unpacked_kwargs, boxes, stores
+
+
+def _has_box_or_store(arg):
+    if isinstance(arg, Box) or isinstance(arg, Store):
+        return True
+    elif isinstance(arg, list) or isinstance(arg, tuple):
+        return any([_has_box_or_store(a) for a in arg])
+    elif isinstance(arg, dict):
+        return any([_has_box_or_store(a) for a in arg.values()])
+    else:
+        return False
 
 
 def _nested_apply(obj: object, fn: callable, return_type: type = None):
@@ -421,13 +579,54 @@ def _pack_boxes_and_stores(obj, return_type: type = None):
     return obj
 
 
-def _add_op_as_child(op: Operation, *boxes_and_stores: Union[Box, Store]):
+def _add_op_as_child(
+    op: Operation,
+    *boxes_and_stores: Union[Box, Store],
+    triggers: bool = True,
+):
     """
     Add the operation as a child of the boxes and stores.
+
+    Args:
+        op: The operation to add as a child.
+        boxes_and_stores: The boxes and stores to add the operation as a child
+            of.
+        triggers: Whether the operation is triggered by changes in the boxes
+            and stores.
     """
     for box_or_store in boxes_and_stores:
         if isinstance(box_or_store, (Box, Store)):
-            box_or_store.children.add(op)
+            box_or_store.add_child(op, triggers=triggers)
+
+
+def endpoint(fn: Callable = None):
+    def _endpoint(fn: Callable):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            """
+            This `wrapper` function is only run once. It creates a node in the
+            operation graph and returns a `Box` object that wraps the output of the
+            function.
+
+            Subsequent calls to the function will be handled by the graph.
+            """
+            # Run the function
+            result = fn(*args, **kwargs)
+
+            # Update the boxes and stores and return modifications
+            # Get the modifications from the queue
+            from meerkat.state import state
+
+            modifications = state.modification_queue.queue
+
+            # Trigger the modifications
+            modifications = trigger(modifications)
+            return result
+
+        # Register the endpoint and return it
+        return Endpoint(wrapper)
+
+    return _endpoint(fn)
 
 
 def interface_op(
@@ -442,6 +641,31 @@ def interface_op(
     Decorator that is used to mark a function as an interface operation.
     Functions decorated with this will create nodes in the operation graph, which
     are executed whenever their inputs are modified.
+
+    A basic example that adds two numbers:
+    .. code-block:: python
+
+        @interface_op
+        def add(a: int, b: int) -> int:
+            return a + b
+
+        a = Store(1)
+        b = Store(2)
+        c = add(a, b)
+
+    When either `a` or `b` is modified, the `add` function will be called again
+    with the new values of `a` and `b`.
+
+    A more complex example that concatenates two mk.DataFrame objects:
+    .. code-block:: python
+
+        @interface_op
+        def concat(df1: mk.DataFrame, df2: mk.DataFrame) -> mk.DataFrame:
+            return mk.concat([df1, df2])
+
+        df1 = mk.DataFrame(...)
+        df2 = mk.DataFrame(...)
+        df3 = concat(df1, df2)
 
     Args:
         fn: The function to decorate.
@@ -536,7 +760,11 @@ def interface_op(
 
             # Setup an Operation node if any of the
             # args or kwargs were boxes or stores
-            if len(boxes) > 0 or len(stores) > 0:
+            if (
+                (len(boxes) > 0 or len(stores) > 0)
+                or on is not None
+                or also_on is not None
+            ):
 
                 # The result should be placed inside a Store or Derived
                 # (or a nested object) containing Stores and Deriveds.
@@ -557,15 +785,22 @@ def interface_op(
                 if on is None:
                     # Add this Operation node as a child of all of the boxes and stores
                     # regardless of the value of `also_on`
-                    _add_op_as_child(op, *boxes, *stores)
+                    _add_op_as_child(op, *boxes, *stores, triggers=True)
                 else:
+                    # Add this Operation node as a child of all of the boxes and stores
+                    # that are passed into the function. However, these children
+                    # are non-triggering, meaning that the Operation node will
+                    # only be called when the boxes and stores in `on` are modified,
+                    # and not otherwise.
+                    _add_op_as_child(op, *boxes, *stores, triggers=False)
+
                     # Add this Operation node as a child of the boxes and stores
-                    # passed into `on`
+                    # passed into `on`. These will trigger the Operation!
                     # TODO(Sabri): this should be nested
                     if isinstance(on, (Box, Store)):
                         on = [on]
                     _, _, boxes, stores = _unpack_boxes_and_stores(*on)
-                    _add_op_as_child(op, *boxes, *stores)
+                    _add_op_as_child(op, *boxes, *stores, triggers=True)
 
                     # Find all the str elements in `on`
                     # These are the names of fn arguments that were passed into `on`
@@ -592,7 +827,7 @@ def interface_op(
                     )
                     # ...and add this Operation node as a child of these
                     # boxes and stores
-                    _add_op_as_child(op, *boxes, *stores)
+                    _add_op_as_child(op, *boxes, *stores, triggers=True)
 
                 if also_on is not None:
                     # Add this Operation node as a child of the boxes and stores
@@ -601,7 +836,7 @@ def interface_op(
                     if isinstance(also_on, (Box, Store)):
                         also_on = [also_on]
                     _, _, boxes, stores = _unpack_boxes_and_stores(*also_on)
-                    _add_op_as_child(op, *boxes, *stores)
+                    _add_op_as_child(op, *boxes, *stores, triggers=True)
 
                 return derived
 

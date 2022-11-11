@@ -21,6 +21,12 @@ def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
     # Create a store modification
     store_modification = StoreModification(id=store_id, value=value)
 
+    # TODO: the interface sends store_triggers for all stores when it starts
+    # up -- these requests should not be being sent.
+    # These requests are indirectly ignored here because we check if the
+    # value of the store actually changed (and these initial post requests
+    # do not change the value of the store).
+
     # Check if this request would actually change the value of the store
     current_store_value = store_modification.node.value
     if current_store_value == value:
