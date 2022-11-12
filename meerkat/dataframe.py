@@ -79,10 +79,10 @@ class DataFrame(
             **kwargs,
         )
         logger.debug("Creating DataFrame.")
+        self._primary_key = None
 
         self.data = data
 
-        self._primary_key = None
 
     @property
     def gui(self):
@@ -154,6 +154,11 @@ class DataFrame(
             raise ValueError(
                 f"Cannot set DataFrame `data` to object of type {type(value)}."
             )
+        
+        # check that the primary key is still valid after data reset
+        if self._primary_key is not None:
+            if self._primary_key not in self or not self.primary_key._is_valid_primary_key():
+                self.set_primary_key(None)
 
     @data.setter
     def data(self, value):
@@ -237,6 +242,9 @@ class DataFrame(
             f"Column with name `{name}` already exists, "
             f"set `overwrite=True` to overwrite."
         )
+
+        if not is_listlike(data):
+            data = [data] * self.nrows
 
         if name in self.columns:
             self.remove_column(name)
@@ -1022,3 +1030,17 @@ class DataFrame(
         from meerkat.ops.aggregate.aggregate import aggregate
 
         return aggregate(self, function="mean", nuisance=nuisance, *args, **kwargs)
+
+
+def is_listlike(obj) -> bool:
+    """Check if the object is listlike.
+
+    Args:
+        obj (object): The object to check.
+    
+    Return:
+        bool: True if the object is listlike, False otherwise.
+    """
+    is_column = isinstance(obj, AbstractColumn)
+    is_sequential = (hasattr(obj, "__len__") and hasattr(obj, "__getitem__") and not isinstance(obj, str))
+    return is_column or is_sequential

@@ -45,7 +45,7 @@ gui_info = mk.gui.start(shareable=False)
 
 # Wrap the DataFrame with a `Reference`
 # This makes it a starting point for the interface
-story_sentence_df = mk.gui.Reference(story_sentence_df)
+story_sentence_df_ref = mk.gui.Reference(story_sentence_df)
 
 # Make a Choice component: this allows us to choose a document
 doc_id_choice = mk.gui.Choice(
@@ -94,7 +94,7 @@ which dataframe to send the `edit` API call request to. This will let us send us
 """
 # Create an EditTarget component
 target = mk.gui.EditTarget(
-    target=story_sentence_df, 
+    target=story_sentence_df_ref, 
     target_id_column="id", 
     source_id_column="id",
 )
@@ -106,7 +106,7 @@ and (iii) the EditTarget component that we created above.
 """
 # Create the Document component
 document = mk.gui.Document(
-    df=choose_sentences(story_sentence_df, doc_id_choice.value),  # sections of the chosen document
+    df=choose_sentences(story_sentence_df_ref, doc_id_choice.value),  # sections of the chosen document
     text_column="text",  # the column that contains document text
     paragraph_column="section",  # the column that contains the paragraph index
     label_column="label",  # the column that contains the label
@@ -126,7 +126,7 @@ def save_labels(df: mk.DataFrame):
     df[['label']].to_jsonl("labels.jsonl")
 
 # Runs the save_labels function whenever the `story_sentence_df` updates
-save_labels(story_sentence_df)
+save_labels(story_sentence_df_ref)
 
 # Launch the interface
 mk.gui.Interface(

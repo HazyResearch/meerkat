@@ -1,12 +1,17 @@
 import os
 
 import pandas as pd
-
+import numpy as np
 import meerkat as mk
+import PIL
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
+
+
+def concat_images(x: PIL.Image.Image, y: PIL.Image.Image):
+    return PIL.Image.fromarray(np.concatenate([np.array(x), np.array(y)], axis=1))
 
 
 @datasets.register()
