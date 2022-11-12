@@ -1067,7 +1067,7 @@ def test_loc_single(testbed, column_type: type):
     # int index => single row (dict)
     index = 2
     df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
-    df.set_primary_key("pk")
+    df = df.set_primary_key("pk")
 
     row = df.loc[str(index + 10)]
     assert isinstance(row, dict)
@@ -1087,7 +1087,7 @@ def test_loc_multiple(testbed, column_type):
     # int index => single row (dict)
     indices = np.array([2, 3])
     df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
-    df.set_primary_key("pk")
+    df = df.set_primary_key("pk")
 
     loc_index = (indices + 10).astype(str)
     new_df = df.loc[loc_index]
@@ -1105,7 +1105,7 @@ def test_loc_missing():
     df = DataFrame(
         {"x": NumpyArrayColumn([1, 2, 3]), "y": PandasSeriesColumn([4, 5, 6])}
     )
-    df.set_primary_key("y")
+    df = df.set_primary_key("y")
 
     with pytest.raises(KeyError):
         df.loc[1, 2, 4]
@@ -1115,7 +1115,7 @@ def test_primary_key_persistence():
     df = DataFrame(
         {"a": PandasSeriesColumn(np.arange(16)), "b": PandasSeriesColumn(np.arange(16))}
     )
-    df.set_primary_key("a")
+    df = df.set_primary_key("a")
 
     df = df[:4]
     df._primary_key == "a"
@@ -1134,7 +1134,7 @@ def test_primary_key_reset():
     df = DataFrame(
         {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
     )
-    df.set_primary_key("a")
+    df = df.set_primary_key("a")
 
     df["a"] = NumpyArrayColumn(np.arange(16))
     assert df._primary_key is None
@@ -1144,7 +1144,7 @@ def test_check_primary_key_reset():
     df = DataFrame(
         {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
     )
-    df.set_primary_key("a")
+    df = df.set_primary_key("a")
 
     assert df.append(df).primary_key is None
 
@@ -1153,7 +1153,7 @@ def test_check_primary_key_no_reset():
     df = DataFrame(
         {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
     )
-    df.set_primary_key("a")
+    df = df.set_primary_key("a")
 
     df2 = DataFrame(
         {"a": NumpyArrayColumn(np.arange(16, 32)), "b": NumpyArrayColumn(np.arange(16))}
@@ -1162,11 +1162,9 @@ def test_check_primary_key_no_reset():
     assert df.append(df2).primary_key is None
 
 
-@pytest.mark.parametrize("x", [0, 0., "hello world", np.nan, np.inf])
+@pytest.mark.parametrize("x", [0, 0.0, "hello world", np.nan, np.inf])
 def test_scalar_setitem(x):
-    df = DataFrame(
-        {"a": NumpyArrayColumn(np.arange(16))}
-    )
+    df = DataFrame({"a": NumpyArrayColumn(np.arange(16))})
     df["extra_column"] = x
 
     assert len(df["extra_column"]) == len(df)

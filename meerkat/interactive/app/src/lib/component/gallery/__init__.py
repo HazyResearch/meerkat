@@ -46,7 +46,10 @@ class Gallery(Component):
             edit_target = EditTarget(self.df, self.primary_key, self.primary_key)
         self.edit_target = edit_target
 
+        if primary_key is None:
+            primary_key = df._primary_key    
         self.primary_key = primary_key
+
         if selected is None:
             selected = []
         self.selected = make_store(selected)

@@ -83,7 +83,6 @@ class DataFrame(
 
         self.data = data
 
-
     @property
     def gui(self):
         from meerkat.interactive.gui import DataFrameGUI
@@ -154,10 +153,13 @@ class DataFrame(
             raise ValueError(
                 f"Cannot set DataFrame `data` to object of type {type(value)}."
             )
-        
+
         # check that the primary key is still valid after data reset
         if self._primary_key is not None:
-            if self._primary_key not in self or not self.primary_key._is_valid_primary_key():
+            if (
+                self._primary_key not in self
+                or not self.primary_key._is_valid_primary_key()
+            ):
                 self.set_primary_key(None)
 
     @data.setter
@@ -177,35 +179,37 @@ class DataFrame(
 
         return self[self._primary_key]
 
-    def set_primary_key(self, column: str):
-        """ Set the DataFrame's primary key.
-        For more information on primary keys, see the User Guide. 
+    def set_primary_key(self, column: str, inplace: bool = False) -> DataFrame:
+        """Set the DataFrame's primary key using an existing column. This is an
+        out-of-place operation. For more information on primary keys, see the User
+        Guide.
 
         Args:
             column (str): The name of an existing column to set as the primary key.
         """
-        if column is None:
-            self._primary_key = None
-            return
+        if column is not None:
+            if column not in self.columns:
+                raise ValueError(
+                    "Must pass the name of an existing column to `set_primary_key`."
+                    f'"{column}" not in {self.columns}'
+                )
 
-        if column not in self.columns:
-            raise ValueError(
-                "Must pass the name of an existing column to `set_primary_key`."
-                f'"{column}" not in {self.columns}'
-            )
+            if not self[column]._is_valid_primary_key():
+                raise ValueError(
+                    f'Column "{column}" cannot be used as a primary key. Ensure that '
+                    "columns of this type can be used as primary keys and that the values "
+                    "in the column are unique."
+                )
 
-        if not self[column]._is_valid_primary_key():
-            raise ValueError(
-                f'Column "{column}" cannot be used as a primary key. Ensure that '
-                "columns of this type can be used as primary keys and that the values "
-                "in the column are unique."
-            )
-
-        self._primary_key = column
+        if inplace:
+            self._primary_key = column
+            return self
+        else:
+            return self._clone(_primary_key=column)
 
     def create_primary_key(self, column: str):
         """Create a primary key of contiguous integers.
-        
+
         Args:
             column (str): The name of the column to create.
         """
@@ -269,8 +273,8 @@ class DataFrame(
         del self.data[column]
 
         if column == self._primary_key:
-            # need to reset the primary key if we remove the column 
-            self.set_primary_key(None)
+            # need to reset the primary key if we remove the column
+            self.set_primary_key(None, inplace=True)
 
         logger.info(f"Removed column `{column}`.")
 
@@ -1037,10 +1041,14 @@ def is_listlike(obj) -> bool:
 
     Args:
         obj (object): The object to check.
-    
+
     Return:
         bool: True if the object is listlike, False otherwise.
     """
     is_column = isinstance(obj, AbstractColumn)
-    is_sequential = (hasattr(obj, "__len__") and hasattr(obj, "__getitem__") and not isinstance(obj, str))
+    is_sequential = (
+        hasattr(obj, "__len__")
+        and hasattr(obj, "__getitem__")
+        and not isinstance(obj, str)
+    )
     return is_column or is_sequential
