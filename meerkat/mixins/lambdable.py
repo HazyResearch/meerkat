@@ -57,11 +57,8 @@ def to_lambda(
         output_type (Union[Dict[str, type], type], optional): _description_. Defaults
             to None.
 
-    Raises:
-        ValueError: _description_
-
     Returns:
-        _type_: _description_
+        Union[DataFrame, LambdaColumn]: A
     """
     from meerkat import LambdaColumn
     from meerkat.block.lambda_block import LambdaBlock, LambdaOp
@@ -97,14 +94,29 @@ def to_lambda(
     block = LambdaBlock.from_block_data(data=op)
 
     if outputs is None:
-        if not (isinstance(output_type, type) or output_type is None):
-            raise ValueError
+        # can only infer output type if the the input columns are nonempty
+        if output_type is None and len(op) > 0:
+            output_type = type(op._get(0))
+
+        if not isinstance(output_type, type):
+            raise ValueError(
+                "Must provide a single `output_type` if `outputs` is None."
+            )
 
         col = LambdaColumn(
             data=BlockView(block_index=None, block=block), output_type=output_type
         )
         return col
     elif isinstance(outputs, Mapping):
+        if output_type is None:
+            output_type = {
+                outputs[output_key]: type(col) for output_key, col in op._get(0)
+            }
+        if not isinstance(output_type, Mapping):
+            raise ValueError(
+                "Must provide a `output_type` mapping if `outputs` is a mapping."
+            )
+
         return DataFrame(
             {
                 col: LambdaColumn(
@@ -115,9 +127,20 @@ def to_lambda(
             }
         )
     elif isinstance(outputs, Sequence):
+        if output_type is None:
+            output_type = [type(col) for col in op._get(0)]
+        if not isinstance(output_type, Sequence):
+            raise ValueError(
+                "Must provide a `output_type` sequence if `outputs` is a sequence."
+            )
         return DataFrame(
             {
-                col: LambdaColumn(data=BlockView(block_index=output_key, block=block))
+                col: LambdaColumn(
+                    data=BlockView(
+                        block_index=output_key, block=block
+                    ),
+                    output_type=output_type[output_key],
+                )
                 for output_key, col in enumerate(outputs)
             }
         )

@@ -53,10 +53,9 @@ class LambdaColumn(AbstractColumn):
         *args,
         **kwargs,
     ):
-
+        self._output_type = output_type
         super(LambdaColumn, self).__init__(data, *args, **kwargs)
 
-        self._output_type = output_type
 
     def _set(self, index, value):
         raise ImmutableError("LambdaColumn is immutable.")
@@ -123,7 +122,6 @@ class LambdaColumn(AbstractColumn):
                 "Reading a LambdaColumn stored in a format that will soon be"
                 " deprecated. Please re-write the column to the new format."
             )
-            print("here")
             meta = yaml.load(
                 open(os.path.join(path, "data", "meta.yaml")),
                 Loader=yaml.FullLoader,
@@ -145,9 +143,11 @@ class LambdaColumn(AbstractColumn):
                 batch_size=1,
             )
 
-    @staticmethod
-    def _get_default_formatter() -> Callable:
-        from meerkat.interactive.formatter import BasicFormatter
+    def _get_default_formatter(self) -> Callable:
+        from meerkat.interactive.formatter import BasicFormatter, PILImageFormatter
+
+        if self._output_type == Image.Image:
+            return PILImageFormatter()
 
         return BasicFormatter()
 
