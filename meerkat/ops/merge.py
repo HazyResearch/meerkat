@@ -7,6 +7,7 @@ from meerkat import DataFrame, ListColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import interface_op
@@ -119,12 +120,28 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
         # by pandas merge can include `nan` in rows corresponding to merge keys that
         # only appear in one of the two panels. For these columns, we convert the
         # column to  ListColumn, and fill with "None" wherever indices is "nan".
-        data = {
-            name: ListColumn(
-                [None if np.isnan(index) else col.lz[int(index)] for index in indices]
-            )
-            for name, col in df.items()
-        }
+        data = {}
+        for name, col in df.items():
+            if isinstance(col, (NumpyArrayColumn, TensorColumn, PandasSeriesColumn)):
+                new_col = col.lz[indices.astype(int)]
+
+                if isinstance(new_col, TensorColumn):
+                    new_col = new_col.to(float)
+                elif isinstance(new_col, PandasSeriesColumn):
+                    if new_col.dtype != "object":
+                        new_col = new_col.astype(float)
+                else:
+                    new_col = new_col.astype(float)
+                
+                new_col[np.isnan(indices)] = np.nan
+                data[name] = new_col
+            else:
+                data[name] = ListColumn(
+                    [
+                        None if np.isnan(index) else col.lz[int(index)]
+                        for index in indices
+                    ]
+                )
         return df._clone(data=data)
     else:
         # if there are no `nan`s in the indices, then we can just lazy index the

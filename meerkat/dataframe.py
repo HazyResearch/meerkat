@@ -71,6 +71,7 @@ class DataFrame(
     def __init__(
         self,
         data: Union[dict, list] = None,
+        primary_key: str = None,
         *args,
         **kwargs,
     ):
@@ -79,7 +80,7 @@ class DataFrame(
             **kwargs,
         )
         logger.debug("Creating DataFrame.")
-        self._primary_key = None
+        self._primary_key = primary_key
 
         self.data = data
 

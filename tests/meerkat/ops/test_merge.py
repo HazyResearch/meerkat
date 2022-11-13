@@ -167,15 +167,15 @@ class TestMerge:
         assert set(out.lz[mask_1]["b_1"]) == a1 - a2
         assert set(out.lz[mask_2]["b_2"]) == a2 - a1
         # check for `None` at unmatched rows
-        assert list(out.lz[mask_1]["b_2"]) == [None] * len(mask_1)
-        assert list(out.lz[mask_2]["b_1"]) == [None] * len(mask_2)
+        assert np.isnan(out.lz[mask_1]["b_2"]).all()
+        assert np.isnan(out.lz[mask_2]["b_1"]).all()
 
         # check for `values` at unmatched rows
         assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
         assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
         # check for equality at matched rows
-        assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
-        assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
+        assert out.lz[mask_1]["e_2"].isna().all()
+        assert out.lz[mask_2]["e_1"].isna().all()
 
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_left(self, testbed, sort):
