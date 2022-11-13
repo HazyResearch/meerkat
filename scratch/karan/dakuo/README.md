@@ -3,7 +3,7 @@
 Run the following script to generate the dataframe:
 ```bash
 conda activate meerkat
-pip install dtw-python thefuzz[speedup]
+pip install dtw-python "thefuzz[speedup]"
 python 11-04-clean-data.py --data_dir [/path/to/FairytaleQA_Dataset]
 ```
 This script tries to align the paragraph-sentence pairs in a hacky way, to find the `section`
