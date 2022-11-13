@@ -179,6 +179,11 @@ class DataFrame(
             return None
 
         return self[self._primary_key]
+    
+    @property
+    def primary_key_name(self) -> str:
+        """The name of the column acting as the primary key."""
+        return self._primary_key
 
     def set_primary_key(self, column: str, inplace: bool = False) -> DataFrame:
         """Set the DataFrame's primary key using an existing column. This is an
