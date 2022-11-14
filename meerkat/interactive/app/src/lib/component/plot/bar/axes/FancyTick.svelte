@@ -16,25 +16,39 @@
 </script>
 
 <div
-	class="flex items-center h-full text-xs whitespace-nowrap overflow-hidden hover:overflow-visible space-x-1"
-	style="
-        width: {hover ? '100%' : width};
-        "
-	on:mouseenter={() => (hover = true)}
-	on:mouseleave={() => (hover = false)}
+	on:mouseover={() => (hover = true)}
+	on:mouseout={() => (hover = false)}
 >
-	{#if can_remove}
+	{#if hover}
 		<div
-			class="text-violet-400 border rounded mr-1 bg-red-100 hover:bg-red-200"
-			on:click={() => dispatch('remove', id)}
+			class="bg-slate-100 z-40 rounded px-2 py-1 shadow-md h-fit"
 		>
-			<Close />
+			<div class="grid grid-cols-[1fr_auto]">
+				<div>
+					{name}
+				</div>
+				{#if can_remove}
+					<div
+						class="font-bold text-red-400 hover:text-red-600"
+						on:click={() => dispatch('remove', id)}
+					>
+						<Close/>
+					</div>
+				{/if}
+			</div>
+			<div class="grid grid-flow-row grid-cols-2 space-x-1">
+				<div class="font-bold">Name</div>
+				<div>{name}</div>
+				<div class="font-bold">Delta</div>
+				<div class="font-bold">Count</div>
+				<div>{size}</div>
+				<div>ID</div>
+				<div>{id}</div>
+			</div>
+		</div>
+	{:else}
+		<div class="bg-slate-100 z-10 rounded px-2 py-1">
+			{name}
 		</div>
 	{/if}
- 	<!-- <div class="font-mono rounded-sm bg-slate-200 px-0.5">
-		{size}
-	</div> -->
-	<div class={hover ? 'bg-slate-200' : 'bg-inherit'}>
-		{name} 
-	</div>
 </div>

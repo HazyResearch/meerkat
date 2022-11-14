@@ -1,13 +1,14 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
 	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import type { Point2D } from '$lib/shared/plot/types';
 
-	const { get_rows, remove_row_by_index } = getContext('Interface');
+	const { get_rows, remove_row_by_index, get_schema } = getContext('Interface');
 
 	export let df: Writable;
 	export let selection: Writable;
@@ -26,10 +27,20 @@
 	// Array of metadata objects. Each metadata object can have any arbitrary number
 	// of key-value pairs.
 	let metadata: Array<any> = [];
-	
-	let get_datum = async (ref_id: string): Promise<Array<Point2D>> => {
+
+	let page: number = 0;
+	let per_page: number = 30;
+
+	$: schema_promise = $get_schema($df.ref_id);
+
+	let get_datum = async (ref_id: string, page: number, per_page: number): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await $get_rows(ref_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
+		let rows = await $get_rows(
+			ref_id, page * per_page,
+			(page + 1) * per_page, 
+			undefined, 
+			[$x, $y, id, ...metadata_columns]
+		);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -44,10 +55,13 @@
 		if (metadata_columns.length > 0) {
 			metadata = [];
 			rows.rows?.forEach((row: any) => {
-				const metadata_obj = metadata_columns.reduce((accumulator: any, column: string, index: number) => {
-					accumulator[index] = row[index + 3];
-					return accumulator;
-				}, {});
+				const metadata_obj = metadata_columns.reduce(
+					(accumulator: any, column: string, index: number) => {
+						accumulator[index] = row[index + 3];
+						return accumulator;
+					},
+					{}
+				);
 				metadata.push(metadata_obj);
 			});
 		} else {
@@ -56,11 +70,11 @@
 
 		return datum;
 	};
-	$: datum_promise = get_datum($df.ref_id);
+	$: datum_promise = get_datum($df.ref_id, page, per_page);
 </script>
 
 <!-- TODO: Figure out the padding to put here.  -->
-<div class="flex-1 flex flex-col items-center">
+<div class="flex-1 flex flex-col items-center w-full">
 	{#await datum_promise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
@@ -68,10 +82,10 @@
 	{:then datum}
 		<FancyHorizontalBarPlot
 			data={datum}
-			metadata={metadata}
+			{metadata}
 			bind:xlabel={$x_label}
 			bind:ylabel={$y_label}
-			ywidth={60}
+			ywidth={196}
 			{padding}
 			{can_remove}
 			on:selection-change={(e) => {
@@ -82,5 +96,10 @@
 				$keys_to_remove = $keys_to_remove;
 			}}
 		/>
+	{/await}
+	{#await schema_promise then schema}
+		<div class=" z-10 bottom-0 w-full m-0 py-3">
+			<Pagination bind:page bind:per_page loaded_items={schema.nrows} total_items={schema.nrows} />
+		</div>
 	{/await}
 </div>

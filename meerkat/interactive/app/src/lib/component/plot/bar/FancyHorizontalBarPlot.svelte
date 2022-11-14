@@ -18,7 +18,7 @@
 	export let padding: number = 0;
 
 	// Width of the "fancy" y ticks in pixels
-	export let ywidth: number = 128;
+	export let ywidth: number = 256;
 
 	export let selection: Array<number> = [];
 
@@ -26,9 +26,6 @@
 	export let ylabel: string = 'y label';
 
 	export let can_remove: boolean = true;
-
-	$: height = 30 * data.length;
-	console.log(height)
 
 	const floor = (x: number, decimals: number): number => {
 		return Math.floor(x * Math.pow(10, decimals)) / Math.pow(10, decimals);
@@ -50,7 +47,7 @@
 	const can_remove_context = setContext("can_remove", can_remove)
 </script>
 
-<div class="relative w-full" style='height:{height}px;'>
+<div class="relative h-full w-full">
 		<LayerCake
 			ssr={true}
 			percentRange={true}
