@@ -896,36 +896,18 @@ class DataFrame(
 
     def rename(
         self,
-        mapper: Dict = None,
-        *,
-        index: Dict = None,
-        columns: Dict = None,
-        axis: Literal[0 | "index" | 1 | "columns"] = "index",
-        # copy=None,
-        # inplace=False,
-        # level=None,
+        mapper: Union[Dict, Callable] = None,
         errors: Literal["ignore", "raise"] = "ignore",
-    ) -> DataPanel:
-        """Return a new DataPanel with the specified axes labels renamed.
+    ) -> DataFrame:
+        """Return a new DataPanel with the specified column labels renamed.
 
         Dictionary values must be unique (1-to-1). Labels not specified will be
         left unchanged. Extra labels will not throw an error.
 
-        TODO: Dean change parameters from Dict to Union[Dict, Callable] (see
-        Pandas)
-
         Args:
-            mapper (Dict, optional): Dict-like to apply to the values of the
-                axis specified by `axis`. Defaults to None.
-            index (Dict, optional): Alternative to specifying axis
-                (`mapper, axis=0` is equivalent to `index=mapper`). Defaults to
-                None.
-            columns (Dict, optional): Alternative to specifying axis
-                (`mapper, axis=1` is equivalent to `columns=mapper`). Defaults
+            mapper (Union[Dict, Callable], optional): Dict-like of function
+                transformations to apply to the values of the columns. Defaults
                 to None.
-            axis (Literal[0 | 'index' | 1 | 'columns'], optional): Axis to
-                target with `mapper`. Can be either the axis name ('index',
-                'columns') or number (0, 1). Defaults to 'index'.
             errors (Literal['ignore', 'raise'], optional): If 'raise', raise a
                 KeyError when the Dict contains labels that do not exist in the
                 DataPanel. If 'ignore', extra keys will be ignored. Defaults to
@@ -935,42 +917,45 @@ class DataFrame(
             ValueError: _description_
 
         Returns:
-            DataPanel: A new DataPanel with the specified axes labels renamed.
+            DataPanel: A new DataPanel with the specified column labels renamed.
         """
-
-        mppr = None
-        ax = None
-        if mapper:
-            mppr, ax = mapper, axis
-        elif index:
-            mppr, ax = mapper, "index"
-        elif columns:
-            mppr, ax = mapper, "columns"
-        else:
-            logger.info("No mapper provided. Returning")
-
-        if ax == "index":
-            logger.info("Renaming by index not supported. Returning")
-            return
-
-        assert len(set(mppr.values())) == len(
-            mppr.values()
-        ), f"Dictionary values must be unique (1-to-1)."
-
         # Copy the ._data dict with a reference to the actual columns
-        new_dp = self.view()
+        new_df = self.view()
+        
+        if isinstance(mapper, Dict):
+            assert len(set(mapper.values())) == len(
+                mapper.values()
+            ), f"Dictionary values must be unique (1-to-1)."
+            
+            names = self.columns # used to preserve order of columns
+            for i, (old_name, new_name) in enumerate(mapper.items()):
+                if old_name not in self.keys():
+                    if errors == "raise":
+                        raise KeyError(f"Cannot rename nonexistent column `{old_name}`.")
+                    continue
+                
+                if old_name == new_name:
+                    continue
 
-        for old_name, new_name in mppr.items():
-            if old_name not in self.keys():
-                if errors == "raise":
-                    raise KeyError(f"Cannot rename nonexistent column `{old_name}`.")
-                continue
+                # Copy old column into new column
+                new_df[new_name] = new_df[old_name]
+                new_df.remove_column(old_name)
+                names[i] = new_name
+            new_df = new_df[names]
+        elif isinstance(mapper, Callable):
+            for old_name in new_df.columns:
+                new_name = mapper(old_name)
+                
+                if old_name == new_name:
+                    continue
+                
+                # Copy old column into new column
+                new_df[new_name] = new_df[old_name]
+                new_df.remove_column(old_name)
+        else:
+            logger.info(f"Mapper type is not one of Dict or Callable: {type(mapper)}. Returning")
 
-            # Copy old column into new column
-            new_dp[new_name] = new_dp[old_name]
-            new_dp.remove_column(old_name)
-
-        return new_dp
+        return new_df
 
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
