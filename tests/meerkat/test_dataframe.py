@@ -657,6 +657,39 @@ def test_overwrite_column():
     assert set(df.columns) == set(["a", "b"])
 
 
+def test_rename():
+    a = np.arange(16)
+    b = np.arange(16) * 2
+    
+    df = DataFrame.from_batch({"a": a, "b": b})
+    assert "a" in df
+    
+    new_df = df.rename({"a": "A"})
+
+    # make sure "a" was renamed to "A"
+    assert np.equal(new_df["A"], a)
+    assert np.equal(new_df["b"], b)
+
+    # check that there are no duplicate columns
+    assert set(new_df.columns) == set(["A", "b"])
+
+    # make sure rename happened out of place
+    assert df["a"]._data is a
+    assert df["b"]._data is b
+
+    new_df = df.rename(str.upper)
+
+    # make sure "a" was renamed to "A" and "b" was renamed to "B"
+    assert np.equal(new_df["A"], a)
+    assert np.equal(new_df["B"], b)
+
+    # check that there are no duplicate columns
+    assert set(new_df.columns) == set(["A", "B"])
+
+    # make sure rename happened out of place
+    assert df["a"]._data is a
+    assert df["b"]._data is b
+
 @product_parametrize(params={"move": [True, False]})
 def test_io(testbed, tmp_path, move):
     """`map`, mixed dataframe, return multiple, `is_batched_fn=True`"""

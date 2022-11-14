@@ -120,15 +120,15 @@ def download_imagenette(
         return (pd.read_csv(csv_path), dir_path) if return_df else dir_path
 
     if overwrite or not os.path.exists(dir_path):
-        download_url(
+        cached_tar_path = download_url(
             url=imagenette.VERSION_TO_URL[version],
-            root=download_dir,
+            dataset_dir=download_dir,
         )
         print("Extracting tar archive, this may take a few minutes...")
-        tar = tarfile.open(tar_path)
+        tar = tarfile.open(cached_tar_path)
         tar.extractall(download_dir)
         tar.close()
-        os.remove(tar_path)
+        # os.remove(tar_path)
     else:
         print(f"Directory {dir_path} already exists. Skipping download.")
 

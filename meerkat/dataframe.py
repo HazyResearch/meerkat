@@ -11,6 +11,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Mapping,
     Optional,
     Sequence,
@@ -892,6 +893,69 @@ class DataFrame(
             weights=weights,
             random_state=random_state,
         )
+
+    def rename(
+        self,
+        mapper: Union[Dict, Callable] = None,
+        errors: Literal["ignore", "raise"] = "ignore",
+    ) -> DataFrame:
+        """Return a new DataFrame with the specified column labels renamed.
+
+        Dictionary values must be unique (1-to-1). Labels not specified will be
+        left unchanged. Extra labels will not throw an error.
+
+        Args:
+            mapper (Union[Dict, Callable], optional): Dict-like of function
+                transformations to apply to the values of the columns. Defaults
+                to None.
+            errors (Literal['ignore', 'raise'], optional): If 'raise', raise a
+                KeyError when the Dict contains labels that do not exist in the
+                DataFrame. If 'ignore', extra keys will be ignored. Defaults to
+                'ignore'.
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            DataFrame: A new DataFrame with the specified column labels renamed.
+        """
+        # Copy the ._data dict with a reference to the actual columns
+        new_df = self.view()
+        
+        if isinstance(mapper, Dict):
+            assert len(set(mapper.values())) == len(
+                mapper.values()
+            ), f"Dictionary values must be unique (1-to-1)."
+            
+            names = self.columns # used to preserve order of columns
+            for i, (old_name, new_name) in enumerate(mapper.items()):
+                if old_name not in self.keys():
+                    if errors == "raise":
+                        raise KeyError(f"Cannot rename nonexistent column `{old_name}`.")
+                    continue
+                
+                if old_name == new_name:
+                    continue
+
+                # Copy old column into new column
+                new_df[new_name] = new_df[old_name]
+                new_df.remove_column(old_name)
+                names[i] = new_name
+            new_df = new_df[names]
+        elif isinstance(mapper, Callable):
+            for old_name in new_df.columns:
+                new_name = mapper(old_name)
+                
+                if old_name == new_name:
+                    continue
+                
+                # Copy old column into new column
+                new_df[new_name] = new_df[old_name]
+                new_df.remove_column(old_name)
+        else:
+            logger.info(f"Mapper type is not one of Dict or Callable: {type(mapper)}. Returning")
+
+        return new_df
 
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
