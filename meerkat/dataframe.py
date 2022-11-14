@@ -899,7 +899,7 @@ class DataFrame(
         mapper: Union[Dict, Callable] = None,
         errors: Literal["ignore", "raise"] = "ignore",
     ) -> DataFrame:
-        """Return a new DataPanel with the specified column labels renamed.
+        """Return a new DataFrame with the specified column labels renamed.
 
         Dictionary values must be unique (1-to-1). Labels not specified will be
         left unchanged. Extra labels will not throw an error.
@@ -910,14 +910,14 @@ class DataFrame(
                 to None.
             errors (Literal['ignore', 'raise'], optional): If 'raise', raise a
                 KeyError when the Dict contains labels that do not exist in the
-                DataPanel. If 'ignore', extra keys will be ignored. Defaults to
+                DataFrame. If 'ignore', extra keys will be ignored. Defaults to
                 'ignore'.
 
         Raises:
             ValueError: _description_
 
         Returns:
-            DataPanel: A new DataPanel with the specified column labels renamed.
+            DataFrame: A new DataFrame with the specified column labels renamed.
         """
         # Copy the ._data dict with a reference to the actual columns
         new_df = self.view()
