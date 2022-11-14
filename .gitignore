@@ -156,6 +156,8 @@ dmypy.json
 # Giant file
 examples/datasets
 
+examples/imagenette2-160/
+
 # History
 .history
 
