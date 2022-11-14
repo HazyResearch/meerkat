@@ -1,9 +1,9 @@
 import code
-import sys
 from dataclasses import dataclass, field
 from functools import partial, wraps
 from typing import Callable, Dict, List, Union
 
+from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
 
@@ -16,32 +16,6 @@ from meerkat.state import state
 from meerkat.tools.utils import nested_apply
 
 
-def call_function_get_frame(func, *args, **kwargs):
-    """https://stackoverflow.com/questions/4214936/how-can-i-get-the-values-of-
-    the-locals-of-a-function-after-it-has-been-executed Calls the function.
-
-    *func* with the specified arguments and keyword arguments and snatches its
-    local frame before it actually executes.
-    """
-
-    frame = None
-    trace = sys.gettrace()
-
-    def snatch_locals(_frame, name, arg):
-        nonlocal frame
-        if frame is None and name == "call":
-            frame = _frame
-            sys.settrace(trace)
-        return trace
-
-    sys.settrace(snatch_locals)
-    try:
-        result = func(*args, **kwargs)
-    finally:
-        sys.settrace(trace)
-    return frame, result
-
-
 def interface(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -49,20 +23,6 @@ def interface(fn: Callable):
         return interface.launch()
 
     return wrapper
-    # frame, out = call_function_get_frame(self.build)
-
-    # if out is not None:
-
-    # if components is not None:
-    #     self.components = components
-
-    # if len(self.components) == 0:
-    #     # Inspect the local frame of the build function
-    #     # and add all the components to self.components
-    #     # in the order in which they were defined
-    #     for _, val in frame.f_locals.items():
-    #         if isinstance(val, Component):
-    #             self.components.append(val)
 
 
 class LayoutConfig(BaseModel):
@@ -112,6 +72,17 @@ class Interface(IdentifiableMixin):
         self.components = components
         if self.components is None:
             self.components = []
+
+    def get(self, id: str):
+        try:
+            from meerkat.state import state
+
+            interface = state.identifiables.get(id, "interfaces")
+        except KeyError:
+            raise HTTPException(
+                status_code=404, detail="No interface with id {}".format(id)
+            )
+        return interface
 
     def launch(self, return_url: bool = False):
         from meerkat.interactive.startup import is_notebook, output_startup_message

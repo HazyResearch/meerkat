@@ -1,9 +1,3 @@
-import hashlib
-import weakref
-from collections.abc import Mapping
-from functools import wraps
-from inspect import getcallargs
-from typing import Sequence
 from uuid import uuid4
 
 
@@ -25,3 +19,11 @@ class IdentifiableMixin:
         from meerkat.state import state
 
         state.identifiables.add(self)
+
+    @classmethod
+    def from_id(cls, id: str):
+        # TODO(karan): make sure we're using this everywhere and it's not
+        # being redefined in subclasses
+        from meerkat.state import state
+
+        return state.identifiables.get(id=id, group=cls.identifiable_group)

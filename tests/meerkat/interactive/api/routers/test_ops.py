@@ -29,7 +29,6 @@ def test_match(df_testbed, monkeypatch):
     response = client.post(
         f"/ops/{ref.id}/match/", json={"input": "a", "query": "this is the query"}
     )
-
     assert response.status_code == 200
 
 

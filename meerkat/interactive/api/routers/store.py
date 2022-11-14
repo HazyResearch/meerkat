@@ -1,25 +1,17 @@
-import functools
 from typing import List
 
-from fastapi import APIRouter, Body
-
-from meerkat.interactive.graph import Modification, StoreModification, trigger
-
-router = APIRouter(
-    prefix="/store",
-    tags=["store"],
-    responses={404: {"description": "Not found"}},
-)
-
-EmbeddedBody = functools.partial(Body, embed=True)
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Modification, Store, StoreModification, trigger
 
 
-@router.post("/{store_id}/trigger/")
-def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
-    """Triggers the computational graph when a store on the frontend
-    changes."""
+@endpoint(prefix="/store", route="/{store}/trigger/")
+def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
+    """
+    Triggers the computational graph when a store on the frontend
+    changes.
+    """
     # Create a store modification
-    store_modification = StoreModification(id=store_id, value=value)
+    store_modification = StoreModification(id=store.id, value=value)
 
     # TODO: the interface sends store_triggers for all stores when it starts
     # up -- these requests should not be being sent.

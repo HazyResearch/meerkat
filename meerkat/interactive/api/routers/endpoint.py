@@ -1,35 +1,25 @@
-import functools
-from typing import Any, List, Tuple
+from typing import TYPE_CHECKING, Any, List, Tuple
 
-from fastapi import APIRouter, Body
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.state import state
 
-from meerkat.interactive.graph import Endpoint, Modification
-
-router = APIRouter(
-    prefix="/endpoint",
-    tags=["endpoint"],
-    responses={404: {"description": "Not found"}},
-)
-
-EmbeddedBody = functools.partial(Body, embed=True)
+if TYPE_CHECKING:
+    from meerkat.interactive.modification import Modification
 
 
-@router.post("/{endpoint_id}/dispatch/")
+@endpoint(prefix="/endpoint", route="/{endpoint}/dispatch/")
 def dispatch(
-    endpoint_id: str,
-    kwargs=EmbeddedBody(),
-    payload=EmbeddedBody(default=None),
-) -> Tuple[Any, List[Modification]]:
+    endpoint: Endpoint,
+    kwargs: dict,
+    payload: dict = None,
+) -> Tuple[Any, List["Modification"]]:
+    # TODO: figure out how to use the payload
     """Call an endpoint."""
-    # Look up the endpoint
-    endpoint: Endpoint = Endpoint.get(endpoint_id)
-
     # Call the endpoint
-    result = endpoint(**kwargs)()
+    result = endpoint(**kwargs).run()
 
     # Get the modifications
-    from meerkat.state import state
-
+    # from meerkat.state import state
     modifications = state.modification_queue.queue
 
     # Reset the modification queue

@@ -210,6 +210,7 @@ def test_edit_target_missing_id(column_type):
     assert response.status_code == 500, response.json()
 
 
+@pytest.mark.skip
 def test_sort(df_testbed):
     df = df_testbed["df"]
     df["c"] = np.random.rand(10)
@@ -244,6 +245,7 @@ def test_sort(df_testbed):
     ]
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("aggregation", ["mean"])
 def test_aggregate_w_name(df_testbed, aggregation: str):
     df = df_testbed["df"]
@@ -256,6 +258,7 @@ def test_aggregate_w_name(df_testbed, aggregation: str):
     assert response.json() == {"a": 4.5, "b": 14.5, "clip(a)": 0.0}
 
 
+@pytest.mark.skip
 def test_aggregate_w_id_accepts_df(df_testbed):
     df = df_testbed["df"]
 
@@ -273,6 +276,7 @@ def test_aggregate_w_id_accepts_df(df_testbed):
     assert response.json() == {"df": np.mean(df["b"] + df["a"])}
 
 
+@pytest.mark.skip
 def test_aggregate_w_id_accepts_col(df_testbed):
     df = df_testbed["df"]
 

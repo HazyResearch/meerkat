@@ -1,32 +1,15 @@
 from typing import Dict, List
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import HTTPException
 from pydantic import BaseModel
 
+from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.formatter import BasicFormatter
-from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
+from meerkat.interactive.graph import Reference
+from meerkat.ops.sliceby.sliceby import SliceKey
 from meerkat.state import state
 
 from .dataframe import RowsResponse, _get_column_infos
-
-
-def get_sliceby(sliceby_id: str) -> SliceBy:
-    try:
-
-        dataframe = state.identifiables.slicebys[sliceby_id]
-
-    except KeyError:
-        raise HTTPException(
-            status_code=404, detail="No dataframe with id {}".format(sliceby_id)
-        )
-    return dataframe
-
-
-router = APIRouter(
-    prefix="/sliceby",
-    tags=["sliceby"],
-    responses={404: {"description": "Not found"}},
-)
 
 
 class InfoResponse(BaseModel):
@@ -41,11 +24,9 @@ class InfoResponse(BaseModel):
         smart_union = True
 
 
-@router.get("/{ref_id}/info/")
-def get_info(ref_id: str) -> InfoResponse:
-    ref = state.identifiables.get(group="refs", id=ref_id)
-    sb = ref.obj
-
+@endpoint(prefix="/sliceby", route="/{ref}/info/", method="GET")
+def get_info(ref: Reference) -> InfoResponse:
+    sb = ref._
     return InfoResponse(
         id=sb.id,
         type=type(sb).__name__,
@@ -66,14 +47,13 @@ class SliceByRowsRequest(BaseModel):
         smart_union = True
 
 
-@router.post("/{ref_id}/rows/")
+@endpoint(prefix="/sliceby", route="/{ref}/rows/")
 def get_rows(
-    ref_id: str,
+    ref: Reference,
     request: SliceByRowsRequest,
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    ref = state.identifiables.get(group="refs", id=ref_id)
-    sb = ref.obj
+    sb = ref._
 
     slice_key = request.slice_key
     full_length = sb.get_slice_length(slice_key)
@@ -103,18 +83,16 @@ def get_rows(
     )
 
 
-@router.post("/{ref_id}/aggregate/")
+@endpoint(prefix="/sliceby", route="/{ref}/aggregate/")
 def aggregate(
-    ref_id: str,
-    aggregation_id: str = Body(None),
-    aggregation: str = Body(None),
-    accepts_df: bool = Body(False),
-    columns: List[str] = Body(None),
+    ref: Reference,
+    aggregation_id: str = Endpoint.EmbeddedBody(None),
+    aggregation: str = Endpoint.EmbeddedBody(None),
+    accepts_df: bool = Endpoint.EmbeddedBody(False),
+    columns: List[str] = Endpoint.EmbeddedBody(None),
 ) -> Dict:
-    ref = state.identifiables.get(group="refs", id=ref_id)
-    sb = ref.obj
 
-    sliceby = sb
+    sliceby = ref._
     if columns is not None:
         sliceby = sliceby[columns]
 

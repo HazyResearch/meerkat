@@ -1,128 +1,27 @@
 import inspect
-from abc import ABC
-from collections import defaultdict
 from functools import partial, wraps
-from typing import Any, Callable, Dict, Generic, List, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, List, Union
 
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel
 from tqdm import tqdm
 
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.modification import (
+    Modification,
+    ReferenceModification,
+    StoreModification,
+)
+from meerkat.interactive.node import NodeMixin, _topological_sort
+from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.state import state
 from meerkat.tools.utils import nested_apply
-
-
-class NodeMixin:
-    """
-    Class for defining nodes in a graph.
-
-    Add this mixin to any class whose objects should be nodes
-    in a graph.
-
-    This mixin is used in Reference, Store and Operation to make
-    them part of a computation graph.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # The children of this node: this is a dictionary
-        # mapping children to a boolean indicating whether
-        # the child is triggered when this node is triggered.
-        self.children: Dict[Operation, bool] = dict()
-
-    def add_child(self, child, triggers=True):
-        """Adds a child to this node.
-
-        Args:
-            child: The child to add.
-            triggers: If True, this child is triggered
-                when this node is triggered.
-        """
-        if child not in self.children:
-            self.children[child] = triggers
-
-        # Don't overwrite triggers=True with triggers=False
-        self.children[child] = triggers | self.children[child]
-
-    @property
-    def trigger_children(self):
-        """Returns the children that are triggered."""
-        return [child for child, triggers in self.children.items() if triggers]
-
-    def __hash__(self):
-        """Hash is based on the id of the node."""
-        return hash(id(self))
-
-    def __eq__(self, other):
-        """Two nodes are equal if they have the same id."""
-        return id(self) == id(other)
-
-    def has_children(self):
-        """Returns True if this node has children."""
-        return len(self.children) > 0
-
-    def has_trigger_children(self):
-        """Returns True if this node has children that are triggered."""
-        return any(self.children.values())
-
-
-def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
-    """
-    Perform a topological sort on a graph.
-
-    Args:
-        root_nodes (List[NodeMixin]): The root nodes of the graph.
-
-    Returns:
-        List[NodeMixin]: The topologically sorted nodes.
-    """
-    # get a mapping from node to the children of each node
-    # only get the children that are triggered by the node
-    # i.e. ignore children that use the node as a dependency
-    # but are not triggered by the node
-    parents = defaultdict(set)
-    nodes = set()
-    while root_nodes:
-        node = root_nodes.pop(0)
-        for child in node.trigger_children:
-            parents[child].add(node)
-            nodes.add(node)
-            root_nodes.append(child)
-
-    current = [
-        node for node in nodes if not parents[node]
-    ]  # get a set of all the nodes without an incoming edge
-
-    while current:
-        node: NodeMixin = current.pop(0)
-        yield node
-
-        for child in node.trigger_children:
-            parents[child].remove(node)
-            if not parents[child]:
-                current.append(child)
-
-
-Primitive = Union[StrictInt, StrictStr, StrictFloat, StrictBool]
-Storeable = Union[
-    None,
-    Primitive,
-    List[Primitive],
-    Dict[Primitive, Primitive],
-    Dict[Primitive, List[Primitive]],
-    List[Dict[Primitive, Primitive]],
-]
 
 
 class ReferenceConfig(BaseModel):
     ref_id: str
     type: str = "DataFrame"
     is_store: bool = True
-
-
-T = TypeVar("T", "DataFrame", "SliceBy")
 
 
 class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
@@ -174,10 +73,6 @@ class StoreConfig(BaseModel):
     is_store: bool = True
 
 
-class EndpointConfig(BaseModel):
-    endpoint_id: Union[str, None]
-
-
 class Store(IdentifiableMixin, NodeMixin, Generic[T]):
     identifiable_group: str = "stores"
 
@@ -214,50 +109,12 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T]):
     def __repr__(self) -> str:
         return f"Store({self._})"
 
-
-class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
-    identifiable_group: str = "endpoints"
-
-    def __init__(self, fn: Callable = None):
-        super().__init__()
-        if fn is None:
-            self.id = None
-        self.fn = fn
-
-    @property
-    def config(self):
-        return EndpointConfig(
-            endpoint_id=self.id,
-        )
-
-    def __call__(self, *args, **kwargs):
-        # Any Stores or References that are passed in as arguments
-        # should have this Endpoint as a non-triggering child
-        for arg in args:
-            if isinstance(arg, (Store, Reference)):
-                arg.add_child(self, triggers=False)
-
-        for kwarg in kwargs.values():
-            if isinstance(kwarg, (Store, Reference)):
-                kwarg.add_child(self, triggers=False)
-
-        return partial(self.fn, *args, **kwargs)
-
-    @staticmethod
-    def get(id: str) -> Store:
-        """Get an Endpoint using its id."""
-        from meerkat.state import state
-
-        return state.identifiables.get(group="endpoints", id=id)
-
-
-def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:
-    """Make an Endpoint."""
-    return (
-        endpoint_or_fn
-        if isinstance(endpoint_or_fn, Endpoint)
-        else Endpoint(endpoint_or_fn)
-    )
+    # @classmethod
+    # def __get_validators__(cls):
+    #     # one or more validators may be yielded which will be called in the
+    #     # order to validate the input, each validator will receive as an input
+    #     # the value returned from the previous validator
+    #     yield cls.validate
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
@@ -290,55 +147,6 @@ def make_ref(value: Union[any, Reference]) -> Reference:
         Reference: The Reference wrapping value.
     """
     return value if isinstance(value, Reference) else Reference(value)
-
-
-class Modification(BaseModel, ABC):
-    """
-    Base class for modifications.
-
-    Modifications are used to track changes to Reference and Store nodes
-    in the graph.
-
-    Attributes:
-        id (str): The id of the Reference or Store.
-    """
-
-    id: str
-
-    @property
-    def node(self):
-        """The Reference or Store node that this modification is for."""
-        raise NotImplementedError()
-
-    def add_to_queue(self):
-        """Add this modification to the queue."""
-        # Get the queue
-        from meerkat.state import state
-
-        state.modification_queue.add(self)
-
-
-class ReferenceModification(Modification):
-    scope: List[str]
-    type: str = "ref"
-
-    @property
-    def node(self) -> Reference:
-        from meerkat.state import state
-
-        return state.identifiables.get(group="refs", id=self.id)
-
-
-class StoreModification(Modification):
-    value: Any  # : Storeable # TODO(karan): Storeable prevents
-    # us from storing objects in the store
-    type: str = "store"
-
-    @property
-    def node(self) -> Store:
-        from meerkat.state import state
-
-        return state.identifiables.get(group="stores", id=self.id)
 
 
 class Operation(NodeMixin):
@@ -592,130 +400,6 @@ def _add_op_as_child(
     for ref_or_store in refs_and_stores:
         if isinstance(ref_or_store, (Reference, Store)):
             ref_or_store.add_child(op, triggers=triggers)
-
-
-def endpoint(fn: Callable = None):
-    """
-    Decorator to mark a function as an endpoint.
-
-    An endpoint is a function that can be called to
-        - update the value of a Store (e.g. incrementing a counter)
-        - update an object referenced by a Reference (e.g. editing the
-            contents of a DataFrame)
-        - run a computation and return its result to the frontend
-        - run a function in response to a frontend event (e.g. button
-            click)
-
-    Endpoints differ from operations in that they are not automatically
-    triggered by changes in their inputs. Instead, they are triggered by
-    explicit calls to the endpoint function.
-
-    The Store and Reference objects that are modified inside the endpoint
-    function will automatically trigger operations in the graph that
-    depend on them.
-
-    Warning: Due to this, we do not recommend running endpoints manually
-    in your Python code. This can lead to unexpected behavior e.g.
-    running an endpoint inside an operation may change a Store or
-    Reference  that causes the operation to be triggered repeatedly,
-    leading to an infinite loop.
-
-    Almost all use cases can be handled by using the frontend to trigger
-    endpoints.
-
-    .. code-block:: python
-
-        @endpoint
-        def increment(count: Store, step: int = 1):
-            count._ += step
-            # ^ update the count Store, which will trigger operations
-            #   that depend on it
-
-            # return the updated value to the frontend
-            return count._
-
-        # Now you can create a button that calls the increment endpoint
-        counter = Store(0)
-        button = Button(on_click=increment(counter))
-        # ^ read this as: call the increment endpoint with the counter
-        # Store when the button is clicked
-
-    Args:
-        fn: The function to decorate.
-
-    Returns:
-        The decorated function, as an Endpoint object.
-    """
-
-    def _endpoint(fn: Callable):
-
-        stores = set()
-        references = set()
-        for name, annot in inspect.getfullargspec(fn).annotations.items():
-            if isinstance(annot, type) and issubclass(annot, Store):
-                stores.add(name)
-            if isinstance(annot, type) and issubclass(annot, Reference):
-                references.add(name)
-
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            """
-            This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Reference` object that wraps the
-            output of the function.
-
-            Subsequent calls to the function will be handled by the graph.
-            """
-            # Keep the arguments that were not annotated to be stores or
-            # references
-            fn_signature = inspect.signature(fn)
-            fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
-
-            # Unpack the args and kwargs to get the refs and stores
-            fn_args_to_unpack = {
-                k: v
-                for k, v in fn_bound_arguments.items()
-                if k not in stores and k not in references
-            }
-            args, kwargs, _, _ = _unpack_refs_and_stores(**fn_args_to_unpack)
-
-            # Don't unpack the refs and stores that were type hinted
-            # Pull them out of the bound arguments, and if they were
-            # passed in as ids, convert them to the actual objects
-            fn_args_as_is = {
-                k: v
-                if isinstance(v, (Store, Reference))
-                else (
-                    state.identifiables.get(v, group="stores")
-                    if k in stores
-                    else state.identifiables.get(v, group="refs")
-                )
-                for k, v in fn_bound_arguments.items()
-                if k in stores or k in references
-            }
-            assert all(
-                [isinstance(v, (Store, Reference)) for v in fn_args_as_is.values()]
-            ), "All arguments that are type hinted as stores or references \
-                must be Store or Reference objects."
-
-            # Run the function
-            result = fn(*args, **{**kwargs, **fn_args_as_is})
-
-            # Get the modifications from the queue
-            modifications = state.modification_queue.queue
-
-            # Trigger the modifications
-            modifications = trigger(modifications)
-            return result
-
-        # Register the endpoint and return it
-        from pydantic import validate_arguments
-
-        return Endpoint(
-            validate_arguments(config=dict(arbitrary_types_allowed=True))(wrapper)
-        )
-
-    return _endpoint(fn)
 
 
 def interface_op(

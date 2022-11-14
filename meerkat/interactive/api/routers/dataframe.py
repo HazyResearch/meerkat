@@ -1,32 +1,20 @@
-import functools
 from typing import Any, Dict, List, Union
 
 import numpy as np
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
-import meerkat as mk
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.dataframe import DataFrame
-from meerkat.interactive import Modification, trigger
 from meerkat.interactive.edit import EditTargetConfig
-from meerkat.interactive.graph import ReferenceModification
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Reference, ReferenceModification, trigger
+from meerkat.interactive.modification import Modification
 from meerkat.state import state
-
-from ....tools.utils import convert_to_python
-
-router = APIRouter(
-    prefix="/df",
-    tags=["df"],
-    responses={404: {"description": "Not found"}},
-)
-
-EmbeddedBody = functools.partial(Body, embed=True)
 
 
 class ColumnInfo(BaseModel):
-
     name: str
     type: str
     cell_component: str
@@ -43,14 +31,13 @@ class SchemaResponse(BaseModel):
     nrows: int = None
 
 
-@router.post("/{pivot_id}/schema/")
-def schema(pivot_id: str, request: SchemaRequest) -> SchemaResponse:
-    pivot = state.identifiables.get(group="refs", id=pivot_id)
-
-    df = state.identifiables.get(group="dataframes", id=pivot.obj.id)
-    columns = df.columns if request is None else request.columns
+@endpoint(prefix="/df", route="/{df}/schema/")
+def schema(df: Reference, request: SchemaRequest) -> SchemaResponse:
+    columns = df._.columns if request is None else request.columns
     return SchemaResponse(
-        id=pivot.obj.id, columns=_get_column_infos(df, columns), nrows=len(df)
+        id=df._.id,
+        columns=_get_column_infos(df._, columns),
+        nrows=len(df._),
     )
 
 
@@ -88,20 +75,18 @@ class RowsResponse(BaseModel):
     full_length: int
 
 
-@router.post("/{ref_id}/rows/")
+@endpoint(prefix="/df", route="/{df}/rows/")
 def rows(
-    ref_id: str,
-    start: int = Body(None),
-    end: int = Body(None),
-    indices: List[int] = Body(None),
-    key_column: str = Body(None),
-    keys: List[Union[StrictInt, StrictStr]] = Body(None),
-    columns: List[str] = Body(None),
+    df: Reference,
+    start: int = Endpoint.EmbeddedBody(None),
+    end: int = Endpoint.EmbeddedBody(None),
+    indices: List[int] = Endpoint.EmbeddedBody(None),
+    key_column: str = Endpoint.EmbeddedBody(None),
+    keys: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
+    columns: List[str] = Endpoint.EmbeddedBody(None),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    ref = state.identifiables.get(group="refs", id=ref_id)
-    df = ref.obj
-
+    df = df._
     full_length = len(df)
     column_infos = _get_column_infos(df, columns)
 
@@ -141,57 +126,46 @@ def rows(
     )
 
 
-@router.post("/{ref_id}/remove_row_by_index/")
+@endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
 def remove_row_by_index(
-    ref_id: str, row_index: int = EmbeddedBody()
+    df: Reference, row_index: int = Endpoint.EmbeddedBody()
 ) -> List[Modification]:
-    ref = state.identifiables.get(group="refs", id=ref_id)
-
-    df = ref.obj
-    df = df.lz[np.arange(len(df)) != row_index]
-    # this is an out-of-place operation, so the ref should be updated
-    # TODO(karan): double check this
-    ref.obj = df
-
+    df._ = df._.lz[np.arange(len(df._)) != row_index]
     modifications = trigger(
-        modifications=[ReferenceModification(id=ref_id, scope=df.columns)]
+        modifications=[ReferenceModification(id=df.id, scope=df._.columns)]
     )
     return modifications
 
 
-@router.post("/{ref_id}/edit/")
+@endpoint(prefix="/df", route="/{df}/edit/")
 def edit(
-    ref_id: str,
-    value=Body(),  # don't set type
-    column: str = Body(),
-    row_id=Body(),
-    id_column: str = Body(),
+    df: Reference,
+    value=Endpoint.EmbeddedBody(),  # don't set type
+    column: str = Endpoint.EmbeddedBody(),
+    row_id=Endpoint.EmbeddedBody(),
+    id_column: str = Endpoint.EmbeddedBody(),
 ) -> List[Modification]:
-
-    ref = state.identifiables.get(group="refs", id=ref_id)
-    df = ref.obj
-
-    mask = df[id_column] == row_id
+    mask = df._[id_column] == row_id
     if mask.sum() == 0:
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
-    df[column][mask] = value
+    df._[column][mask] = value
 
     modifications = trigger(
-        modifications=[ReferenceModification(id=ref_id, scope=[column])]
+        modifications=[ReferenceModification(id=df.id, scope=[column])]
     )
     return modifications
 
 
-@router.post("/{ref_id}/edit_target/")
+@endpoint(prefix="/df", route="/{df}/edit_target/")
 def edit_target(
-    ref_id: str,
-    target: EditTargetConfig = Body(),
-    value=Body(),  # don't set type
-    column: str = Body(),
-    row_indices: List[int] = Body(None),
-    row_keys: List[Union[StrictInt, StrictStr]] = Body(None),
-    primary_key: str = Body(None),
-    metadata: Dict[str, Any] = Body(None),
+    df: Reference,
+    target: EditTargetConfig = Endpoint.EmbeddedBody(),
+    value=Endpoint.EmbeddedBody(),  # don't set type
+    column: str = Endpoint.EmbeddedBody(),
+    row_indices: List[int] = Endpoint.EmbeddedBody(None),
+    row_keys: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
+    primary_key: str = Endpoint.EmbeddedBody(None),
+    metadata: Dict[str, Any] = Endpoint.EmbeddedBody(None),
 ):
     """Edit a target dataframe.
 
@@ -205,19 +179,18 @@ def edit_target(
             status_code=400,
             detail="Exactly one of row_indices or row_keys must be specified",
         )
-
-    df = state.identifiables.get(group="refs", id=ref_id).obj
-
     target_df = state.identifiables.get(group="refs", id=target.target.ref_id).obj
 
     if row_indices is not None:
-        source_ids = df[target.source_id_column][row_indices]
+        source_ids = df._[target.source_id_column][row_indices]
     else:
         if primary_key is None:
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_df.primary_key
-        source_ids = df[target.source_id_column].lz[np.isin(df[primary_key], row_keys)]
+        source_ids = df._[target.source_id_column].lz[
+            np.isin(df._[primary_key], row_keys)
+        ]
 
     mask = np.isin(target_df[target.target_id_column], source_ids)
 
@@ -256,98 +229,3 @@ def edit_target(
         modifications=[ReferenceModification(id=target.target.ref_id, scope=[column])]
     )
     return modifications
-
-
-@router.post("/{dataframe_id}/sort/")
-def sort(dataframe_id: str, by: str = EmbeddedBody()):
-    df = state.identifiables.get(group="dataframes", id=dataframe_id)
-    df = mk.sort(data=df, by=by, ascending=False)
-    global curr_df
-    curr_df = df
-    return SchemaResponse(id=df.id, columns=_get_column_infos(df))
-
-
-@router.post("/{dataframe_id}/aggregate/")
-def aggregate(
-    dataframe_id: str,
-    aggregation_id: str = Body(None),
-    aggregation: str = Body(None),
-    accepts_df: bool = Body(False),
-    columns: List[str] = Body(None),
-) -> Union[float, int, str]:
-    df = state.identifiables.get(group="dataframes", id=dataframe_id)
-
-    if columns is not None:
-        df = df[columns]
-
-    if (aggregation_id is None) == (aggregation is None):
-        raise HTTPException(
-            status_code=400,
-            detail="Must specify either aggregation_id or aggregation",
-        )
-
-    if aggregation_id is not None:
-        aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
-        value = df.aggregate(aggregation, accepts_df=accepts_df)
-
-    else:
-        if aggregation not in ["mean", "sum", "min", "max"]:
-            raise HTTPException(
-                status_code=400, detail=f"Invalid aggregation {aggregation}"
-            )
-        value = df.aggregate(aggregation)
-
-    # convert value to native python type
-    value = convert_to_python(value)
-
-    return value
-
-
-# TODO: Filter to take filtering criteria objects
-# TODO: update for filtering row
-class FilterRequest(BaseModel):
-    columns: List[str]
-    values: List[Any]
-    ops: List[str]
-
-
-# Map a string operator to a function that takes a value and returns a boolean.
-_operator_str_to_func = {
-    "==": lambda x, y: x == y,  # equality
-    "!=": lambda x, y: x != y,  # inequality
-    ">": lambda x, y: x > y,  # greater than
-    "<": lambda x, y: x < y,  # less than
-    ">=": lambda x, y: x >= y,  # greater than or equal to
-    "<=": lambda x, y: x <= y,  # less than or equal to
-    "in": lambda x, y: x in y,  # in
-    "not in": lambda x, y: x not in y,  # not in
-}
-
-
-@router.post("/{dataframe_id}/filter")
-def filter(dataframe_id: str, request: FilterRequest) -> SchemaResponse:
-    # TODO(karan): untested change as earlier version called a function
-    # that didn't exist
-    df = state.identifiables.get(group="dataframes", id=dataframe_id)
-
-    supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
-    if not all(
-        isinstance(df[column], supported_column_types) for column in request.columns
-    ):
-        raise HTTPException(
-            f"Only {supported_column_types} are supported for filtering."
-        )
-
-    # Filter pandas series columns.
-    all_series = [
-        _operator_str_to_func[op](df[col], value)
-        for col, value, op in zip(request.columns, request.values, request.ops)
-    ]
-    mask = functools.reduce(lambda x, y: x & y, all_series)
-    df = df.lz[mask]
-
-    global curr_df
-    curr_df = df
-    return SchemaResponse(
-        id=df.id, columns=_get_column_infos(df, ["img", "path", "label"])
-    )

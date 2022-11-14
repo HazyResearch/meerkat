@@ -19,8 +19,8 @@ from .app.src.lib.component.table import Table
 from .app.src.lib.component.textbox import Textbox
 from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .edit import EditTarget
+from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
-    Modification,
     Reference,
     ReferenceConfig,
     Store,
@@ -29,11 +29,15 @@ from .graph import (
     make_store,
     trigger,
 )
+from .modification import Modification
 from .startup import start
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
+    "Endpoint",
+    "endpoint",
+    "make_endpoint",
     "Reference",
     "ReferenceConfig",
     "Modification",

@@ -61,6 +61,7 @@
 		"daisyui": "^2.22.0",
 		"flowbite": "^1.5.2",
 		"layercake": "^7.0.0",
+		"marked": "^4.2.2",
 		"prismjs": "^1.28.0",
 		"svelte-forms": "^2.3.1",
 		"svelte-grid": "^5.1.1",

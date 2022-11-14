@@ -1,22 +1,20 @@
-import functools
 import re
 from typing import Callable, List, Optional, Tuple
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import HTTPException
 
 import meerkat as mk
 from meerkat.dataframe import DataFrame
-from meerkat.interactive import Modification, trigger
-from meerkat.interactive.graph import ReferenceModification, StoreModification
-from meerkat.state import state
-
-EmbeddedBody = functools.partial(Body, embed=True)
-
-router = APIRouter(
-    prefix="/ops",
-    tags=["ops"],
-    responses={404: {"description": "Not found"}},
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import (
+    Reference,
+    ReferenceModification,
+    Store,
+    StoreModification,
+    trigger,
 )
+from meerkat.interactive.modification import Modification
+
 _SUPPORTED_MATCH_OPS = {
     "+": lambda x, y: x + y,
     "-": lambda x, y: x - y,
@@ -61,18 +59,19 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     return queries, op
 
 
-@router.post("/{ref_id}/match/")
+@endpoint(prefix="/ops", route="/{df}/match/")
 def match(
-    ref_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
+    df: Reference,
+    input: str = Endpoint.EmbeddedBody(),
+    query: str = Endpoint.EmbeddedBody(),
+    col_out: Store = Endpoint.EmbeddedBody(None),
 ) -> List[Modification]:
     """Match a query string against a DataFrame column.
 
     The `dataframe_id` remains the same as the original request.
     """
-    ref = state.identifiables.get(group="refs", id=ref_id)
-
-    df = ref.obj
-    if not isinstance(df, DataFrame):
+    print(df)
+    if not isinstance(df._, DataFrame):
         raise HTTPException(
             status_code=400, detail="`match` expects a ref containing a dataframe"
         )
@@ -82,51 +81,42 @@ def match(
         # TODO (arjundd): Support more than one op.
         # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
-        df, match_columns = mk.match(
-            data=df, query=queries, input=input, return_column_names=True
+        df._, match_columns = mk.match(
+            data=df._, query=queries, input=input, return_column_names=True
         )
         if len(match_columns) > 1:
             assert op is not None
             col = f"_match_{input}_{query}"
-            df[col] = _SUPPORTED_MATCH_OPS[op](
-                df[match_columns[0]], df[match_columns[1]]
+            df._[col] = _SUPPORTED_MATCH_OPS[op](
+                df._[match_columns[0]], df._[match_columns[1]]
             )
             match_columns = [col] + match_columns
 
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=404, detail=str(e))
 
     modifications = [
-        ReferenceModification(id=ref_id, scope=match_columns),
+        ReferenceModification(id=df.id, scope=match_columns),
     ]
 
     if col_out is not None:
-        col_out_store = state.identifiables.get(group="stores", id=col_out)
-        col_out_store.value = match_columns[
+        # col_out_store = state.identifiables.get(group="stores", id=col_out)
+        col_out._ = match_columns[
             0
         ]  # TODO: match probably will only need to return one column in the future
         modifications.append(
-            StoreModification(id=col_out, value=col_out_store.value),
+            StoreModification(id=col_out.id, value=col_out._),
         )
 
     modifications = trigger(modifications)
     return modifications
-    # return SchemaResponse(
-    #     id=pivot.dataframe_id,
-    #     columns=_get_column_infos(df, match_columns)
-    # )
 
 
-@router.post("/{pivot_id}/add/")
-def add_column(pivot_id: str, column: str = EmbeddedBody()):
-    pivot = state.identifiables.get(group="refs", id=pivot_id)
-    df = pivot.obj
-
+@endpoint(prefix="/ops", route="/{df}/add/")
+def add_column(df: Reference, column: str = Endpoint.EmbeddedBody()):
     import numpy as np
 
-    df[column] = np.zeros(len(df))
-
-    modifications = [Modification(ref_id=pivot_id, scope=[column])]
+    df._[column] = np.zeros(len(df._))
+    modifications = [ReferenceModification(id=df.id, scope=[column])]
     modifications = trigger(modifications)
     return modifications
