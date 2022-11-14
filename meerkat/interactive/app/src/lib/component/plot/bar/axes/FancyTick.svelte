@@ -15,14 +15,9 @@
 	let hover = false;
 </script>
 
-<div
-	on:mouseover={() => (hover = true)}
-	on:mouseout={() => (hover = false)}
->
+<div class="relative" on:mouseenter={() => (hover = true)} on:mouseleave={() => (hover = false)}>
 	{#if hover}
-		<div
-			class="bg-slate-100 z-40 rounded px-2 py-1 shadow-md h-fit"
-		>
+		<div class="absolute top-0 left-0 bg-slate-100 z-40 rounded px-2 py-1 shadow-md h-fit">
 			<div class="grid grid-cols-[1fr_auto]">
 				<div>
 					{name}
@@ -32,23 +27,22 @@
 						class="font-bold text-red-400 hover:text-red-600"
 						on:click={() => dispatch('remove', id)}
 					>
-						<Close/>
+						<Close />
 					</div>
 				{/if}
 			</div>
 			<div class="grid grid-flow-row grid-cols-2 space-x-1">
 				<div class="font-bold">Name</div>
 				<div>{name}</div>
-				<div class="font-bold">Delta</div>
 				<div class="font-bold">Count</div>
 				<div>{size}</div>
 				<div>ID</div>
 				<div>{id}</div>
 			</div>
 		</div>
-	{:else}
-		<div class="bg-slate-100 z-10 rounded px-2 py-1">
-			{name}
-		</div>
 	{/if}
+
+	<div class="bg-slate-100 z-10 rounded px-2 py-1 w-fit">
+		{name}
+	</div>
 </div>

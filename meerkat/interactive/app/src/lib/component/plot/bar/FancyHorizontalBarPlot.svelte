@@ -47,7 +47,7 @@
 	const can_remove_context = setContext("can_remove", can_remove)
 </script>
 
-<div class="relative h-full w-full">
+<div class="relative h-full w-full z-10">
 		<LayerCake
 			ssr={true}
 			percentRange={true}
@@ -77,7 +77,7 @@
 		>
 			<Html>
 				<Label axis="x" label={xlabel} />
-				<FancyLabelY label={ylabel} offset={0} />
+				<!-- <FancyLabelY label={ylabel} offset={0} /> -->
 			</Html>
 			<Svg>
 				<SvgAxisX />
