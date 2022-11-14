@@ -122,7 +122,7 @@ def download_imagenette(
     if overwrite or not os.path.exists(dir_path):
         download_url(
             url=imagenette.VERSION_TO_URL[version],
-            root=download_dir,
+            dataset_dir=download_dir,
         )
         print("Extracting tar archive, this may take a few minutes...")
         tar = tarfile.open(tar_path)
