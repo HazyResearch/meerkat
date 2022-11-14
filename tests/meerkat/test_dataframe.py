@@ -658,8 +658,6 @@ def test_overwrite_column():
 
 
 def test_rename():
-    print("DEAN hello world")
-
     a = np.arange(16)
     b = np.arange(16) * 2
     
