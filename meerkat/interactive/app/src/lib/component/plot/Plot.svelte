@@ -4,6 +4,7 @@
 	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
 	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
 	import type { Point2D } from '$lib/shared/plot/types';
 
 	const { get_rows, remove_row_by_index } = getContext('Interface');
@@ -59,16 +60,11 @@
 </script>
 
 <!-- TODO: Figure out the padding to put here.  -->
-<div class="flex-1 flex flex-col items-center ml-16">
+<div class="flex-1 flex flex-col items-center">
 	{#await datum_promise}
-		<ScatterPlot
-			data={[{ x: 0, y: 0, id: 0, key: 0 }]}
-			metadata={[]}
-			bind:xlabel={$x_label}
-			bind:ylabel={$y_label}
-			width="90%"
-			height="300px"
-		/>
+		<div class="flex justify-center items-center h-full">
+			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
+		</div>
 	{:then datum}
 		<FancyHorizontalBarPlot
 			data={datum}

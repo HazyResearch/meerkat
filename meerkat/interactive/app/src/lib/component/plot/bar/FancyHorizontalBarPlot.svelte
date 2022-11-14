@@ -27,7 +27,8 @@
 
 	export let can_remove: boolean = true;
 
-	let height = 20 * data.length;
+	$: height = 30 * data.length;
+	console.log(height)
 
 	const floor = (x: number, decimals: number): number => {
 		return Math.floor(x * Math.pow(10, decimals)) / Math.pow(10, decimals);
@@ -39,53 +40,52 @@
 	let get_x_domain = () => {
 		let min = Math.min(...data.map((d) => d.x));
 		let max = Math.max(...data.map((d) => d.x));
-		return [0, max]
-		// return [min - 0.05, max + 0.05];
+		// return [0, max]
+		return [min - 0.05, max + 0.05];
 		// return [floor(min, 1), ceil(max, 1)];
 	}
 
 	// Set a context to allow passing of metadata.
-	console.log(metadata);
 	const metadataContext = setContext("FancyHorizontalBarPlotMetadata", { metadata } );
 	const can_remove_context = setContext("can_remove", can_remove)
 </script>
 
-<div class="relative w-full h-full">
-	<LayerCake
-		ssr={true}
-		percentRange={true}
-		padding={{ bottom: padding, left: padding + ywidth }}
-		x="x"
-		y="y"
-		yScale={scaleBand().paddingInner(0.05)}
-		{data}
-		xDomain={get_x_domain()}
-		position="absolute"
-	>
-		<Html>
-			<!-- <HtmlAxisY /> -->
-			<FancyHtmlAxisY width={ywidth} tickMarks={true} on:remove />
-		</Html>
-	</LayerCake>
-	<LayerCake
-		ssr={false}
-		percentRange={false}
-		padding={{ bottom: padding, left: padding + ywidth }}
-		x="x"
-		y="y"
-		yScale={scaleBand().paddingInner(0.05)}
-		{data}
-		xDomain={get_x_domain()}
-		position="absolute"
-	>
-		<Html>
-			<Label axis="x" label={xlabel} />
-			<FancyLabelY label={ylabel} offset={0} />
-		</Html>
-		<Svg>
-			<SvgAxisX />
-			<!-- <SvgAxisY /> -->
-			<SvgBar on:selection-change />
-		</Svg>
-	</LayerCake>
+<div class="relative w-full" style='height:{height}px;'>
+		<LayerCake
+			ssr={true}
+			percentRange={true}
+			padding={{top: 50, left: padding + ywidth }}
+			x="x"
+			y="y"
+			yScale={scaleBand().paddingInner(0.05)}
+			{data}
+			xDomain={get_x_domain()}
+			position="absolute"
+		>
+			<Html>
+				<!-- <HtmlAxisY /> -->
+				<FancyHtmlAxisY width={ywidth} tickMarks={true} on:remove />
+			</Html>
+		</LayerCake>
+		<LayerCake
+			ssr={false}
+			percentRange={false}
+			padding={{top: 50, left: padding + ywidth }}
+			x="x"
+			y="y"
+			yScale={scaleBand().paddingInner(0.05)}
+			{data}
+			xDomain={get_x_domain()}
+			position="absolute"
+		>
+			<Html>
+				<Label axis="x" label={xlabel} />
+				<FancyLabelY label={ylabel} offset={0} />
+			</Html>
+			<Svg>
+				<SvgAxisX />
+				<!-- <SvgAxisY /> -->
+				<SvgBar on:selection-change />
+			</Svg>
+		</LayerCake>
 </div>

@@ -38,7 +38,7 @@
 	};
 </script>
 
-<g class="w-full h-full" on:contextmenu={clear_points}>
+<g class="w-full" on:contextmenu={clear_points}>
 	<g class="bar-group">
 		{#each $data as d}
 			{@const x = $x(d) >= 0 ? $xGet({ x: 0 }) : $xGet(d)}

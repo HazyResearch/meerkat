@@ -11,17 +11,8 @@
 
 	export let components;
 
-	let gallery = components.gallery;
-	let gallery_match = components.gallery_match;
-	let gallery_filter = components.gallery_filter;
-	let gallery_sort = components.gallery_sort;
-	let gallery_editor = components.gallery_editor;
-	let plot = components.plot;
-	let active_slice = components.active_slice;
-	let slice_sort = components.slice_sort;
-	let slice_match = components.slice_match;
-	let global_stats = components.global_stats
 </script>
+
 <div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
 	<div class="grid grid-rows-[auto_auto_auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
@@ -29,10 +20,10 @@
 				<span color="transparent" text-shadow="0 0 0 white">♨️</span> Mocha ChangeList
 			</div>
 		</div>
-		<Match {...slice_match.props} />
-		<Sort {...slice_sort.props} />
-		<Stats {...global_stats.props} />
-		<Plot {...plot.props} />
+		<Match {...components.slice_match.props} />
+		<Sort {...components.slice_sort.props} />
+		<Stats {...components.global_stats.props} />
+		<Plot {...components.plot.props} />
 	</div>
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
@@ -41,17 +32,17 @@
 			</div>
 		</div>
 		<div class="grid grid-rows-auto grid-flow-col gap-3">
-			<!-- <div class="flex flex-col space-y-3">
-				<Row {...active_slice.props} />
-				<StatsLabeler {...gallery_editor.props} />
-			</div> -->
+			<div class="flex flex-col space-y-3">
+				<Row {...components.active_slice.props} />
+				<StatsLabeler {...components.gallery_editor.props} />
+			</div>
 			<div class="flex flex-col space-y-3">
 				<Match {...gallery_match.props} />
 
-				<Filter {...gallery_filter.props} />
-				<Sort {...gallery_sort.props} />
+				<Filter {...components.gallery_filter.props} />
+				<Sort {...components.gallery_sort.props} />
 			</div>
 		</div>
-		<Gallery {...gallery.props} />
+		<Gallery {...components.gallery.props} />
 	</div>
 </div>

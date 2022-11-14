@@ -38,8 +38,8 @@
     }
 
     .xlabel {
-        @apply bottom-0 left-1/2;
-        transform: translate(-55px, 55px);
+        @apply top-0 left-1/2;
+        transform: translate(-55px, -55px);
     }
 
 	.ylabel {

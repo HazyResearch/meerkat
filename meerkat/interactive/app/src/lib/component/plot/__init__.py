@@ -17,7 +17,7 @@ class Plot(Component):
         y: Union[str, Store],
         x_label: Union[str, Store],
         y_label: Union[str, Store],
-        id: Union[str, Store] = "key",
+        id: Union[str, Store],
         type: str = "scatter",
         slot: str = None,
         keys_to_remove: Union[str, Store] = None,

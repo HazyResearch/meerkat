@@ -28,7 +28,7 @@
 	export let xTick = 0;
 
 	/** @type {Number} [yTick=16] - The distance from the baseline to place each tick value. */
-	export let yTick = 16;
+	export let yTick = -16;
 
 	$: isBandwidth = typeof $xScale.bandwidth === 'function';
 
@@ -57,9 +57,9 @@
 	{#each tickVals as tick, i}
 		<!-- Need to check the difference below! -->
 		<!-- <g class='tick tick-{ i }' transform='translate({$xScale(tick)},{$yRange[0]})'> -->
-		<g class="tick tick-{i}" transform="translate({$xScale(tick)},{Math.max(...$yRange)})">
+		<g class="tick tick-{i}" transform="translate({$xScale(tick)},{Math.min(...$yRange)})">
 			{#if gridlines !== false}
-				<line class="gridline" y1={$height * -1} y2="0" x1="0" x2="0" />
+				<line class="gridline" y1={$height} y2="0" x1="0" x2="0" />
 			{/if}
 			{#if tickMarks === true}
 				<line

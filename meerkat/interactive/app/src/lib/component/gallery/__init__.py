@@ -47,7 +47,7 @@ class Gallery(Component):
         self.edit_target = edit_target
 
         if primary_key is None:
-            primary_key = df._primary_key    
+            primary_key = df._._primary_key    
         self.primary_key = primary_key
 
         if selected is None:

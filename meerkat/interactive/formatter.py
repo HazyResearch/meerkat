@@ -51,7 +51,6 @@ class Formatter(ABC):
         return {}
 
 
-
 class BasicFormatter(Formatter):
     cell_component = "basic"
 
