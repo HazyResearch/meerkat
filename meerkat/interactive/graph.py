@@ -539,6 +539,7 @@ def interface_op(
     first_call: Any = None,
     on: Union[Reference, Store, str, List[Union[Reference, Store, str]]] = None,
     also_on: Union[Reference, Store, List[Union[Reference, Store]]] = None,
+    force_reactify: bool = False
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -604,6 +605,8 @@ def interface_op(
         also_on: A Reference or Store, or a list of References or Stores. When these are
             modified, the function will be called. *The function will continue to be
             triggered when its inputs are modified.*
+        force_reactify: Whether to force the function to be reactified. This is useful
+            for returning outputs that are always reactified.
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
@@ -674,7 +677,7 @@ def interface_op(
             #     or on is not None
             #     or also_on is not None
             # ):
-            if (len(nodeables) > 0) or on is not None or also_on is not None:
+            if (len(nodeables) > 0) or on is not None or also_on is not None or force_reactify:
 
                 # FIXME: the result should be possible to put as nodes in the graph
                 # and if they're not, wrap them in Store and make them nodes
@@ -791,15 +794,30 @@ _IS_REACTIVE = []
 def is_reactive():
     return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
 
+
 def reactify(fn, **kwargs):
-    @interface_op(**kwargs)
-    def _wrapper_interface_op(*args, **kwargs):
-        return fn(*args, **kwargs)
+    """Reactify a function when reactive mode is enabled.
 
-    def _wrapper(*args, **kwargs):
-        return fn(*args, **kwargs)
+    To enable reactive mode, the function/method should be called
+    in the :class:`mk.gui.react` context.
 
-    return _wrapper_interface_op if is_reactive() else _wrapper
+    Args:
+        fn: The function to reactify.
+        **kwargs: Keyword arguments to pass to :func:`interface_op`.
+            Cannot include `force_reactify` or `nested_return` arguments.
+
+    Returns:
+        Callable: The reactified function.
+    """
+    # nested_return is False because any operations on the outputs of the
+    # function should recursively generate Stores / References.
+    # For example, if fn returns a list. The reactified fn will return a Store(list).
+    # Then, Store(list)[0] should also return a Store.
+    # TODO (arjun): These if this assumption holds.
+    if is_reactive():
+        fn = interface_op(fn=fn, force_reactify=True, nested_return=False, **kwargs)
+
+    return fn
 
 
 class react:

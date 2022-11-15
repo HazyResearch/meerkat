@@ -40,6 +40,7 @@ from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
 
@@ -60,6 +61,7 @@ class DataFrame(
     MaterializationMixin,
     IndexerMixin,
     ProvenanceMixin,
+    ReactifiableMixin,
 ):
     """Meerkat DataFrame class."""
 

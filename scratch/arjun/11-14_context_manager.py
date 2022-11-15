@@ -1,16 +1,32 @@
 """Test the context manager with stores."""
+# import meerkat as mk
+
+
+# # Example 1
+# s1 = mk.gui.Store(5)
+
+# with mk.gui.react():
+#     r = s1 + 2
+
+# # the interface_op decorator should be applied to the addition method.
+# # Thus:
+# # 1. r should be a store because it is in mk.gui.react()
+# # 2. r should be on the graph.
+# assert isinstance(r, mk.gui.Store), type(r)
+# # assert r.has_trigger_children()
+
+
+import pandas as pd
+
 import meerkat as mk
 
+df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+df = mk.DataFrame.from_pandas(df)
 
-# Example 1
-s1 = mk.gui.Store(5)
-
+df = mk.gui.Reference(df)
 with mk.gui.react():
-    r = s1 + 2
+    columns_store = df.obj.keys()
 
-# the interface_op decorator should be applied to the addition method.
-# Thus:
-# 1. r should be a store because it is in mk.gui.react()
-# 2. r should be on the graph.
-assert isinstance(r, mk.gui.Store), type(r)
-# assert r.has_trigger_children()
+columns = df.obj.keys()
+print(type(columns_store), columns_store)
+print(columns)

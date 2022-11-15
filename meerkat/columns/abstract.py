@@ -22,6 +22,7 @@ from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
@@ -44,6 +45,7 @@ class AbstractColumn(
     MappableMixin,
     MaterializationMixin,
     ProvenanceMixin,
+    ReactifiableMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
