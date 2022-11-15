@@ -16,17 +16,25 @@
 # # assert r.has_trigger_children()
 
 
-import pandas as pd
+# import pandas as pd
+
+# import meerkat as mk
+
+# df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+# df = mk.DataFrame.from_pandas(df)
+
+# df = mk.gui.Reference(df)
+# with mk.gui.react():
+#     columns_store = df.obj.keys()
+
+# columns = df.obj.keys()
+# print(type(columns_store), columns_store)
+# print(columns)
+
 
 import meerkat as mk
-
-df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-df = mk.DataFrame.from_pandas(df)
-
-df = mk.gui.Reference(df)
+a = mk.gui.Store(1)
 with mk.gui.react():
-    columns_store = df.obj.keys()
+    b = a + 1
 
-columns = df.obj.keys()
-print(type(columns_store), columns_store)
-print(columns)
+print(b)

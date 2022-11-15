@@ -67,6 +67,73 @@ class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
         return f"Reference({self.obj})"
 
 
+# A stack that manages if reactive mode is enabled
+# The stack is reveresed so that the top of the stack is
+# the last index in the list.
+_IS_REACTIVE = []
+
+
+def is_reactive():
+    return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
+
+
+def reactify(fn, **kwargs):
+    """Reactify a function when reactive mode is enabled.
+
+    To enable reactive mode, the function/method should be called
+    in the :class:`mk.gui.react` context.
+
+    Args:
+        fn: The function to reactify.
+        **kwargs: Keyword arguments to pass to :func:`interface_op`.
+            Cannot include `force_reactify` or `nested_return` arguments.
+
+    Returns:
+        Callable: The reactified function.
+    """
+    # nested_return is False because any operations on the outputs of the
+    # function should recursively generate Stores / References.
+    # For example, if fn returns a list. The reactified fn will return a Store(list).
+    # Then, Store(list)[0] should also return a Store.
+    # TODO (arjun): These if this assumption holds.
+    if is_reactive():
+        fn = interface_op(fn=fn, force_reactify=True, nested_return=False, **kwargs)
+
+    return fn
+
+
+def reactify_decorator(fn=None, **interface_op_kwargs):
+    """A decorator for reactifying functions and methods."""
+    if fn is None:
+        return partial(reactify_decorator, **interface_op_kwargs)
+
+    def _decorator(fn):
+        @wraps(fn)
+        def _wrapper(*args, **kwargs):
+            return reactify(fn, **interface_op_kwargs)(*args, **kwargs)
+        return _wrapper
+
+    return _decorator(fn)
+
+
+class react:
+    def __init__(self, reactive: bool = True):
+        self._reactive = reactive
+
+    def __enter__(self):
+        _IS_REACTIVE.append(self._reactive)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        _IS_REACTIVE.pop(-1)
+
+
+class no_react(react):
+    def __init__(self):
+        super().__init__(reactive=False)
+
+
+
 class StoreConfig(BaseModel):
     store_id: str
     value: Any
@@ -149,13 +216,10 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # storing the attributes as a state would give us.
         return reactify(attr) if callable(attr) else attr
 
+    @reactify_decorator()
     def __add__(self, other):
-        # TODO: Is there a fast way to do this for all of the operators?
-        # TODO: This might be covered by the ObjectProxy?
-        out = reactify(lambda x, y: x + y)(self, other)
-        # if not isinstance(out, Store):
-        #     out = Store(out)
-        return out
+        # TODO (arjun): This should not fail with karan's changes.
+        return self.value + other
 
     # @classmethod
     # def __get_validators__(cls):
