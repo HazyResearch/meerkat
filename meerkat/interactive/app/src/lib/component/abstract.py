@@ -13,7 +13,7 @@ class ComponentConfig(BaseModel):
 
 class Component(IdentifiableMixin):
 
-    identifiable_group: str = "components"
+    _self_identifiable_group: str = "components"
 
     name: str
 
@@ -23,4 +23,10 @@ class Component(IdentifiableMixin):
 
     @property
     def props(self):
-        return {}
+        return {
+            # TODO: improve this so we isinstance a class instead
+            k: v.config if hasattr(v, "config") else v
+            for k, v in self.__dict__.items()
+            # FIXME: critical fix, need to remove all keys here
+            if k not in ["id", "name", "identifiable_group"]
+        }

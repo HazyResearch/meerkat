@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Generic, List, Union
 
 from pydantic import BaseModel
 from tqdm import tqdm
+from wrapt import ObjectProxy
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.modification import (
@@ -25,7 +26,7 @@ class ReferenceConfig(BaseModel):
 
 
 class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
-    identifiable_group: str = "refs"
+    _self_identifiable_group: str = "refs"
 
     def __init__(self, obj: T):
         super().__init__()
@@ -73,48 +74,78 @@ class StoreConfig(BaseModel):
     is_store: bool = True
 
 
-class Store(IdentifiableMixin, NodeMixin, Generic[T]):
-    identifiable_group: str = "stores"
+# ObjectProxy must be the last base class
+class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
-    def __init__(self, value: Any):
-        super().__init__()
-        self._value = value
+    _self_identifiable_group: str = "stores"
+
+    def __init__(self, wrapped: T):
+        super().__init__(wrapped=wrapped)
 
     @property
     def config(self):
         return StoreConfig(
             store_id=self.id,
-            value=self.value,
+            value=self.__wrapped__,
             has_children=self.has_children(),
         )
 
-    @property
-    def _(self):
-        return self.value
-
-    @_.setter
-    def _(self, value):
-        self.value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        mod = StoreModification(id=self.id, value=value)
-        self._value = value
+    def set(self, new_value: T):
+        """Set the value of the store."""
+        mod = StoreModification(id=self.id, value=new_value)
+        self.__wrapped__ = new_value
         mod.add_to_queue()
 
     def __repr__(self) -> str:
-        return f"Store({self._})"
+        return f"Store({self.__wrapped__})"
 
-    # @classmethod
-    # def __get_validators__(cls):
-    #     # one or more validators may be yielded which will be called in the
-    #     # order to validate the input, each validator will receive as an input
-    #     # the value returned from the previous validator
-    #     yield cls.validate
+    @property
+    def detail(self):
+        return f"Store({self.__wrapped__}) has id {self.id} and node id {self.node_id}"
+
+
+# class Store(IdentifiableMixin, NodeMixin, Generic[T]):
+#     identifiable_group: str = "stores"
+
+#     def __init__(self, value: Any):
+#         super().__init__()
+#         self._value = value
+
+#     @property
+#     def config(self):
+#         return StoreConfig(
+#             store_id=self.id,
+#             value=self.value,
+#             has_children=self.has_children(),
+#         )
+
+#     @property
+#     def _(self):
+#         return self.value
+
+#     @_.setter
+#     def _(self, value):
+#         self.value = value
+
+#     @property
+#     def value(self):
+#         return self._value
+
+#     @value.setter
+#     def value(self, value):
+#         mod = StoreModification(id=self.id, value=value)
+#         self._value = value
+#         mod.add_to_queue()
+
+#     def __repr__(self) -> str:
+#         return f"Store({self._})"
+
+# @classmethod
+# def __get_validators__(cls):
+#     # one or more validators may be yielded which will be called in the
+#     # order to validate the input, each validator will receive as an input
+#     # the value returned from the previous validator
+#     yield cls.validate
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
@@ -164,7 +195,9 @@ class Operation(NodeMixin):
         self.kwargs = kwargs
         self.result = result
         self.on = on
-        nested_apply(self.result, self.add_child)
+
+        # Add the result as a child of this Operation node
+        # nested_apply(self.result, self.add_child)
 
     def __call__(self) -> List[Modification]:
         """
@@ -175,13 +208,15 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the result Reference,
         and are used to update the state of the GUI.
         """
-        unpacked_args, unpacked_kwargs, _, _ = _unpack_refs_and_stores(
-            *self.args, **self.kwargs
-        )
-        update = self.fn(*unpacked_args, **unpacked_kwargs)
+        # unpacked_args, unpacked_kwargs, _, _ = _unpack_refs_and_stores(
+        #     *self.args, **self.kwargs
+        # )
+        # update = self.fn(*unpacked_args, **unpacked_kwargs)
+
+        update = self.fn(*self.args, **self.kwargs)
 
         modifications = []
-        _update_result(self.result, update, modifications=modifications)
+        self.result = _update_result(self.result, update, modifications=modifications)
 
         return modifications
 
@@ -219,33 +254,46 @@ def _update_result(
         return {
             k: _update_result(v, update[k], modifications) for k, v in result.items()
         }
-    elif isinstance(result, Reference):
-        # If the result is a Reference, then we need to update the Reference's object
-        # and return a ReferenceModification
-        result.obj = update
-        if isinstance(result.obj, DataFrame):
-            modifications.append(
-                ReferenceModification(id=result.id, scope=result.obj.columns)
-            )
-        return result
+    # elif isinstance(result, Reference):
+    #     # If the result is a Reference, then we need to update the Reference's object
+    #     # and return a ReferenceModification
+    #     result.obj = update
+    #     if isinstance(result.obj, DataFrame):
+    #         modifications.append(
+    #             ReferenceModification(id=result.id, scope=result.obj.columns)
+    #         )
+    #     return result
+    elif isinstance(result, DataFrame):
+        # Detach the result object from the Node
+        inode = result.detach_inode()
+
+        # Attach the inode to the update object
+        update.attach_to_inode(inode)
+
+        # Create modifications
+        modifications.append(ReferenceModification(id=inode.id, scope=update.columns))
+
+        return update
+
     elif isinstance(result, Store):
         # If the result is a Store, then we need to update the Store's value
         # and return a StoreModification
         # TODO(karan): now checking if the value is the same
         # This is assuming that all values put into Stores have an __eq__ method
         # defined that can be used to check if the value has changed.
-        # print(result.value, update)
-        if isinstance(result.value, (str, int, float, bool, type(None), tuple)):
+        if isinstance(result, (str, int, float, bool, type(None), tuple)):
             # We can just check if the value is the same
-            if result.value != update:
-                result.value = update
-                modifications.append(StoreModification(id=result.id, value=update))
+            if result != update:
+                result.set(update)
+                modifications.append(
+                    StoreModification(id=result.inode.id, value=update)
+                )
         else:
             # We can't just check if the value is the same if the Store contains
             # a list, dict or object, since they are mutable (and it would just
             # return True).
-            result.value = update
-            modifications.append(StoreModification(id=result.id, value=update))
+            result.set(update)
+            modifications.append(StoreModification(id=result.inode.id, value=update))
         return result
     else:
         # If the result is not a Reference or Store, then it is a primitive type
@@ -265,21 +313,49 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
+    # order = [
+    #     node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
+    # ]
     # Sort the nodes in topological order, and keep the Operation nodes
     order = [
-        node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
+        node.obj
+        for node in _topological_sort(root_nodes)
+        if isinstance(node.obj, Operation)
     ]
 
     print(f"trigged pipeline: {'->'.join([node.fn.__name__ for node in order])}")
     new_modifications = []
     with tqdm(total=len(order)) as pbar:
+        # Go through all the operations in order: run them and add their modifications
+        # to the new_modifications list
         for op in order:
             pbar.set_postfix_str(f"Running {op.fn.__name__}")
             mods = op()
+            # TODO: check this
             mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
             pbar.update(1)
     return modifications + new_modifications
+
+
+def _get_nodeables(*args, **kwargs):
+    nodeables = []
+    for arg in args:
+        if isinstance(arg, NodeMixin):
+            nodeables.append(arg)
+        elif isinstance(arg, list) or isinstance(arg, tuple):
+            nodeables.extend(_get_nodeables(*arg))
+        elif isinstance(arg, dict):
+            nodeables.extend(_get_nodeables(**arg))
+
+    for _, v in kwargs.items():
+        if isinstance(v, NodeMixin):
+            nodeables.append(v)
+        elif isinstance(v, list) or isinstance(v, tuple):
+            nodeables.extend(_get_nodeables(*v))
+        elif isinstance(v, dict):
+            nodeables.extend(_get_nodeables(**v))
+    return nodeables
 
 
 def _unpack_refs_and_stores(*args, **kwargs):
@@ -293,7 +369,8 @@ def _unpack_refs_and_stores(*args, **kwargs):
             unpacked_args.append(arg.obj)
         elif isinstance(arg, Store):
             stores.append(arg)
-            unpacked_args.append(arg.value)
+            # unpacked_args.append(arg.value)
+            unpacked_args.append(arg)
         elif isinstance(arg, list) or isinstance(arg, tuple):
             unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*arg)
             unpacked_args.append(unpacked_args_i)
@@ -314,7 +391,8 @@ def _unpack_refs_and_stores(*args, **kwargs):
             unpacked_kwargs[k] = v.obj
         elif isinstance(v, Store):
             stores.append(v)
-            unpacked_kwargs[k] = v.value
+            # unpacked_kwargs[k] = v.value
+            unpacked_kwargs[k] = v
         elif isinstance(v, list) or isinstance(v, tuple):
             unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*v)
             unpacked_kwargs[k] = unpacked_args_i
@@ -382,24 +460,59 @@ def _pack_refs_and_stores(obj, return_type: type = None):
     return obj
 
 
+def _wrap_outputs(obj, return_type: type = None):
+    if isinstance(obj, NodeMixin):
+        return obj
+    return Store(obj)
+
+
+# def _add_op_as_child(
+#     op: Operation,
+#     *refs_and_stores: Union[Reference, Store],
+#     triggers: bool = True,
+# ):
+#     """
+#     Add the operation as a child of the refs and stores.
+
+#     Args:
+#         op: The operation to add as a child.
+#         refs_and_stores: The refs and stores to add the operation as a child
+#             of.
+#         triggers: Whether the operation is triggered by changes in the refs
+#             and stores.
+#     """
+#     for ref_or_store in refs_and_stores:
+#         if isinstance(ref_or_store, (Reference, Store)):
+#             ref_or_store.add_child(op, triggers=triggers)
+
+
 def _add_op_as_child(
     op: Operation,
-    *refs_and_stores: Union[Reference, Store],
+    *nodeables: NodeMixin,
     triggers: bool = True,
 ):
     """
-    Add the operation as a child of the refs and stores.
+    Add the operation as a child of the nodeables.
 
     Args:
         op: The operation to add as a child.
-        refs_and_stores: The refs and stores to add the operation as a child
-            of.
-        triggers: Whether the operation is triggered by changes in the refs
-            and stores.
+        nodeables: The nodeables to add the operation as a child.
+        triggers: Whether the operation is triggered by changes in the
+            nodeables.
     """
-    for ref_or_store in refs_and_stores:
-        if isinstance(ref_or_store, (Reference, Store)):
-            ref_or_store.add_child(op, triggers=triggers)
+    for nodeable in nodeables:
+        assert isinstance(nodeable, NodeMixin)
+        # Make a node for this nodeable if it doesn't have one
+        if not nodeable.has_inode():
+            inode_id = None if not isinstance(nodeable, Store) else nodeable.id
+            nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
+
+        # Make a node for the operation if it doesn't have one
+        if not op.has_inode():
+            op.attach_to_inode(op.create_inode())
+
+        # Add the operation as a child of the nodeable
+        nodeable.inode.add_child(op.inode, triggers=triggers)
 
 
 def interface_op(
@@ -516,40 +629,53 @@ def interface_op(
             nonlocal on, also_on
 
             # TODO(Sabri): this should be nested
-            unpacked_args, unpacked_kwargs, refs, stores = _unpack_refs_and_stores(
-                *args, **kwargs
-            )
+            nodeables = _get_nodeables(*args, **kwargs)
+            print("Nodeables", nodeables)
+            # unpacked_args, unpacked_kwargs, refs, stores = _unpack_refs_and_stores(
+            #     *args, **kwargs
+            # )
 
-            if first_call is not None:
-                # For expensive functions, the user can specify a first call value
-                # that allows us to setup the Operation without running the function
-                if isinstance(first_call, Callable):
-                    result = first_call(*unpacked_args, **unpacked_kwargs)
-                else:
-                    result = first_call
-            else:
-                # By default, run the function to produce a result
-                # Call the function on the unpacked args and kwargs
-                result = fn(*unpacked_args, **unpacked_kwargs)
+            # if first_call is not None:
+            #     # For expensive functions, the user can specify a first call value
+            #     # that allows us to setup the Operation without running the function
+            #     if isinstance(first_call, Callable):
+            #         result = first_call(*unpacked_args, **unpacked_kwargs)
+            #     else:
+            #         result = first_call
+            # else:
+            #     # By default, run the function to produce a result
+            #     # Call the function on the unpacked args and kwargs
+            #     result = fn(*unpacked_args, **unpacked_kwargs)
+
+            # Call the function on the args and kwargs
+            result = fn(*args, **kwargs)
 
             # Setup an Operation node if any of the
             # args or kwargs were refs or stores
-            if (
-                (len(refs) > 0 or len(stores) > 0)
-                or on is not None
-                or also_on is not None
-            ):
+            # if (
+            #     (len(refs) > 0 or len(stores) > 0)
+            #     or on is not None
+            #     or also_on is not None
+            # ):
+            if (len(nodeables) > 0) or on is not None or also_on is not None:
+
+                # FIXME: the result should be possible to put as nodes in the graph
+                # and if they're not, wrap them in Store and make them nodes
+                # So classes that are Nodeable
 
                 # The result should be placed inside a Store or Reference
                 # (or a nested object) containing Stores and References.
                 # Then we can update the contents of this result when the
                 # function is called again.
                 if nested_return:
-                    derived = _nested_apply(
-                        result, fn=_pack_refs_and_stores, return_type=return_type
-                    )
-                elif isinstance(result, (DataFrame, SliceBy)):
-                    derived = Reference(result)
+                    derived = _nested_apply(result, fn=_wrap_outputs)
+                # elif isinstance(result, (DataFrame, SliceBy)):
+                # TODO: this needs to be removed
+                # Instead, we should directly return the result
+                # derived = Reference(result)
+                # pass
+                elif isinstance(result, NodeMixin):
+                    derived = result
                 else:
                     derived = Store(result)
 
@@ -559,14 +685,31 @@ def interface_op(
                 if on is None:
                     # Add this Operation node as a child of all of the refs and stores
                     # regardless of the value of `also_on`
-                    _add_op_as_child(op, *refs, *stores, triggers=True)
+                    # TODO: refs should be all the DataFrame / SliceBy / Column objects
+                    # that are now "References"
+                    # _add_op_as_child(op, *refs, *stores, triggers=True)
+                    _add_op_as_child(op, *nodeables, triggers=True)
+
+                    # Attach the Operation node to its children
+                    def _foo(nodeable: NodeMixin):
+                        if not nodeable.has_inode():
+                            inode_id = (
+                                None if not isinstance(nodeable, Store) else nodeable.id
+                            )
+                            nodeable.attach_to_inode(
+                                nodeable.create_inode(inode_id=inode_id)
+                            )
+
+                        op.inode.add_child(nodeable.inode)
+
+                    nested_apply(derived, _foo)
                 else:
                     # Add this Operation node as a child of all of the refs and stores
                     # that are passed into the function. However, these children
                     # are non-triggering, meaning that the Operation node will
                     # only be called when the refs and stores in `on` are modified,
                     # and not otherwise.
-                    _add_op_as_child(op, *refs, *stores, triggers=False)
+                    # _add_op_as_child(op, *refs, *stores, triggers=False)
 
                     # Add this Operation node as a child of the refs and stores
                     # passed into `on`. These will trigger the Operation!
@@ -620,12 +763,3 @@ def interface_op(
         return wrapper
 
     return _interface_op(fn)
-
-
-@interface_op
-def head(df: "DataFrame", n: int = 5):
-    new_df = df.head(n)
-    import numpy as np
-
-    new_df["head_column"] = np.zeros(len(new_df))
-    return new_df

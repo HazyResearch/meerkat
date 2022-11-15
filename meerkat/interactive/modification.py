@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from meerkat.interactive.graph import Reference, Store
+    from meerkat.interactive.node import Node
 
 
 class Modification(BaseModel, ABC):
@@ -50,7 +51,8 @@ class StoreModification(Modification):
     type: str = "store"
 
     @property
-    def node(self) -> "Store":
+    def node(self) -> "Node":
         from meerkat.state import state
 
-        return state.identifiables.get(group="stores", id=self.id)
+        store: Store = state.identifiables.get(group="stores", id=self.id)
+        return store.inode

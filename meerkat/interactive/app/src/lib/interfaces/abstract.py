@@ -51,7 +51,7 @@ class Interface(IdentifiableMixin):
     # TODO (all): I think this should probably be a subclassable thing that people
     # implement. e.g. TableInterface
 
-    identifiable_group: str = "interfaces"
+    _self_identifiable_group: str = "interfaces"
 
     def __init__(
         self,

@@ -60,7 +60,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
         True
     """
 
-    identifiable_group: str = "routers"
+    _self_identifiable_group: str = "routers"
 
     def __init__(self, prefix: str, **kwargs):
         super().__init__(
@@ -115,7 +115,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
     EmbeddedBody = partial(Body, embed=True)
 
-    identifiable_group: str = "endpoints"
+    _self_identifiable_group: str = "endpoints"
 
     def __init__(
         self,
@@ -158,33 +158,60 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         Returns:
             The return value of `fn`.
         """
-        # Check if self.fn has any arguments left to be filled
-        signature = inspect.signature(self.fn)
-        bound_args = signature.bind_partial(*args, **kwargs)
-        bound_args.apply_defaults()
 
-        # If there are no arguments left to be filled, then we can
-        # call the function
-        if len(bound_args.arguments) == len(signature.parameters) == 0:
-            return self.fn()
+        # Apply a partial function to ingest the additional arguments
+        # that are passed in
+        partial_fn = partial(self.fn, *args, **kwargs)
 
-        # Raise an error if there are still arguments left to be filled
+        # Check if the partial_fn has any arguments left to be filled
+        spec = inspect.getfullargspec(partial_fn)
+        # Check if spec has no args: if it does have args,
+        # it means that we can't call the function without filling them in
+        no_args = len(spec.args) == 0
+        # Check if all the kwonlyargs are in the keywords: if yes, we've
+        # bound all the keyword arguments
+        no_kwonlyargs = all([arg in partial_fn.keywords for arg in spec.kwonlyargs])
+
+        # Get the signature
+        signature = inspect.signature(partial_fn)
+        # Check if any parameters are unfilled args
+        no_unfilled_args = all(
+            [param.default != param.empty for param in signature.parameters.values()]
+        )
+
+        if no_args and no_kwonlyargs and no_unfilled_args:
+            return partial_fn()
+
+        # Find the missing keyword arguments
+        missing_args = [
+            arg for arg in spec.kwonlyargs if arg not in partial_fn.keywords
+        ] + [
+            param.name
+            for param in signature.parameters.values()
+            if param.default == param.empty
+        ]
         raise ValueError(
             f"Endpoint {self.id} still has arguments left to be \
-            filled: {bound_args.arguments}. Ensure that all arguments \
+            filled (args: {spec.args}, kwargs: {missing_args}). \
+                Ensure that all keyword arguments \
                 are passed in when calling `.run()` on this endpoint."
         )
 
     def __call__(self, *args, **kwargs):
         # Any Stores or References that are passed in as arguments
         # should have this Endpoint as a non-triggering child
-        for arg in args:
-            if isinstance(arg, (Store, Reference)):
-                arg.add_child(self, triggers=False)
+        if not self.has_inode():
+            node = self.create_inode()
+            self.attach_to_inode(node)
 
-        for kwarg in kwargs.values():
-            if isinstance(kwarg, (Store, Reference)):
-                kwarg.add_child(self, triggers=False)
+        for arg in list(args) + list(kwargs.values()):
+            if isinstance(arg, NodeMixin):
+                if not arg.has_inode():
+                    inode_id = None if not isinstance(arg, Store) else arg.id
+                    node = arg.create_inode(inode_id=inode_id)
+                    arg.attach_to_inode(node)
+
+                arg.inode.add_child(self.inode, triggers=False)
 
         return Endpoint(
             fn=partial(self.fn, *args, **kwargs),
@@ -289,8 +316,6 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         from meerkat.interactive.api.main import app
 
         app.include_router(self.router)
-
-        print(self.router, self.prefix, self.route, method)
 
 
 def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from functools import wraps
 from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
-from tqdm import tqdm
 
 import numpy as np
 
@@ -26,7 +25,7 @@ SliceKey = Union[str, int]
 
 class SliceBy(IdentifiableMixin):
 
-    identifiable_group: str = "slicebys"
+    _self_identifiable_group: str = "slicebys"
 
     def __init__(
         self,
@@ -90,8 +89,8 @@ class SliceBy(IdentifiableMixin):
 
         # means will be a list of dictionaries where each element in the dict
         out = []
-        
-        # TODO (Sabri): This is an extremely slow way of doing this – we need to 
+
+        # TODO (Sabri): This is an extremely slow way of doing this – we need to
         # vectorize it
         for slice_key in self.slice_keys:
             if self.slice_type == "scores":
