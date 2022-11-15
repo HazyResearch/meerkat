@@ -28,6 +28,9 @@ from .graph import (
     interface_op,
     make_store,
     trigger,
+    react,
+    no_react,
+    is_reactive,
 )
 from .modification import Modification
 from .startup import start

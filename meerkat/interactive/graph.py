@@ -144,7 +144,18 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         attr = getattr(self.value, name)
 
         # Only executing functions/methods should make the output reactifiable.
+        # TODO: See if we want accessing attributes/properties to be reactifiable.
+        # The reason they are not reactifiable now is that it is not clear what
+        # storing the attributes as a state would give us.
         return reactify(attr) if callable(attr) else attr
+
+    def __add__(self, other):
+        # TODO: Is there a fast way to do this for all of the operators?
+        # TODO: This might be covered by the ObjectProxy?
+        out = reactify(lambda x, y: x + y)(self, other)
+        # if not isinstance(out, Store):
+        #     out = Store(out)
+        return out
 
     # @classmethod
     # def __get_validators__(cls):
@@ -777,6 +788,9 @@ def interface_op(
 _IS_REACTIVE = []
 
 
+def is_reactive():
+    return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
+
 def reactify(fn, **kwargs):
     @interface_op(**kwargs)
     def _wrapper_interface_op(*args, **kwargs):
@@ -785,8 +799,7 @@ def reactify(fn, **kwargs):
     def _wrapper(*args, **kwargs):
         return fn(*args, **kwargs)
 
-    is_reactive = len(_IS_REACTIVE) and _IS_REACTIVE[-1]
-    return _wrapper_interface_op if is_reactive else _wrapper
+    return _wrapper_interface_op if is_reactive() else _wrapper
 
 
 class react:
