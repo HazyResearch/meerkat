@@ -1,4 +1,4 @@
-from meerkat.interactive.graph import Endpoint, make_endpoint
+from meerkat.interactive.endpoint import Endpoint, make_endpoint
 
 from ..abstract import Component
 
@@ -6,6 +6,9 @@ from ..abstract import Component
 class Button(Component):
 
     name = "Button"
+
+    # title: Store[str]
+    # on_click: Endpoint
 
     def __init__(
         self,
