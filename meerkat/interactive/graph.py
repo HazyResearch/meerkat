@@ -140,12 +140,18 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 #     def __repr__(self) -> str:
 #         return f"Store({self._})"
 
-# @classmethod
-# def __get_validators__(cls):
-#     # one or more validators may be yielded which will be called in the
-#     # order to validate the input, each validator will receive as an input
-#     # the value returned from the previous validator
-#     yield cls.validate
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self.value, name)
+
+        # Only executing functions/methods should make the output reactifiable.
+        return reactify(attr) if callable(attr) else attr
+
+    # @classmethod
+    # def __get_validators__(cls):
+    #     # one or more validators may be yielded which will be called in the
+    #     # order to validate the input, each validator will receive as an input
+    #     # the value returned from the previous validator
+    #     yield cls.validate
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
@@ -763,3 +769,38 @@ def interface_op(
         return wrapper
 
     return _interface_op(fn)
+
+
+# A stack that manages if reactive mode is enabled
+# The stack is reveresed so that the top of the stack is
+# the last index in the list.
+_IS_REACTIVE = []
+
+
+def reactify(fn, **kwargs):
+    @interface_op(**kwargs)
+    def _wrapper_interface_op(*args, **kwargs):
+        return fn(*args, **kwargs)
+
+    def _wrapper(*args, **kwargs):
+        return fn(*args, **kwargs)
+
+    is_reactive = len(_IS_REACTIVE) and _IS_REACTIVE[-1]
+    return _wrapper_interface_op if is_reactive else _wrapper
+
+
+class react:
+    def __init__(self, reactive: bool = True):
+        self._reactive = reactive
+
+    def __enter__(self):
+        _IS_REACTIVE.append(self._reactive)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        _IS_REACTIVE.pop(-1)
+
+
+class no_react(react):
+    def __init__(self):
+        super().__init__(reactive=False)
