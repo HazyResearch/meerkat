@@ -15,15 +15,15 @@ match: mk.gui.Component = mk.gui.Match(
     col="label"
 )
 
-sorted_box = mk.sort(dp_pivot, by=match.col, ascending=False)
+# sorted_box = mk.sort(dp_pivot, by=match.col, ascending=False)
 
-gallery = mk.gui.Gallery(
-    sorted_box,
-    main_column="img",
-    tag_columns=["label"],
-)
+# gallery = mk.gui.Gallery(
+#     sorted_box,
+#     main_column="img",
+#     tag_columns=["label"],
+# )
 
 mk.gui.start()
 mk.gui.Interface(
-    components=[match, gallery]
+    components=[match]
 ).launch()

@@ -1,20 +1,6 @@
 <script lang="ts">
-	import { get, writable, type Writable } from 'svelte/store';
-	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
-    import monaco from 'monaco-editor';
-	import { getContext } from 'svelte';
-	import Status from '$lib/components/common/Status.svelte';
-	import Select from 'svelte-select';
-
+	import { type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-    import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-    import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-    import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-    import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-    import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-
-
-	const { get_schema, match } = getContext('Interface');
 
 	export let dp: Writable;
 	export let against: Writable<string>;
@@ -22,136 +8,104 @@
 	export let text: Writable<string>; //we can get rid of this.
 	export let title: string = '';
 
-
-	let status: string = 'waiting';
-	let schema_promise;
-	let items_promise;
-	let searchValue: string="";
-	let columns: Array<Object>=[];
-
 	let divEl: HTMLDivElement = null;
-    let editor: monaco.editor.IStandaloneCodeEditor;
-    let Monaco;
-
-
+	let editor;
+	let monaco;
 	onMount(async () => {
-        // @ts-ignore
-        self.MonacoEnvironment = {
-            getWorker: function (_moduleId: any, label: string) {
-                if (label === 'json') {
-                    return new jsonWorker();
-                }
-                if (label === 'css' || label === 'scss' || label === 'less') {
-                    return new cssWorker();
-                }
-                if (label === 'html' || label === 'handlebars' || label === 'razor') {
-                    return new htmlWorker();
-                }
-                if (label === 'typescript' || label === 'javascript') {
-                    return new tsWorker();
-                }
-                return new editorWorker();
-            }
-        };
+		// @ts-ignore
+		monaco = await import('monaco-editor');
 
-		let keywords = ['col('];
-        Monaco = await import('monaco-editor');
-		
-		let regex="col\(";
-		editor = Monaco.editor.create(divEl, {
-            value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-            language: 'mylang'
-        });
-		
-		editor.languages.register({id: 'myLang'});
-		editor.languages.setMonarchTokensProvider("myLang", {
-			tokenizer:{
-				root:[
-					[regex, 
-				{
-					cases:{
-						'@keywords': 'keyword',
-						'@default': 'variable',
-					}
-				}],
+		let regex = 'col';
+		monaco.languages.register({ id: 'mySpecialLanguage' });
+
+		// Register a tokens provider for the language
+		monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
+			tokenizer: {
+				root: [
+					[/\[error.*/, 'custom-error'],
+					[/\[notice.*/, 'custom-notice'],
+					[/\[info.*/, 'custom-info'],
+					[/\[[a-zA-Z 0-9:]+\]/, 'custom-date']
 				]
 			}
 		});
-        
 
-        return () => {
-            editor.dispose();
-        };
-    });
-
-	$: {
-		schema_promise = $get_schema($dp.box_id);
-		items_promise = schema_promise.then((schema: DataPanelSchema) => {
-			return schema.columns.filter((column) => {
-				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
-			}).map(column => {
-				console.log("this is a column: ");
-				console.log({column});
-				columns.push(column);
-				console.log(columns);
-			return({value: column.name, label: column.name})})
+		// Define a new theme that contains only rules that match this language
+		monaco.editor.defineTheme('myCoolTheme', {
+			base: 'vs',
+			inherit: false,
+			rules: [
+				{ token: 'custom-info', foreground: '808080' },
+				{ token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+				{ token: 'custom-notice', foreground: 'FFA500' },
+				{ token: 'custom-date', foreground: '008800' }
+			],
+			colors: {
+				'editor.foreground': '#000000'
+			}
 		});
-	}
-	
 
-	const onKeyPress = (e) => {
-		//match with column names. 
-		console.log(e.key);
-		console.log({columns});
-		console.log({searchValue});
-		if(searchValue.includes('col(')){
-			columns.map(column => {
-				console.log({column});
-			})
-		}
-		if (e.charCode === 13) on_search();
-		else status = 'waiting';
-	};
+		// Register a completion item provider for the new language
+		monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
+			provideCompletionItems: () => {
+				var suggestions = [
+					{
+						label: 'simpleText',
+						kind: monaco.languages.CompletionItemKind.Text,
+						insertText: 'simpleText'
+					},
+					{
+						label: 'testing',
+						kind: monaco.languages.CompletionItemKind.Keyword,
+						insertText: 'testing(${1:condition})',
+						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+					},
+					{
+						label: 'ifelse',
+						kind: monaco.languages.CompletionItemKind.Snippet,
+						insertText: ['if (${1:condition}) {', '\t$0', '} else {', '\t', '}'].join('\n'),
+						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+						documentation: 'If-Else Statement'
+					}
+				];
+				return { suggestions: suggestions };
+			}
+		});
 
+		editor = monaco.editor.create(divEl, {
+			theme: 'myCoolTheme',
+			value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+			language: 'mySpecialLanguage'
+		});
 
+		return () => {
+			editor.dispose();
+		};
+	});
 
-	let on_search = async () => {
-		
-		if ($against === '') {
-			status = 'error';
-			return;
-		}
-		status = 'working';
-		let box_id = $dp.box_id;
-		let promise = $match(box_id, $against, $text, col);
-		promise
-			.then(() => {
-				status = 'success';
-			})
-			.catch((error: TypeError) => {
-				status = 'error';
-				console.log(error);
-			});
-	};
-
-	function handleSelect(event) {
-		$against = event.detail.value;
-	}
-
-	function handleClear() {
-		$against = '';
-	}
-	$: against_item = { value: $against, label: $against };
+	// monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
+	// 	tokenizer: {
+	// 		root: [
+	// 			[/\[error.*/, 'custom-error'],
+	// 			[/\[notice.*/, 'custom-notice'],
+	// 			[/\[info.*/, 'custom-info'],
+	// 			[/\[[a-zA-Z 0-9:]+\]/, 'custom-date']
+	// 		]
+	// 	}
+	// });
 </script>
 
+<div bind:this={divEl} class="h-screen" />
+
+<!-- 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
 	{#if title != ''}
 		<div class="font-bold text-xl text-slate-600 self-start pl-2">
 			{title}
 		</div>
 	{/if}
-	<div bind:this={divEl} class="h-screen" />
-	<!-- <div class="form-control">
+	<div bind:this={divEl} class="h-screen" /> -->
+<!-- <div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
 				<Status {status} />
@@ -185,7 +139,7 @@
 			</div>
 		</div>
 	</div> -->
-</div>
+<!-- </div> -->
 <!-- 
 <div class="w-full py-5 px-2 bg-slate-100 ">
     Match

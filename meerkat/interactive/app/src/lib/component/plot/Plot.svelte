@@ -26,7 +26,6 @@
 	// of key-value pairs.
 	let metadata: Array<any> = [];
 	
-	console.log(metadata_columns)
 	let get_datum = async (box_id: string): Promise<Array<Point2D>> => {
 		// Fetch all the data from the datapanel for the columns to be plotted
 		let rows = await $get_rows(box_id, 0, undefined, undefined, [$x, $y, id, ...metadata_columns]);
