@@ -1,7 +1,7 @@
-import warnings
 from typing import Union
 
-from meerkat.interactive.graph import Reference, Store, make_ref, make_store
+from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph import Store, make_store
 
 from ..abstract import Component
 
@@ -12,15 +12,13 @@ class Match(Component):
 
     def __init__(
         self,
-        pivot: Reference,
+        df: DataFrame,
         against: Union[Store, str],
         col: Union[Store, str] = "",
         title: str = "",
     ):
         super().__init__()
-        if not isinstance(pivot, Reference):
-            warnings.warn("input is not a Reference - this may cause errors")
-        self.pivot = make_ref(pivot)
+        self.df = df
         self.against: Store = make_store(against)
         self.col = make_store(col)
         self.text = make_store("")
@@ -30,7 +28,7 @@ class Match(Component):
     def props(self):
         return {
             "against": self.against.config,
-            "df": self.pivot.config,
+            "df": self.df.config,  # FIXME
             "col": self.col.config,
             "text": self.text.config,
             "title": self.title,

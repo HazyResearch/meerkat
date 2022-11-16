@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 from typing import List
 
-from meerkat.interactive.graph import Reference, Store, make_ref, make_store
+from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph import Store, make_store
 
 from ..abstract import Component
 
 
 @dataclass
 class EditTarget:
-    pivot: Reference
+    pivot: DataFrame
     pivot_id_column: str
     id_column: str
 
@@ -27,7 +28,7 @@ class Gallery(Component):
 
     def __init__(
         self,
-        df: Reference,
+        df: DataFrame,
         main_column: str,
         tag_columns: List[str],
         edit_target: EditTarget = None,
@@ -35,7 +36,7 @@ class Gallery(Component):
         primary_key: str = None,
     ) -> None:
         super().__init__()
-        self.df = make_ref(df)
+        self.df = df
         self.main_column = make_store(main_column)
         self.tag_columns = make_store(tag_columns)
         self.primary_key = primary_key
@@ -47,7 +48,7 @@ class Gallery(Component):
         self.edit_target = edit_target
 
         if primary_key is None:
-            primary_key = df._._primary_key    
+            primary_key = df._._primary_key
         self.primary_key = primary_key
 
         if selected is None:
@@ -57,7 +58,7 @@ class Gallery(Component):
     @property
     def props(self):
         props = {
-            "df": self.df.config,
+            "df": self.df.config,  # FIXME
             "main_column": self.main_column.config,
             "tag_columns": self.tag_columns.config,
             "edit_target": self.edit_target.config,

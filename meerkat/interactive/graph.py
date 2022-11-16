@@ -15,8 +15,6 @@ from meerkat.interactive.modification import (
 from meerkat.interactive.node import NodeMixin, _topological_sort
 from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.tools.utils import nested_apply
 
 
 class ReferenceConfig(BaseModel):
@@ -200,40 +198,19 @@ def make_store(value: Union[str, Storeable]) -> Store:
     return value if isinstance(value, Store) else Store(value)
 
 
-def make_ref(value: Union[any, Reference]) -> Reference:
-    """
-    Make a Reference.
-
-    If value is a Reference, return it. Otherwise, return a
-    new Reference that wraps value.
-
-    Args:
-        value (Union[any, Reference]): The value to wrap.
-
-    Returns:
-        Reference: The Reference wrapping value.
-    """
-    return value if isinstance(value, Reference) else Reference(value)
-
-
 class Operation(NodeMixin):
     def __init__(
         self,
         fn: Callable,
-        args: List[Reference],
-        kwargs: Dict[str, Reference],
-        result: Reference,
-        on=None,  # TODO: add support for on
+        args: List[Any],
+        kwargs: Dict[str, Any],
+        result: Any,
     ):
         super().__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
         self.result = result
-        self.on = on
-
-        # Add the result as a child of this Operation node
-        # nested_apply(self.result, self.add_child)
 
     def __call__(self) -> List[Modification]:
         """
@@ -244,11 +221,6 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the result Reference,
         and are used to update the state of the GUI.
         """
-        # unpacked_args, unpacked_kwargs, _, _ = _unpack_refs_and_stores(
-        #     *self.args, **self.kwargs
-        # )
-        # update = self.fn(*unpacked_args, **unpacked_kwargs)
-
         update = self.fn(*self.args, **self.kwargs)
 
         modifications = []
@@ -433,57 +405,6 @@ def _unpack_refs_and_stores(*args, **kwargs):
     return unpacked_args, unpacked_kwargs, refs, stores
 
 
-def _has_ref_or_store(arg):
-    if isinstance(arg, Reference) or isinstance(arg, Store):
-        return True
-    elif isinstance(arg, list) or isinstance(arg, tuple):
-        return any([_has_ref_or_store(a) for a in arg])
-    elif isinstance(arg, dict):
-        return any([_has_ref_or_store(a) for a in arg.values()])
-    else:
-        return False
-
-
-def _nested_apply(obj: object, fn: callable, return_type: type = None):
-    if return_type is Store or return_type is Reference:
-        return fn(obj, return_type=return_type)
-
-    if isinstance(obj, list):
-        if return_type is not None:
-            assert return_type.__origin__ is list
-            return_type = return_type.__args__[0]
-        return [_nested_apply(v, fn=fn, return_type=return_type) for v in obj]
-    elif isinstance(obj, tuple):
-        if return_type is not None:
-            assert return_type.__origin__ is tuple
-            return_type = return_type.__args__[0]
-        return tuple(_nested_apply(v, fn=fn, return_type=return_type) for v in obj)
-    elif isinstance(obj, dict):
-        if return_type is not None:
-            assert return_type.__origin__ is dict
-            return_type = return_type.__args__[1]
-        return {
-            k: _nested_apply(v, fn=fn, return_type=return_type) for k, v in obj.items()
-        }
-    else:
-        return fn(obj, return_type=return_type)
-
-
-def _pack_refs_and_stores(obj, return_type: type = None):
-    if return_type is Store:
-        return Store(obj)
-    elif return_type is Reference:
-        return Reference(obj)
-
-    if isinstance(obj, (DataFrame, SliceBy)):
-        return Reference(obj)
-
-    # TODO(Sabri): we should think more deeply about how to handle nested outputs
-    if obj is None or isinstance(obj, (int, float, str, bool)):
-        return Store(obj)
-    return obj
-
-
 def _wrap_outputs(obj, return_type: type = None):
     if isinstance(obj, NodeMixin):
         return obj
@@ -520,11 +441,11 @@ def _nested_apply(obj: object, fn: callable):
         return fn(obj)
 
     if isinstance(obj, list):
-        return [nested_apply(v, fn=fn) for v in obj]
+        return [_nested_apply(v, fn=fn) for v in obj]
     elif isinstance(obj, tuple):
-        return tuple(nested_apply(v, fn=fn) for v in obj)
+        return tuple(_nested_apply(v, fn=fn) for v in obj)
     elif isinstance(obj, dict):
-        return {k: nested_apply(v, fn=fn) for k, v in obj.items()}
+        return {k: _nested_apply(v, fn=fn) for k, v in obj.items()}
     else:
         raise ValueError(f"Unexpected type {type(obj)}.")
 
@@ -533,9 +454,6 @@ def interface_op(
     fn: Callable = None,
     nested_return: bool = True,
     return_type: type = None,
-    first_call: Any = None,
-    on: Union[Reference, Store, str, List[Union[Reference, Store, str]]] = None,
-    also_on: Union[Reference, Store, List[Union[Reference, Store]]] = None,
     force_reactify: bool = False,
 ) -> Callable:
     """
@@ -578,46 +496,12 @@ def interface_op(
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
         return_type: The type of the return value.
-        first_call: Return value for the first call to the function. This is useful for
-            time consuming operations (e.g. image generation) that shouldn't trigger
-            when the script is first run, and wait until an interaction with the GUI
-            happens.
-
-            Ideally, pass in a return value here that looks like the return value of the
-            function. For example, if the function returns a DataFrame with columns `id`
-            and `image`, then pass in an empty DataFrame with the same columns.
-
-            You can also pass in a function that returns the first call value. This
-            function should take the same arguments as the function being decorated
-            (or should absorb arguments with `*args, **kwargs`).
-        on: A Reference or Store, or a list of References or Stores. When these are
-            modified, the function will be called. *This will prevent the function from
-            being triggered when its inputs are modified.*
-
-            Also accepts strings in addition to References and Stores. If a string is
-            passed, then the function argument with the same name will be used as the
-            Reference or Store. For example, if the function has an argument `df`,
-            then you can pass in `on="df"` to trigger the function when `df` is
-            modified.
-        also_on: A Reference or Store, or a list of References or Stores. When these are
-            modified, the function will be called. *The function will continue to be
-            triggered when its inputs are modified.*
         force_reactify: Whether to force the function to be reactified. This is useful
             for returning outputs that are always reactified.
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
     """
-    # Assert that only one of `on` and `also_on` is specified, if any.
-    assert not (
-        on is not None and also_on is not None
-    ), "Must specify only one of `on` and `also_on` but not both. \
-        Use `on` to prevent the decorated function from being called when its \
-        arguments are modified (and only pay attention to the objects passed \
-        into `on`), and use `also_on` to trigger the function when its arguments \
-        are modified (and additionally when the objects passed into `also_on` \
-        are modified)."
-
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
@@ -625,9 +509,6 @@ def interface_op(
             interface_op,
             nested_return=nested_return,
             return_type=return_type,
-            first_call=first_call,
-            on=on,
-            also_on=also_on,
         )
 
     def _interface_op(fn: Callable):
@@ -640,159 +521,58 @@ def interface_op(
 
             Subsequent calls to the function will be handled by the graph.
             """
-            # TODO(karan): have to make `on` and `also_on` nonlocal otherwise
-            # it throws an UnboundLocalError. But why doesn't this happen for
-            # `first_call`?!
-            nonlocal on, also_on
-
-            # TODO(Sabri): this should be nested
-            print("PRINTING", args, kwargs)
-            print(fn)
+            # Get all the NodeMixin objects from the args and kwargs
+            # These objects will be parents of the Operation node
+            # that is created for this function
             nodeables = _get_nodeables(*args, **kwargs)
 
             # Check if fn is a bound method
             if hasattr(fn, "__self__") and fn.__self__ is not None:
                 if isinstance(fn.__self__, NodeMixin):
                     nodeables.append(fn.__self__)
-            print("Nodeables", nodeables)
-            # unpacked_args, unpacked_kwargs, refs, stores = _unpack_refs_and_stores(
-            #     *args, **kwargs
-            # )
-
-            # if first_call is not None:
-            #     # For expensive functions, the user can specify a first call value
-            #     # that allows us to setup the Operation without running the function
-            #     if isinstance(first_call, Callable):
-            #         result = first_call(*unpacked_args, **unpacked_kwargs)
-            #     else:
-            #         result = first_call
-            # else:
-            #     # By default, run the function to produce a result
-            #     # Call the function on the unpacked args and kwargs
-            #     result = fn(*unpacked_args, **unpacked_kwargs)
 
             # Call the function on the args and kwargs
             result = fn(*args, **kwargs)
 
             # Setup an Operation node if any of the
-            # args or kwargs were refs or stores
-            # if (
-            #     (len(refs) > 0 or len(stores) > 0)
-            #     or on is not None
-            #     or also_on is not None
-            # ):
-            if (
-                (len(nodeables) > 0)
-                or on is not None
-                or also_on is not None
-                or force_reactify
-            ):
-
-                # FIXME: the result should be possible to put as nodes in the graph
-                # and if they're not, wrap them in Store and make them nodes
-                # So classes that are Nodeable
-
-                # The result should be placed inside a Store or Reference
-                # (or a nested object) containing Stores and References.
+            # args or kwargs were nodeables or we're forcing reactivity
+            if (len(nodeables) > 0) or force_reactify:
+                # The result should be placed inside a Store
+                # (or a nested object) containing Stores if it isn't
+                # already a NodeMixin ("nodeable") object.
                 # Then we can update the contents of this result when the
                 # function is called again.
                 if nested_return:
-                    derived = _nested_apply(result, fn=_wrap_outputs)
-                # elif isinstance(result, (DataFrame, SliceBy)):
-                # TODO: this needs to be removed
-                # Instead, we should directly return the result
-                # derived = Reference(result)
-                # pass
+                    result = _nested_apply(result, fn=_wrap_outputs)
                 elif isinstance(result, NodeMixin):
-                    derived = result
+                    result = result
                 else:
-                    derived = Store(result)
+                    result = Store(result)
 
                 # Create the Operation node
-                op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+                op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
 
                 # For normal functions
                 # Make a node for the operation if it doesn't have one
                 if not op.has_inode():
                     op.attach_to_inode(op.create_inode())
 
-                if on is None:
-                    # Add this Operation node as a child of all of the refs and stores
-                    # regardless of the value of `also_on`
-                    # TODO: refs should be all the DataFrame / SliceBy / Column objects
-                    # that are now "References"
-                    # _add_op_as_child(op, *refs, *stores, triggers=True)
-                    _add_op_as_child(op, *nodeables, triggers=True)
+                # Add this Operation node as a child of all of the nodeables
+                _add_op_as_child(op, *nodeables, triggers=True)
 
-                    # Attach the Operation node to its children
-                    def _foo(nodeable: NodeMixin):
-                        print("Foo nodeable", nodeable, type(nodeable))
-                        if not nodeable.has_inode():
-                            inode_id = (
-                                None if not isinstance(nodeable, Store) else nodeable.id
-                            )
-                            nodeable.attach_to_inode(
-                                nodeable.create_inode(inode_id=inode_id)
-                            )
+                # Attach the Operation node to its children
+                def _foo(nodeable: NodeMixin):
+                    if not nodeable.has_inode():
+                        inode_id = (
+                            None if not isinstance(nodeable, Store) else nodeable.id
+                        )
+                        nodeable.attach_to_inode(
+                            nodeable.create_inode(inode_id=inode_id)
+                        )
 
-                        op.inode.add_child(nodeable.inode)
+                    op.inode.add_child(nodeable.inode)
 
-                    print("Derived", type(fn), derived, type(derived))
-                    _nested_apply(derived, _foo)
-                else:
-                    # Add this Operation node as a child of all of the refs and stores
-                    # that are passed into the function. However, these children
-                    # are non-triggering, meaning that the Operation node will
-                    # only be called when the refs and stores in `on` are modified,
-                    # and not otherwise.
-                    # _add_op_as_child(op, *refs, *stores, triggers=False)
-
-                    # Add this Operation node as a child of the refs and stores
-                    # passed into `on`. These will trigger the Operation!
-                    # TODO(Sabri): this should be nested
-                    if isinstance(on, (Reference, Store)):
-                        on = [on]
-                    _, _, refs, stores = _unpack_refs_and_stores(*on)
-                    _add_op_as_child(op, *refs, *stores, triggers=True)
-
-                    # Find all the str elements in `on`
-                    # These are the names of fn arguments that were passed into `on`
-                    # We can first analyze the fn signature to figure out which
-                    # argument names are bound to what values
-                    # (e.g. Reference, Store, etc.)
-
-                    # Analyze the fn signature to figure out which argument names
-                    # are bound
-                    fn_signature = inspect.signature(fn)
-                    if on:
-                        assert all(
-                            [
-                                e in fn_signature.parameters
-                                for e in on
-                                if isinstance(e, str)
-                            ]
-                        ), "All strings passed into `on` must be arguments of the \
-                            decorated function."
-                    fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
-                    # Now we pull out the values of the arguments that were passed
-                    # into `on` and unpack them to get the refs and stores
-                    _, _, refs, stores = _unpack_refs_and_stores(
-                        *[fn_bound_arguments[e] for e in on if isinstance(e, str)]
-                    )
-                    # ...and add this Operation node as a child of these
-                    # refs and stores
-                    _add_op_as_child(op, *refs, *stores, triggers=True)
-
-                if also_on is not None:
-                    # Add this Operation node as a child of the refs and stores
-                    # passed into `also_on`
-                    # TODO(Sabri): this should be nested
-                    if isinstance(also_on, (Reference, Store)):
-                        also_on = [also_on]
-                    _, _, refs, stores = _unpack_refs_and_stores(*also_on)
-                    _add_op_as_child(op, *refs, *stores, triggers=True)
-
-                return derived
+                _nested_apply(result, _foo)
 
             return result
 
