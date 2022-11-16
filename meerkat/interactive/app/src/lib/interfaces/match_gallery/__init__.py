@@ -6,7 +6,7 @@ from meerkat.interactive.app.src.lib.component.filter import Filter
 from meerkat.interactive.app.src.lib.component.gallery import Gallery
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.table import EditTarget
-from meerkat.interactive.graph import Reference, interface_op
+from meerkat.interactive.graph import interface_op
 
 from ..abstract import Interface, InterfaceConfig
 
@@ -40,7 +40,7 @@ class MatchGalleryInterface(Interface):
     def pivot(self, obj):
         # checks whether the object is valid pivot
 
-        pivot = Reference(obj)
+        pivot = obj
         self.pivots.append(pivot)
 
         return pivot
