@@ -111,6 +111,7 @@ def reactify_decorator(fn=None, **interface_op_kwargs):
         @wraps(fn)
         def _wrapper(*args, **kwargs):
             return reactify(fn, **interface_op_kwargs)(*args, **kwargs)
+
         return _wrapper
 
     return _decorator(fn)
@@ -131,7 +132,6 @@ class react:
 class no_react(react):
     def __init__(self):
         super().__init__(reactive=False)
-
 
 
 class StoreConfig(BaseModel):
@@ -576,7 +576,7 @@ def interface_op(
     first_call: Any = None,
     on: Union[Reference, Store, str, List[Union[Reference, Store, str]]] = None,
     also_on: Union[Reference, Store, List[Union[Reference, Store]]] = None,
-    force_reactify: bool = False
+    force_reactify: bool = False,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -689,9 +689,9 @@ def interface_op(
             print("PRINTING", args, kwargs)
             print(fn)
             nodeables = _get_nodeables(*args, **kwargs)
-            
+
             # Check if fn is a bound method
-            if hasattr(fn, '__self__') and fn.__self__ is not None:
+            if hasattr(fn, "__self__") and fn.__self__ is not None:
                 if isinstance(fn.__self__, NodeMixin):
                     nodeables.append(fn.__self__)
             print("Nodeables", nodeables)
@@ -721,7 +721,12 @@ def interface_op(
             #     or on is not None
             #     or also_on is not None
             # ):
-            if (len(nodeables) > 0) or on is not None or also_on is not None or force_reactify:
+            if (
+                (len(nodeables) > 0)
+                or on is not None
+                or also_on is not None
+                or force_reactify
+            ):
 
                 # FIXME: the result should be possible to put as nodes in the graph
                 # and if they're not, wrap them in Store and make them nodes
@@ -745,7 +750,7 @@ def interface_op(
 
                 # Create the Operation node
                 op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
-                    
+
                 # For normal functions
                 # Make a node for the operation if it doesn't have one
                 if not op.has_inode():
