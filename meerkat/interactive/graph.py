@@ -15,180 +15,12 @@ from meerkat.interactive.node import NodeMixin, _topological_sort
 from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 
-# A stack that manages if reactive mode is enabled
-# The stack is reveresed so that the top of the stack is
-# the last index in the list.
-_IS_REACTIVE = []
-
-
-def is_reactive():
-    return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
-
-
-def reactify(fn, **kwargs):
-    """Reactify a function when reactive mode is enabled.
-
-    To enable reactive mode, the function/method should be called
-    in the :class:`mk.gui.react` context.
-
-    Args:
-        fn: The function to reactify.
-        **kwargs: Keyword arguments to pass to :func:`interface_op`.
-            Cannot include `force_reactify` or `nested_return` arguments.
-
-    Returns:
-        Callable: The reactified function.
-    """
-    # nested_return is False because any operations on the outputs of the
-    # function should recursively generate Stores / References.
-    # For example, if fn returns a list. The reactified fn will return a Store(list).
-    # Then, Store(list)[0] should also return a Store.
-    # TODO (arjun): These if this assumption holds.
-    if is_reactive():
-        fn = interface_op(fn=fn, force_reactify=True, nested_return=False, **kwargs)
-
-    return fn
-
-
-def reactify_decorator(fn=None, **interface_op_kwargs):
-    """A decorator for reactifying functions and methods."""
-    if fn is None:
-        return partial(reactify_decorator, **interface_op_kwargs)
-
-    def _decorator(fn):
-        @wraps(fn)
-        def _wrapper(*args, **kwargs):
-            return reactify(fn, **interface_op_kwargs)(*args, **kwargs)
-
-        return _wrapper
-
-    return _decorator(fn)
-
-
-class react:
-    def __init__(self, reactive: bool = True):
-        self._reactive = reactive
-
-    def __enter__(self):
-        _IS_REACTIVE.append(self._reactive)
-        return self
-
-    def __exit__(self, type, value, traceback):
-        _IS_REACTIVE.pop(-1)
-
-
-class no_react(react):
-    def __init__(self):
-        super().__init__(reactive=False)
-
-
-class StoreConfig(BaseModel):
-    store_id: str
-    value: Any
-    has_children: bool
-    is_store: bool = True
-
-
-# ObjectProxy must be the last base class
-class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
-
-    _self_identifiable_group: str = "stores"
-
-    def __init__(self, wrapped: T):
-        super().__init__(wrapped=wrapped)
-        # Set up these attributes so we can create the
-        # config and detail properties.
-        self._self_config = None
-        self._self_detail = None
-
-    @property
-    def config(self):
-        return StoreConfig(
-            store_id=self.id,
-            value=self.__wrapped__,
-            has_children=self.inode.has_children() if self.inode else False,
-        )
-
-    @property
-    def detail(self):
-        return f"Store({self.__wrapped__}) has id {self.id} and node {self.inode}"
-
-    def set(self, new_value: T):
-        """Set the value of the store."""
-        mod = StoreModification(id=self.id, value=new_value)
-        self.__wrapped__ = new_value
-        mod.add_to_queue()
-
-    def __repr__(self) -> str:
-        return f"Store({self.__wrapped__})"
-
-    def __getattr__(self, name: str) -> Any:
-        attr = getattr(self.__wrapped__, name)
-
-        # Only executing functions/methods should make the output reactifiable.
-        # TODO: See if we want accessing attributes/properties to be reactifiable.
-        # The reason they are not reactifiable now is that it is not clear what
-        # storing the attributes as a state would give us.
-        return reactify(attr) if callable(attr) else attr
-
-    # @reactify_decorator()
-    def __add__(self, other):
-        # TODO (arjun): This should not fail with karan's changes.
-        return super().__add__(other)
-
-
-def make_store(value: Union[str, Storeable]) -> Store:
-    """
-    Make a Store.
-
-    If value is a Store, return it. Otherwise, return a
-    new Store that wraps value.
-
-    Args:
-        value (Union[str, Storeable]): The value to wrap.
-
-    Returns:
-        Store: The Store wrapping value.
-    """
-    return value if isinstance(value, Store) else Store(value)
-
-
-class Operation(NodeMixin):
-    def __init__(
-        self,
-        fn: Callable,
-        args: List[Any],
-        kwargs: Dict[str, Any],
-        result: Any,
-    ):
-        super().__init__()
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-        self.result = result
-
-    def __call__(self) -> List[Modification]:
-        """
-        Execute the operation. Unpack the arguments and keyword arguments
-        and call the function. Then, update the result Reference with the result
-        and return a list of modifications.
-
-        These modifications describe the delta changes made to the result Reference,
-        and are used to update the state of the GUI.
-        """
-        update = self.fn(*self.args, **self.kwargs)
-
-        modifications = []
-        self.result = _update_result(self.result, update, modifications=modifications)
-
-        return modifications
-
 
 def _update_result(
-    result: Union[list, tuple, dict, Store, Primitive],
-    update: Union[list, tuple, dict, Store, Primitive],
+    result: Union[list, tuple, dict, "Store", Primitive],
+    update: Union[list, tuple, dict, "Store", Primitive],
     modifications: List[Modification],
-) -> Union[list, tuple, dict, Store, Primitive]:
+) -> Union[list, tuple, dict, "Store", Primitive]:
     """
     Update the result object with the update object. This recursive
     function will perform a nested update to the result with the update.
@@ -316,7 +148,7 @@ def _wrap_outputs(obj, return_type: type = None):
 
 
 def _add_op_as_child(
-    op: Operation,
+    op: "Operation",
     *nodeables: NodeMixin,
     triggers: bool = True,
 ):
@@ -360,7 +192,7 @@ def interface_op(
     fn: Callable = None,
     nested_return: bool = True,
     return_type: type = None,
-    force_reactify: bool = False,
+    # force_reactify: bool = False,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -402,8 +234,8 @@ def interface_op(
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
         return_type: The type of the return value.
-        force_reactify: Whether to force the function to be reactified. This is useful
-            for returning outputs that are always reactified.
+        # force_reactify: Whether to force the function to be reactified. This is useful
+        #    for returning outputs that are always reactified.
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
@@ -418,6 +250,7 @@ def interface_op(
         )
 
     def _interface_op(fn: Callable):
+
         @wraps(fn)
         def wrapper(*args, **kwargs):
             """
@@ -427,6 +260,16 @@ def interface_op(
 
             Subsequent calls to the function will be handled by the graph.
             """
+            # nested_return is False because any operations on the outputs of the
+            # function should recursively generate Stores / References.
+            # For example, if fn returns a list. The reactified fn will return a Store(list).
+            # Then, Store(list)[0] should also return a Store.
+            # TODO (arjun): These if this assumption holds.
+            force_reactify = False
+            if is_reactive():
+                force_reactify = True
+                nested_return = False
+
             # Get all the NodeMixin objects from the args and kwargs
             # These objects will be parents of the Operation node
             # that is created for this function
@@ -497,31 +340,6 @@ def is_reactive():
     return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
 
 
-def reactify(fn, **kwargs):
-    """Reactify a function when reactive mode is enabled.
-
-    To enable reactive mode, the function/method should be called
-    in the :class:`mk.gui.react` context.
-
-    Args:
-        fn: The function to reactify.
-        **kwargs: Keyword arguments to pass to :func:`interface_op`.
-            Cannot include `force_reactify` or `nested_return` arguments.
-
-    Returns:
-        Callable: The reactified function.
-    """
-    # nested_return is False because any operations on the outputs of the
-    # function should recursively generate Stores / References.
-    # For example, if fn returns a list. The reactified fn will return a Store(list).
-    # Then, Store(list)[0] should also return a Store.
-    # TODO (arjun): These if this assumption holds.
-    if is_reactive():
-        fn = interface_op(fn=fn, force_reactify=True, nested_return=False, **kwargs)
-
-    return fn
-
-
 class react:
     def __init__(self, reactive: bool = True):
         self._reactive = reactive
@@ -537,3 +355,105 @@ class react:
 class no_react(react):
     def __init__(self):
         super().__init__(reactive=False)
+
+
+class StoreConfig(BaseModel):
+    store_id: str
+    value: Any
+    has_children: bool
+    is_store: bool = True
+
+
+# ObjectProxy must be the last base class
+class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
+
+    _self_identifiable_group: str = "stores"
+
+    def __init__(self, wrapped: T):
+        super().__init__(wrapped=wrapped)
+        # Set up these attributes so we can create the
+        # config and detail properties.
+        self._self_config = None
+        self._self_detail = None
+
+    @property
+    def config(self):
+        return StoreConfig(
+            store_id=self.id,
+            value=self.__wrapped__,
+            has_children=self.inode.has_children() if self.inode else False,
+        )
+
+    @property
+    def detail(self):
+        return f"Store({self.__wrapped__}) has id {self.id} and node {self.inode}"
+
+    def set(self, new_value: T):
+        """Set the value of the store."""
+        mod = StoreModification(id=self.id, value=new_value)
+        self.__wrapped__ = new_value
+        mod.add_to_queue()
+
+    def __repr__(self) -> str:
+        return f"Store({self.__wrapped__})"
+
+    def __getattr__(self, name: str) -> Any:
+        attr = getattr(self.__wrapped__, name)
+
+        # Only executing functions/methods should make the output reactifiable.
+        # TODO: See if we want accessing attributes/properties to be reactifiable.
+        # The reason they are not reactifiable now is that it is not clear what
+        # storing the attributes as a state would give us.
+        return interface_op(attr) if callable(attr) else attr
+
+    @interface_op()
+    def __add__(self, other):
+        # TODO (arjun): This should not fail with karan's changes.
+        return super().__add__(other)
+
+
+def make_store(value: Union[str, Storeable]) -> Store:
+    """
+    Make a Store.
+
+    If value is a Store, return it. Otherwise, return a
+    new Store that wraps value.
+
+    Args:
+        value (Union[str, Storeable]): The value to wrap.
+
+    Returns:
+        Store: The Store wrapping value.
+    """
+    return value if isinstance(value, Store) else Store(value)
+
+
+class Operation(NodeMixin):
+    def __init__(
+        self,
+        fn: Callable,
+        args: List[Any],
+        kwargs: Dict[str, Any],
+        result: Any,
+    ):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.result = result
+
+    def __call__(self) -> List[Modification]:
+        """
+        Execute the operation. Unpack the arguments and keyword arguments
+        and call the function. Then, update the result Reference with the result
+        and return a list of modifications.
+
+        These modifications describe the delta changes made to the result Reference,
+        and are used to update the state of the GUI.
+        """
+        update = self.fn(*self.args, **self.kwargs)
+
+        modifications = []
+        self.result = _update_result(self.result, update, modifications=modifications)
+
+        return modifications

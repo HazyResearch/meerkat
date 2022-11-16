@@ -15,44 +15,44 @@
 # assert isinstance(r, mk.gui.Store), type(r)
 # # assert r.has_trigger_children()
 
+case = 1
+if case == 0:
+    import pandas as pd
 
-import pandas as pd
+    import meerkat as mk
 
-import meerkat as mk
+    df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    df = mk.DataFrame.from_pandas(df)
 
-df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-df = mk.DataFrame.from_pandas(df)
+    @mk.gui.endpoint
+    def reassign(df: mk.DataFrame):
+        df["c"] = df["b"]
 
-@mk.gui.endpoint
-def reassign(df: mk.DataFrame):
-    df["c"] = df["b"]
+    print(df.inode)
+    # df = mk.gui.Reference(df)
+    with mk.gui.react():
+        print("=============")
+        columns_store = df.keys()
 
-print(df.inode)
-# df = mk.gui.Reference(df)
-with mk.gui.react():
-    print("=============")
-    columns_store = df.keys()
+        print("Print inside ctx")
+        print(list(df.inode.children.keys())[0].children)
+        print(columns_store.inode)
 
-    print("Print inside ctx")
-    print(list(df.inode.children.keys())[0].children)
-    print(columns_store.inode)
+    columns = df.keys()
+    print(type(columns_store), columns_store)
+    print(columns, type(columns))
 
-columns = df.keys()
-print(type(columns_store), columns_store)
-print(columns, type(columns))
+    reassign(df).run()
+    print(df)
+    print(columns_store, type(columns_store))
 
-reassign(df).run()
-print(df)
-print(columns_store, type(columns_store))
+elif case == 1:
+    import meerkat as mk
 
-# print(df.inode.children)
-# print(columns_store.inode)
+    a = mk.gui.Store(1)
 
-# import meerkat as mk
+    with mk.gui.react():
+        b = a + 1
 
-# a = mk.gui.Store(1)
+    print(b, type(b))
 
-# with mk.gui.react():
-#     b = a + 1
-
-# print(b, type(b))
