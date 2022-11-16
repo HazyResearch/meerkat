@@ -17,6 +17,14 @@ class ReactifiableMixin:
         """
         from meerkat.interactive.graph import reactify
 
+        if name == 'keys':
+            out = super().__getattribute__(name)
+            if isinstance(out, Callable):
+                out = reactify(out)
+            return out
+        else:
+            return super().__getattribute__(name)
+
         out = super().__getattribute__(name)
         if isinstance(out, Callable):
             out = reactify(out)

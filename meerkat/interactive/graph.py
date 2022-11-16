@@ -170,45 +170,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def detail(self):
         return f"Store({self.__wrapped__}) has id {self.id} and node id {self.node_id}"
 
-
-# class Store(IdentifiableMixin, NodeMixin, Generic[T]):
-#     identifiable_group: str = "stores"
-
-#     def __init__(self, value: Any):
-#         super().__init__()
-#         self._value = value
-
-#     @property
-#     def config(self):
-#         return StoreConfig(
-#             store_id=self.id,
-#             value=self.value,
-#             has_children=self.has_children(),
-#         )
-
-#     @property
-#     def _(self):
-#         return self.value
-
-#     @_.setter
-#     def _(self, value):
-#         self.value = value
-
-#     @property
-#     def value(self):
-#         return self._value
-
-#     @value.setter
-#     def value(self, value):
-#         mod = StoreModification(id=self.id, value=value)
-#         self._value = value
-#         mod.add_to_queue()
-
-#     def __repr__(self) -> str:
-#         return f"Store({self._})"
-
     def __getattr__(self, name: str) -> Any:
-        attr = getattr(self.value, name)
+        attr = getattr(self.__wrapped__, name)
 
         # Only executing functions/methods should make the output reactifiable.
         # TODO: See if we want accessing attributes/properties to be reactifiable.
@@ -216,10 +179,10 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # storing the attributes as a state would give us.
         return reactify(attr) if callable(attr) else attr
 
-    @reactify_decorator()
+    # @reactify_decorator()
     def __add__(self, other):
         # TODO (arjun): This should not fail with karan's changes.
-        return self.value + other
+        return super().__add__(other)
 
     # @classmethod
     # def __get_validators__(cls):
@@ -588,12 +551,22 @@ def _add_op_as_child(
             inode_id = None if not isinstance(nodeable, Store) else nodeable.id
             nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
 
-        # Make a node for the operation if it doesn't have one
-        if not op.has_inode():
-            op.attach_to_inode(op.create_inode())
-
         # Add the operation as a child of the nodeable
         nodeable.inode.add_child(op.inode, triggers=triggers)
+
+
+def _nested_apply(obj: object, fn: callable):
+    if isinstance(obj, Store) or isinstance(obj, NodeMixin):
+        return fn(obj)
+
+    if isinstance(obj, list):
+        return [nested_apply(v, fn=fn) for v in obj]
+    elif isinstance(obj, tuple):
+        return tuple(nested_apply(v, fn=fn) for v in obj)
+    elif isinstance(obj, dict):
+        return {k: nested_apply(v, fn=fn) for k, v in obj.items()}
+    else:
+        raise ValueError(f"Unexpected type {type(obj)}.")
 
 
 def interface_op(
@@ -713,7 +686,14 @@ def interface_op(
             nonlocal on, also_on
 
             # TODO(Sabri): this should be nested
+            print("PRINTING", args, kwargs)
+            print(fn)
             nodeables = _get_nodeables(*args, **kwargs)
+            
+            # Check if fn is a bound method
+            if hasattr(fn, '__self__') and fn.__self__ is not None:
+                if isinstance(fn.__self__, NodeMixin):
+                    nodeables.append(fn.__self__)
             print("Nodeables", nodeables)
             # unpacked_args, unpacked_kwargs, refs, stores = _unpack_refs_and_stores(
             #     *args, **kwargs
@@ -765,6 +745,11 @@ def interface_op(
 
                 # Create the Operation node
                 op = Operation(fn=fn, args=args, kwargs=kwargs, result=derived)
+                    
+                # For normal functions
+                # Make a node for the operation if it doesn't have one
+                if not op.has_inode():
+                    op.attach_to_inode(op.create_inode())
 
                 if on is None:
                     # Add this Operation node as a child of all of the refs and stores
@@ -776,6 +761,7 @@ def interface_op(
 
                     # Attach the Operation node to its children
                     def _foo(nodeable: NodeMixin):
+                        print("Foo nodeable", nodeable, type(nodeable))
                         if not nodeable.has_inode():
                             inode_id = (
                                 None if not isinstance(nodeable, Store) else nodeable.id
@@ -786,7 +772,8 @@ def interface_op(
 
                         op.inode.add_child(nodeable.inode)
 
-                    nested_apply(derived, _foo)
+                    print("Derived", type(fn), derived, type(derived))
+                    _nested_apply(derived, _foo)
                 else:
                     # Add this Operation node as a child of all of the refs and stores
                     # that are passed into the function. However, these children
