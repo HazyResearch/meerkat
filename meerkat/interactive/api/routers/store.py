@@ -20,14 +20,15 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # do not change the value of the store).
 
     # Check if this request would actually change the value of the store
-    current_store_value = store_modification.node.value
-    if current_store_value == value:
+    # current_store_value = store_modification.node
+    if store == value:
         return []
 
     # Set the new value of the store
     # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
     # of the store.
-    store_modification.node.value = value
+    # store_modification.node.set(value)
+    store.set(value)
 
     # Trigger on the store modification: leads to modifications on the graph
     modifications = trigger([store_modification])

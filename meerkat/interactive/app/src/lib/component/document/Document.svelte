@@ -117,7 +117,7 @@
 													class:bg-red-500={label === 0}
 													class:text-red-100={label === 0}
 													on:click={() => {
-														label = 0;
+														// label = 0;
 														$edit(get(edit_target.target).ref_id, 0, $label_column, id, id_column);
 													}}
 												>
@@ -128,7 +128,7 @@
 													class:bg-emerald-400={label === 1}
 													class:text-emerald-100={label === 1}
 													on:click={() => {
-														label = 1;
+														// label = 1;
 														$edit(get(edit_target.target).ref_id, 1, $label_column, id, id_column);
 													}}
 												>
@@ -139,7 +139,7 @@
 													class:bg-orange-400={label === 2}
 													class:text-orange-100={label === 2}
 													on:click={() => {
-														label = 2;
+														// label = 2;
 														$edit(get(edit_target.target).ref_id, 2, $label_column, id, id_column);
 													}}
 												>

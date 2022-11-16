@@ -1,7 +1,15 @@
 from collections import defaultdict
 from typing import Dict, List, Optional
 
+from pydantic import BaseModel
+
 from meerkat.mixins.identifiable import IdentifiableMixin
+
+
+class NodeConfig(BaseModel):
+    ref_id: str
+    type: str
+    is_store: bool = True
 
 
 class Node(IdentifiableMixin):
@@ -26,6 +34,13 @@ class Node(IdentifiableMixin):
 
         # Don't overwrite triggers=True with triggers=False
         self.children[child] = triggers | self.children[child]
+
+    @property
+    def config(self):
+        return NodeConfig(
+            ref_id=self.id,
+            type=self.obj.__class__.__name__,
+        )
 
     @property
     def trigger_children(self):
@@ -71,6 +86,18 @@ class NodeMixin:
         # self._self_children: Dict[Node, bool] = dict()
         self._self_inode = None  # Node(self)
         # self._set_node_id()
+
+    @property
+    def config(self):
+        """Returns the config for the node."""
+        assert (
+            self.inode is not None
+        ), "Something went wrong -- this object must be attached \
+            to a node in the graph."
+        # FIXME: Component must ensure that NodeMixin objects
+        # are attached to nodes in the graph before
+        # sending over their configs to the frontend.
+        return self.inode.config
 
     def attach_to_inode(self, inode: Node):
         """
