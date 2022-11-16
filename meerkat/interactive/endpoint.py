@@ -75,7 +75,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
 class EndpointConfig(BaseModel):
     endpoint_id: Union[str, None]
 
-
+# TODO: technically Endpoint doesn't need to be NodeMixin (probably)
 class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     """
     Create an endpoint from a function in Meerkat.
@@ -404,9 +404,6 @@ def endpoint(
         @wraps(fn)
         def wrapper(*args, **kwargs):
             """
-            This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Reference` object that wraps the
-            output of the function.
 
             Subsequent calls to the function will be handled by the graph.
             """

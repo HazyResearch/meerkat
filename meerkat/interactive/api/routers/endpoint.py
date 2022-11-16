@@ -10,13 +10,13 @@ if TYPE_CHECKING:
 @endpoint(prefix="/endpoint", route="/{endpoint}/dispatch/")
 def dispatch(
     endpoint: Endpoint,
-    kwargs: dict,
+    fn_kwargs: dict,
     payload: dict = None,
 ) -> Tuple[Any, List["Modification"]]:
     # TODO: figure out how to use the payload
     """Call an endpoint."""
     # Call the endpoint
-    result = endpoint(**kwargs).run()
+    result = endpoint(**fn_kwargs).run()
 
     # Get the modifications
     # from meerkat.state import state

@@ -8,7 +8,13 @@ class Node(IdentifiableMixin):
 
     _self_identifiable_group: str = "nodes"
 
-    def __init__(self, obj, **kwargs):
+    def __init__(self, obj: any, **kwargs):
+        """ A node in the computational graph. This could be an object or an operation. 
+
+        Args:
+            obj (any): This could be any class that has NodeMixin (e.g. store, 
+                Operation, DataFrame, Column). 
+        """
         super().__init__(**kwargs)
         self.obj = obj
         self.children: Dict["Node", bool] = dict()
@@ -54,7 +60,7 @@ class Node(IdentifiableMixin):
 
 class NodeMixin:
     """
-    Class for defining nodes in a graph.
+    Mixin for Classes whose objects can be attached to a node in the computation graph. 
 
     Add this mixin to any class whose objects should be nodes
     in a graph.
