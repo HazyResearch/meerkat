@@ -1,4 +1,3 @@
-import inspect
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Union
 
@@ -8,14 +7,13 @@ from wrapt import ObjectProxy
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.modification import (
+    DataFrameModification,
     Modification,
-    ReferenceModification,
     StoreModification,
 )
 from meerkat.interactive.node import NodeMixin, _topological_sort
 from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
-
 
 # A stack that manages if reactive mode is enabled
 # The stack is reveresed so that the top of the stack is
@@ -210,7 +208,7 @@ def _update_result(
         update.attach_to_inode(inode)
 
         # Create modifications
-        modifications.append(ReferenceModification(id=inode.id, scope=update.columns))
+        modifications.append(DataFrameModification(id=inode.id, scope=update.columns))
 
         return update
 

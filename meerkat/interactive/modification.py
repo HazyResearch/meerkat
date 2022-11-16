@@ -34,17 +34,6 @@ class Modification(BaseModel, ABC):
         state.modification_queue.add(self)
 
 
-class ReferenceModification(Modification):
-    scope: List[str]
-    type: str = "ref"
-
-    @property
-    def node(self):
-        from meerkat.state import state
-
-        return state.identifiables.get(group="refs", id=self.id)
-
-
 # TODO: need to consolidate Modification
 # associate them with NodeMixin (Nodeable objects)
 class DataFrameModification(Modification):
