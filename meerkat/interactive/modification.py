@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, List
 
 from pydantic import BaseModel
 
-
 if TYPE_CHECKING:
     from meerkat.interactive.graph import Reference, Store
     from meerkat.interactive.node import Node
@@ -44,6 +43,7 @@ class ReferenceModification(Modification):
         from meerkat.state import state
 
         return state.identifiables.get(group="refs", id=self.id)
+
 
 # TODO: need to consolidate Modification
 # associate them with NodeMixin (Nodeable objects)
