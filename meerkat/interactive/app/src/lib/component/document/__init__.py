@@ -27,7 +27,7 @@ class Document(Component):
     @property
     def props(self):
         props = {
-            "df": self.df.config,  # FIXME
+            "df": self.df.config,
             "text_column": self.text_column.config,
             "paragraph_column": self.paragraph_column.config,
             "label_column": self.label_column.config,

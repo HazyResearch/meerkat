@@ -1019,6 +1019,7 @@ class DataFrame(
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         df = cls.__new__(cls)
         df._set_id()  # TODO: consider if we want to persist this id
+        df._set_inode()  # FIXME: this seems hacky
         df._set_state(state)
 
         # Load the the manager
