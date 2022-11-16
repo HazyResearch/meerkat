@@ -55,14 +55,6 @@ class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
         # mod.add_to_queue()
         self._obj = obj
 
-    # def __getattr__(self, name):
-    #     if name == "_obj":
-    #         return self._obj
-    #     return getattr(self.obj, name)
-
-    # def __getitem__(self, key):
-    #     return self.obj[key]
-
     def __repr__(self):
         return f"Reference({self.obj})"
 
@@ -496,26 +488,6 @@ def _wrap_outputs(obj, return_type: type = None):
     if isinstance(obj, NodeMixin):
         return obj
     return Store(obj)
-
-
-# def _add_op_as_child(
-#     op: Operation,
-#     *refs_and_stores: Union[Reference, Store],
-#     triggers: bool = True,
-# ):
-#     """
-#     Add the operation as a child of the refs and stores.
-
-#     Args:
-#         op: The operation to add as a child.
-#         refs_and_stores: The refs and stores to add the operation as a child
-#             of.
-#         triggers: Whether the operation is triggered by changes in the refs
-#             and stores.
-#     """
-#     for ref_or_store in refs_and_stores:
-#         if isinstance(ref_or_store, (Reference, Store)):
-#             ref_or_store.add_child(op, triggers=triggers)
 
 
 def _add_op_as_child(

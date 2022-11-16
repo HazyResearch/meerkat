@@ -5,8 +5,8 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Reference, Store, _unpack_refs_and_stores, trigger
-from meerkat.interactive.node import NodeMixin
+from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
@@ -390,15 +390,12 @@ def endpoint(
     def _endpoint(fn: Callable):
         # Gather up all the arguments that are hinted as Stores and References
         stores = set()
-        references = set()
         # Also gather up the hinted arguments that subclass IdentifiableMixin
         # e.g. Store, Reference, Endpoint, Interface, etc.
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):
                 stores.add(name)
-            elif isinstance(annot, type) and issubclass(annot, Reference):
-                references.add(name)
 
             # Add all the identifiables
             if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
@@ -418,37 +415,49 @@ def endpoint(
             fn_signature = inspect.signature(fn)
             fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
 
-            # Unpack the arguments that were *not* annotated to be Stores or
-            # References. Unpacking takes Stores or References, and grabs
-            # the `._` attribute, which is the value of the Store or
-            # the object the Reference points to.
-            fn_args_to_unpack = {
-                k: v
-                for k, v in fn_bound_arguments.items()
-                if k not in stores and k not in references
-            }
-            args, kwargs, _, _ = _unpack_refs_and_stores(**fn_args_to_unpack)
-
             # Identifiables that are passed into the function
             # may be passed in as a string id, or as the object itself
             # If they are passed in as a string id, we need to get the object
             # from the registry
-            fn_args_as_is = {
-                k: v if not isinstance(v, str) else identifiables[k].from_id(v)
-                for k, v in fn_bound_arguments.items()
-                if k in identifiables
-            }
-
-            # # Cautionary early check to make sure that the arguments that
-            # # were hinted as Store and Reference arguments are indeed
-            # # Store and Reference objects
-            # assert all(
-            #     [isinstance(v, (Store, Reference)) for v in fn_args_as_is.values()]
-            # ), "All arguments that are type hinted as stores or references \
-            #     must be Store or Reference objects."
+            _args, _kwargs = [], {}
+            for k, v in fn_bound_arguments.items():
+                if k in identifiables:
+                    # Dereference the argument if it was passed in as a string id
+                    if not isinstance(v, str):
+                        # Not a string id, so just use the object
+                        _kwargs[k] = v
+                    else:
+                        if isinstance(v, IdentifiableMixin):
+                            # v is a string, but it is also an IdentifiableMixin
+                            # e.g. Store("foo"), so just use v as is
+                            _kwargs[k] = v
+                        else:
+                            # v is a string id
+                            try:
+                                # Directly try to look up the string id in the
+                                # registry of the annotated type
+                                _kwargs[k] = identifiables[k].from_id(v)
+                            except Exception:
+                                # If that fails, try to look up the string id in
+                                # the Node registry, and then get the object
+                                # from the Node
+                                _kwargs[k] = Node.from_id(v).obj
+                else:
+                    if k == "args":
+                        # These are *args under the `args` key
+                        # These are the only arguments that will be passed in as
+                        # *args to the fn
+                        _args = v
+                    elif k == "kwargs":
+                        # These are **kwargs under the `kwargs` key
+                        _kwargs = {**_kwargs, **v}
+                    else:
+                        # All other positional arguments that were not *args were
+                        # bound, so they become kwargs
+                        _kwargs[k] = v
 
             # Run the function
-            result = fn(*args, **{**kwargs, **fn_args_as_is})
+            result = fn(*_args, **_kwargs)
 
             # Get the modifications from the queue
             modifications = state.modification_queue.queue

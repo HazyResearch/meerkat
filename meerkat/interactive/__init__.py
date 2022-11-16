@@ -21,8 +21,6 @@ from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
-    Reference,
-    ReferenceConfig,
     Store,
     StoreConfig,
     interface_op,
