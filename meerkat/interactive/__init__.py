@@ -39,8 +39,6 @@ __all__ = [
     "Endpoint",
     "endpoint",
     "make_endpoint",
-    "Reference",
-    "ReferenceConfig",
     "Modification",
     "Document",
     "Store",
