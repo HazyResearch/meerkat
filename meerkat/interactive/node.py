@@ -107,64 +107,13 @@ class NodeMixin:
         """The node for this object, if it exists."""
         return self._self_inode
 
-    # def _set_node_id(self):
-    #     """Sets the node id."""
-    #     self._self_node_id = uuid4().hex
-
     @property
     def inode_id(self):
         return self.inode.id if self.inode else None
 
-    # @node_id.setter
-    # def node_id(self, value):
-    #     self._self_node_id = value
-
     def _set_inode(self):
         """Sets the node for this object."""
         self._self_inode = None
-
-    # def _set_children(self):
-    #     """Sets the children of this node."""
-    #     self._self_children = dict()
-
-    # def add_child(self, child, triggers=True):
-    #     """Adds a child to this node.
-
-    #     Args:
-    #         child: The child to add.
-    #         triggers: If True, this child is triggered
-    #             when this node is triggered.
-    #     """
-    #     if child not in self._self_children:
-    #         self._self_children[child] = triggers
-
-    #     # Don't overwrite triggers=True with triggers=False
-    #     self._self_children[child] = triggers | self._self_children[child]
-
-    # @property
-    # def children(self):
-    #     return self._self_children
-
-    # @property
-    # def trigger_children(self):
-    #     """Returns the children that are triggered."""
-    #     return [child for child, triggers in self._self_children.items() if triggers]
-
-    # def __hash__(self):
-    #     """Hash is based on the id of the node."""
-    #     return hash(id(self))
-
-    # def __eq__(self, other):
-    #     """Two nodes are equal if they have the same id."""
-    #     return id(self) == id(other)
-
-    # def has_children(self):
-    #     """Returns True if this node has children."""
-    #     return len(self._self_children) > 0
-
-    # def has_trigger_children(self):
-    #     """Returns True if this node has children that are triggered."""
-    #     return any(self._self_children.values())
 
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
