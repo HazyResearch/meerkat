@@ -172,7 +172,7 @@ class Filter(Component):
 
     def __init__(
         self,
-        df: DataFrame,
+        df: "DataFrame",
         criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
         title: str = "",
     ):
