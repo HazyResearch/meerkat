@@ -17,46 +17,6 @@ from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 
 
-class ReferenceConfig(BaseModel):
-    ref_id: str
-    type: str = "DataFrame"
-    is_store: bool = True
-
-
-class Reference(IdentifiableMixin, NodeMixin, Generic[T]):
-    _self_identifiable_group: str = "refs"
-
-    def __init__(self, obj: T):
-        super().__init__()
-        self._obj = obj
-
-    @property
-    def config(self):
-        return ReferenceConfig(ref_id=self.id, type="DataFrame")
-
-    @property
-    def _(self):
-        return self.obj
-
-    @_.setter
-    def _(self, obj: T):
-        self.obj = obj
-
-    @property
-    def obj(self):
-        return self._obj
-
-    @obj.setter
-    def obj(self, obj: T):
-        # TODO: make it this
-        # mod = ReferenceModification(id=self.id, scope=self.obj.columns)
-        # mod.add_to_queue()
-        self._obj = obj
-
-    def __repr__(self):
-        return f"Reference({self.obj})"
-
-
 # A stack that manages if reactive mode is enabled
 # The stack is reveresed so that the top of the stack is
 # the last index in the list.
@@ -174,13 +134,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # TODO (arjun): This should not fail with karan's changes.
         return super().__add__(other)
 
-    # @classmethod
-    # def __get_validators__(cls):
-    #     # one or more validators may be yielded which will be called in the
-    #     # order to validate the input, each validator will receive as an input
-    #     # the value returned from the previous validator
-    #     yield cls.validate
-
 
 def make_store(value: Union[str, Storeable]) -> Store:
     """
@@ -230,10 +183,10 @@ class Operation(NodeMixin):
 
 
 def _update_result(
-    result: Union[list, tuple, dict, Reference, Store, Primitive],
-    update: Union[list, tuple, dict, Reference, Store, Primitive],
+    result: Union[list, tuple, dict, Store, Primitive],
+    update: Union[list, tuple, dict, Store, Primitive],
     modifications: List[Modification],
-) -> Union[list, tuple, dict, Reference, Store, Primitive]:
+) -> Union[list, tuple, dict, Store, Primitive]:
     """
     Update the result object with the update object. This recursive
     function will perform a nested update to the result with the update.
@@ -352,57 +305,6 @@ def _get_nodeables(*args, **kwargs):
         elif isinstance(v, dict):
             nodeables.extend(_get_nodeables(**v))
     return nodeables
-
-
-def _unpack_refs_and_stores(*args, **kwargs):
-    # TODO(Sabri): this should be nested
-    refs = []
-    stores = []
-    unpacked_args = []
-    for arg in args:
-        if isinstance(arg, Reference):
-            refs.append(arg)
-            unpacked_args.append(arg.obj)
-        elif isinstance(arg, Store):
-            stores.append(arg)
-            # unpacked_args.append(arg.value)
-            unpacked_args.append(arg)
-        elif isinstance(arg, list) or isinstance(arg, tuple):
-            unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*arg)
-            unpacked_args.append(unpacked_args_i)
-            refs.extend(refs_i)
-            stores.extend(stores_i)
-        elif isinstance(arg, dict):
-            _, unpacked_kwargs_i, refs_i, stores_i = _unpack_refs_and_stores(**arg)
-            unpacked_args.append(unpacked_kwargs_i)
-            refs.extend(refs_i)
-            stores.extend(stores_i)
-        else:
-            unpacked_args.append(arg)
-
-    unpacked_kwargs = {}
-    for k, v in kwargs.items():
-        if isinstance(v, Reference):
-            refs.append(v)
-            unpacked_kwargs[k] = v.obj
-        elif isinstance(v, Store):
-            stores.append(v)
-            # unpacked_kwargs[k] = v.value
-            unpacked_kwargs[k] = v
-        elif isinstance(v, list) or isinstance(v, tuple):
-            unpacked_args_i, _, refs_i, stores_i = _unpack_refs_and_stores(*v)
-            unpacked_kwargs[k] = unpacked_args_i
-            refs.extend(refs_i)
-            stores.extend(stores_i)
-        elif isinstance(v, dict):
-            _, unpacked_kwargs_i, refs_i, stores_i = _unpack_refs_and_stores(**v)
-            unpacked_kwargs[k] = unpacked_kwargs_i
-            refs.extend(refs_i)
-            stores.extend(stores_i)
-        else:
-            unpacked_kwargs[k] = v
-
-    return unpacked_args, unpacked_kwargs, refs, stores
 
 
 def _wrap_outputs(obj, return_type: type = None):

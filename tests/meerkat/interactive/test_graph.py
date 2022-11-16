@@ -5,11 +5,10 @@ import pandas as pd
 
 import meerkat as mk
 from meerkat.interactive.graph import (
-    Reference,
-    ReferenceModification,
     interface_op,
     trigger,
 )
+from meerkat.interactive.modification import DataFrameModification
 
 
 @interface_op
@@ -23,23 +22,21 @@ def unary_op(df_1):
 
 
 def test_trigger():
+    # FIXME: fix this test
     df_1 = mk.DataFrame({"a": np.arange(10)})
     df_2 = mk.DataFrame({"a": np.arange(10)})
 
-    ref_1 = Reference(df_1)
-    ref_2 = Reference(df_2)
-
-    derived_1 = binary_op(ref_1, ref_2)
+    derived_1 = binary_op(df_1, df_2)
     derived_2 = unary_op(derived_1)
     derived_3 = binary_op(derived_1, derived_2)
-    derived_4 = binary_op(derived_3, ref_2)
+    derived_4 = binary_op(derived_3, df_2)
 
-    ref_1.obj = mk.DataFrame({"a": np.arange(10, 20)})
-    ref_2.obj = mk.DataFrame({"a": np.arange(10, 20)})
+    df_1 = mk.DataFrame({"a": np.arange(10, 20)})
+    df_2 = mk.DataFrame({"a": np.arange(10, 20)})
     modifications = trigger(
         [
-            ReferenceModification(id=ref_1.id, scope=[]),
-            ReferenceModification(id=ref_2.id, scope=[]),
+            DataFrameModification(id=df_1.inode.id, scope=[]),
+            DataFrameModification(id=df_2.inode.id, scope=[]),
         ],
     )
 

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Sequence, Union
 from pydantic import BaseModel
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import Store, interface_op, make_store
 
 from ..abstract import Component
 
@@ -58,7 +58,7 @@ class Sort(Component):
 
     def __init__(
         self,
-        df: Reference["DataFrame"],
+        df: DataFrame,
         criteria: Union[Store[List[str]], List[str]] = None,
         title: str = "",
     ):
@@ -78,7 +78,7 @@ class Sort(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config,
+            "df": self.df.config,  # FIXME
             "criteria": self.criteria.config,
             "title": self.title,
         }

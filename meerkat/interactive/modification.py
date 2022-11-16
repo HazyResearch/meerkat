@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, List
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from meerkat.interactive.graph import Reference, Store
+    from meerkat.interactive.graph import Store
     from meerkat.interactive.node import Node
 
 
@@ -39,7 +39,7 @@ class ReferenceModification(Modification):
     type: str = "ref"
 
     @property
-    def node(self) -> "Reference":
+    def node(self):
         from meerkat.state import state
 
         return state.identifiables.get(group="refs", id=self.id)

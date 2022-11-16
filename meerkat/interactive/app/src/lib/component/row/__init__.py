@@ -1,7 +1,8 @@
 import numpy as np
+from meerkat.dataframe import DataFrame
 
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Reference, Store
+from meerkat.interactive.graph import Store
 
 from ..abstract import Component
 
@@ -12,7 +13,7 @@ class Row(Component):
 
     def __init__(
         self,
-        df: Reference,
+        df: DataFrame,
         idx: Store[int],
         target: EditTarget = None,
         cell_specs: dict = None,
@@ -34,7 +35,7 @@ class Row(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config,
+            "df": self.df.config,  # FIXME
             "idx": self.idx.config,
             "target": self.target.config,
             "cell_specs": self.cell_specs,

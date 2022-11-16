@@ -1,6 +1,6 @@
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Reference, make_store
+from meerkat.interactive.graph import make_store
 
 from ..abstract import Component
 

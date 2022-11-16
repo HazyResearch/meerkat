@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import Store, interface_op, make_store
 
 from ..abstract import Component
 
@@ -172,7 +172,7 @@ class Filter(Component):
 
     def __init__(
         self,
-        df: Reference["DataFrame"],
+        df: DataFrame,
         criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
         title: str = "",
     ):
@@ -193,7 +193,7 @@ class Filter(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config,
+            "df": self.df.config,  # FIXME
             "criteria": self.criteria.config,
             "operations": self.operations,
             "title": self.title,

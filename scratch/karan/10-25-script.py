@@ -7,7 +7,7 @@ import pandas as pd
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.sort import SortCriterion
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import interface_op
 from meerkat.ops.sliceby.groupby import groupby
 
 #### New Dataloading
