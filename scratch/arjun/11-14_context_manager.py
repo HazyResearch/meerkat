@@ -45,8 +45,8 @@ reassign(df).run()
 print(df)
 print(columns_store, type(columns_store))
 
-print(df.inode.children)
-print(columns_store.inode)
+# print(df.inode.children)
+# print(columns_store.inode)
 
 # import meerkat as mk
 

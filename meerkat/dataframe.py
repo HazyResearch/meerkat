@@ -33,6 +33,7 @@ import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
+from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -403,6 +404,11 @@ class DataFrame(
 
     def __setitem__(self, posidx, value):
         self.add_column(name=posidx, data=value, overwrite=True)
+
+        if self.has_inode():
+            # Add a modification if it's on the graph
+            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod.add_to_queue()
 
     def consolidate(self):
         self.data.consolidate()

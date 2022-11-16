@@ -285,29 +285,7 @@ def _update_result(
         The updated result object.
     """
 
-    if isinstance(result, list):
-        # Recursively update each element of the list
-        return [_update_result(r, u, modifications) for r, u in zip(result, update)]
-    elif isinstance(result, tuple):
-        # Recursively update each element of the tuple
-        return tuple(
-            _update_result(r, u, modifications) for r, u in zip(result, update)
-        )
-    elif isinstance(result, dict):
-        # Recursively update each element of the dict
-        return {
-            k: _update_result(v, update[k], modifications) for k, v in result.items()
-        }
-    # elif isinstance(result, Reference):
-    #     # If the result is a Reference, then we need to update the Reference's object
-    #     # and return a ReferenceModification
-    #     result.obj = update
-    #     if isinstance(result.obj, DataFrame):
-    #         modifications.append(
-    #             ReferenceModification(id=result.id, scope=result.obj.columns)
-    #         )
-    #     return result
-    elif isinstance(result, DataFrame):
+    if isinstance(result, DataFrame):
         # Detach the result object from the Node
         inode = result.detach_inode()
 
@@ -339,6 +317,19 @@ def _update_result(
             result.set(update)
             modifications.append(StoreModification(id=result.inode.id, value=update))
         return result
+    elif isinstance(result, list):
+        # Recursively update each element of the list
+        return [_update_result(r, u, modifications) for r, u in zip(result, update)]
+    elif isinstance(result, tuple):
+        # Recursively update each element of the tuple
+        return tuple(
+            _update_result(r, u, modifications) for r, u in zip(result, update)
+        )
+    elif isinstance(result, dict):
+        # Recursively update each element of the dict
+        return {
+            k: _update_result(v, update[k], modifications) for k, v in result.items()
+        }
     else:
         # If the result is not a Reference or Store, then it is a primitive type
         # and we can just return the update
@@ -357,9 +348,6 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
-    # order = [
-    #     node for node in _topological_sort(root_nodes) if isinstance(node, Operation)
-    # ]
     # Sort the nodes in topological order, and keep the Operation nodes
     order = [
         node.obj

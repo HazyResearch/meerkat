@@ -12,6 +12,7 @@ import pandas as pd
 import torch
 
 import meerkat.config
+from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -44,6 +45,7 @@ class AbstractColumn(
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
+    NodeMixin,
     ProvenanceMixin,
     ReactifiableMixin,
     abc.ABC,
