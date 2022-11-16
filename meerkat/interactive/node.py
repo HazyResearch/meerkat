@@ -32,6 +32,9 @@ class Node(IdentifiableMixin):
         """Returns the children that are triggered."""
         return [child for child, triggers in self.children.items() if triggers]
 
+    def __repr__(self) -> str:
+        return f"Node({self.obj}, {len(self.children)} children)"
+
     def __hash__(self):
         """Hash is based on the id of the node."""
         return hash(id(self))

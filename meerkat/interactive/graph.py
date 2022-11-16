@@ -96,14 +96,22 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     def __init__(self, wrapped: T):
         super().__init__(wrapped=wrapped)
+        # Set up these attributes so we can create the
+        # config and detail properties.
+        self._self_config = None
+        self._self_detail = None
 
     @property
     def config(self):
         return StoreConfig(
             store_id=self.id,
             value=self.__wrapped__,
-            has_children=self.has_children(),
+            has_children=self.inode.has_children() if self.inode else False,
         )
+
+    @property
+    def detail(self):
+        return f"Store({self.__wrapped__}) has id {self.id} and node {self.inode}"
 
     def set(self, new_value: T):
         """Set the value of the store."""
@@ -113,10 +121,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     def __repr__(self) -> str:
         return f"Store({self.__wrapped__})"
-
-    @property
-    def detail(self):
-        return f"Store({self.__wrapped__}) has id {self.id} and node id {self.node_id}"
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self.__wrapped__, name)
@@ -346,6 +350,8 @@ def _nested_apply(obj: object, fn: callable):
         return tuple(_nested_apply(v, fn=fn) for v in obj)
     elif isinstance(obj, dict):
         return {k: _nested_apply(v, fn=fn) for k, v in obj.items()}
+    elif obj is None:
+        return None
     else:
         raise ValueError(f"Unexpected type {type(obj)}.")
 
