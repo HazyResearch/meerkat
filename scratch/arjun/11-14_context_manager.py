@@ -56,3 +56,8 @@ print(columns_store, type(columns_store))
 #     b = a + 1
 
 # print(b, type(b))
+
+with mk.gui.react():
+
+    with mk.gui.no_react()
+        

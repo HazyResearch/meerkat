@@ -75,6 +75,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
 class EndpointConfig(BaseModel):
     endpoint_id: Union[str, None]
 
+
 # TODO: technically Endpoint doesn't need to be NodeMixin (probably)
 class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     """
@@ -179,25 +180,30 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             [param.default != param.empty for param in signature.parameters.values()]
         )
 
-        if no_args and no_kwonlyargs and no_unfilled_args:
-            return partial_fn()
+        if not (no_args and no_kwonlyargs and no_unfilled_args):
 
-        # Find the missing keyword arguments
-        missing_args = [
-            arg for arg in spec.kwonlyargs if arg not in partial_fn.keywords
-        ] + [
-            param.name
-            for param in signature.parameters.values()
-            if param.default == param.empty
-        ]
-        raise ValueError(
-            f"Endpoint {self.id} still has arguments left to be \
-            filled (args: {spec.args}, kwargs: {missing_args}). \
-                Ensure that all keyword arguments \
-                are passed in when calling `.run()` on this endpoint."
-        )
+            # Find the missing keyword arguments
+            missing_args = [
+                arg for arg in spec.kwonlyargs if arg not in partial_fn.keywords
+            ] + [
+                param.name
+                for param in signature.parameters.values()
+                if param.default == param.empty
+            ]
+            raise ValueError(
+                f"Endpoint {self.id} still has arguments left to be \
+                filled (args: {spec.args}, kwargs: {missing_args}). \
+                    Ensure that all keyword arguments \
+                    are passed in when calling `.run()` on this endpoint."
+            )
 
-    def __call__(self, *args, **kwargs):
+        result = partial_fn()
+
+        modifications = trigger()
+
+        return result, modifications
+
+    def partial(self, *args, **kwargs):
         # Any Stores or References that are passed in as arguments
         # should have this Endpoint as a non-triggering child
         if not self.has_inode():
@@ -455,12 +461,6 @@ def endpoint(
 
             # Run the function
             result = fn(*_args, **_kwargs)
-
-            # Get the modifications from the queue
-            modifications = state.modification_queue.queue
-
-            # Trigger the modifications
-            modifications = trigger(modifications)
 
             # Return the result of the function
             return result

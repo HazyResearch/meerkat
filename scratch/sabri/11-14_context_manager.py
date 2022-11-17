@@ -26,24 +26,26 @@ def reassign(value: mk.gui.Store):
     value.set(value + 1)
     print(value)
 
+
 @mk.gui.interface_op
 def print_op(value: any):
     print("in print op")
     print(value)
 
+@mk.gui.interface_op
+def filter(df: mk.DataFrame, value: int):
+    return df.lz[10 * value:]
+
+
+df = mk.get("imagenette")
 
 with mk.gui.react():
     value = mk.gui.Store(0)
-    button = mk.gui.Button("Increment", on_click=reassign(value))
+    button = mk.gui.Button("Increment", on_click=reassign.partial(value))
+    
+    df = filter(df, value)
 
-    new_value = value + 10
-    print_op(value)
-    breakpoint()
-    print_op(new_value)
-
-
+    gallery = mk.gui.Gallery(df, main_column="img", tag_columns=["label"])
 
 mk.gui.start()
-mk.gui.Interface(
-    components=[button]
-).launch()
+mk.gui.Interface(components=[button, gallery]).launch()

@@ -96,13 +96,18 @@ class NodeMixin:
     @property
     def config(self):
         """Returns the config for the node."""
-        assert (
-            self.inode is not None
-        ), "Something went wrong -- this object must be attached \
-            to a node in the graph."
-        # FIXME: Component must ensure that NodeMixin objects
-        # are attached to nodes in the graph before
-        # sending over their configs to the frontend.
+        # We used to assert if it wasn't already in the graph
+        # assert (
+        #     self.inode is not None
+        # ), (
+        #     "Something went wrong -- this object must be attached "
+        #     "to a node in the graph."
+        # )
+        if self.inode is None:
+            # to create a config that can be sent to the frontend 
+            # the object must be attached to a node in the graph
+            self.attach_to_inode(self.create_inode())
+
         return self.inode.config
 
     def attach_to_inode(self, inode: Node):

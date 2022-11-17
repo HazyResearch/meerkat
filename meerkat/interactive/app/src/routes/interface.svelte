@@ -41,6 +41,7 @@
 				fn_kwargs: kwargs,
 				payload: payload
 			});
+		console.log(modifications);
 		apply_modifications(modifications);
 		return result;
 	};

@@ -14,6 +14,7 @@ from meerkat.interactive.modification import (
 from meerkat.interactive.node import NodeMixin, _topological_sort
 from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.state import state
 
 # A stack that manages if reactive mode is enabled
 # The stack is reveresed so that the top of the stack is
@@ -44,12 +45,14 @@ def reactify(fn, **kwargs):
     # For example, if fn returns a list. The reactified fn will return a Store(list).
     # Then, Store(list)[0] should also return a Store.
     # TODO (arjun): These if this assumption holds.
+    # TODO: check if fn is already an interface_op, will probably need to make it 
+    # force_reactify=True
     if is_reactive():
         fn = interface_op(fn=fn, force_reactify=True, nested_return=False, **kwargs)
 
     return fn
 
-
+# TODO: consolidate this with reactify
 def reactify_decorator(fn=None, **interface_op_kwargs):
     """A decorator for reactifying functions and methods."""
     if fn is None:
@@ -131,7 +134,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # storing the attributes as a state would give us.
         return reactify(attr) if callable(attr) else attr
 
-    # @reactify_decorator()
+    @reactify_decorator()
     def __add__(self, other):
         # TODO (arjun): This should not fail with karan's changes.
         return super().__add__(other)
@@ -255,7 +258,7 @@ def _update_result(
         return update
 
 
-def trigger(modifications: List[Modification]) -> List[Modification]:
+def trigger() -> List[Modification]:
     """
     Trigger the computation graph of an interface based on a list of
     modifications.
@@ -264,6 +267,10 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         List[Modification]: The list of modifications that resulted from running the
             computation graph.
     """
+    modifications = state.modification_queue.queue
+
+        
+
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
@@ -274,7 +281,7 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
         if isinstance(node.obj, Operation)
     ]
 
-    print(f"trigged pipeline: {'->'.join([node.fn.__name__ for node in order])}")
+    print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
     new_modifications = []
     with tqdm(total=len(order)) as pbar:
         # Go through all the operations in order: run them and add their modifications
@@ -283,9 +290,11 @@ def trigger(modifications: List[Modification]) -> List[Modification]:
             pbar.set_postfix_str(f"Running {op.fn.__name__}")
             mods = op()
             # TODO: check this
-            mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
+            # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
             pbar.update(1)
+    
+    state.modification_queue.queue = []
     return modifications + new_modifications
 
 

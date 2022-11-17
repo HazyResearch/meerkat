@@ -31,7 +31,7 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     store.set(value)
 
     # Trigger on the store modification: leads to modifications on the graph
-    modifications = trigger([store_modification])
+    modifications = trigger()
 
     # Return the modifications
     return modifications
