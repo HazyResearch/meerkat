@@ -20,6 +20,13 @@ _SUPPORTED_MATCH_OPS = {
 }
 
 def _parse_concat(query: str) -> List[str]:
+    query = query.strip()
+
+    if query.startswith("concat(") and query.endswith(")"):
+        query = query[7:-1]
+        return re.split(r',(?=")', query)
+    else:
+        return query
     
     pass 
 
@@ -79,7 +86,6 @@ def get_match_schema(df: DataFrame, encoder: str):
     )
 
 
-@endpoint
 def match(
     df: DataFrame,
     against: str = Endpoint.EmbeddedBody(),
