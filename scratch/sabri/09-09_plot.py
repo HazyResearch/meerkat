@@ -12,7 +12,7 @@ def plot(df: mk.DataFrame) -> mk.gui.Interface:
     pivot = mk.gui.Reference(df)
     selection = mk.gui.Store([])
 
-    @mk.gui.interface_op
+    @mk.gui.reactive
     def sliceby(df: mk.DataFrame):
         sb = df.sliceby(
             [
@@ -48,7 +48,7 @@ def plot(df: mk.DataFrame) -> mk.gui.Interface:
         slot="plot",
     )
 
-    @mk.gui.interface_op
+    @mk.gui.reactive
     def filter_selection(
         df: mk.DataFrame, sb, sb_df: mk.DataFrame, selection: List[int]
     ):

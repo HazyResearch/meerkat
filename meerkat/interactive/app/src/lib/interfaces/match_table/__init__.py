@@ -2,12 +2,12 @@ import meerkat as mk
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import interface_op
+from meerkat.interactive.graph import reactive
 
 from ..abstract import Interface, InterfaceConfig
 
 
-@interface_op
+@reactive
 def simple_op(col: str):
     return col + "!"
 

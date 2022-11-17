@@ -65,7 +65,7 @@ _index = dict(zip(story_sentence_df["doc_id"].unique(), range(len(story_sentence
 _sentence_index = mk.ArrayColumn(story_sentence_df['doc_id'])[None, :] == mk.ArrayColumn(story_sentence_df['doc_id'].unique())[:, None]
 _get_sentences = lambda idx: np.where(_sentence_index[idx])[0]
 
-@mk.gui.interface_op
+@mk.gui.reactive
 def choose_sentences(sentence_df: mk.DataFrame, doc_id: str):
     """
     This is an interactive operation (decorate with `@mk.gui.interface_op`)
@@ -118,7 +118,7 @@ Code snippet that autosaves labels to a jsonl file, whenever the user updates an
 
 TODO: it is very easy to also just load these back in to continue a labeling session as well!
 """
-@mk.gui.interface_op
+@mk.gui.reactive
 def save_labels(df: mk.DataFrame):
     """
     Save the labels to a file.

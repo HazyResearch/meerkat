@@ -5,18 +5,18 @@ import pandas as pd
 
 import meerkat as mk
 from meerkat.interactive.graph import (
-    interface_op,
+    reactive,
     trigger,
 )
 from meerkat.interactive.modification import DataFrameModification
 
 
-@interface_op
+@reactive
 def binary_op(df_1: mk.DataFrame, df_2: mk.DataFrame):
     return mk.DataFrame({"a": df_1["a"] + df_2["a"]})
 
 
-@interface_op
+@reactive
 def unary_op(df_1):
     return mk.DataFrame({"a": df_1["a"] * 3})
 
@@ -52,7 +52,7 @@ def _create_dummy_df() -> mk.DataFrame:
     return mk.DataFrame.from_pandas(df)
 
 
-@interface_op
+@reactive
 def _add_to_list(_keys: List[str], new_key: str):
     return _keys + [new_key]
 

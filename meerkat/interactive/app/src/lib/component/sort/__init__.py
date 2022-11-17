@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Sequence, Union
 from pydantic import BaseModel
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store, interface_op, make_store
+from meerkat.interactive.graph import Store, reactive, make_store
 
 from ..abstract import Component
 
@@ -16,7 +16,7 @@ class SortCriterion(BaseModel):
     source: str = ""
 
 
-@interface_op
+@reactive
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],

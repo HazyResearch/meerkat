@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Store, interface_op, make_store
+from meerkat.interactive.graph import Store, reactive, make_store
 
 from ..abstract import Component
 
@@ -81,7 +81,7 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
     # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
-@interface_op
+@reactive
 def filter_by_operator(
     data: Union["DataFrame", "AbstractColumn"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],

@@ -3,10 +3,10 @@ from typing import List, Union
 import numpy as np
 
 from meerkat import DataFrame
-from meerkat.interactive.graph import interface_op
+from meerkat.interactive.graph import reactive
 
 
-@interface_op
+@reactive
 def sort(
     data: DataFrame,
     by: Union[str, List[str]],

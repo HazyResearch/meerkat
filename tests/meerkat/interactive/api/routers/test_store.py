@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 import meerkat as mk
 from meerkat.interactive.api.main import app
-from meerkat.interactive.graph import Store, interface_op
+from meerkat.interactive.graph import Store, reactive
 
 client = TestClient(app)
 
@@ -28,6 +28,6 @@ def test_store():
     assert store.value == 2
 
 
-@interface_op
+@reactive
 def unary_op(value):
     return value + 3
