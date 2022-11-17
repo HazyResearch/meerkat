@@ -37,6 +37,14 @@ class SingletonRouter(type):
 
 
 class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter):
+    #TODO: using the SingletonRouter metaclass causes a bug. 
+    # app.include_router() inside Endpoint is called multiple times
+    # for the same router. This causes an error because some 
+    # endpoints are registered multiple times because the FastAPI
+    # class doesn't check if an endpoint is already registered.
+    # As a patch, we're generating one router per Endpoint object
+    # (this could generate multiple routers for the same prefix, but
+    # that's not a problem).
     """
     A very simple FastAPI router.
 
@@ -216,7 +224,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         return result, modifications
 
     def partial(self, *args, **kwargs) -> Endpoint:
-        # Any Stores or References that are passed in as arguments
+        # Any NodeMixin objects that are passed in as arguments
         # should have this Endpoint as a non-triggering child
         if not self.has_inode():
             node = self.create_inode()
@@ -233,8 +241,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         return Endpoint(
             fn=partial(self.fn, *args, **kwargs),
-            prefix=self.prefix,
-            route=self.route,
+            prefix=None,
+            route=None,
         )
 
     def compose(self, fn: Union[Endpoint, callable]) -> Endpoint:
