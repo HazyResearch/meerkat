@@ -36,11 +36,13 @@
 	};
 
 	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any) => {
-		if (endpoint_id === null) { return; }
+		if (endpoint_id === null) {
+			return;
+		}
 		let [result, modifications] = await post(`${$api_url}/endpoint/${endpoint_id}/dispatch`, {
-				fn_kwargs: kwargs,
-				payload: payload
-			});
+			fn_kwargs: kwargs,
+			payload: payload
+		});
 		apply_modifications(modifications);
 		return result;
 	};

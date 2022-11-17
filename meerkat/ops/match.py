@@ -50,7 +50,7 @@ def match(
     to_embedding = embed(
         data=query, encoder=encoder, num_workers=0, modality=query_modality, pbar=False
     )
-
+    print(against)
     scores = data_embedding @ to_embedding.T
     column_names = []
     for i, query_item in enumerate(query):

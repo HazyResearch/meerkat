@@ -22,8 +22,7 @@
 	$: {
 		schema_promise = $dispatch(get_match_schema.endpoint_id, {}, {});
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
-			return schema.columns
-				.map((column) => ({ value: column.name, label: column.name }));
+			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
 	}
 
@@ -38,7 +37,10 @@
 			return;
 		}
 		status = 'working';
-		let promise = $dispatch(on_match.endpoint_id, {}, {});
+		let promise = $dispatch(on_match.endpoint_id, {
+			"against": $against,
+			"query": $text
+		}, {});
 		promise
 			.then(() => {
 				status = 'success';
@@ -50,6 +52,8 @@
 	};
 
 	function handleSelect(event) {
+		console.log("here")
+		console.log(against)
 		$against = event.detail.value;
 	}
 

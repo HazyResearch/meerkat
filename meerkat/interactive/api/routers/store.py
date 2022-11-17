@@ -11,7 +11,6 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     Triggers the computational graph when a store on the frontend
     changes.
     """
-
     # TODO: the interface sends store_triggers for all stores when it starts
     # up -- these requests should not be being sent.
     # These requests are indirectly ignored here because we check if the
@@ -28,9 +27,7 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
     # of the store.
     # store_modification.node.set(value)
-    print(len(state.modification_queue.queue))
     store.set(value)
-    print(len(state.modification_queue.queue))
 
     # Trigger on the store modification: leads to modifications on the graph
     modifications = trigger()

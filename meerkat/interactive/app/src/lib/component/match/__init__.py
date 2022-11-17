@@ -121,10 +121,14 @@ class Match(Component):
     title: str = "Match"
 
     def __post_init__(self):
+        super().__post_init__()
+
+        # we do not add the against or the query to the partial, because we don't
+        # want them to be maintained on the backend
+        # if they are maintained on the backend, then a store update dispatch will 
+        # run on every key stroke 
         self.on_match = match.partial(
             df=self.df,
-            against=self.against,
-            query=self.text,
             encoder=self.encoder,
         )
         self.get_match_schema = get_match_schema.partial(
@@ -135,5 +139,4 @@ class Match(Component):
         #     on_match = on_match.compose(self.on_match)
         # self.on_match = on_match
         pass 
-        super().__post_init__()
     
