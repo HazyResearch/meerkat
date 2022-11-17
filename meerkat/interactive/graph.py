@@ -148,7 +148,7 @@ def _get_nodeables(*args, **kwargs):
     return nodeables
 
 
-def _wrap_outputs(obj, return_type: type = None):
+def _wrap_outputs(obj):
     if isinstance(obj, NodeMixin):
         return obj
     return Store(obj)
@@ -204,7 +204,6 @@ def _nested_apply(obj: object, fn: callable):
 def reactive(
     fn: Callable = None,
     nested_return: bool = None,
-    return_type: type = None,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -245,9 +244,6 @@ def reactive(
             function returns two DataFrames in a tuple, then `nested_return` should be
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
-        return_type: The type of the return value.
-        # force_reactify: Whether to force the function to be reactified. This is useful
-        #    for returning outputs that are always reactified.
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
@@ -258,7 +254,6 @@ def reactive(
         return partial(
             reactive,
             nested_return=nested_return,
-            return_type=return_type,
         )
 
     def _reactive(fn: Callable):
