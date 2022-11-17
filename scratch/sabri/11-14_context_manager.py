@@ -32,7 +32,7 @@ def filter(df: mk.DataFrame, value: int):
     return df.lz[10 * value :]
 
 
-df = mk.get("imagenette")
+df = mk.get("imagenette", version="160px")
 
 with mk.gui.react():
     value = mk.gui.Store(0)
