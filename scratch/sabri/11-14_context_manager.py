@@ -41,7 +41,7 @@ with mk.gui.react():
     df = filter(df, value)
 
     gallery = mk.gui.Gallery(df, main_column="img", tag_columns=["label"])
-    
+
 
 mk.gui.start()
 mk.gui.Interface(components=[button, gallery]).launch()

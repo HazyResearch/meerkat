@@ -405,6 +405,11 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     def set(self, new_value: T):
         """Set the value of the store."""
+        if isinstance(new_value, Store):
+            # if the value is a store, then we need to unpack it soit can be sent to the
+            # frontend 
+            new_value = new_value.__wrapped__
+            
         mod = StoreModification(id=self.id, value=new_value)
         self.__wrapped__ = new_value
         mod.add_to_queue()
