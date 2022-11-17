@@ -1,14 +1,13 @@
+import random
 from typing import List
 
 import numpy as np
 import pandas as pd
 
 import meerkat as mk
-from meerkat.interactive.graph import (
-    reactive,
-    trigger,
-)
+from meerkat.interactive.graph import reactive, trigger
 from meerkat.interactive.modification import DataFrameModification
+from meerkat.state import state
 
 
 @reactive
@@ -85,8 +84,37 @@ def test_react_context_manager_nested():
     assert isinstance(keys, List)
 
 
+def test_react_context_instance_method():
+    rng = np.random.RandomState(0)
+
+    # TODO: Why is this decorator affecting the return type?
+    @reactive
+    def _subselect_df(df: mk.DataFrame) -> mk.DataFrame:
+        cols = list(rng.choice(df.columns, 3))
+        return df[cols]
+
+    df = mk.DataFrame({str(k): [k] for k in range(1000)})
+    with mk.gui.react():
+        df_sub = _subselect_df(df)
+        keys_reactive = df_sub.keys()
+
+    keys0 = keys_reactive.__wrapped__
+
+    state.modification_queue.queue = [DataFrameModification(id=df.id, scope=[])]
+    modifications1 = trigger()
+    keys1 = modifications1[-1].value
+
+    state.modification_queue.queue = [DataFrameModification(id=df.id, scope=[])]
+    modifications2 = trigger()
+    keys2 = modifications2[-1].value
+
+    assert keys0 != keys1
+    assert keys1 != keys2
+
+
 def test_default_nested_return():
     """By default, nested return is True for functions returning tuples."""
+
     @reactive
     def _return_tuple():
         return ("a", "b")
