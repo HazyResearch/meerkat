@@ -19,6 +19,9 @@ _SUPPORTED_MATCH_OPS = {
     "**": lambda x, y: x**y,
 }
 
+def _parse_concat(query: str) -> List[str]:
+    
+    pass 
 
 def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     """Parse a query string into a list of columns and operations to perform.
@@ -31,7 +34,6 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     in double quotation marks (e.g. "query1" + "query2"). Single quotation marks
     will be ignored.
     """
-
     def _process_queries(queries):
         # Remove quotation marks from queries.
         return [q.replace('"', "") for q in queries]
@@ -96,29 +98,36 @@ def match(
         )
 
     try:
-        # Parse the string to see if we should be running some operation on it.
-        # TODO (arjundd): Support more than one op.
-        # Potentially parse the string in order?
-        queries, op = _regex_parse_query(query)
-        df, match_columns = mk.match(
-            data=df,
-            query=queries,
-            against=against,
-            encoder=encoder,
-            return_column_names=True,
-        )
-        if len(match_columns) > 1:
-            assert op is not None
-            col = f"_match_{against}_{query}"
-            df[col] = _SUPPORTED_MATCH_OPS[op](
-                df[match_columns[0]], df[match_columns[1]]
+        data_embedding = df[against]
+
+        # TODO: This is remarkably hacky. Needs a much better fix soon.
+        sub_queries = _parse_concat(query)
+        queries_to_concat = []
+        for sub_query in sub_queries:
+            subsub_queries, op = mk.PandasSeriesColumn(_regex_parse_query(sub_query))
+            subsubquery_embs = mk.embed(
+                data=subsub_queries, 
+                encoder=encoder, 
+                num_workers=0, 
+                pbar=False
             )
-            match_columns = [col] + match_columns
+            if len(subsubquery_embs) > 1:
+                subquery_emb = _SUPPORTED_MATCH_OPS[op](
+                    subsubquery_embs[0], subsubquery_embs[1]
+                )
+            else: 
+                subquery_emb = subsubquery_embs[0]
+            queries_to_concat.apend(subquery_emb)
+        query_emb = mk.concat(queries_to_concat)
+        
+        scores = data_embedding @ query_emb.T
+        col_name = f"match({against}, {query})"
+        df[col_name] = scores
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return match_columns[0]
+    return col_name
 
 
 @dataclass

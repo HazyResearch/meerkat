@@ -7,7 +7,7 @@ from .embed import embed
 
 def match(
     data: Union[DataFrame, AbstractColumn],
-    query: Union[str, List[str], Tuple[str], PandasSeriesColumn],
+    query: Union[str, List[str], Tuple[str], PandasSeriesColumn, DataFrame],
     against: Optional[str] = None,
     against_modality: Optional[str] = None,
     query_modality: Optional[str] = None,
