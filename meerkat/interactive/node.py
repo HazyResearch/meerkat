@@ -160,6 +160,7 @@ class NodeMixin:
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     """
     Perform a topological sort on a graph.
+    TODO: Add a check to ensure the graph is acyclic.
 
     Args:
         root_nodes (List[NodeMixin]): The root nodes of the graph.
@@ -171,12 +172,10 @@ def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     # only get the children that are triggered by the node
     # i.e. ignore children that use the node as a dependency
     # but are not triggered by the node
-    # print("root_nodes", root_nodes)
     parents = defaultdict(set)
     nodes = set()
     while root_nodes:
         node = root_nodes.pop(0)
-        # print("node", node, node.obj, node.children)
         for child in node.trigger_children:
             parents[child].add(node)
             nodes.add(node)

@@ -40,8 +40,11 @@ with mk.gui.react():
 
     df = filter(df, value)
 
+    filter_component = mk.gui.Filter(df, criteria=[], title="Filter Examples")
+    df = filter_component(df)
+
     gallery = mk.gui.Gallery(df, main_column="img", tag_columns=["label"])
 
 
 mk.gui.start()
-mk.gui.Interface(components=[button, gallery]).launch()
+mk.gui.Interface(components=[button, filter_component, gallery]).launch()

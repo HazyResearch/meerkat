@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Sequence, Union
 
 from pydantic import BaseModel
@@ -43,6 +44,7 @@ def sort_by_criteria(
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
+@dataclass
 class Sort(Component):
     """This component handles a sort_by list and a sort_order list.
 
@@ -54,31 +56,11 @@ class Sort(Component):
     new dataframe will be returned as a result of the op.
     """
 
-    name = "Sort"
+    df: DataFrame
+    criteria: List[SortCriterion] = field(default_factory=list)
+    title: str = "Sort"
 
-    def __init__(
-        self,
-        df: DataFrame,
-        criteria: Union[Store[List[str]], List[str]] = None,
-        title: str = "",
-    ):
-        super().__init__()
-        self.df = df
-
-        if criteria is None:
-            criteria = []
-
-        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
-        self.title = title
-
-    def derived(self):
-        # TODO (arjundd): Add option to configure ascending / descending.
-        return sort_by_criteria(self.df, self.criteria)
-
-    @property
-    def props(self):
-        return {
-            "df": self.df.config,  # FIXME
-            "criteria": self.criteria.config,
-            "title": self.title,
-        }
+    def __call__(self, df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+        return sort_by_criteria(df, self.criteria)

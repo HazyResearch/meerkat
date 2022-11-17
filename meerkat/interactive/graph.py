@@ -99,7 +99,6 @@ def trigger() -> List[Modification]:
     """
     modifications = state.modification_queue.queue
 
-        
 
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
@@ -110,7 +109,6 @@ def trigger() -> List[Modification]:
         for node in _topological_sort(root_nodes)
         if isinstance(node.obj, Operation)
     ]
-
     print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
     new_modifications = []
     with tqdm(total=len(order)) as pbar:
@@ -326,6 +324,9 @@ def reactive(
 
                 # Attach the Operation node to its children (if it is not None)
                 def _foo(nodeable: NodeMixin):
+                    # FIXME: make sure they are not returning a nodeable that
+                    # is already in the dag. May be related to checking that the graph
+                    # is acyclic.
                     if not nodeable.has_inode():
                         inode_id = (
                             None if not isinstance(nodeable, Store) else nodeable.id
@@ -409,7 +410,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
             # if the value is a store, then we need to unpack it soit can be sent to the
             # frontend 
             new_value = new_value.__wrapped__
-            
+
         mod = StoreModification(id=self.id, value=new_value)
         self.__wrapped__ = new_value
         mod.add_to_queue()

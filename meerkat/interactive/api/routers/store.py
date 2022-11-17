@@ -10,8 +10,6 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     Triggers the computational graph when a store on the frontend
     changes.
     """
-    # Create a store modification
-    store_modification = StoreModification(id=store.id, value=value)
 
     # TODO: the interface sends store_triggers for all stores when it starts
     # up -- these requests should not be being sent.

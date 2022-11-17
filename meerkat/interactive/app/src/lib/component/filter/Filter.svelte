@@ -20,8 +20,9 @@
 	// and this can cause some lack of synchronization between the frontend and
 	// backend.
 	export let criteria: Writable<FilterCriterion[]>;
-	export let operations: string[];
-	export let title: string = "";
+	export let operations: Writable<string[]>;
+	export let title: Writable<string> = "";
+	
 
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
@@ -63,6 +64,7 @@
 		// console.log("New criteria", new_criteria)
 
 		// Need to reset the array to trigger.
+		console.log(criteria)
 		criteria.set(criteria_frontend);
 	};
 
@@ -88,7 +90,7 @@
 		// Add a new filter criteria.
 		criteria_frontend = [
 			...criteria_frontend,
-			{ is_enabled: false, column: '', op: operations[0], value: '', is_fixed: false, source: 'frontend'}
+			{ is_enabled: false, column: '', op: $operations[0], value: '', is_fixed: false, source: 'frontend'}
 		];
 	};
 
@@ -119,9 +121,9 @@
 </script>
 
 <div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-40 flex flex-col">
-	{#if title != ""}
+	{#if $title != ""}
 	<div class="font-bold text-xl text-slate-600 self-start pl-2">
-		{title}
+		{$title}
 	</div>
 	{/if}
 	<div class="form-control w-full z-21">
@@ -159,7 +161,7 @@
 						id="op"
 						placeholder="...an operation."
 						value={criterion.op}
-						items={operations}
+						items={$operations}
 						showIndicator={true}
 						listPlacement="auto"
 						on:select={(event) => onInputChange(criterion, 'op', event.detail.value)}

@@ -224,6 +224,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             prefix=self.prefix,
             route=self.route,
         )
+    
+    def then(self, fn: callable):
+        return lambda *args, **kwargs: fn(self.fn(*args, **kwargs))
 
     def add_route(self, method: str = "POST") -> None:
         """
