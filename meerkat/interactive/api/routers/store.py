@@ -28,10 +28,16 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # of the store.
     # store_modification.node.set(value)
     print(value)
+
     store.set(value)
+
+    state.modification_queue.ready()
 
     # Trigger on the store modification: leads to modifications on the graph
     modifications = trigger()
+
+    state.modification_queue.unready()
+
 
     # Return the modifications
     return modifications
