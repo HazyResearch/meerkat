@@ -276,10 +276,6 @@ def reactive(
             nonlocal nested_return
             nonlocal fn
 
-            force_reactify = False
-            if is_reactive():
-                force_reactify = True
-
             # Check if fn is a bound method (i.e. an instance method).
             # If so, we need to functionalize the method (i.e. make the method
             # into a function).
@@ -298,66 +294,68 @@ def reactive(
                 fn_class = getattr(fn.__self__.__class__, fn.__name__)
                 fn = _fn_outer_wrapper(fn_class)
 
+            # Call the function on the args and kwargs
+            result = fn(*args, **kwargs)
+
+            if not is_reactive():
+                # If we are not in a reactive context, then we don't need to create
+                # any nodes in the graph.
+                # `fn` should be run as normal.
+                return result
+
+            # Now we're in a reactive context i.e. is_reactive() == True
+
             # Get all the NodeMixin objects from the args and kwargs
             # These objects will be parents of the Operation node
             # that is created for this function
             nodeables = _get_nodeables(*args, **kwargs)
 
-            # Call the function on the args and kwargs
-            result = fn(*args, **kwargs)
-
             # By default, nested return is True when the output is a tuple.
             if nested_return is None:
                 nested_return = isinstance(result, tuple)
 
-            # TODO: explain why this is needed.
-            if (len(nodeables) > 0) or force_reactify:
-                if nested_return:
-                    result = _nested_apply(result, fn=_wrap_outputs)
-                elif isinstance(result, NodeMixin):
-                    result = result
-                else:
-                    result = Store(result)
+            # Wrap the Result in NodeMixin objects
+            if nested_return:
+                result = _nested_apply(result, fn=_wrap_outputs)
+            elif isinstance(result, NodeMixin):
+                result = result
+            else:
+                result = Store(result)
 
             # Setup an Operation node if any of the args or kwargs
             # were nodeables
             op = None
-            if len(nodeables) > 0:
-                _create_nodes_for_nodeables(*nodeables)
-                args = _replace_nodeables_with_nodes(args)
-                kwargs = _replace_nodeables_with_nodes(kwargs)
 
-                # Create the Operation node
-                op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
+            # Create Nodes for each NodeMixin object
+            _create_nodes_for_nodeables(*nodeables)
+            args = _replace_nodeables_with_nodes(args)
+            kwargs = _replace_nodeables_with_nodes(kwargs)
 
-                # For normal functions
-                # Make a node for the operation if it doesn't have one
-                if not op.has_inode():
-                    op.attach_to_inode(op.create_inode())
+            # Create the Operation node
+            op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
 
-                # Add this Operation node as a child of all of the nodeables
-                # FIXME: SUSPICIOUS
-                _add_op_as_child(op, *nodeables, triggers=True)
+            # For normal functions
+            # Make a node for the operation if it doesn't have one
+            if not op.has_inode():
+                op.attach_to_inode(op.create_inode())
 
-            # Make sure the result is a NodeMixin object
-            if (len(nodeables) > 0) or force_reactify:
-                # Attach the Operation node to its children (if it is not None)
-                def _foo(nodeable: NodeMixin):
-                    # FIXME: make sure they are not returning a nodeable that
-                    # is already in the dag. May be related to checking that the graph
-                    # is acyclic.
-                    if not nodeable.has_inode():
-                        inode_id = (
-                            None if not isinstance(nodeable, Store) else nodeable.id
-                        )
-                        nodeable.attach_to_inode(
-                            nodeable.create_inode(inode_id=inode_id)
-                        )
+            # Add this Operation node as a child of all of the nodeables
+            _add_op_as_child(op, *nodeables, triggers=True)
 
-                    if op is not None:
-                        op.inode.add_child(nodeable.inode)
+            # Attach the Operation node to its children (if it is not None)
+            def _foo(nodeable: NodeMixin):
+                # FIXME: make sure they are not returning a nodeable that
+                # is already in the dag. May be related to checking that the graph
+                # is acyclic.
+                if not nodeable.has_inode():
+                    inode_id = None if not isinstance(nodeable, Store) else nodeable.id
+                    nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
 
-                _nested_apply(result, _foo)
+                if op is not None:
+                    op.inode.add_child(nodeable.inode)
+
+            _nested_apply(result, _foo)
+
             return result
 
         return wrapper
