@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { get, writable, type Writable } from 'svelte/store';
 	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
-    import monaco from 'monaco-editor';
+    import * as monaco from 'monaco-editor';
 	import { getContext } from 'svelte';
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
@@ -12,6 +12,7 @@
     import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
     import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
     import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+	import { Model } from 'carbon-icons-svelte';
 
 
 	const { get_schema, match } = getContext('Interface');
@@ -34,55 +35,14 @@
     let Monaco;
 
 
-	onMount(async () => {
-        // @ts-ignore
-        self.MonacoEnvironment = {
-            getWorker: function (_moduleId: any, label: string) {
-                if (label === 'json') {
-                    return new jsonWorker();
-                }
-                if (label === 'css' || label === 'scss' || label === 'less') {
-                    return new cssWorker();
-                }
-                if (label === 'html' || label === 'handlebars' || label === 'razor') {
-                    return new htmlWorker();
-                }
-                if (label === 'typescript' || label === 'javascript') {
-                    return new tsWorker();
-                }
-                return new editorWorker();
-            }
-        };
+	let keywords: Array<string>=[]; 
+	let regex="col\\(";
+	//if we wanted to add more regex, it would look like: 
+	//i.e. add row as another keyword: 
+	//regex = "(col\\()|(row\\()|(tag\\() etc..."
+	console.log({regex});
 
-		let keywords = ['col('];
-        Monaco = await import('monaco-editor');
-		
-		let regex="col\(";
-		editor = Monaco.editor.create(divEl, {
-            value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-            language: 'mylang'
-        });
-		
-		editor.languages.register({id: 'myLang'});
-		editor.languages.setMonarchTokensProvider("myLang", {
-			tokenizer:{
-				root:[
-					[regex, 
-				{
-					cases:{
-						'@keywords': 'keyword',
-						'@default': 'variable',
-					}
-				}],
-				]
-			}
-		});
-        
-
-        return () => {
-            editor.dispose();
-        };
-    });
+	//onMount will happen after the other calls in the <script/>
 
 	$: {
 		schema_promise = $get_schema($dp.box_id);
@@ -93,10 +53,67 @@
 				console.log("this is a column: ");
 				console.log({column});
 				columns.push(column);
-				console.log(columns);
+				keywords.push(`col(` + column.name + `)`);
+				console.log({columns});
 			return({value: column.name, label: column.name})})
 		});
 	}
+	
+	onMount(async () => {
+		//col prompts
+		//img is the value
+		monaco.languages.register({id: 'myLang'});
+		monaco.languages.setMonarchTokensProvider('myLang', {
+			keywords, 
+			tokenizer:{
+				root:[[
+					regex, {
+						cases:{
+							'@keywords': 'keyword',
+							'@default': 'variable',
+						} 
+					}
+				]
+				]
+			}
+		});
+
+		
+
+		monaco.languages.registerCompletionItemProvider('myLang', {
+			provideCompletionItems: (model, position) => {
+				const suggestions = [
+					...keywords.map(keyword => {
+						return {
+							label: keyword,
+							kind: monaco.languages.CompletionItemKind.Keyword,
+							insertText: keyword
+						}
+					})
+				]
+				return {suggestions: suggestions};
+			}
+		})
+		let options : monaco.editor.IStandaloneEditorConstructionOptions = {
+			wordWrap: 'off',
+            lineNumbers: 'off',
+            lineDecorationsWidth: 0,
+            overviewRulerLanes: 0,
+            overviewRulerBorder: false,
+            scrollbar: { horizontal: 'hidden', vertical: 'hidden' }
+			
+	};
+		monaco.editor.create(divEl,{
+			value: "",
+            language: 'myLang',
+			options:options,
+		});
+		
+    });
+
+	
+
+	
 	
 
 	const onKeyPress = (e) => {
@@ -142,6 +159,8 @@
 		$against = '';
 	}
 	$: against_item = { value: $against, label: $against };
+
+	
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">

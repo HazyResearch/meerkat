@@ -3,11 +3,11 @@ import meerkat as mk
 dp = mk.get("imagenette",).lz[:100]
 dp_pivot = mk.gui.Pivot(dp)
 
-# dp = mk.embed(
-#     dp,
-#     input="img",
-#     batch_size=128,
-# )
+dp = mk.embed(
+    dp,
+    input="img",
+    batch_size=128,
+)
 
 match: mk.gui.Component = mk.gui.Match(
     dp_pivot, 
