@@ -35,7 +35,7 @@ class SingletonRouter(type):
         return cls._instances[(cls, prefix)]
 
 
-class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
+class SimpleRouter(IdentifiableMixin, APIRouter):#, metaclass=SingletonRouter):
     """
     A very simple FastAPI router.
 
