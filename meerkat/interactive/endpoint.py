@@ -1,3 +1,4 @@
+from __future__ import annotations
 import inspect
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
@@ -35,7 +36,7 @@ class SingletonRouter(type):
         return cls._instances[(cls, prefix)]
 
 
-class SimpleRouter(IdentifiableMixin, APIRouter):#, metaclass=SingletonRouter):
+class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter):
     """
     A very simple FastAPI router.
 
@@ -214,7 +215,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         return result, modifications
 
-    def partial(self, *args, **kwargs):
+    def partial(self, *args, **kwargs) -> Endpoint:
         # Any Stores or References that are passed in as arguments
         # should have this Endpoint as a non-triggering child
         if not self.has_inode():
@@ -235,9 +236,30 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             prefix=self.prefix,
             route=self.route,
         )
-    
-    def then(self, fn: callable):
-        return lambda *args, **kwargs: fn(self.fn(*args, **kwargs))
+
+    def compose(self, fn: Union[Endpoint, callable]) -> Endpoint:
+        """Create a new Endpoint that applies `fn` to the return value of this
+        Endpoint.
+        Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
+
+        Args:
+            fn (Endpoint, callable): An Endpoint or a callable function that accepts
+                a single argument of the same type as the return of this Endpoint
+                (i.e. self).
+
+        Return:
+            Endpoint: The new composed Endpoint.
+        """
+
+        @wraps(self.fn)
+        def composed(*args, **kwargs):
+            return fn(self.fn(*args, **kwargs))
+
+        return Endpoint(
+            fn=composed,
+            prefix=self.prefix,
+            route=self.route,
+        )
 
     def add_route(self, method: str = "POST") -> None:
         """
@@ -336,7 +358,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         from meerkat.interactive.api.main import app
 
         app.include_router(self.router)
-    
+
     def __call__(self, *args, **kwargs):
         """Calling the endpoint will just call the raw underlying function."""
         return self.fn(*args, **kwargs)

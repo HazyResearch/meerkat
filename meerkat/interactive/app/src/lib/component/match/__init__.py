@@ -7,6 +7,7 @@ from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
+
 # from meerkat.interactive.modification import Modification
 
 
@@ -53,15 +54,20 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     queries = _process_queries(queries)
     return queries, op
 
+
 @endpoint
 def get_match_schema(df: DataFrame, encoder: str):
     import meerkat as mk
-    from meerkat.interactive.api.routers.dataframe import _get_column_infos, SchemaResponse
+    from meerkat.interactive.api.routers.dataframe import (
+        _get_column_infos,
+        SchemaResponse,
+    )
+
     columns = [
         k
         for k, v in df.items()
         if isinstance(v, mk.NumpyArrayColumn) and len(v.shape) == 2
-        # TODO: We should know the provenance of embeddings and where they came from, 
+        # TODO: We should know the provenance of embeddings and where they came from,
         # to explicitly check whether the encoder will match it in size.
     ]
     return SchemaResponse(
@@ -83,6 +89,7 @@ def match(
     The `dataframe_id` remains the same as the original request.
     """
     import meerkat as mk
+
     if not isinstance(df, DataFrame):
         raise HTTPException(
             status_code=400, detail="`match` expects a ref containing a dataframe"
@@ -94,7 +101,11 @@ def match(
         # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
         df, match_columns = mk.match(
-            data=df, query=queries, against=against, encoder=encoder, return_column_names=True
+            data=df,
+            query=queries,
+            against=against,
+            encoder=encoder,
+            return_column_names=True,
         )
         if len(match_columns) > 1:
             assert op is not None
@@ -106,7 +117,7 @@ def match(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
     return match_columns[0]
 
 
@@ -125,18 +136,18 @@ class Match(Component):
 
         # we do not add the against or the query to the partial, because we don't
         # want them to be maintained on the backend
-        # if they are maintained on the backend, then a store update dispatch will 
-        # run on every key stroke 
-        self.on_match = match.partial(
-            df=self.df,
-            encoder=self.encoder,
-        )
+        # if they are maintained on the backend, then a store update dispatch will
+        # run on every key stroke
+
         self.get_match_schema = get_match_schema.partial(
             df=self.df,
             encoder=self.encoder,
         )
-        # if self.on_match is not None:
-        #     on_match = on_match.compose(self.on_match)
-        # self.on_match = on_match
-        pass 
-    
+
+        on_match = match.partial(
+            df=self.df,
+            encoder=self.encoder,
+        )
+        if self.on_match is not None:
+            on_match = on_match.compose(self.on_match)
+        self.on_match = on_match

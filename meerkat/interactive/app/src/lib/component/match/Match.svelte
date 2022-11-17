@@ -12,7 +12,7 @@
 	export let against: Writable<string>;
 	export let on_match: Endpoint;
 	export let text: Writable<string>;
-	export let title: string = '';
+	export let title: Writable<string> = '';
 	export let get_match_schema: Endpoint;
 
 	let status: string = 'waiting';
@@ -64,9 +64,9 @@
 </script>
 
 <div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
-	{#if title != ''}
+	{#if $title != ''}
 		<div class="font-bold text-md text-slate-600 pl-2 text-center">
-			{title}
+			{$title}
 		</div>
 	{/if}
 	<div class="form-control">

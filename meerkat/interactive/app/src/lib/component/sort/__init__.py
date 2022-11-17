@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import uuid
 from typing import Any, Dict, List, Sequence, Union
 
 from pydantic import BaseModel
@@ -64,3 +65,14 @@ class Sort(Component):
         if df is None:
             df = self.df
         return sort_by_criteria(df, self.criteria)
+
+    def create_criterion(
+        self, column: str, ascending: bool, source: str = ""
+    ):
+        return SortCriterion(
+                    id=str(uuid.uuid4()),
+                    is_enabled=True,
+                    column=column,
+                    ascending=ascending,
+                    source=source,
+        )

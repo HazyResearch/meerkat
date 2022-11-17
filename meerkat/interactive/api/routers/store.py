@@ -27,6 +27,7 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
     # of the store.
     # store_modification.node.set(value)
+    print(value)
     store.set(value)
 
     # Trigger on the store modification: leads to modifications on the graph
