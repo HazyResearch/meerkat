@@ -2,18 +2,18 @@ from typing import Callable, Dict, List, Union
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
-from meerkat.interactive.graph import interface_op
+from meerkat.interactive.graph import reactive
 from meerkat.ops.sliceby.sliceby import SliceBy
 
 from ..abstract import Interface
 
 
-@interface_op
+@reactive
 def simple_op(col: str):
     return col + "!"
 
 
-@interface_op
+@reactive
 def make_selection_df(df, id, selection):
     """An out of place operation to take a store and make it a derived
     dataframe."""

@@ -188,7 +188,7 @@ def _nested_apply(obj: object, fn: callable):
         raise ValueError(f"Unexpected type {type(obj)}.")
 
 
-def interface_op(
+def reactive(
     fn: Callable = None,
     nested_return: bool = True,
     return_type: type = None,
@@ -202,7 +202,7 @@ def interface_op(
     A basic example that adds two numbers:
     .. code-block:: python
 
-        @interface_op
+        @reactive
         def add(a: int, b: int) -> int:
             return a + b
 
@@ -216,7 +216,7 @@ def interface_op(
     A more complex example that concatenates two mk.DataFrame objects:
     .. code-block:: python
 
-        @interface_op
+        @reactive
         def concat(df1: mk.DataFrame, df2: mk.DataFrame) -> mk.DataFrame:
             return mk.concat([df1, df2])
 
@@ -244,12 +244,12 @@ def interface_op(
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
         return partial(
-            interface_op,
+            reactive,
             nested_return=nested_return,
             return_type=return_type,
         )
 
-    def _interface_op(fn: Callable):
+    def _reactive(fn: Callable):
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -283,8 +283,22 @@ def interface_op(
             # Call the function on the args and kwargs
             result = fn(*args, **kwargs)
 
-            # Setup an Operation node if any of the
-            # args or kwargs were nodeables or we're forcing reactivity
+            # Setup an Operation node if any of the args or kwargs 
+            # were nodeables
+            op = None
+            if len(nodeables) > 0:
+                # Create the Operation node
+                op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
+
+                # For normal functions
+                # Make a node for the operation if it doesn't have one
+                if not op.has_inode():
+                    op.attach_to_inode(op.create_inode())
+
+                # Add this Operation node as a child of all of the nodeables
+                _add_op_as_child(op, *nodeables, triggers=True)
+
+            # Make sure the result is a NodeMixin object
             if (len(nodeables) > 0) or force_reactify:
                 # The result should be placed inside a Store
                 # (or a nested object) containing Stores if it isn't
@@ -298,18 +312,7 @@ def interface_op(
                 else:
                     result = Store(result)
 
-                # Create the Operation node
-                op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
-
-                # For normal functions
-                # Make a node for the operation if it doesn't have one
-                if not op.has_inode():
-                    op.attach_to_inode(op.create_inode())
-
-                # Add this Operation node as a child of all of the nodeables
-                _add_op_as_child(op, *nodeables, triggers=True)
-
-                # Attach the Operation node to its children
+                # Attach the Operation node to its children (if it is not None)
                 def _foo(nodeable: NodeMixin):
                     if not nodeable.has_inode():
                         inode_id = (
@@ -319,7 +322,8 @@ def interface_op(
                             nodeable.create_inode(inode_id=inode_id)
                         )
 
-                    op.inode.add_child(nodeable.inode)
+                    if op is not None:
+                        op.inode.add_child(nodeable.inode)
 
                 _nested_apply(result, _foo)
 
@@ -327,7 +331,7 @@ def interface_op(
 
         return wrapper
 
-    return _interface_op(fn)
+    return _reactive(fn)
 
 
 # A stack that manages if reactive mode is enabled
@@ -404,9 +408,9 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # TODO: See if we want accessing attributes/properties to be reactifiable.
         # The reason they are not reactifiable now is that it is not clear what
         # storing the attributes as a state would give us.
-        return interface_op(attr) if callable(attr) else attr
+        return reactive(attr) if callable(attr) else attr
 
-    @interface_op()
+    @reactive(nested_return=False)
     def __add__(self, other):
         # TODO (arjun): This should not fail with karan's changes.
         return super().__add__(other)

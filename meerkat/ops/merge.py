@@ -10,12 +10,12 @@ from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.errors import MergeError
-from meerkat.interactive.graph import interface_op
+from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
 
 
 @capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
-@interface_op
+@reactive
 def merge(
     left: DataFrame,
     right: DataFrame,

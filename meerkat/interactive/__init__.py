@@ -23,7 +23,7 @@ from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
     Store,
     StoreConfig,
-    interface_op,
+    reactive,
     make_store,
     trigger,
     react,
@@ -58,7 +58,7 @@ __all__ = [
     "Filter",
     "Interface",
     "interface",
-    "interface_op",
+    "reactive",
     "start",
     "Layout",
     "Editor",

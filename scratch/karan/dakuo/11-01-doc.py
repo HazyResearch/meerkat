@@ -47,7 +47,7 @@ doc_id_choice = mk.gui.Choice(
 _index = dict(zip(story_doc_df["id"], range(len(story_doc_df["id"]))))
 
 
-@mk.gui.interface_op
+@mk.gui.reactive
 def choose_doc(doc_id):
     """
     This is an interactive operation (decorate with `@mk.gui.interface_op`)

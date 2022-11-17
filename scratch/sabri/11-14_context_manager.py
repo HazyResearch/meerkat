@@ -26,7 +26,7 @@ def reassign(value: mk.gui.Store):
     value.set(value + 1)
     print(value)
 
-@mk.gui.interface_op
+@mk.gui.reactive
 def print_op(value: any):
     print("in print op")
     print(value)

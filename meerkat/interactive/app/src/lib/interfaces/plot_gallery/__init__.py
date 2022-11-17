@@ -3,17 +3,17 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.app.src.lib.component.match import Match
 from meerkat.interactive.app.src.lib.component.plot import Plot
 from meerkat.interactive.app.src.lib.component.table import EditTarget, Table
-from meerkat.interactive.graph import Store, interface_op
+from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import Interface
 
 
-@interface_op
+@reactive
 def simple_op(col: str):
     return col + "!"
 
 
-@interface_op
+@reactive
 def make_selection_df(df, id, selection):
     """An out of place operation to take a store and make it a derived
     dataframe."""
