@@ -197,7 +197,18 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                     are passed in when calling `.run()` on this endpoint."
             )
 
+        # Clear the modification queue before running the function
+        # This is an invariant: there should be no pending modifications
+        # when running an endpoint, so that only the modifications
+        # that are made by the endpoint are applied
+        state.modification_queue.clear()
+
+        # Ready the ModificationQueue so that it can be used to track
+        # modifications made by the endpoint
+        state.modification_queue.ready()
         result = partial_fn()
+        # Don't track modifications outside of the endpoint
+        state.modification_queue.unready()
 
         modifications = trigger()
 

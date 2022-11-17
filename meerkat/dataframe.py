@@ -405,10 +405,13 @@ class DataFrame(
     def __setitem__(self, posidx, value):
         self.add_column(name=posidx, data=value, overwrite=True)
 
-        # if self.has_inode():
-        #     # Add a modification if it's on the graph
-        #     mod = DataFrameModification(id=self.id, scope=self.columns)
-        #     mod.add_to_queue()
+        # This condition will issue modifications even if we're outside an endpoint
+        # but those modifications will be cleared by the endpoint before it is
+        # run.
+        if self.has_inode():
+            # Add a modification if it's on the graph
+            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod.add_to_queue()
 
     def consolidate(self):
         self.data.consolidate()

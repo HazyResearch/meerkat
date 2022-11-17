@@ -121,7 +121,9 @@ def trigger() -> List[Modification]:
             new_modifications.extend(mods)
             pbar.update(1)
 
-    state.modification_queue.queue = []
+    # Clear out the modification queue
+    state.modification_queue.clear()
+
     return modifications + new_modifications
 
 
