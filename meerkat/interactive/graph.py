@@ -98,7 +98,6 @@ def trigger() -> List[Modification]:
             computation graph.
     """
     modifications = state.modification_queue.queue
-    print(modifications)
 
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
