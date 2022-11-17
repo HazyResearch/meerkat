@@ -11,7 +11,7 @@ from meerkat.interactive.modification import (
     Modification,
     StoreModification,
 )
-from meerkat.interactive.node import NodeMixin, _topological_sort
+from meerkat.interactive.node import Node, NodeMixin, _topological_sort
 from meerkat.interactive.types import Primitive, Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
@@ -99,8 +99,6 @@ def trigger() -> List[Modification]:
     """
     modifications = state.modification_queue.queue
 
-        
-
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications]
 
@@ -123,7 +121,7 @@ def trigger() -> List[Modification]:
             # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
             pbar.update(1)
-    
+
     state.modification_queue.queue = []
     return modifications + new_modifications
 
@@ -154,6 +152,15 @@ def _wrap_outputs(obj):
     return Store(obj)
 
 
+def _create_nodes_for_nodeables(*nodeables: NodeMixin):
+    for nodeable in nodeables:
+        assert isinstance(nodeable, NodeMixin)
+        # Make a node for this nodeable if it doesn't have one
+        if not nodeable.has_inode():
+            inode_id = None if not isinstance(nodeable, Store) else nodeable.id
+            nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
+
+
 def _add_op_as_child(
     op: "Operation",
     *nodeables: NodeMixin,
@@ -169,12 +176,6 @@ def _add_op_as_child(
             nodeables.
     """
     for nodeable in nodeables:
-        assert isinstance(nodeable, NodeMixin)
-        # Make a node for this nodeable if it doesn't have one
-        if not nodeable.has_inode():
-            inode_id = None if not isinstance(nodeable, Store) else nodeable.id
-            nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
-
         # Add the operation as a child of the nodeable
         nodeable.inode.add_child(op.inode, triggers=triggers)
 
@@ -184,11 +185,11 @@ def _nested_apply(obj: object, fn: callable):
         if isinstance(_obj, Store) or isinstance(_obj, NodeMixin):
             return fn(_obj)
         if isinstance(_obj, list):
-            return [_internal(v, depth=depth+1) for v in _obj]
+            return [_internal(v, depth=depth + 1) for v in _obj]
         elif isinstance(_obj, tuple):
-            return tuple(_internal(v, depth=depth+1) for v in _obj)
+            return tuple(_internal(v, depth=depth + 1) for v in _obj)
         elif isinstance(_obj, dict):
-            return {k: _internal(v,  depth=depth+1) for k, v in _obj.items()}
+            return {k: _internal(v, depth=depth + 1) for k, v in _obj.items()}
         elif _obj is None:
             return None
         elif depth > 0:
@@ -257,7 +258,6 @@ def reactive(
         )
 
     def _reactive(fn: Callable):
-
         @wraps(fn)
         def wrapper(*args, **kwargs):
             """
@@ -273,20 +273,34 @@ def reactive(
             # Then, Store(list)[0] should also return a Store.
             # TODO (arjun): These if this assumption holds.
             nonlocal nested_return
+            nonlocal fn
 
             force_reactify = False
             if is_reactive():
                 force_reactify = True
 
+            # Check if fn is a bound method (i.e. an instance method).
+            # If so, we need to functionalize the method (i.e. make the method
+            # into a function).
+            # First argument in *args must be the instance.
+            # We assume that the type of the instance will not change.
+            def _fn_outer_wrapper(_fn):
+                @wraps(_fn)
+                def _fn_wrapper(*args, **kwargs):
+                    return _fn(*args, **kwargs)
+
+                return _fn_wrapper
+
+            if hasattr(fn, "__self__") and fn.__self__ is not None:
+                args = (fn.__self__, *args)
+                # The method bound to the class.
+                fn_class = getattr(fn.__self__.__class__, fn.__name__)
+                fn = _fn_outer_wrapper(fn_class)
+
             # Get all the NodeMixin objects from the args and kwargs
             # These objects will be parents of the Operation node
             # that is created for this function
             nodeables = _get_nodeables(*args, **kwargs)
-
-            # Check if fn is a bound method
-            if hasattr(fn, "__self__") and fn.__self__ is not None:
-                if isinstance(fn.__self__, NodeMixin):
-                    nodeables.append(fn.__self__)
 
             # Call the function on the args and kwargs
             result = fn(*args, **kwargs)
@@ -295,10 +309,23 @@ def reactive(
             if nested_return is None:
                 nested_return = isinstance(result, tuple)
 
-            # Setup an Operation node if any of the args or kwargs 
+            # TODO: explain why this is needed.
+            if (len(nodeables) > 0) or force_reactify:
+                if nested_return:
+                    result = _nested_apply(result, fn=_wrap_outputs)
+                elif isinstance(result, NodeMixin):
+                    result = result
+                else:
+                    result = Store(result)
+
+            # Setup an Operation node if any of the args or kwargs
             # were nodeables
             op = None
             if len(nodeables) > 0:
+                _create_nodes_for_nodeables(*nodeables)
+                args = _replace_nodeables_with_nodes(args)
+                kwargs = _replace_nodeables_with_nodes(kwargs)
+
                 # Create the Operation node
                 op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
 
@@ -308,17 +335,11 @@ def reactive(
                     op.attach_to_inode(op.create_inode())
 
                 # Add this Operation node as a child of all of the nodeables
+                # FIXME: SUSPICIOUS
                 _add_op_as_child(op, *nodeables, triggers=True)
 
             # Make sure the result is a NodeMixin object
             if (len(nodeables) > 0) or force_reactify:
-                if nested_return:
-                    result = _nested_apply(result, fn=_wrap_outputs)
-                elif isinstance(result, NodeMixin):
-                    result = result
-                else:
-                    result = Store(result)
-
                 # Attach the Operation node to its children (if it is not None)
                 def _foo(nodeable: NodeMixin):
                     if not nodeable.has_inode():
@@ -338,6 +359,32 @@ def reactive(
         return wrapper
 
     return _reactive(fn)
+
+
+def _replace_nodeables_with_nodes(obj):
+    if isinstance(obj, NodeMixin):
+        obj = obj.inode
+    elif isinstance(obj, list) or isinstance(obj, tuple):
+        obj = type(obj)(_replace_nodeables_with_nodes(x) for x in obj)
+    elif isinstance(obj, dict):
+        obj = {
+            _replace_nodeables_with_nodes(k): _replace_nodeables_with_nodes(v)
+            for k, v in obj.items()
+        }
+    return obj
+
+
+def _replace_nodes_with_nodeables(obj):
+    if isinstance(obj, Node):
+        obj = obj.obj
+    elif isinstance(obj, list) or isinstance(obj, tuple):
+        obj = type(obj)(_replace_nodes_with_nodeables(x) for x in obj)
+    elif isinstance(obj, dict):
+        obj = {
+            _replace_nodes_with_nodeables(k): _replace_nodes_with_nodeables(v)
+            for k, v in obj.items()
+        }
+    return obj
 
 
 # A stack that manages if reactive mode is enabled
@@ -402,9 +449,9 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         """Set the value of the store."""
         if isinstance(new_value, Store):
             # if the value is a store, then we need to unpack it soit can be sent to the
-            # frontend 
+            # frontend
             new_value = new_value.__wrapped__
-            
+
         mod = StoreModification(id=self.id, value=new_value)
         self.__wrapped__ = new_value
         mod.add_to_queue()
@@ -466,7 +513,11 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the result Reference,
         and are used to update the state of the GUI.
         """
-        update = self.fn(*self.args, **self.kwargs)
+        # Dereference the nodes.
+        args = _replace_nodes_with_nodeables(self.args)
+        kwargs = _replace_nodes_with_nodeables(self.kwargs)
+
+        update = self.fn(*args, **kwargs)
 
         modifications = []
         self.result = _update_result(self.result, update, modifications=modifications)
