@@ -167,8 +167,32 @@ class ModificationQueue:
 
     queue: List["Modification"] = field(default_factory=list)
 
+    # Boolean attribute that controls whether the queue is accepting new
+    # modifications
+    # When _ready is False, `add` will no-op
+    _ready: bool = False
+
     def add(self, modification: "Modification"):
-        self.queue.append(modification)
+        if self._ready:
+            self.queue.append(modification)
+        # Do nothing if not ready
+
+    def clear(self) -> list:
+        """
+        Clear the modification queue, and return the old queue.
+        """
+        current_queue = self.queue
+        self.queue = []
+        return current_queue
+
+    def ready(self):
+        """
+        Ready the queue for accepting new modifications.
+        """
+        self._ready = True
+    
+    def unready(self):
+        self._ready = False
 
 
 @dataclass
