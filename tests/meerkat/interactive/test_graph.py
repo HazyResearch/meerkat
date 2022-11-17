@@ -66,7 +66,7 @@ def test_react_context_manager_basic():
         _ = _add_to_list(keys_reactive, "c")
 
     assert isinstance(keys_reactive, mk.gui.Store)
-    assert keys_reactive.has_trigger_children()
+    assert keys_reactive.inode.has_trigger_children()
 
     # Outside of context manager.
     keys = df.keys()
@@ -83,3 +83,25 @@ def test_react_context_manager_nested():
 
     assert isinstance(keys_reactive, mk.gui.Store)
     assert isinstance(keys, List)
+
+
+def test_default_nested_return():
+    """By default, nested return is True for functions returning tuples."""
+    @reactive
+    def _return_tuple():
+        return ("a", "b")
+
+    @reactive
+    def _return_list():
+        return ["a", "b"]
+
+    with mk.gui.react():
+        out = _return_tuple()
+        a, b = out
+    assert not isinstance(out, mk.gui.Store)
+    assert isinstance(a, mk.gui.Store)
+    assert isinstance(b, mk.gui.Store)
+
+    with mk.gui.react():
+        out = _return_list()
+    assert isinstance(out, mk.gui.Store)

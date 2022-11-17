@@ -180,26 +180,31 @@ def _add_op_as_child(
 
 
 def _nested_apply(obj: object, fn: callable):
-    if isinstance(obj, Store) or isinstance(obj, NodeMixin):
-        return fn(obj)
+    def _internal(_obj: object, depth: int = 0):
+        if isinstance(_obj, Store) or isinstance(_obj, NodeMixin):
+            return fn(_obj)
+        if isinstance(_obj, list):
+            return [_internal(v, depth=depth+1) for v in _obj]
+        elif isinstance(_obj, tuple):
+            return tuple(_internal(v, depth=depth+1) for v in _obj)
+        elif isinstance(_obj, dict):
+            return {k: _internal(v,  depth=depth+1) for k, v in _obj.items()}
+        elif _obj is None:
+            return None
+        elif depth > 0:
+            # We want to call the function on the object (including primitives) when we
+            # have recursed into it at least once.
+            return fn(_obj)
+        else:
+            raise ValueError(f"Unexpected type {type(_obj)}.")
 
-    if isinstance(obj, list):
-        return [_nested_apply(v, fn=fn) for v in obj]
-    elif isinstance(obj, tuple):
-        return tuple(_nested_apply(v, fn=fn) for v in obj)
-    elif isinstance(obj, dict):
-        return {k: _nested_apply(v, fn=fn) for k, v in obj.items()}
-    elif obj is None:
-        return None
-    else:
-        raise ValueError(f"Unexpected type {type(obj)}.")
+    return _internal(obj)
 
 
 def reactive(
     fn: Callable = None,
-    nested_return: bool = True,
+    nested_return: bool = None,
     return_type: type = None,
-    # force_reactify: bool = False,
 ) -> Callable:
     """
     Decorator that is used to mark a function as an interface operation.
@@ -272,10 +277,11 @@ def reactive(
             # For example, if fn returns a list. The reactified fn will return a Store(list).
             # Then, Store(list)[0] should also return a Store.
             # TODO (arjun): These if this assumption holds.
+            nonlocal nested_return
+
             force_reactify = False
             if is_reactive():
                 force_reactify = True
-                nested_return = False
 
             # Get all the NodeMixin objects from the args and kwargs
             # These objects will be parents of the Operation node
@@ -289,6 +295,10 @@ def reactive(
 
             # Call the function on the args and kwargs
             result = fn(*args, **kwargs)
+
+            # By default, nested return is True when the output is a tuple.
+            if nested_return is None:
+                nested_return = isinstance(result, tuple)
 
             # Setup an Operation node if any of the args or kwargs 
             # were nodeables
@@ -307,13 +317,6 @@ def reactive(
 
             # Make sure the result is a NodeMixin object
             if (len(nodeables) > 0) or force_reactify:
-                # The result should be placed inside a Store
-                # (or a nested object) containing Stores if it isn't
-                # already a NodeMixin ("nodeable") object.
-                # Then we can update the contents of this result when the
-                # function is called again.
-                # FIXME: figure out what nested return should be here
-                nested_return = False
                 if nested_return:
                     result = _nested_apply(result, fn=_wrap_outputs)
                 elif isinstance(result, NodeMixin):
@@ -418,7 +421,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # storing the attributes as a state would give us.
         return reactive(attr) if callable(attr) else attr
 
-    @reactive(nested_return=False)
+    @reactive()
     def __add__(self, other):
         # TODO (arjun): This should not fail with karan's changes.
         return super().__add__(other)
