@@ -4,25 +4,26 @@
 	import { getContext } from 'svelte';
 	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
+	import type { Endpoint } from '$lib/utils/types';
 
-	const { get_schema, match } = getContext('Interface');
+	const { get_schema, dispatch } = getContext('Interface');
 
 	export let df: Writable;
 	export let against: Writable<string>;
-	export let col: Writable<string>;
+	export let on_match: Endpoint;
 	export let text: Writable<string>;
 	export let title: string = '';
+	export let get_match_schema: Endpoint;
 
 	let status: string = 'waiting';
 
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($df.ref_id);
+		schema_promise = $dispatch(get_match_schema.endpoint_id, {}, {});
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
-			return schema.columns.filter((column) => {
-				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
-			}).map(column =>  ({value: column.name, label: column.name}))
+			return schema.columns
+				.map((column) => ({ value: column.name, label: column.name }));
 		});
 	}
 
@@ -37,8 +38,7 @@
 			return;
 		}
 		status = 'working';
-		let ref_id = $df.ref_id;
-		let promise = $match(ref_id, $against, $text, col);
+		let promise = $dispatch(on_match.endpoint_id, {}, {});
 		promise
 			.then(() => {
 				status = 'success';
@@ -98,30 +98,3 @@
 		</div>
 	</div>
 </div>
-<!-- 
-<div class="w-full py-5 px-2 bg-slate-100 ">
-    Match
-
-    <input type="text" bind:value={$against}>
-    <input type="text" bind:value={$text}>
-
-
-    Column: {$col}
-
-    <button class="bg-slate-500" on:click={on_add}> Add </button>
-    
-    {#await schema_promise}
-        waiting....
-    {:then schema}
-        <div class="flex space-x-3">
-            {#each schema.columns as column_info}  
-                <div class="bg-violet-200 rounded-md px-3 font-bold text-slate-700">
-                    {column_info.name}
-                </div>  
-            {/each}
-        </div>
-    {:catch error}
-        {error}
-    {/await}
-
-</div> -->

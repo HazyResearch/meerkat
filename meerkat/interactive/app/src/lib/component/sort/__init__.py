@@ -37,7 +37,7 @@ def sort_by_criteria(
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
     if len(criteria) == 0:
-        return data
+        return data.view()
 
     sort_by = [criterion.column for criterion in criteria]
     ascending = [criterion.ascending for criterion in criteria]

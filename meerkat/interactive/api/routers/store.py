@@ -1,5 +1,6 @@
 from typing import List
 
+from meerkat.state import state 
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Modification, Store, StoreModification, trigger
 
@@ -17,6 +18,7 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # value of the store actually changed (and these initial post requests
     # do not change the value of the store).
 
+
     # Check if this request would actually change the value of the store
     # current_store_value = store_modification.node
     if store == value:
@@ -26,7 +28,9 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
     # of the store.
     # store_modification.node.set(value)
+    print(len(state.modification_queue.queue))
     store.set(value)
+    print(len(state.modification_queue.queue))
 
     # Trigger on the store modification: leads to modifications on the graph
     modifications = trigger()

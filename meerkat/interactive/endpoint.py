@@ -325,6 +325,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         from meerkat.interactive.api.main import app
 
         app.include_router(self.router)
+    
+    def __call__(self, *args, **kwargs):
+        """Calling the endpoint will just call the raw underlying function."""
+        return self.fn(*args, **kwargs)
 
 
 def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:

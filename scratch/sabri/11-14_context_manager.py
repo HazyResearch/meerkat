@@ -21,6 +21,8 @@ import meerkat as mk
 value = []
 
 
+
+
 @mk.gui.endpoint
 def reassign(value: mk.gui.Store):
     value.set(value + 1)
@@ -33,6 +35,8 @@ def filter(df: mk.DataFrame, value: int):
 
 
 df = mk.get("imagenette", version="160px")
+
+df["new_col"] = 1
 
 with mk.gui.react():
     value = mk.gui.Store(0)

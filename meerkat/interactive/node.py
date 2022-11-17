@@ -168,6 +168,7 @@ def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     Returns:
         List[NodeMixin]: The topologically sorted nodes.
     """
+
     # get a mapping from node to the children of each node
     # only get the children that are triggered by the node
     # i.e. ignore children that use the node as a dependency
