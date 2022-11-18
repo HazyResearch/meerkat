@@ -37,7 +37,6 @@
 
 	<div id="fancy-tick-{id}" class="hidden">
 		<div class="grid grid-cols-[1fr_auto] items-center">
-			<!-- <div>{name}</div> -->
 			{name}
 			{#if can_remove}
 				<div
