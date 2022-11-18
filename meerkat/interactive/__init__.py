@@ -31,7 +31,7 @@ from .graph import (
     no_react,
     is_reactive,
 )
-from .modification import Modification
+from .modification import Modification, DataFrameModification
 from .startup import start
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
@@ -41,6 +41,7 @@ __all__ = [
     "endpoint",
     "make_endpoint",
     "Modification",
+    "DataFrameModification",
     "Document",
     "Store",
     "StoreConfig",

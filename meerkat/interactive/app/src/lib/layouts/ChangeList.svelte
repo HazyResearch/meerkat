@@ -44,10 +44,10 @@
 			</div>
 		</div>
 		<div class="grid grid-rows-auto grid-flow-col gap-3">
-			<!-- <div class="flex flex-col space-y-3">
+			<div class="flex flex-col space-y-3">
 				<Row {...active_slice.props} />
-				<StatsLabeler {...gallery_editor.props} />
-			</div> -->
+				<!-- <StatsLabeler {...gallery_editor.props} /> -->
+			</div>
 			<div class="flex flex-col space-y-3">
 				<Match {...gallery_match.props} />
 

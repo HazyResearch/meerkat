@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
 import uuid
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Sequence, Union
 
 from pydantic import BaseModel
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store, reactive, make_store
+from meerkat.interactive.graph import Store, make_store, reactive
 
 from ..abstract import Component
 
