@@ -9,7 +9,7 @@
 	import type { Point2D } from '$lib/shared/plot/types';
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { get_rows, remove_row_by_index, get_schema, dispatch } = getContext('Interface');
+	const { get_rows, get_schema, dispatch } = getContext('Interface');
 
 	export let df: Writable;
 	export let x: Writable<string>;
