@@ -95,6 +95,10 @@ class NodeMixin:
 
     @property
     def config(self):
+        # TODO(karan): maybe this method should be removed
+        # to prevent confusion (so you have to explicitly)
+        # call self.inode.config (and if inode is None, then
+        # create a node yourself and return its config)
         """Returns the config for the node."""
         # We used to assert if it wasn't already in the graph
         # assert (

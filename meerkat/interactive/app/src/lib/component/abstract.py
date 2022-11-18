@@ -1,7 +1,7 @@
 from typing import ClassVar, Dict
 
 from pydantic import BaseModel
-from meerkat.interactive.node import NodeMixin
+from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
 from meerkat.mixins.identifiable import IdentifiableMixin
 
@@ -22,18 +22,39 @@ class Component(IdentifiableMixin):
         """
         super().__init__()
 
-        self.__dict__.update(
-            {
-                # TODO: improve this so we isinstance a class instead
-                k: v if isinstance(v, NodeMixin) else Store(v)
-                for k, v in self.__dict__.items()
-                # FIXME: critical fix, need to remove all keys here
-                if (
-                    k not in ["_self_id", "name", "identifiable_group"]
-                    and not isinstance(v, NodeMixin)
-                )
-            }
-        )
+        # Custom setup
+        self.setup()
+
+        update_dict = {}
+        for k, v in self.__dict__.items():
+            new_v = v
+            if k not in ["_self_id", "name", "identifiable_group"] and not isinstance(v, NodeMixin):
+                # Convert literals to Store objects
+                new_v = Store(v)
+            elif k in ["_self_id", "name", "identifiable_group"]:
+                continue
+
+            # Now new_v is a NodeMixin object
+            # We need to make sure that new_v points to a Node in the graph
+            # If it doesn't, we need to add it to the graph
+            if not new_v.has_inode():
+                new_v.attach_to_inode(new_v.create_inode())
+            
+            # Now new_v is a NodeMixin object that points to a Node in the graph
+            update_dict[k] = new_v.inode # this will exist
+
+            assert isinstance(update_dict[k], Node)
+        
+        self.__dict__.update(update_dict)
+
+    def setup(self):
+        pass
+
+    def __getattribute__(self, name):
+        value = super().__getattribute__(name)
+        if isinstance(value, Node):
+            return value.obj
+        return value
 
     @property
     def config(self):
@@ -47,12 +68,14 @@ class Component(IdentifiableMixin):
 
     @property
     def props(self):
-        return {
-            # TODO: improve this so we isinstance a class instead
-            k: v.config if hasattr(v, "config") else v
-            for k, v in self.__dict__.items()
-            # FIXME: critical fix, need to remove all keys here
-            if k not in self._backend_only and v is not None
-        }
-
-        
+        props_dict = {}
+        for k, v in self.__dict__.items():
+            if k not in self._backend_only and v is not None:
+                if hasattr(v, "config"):
+                    if isinstance(v, Node) and isinstance(v.obj, Store):
+                        props_dict[k] = v.obj.config
+                    else:
+                        props_dict[k] = v.config
+                else:
+                    props_dict[k] = v
+        return props_dict

@@ -1,11 +1,13 @@
-from typing import Sequence, Union
 from dataclasses import dataclass, field
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store, make_store
+from meerkat.interactive.graph import Store
 
 from ..abstract import Component
-from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.endpoint import Endpoint
 
+
+def is_none(x):
+  return (isinstance(x, Store) and x.__wrapped__ is None) or x is None
 
 @dataclass
 class Plot(Component):
@@ -24,22 +26,21 @@ class Plot(Component):
 
     on_select: Endpoint = None
 
-    def __post_init__(self):
-        super().__post_init__()
-
-        if self.x_label.__wrapped__ is None:
+    def setup(self):
+        # FIXME: this is buggy code, will create two stores for x and 
+        # x_label if x is a string, and x_label is None
+        # and will create a single store for x and x_label if x is a store
+        # and x_label is None
+        if is_none(self.x_label):
             self.x_label = self.x
-        if self.y_label.__wrapped__ is None:
+        if is_none(self.y_label):
             self.y_label = self.y
 
-        if self.primary_key.__wrapped__ is not None:
+        if not is_none(self.primary_key):
             self.df = self.df.set_primary_key(self.primary_key)
         self.primary_key = Store(self.df.primary_key_name)
-        print(self.primary_key)
-
         self.selection = Store([0])
 
     @property
     def props(self):
-        print(self.metadata_columns)
         return super().props
