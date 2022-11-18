@@ -33,6 +33,7 @@
 		// null,
 		// [$main_column, primary_key].concat($tag_columns)
 	);
+	$: console.log($df.ref_id)
 
 	// async function handle_edit(event: any) {
 	// 	let { pivot, pivot_id_column, id_column } = edit_target;

@@ -53,7 +53,7 @@
 			percentRange={true}
 			padding={{top: 50, left: padding + ywidth }}
 			x="x"
-			y="y"
+			y="id"
 			yScale={scaleBand().paddingInner(0.05)}
 			{data}
 			xDomain={get_x_domain()}
@@ -69,7 +69,7 @@
 			percentRange={false}
 			padding={{top: 50, left: padding + ywidth }}
 			x="x"
-			y="y"
+			y="id"
 			yScale={scaleBand().paddingInner(0.05)}
 			{data}
 			xDomain={get_x_domain()}

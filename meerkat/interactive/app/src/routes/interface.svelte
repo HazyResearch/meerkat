@@ -214,6 +214,8 @@
 		document.title = config.name;
 	});
 
+	console.log(global_stores)
+
 	for (let i = 0; i < component_array.length; i++) {
 		// Pull out the ith component
 		let component = component_array[i];

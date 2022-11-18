@@ -12,7 +12,6 @@
 
 	// Callback that runs when the store changes
 	export let callback = () => {
-		console.log(is_backend_store)
 		if (!is_backend_store) {
 			return;
 		}

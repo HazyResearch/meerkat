@@ -66,13 +66,12 @@ class Sort(Component):
             df = self.df
         return sort_by_criteria(df, self.criteria)
 
-    def create_criterion(
-        self, column: str, ascending: bool, source: str = ""
-    ):
+    @staticmethod
+    def create_criterion(column: str, ascending: bool, source: str = ""):
         return SortCriterion(
-                    id=str(uuid.uuid4()),
-                    is_enabled=True,
-                    column=column,
-                    ascending=ascending,
-                    source=source,
+            id=str(uuid.uuid4()),
+            is_enabled=True,
+            column=column,
+            ascending=ascending,
+            source=source,
         )
