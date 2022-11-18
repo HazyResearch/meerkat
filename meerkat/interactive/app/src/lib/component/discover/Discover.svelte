@@ -9,7 +9,8 @@
 	const { dispatch } = getContext('Interface');
 
 	export let df: Writable;
-	export let against: Writable<string>;
+	export let by: Writable<string>;
+	export let target: Writable<string>;
 	export let on_discover: Endpoint;
 	export let get_discover_schema: Endpoint;
 
@@ -25,7 +26,7 @@
 	}
 
 	const on_submit = async () => {
-		if ($against === '') {
+		if ($by === '') {
 			status = 'error';
 			return;
 		}
@@ -33,7 +34,7 @@
 		let promise = $dispatch(
 			on_discover.endpoint_id,
 			{
-				against: $against
+				by: $by
 			},
 			{}
 		);
@@ -48,18 +49,18 @@
 	};
 
 	function handleSelect(event) {
-		$against = event.detail.value;
+		$by = event.detail.value;
 	}
 
 	function handleClear() {
-		$against = '';
+		$by = '';
 	}
-	$: against_item = { value: $against, label: $against };
+	$: by_item = { value: $by, label: $by };
 </script>
 
 <div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
 	<div class="form-control">
-		<div class="input-group w-100% flex items-center">
+		<div class="input-group w-100% flex items-center space-x-3">
 			<div class="px-3">
 				<Status {status} />
 			</div>
@@ -67,7 +68,7 @@
 				on:click={on_submit}
 				class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md"
 			>
-				discover
+				Discover
 			</button>
 			<div class="themed pr-2 w-48">
 				{#await items_promise}
@@ -76,7 +77,7 @@
 					<Select
 						id="column"
 						placeholder="...a column."
-						value={against_item}
+						value={by_item}
 						{items}
 						showIndicator={true}
 						listPlacement="auto"

@@ -34,15 +34,25 @@ def get_discover_schema(df: DataFrame):
 
 
 @endpoint
-def discover(df: DataFrame, against: str):
-    print("discovering")
+def discover(df: DataFrame, by: str, target: str, pred: str):
+    eb = df.explainby(
+        by,
+        target={"targets": target, "pred_probs": pred},
+        n_slices=10,
+        n_mixture_components=10,
+        n_pca_components=256,
+    )
+    return eb
 
 
 @dataclass
 class Discover(Component):
 
     df: "DataFrame"
-    get_discover_schema: str
+    by: str = None
+    target: str = None
+    pred: str = None
+    on_discover: Endpoint = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -51,8 +61,8 @@ class Discover(Component):
             df=self.df,
         )
 
-        self.on_match = discover.partial(
-            df=self.df,
-        )
-        # if self.on_match is not None:
-        #     on_match = on_match.compose(self.on_match)
+        on_discover = discover.partial(
+            df=self.df, target=self.target, pred=self.pred)
+        if self.on_discover is not None:
+            on_discover = on_discover.compose(self.on_discover)
+        self.on_discover = on_discover

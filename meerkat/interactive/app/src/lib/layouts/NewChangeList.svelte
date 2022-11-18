@@ -40,7 +40,6 @@
 			</div>
 			<div class="flex flex-col space-y-3">
 				<Match {...gallery_match.props} />
-
 				<Filter {...components.gallery_filter.props} />
 				<Sort {...components.gallery_sort.props} />
 			</div>
