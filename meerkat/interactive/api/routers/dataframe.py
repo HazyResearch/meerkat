@@ -128,12 +128,12 @@ def rows(
 @endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
 def remove_row_by_index(
     df: DataFrame, row_index: int = Endpoint.EmbeddedBody()
-) -> List[Modification]:
+):
     df = df.lz[np.arange(len(df)) != row_index]
-    modifications = trigger(
-        modifications=[DataFrameModification(id=df.inode.id, scope=df.columns)]
-    )
-    return modifications
+
+    # TODO: shouldn't have to issue this manually
+    from meerkat.state import state
+    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=df.columns))
 
 
 @endpoint(prefix="/df", route="/{df}/edit/")
@@ -143,7 +143,7 @@ def edit(
     column: str = Endpoint.EmbeddedBody(),
     row_id=Endpoint.EmbeddedBody(),
     id_column: str = Endpoint.EmbeddedBody(),
-) -> List[Modification]:
+):
     mask = df[id_column] == row_id
     if mask.sum() == 0:
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
@@ -153,8 +153,6 @@ def edit(
     from meerkat.state import state
     state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=[column]))
 
-    modifications = trigger()
-    return modifications
 
 
 @endpoint(prefix="/df", route="/{df}/edit_target/")

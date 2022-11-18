@@ -9,12 +9,12 @@
 	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
 	import Help from 'carbon-icons-svelte/lib/Help.svelte';
 
-	import type { EditTarget } from '$lib/utils/types';
+	import type { Endpoint } from '$lib/utils/types';
 
 	// Running getContext('Interface') returns an object which contains useful functions
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
-	const { get_rows, edit } = getContext('Interface');
+	const { get_rows, dispatch } = getContext('Interface');
 	// the `$get_rows` function is used to fetch data from a dataframe in the Python backend
 	// the `$edit` function is used to send edits to a dataframe in the Python backend
 
@@ -27,7 +27,8 @@
 	export let text_column: Writable<string>;
 	export let paragraph_column: Writable<string>;
 	export let label_column: Writable<string>;
-	export let edit_target: EditTarget;
+	export let id_column: Writable<string>;
+	export let on_sentence_label: Endpoint;
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the $text_column
@@ -43,11 +44,9 @@
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the $label_column and id_column
 	let label_id_df_promise: any;
-	let id_column: string;
 	$: if ($label_column) {
 		// The name of the id_column was told to us by the edit_target
-		id_column = edit_target.source_id_column;
-		label_id_df_promise = $get_rows($df.ref_id, 0, null, null, [$label_column, id_column]);
+		label_id_df_promise = $get_rows($df.ref_id, 0, null, null, [$label_column, $id_column]);
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)
@@ -117,8 +116,12 @@
 													class:bg-red-500={label === 0}
 													class:text-red-100={label === 0}
 													on:click={() => {
-														// label = 0;
-														$edit(get(edit_target.target).ref_id, 0, $label_column, id, id_column);
+														console.log(on_sentence_label.endpoint_id)
+														$dispatch(on_sentence_label.endpoint_id, {
+															row_id: id,
+															value: 0
+														});
+														// $edit(get(edit_target.target).ref_id, 0, $label_column, id, id_column);
 													}}
 												>
 													<CloseOutline size={32} />
@@ -128,8 +131,11 @@
 													class:bg-emerald-400={label === 1}
 													class:text-emerald-100={label === 1}
 													on:click={() => {
-														// label = 1;
-														$edit(get(edit_target.target).ref_id, 1, $label_column, id, id_column);
+														$dispatch(on_sentence_label.endpoint_id, {
+															row_id: id,
+															value: 1
+														});
+														// $edit(get(edit_target.target).ref_id, 1, $label_column, id, id_column);
 													}}
 												>
 													<CheckmarkOutline size={32} />
@@ -139,8 +145,11 @@
 													class:bg-orange-400={label === 2}
 													class:text-orange-100={label === 2}
 													on:click={() => {
-														// label = 2;
-														$edit(get(edit_target.target).ref_id, 2, $label_column, id, id_column);
+														$dispatch(on_sentence_label.endpoint_id, {
+															row_id: id,
+															value: 2
+														});
+														// $edit(get(edit_target.target).ref_id, 2, $label_column, id, id_column);
 													}}
 												>
 													<Help size={32} />

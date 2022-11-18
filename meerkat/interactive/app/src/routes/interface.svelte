@@ -35,7 +35,7 @@
 		return modifications;
 	};
 
-	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any) => {
+	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any = {}) => {
 		if (endpoint_id === null) {
 			return;
 		}
