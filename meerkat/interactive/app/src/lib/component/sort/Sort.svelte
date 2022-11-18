@@ -96,17 +96,7 @@
 	};
 
 	const handleClear = () => {
-		// Toggle all filters to be off.
-		let any_enabled: boolean = false;
-		for (const criterion of criteria_frontend) {
-			any_enabled = any_enabled || criterion.is_enabled;
-			criterion.is_enabled = false;
-		}
-		if (any_enabled) {
-			// Make a new array that svelte should respond to.
-			criteria_frontend = [...criteria_frontend];
-			criteria.set(criteria_frontend);
-		}
+		criteria.set([]);
 	};
 
 	const flipDurationMs = 300;
@@ -122,11 +112,18 @@
 </script>
 
 <div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30 flex flex-col">
-	{#if $title != ''}
-		<div class="font-bold text-xl text-slate-600 self-start pl-2">
-			{$title}
+	<div class="flex space-x-6">
+		{#if $title != ''}
+			<div class="font-bold text-xl text-slate-600 self-start pl-2">
+				{$title}
+			</div>
+		{/if}
+		<div class="flex space-x-4 px-2">
+			<button on:click={addCriterion} class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md">+ Add Sort</button>
+			<button on:click={handleClear} class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"> Clear </button>
+
 		</div>
-	{/if}
+	</div>
 	<div class="form-control w-full">
 		<section
 			use:dndzone={{ items: criteria_frontend, flipDurationMs: flipDurationMs }}
@@ -235,11 +232,7 @@
 				</div>
 			{/each}
 		</section>
-		<div class="flex space-x-6 px-2">
-			<button on:click={addCriterion} class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md">+ Add Sort</button>
-			<button on:click={handleClear} class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"> Clear </button>
 
-		</div>
 	</div>
 </div>
 
