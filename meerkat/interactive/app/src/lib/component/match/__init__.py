@@ -2,8 +2,10 @@ from dataclasses import dataclass
 from ..abstract import Component
 import re
 from typing import Callable, List, Optional, Tuple
+import ast
 
 from fastapi import HTTPException
+import numpy as np
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
@@ -11,24 +13,28 @@ from meerkat.interactive.endpoint import Endpoint, endpoint
 # from meerkat.interactive.modification import Modification
 
 
-_SUPPORTED_MATCH_OPS = {
-    "+": lambda x, y: x + y,
-    "-": lambda x, y: x - y,
-    "*": lambda x, y: x * y,
-    "/": lambda x, y: x / y,
-    "**": lambda x, y: x**y,
-}
-
 def _parse_concat(query: str) -> List[str]:
+    import csv
+
     query = query.strip()
 
     if query.startswith("concat(") and query.endswith(")"):
         query = query[7:-1]
-        return re.split(r',(?=")', query)
+        return [
+            "{}".format(x)
+            for x in list(
+                csv.reader(
+                    [query],
+                    delimiter=",",
+                    quotechar='"',
+                    skipinitialspace=True,
+                    doublequote=False,
+                )
+            )[0]
+        ]
     else:
         return query
-    
-    pass 
+
 
 def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     """Parse a query string into a list of columns and operations to perform.
@@ -41,6 +47,7 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     in double quotation marks (e.g. "query1" + "query2"). Single quotation marks
     will be ignored.
     """
+
     def _process_queries(queries):
         # Remove quotation marks from queries.
         return [q.replace('"', "") for q in queries]
@@ -86,11 +93,50 @@ def get_match_schema(df: DataFrame, encoder: str):
     )
 
 
+_SUPPORTED_BIN_OPS = {
+    "Add": lambda x, y: x + y,
+    "Sub": lambda x, y: x - y,
+    "Mult": lambda x, y: x * y,
+    "Div": lambda x, y: x / y,
+    "Pow": lambda x, y: x**y,
+}
+
+_SUPPORTED_CALLS = {
+    "concat": lambda *args: np.concatenate(args, axis=1),
+}
+
+def parse_query(query: str):
+    return _parse_query(ast.parse(query, mode="eval").body)
+
+
+def _parse_query(
+    node: ast.AST,
+):
+    import meerkat as mk
+
+    if isinstance(node, ast.BinOp):
+        return _SUPPORTED_BIN_OPS[node.op.__class__.__name__](
+            _parse_query(node.left), _parse_query(node.right)
+        )
+    elif isinstance(node, ast.Call):
+        return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg) for arg in node.args])
+    elif isinstance(node, ast.Constant):
+        return mk.embed(
+            data=mk.PandasSeriesColumn([node.value]),
+            encoder="clip",
+            num_workers=0,
+            pbar=False,
+        )
+    else:
+        raise ValueError(f"Unsupported query node {node}")
+
+
+@endpoint
 def match(
     df: DataFrame,
     against: str = Endpoint.EmbeddedBody(),
     query: str = Endpoint.EmbeddedBody(),
-    encoder: str = Endpoint.EmbeddedBody(),
+    encoder: str = Endpoint.EmbeddedBody(None),
 ):
     """Match a query string against a DataFrame column.
 
@@ -105,28 +151,11 @@ def match(
 
     try:
         data_embedding = df[against]
+        query_embedding = parse_query(query)
+        print(query_embedding.shape)
 
-        # TODO: This is remarkably hacky. Needs a much better fix soon.
-        sub_queries = _parse_concat(query)
-        queries_to_concat = []
-        for sub_query in sub_queries:
-            subsub_queries, op = mk.PandasSeriesColumn(_regex_parse_query(sub_query))
-            subsubquery_embs = mk.embed(
-                data=subsub_queries, 
-                encoder=encoder, 
-                num_workers=0, 
-                pbar=False
-            )
-            if len(subsubquery_embs) > 1:
-                subquery_emb = _SUPPORTED_MATCH_OPS[op](
-                    subsubquery_embs[0], subsubquery_embs[1]
-                )
-            else: 
-                subquery_emb = subsubquery_embs[0]
-            queries_to_concat.apend(subquery_emb)
-        query_emb = mk.concat(queries_to_concat)
-        
-        scores = data_embedding @ query_emb.T
+        scores = (data_embedding @ query_embedding.T).squeeze()
+        print(scores.shape)
         col_name = f"match({against}, {query})"
         df[col_name] = scores
 
