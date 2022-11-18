@@ -44,8 +44,11 @@ class DataFrameModification(Modification):
     def node(self) -> "Node":
         from meerkat.state import state
 
-        df = state.identifiables.get(group="dataframes", id=self.id)
-        return df.inode
+        try:
+            df = state.identifiables.get(group="dataframes", id=self.id)
+            return df.inode
+        except Exception as e:
+            return state.identifiables.get(group="nodes", id=self.id)
 
 
 class StoreModification(Modification):
@@ -57,5 +60,8 @@ class StoreModification(Modification):
     def node(self) -> "Node":
         from meerkat.state import state
 
-        store: Store = state.identifiables.get(group="stores", id=self.id)
-        return store.inode
+        try:
+            store = state.identifiables.get(group="stores", id=self.id)
+            return store.inode
+        except Exception as e:
+            return state.identifiables.get(group="nodes", id=self.id)

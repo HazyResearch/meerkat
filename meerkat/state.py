@@ -177,7 +177,7 @@ class ModificationQueue:
             self.queue.append(modification)
         # Do nothing if not ready
 
-    def clear(self) -> list:
+    def clear(self) -> List["Modification"]:
         """
         Clear the modification queue, and return the old queue.
         """

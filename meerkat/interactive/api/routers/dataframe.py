@@ -149,9 +149,11 @@ def edit(
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
     df[column][mask] = value
 
-    modifications = trigger(
-        modifications=[DataFrameModification(id=df.inode.id, scope=[column])]
-    )
+    # TODO: shouldn't have to issue this manually
+    from meerkat.state import state
+    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=[column]))
+
+    modifications = trigger()
     return modifications
 
 
