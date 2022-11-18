@@ -48,5 +48,5 @@ class Component(IdentifiableMixin):
             k: v.config if hasattr(v, "config") else v
             for k, v in self.__dict__.items()
             # FIXME: critical fix, need to remove all keys here
-            if k not in ["id", "name", "identifiable_group"]
+            if k not in ["id", "name", "identifiable_group"] and v is not None
         }

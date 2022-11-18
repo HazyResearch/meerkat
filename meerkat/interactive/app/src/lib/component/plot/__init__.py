@@ -1,68 +1,46 @@
 from typing import Sequence, Union
-
+from dataclasses import dataclass
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, make_store
 
 from ..abstract import Component
+from meerkat.interactive.endpoint import Endpoint, endpoint
 
-
+@dataclass
 class Plot(Component):
-    name: str = "Plot"
+    # name: str = "Plot"
 
-    def __init__(
-        self,
-        data: DataFrame,
-        selection: Union[list, Store],
-        x: Union[str, Store],
-        y: Union[str, Store],
-        x_label: Union[str, Store],
-        y_label: Union[str, Store],
-        id: Union[str, Store],
-        type: str = "scatter",
-        slot: str = None,
-        keys_to_remove: Union[str, Store] = None,
-        metadata_columns: Sequence[str] = None,
-        can_remove: bool = True,
-    ) -> None:
-        super().__init__()
-        if selection is None:
-            selection = []
+    df: "DataFrame"
+    x: str
+    y: str
+    id_col: str
+    x_label: str = None
+    y_label: str = None
+    type: str = "scatter"
+    slot: str = None
+    keys_to_remove: list = None
+    metadata_columns: list = None
 
-        self.data = data
-        self.selection = make_store(selection)
-        self.x = make_store(x)
-        self.y = make_store(y)
-        self.id_col = id
-        self.x_label = self.x if x_label is None else make_store(x_label)
-        self.y_label = self.y if y_label is None else make_store(y_label)
-        self.type = type
-        self.slot = slot
-        self.can_remove = can_remove
+    on_select: Endpoint = None
 
-        if metadata_columns is None:
-            metadata_columns = []
-        self.metadata_columns = metadata_columns
+    def __post_init__(self):
+        super().__post_init__()
 
-        if keys_to_remove is None:
-            keys_to_remove = []
-        self.keys_to_remove = make_store(keys_to_remove)
+        if self.x_label is None:
+            self.x_label = self.x
+        if self.y_label is None:
+            self.y_label = self.y
+
+        if self.metadata_columns is None:
+            self.metadata_columns = []
+
+        if self.keys_to_remove is None:
+            self.keys_to_remove = []
+        
+        self.selection = Store([0])
+
 
     @property
     def props(self):
-        props = {
-            "df": self.data.config,  # FIXME
-            "selection": self.selection.config,
-            "x": self.x.config,
-            "y": self.y.config,
-            "x_label": self.x_label.config,
-            "y_label": self.y_label.config,
-            "type": self.type,
-            "id": self.id_col if isinstance(self.id_col, str) else self.id_col.config,
-            "keys_to_remove": self.keys_to_remove.config,
-            "can_remove": self.can_remove,
-        }
-        if self.slot is not None:
-            props["slot"] = self.slot
-        if self.metadata_columns is not None:
-            props["metadata_columns"] = self.metadata_columns
-        return props
+        print(self.metadata_columns)
+        return super().props
