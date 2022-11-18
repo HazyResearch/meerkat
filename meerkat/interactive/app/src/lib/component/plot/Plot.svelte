@@ -14,7 +14,7 @@
 	export let df: Writable;
 	export let x: Writable<string>;
 	export let y: Writable<string>;
-	export let id_col: Writable<string>;
+	export let primary_key: Writable<string>;
 	export let x_label: Writable<string>;
 	export let y_label: Writable<string>;
 	export let type: Writable<string>;
@@ -25,7 +25,6 @@
 
 	// The columns corresponding to metadata to track.
 	export let metadata_columns: Writable<Array<string>>;
-	console.log('metadata_columns', $metadata_columns);
 
 	// Array of metadata objects. Each metadata object can have any arbitrary number
 	// of key-value pairs.
@@ -36,21 +35,24 @@
 
 	$: schema_promise = $get_schema($df.ref_id);
 
-	let get_datum = async (ref_id: string, page: number, per_page: number): Promise<Array<Point2D>> => {
+	let get_datum = async (
+		ref_id: string,
+		page: number,
+		per_page: number
+	): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await $get_rows(
-			ref_id, page * per_page,
-			(page + 1) * per_page, 
-			undefined, 
-			[$x, $y, $id_col, ...$metadata_columns]
-		);
+		let rows = await $get_rows(ref_id, page * per_page, (page + 1) * per_page, undefined, [
+			$x,
+			$y,
+			$primary_key,
+			...$metadata_columns
+		]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
 				x: parseFloat(row[0]),
 				y: row[1],
-				id: rows.indices[index],
-				key: row[2]
+				id: row[2]
 			});
 		});
 
@@ -79,13 +81,17 @@
 		if (on_select === null) {
 			return;
 		}
-		
+
 		status = 'working';
-		const promise = $dispatch(on_select.endpoint_id, {
-			// FIXME: Should we support multiple selections?
-			// If there is nothing in the array we should return an empty string
-			"slice_id": slice_ids.length > 0 ? slice_ids[0] : ""
-		}, {})
+		const promise = $dispatch(
+			on_select.endpoint_id,
+			{
+				// FIXME: Should we support multiple selections?
+				// If there is nothing in the array we should return an empty string
+				slice_id: slice_ids.length > 0 ? slice_ids[0] : ''
+			},
+			{}
+		);
 		promise
 			.then(() => {
 				status = 'success';
@@ -95,7 +101,6 @@
 				console.log(error);
 			});
 	};
-
 </script>
 
 <!-- TODO: Figure out the padding to put here.  -->
