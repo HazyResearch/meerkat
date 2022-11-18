@@ -1,6 +1,7 @@
 from typing import ClassVar, Dict
 
 from pydantic import BaseModel
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -72,7 +73,7 @@ class Component(IdentifiableMixin):
         for k, v in self.__dict__.items():
             if k not in self._backend_only and v is not None:
                 if hasattr(v, "config"):
-                    if isinstance(v, Node) and isinstance(v.obj, Store):
+                    if isinstance(v, Node) and (isinstance(v.obj, Store) or isinstance(v.obj, Endpoint)):
                         props_dict[k] = v.obj.config
                     else:
                         props_dict[k] = v.config
