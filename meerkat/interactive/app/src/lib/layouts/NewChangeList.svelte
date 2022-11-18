@@ -17,7 +17,7 @@
 	<div class="grid grid-rows-[auto_auto_auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
 			<div class="font-bold text-xl text-slate-800 self-center justify-self-center">
-				<span color="transparent" text-shadow="0 0 0 white">♨️</span> Mocha ChangeList
+				<span color="transparent" text-shadow="0 0 0 white">☕️</span> Mocha ChangeList
 			</div>
 		</div>
 		<Match {...components.slice_match.props} />
