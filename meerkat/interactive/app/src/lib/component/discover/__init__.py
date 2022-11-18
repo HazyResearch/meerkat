@@ -41,6 +41,7 @@ def discover(df: DataFrame, by: str, target: str, pred: str):
         n_slices=10,
         n_mixture_components=10,
         n_pca_components=256,
+        use_cache=False
     )
     return eb
 

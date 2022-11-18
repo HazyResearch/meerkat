@@ -413,6 +413,17 @@ class DataFrame(
             mod = DataFrameModification(id=self.id, scope=self.columns)
             mod.add_to_queue()
 
+    def set(self, value: DataFrame):
+        # FIXME: This should not be called outside of an endpoint. Add explicit check
+        # fot that. 
+        self._set_data(value._data)
+        self._set_state(value._get_state())
+        
+        if self.has_inode():
+            # Add a modification if it's on the graph
+            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod.add_to_queue()
+
     def consolidate(self):
         self.data.consolidate()
 
