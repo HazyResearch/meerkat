@@ -12,65 +12,6 @@ from meerkat.interactive.endpoint import Endpoint, endpoint
 
 # from meerkat.interactive.modification import Modification
 
-
-def _parse_concat(query: str) -> List[str]:
-    import csv
-
-    query = query.strip()
-
-    if query.startswith("concat(") and query.endswith(")"):
-        query = query[7:-1]
-        return [
-            "{}".format(x)
-            for x in list(
-                csv.reader(
-                    [query],
-                    delimiter=",",
-                    quotechar='"',
-                    skipinitialspace=True,
-                    doublequote=False,
-                )
-            )[0]
-        ]
-    else:
-        return query
-
-
-def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
-    """Parse a query string into a list of columns and operations to perform.
-
-    This parser is not exhaustive and should only be used to parse simple
-    operations (e.g. addition, subtraction, division, multiplication) between
-    two columns.
-
-    To run an operation between two query results, each query must be wrapped
-    in double quotation marks (e.g. "query1" + "query2"). Single quotation marks
-    will be ignored.
-    """
-
-    def _process_queries(queries):
-        # Remove quotation marks from queries.
-        return [q.replace('"', "") for q in queries]
-
-    queries = re.findall('"[^"]*"', query)
-    if not queries:
-        return [query], None
-
-    # Remove quotation marks from queries.
-    if len(queries) == 1:
-        return _process_queries(queries), None
-
-    if len(queries) != 2:
-        raise ValueError(
-            f"Invalid query string - expected two columns, got {len(queries)}"
-        )
-    op = query.replace(queries[0], "").replace(queries[1], "").replace('"', "").strip()
-    if op not in _SUPPORTED_MATCH_OPS:
-        raise ValueError(f"Invalid query string - unsupported operation {op}")
-    queries = _process_queries(queries)
-    return queries, op
-
-
 @endpoint
 def get_match_schema(df: DataFrame, encoder: str):
     import meerkat as mk

@@ -4,6 +4,7 @@ from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.document import Document
+from .app.src.lib.component.discover import Discover
 from .app.src.lib.component.editor import Editor
 from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
@@ -46,6 +47,7 @@ __all__ = [
     "make_store",
     "trigger",
     "Component",
+    "Discover"
     "Gallery",
     "Markdown",
     "Match",
