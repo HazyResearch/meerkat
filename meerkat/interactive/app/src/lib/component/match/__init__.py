@@ -158,7 +158,7 @@ class Match(Component):
             encoder=self.encoder,
         )
 
-        self.criterion: MatchCriterion = Store(None)
+        self.criterion: MatchCriterion = Store(None, backend_only=True)
 
         on_match = set_criterion.partial(
             df=self.df,

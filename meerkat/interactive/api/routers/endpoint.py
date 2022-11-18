@@ -17,8 +17,16 @@ def dispatch(
 ) -> Tuple[Any, List["Modification"]]:
     # TODO: figure out how to use the payload
     """Call an endpoint."""
-    # Call the endpoint
+    from meerkat.interactive.modification import StoreModification
+
     result, modifications = endpoint.partial(**fn_kwargs).run()
+
+    # only return store modifications that are not backend_only
+    modifications = [
+        m
+        for m in modifications
+        if not (isinstance(m, StoreModification) and m.backend_only)
+    ]
 
     # Return the modifications and the result to the frontend
     return result, modifications

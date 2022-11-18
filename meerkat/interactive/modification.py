@@ -57,9 +57,19 @@ class StoreModification(Modification):
     type: str = "store"
 
     @property
+    def backend_only(self) -> bool:
+        """Whether this modification should not be sent to frontend."""
+        from meerkat.state import state
+        store = state.identifiables.get(group="stores", id=self.id)
+        return store._self_backend_only
+
+
+    @property
     def node(self) -> "Node":
         from meerkat.state import state
 
+
+        # FIXME: what's going on with this try-except here?
         try:
             store = state.identifiables.get(group="stores", id=self.id)
             return store.inode

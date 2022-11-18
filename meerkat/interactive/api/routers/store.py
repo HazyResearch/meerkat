@@ -36,5 +36,12 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
 
     state.modification_queue.unready()
 
+    # only return modifications that are not backend_only
+    modifications = [
+        m
+        for m in modifications
+        if not (isinstance(m, StoreModification) and m.backend_only)
+    ]
+
     # Return the modifications
     return modifications
