@@ -123,6 +123,8 @@ def trigger() -> List[Modification]:
 
     # Clear out the modification queue
     state.modification_queue.clear()
+    print("done")
+    print(modifications + new_modifications)
 
     return modifications + new_modifications
 

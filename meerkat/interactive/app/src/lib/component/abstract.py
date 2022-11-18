@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import ClassVar, Dict
 
 from pydantic import BaseModel
 from meerkat.interactive.node import NodeMixin
@@ -42,11 +42,17 @@ class Component(IdentifiableMixin):
         )
 
     @property
+    def _backend_only(self):
+        return ["id", "name", "identifiable_group"]
+
+    @property
     def props(self):
         return {
             # TODO: improve this so we isinstance a class instead
             k: v.config if hasattr(v, "config") else v
             for k, v in self.__dict__.items()
             # FIXME: critical fix, need to remove all keys here
-            if k not in ["id", "name", "identifiable_group"] and v is not None
+            if k not in self._backend_only and v is not None
         }
+
+        

@@ -1,16 +1,20 @@
 from dataclasses import dataclass
+
+from meerkat.interactive.graph import Store
 from ..abstract import Component
 import re
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, ClassVar, List, Optional, Tuple
 import ast
 
 from fastapi import HTTPException
 import numpy as np
 
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph import reactive
 from meerkat.interactive.endpoint import Endpoint, endpoint
 
 # from meerkat.interactive.modification import Modification
+
 
 @endpoint
 def get_match_schema(df: DataFrame, encoder: str):
@@ -46,6 +50,7 @@ _SUPPORTED_CALLS = {
     "concat": lambda *args: np.concatenate(args, axis=1),
 }
 
+
 def parse_query(query: str):
     return _parse_query(ast.parse(query, mode="eval").body)
 
@@ -73,17 +78,17 @@ def _parse_query(
 
 
 @endpoint
-def match(
+def set_criterion(
     df: DataFrame,
-    against: str = Endpoint.EmbeddedBody(),
     query: str = Endpoint.EmbeddedBody(),
+    against: str = Endpoint.EmbeddedBody(),
+    criterion: str = Endpoint.EmbeddedBody(),
     encoder: str = Endpoint.EmbeddedBody(None),
 ):
     """Match a query string against a DataFrame column.
 
     The `dataframe_id` remains the same as the original request.
     """
-    import meerkat as mk
 
     if not isinstance(df, DataFrame):
         raise HTTPException(
@@ -91,19 +96,43 @@ def match(
         )
 
     try:
-        data_embedding = df[against]
         query_embedding = parse_query(query)
-        print(query_embedding.shape)
 
-        scores = (data_embedding @ query_embedding.T).squeeze()
-        print(scores.shape)
-        col_name = f"match({against}, {query})"
-        df[col_name] = scores
+        criterion.set(
+            MatchCriterion(
+                query=query,
+                against=against,
+                query_embedding=query_embedding,
+                name=f"match({against}, {query})",
+            )
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return col_name
+    return criterion.__wrapped__
+
+
+
+@dataclass
+class MatchCriterion:
+    against: str
+    query: str
+    name: str
+    query_embedding: np.ndarray = None
+
+
+
+@reactive
+def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
+    df = df.view() 
+    if criterion == None: 
+        return df
+
+    data_embedding = df[criterion.against]
+    scores = (data_embedding @ criterion.query_embedding.T).squeeze()
+    df[criterion.name] = scores
+    return df 
 
 
 @dataclass
@@ -129,10 +158,25 @@ class Match(Component):
             encoder=self.encoder,
         )
 
-        on_match = match.partial(
+        self.criterion: MatchCriterion = Store(None)
+
+        on_match = set_criterion.partial(
             df=self.df,
             encoder=self.encoder,
+            criterion=self.criterion,
         )
         if self.on_match is not None:
             on_match = on_match.compose(self.on_match)
         self.on_match = on_match
+
+    @property
+    def _backend_only(self):
+        return ["criterion"] + super()._backend_only
+    
+    def __call__(self, df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+
+        return compute_match_scores(df, self.criterion)
+    
+

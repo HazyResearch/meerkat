@@ -42,6 +42,8 @@ def sort_by_criteria(
 
     sort_by = [criterion.column for criterion in criteria]
     ascending = [criterion.ascending for criterion in criteria]
+    print(data.columns)
+
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
