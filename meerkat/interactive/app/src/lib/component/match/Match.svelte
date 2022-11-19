@@ -58,7 +58,8 @@
 			return({value: column.name, label: column.name})})
 		});
 	}
-	
+
+
 	onMount(async () => {
 		//col prompts
 		//img is the value
@@ -78,8 +79,6 @@
 			}
 		});
 
-		
-
 		monaco.languages.registerCompletionItemProvider('myLang', {
 			provideCompletionItems: (model, position) => {
 				const suggestions = [
@@ -94,27 +93,46 @@
 				return {suggestions: suggestions};
 			}
 		})
+		let width = window.innerWidth;
 		let options : monaco.editor.IStandaloneEditorConstructionOptions = {
 			wordWrap: 'off',
             lineNumbers: 'off',
             lineDecorationsWidth: 0,
+			lineHeight: 40,
             overviewRulerLanes: 0,
             overviewRulerBorder: false,
-            scrollbar: { horizontal: 'hidden', vertical: 'hidden' }
-			
-	};
-		monaco.editor.create(divEl,{
+            scrollbar: { horizontal: 'hidden', vertical: 'hidden' },
 			value: "",
             language: 'myLang',
-			options:options,
-		});
+			minimap: {enabled: false},
+			renderLineHighlight: "none",
+			// showFoldingControls: "never",
+			padding: {bottom: 0}
+
+	};
+	 const editor =	monaco.editor.create(divEl,options);
+
+	 editor.onKeyDown(e => {
+            if (e.keyCode == monaco.KeyCode.Enter) {
+                // We only prevent enter when the suggest model is not active
+                if (editor?.getContribution('editor.contrib.suggestController')?.model?.state == 0) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+		editor.onDidPaste(e => {
+           if (e.range.endLineNumber > 1) {
+               let newContent = "";
+               let lineCount = editor.getModel()?.getLineCount();
+               for (let i = 0; i < (lineCount || 1); i++) {
+                   newContent += editor.getModel()?.getLineContent(i + 1);
+               }
+               editor.getModel()?.setValue(newContent);
+           }
+        });
 		
     });
-
-	
-
-	
-	
 
 	const onKeyPress = (e) => {
 		//match with column names. 
@@ -163,47 +181,36 @@
 	
 </script>
 
+<style>
+	.command-line{
+		background-color: red;
+		
+	}
+</style>
+
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
 	{#if title != ''}
 		<div class="font-bold text-xl text-slate-600 self-start pl-2">
 			{title}
 		</div>
 	{/if}
-	<div bind:this={divEl} class="h-screen" />
-	<!-- <div class="form-control">
+	<div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
 				<Status {status} />
 			</div>
 			
+			<div bind:this={divEl} style="" class="command-line input mr-5  grow h-10 rounded-md shadow-md" />
 
-			<input
+			<!-- <input
 				type="text"
 				bind:value={searchValue}
 				placeholder="Write some text to be matched..."
 				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
 				on:keypress={onKeyPress}
-			/>
-			<div class="text-slate-400 px-2">against</div>
-
-			<div class="themed pr-2 w-48">
-				{#await items_promise}
-					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
-				{:then items}
-					<Select
-						id="column"
-						placeholder="...a column."
-						value={against_item}
-						{items}
-						showIndicator={true}
-						listPlacement="auto"
-						on:select={handleSelect}
-						on:clear={handleClear}
-					/>
-				{/await}
-			</div>
+			/> -->
 		</div>
-	</div> -->
+	</div>
 </div>
 <!-- 
 <div class="w-full py-5 px-2 bg-slate-100 ">
