@@ -11,7 +11,6 @@ from typing import (
     Dict,
     Iterable,
     List,
-    Literal,
     Mapping,
     Optional,
     Sequence,
@@ -44,6 +43,11 @@ from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 logger = logging.getLogger(__name__)
 
