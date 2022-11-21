@@ -21,7 +21,7 @@ class Table(Component):
 
         self.df = df
         if edit_target is None:
-            self.df.obj["_edit_id"] = np.arange(len(self.df.obj))
+            self.df["_edit_id"] = np.arange(len(self.df))
             edit_target = EditTarget(self.df, "_edit_id", "_edit_id")
         self.edit_target = edit_target
 

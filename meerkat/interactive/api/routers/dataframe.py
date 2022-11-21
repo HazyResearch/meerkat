@@ -179,6 +179,7 @@ def edit_target(
             detail="Exactly one of row_indices or row_keys must be specified",
         )
     # FIXME: this line won't work anymore!
+    print(target.target)
     target_df = state.identifiables.get(group="refs", id=target.target.ref_id).obj
 
     if row_indices is not None:

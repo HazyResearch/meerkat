@@ -127,12 +127,12 @@ class MatchCriterion:
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view() 
     if criterion == None: 
-        return df
+        return df, None
 
     data_embedding = df[criterion.against]
     scores = (data_embedding @ criterion.query_embedding.T).squeeze()
     df[criterion.name] = scores
-    return df 
+    return df, criterion.name
 
 
 @dataclass

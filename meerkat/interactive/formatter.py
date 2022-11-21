@@ -112,7 +112,7 @@ class NumpyArrayFormatter(BasicFormatter):
 
     def encode(self, cell: Any):
         if isinstance(cell, np.ndarray):
-            return str(cell)
+            return str(f"Tensor of shape {cell.shape}")
         return super().encode(cell)
 
     def html(self, cell: Any):

@@ -28,6 +28,9 @@ def sort(
     Return:
         DataFrame: A sorted view of DataFrame.
     """
+    if by is None:
+        return data
+        
     by = [by] if isinstance(by, str) else by
 
     if isinstance(ascending, bool):

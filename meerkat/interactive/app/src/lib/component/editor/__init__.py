@@ -9,6 +9,8 @@ from meerkat.interactive.graph import Store, make_store
 from ..abstract import Component
 
 
+
+
 class Editor(Component):
 
     name = "Editor"
