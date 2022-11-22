@@ -20,7 +20,7 @@ class ReactifiableMixin:
 
         Currently properties and attributes are not reactified.
         """
-        from meerkat.interactive.graph import reactive, is_reactive
+        from meerkat.interactive.graph import is_reactive, reactive
 
         if name in _REACTIVE_KEYS:  # FIXME
             out = super().__getattribute__(name)
