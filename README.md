@@ -26,7 +26,7 @@ An interactive and intelligent DataFrame for wrangling complex data types.
 ```bash
 pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@clever-dev"
 ``` 
-> _Optional_: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install meerkat-ml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
+> **_Optional_**: some parts of Meerkat rely on optional dependencies. If you know which optional dependencies you'd like to install, you can do so using something like `pip install meerkat-ml[dev,text]` instead. See `setup.py` for a full list of optional dependencies.   
 
  
 Load a dataset into a `DataFrame` and get going!
@@ -50,7 +50,7 @@ Meerkat is a data-wrangling library that helps data scientists and machine learn
 
 Meerkat's core contribution is the `DataFrame`, a columnar data abstraction. The Meerkat DataFrame can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like images, audio, tensors, and graphs. It extends the traditional DataFrame API with (1) intelligent operations backed by machine learning and (2) interactive components that help users control and validate those operations.
 
-Please see our (incomplete) [documentation](https://meerkat.readthedocs.io/en/dev/guide/guide.html) for more information. As we make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions. 
+Please see our [documentation](https://meerkat.readthedocs.io/en/dev/guide/guide.html) for more information. As we work to make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions. 
 
 ## ✉️ About
 Meerkat is being developed at Stanford's Hazy Research Lab. Please reach out to `kgoel [at] cs [dot] stanford [dot] edu, eyuboglu [at] stanford [dot] edu, and arjundd [at] stanford [dot] edu` if you would like to use or contribute to Meerkat.
