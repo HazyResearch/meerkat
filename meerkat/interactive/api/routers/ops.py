@@ -7,20 +7,18 @@ import meerkat as mk
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import (
-    Reference,
-    ReferenceModification,
     Store,
     StoreModification,
     trigger,
 )
-from meerkat.interactive.modification import Modification
+from meerkat.interactive.modification import DataFrameModification, Modification
 
 _SUPPORTED_MATCH_OPS = {
     "+": lambda x, y: x + y,
     "-": lambda x, y: x - y,
     "*": lambda x, y: x * y,
     "/": lambda x, y: x / y,
-    "**": lambda x, y: x ** y,
+    "**": lambda x, y: x**y,
 }
 
 
@@ -61,7 +59,7 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
 
 @endpoint(prefix="/ops", route="/{df}/match/")
 def match(
-    df: Reference,
+    df: DataFrame,
     input: str = Endpoint.EmbeddedBody(),
     query: str = Endpoint.EmbeddedBody(),
     col_out: Store = Endpoint.EmbeddedBody(None),
@@ -70,8 +68,7 @@ def match(
 
     The `dataframe_id` remains the same as the original request.
     """
-    print(df)
-    if not isinstance(df._, DataFrame):
+    if not isinstance(df, DataFrame):
         raise HTTPException(
             status_code=400, detail="`match` expects a ref containing a dataframe"
         )
@@ -81,14 +78,14 @@ def match(
         # TODO (arjundd): Support more than one op.
         # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
-        df._, match_columns = mk.match(
-            data=df._, query=queries, input=input, return_column_names=True
+        df, match_columns = mk.match(
+            data=df, query=queries, input=input, return_column_names=True
         )
         if len(match_columns) > 1:
             assert op is not None
             col = f"_match_{input}_{query}"
-            df._[col] = _SUPPORTED_MATCH_OPS[op](
-                df._[match_columns[0]], df._[match_columns[1]]
+            df[col] = _SUPPORTED_MATCH_OPS[op](
+                df[match_columns[0]], df[match_columns[1]]
             )
             match_columns = [col] + match_columns
 
@@ -96,16 +93,14 @@ def match(
         raise HTTPException(status_code=404, detail=str(e))
 
     modifications = [
-        ReferenceModification(id=df.id, scope=match_columns),
+        DataFrameModification(id=df.inode.id, scope=match_columns),  # FIXME: check
     ]
 
     if col_out is not None:
-        # col_out_store = state.identifiables.get(group="stores", id=col_out)
-        col_out._ = match_columns[
-            0
-        ]  # TODO: match probably will only need to return one column in the future
+        # TODO: match probably will only need to return one column in the future
+        col_out.set(match_columns[0])
         modifications.append(
-            StoreModification(id=col_out.id, value=col_out._),
+            StoreModification(id=col_out.id, value=col_out),  # FIXME: check
         )
 
     modifications = trigger(modifications)
@@ -113,10 +108,12 @@ def match(
 
 
 @endpoint(prefix="/ops", route="/{df}/add/")
-def add_column(df: Reference, column: str = Endpoint.EmbeddedBody()):
+def add_column(df: DataFrame, column: str = Endpoint.EmbeddedBody()):
     import numpy as np
 
-    df._[column] = np.zeros(len(df._))
-    modifications = [ReferenceModification(id=df.id, scope=[column])]
+    df[column] = np.zeros(len(df))
+    modifications = [
+        DataFrameModification(id=df.inode.id, scope=[column])
+    ]  # FIXME: check
     modifications = trigger(modifications)
     return modifications

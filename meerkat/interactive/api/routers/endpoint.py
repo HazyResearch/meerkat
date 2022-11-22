@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, Any, List, Tuple
 
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.state import state
+from meerkat.interactive.graph import Modification, trigger
+
 
 if TYPE_CHECKING:
     from meerkat.interactive.modification import Modification
@@ -10,20 +12,21 @@ if TYPE_CHECKING:
 @endpoint(prefix="/endpoint", route="/{endpoint}/dispatch/")
 def dispatch(
     endpoint: Endpoint,
-    kwargs: dict,
+    fn_kwargs: dict,
     payload: dict = None,
 ) -> Tuple[Any, List["Modification"]]:
     # TODO: figure out how to use the payload
     """Call an endpoint."""
-    # Call the endpoint
-    result = endpoint(**kwargs).run()
+    from meerkat.interactive.modification import StoreModification
 
-    # Get the modifications
-    # from meerkat.state import state
-    modifications = state.modification_queue.queue
+    result, modifications = endpoint.partial(**fn_kwargs).run()
 
-    # Reset the modification queue
-    state.modification_queue.queue = []
+    # only return store modifications that are not backend_only
+    modifications = [
+        m
+        for m in modifications
+        if not (isinstance(m, StoreModification) and m.backend_only)
+    ]
 
     # Return the modifications and the result to the frontend
     return result, modifications

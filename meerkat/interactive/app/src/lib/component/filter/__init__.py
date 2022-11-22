@@ -1,12 +1,14 @@
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
+from meerkat.dataframe import DataFrame
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import Store, reactive, make_store
 
 from ..abstract import Component
 
@@ -81,8 +83,8 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
     # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
-@interface_op
-def filter_by_operator(
+@reactive
+def filter(
     data: Union["DataFrame", "AbstractColumn"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
 ):
@@ -123,11 +125,9 @@ def filter_by_operator(
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
 
     if len(criteria) == 0:
-        # FIXME: Do we need to return a new DataFrame so that it does not point
-        # to the pivot?
-        return data
+        # we view so that the result is a different dataframe than the input
+        return data.view()
 
-    (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     # if not all(
     #     isinstance(data[column], supported_column_types) for column in input_columns
     # ):
@@ -149,13 +149,16 @@ def filter_by_operator(
             if isinstance(col, mk.NumpyArrayColumn):
                 value = np.asarray(value, dtype=col.dtype)
 
-        mask = _operator_str_to_func[criterion.op](col, value)
+        # FIXME: Figure out why we cannot pass col for PandasSeriesColumn.
+        # the .data accessor is an interim solution.
+        mask = _operator_str_to_func[criterion.op](col.data, value)
         all_masks.append(np.asarray(mask))
     mask = np.stack(all_masks, axis=1).all(axis=1)
 
     return data.lz[mask]
 
 
+@dataclass
 class Filter(Component):
     """This component handles filtering of the pivot dataframe.
 
@@ -168,33 +171,14 @@ class Filter(Component):
     like sorting, to avoid unnecessary computation.
     """
 
-    name = "Filter"
+    df: DataFrame
+    criteria: List[FilterCriterion] = field(default_factory=list)
+    operations: List[str] = field(
+        default_factory=lambda: list(_operator_str_to_func.keys())
+    )
+    title: str = "Filter"
 
-    def __init__(
-        self,
-        df: Reference["DataFrame"],
-        criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
-        title: str = "",
-    ):
-        super().__init__()
-        self.df = df
-
-        if criteria is None:
-            criteria = []
-
-        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
-        self.operations = list(_operator_str_to_func.keys())
-        self.title = title
-
-    def derived(self):
-        """Return a derived object that filters the pivot dataframe."""
-        return filter_by_operator(self.df, self.criteria)
-
-    @property
-    def props(self):
-        return {
-            "df": self.df.config,
-            "criteria": self.criteria.config,
-            "operations": self.operations,
-            "title": self.title,
-        }
+    def __call__(self, df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+        return filter(df, self.criteria)

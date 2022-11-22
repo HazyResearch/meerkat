@@ -7,7 +7,7 @@ import pandas as pd
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.sort import SortCriterion
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import reactive
 from meerkat.ops.sliceby.groupby import groupby
 
 #### New Dataloading
@@ -119,7 +119,7 @@ LABEL_COLUMN = "label"
 ngoa_images["label"] = ["undefined"] * len(ngoa_images)
 
 
-@interface_op
+@reactive
 def groupby_and_count(
     data: mk.DataFrame, by: Union[str, Sequence[str]], label: str
 ) -> mk.DataFrame:
@@ -129,12 +129,12 @@ def groupby_and_count(
     return mk.DataFrame({"group": groups[by], "prevalence": groups[f"is_{label}"]})
 
 
-@interface_op(nested_return=False)
+@reactive(nested_return=False)
 def get_df_columns(df: mk.DataFrame) -> Sequence[str]:
     return df.columns
 
 
-@interface_op(nested_return=False)
+@reactive(nested_return=False)
 def get_labels(df: mk.DataFrame) -> Sequence[str]:
     return df["label"].unique().tolist()
 

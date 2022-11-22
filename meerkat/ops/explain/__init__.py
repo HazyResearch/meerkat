@@ -37,7 +37,8 @@ def explain(
     if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
         output_column = f"{method}({input},{target})"
-        embed_col = f"{encoder}({input})"
+        #embed_col = f"{encoder}({input})"
+        embed_col = input
 
         # TODO (sabri): Remove this guard once caching is supported.
         if embed_col not in data:

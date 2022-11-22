@@ -7,7 +7,7 @@ df["car"] = np.zeros(len(df))
 df = mk.gui.Reference(df)
 
 
-@mk.gui.interface_op
+@mk.gui.reactive
 def filter(df: mk.DataFrame):
     return df.lz[df["label"] == "gas pump"]
 

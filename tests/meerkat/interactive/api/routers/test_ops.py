@@ -3,7 +3,6 @@ import pytest
 from fastapi.testclient import TestClient
 
 import meerkat as mk
-from meerkat.interactive import Reference
 from meerkat.interactive.api.main import app
 from meerkat.interactive.graph import Store
 

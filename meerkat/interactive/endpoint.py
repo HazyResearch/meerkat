@@ -1,3 +1,4 @@
+from __future__ import annotations
 import inspect
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
@@ -5,8 +6,8 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Reference, Store, _unpack_refs_and_stores, trigger
-from meerkat.interactive.node import NodeMixin
+from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
@@ -35,7 +36,15 @@ class SingletonRouter(type):
         return cls._instances[(cls, prefix)]
 
 
-class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
+class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter):
+    #TODO: using the SingletonRouter metaclass causes a bug. 
+    # app.include_router() inside Endpoint is called multiple times
+    # for the same router. This causes an error because some 
+    # endpoints are registered multiple times because the FastAPI
+    # class doesn't check if an endpoint is already registered.
+    # As a patch, we're generating one router per Endpoint object
+    # (this could generate multiple routers for the same prefix, but
+    # that's not a problem).
     """
     A very simple FastAPI router.
 
@@ -60,7 +69,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter, metaclass=SingletonRouter):
         True
     """
 
-    identifiable_group: str = "routers"
+    _self_identifiable_group: str = "routers"
 
     def __init__(self, prefix: str, **kwargs):
         super().__init__(
@@ -76,6 +85,7 @@ class EndpointConfig(BaseModel):
     endpoint_id: Union[str, None]
 
 
+# TODO: technically Endpoint doesn't need to be NodeMixin (probably)
 class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     """
     Create an endpoint from a function in Meerkat.
@@ -115,7 +125,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
     EmbeddedBody = partial(Body, embed=True)
 
-    identifiable_group: str = "endpoints"
+    _self_identifiable_group: str = "endpoints"
 
     def __init__(
         self,
@@ -158,36 +168,103 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         Returns:
             The return value of `fn`.
         """
-        # Check if self.fn has any arguments left to be filled
-        signature = inspect.signature(self.fn)
-        bound_args = signature.bind_partial(*args, **kwargs)
-        bound_args.apply_defaults()
 
-        # If there are no arguments left to be filled, then we can
-        # call the function
-        if len(bound_args.arguments) == len(signature.parameters) == 0:
-            return self.fn()
+        # Apply a partial function to ingest the additional arguments
+        # that are passed in
+        partial_fn = partial(self.fn, *args, **kwargs)
 
-        # Raise an error if there are still arguments left to be filled
-        raise ValueError(
-            f"Endpoint {self.id} still has arguments left to be \
-            filled: {bound_args.arguments}. Ensure that all arguments \
-                are passed in when calling `.run()` on this endpoint."
+        # Check if the partial_fn has any arguments left to be filled
+        spec = inspect.getfullargspec(partial_fn)
+        # Check if spec has no args: if it does have args,
+        # it means that we can't call the function without filling them in
+        no_args = len(spec.args) == 0
+        # Check if all the kwonlyargs are in the keywords: if yes, we've
+        # bound all the keyword arguments
+        no_kwonlyargs = all([arg in partial_fn.keywords for arg in spec.kwonlyargs])
+
+        # Get the signature
+        signature = inspect.signature(partial_fn)
+        # Check if any parameters are unfilled args
+        no_unfilled_args = all(
+            [param.default != param.empty for param in signature.parameters.values()]
         )
 
-    def __call__(self, *args, **kwargs):
-        # Any Stores or References that are passed in as arguments
-        # should have this Endpoint as a non-triggering child
-        for arg in args:
-            if isinstance(arg, (Store, Reference)):
-                arg.add_child(self, triggers=False)
+        if not (no_args and no_kwonlyargs and no_unfilled_args):
 
-        for kwarg in kwargs.values():
-            if isinstance(kwarg, (Store, Reference)):
-                kwarg.add_child(self, triggers=False)
+            # Find the missing keyword arguments
+            missing_args = [
+                arg for arg in spec.kwonlyargs if arg not in partial_fn.keywords
+            ] + [
+                param.name
+                for param in signature.parameters.values()
+                if param.default == param.empty
+            ]
+            raise ValueError(
+                f"Endpoint {self.id} still has arguments left to be \
+                filled (args: {spec.args}, kwargs: {missing_args}). \
+                    Ensure that all keyword arguments \
+                    are passed in when calling `.run()` on this endpoint."
+            )
+
+        # Clear the modification queue before running the function
+        # This is an invariant: there should be no pending modifications
+        # when running an endpoint, so that only the modifications
+        # that are made by the endpoint are applied
+        state.modification_queue.clear()
+
+        # Ready the ModificationQueue so that it can be used to track
+        # modifications made by the endpoint
+        state.modification_queue.ready()
+        result = partial_fn()
+        # Don't track modifications outside of the endpoint
+        state.modification_queue.unready()
+
+        modifications = trigger()
+
+        return result, modifications
+
+    def partial(self, *args, **kwargs) -> Endpoint:
+        # Any NodeMixin objects that are passed in as arguments
+        # should have this Endpoint as a non-triggering child
+        if not self.has_inode():
+            node = self.create_inode()
+            self.attach_to_inode(node)
+
+        for arg in list(args) + list(kwargs.values()):
+            if isinstance(arg, NodeMixin):
+                if not arg.has_inode():
+                    inode_id = None if not isinstance(arg, Store) else arg.id
+                    node = arg.create_inode(inode_id=inode_id)
+                    arg.attach_to_inode(node)
+
+                arg.inode.add_child(self.inode, triggers=False)
 
         return Endpoint(
             fn=partial(self.fn, *args, **kwargs),
+            prefix=None,
+            route=None,
+        )
+
+    def compose(self, fn: Union[Endpoint, callable]) -> Endpoint:
+        """Create a new Endpoint that applies `fn` to the return value of this
+        Endpoint.
+        Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
+
+        Args:
+            fn (Endpoint, callable): An Endpoint or a callable function that accepts
+                a single argument of the same type as the return of this Endpoint
+                (i.e. self).
+
+        Return:
+            Endpoint: The new composed Endpoint.
+        """
+
+        @wraps(self.fn)
+        def composed(*args, **kwargs):
+            return fn(self.fn(*args, **kwargs))
+
+        return Endpoint(
+            fn=composed,
             prefix=self.prefix,
             route=self.route,
         )
@@ -290,7 +367,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         app.include_router(self.router)
 
-        print(self.router, self.prefix, self.route, method)
+    def __call__(self, *args, **kwargs):
+        """Calling the endpoint will just call the raw underlying function."""
+        return self.fn(*args, **kwargs)
 
 
 def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:
@@ -365,15 +444,12 @@ def endpoint(
     def _endpoint(fn: Callable):
         # Gather up all the arguments that are hinted as Stores and References
         stores = set()
-        references = set()
         # Also gather up the hinted arguments that subclass IdentifiableMixin
         # e.g. Store, Reference, Endpoint, Interface, etc.
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):
                 stores.add(name)
-            elif isinstance(annot, type) and issubclass(annot, Reference):
-                references.add(name)
 
             # Add all the identifiables
             if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
@@ -382,9 +458,6 @@ def endpoint(
         @wraps(fn)
         def wrapper(*args, **kwargs):
             """
-            This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Reference` object that wraps the
-            output of the function.
 
             Subsequent calls to the function will be handled by the graph.
             """
@@ -393,43 +466,49 @@ def endpoint(
             fn_signature = inspect.signature(fn)
             fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
 
-            # Unpack the arguments that were *not* annotated to be Stores or
-            # References. Unpacking takes Stores or References, and grabs
-            # the `._` attribute, which is the value of the Store or
-            # the object the Reference points to.
-            fn_args_to_unpack = {
-                k: v
-                for k, v in fn_bound_arguments.items()
-                if k not in stores and k not in references
-            }
-            args, kwargs, _, _ = _unpack_refs_and_stores(**fn_args_to_unpack)
-
             # Identifiables that are passed into the function
             # may be passed in as a string id, or as the object itself
             # If they are passed in as a string id, we need to get the object
             # from the registry
-            fn_args_as_is = {
-                k: v if not isinstance(v, str) else identifiables[k].from_id(v)
-                for k, v in fn_bound_arguments.items()
-                if k in identifiables
-            }
-
-            # # Cautionary early check to make sure that the arguments that
-            # # were hinted as Store and Reference arguments are indeed
-            # # Store and Reference objects
-            # assert all(
-            #     [isinstance(v, (Store, Reference)) for v in fn_args_as_is.values()]
-            # ), "All arguments that are type hinted as stores or references \
-            #     must be Store or Reference objects."
+            _args, _kwargs = [], {}
+            for k, v in fn_bound_arguments.items():
+                if k in identifiables:
+                    # Dereference the argument if it was passed in as a string id
+                    if not isinstance(v, str):
+                        # Not a string id, so just use the object
+                        _kwargs[k] = v
+                    else:
+                        if isinstance(v, IdentifiableMixin):
+                            # v is a string, but it is also an IdentifiableMixin
+                            # e.g. Store("foo"), so just use v as is
+                            _kwargs[k] = v
+                        else:
+                            # v is a string id
+                            try:
+                                # Directly try to look up the string id in the
+                                # registry of the annotated type
+                                _kwargs[k] = identifiables[k].from_id(v)
+                            except Exception:
+                                # If that fails, try to look up the string id in
+                                # the Node registry, and then get the object
+                                # from the Node
+                                _kwargs[k] = Node.from_id(v).obj
+                else:
+                    if k == "args":
+                        # These are *args under the `args` key
+                        # These are the only arguments that will be passed in as
+                        # *args to the fn
+                        _args = v
+                    elif k == "kwargs":
+                        # These are **kwargs under the `kwargs` key
+                        _kwargs = {**_kwargs, **v}
+                    else:
+                        # All other positional arguments that were not *args were
+                        # bound, so they become kwargs
+                        _kwargs[k] = v
 
             # Run the function
-            result = fn(*args, **{**kwargs, **fn_args_as_is})
-
-            # Get the modifications from the queue
-            modifications = state.modification_queue.queue
-
-            # Trigger the modifications
-            modifications = trigger(modifications)
+            result = fn(*_args, **_kwargs)
 
             # Return the result of the function
             return result

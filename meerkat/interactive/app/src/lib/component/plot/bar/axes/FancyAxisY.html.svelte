@@ -8,6 +8,7 @@
 
 	const { padding, xRange, yScale } = getContext('LayerCake');
 
+	const { data } = getContext('LayerCake');
 	$: metadata = getContext('FancyHorizontalBarPlotMetadata').metadata;
 	
 
@@ -90,7 +91,7 @@
 
 					TODO (arjundd): Make a default value of count so that it doesn't display.
 				-->
-				<FancyTick width="{width}px" name={tick} id={i} size={metadata[i][0] || 0} on:remove />
+				<FancyTick width="{width}px" name={$data[i].y} id={i} size={metadata[i][0] || 0} on:remove />
 			</div>
 		</div>
 	{/each}

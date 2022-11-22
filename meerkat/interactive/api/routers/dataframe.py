@@ -9,8 +9,8 @@ from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.graph import Reference, ReferenceModification, trigger
-from meerkat.interactive.modification import Modification
+from meerkat.interactive.graph import trigger
+from meerkat.interactive.modification import DataFrameModification, Modification
 from meerkat.state import state
 
 
@@ -32,12 +32,12 @@ class SchemaResponse(BaseModel):
 
 
 @endpoint(prefix="/df", route="/{df}/schema/")
-def schema(df: Reference, request: SchemaRequest) -> SchemaResponse:
-    columns = df._.columns if request is None else request.columns
+def schema(df: DataFrame, request: SchemaRequest) -> SchemaResponse:
+    columns = df.columns if request is None else request.columns
     return SchemaResponse(
-        id=df._.id,
-        columns=_get_column_infos(df._, columns),
-        nrows=len(df._),
+        id=df.id,
+        columns=_get_column_infos(df, columns),
+        nrows=len(df),
     )
 
 
@@ -77,7 +77,7 @@ class RowsResponse(BaseModel):
 
 @endpoint(prefix="/df", route="/{df}/rows/")
 def rows(
-    df: Reference,
+    df: DataFrame,
     start: int = Endpoint.EmbeddedBody(None),
     end: int = Endpoint.EmbeddedBody(None),
     indices: List[int] = Endpoint.EmbeddedBody(None),
@@ -86,7 +86,6 @@ def rows(
     columns: List[str] = Endpoint.EmbeddedBody(None),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    df = df._
     full_length = len(df)
     column_infos = _get_column_infos(df, columns)
 
@@ -128,37 +127,37 @@ def rows(
 
 @endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
 def remove_row_by_index(
-    df: Reference, row_index: int = Endpoint.EmbeddedBody()
-) -> List[Modification]:
-    df._ = df._.lz[np.arange(len(df._)) != row_index]
-    modifications = trigger(
-        modifications=[ReferenceModification(id=df.id, scope=df._.columns)]
-    )
-    return modifications
+    df: DataFrame, row_index: int = Endpoint.EmbeddedBody()
+):
+    df = df.lz[np.arange(len(df)) != row_index]
+
+    # TODO: shouldn't have to issue this manually
+    from meerkat.state import state
+    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=df.columns))
 
 
 @endpoint(prefix="/df", route="/{df}/edit/")
 def edit(
-    df: Reference,
+    df: DataFrame,
     value=Endpoint.EmbeddedBody(),  # don't set type
     column: str = Endpoint.EmbeddedBody(),
     row_id=Endpoint.EmbeddedBody(),
     id_column: str = Endpoint.EmbeddedBody(),
-) -> List[Modification]:
-    mask = df._[id_column] == row_id
+):
+    mask = df[id_column] == row_id
     if mask.sum() == 0:
         raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
-    df._[column][mask] = value
+    df[column][mask] = value
 
-    modifications = trigger(
-        modifications=[ReferenceModification(id=df.id, scope=[column])]
-    )
-    return modifications
+    # TODO: shouldn't have to issue this manually
+    from meerkat.state import state
+    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=[column]))
+
 
 
 @endpoint(prefix="/df", route="/{df}/edit_target/")
 def edit_target(
-    df: Reference,
+    df: DataFrame,
     target: EditTargetConfig = Endpoint.EmbeddedBody(),
     value=Endpoint.EmbeddedBody(),  # don't set type
     column: str = Endpoint.EmbeddedBody(),
@@ -179,18 +178,18 @@ def edit_target(
             status_code=400,
             detail="Exactly one of row_indices or row_keys must be specified",
         )
+    # FIXME: this line won't work anymore!
+    print(target.target)
     target_df = state.identifiables.get(group="refs", id=target.target.ref_id).obj
 
     if row_indices is not None:
-        source_ids = df._[target.source_id_column][row_indices]
+        source_ids = df[target.source_id_column][row_indices]
     else:
         if primary_key is None:
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_df.primary_key
-        source_ids = df._[target.source_id_column].lz[
-            np.isin(df._[primary_key], row_keys)
-        ]
+        source_ids = df[target.source_id_column].lz[np.isin(df[primary_key], row_keys)]
 
     mask = np.isin(target_df[target.target_id_column], source_ids)
 
@@ -226,6 +225,7 @@ def edit_target(
             target_df[column_name][mask] = value
 
     modifications = trigger(
-        modifications=[ReferenceModification(id=target.target.ref_id, scope=[column])]
+        # FIXME: this is not correct
+        modifications=[DataFrameModification(id=target.target.ref_id, scope=[column])]
     )
     return modifications

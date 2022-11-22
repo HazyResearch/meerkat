@@ -12,7 +12,7 @@
 	export let df: Writable;
 	export let main_column: Writable<string>;
 	export let tag_columns: Writable<Array<string>>;
-	export let edit_target: Any;
+	// export let edit_target: Any;
 	export let primary_key: string;
 	export let selected: Writable<Array<string>>;
 
@@ -33,18 +33,19 @@
 		// null,
 		// [$main_column, primary_key].concat($tag_columns)
 	);
+	$: console.log($df.ref_id)
 
-	async function handle_edit(event: any) {
-		let { pivot, pivot_id_column, id_column } = edit_target;
-		let rows = await rows_promise;
+	// async function handle_edit(event: any) {
+	// 	let { pivot, pivot_id_column, id_column } = edit_target;
+	// 	let rows = await rows_promise;
 
-		let { row, column, value } = event.detail;
-		let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
-		let row_index = rows.indices.indexOf(row);
-		let row_id = rows.rows[row_index][row_id_column_index];
+	// 	let { row, column, value } = event.detail;
+	// 	let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
+	// 	let row_index = rows.indices.indexOf(row);
+	// 	let row_id = rows.rows[row_index][row_id_column_index];
 
-		$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
-	}
+	// 	$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
+	// }
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50">

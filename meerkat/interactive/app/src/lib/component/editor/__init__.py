@@ -2,10 +2,13 @@ from typing import List, Union
 
 import numpy as np
 
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTarget
-from meerkat.interactive.graph import Reference, Store, make_ref, make_store
+from meerkat.interactive.graph import Store, make_store
 
 from ..abstract import Component
+
+
 
 
 class Editor(Component):
@@ -14,7 +17,7 @@ class Editor(Component):
 
     def __init__(
         self,
-        df: Reference,
+        df: DataFrame,
         col: Union[Store, str],
         target: EditTarget = None,
         selected: Store[List[int]] = None,
@@ -26,7 +29,7 @@ class Editor(Component):
         self.text = make_store("")
         self.primary_key = primary_key
 
-        self.df = make_ref(df)
+        self.df = df
         if target is None:
             df["_edit_id"] = np.arange(len(df))
             target = EditTarget(self.df, "_edit_id", "_edit_id")
@@ -37,7 +40,7 @@ class Editor(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config,
+            "df": self.df.config,  # FIXME
             "target": self.target.config,
             "col": self.col.config,
             "text": self.text.config,

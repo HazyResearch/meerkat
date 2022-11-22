@@ -414,7 +414,7 @@ def download_url(url: str, dst: Union[str, io.BytesIO]):
         return dst
 
 
-@functools.lru_cache
+@functools.lru_cache()
 def _get_gcs_bucket(bucket_name: str, project: str = None):
     """Get a GCS bucket."""
     from google.cloud import storage

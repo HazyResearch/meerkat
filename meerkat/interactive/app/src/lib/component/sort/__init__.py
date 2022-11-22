@@ -1,9 +1,11 @@
+import uuid
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Sequence, Union
 
 from pydantic import BaseModel
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Reference, Store, interface_op, make_store
+from meerkat.interactive.graph import Store, make_store, reactive
 
 from ..abstract import Component
 
@@ -16,7 +18,7 @@ class SortCriterion(BaseModel):
     source: str = ""
 
 
-@interface_op
+@reactive
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],
@@ -36,13 +38,16 @@ def sort_by_criteria(
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
     if len(criteria) == 0:
-        return data
+        return data.view()
 
     sort_by = [criterion.column for criterion in criteria]
     ascending = [criterion.ascending for criterion in criteria]
+    print(data.columns)
+
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
+@dataclass
 class Sort(Component):
     """This component handles a sort_by list and a sort_order list.
 
@@ -54,31 +59,21 @@ class Sort(Component):
     new dataframe will be returned as a result of the op.
     """
 
-    name = "Sort"
+    df: DataFrame
+    criteria: List[SortCriterion] = field(default_factory=list)
+    title: str = "Sort"
 
-    def __init__(
-        self,
-        df: Reference["DataFrame"],
-        criteria: Union[Store[List[str]], List[str]] = None,
-        title: str = "",
-    ):
-        super().__init__()
-        self.df = df
+    def __call__(self, df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+        return sort_by_criteria(df, self.criteria)
 
-        if criteria is None:
-            criteria = []
-
-        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
-        self.title = title
-
-    def derived(self):
-        # TODO (arjundd): Add option to configure ascending / descending.
-        return sort_by_criteria(self.df, self.criteria)
-
-    @property
-    def props(self):
-        return {
-            "df": self.df.config,
-            "criteria": self.criteria.config,
-            "title": self.title,
-        }
+    @staticmethod
+    def create_criterion(column: str, ascending: bool, source: str = ""):
+        return SortCriterion(
+            id=str(uuid.uuid4()),
+            is_enabled=True,
+            column=column,
+            ascending=ascending,
+            source=source,
+        )

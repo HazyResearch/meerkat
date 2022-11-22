@@ -11,7 +11,6 @@ from typing import (
     Dict,
     Iterable,
     List,
-    Literal,
     Mapping,
     Optional,
     Sequence,
@@ -33,14 +32,22 @@ import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.cell_column import CellColumn
+from meerkat.interactive.modification import DataFrameModification
+from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
-from meerkat.mixins.indexing import MaterializationMixin, IndexerMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 logger = logging.getLogger(__name__)
 
@@ -53,15 +60,17 @@ class DataFrame(
     CloneableMixin,
     FunctionInspectorMixin,
     IdentifiableMixin,
+    NodeMixin,
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
     IndexerMixin,
     ProvenanceMixin,
+    ReactifiableMixin,
 ):
     """Meerkat DataFrame class."""
 
-    identifiable_group: str = "dataframes"
+    _self_identifiable_group: str = "dataframes"
 
     # Path to a log directory
     logdir: pathlib.Path = pathlib.Path.home() / "meerkat/"
@@ -180,7 +189,7 @@ class DataFrame(
             return None
 
         return self[self._primary_key]
-    
+
     @property
     def primary_key_name(self) -> str:
         """The name of the column acting as the primary key."""
@@ -204,8 +213,8 @@ class DataFrame(
             if not self[column]._is_valid_primary_key():
                 raise ValueError(
                     f'Column "{column}" cannot be used as a primary key. Ensure that '
-                    "columns of this type can be used as primary keys and that the values "
-                    "in the column are unique."
+                    "columns of this type can be used as primary keys and \
+                    that the values in the column are unique."
                 )
 
         if inplace:
@@ -399,6 +408,25 @@ class DataFrame(
 
     def __setitem__(self, posidx, value):
         self.add_column(name=posidx, data=value, overwrite=True)
+
+        # This condition will issue modifications even if we're outside an endpoint
+        # but those modifications will be cleared by the endpoint before it is
+        # run.
+        if self.has_inode():
+            # Add a modification if it's on the graph
+            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod.add_to_queue()
+
+    def set(self, value: DataFrame):
+        # FIXME: This should not be called outside of an endpoint. Add explicit check
+        # fot that. 
+        self._set_data(value._data)
+        self._set_state(value._get_state())
+        
+        if self.has_inode():
+            # Add a modification if it's on the graph
+            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod.add_to_queue()
 
     def consolidate(self):
         self.data.consolidate()
@@ -921,19 +949,21 @@ class DataFrame(
         """
         # Copy the ._data dict with a reference to the actual columns
         new_df = self.view()
-        
+
         if isinstance(mapper, Dict):
             assert len(set(mapper.values())) == len(
                 mapper.values()
-            ), f"Dictionary values must be unique (1-to-1)."
-            
-            names = self.columns # used to preserve order of columns
+            ), "Dictionary values must be unique (1-to-1)."
+
+            names = self.columns  # used to preserve order of columns
             for i, (old_name, new_name) in enumerate(mapper.items()):
                 if old_name not in self.keys():
                     if errors == "raise":
-                        raise KeyError(f"Cannot rename nonexistent column `{old_name}`.")
+                        raise KeyError(
+                            f"Cannot rename nonexistent column `{old_name}`."
+                        )
                     continue
-                
+
                 if old_name == new_name:
                     continue
 
@@ -945,15 +975,17 @@ class DataFrame(
         elif isinstance(mapper, Callable):
             for old_name in new_df.columns:
                 new_name = mapper(old_name)
-                
+
                 if old_name == new_name:
                     continue
-                
+
                 # Copy old column into new column
                 new_df[new_name] = new_df[old_name]
                 new_df.remove_column(old_name)
         else:
-            logger.info(f"Mapper type is not one of Dict or Callable: {type(mapper)}. Returning")
+            logger.info(
+                f"Mapper type is not one of Dict or Callable: {type(mapper)}. Returning"
+            )
 
         return new_df
 
@@ -1005,6 +1037,7 @@ class DataFrame(
         state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         df = cls.__new__(cls)
         df._set_id()  # TODO: consider if we want to persist this id
+        df._set_inode()  # FIXME: this seems hacky
         df._set_state(state)
 
         # Load the the manager

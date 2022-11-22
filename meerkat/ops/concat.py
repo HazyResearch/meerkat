@@ -59,7 +59,7 @@ Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
                     "Can only concatenate DataFrames along axis 0 (rows) if they have "
                     " the same set of columns names."
                 )
-            return objs[0].from_batch(
+            return objs[0]._clone(
                 {column: concat([df[column] for df in objs]) for column in columns}
             )
         elif axis == 1 or axis == "columns":

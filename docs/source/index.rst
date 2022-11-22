@@ -125,6 +125,7 @@ Next Steps
 
    guide/guide
    datasets/datasets
+   examples/navigation
 
 
 .. toctree::

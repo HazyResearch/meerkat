@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Any, List
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from meerkat.interactive.graph import Reference, Store
+    from meerkat.interactive.graph import Store
+    from meerkat.interactive.node import Node
 
 
 class Modification(BaseModel, ABC):
@@ -33,15 +34,21 @@ class Modification(BaseModel, ABC):
         state.modification_queue.add(self)
 
 
-class ReferenceModification(Modification):
+# TODO: need to consolidate Modification
+# associate them with NodeMixin (Nodeable objects)
+class DataFrameModification(Modification):
     scope: List[str]
     type: str = "ref"
 
     @property
-    def node(self) -> "Reference":
+    def node(self) -> "Node":
         from meerkat.state import state
 
-        return state.identifiables.get(group="refs", id=self.id)
+        try:
+            df = state.identifiables.get(group="dataframes", id=self.id)
+            return df.inode
+        except Exception as e:
+            return state.identifiables.get(group="nodes", id=self.id)
 
 
 class StoreModification(Modification):
@@ -50,7 +57,21 @@ class StoreModification(Modification):
     type: str = "store"
 
     @property
-    def node(self) -> "Store":
+    def backend_only(self) -> bool:
+        """Whether this modification should not be sent to frontend."""
+        from meerkat.state import state
+        store = state.identifiables.get(group="stores", id=self.id)
+        return store._self_backend_only
+
+
+    @property
+    def node(self) -> "Node":
         from meerkat.state import state
 
-        return state.identifiables.get(group="stores", id=self.id)
+
+        # FIXME: what's going on with this try-except here?
+        try:
+            store = state.identifiables.get(group="stores", id=self.id)
+            return store.inode
+        except Exception as e:
+            return state.identifiables.get(group="nodes", id=self.id)

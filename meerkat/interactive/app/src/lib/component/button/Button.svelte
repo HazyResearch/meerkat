@@ -13,10 +13,7 @@
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
 	<button
 		on:click={(e) => {
-			console.log(e);
-			// $on_click = { type: e.type, detail: e.detail };
 			let output = $dispatch(on_click.endpoint_id, {}, { type: e.type, detail: e.detail });
-			console.log(output);
 			output.then((e) => console.log(e));
 		}}>{title}</button
 	>

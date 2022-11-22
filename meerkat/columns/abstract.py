@@ -12,16 +12,18 @@ import pandas as pd
 import torch
 
 import meerkat.config
+from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
-from meerkat.mixins.indexing import MaterializationMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
@@ -43,7 +45,9 @@ class AbstractColumn(
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
+    NodeMixin,
     ProvenanceMixin,
+    ReactifiableMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
@@ -56,7 +60,7 @@ class AbstractColumn(
     # Create a directory
     logdir.mkdir(parents=True, exist_ok=True)
 
-    identifiable_group: str = "columns"
+    _self_identifiable_group: str = "columns"
 
     def __init__(
         self,
@@ -128,9 +132,9 @@ class AbstractColumn(
         """Get the posidxs of the given keyidxs. Raise a key error if any of the
         keyidxs are not found.
 
-        Args:   
+        Args:
             keyidxs: The keyidxs to search for.
-        
+
         Returns:
             The posidxs of the given keyidxs.
         """

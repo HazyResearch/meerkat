@@ -36,6 +36,7 @@ export async function modify(url: string, data: any): Promise<any> {
 }
 
 export function apply_modifications(modifications: Array<any>) {
+    console.log(modifications);
     for (let modification of modifications) {
         if (modification.type === 'ref') {
             // Box modification

@@ -4,6 +4,7 @@ from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.document import Document
+from .app.src.lib.component.discover import Discover
 from .app.src.lib.component.editor import Editor
 from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
@@ -21,15 +22,16 @@ from .app.src.lib.interfaces.abstract import Interface, Layout, interface
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
-    Reference,
-    ReferenceConfig,
     Store,
     StoreConfig,
-    interface_op,
+    reactive,
     make_store,
     trigger,
+    react,
+    no_react,
+    is_reactive,
 )
-from .modification import Modification
+from .modification import Modification, DataFrameModification
 from .startup import start
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
@@ -38,15 +40,15 @@ __all__ = [
     "Endpoint",
     "endpoint",
     "make_endpoint",
-    "Reference",
-    "ReferenceConfig",
     "Modification",
+    "DataFrameModification",
     "Document",
     "Store",
     "StoreConfig",
     "make_store",
     "trigger",
     "Component",
+    "Discover"
     "Gallery",
     "Markdown",
     "Match",
@@ -59,7 +61,7 @@ __all__ = [
     "Filter",
     "Interface",
     "interface",
-    "interface_op",
+    "reactive",
     "start",
     "Layout",
     "Editor",

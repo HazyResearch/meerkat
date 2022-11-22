@@ -35,12 +35,14 @@
 		return modifications;
 	};
 
-	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any) => {
-		if (endpoint_id === null) { return; }
+	$: dispatch = async (endpoint_id: string, kwargs: any, payload: any = {}) => {
+		if (endpoint_id === null) {
+			return;
+		}
 		let [result, modifications] = await post(`${$api_url}/endpoint/${endpoint_id}/dispatch`, {
-				kwargs: kwargs,
-				payload: payload
-			});
+			fn_kwargs: kwargs,
+			payload: payload
+		});
 		apply_modifications(modifications);
 		return result;
 	};
@@ -198,6 +200,8 @@
 	};
 	$: setContext('Interface', context);
 
+	console.log(config);
+
 	// check if config.components is an array
 	let component_array: Array<any>;
 	if (Array.isArray(config.components)) {
@@ -211,6 +215,8 @@
 		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
 		document.title = config.name;
 	});
+
+	console.log(global_stores)
 
 	for (let i = 0; i < component_array.length; i++) {
 		// Pull out the ith component
@@ -240,6 +246,7 @@
 			} else if (v.ref_id !== undefined) {
 				if (!global_stores.has(v.ref_id)) {
 					// add it to the global_stores Map if it isn't already there
+					console.log(v);
 					global_stores.set(v.ref_id, writable(v));
 				}
 				return global_stores.get(v.ref_id);
@@ -282,6 +289,7 @@
 		// 	id: i
 		// });
 	}
+	console.log(global_stores)
 
 	const cols = [[1200, 6]];
 </script>

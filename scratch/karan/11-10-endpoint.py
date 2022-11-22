@@ -13,7 +13,7 @@ choice = mk.gui.Choice(value=1, choices=[1, 2, 3])
 button = mk.gui.Button(on_click=increment(store, choice.value))
 
 
-@mk.gui.interface_op
+@mk.gui.reactive
 def next_count(count: int):
     return count + 1
 

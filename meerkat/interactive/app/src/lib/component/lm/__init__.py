@@ -1,5 +1,4 @@
-from meerkat.interactive import Reference
-
+from meerkat.dataframe import DataFrame
 from ..abstract import Component
 
 
@@ -9,7 +8,7 @@ class SchemaTree(Component):
 
     def __init__(
         self,
-        df: Reference,
+        df: DataFrame,
     ) -> None:
         super().__init__()
         self.df = df
@@ -17,5 +16,5 @@ class SchemaTree(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config,
+            "df": self.df.config, # FIXME
         }
