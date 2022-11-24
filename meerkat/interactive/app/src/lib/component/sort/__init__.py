@@ -1,11 +1,10 @@
 import uuid
-from dataclasses import dataclass, field
 from typing import Any, Dict, List, Sequence, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store, make_store, reactive
+from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import Component
 
@@ -47,7 +46,6 @@ def sort_by_criteria(
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
-@dataclass
 class Sort(Component):
     """This component handles a sort_by list and a sort_order list.
 
@@ -60,7 +58,7 @@ class Sort(Component):
     """
 
     df: DataFrame
-    criteria: List[SortCriterion] = field(default_factory=list)
+    criteria: List[SortCriterion] = Field(default_factory=list)
     title: str = "Sort"
 
     def __call__(self, df: DataFrame = None) -> DataFrame:

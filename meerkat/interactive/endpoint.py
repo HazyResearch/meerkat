@@ -5,6 +5,7 @@ from typing import Any, Callable, Generic, Union
 
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
+from pydantic.fields import ModelField
 
 from meerkat.interactive.graph import Store, trigger
 from meerkat.interactive.node import Node, NodeMixin
@@ -37,9 +38,9 @@ class SingletonRouter(type):
 
 
 class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter):
-    #TODO: using the SingletonRouter metaclass causes a bug. 
+    # TODO: using the SingletonRouter metaclass causes a bug.
     # app.include_router() inside Endpoint is called multiple times
-    # for the same router. This causes an error because some 
+    # for the same router. This causes an error because some
     # endpoints are registered multiple times because the FastAPI
     # class doesn't check if an endpoint is already registered.
     # As a patch, we're generating one router per Endpoint object
@@ -81,7 +82,9 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
         )
 
 
-class EndpointConfig(BaseModel):
+class EndpointSchema(BaseModel):
+    """A schema for sending an endpoint to the frontend."""
+
     endpoint_id: Union[str, None]
 
 
@@ -152,8 +155,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         self.route = route
 
     @property
-    def config(self):
-        return EndpointConfig(
+    def schema(self):
+        return EndpointSchema(
             endpoint_id=self.id,
         )
 
@@ -370,6 +373,16 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     def __call__(self, *args, **kwargs):
         """Calling the endpoint will just call the raw underlying function."""
         return self.fn(*args, **kwargs)
+    
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, cls):
+            return make_endpoint(v)
+        return v
 
 
 def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:

@@ -7,10 +7,10 @@ from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
 
-from meerkat.interactive.app.src.lib.component.abstract import (
-    Component,
-    ComponentConfig,
-)
+# from meerkat.interactive.app.src.lib.component.abstract import (
+#     Component,
+#     ComponentSchema,
+# )
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 from meerkat.tools.utils import nested_apply
@@ -43,7 +43,7 @@ class Layout:
 class InterfaceConfig(BaseModel):
 
     layout: LayoutConfig
-    components: Union[List[ComponentConfig], Dict[str, ComponentConfig]]
+    # components: Union[List[ComponentConfig], Dict[str, ComponentConfig]]
     name: str
 
 
@@ -55,7 +55,7 @@ class Interface(IdentifiableMixin):
 
     def __init__(
         self,
-        components: Union[List[Component], Dict[str, Component]] = None,
+        # components: Union[List[Component], Dict[str, Component]] = None,
         layout: Layout = None,
         name: str = "Interface",
         id: str = None,

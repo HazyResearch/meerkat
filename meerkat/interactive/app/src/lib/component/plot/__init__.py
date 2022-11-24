@@ -1,4 +1,5 @@
-from dataclasses import dataclass, field
+from pydantic import Field
+
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store
 
@@ -9,7 +10,6 @@ from meerkat.interactive.endpoint import Endpoint
 def is_none(x):
   return (isinstance(x, Store) and x.__wrapped__ is None) or x is None
 
-@dataclass
 class Plot(Component):
     # name: str = "Plot"
 
@@ -21,8 +21,8 @@ class Plot(Component):
     y_label: str = None
     type: str = "scatter"
     slot: str = None
-    keys_to_remove: list = field(default_factory=list)
-    metadata_columns: list = field(default_factory=list)
+    keys_to_remove: list = Field(default_factory=list)
+    metadata_columns: list = Field(default_factory=list)
 
     on_select: Endpoint = None
 

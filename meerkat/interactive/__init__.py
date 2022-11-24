@@ -10,6 +10,7 @@ from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.markdown import Markdown
 from .app.src.lib.component.match import Match
+from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.row import Row
 from .app.src.lib.component.slicebycards import SliceByCards
@@ -23,7 +24,7 @@ from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
     Store,
-    StoreConfig,
+    StoreSchema,
     reactive,
     make_store,
     trigger,
@@ -44,7 +45,7 @@ __all__ = [
     "DataFrameModification",
     "Document",
     "Store",
-    "StoreConfig",
+    "StoreSchema",
     "make_store",
     "trigger",
     "Component",
@@ -58,6 +59,7 @@ __all__ = [
     "Stats",
     "EditTarget",
     "Table",
+    "Tabs", 
     "Filter",
     "Interface",
     "interface",

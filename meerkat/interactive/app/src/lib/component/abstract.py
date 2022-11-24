@@ -1,82 +1,65 @@
 from typing import ClassVar, Dict
+from dataclasses import is_dataclass, fields
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
+from meerkat.interactive.frontend import FrontendMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.tools.utils import nested_apply
 
 
-class ComponentConfig(BaseModel):
+class ComponentSchema(BaseModel):
     component_id: str
     name: str
     props: Dict
 
 
-class Component(IdentifiableMixin):
+class Component(BaseModel, IdentifiableMixin, FrontendMixin):
+
+    """Create
+
+    Returns:
+        _type_: _description_
+    """
 
     _self_identifiable_group: str = "components"
 
-    def __post_init__(self):
-        """This is needed to support dataclasses on Components.
-        https://docs.python.org/3/library/dataclasses.html#post-init-processing
-        """
-        super().__init__()
+    # @validator("*", pre=False)
+    # def check_inode(cls, value):
+    #     if isinstance(value, NodeMixin):
+    #         # Now value is a NodeMixin object
+    #         # We need to make sure that value points to a Node in the graph
+    #         # If it doesn't, we need to add it to the graph
+    #         if not value.has_inode():
+    #             value.attach_to_inode(value.create_inode())
 
-        # Custom setup
-        self.setup()
-
-        update_dict = {}
-        for k, v in self.__dict__.items():
-            new_v = v
-            if k not in ["_self_id", "name", "identifiable_group"] and not isinstance(v, NodeMixin):
-                # Convert literals to Store objects
-                new_v = Store(v)
-            elif k in ["_self_id", "name", "identifiable_group"]:
-                continue
-
-            # Now new_v is a NodeMixin object
-            # We need to make sure that new_v points to a Node in the graph
-            # If it doesn't, we need to add it to the graph
-            if not new_v.has_inode():
-                new_v.attach_to_inode(new_v.create_inode())
-            
-            # Now new_v is a NodeMixin object that points to a Node in the graph
-            update_dict[k] = new_v.inode # this will exist
-
-            assert isinstance(update_dict[k], Node)
-        
-        self.__dict__.update(update_dict)
-
-    def setup(self):
-        pass
+    #         # Now value is a NodeMixin object that points to a Node in the graph
+    #         return value.inode  # this will exist
+    #     return value
 
     def __getattribute__(self, name):
+        # TODO: when would a component actually hold a node
         value = super().__getattribute__(name)
         if isinstance(value, Node):
+            raise ValueError("Component holds node. TODO: understand why?")
             return value.obj
         return value
 
     @property
-    def config(self):
-        return ComponentConfig(
-            component_id=self.id, name=self.__class__.__name__, props=self.props
+    def frontend(self):
+        frontend_props = nested_apply(self.dict(), self._frontend)
+        return ComponentSchema(
+            component_id=self.id, name=self.__class__.__name__, props=frontend_props
         )
 
     @property
     def _backend_only(self):
         return ["id", "name", "identifiable_group"]
 
-    @property
-    def props(self):
-        props_dict = {}
-        for k, v in self.__dict__.items():
-            if k not in self._backend_only and v is not None:
-                if hasattr(v, "config"):
-                    if isinstance(v, Node) and (isinstance(v.obj, Store) or isinstance(v.obj, Endpoint)):
-                        props_dict[k] = v.obj.config
-                    else:
-                        props_dict[k] = v.config
-                else:
-                    props_dict[k] = v
-        return props_dict
+    @staticmethod
+    def _frontend(value):
+        if isinstance(value, FrontendMixin):
+            return value.frontend
+        return value

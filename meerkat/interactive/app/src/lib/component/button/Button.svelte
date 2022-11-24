@@ -6,15 +6,14 @@
 
 	let { dispatch } = getContext('Interface');
 
-	export let title: string = '';
+	export let title: Writable<string> = '';
 	export let on_click: Endpoint;
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
 	<button
 		on:click={(e) => {
-			let output = $dispatch(on_click.endpoint_id, {}, { type: e.type, detail: e.detail });
-			output.then((e) => console.log(e));
-		}}>{title}</button
+			$dispatch(on_click.endpoint_id, {}, { type: e.type, detail: e.detail });
+		}}>{$title}</button
 	>
 </div>
