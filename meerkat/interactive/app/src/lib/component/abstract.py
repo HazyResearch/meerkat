@@ -1,4 +1,6 @@
+import os
 from typing import Dict
+import inspect
 
 from pydantic import BaseModel, Extra, validator
 from meerkat.interactive.node import Node, NodeMixin
@@ -10,18 +12,13 @@ from meerkat.tools.utils import nested_apply
 
 class ComponentFrontend(BaseModel):
     component_id: str
+    path: str
     name: str
     props: Dict
 
 
 # need to pass the extra param in order to
 class Component(IdentifiableMixin, FrontendMixin, BaseModel):
-
-    """Create
-
-    Returns:
-        _type_: _description_
-    """
 
     _self_identifiable_group: str = "components"
 
@@ -56,10 +53,17 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
         frontend_props = nested_apply(
             {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k},
             _frontend,
-            base_types=(Store)
+            base_types=(Store),
         )
+
         return ComponentFrontend(
-            component_id=self.id, name=self.__class__.__name__, props=frontend_props
+            component_id=self.id,
+            path=os.path.join(
+                os.path.dirname(inspect.getfile(self.__class__)),
+                f"{self.__class__.__name__}.svelte",
+            ),
+            name=self.__class__.__name__,
+            props=frontend_props,
         )
 
     class Config:

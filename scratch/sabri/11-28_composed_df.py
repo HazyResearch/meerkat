@@ -1,5 +1,7 @@
 import meerkat as mk
 
+from mocha.component.test import Test
+
 df = mk.get("imagenette")
 
 tabs = mk.gui.Tabs(
@@ -13,7 +15,7 @@ tabs = mk.gui.Tabs(
     }
 )
 
-
+# gallery = Test()
 
 
 mk.gui.start(shareable=False)

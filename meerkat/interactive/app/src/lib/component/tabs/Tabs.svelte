@@ -40,6 +40,6 @@
 
 {#each tabs as {id, component}}
     {#if id === activeTabId}
-        <DynamicComponent name={component.name} props={component.props} />
+        <DynamicComponent {...component} />
     {/if}
 {/each}

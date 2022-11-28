@@ -201,7 +201,6 @@
 	};
 	$: setContext('Interface', context);
 
-
 	onMount(async () => {
 		document.title = config.name;
 	});
@@ -247,5 +246,9 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
-	<DynamicComponent name={config.component.name} props={config.component.props} />
+	<DynamicComponent
+		name={config.component.name}
+		path={config.component.path}
+		props={config.component.props}
+	/>
 </div>

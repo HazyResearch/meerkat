@@ -3,6 +3,7 @@ import type { Dictionary } from "underscore";
 
 export interface Component {
     component_id: string;
+    path: string;
     name: string;
     props: any; 
 }
