@@ -6,7 +6,10 @@ from typing import Callable, Dict, List, Union
 from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
-from meerkat.interactive.app.src.lib.component.abstract import Component, ComponentFrontend
+from meerkat.interactive.app.src.lib.component.abstract import (
+    Component,
+    ComponentFrontend,
+)
 from meerkat.interactive.frontend import FrontendMixin
 
 # from meerkat.interactive.app.src.lib.component.abstract import (
@@ -27,38 +30,18 @@ def interface(fn: Callable):
     return wrapper
 
 
-class LayoutConfig(BaseModel):
-    name: str
-    props: Dict
-
-
-@dataclass
-class Layout:
-    name: str = "DefaultLayout"
-    props: Dict[str, any] = field(default_factory=dict)
-
-    @property
-    def config(self):
-        return LayoutConfig(name=self.name, props=self.props)
-
-
-class InterfaceConfig(BaseModel):
-
-    layout: LayoutConfig
-    components: Union[List[ComponentFrontend], Dict[str, ComponentFrontend]]
+class InterfaceFrontend(BaseModel):
+    component: ComponentFrontend
     name: str
 
 
 class Interface(IdentifiableMixin):
-    # TODO (all): I think this should probably be a subclassable thing that people
-    # implement. e.g. TableInterface
 
     _self_identifiable_group: str = "interfaces"
 
     def __init__(
         self,
-        components: Union[List[Component], Dict[str, Component]] = None,
-        layout: Layout = None,
+        component: Component,
         name: str = "Interface",
         id: str = None,
     ):
@@ -67,13 +50,7 @@ class Interface(IdentifiableMixin):
 
         self.name = name
 
-        self.layout = layout
-        if self.layout is None:
-            self.layout = Layout()
-
-        self.components = components
-        if self.components is None:
-            self.components = []
+        self.component = component
 
     def get(self, id: str):
         try:
@@ -119,9 +96,5 @@ class Interface(IdentifiableMixin):
             code.interact(local=__main__.__dict__)
 
     @property
-    def config(self):
-        return InterfaceConfig(
-            name=self.name,
-            layout=self.layout.config,
-            components=nested_apply(self.components, lambda c: c.frontend if isinstance(c, FrontendMixin) else c),
-        )
+    def frontend(self):
+        return InterfaceFrontend(name=self.name, component=self.component.frontend)

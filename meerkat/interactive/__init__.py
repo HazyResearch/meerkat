@@ -19,7 +19,7 @@ from .app.src.lib.component.stats import Stats
 from .app.src.lib.component.stats_labeler import StatsLabeler
 from .app.src.lib.component.table import Table
 from .app.src.lib.component.textbox import Textbox
-from .app.src.lib.interfaces.abstract import Interface, Layout, interface
+from .app.src.lib.interfaces.abstract import Interface, interface
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
@@ -65,7 +65,6 @@ __all__ = [
     "interface",
     "reactive",
     "start",
-    "Layout",
     "Editor",
     "Sort",
     "StatsLabeler",

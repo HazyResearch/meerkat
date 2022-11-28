@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { setContext } from 'svelte';
-	import { writable } from 'svelte/store';
     import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
-    import {Component} from '$lib/utils/types';
+    import type {Component} from '$lib/utils/types';
 
 	interface Tab {
 		label: string;
@@ -11,6 +9,7 @@
 	}
 
 	export let tabs: Array<Tab> = [];
+    console.log(tabs);
     
     let activeTabId = '';
 
@@ -28,19 +27,19 @@
 	<div class="flex-grow flex justify-center">
 		{#each tabs as { label, id }}
 			<button
-				class="{$activeTabId === $id
+				class="{activeTabId === id
 					? 'active inline-block py-1 px-4 text-lg font-medium text-center text-white bg-violet-600 rounded-lg'
 					: 'inline-block py-1 px-4 text-lg font-medium text-center text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'} "
-				on:click={() => setActiveTab($id)}
+				on:click={() => setActiveTab(id)}
 			>
-				{$label}
+				{label}
 			</button>
 		{/each}
 	</div>
 </div>
 
 {#each tabs as {id, component}}
-    {#if id === $activeTabId}
+    {#if id === activeTabId}
         <DynamicComponent name={component.name} props={component.props} />
     {/if}
 {/each}

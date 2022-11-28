@@ -18,8 +18,7 @@ export interface Layout {
 
 export interface Interface {
     name: string;
-    layout: Layout;
-    components: Array<Component> | any 
+    component: Component
 }
 
 export interface EditTarget {

@@ -5,7 +5,7 @@ import uuid
 from meerkat.interactive.frontend import FrontendMixin
 from ..abstract import Component
 
-
+@dataclass
 class Tab(FrontendMixin):
     label: str
     component: Component
@@ -24,10 +24,10 @@ class Tabs(Component):
 
     tabs: Union[Mapping[str, Component], Sequence[Tab]]
 
-    def __post_init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         if isinstance(self.tabs, Mapping):
             self.tabs = [
                 Tab(label=label, component=component)
                 for label, component in self.tabs.items()
             ]
-        super().__post_init__()

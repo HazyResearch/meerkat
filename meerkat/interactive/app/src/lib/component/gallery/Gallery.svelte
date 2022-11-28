@@ -11,7 +11,7 @@
 
 	export let df: Writable;
 	export let main_column: Writable<string>;
-	export let tag_columns: Writable<Array<string>>;
+	export let tag_columns: Any; // Writable<Array<string>>;
 	// export let edit_target: Any;
 	export let primary_key: string;
 	export let selected: Writable<Array<string>>;
@@ -20,6 +20,8 @@
 	export let per_page: number = 20;
 
 	export let cell_size: number = 24;
+	console.log(main_column);
+	console.log(tag_columns);
 
 	$: schema_promise = $get_schema($df.ref_id);
 
@@ -27,13 +29,12 @@
 	$: rows_promise = $get_rows(
 		$df.ref_id,
 		page * per_page,
-		(page + 1) * per_page,
-		// TODO (Sabri): we should limit the columns only to the main_column and the 
+		(page + 1) * per_page
+		// TODO (Sabri): we should limit the columns only to the main_column and the
 		// tag_columns and primary_key as described below
 		// null,
 		// [$main_column, primary_key].concat($tag_columns)
 	);
-	$: console.log($df.ref_id)
 
 	// async function handle_edit(event: any) {
 	// 	let { pivot, pivot_id_column, id_column } = edit_target;

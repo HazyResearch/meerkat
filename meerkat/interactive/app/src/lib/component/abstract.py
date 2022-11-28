@@ -1,8 +1,6 @@
-from typing import ClassVar, Dict
-from dataclasses import is_dataclass, fields
+from typing import Dict
 
-from pydantic import BaseModel, Extra
-from meerkat.interactive.endpoint import Endpoint
+from pydantic import BaseModel, Extra, validator
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.frontend import FrontendMixin
@@ -27,24 +25,24 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
 
     _self_identifiable_group: str = "components"
 
-    # @validator("*", pre=False)
-    # def check_inode(cls, value):
-    #     if isinstance(value, NodeMixin):
-    #         # Now value is a NodeMixin object
-    #         # We need to make sure that value points to a Node in the graph
-    #         # If it doesn't, we need to add it to the graph
-    #         if not value.has_inode():
-    #             value.attach_to_inode(value.create_inode())
+    @validator("*", pre=False)
+    def check_inode(cls, value):
+        if isinstance(value, NodeMixin) and not isinstance(value, Store):
+            # Now value is a NodeMixin object
+            # We need to make sure that value points to a Node in the graph
+            # If it doesn't, we need to add it to the graph
+            if not value.has_inode():
+                value.attach_to_inode(value.create_inode())
 
-    #         # Now value is a NodeMixin object that points to a Node in the graph
-    #         return value.inode  # this will exist
-    #     return value
+            # Now value is a NodeMixin object that points to a Node in the graph
+            return value.inode  # this will exist
+        return value
 
     def __getattribute__(self, name):
-        # TODO: when would a component actually hold a node
         value = super().__getattribute__(name)
         if isinstance(value, Node):
-            raise ValueError("Component holds node. TODO: understand why?")
+            # because the validator above converts dataframes to nodes, when the
+            # dataframe is accessed we need to convert it back to the dataframe
             return value.obj
         return value
 
@@ -58,6 +56,7 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
         frontend_props = nested_apply(
             {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k},
             _frontend,
+            base_types=(Store)
         )
         return ComponentFrontend(
             component_id=self.id, name=self.__class__.__name__, props=frontend_props

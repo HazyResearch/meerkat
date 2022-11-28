@@ -25,6 +25,7 @@
 	import { nestedMap } from '$lib/utils/tools';
 	import type { EditTarget, Interface } from '$lib/utils/types';
 	import { onMount } from 'svelte';
+	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
 
@@ -200,22 +201,12 @@
 	};
 	$: setContext('Interface', context);
 
-	// check if config.components is an array or dict 
-	let component_array: Array<any>;
-	if (Array.isArray(config.components)) {
-		component_array = config.components;
-	} else {
-		component_array = Object.entries(config.components).map(([key, value]) => value);
-	}
 
-	let imported_layout: any;
 	onMount(async () => {
-		imported_layout = (await import(`$lib/layouts/${config.layout.name}.svelte`)).default;
 		document.title = config.name;
 	});
 
-
-	config.components = nestedMap(config.components, (v: any) => {
+	config.component = nestedMap(config.component, (v: any) => {
 		if (!v) {
 			return v;
 		}
@@ -238,48 +229,12 @@
 		} else if (v.ref_id !== undefined) {
 			if (!global_stores.has(v.ref_id)) {
 				// add it to the global_stores Map if it isn't already there
-				console.log(v);
 				global_stores.set(v.ref_id, writable(v));
 			}
 			return global_stores.get(v.ref_id);
 		}
 		return v;
 	});
-	
-	// for (let component of component_array ) {
-
-	// 	// Define the stores
-	// 	component.props = nestedMap(component.props, (v: any) => {
-	// 		if (!v) {
-	// 			return v;
-	// 		}
-	// 		if (v.store_id !== undefined) {
-	// 			// unpack the store
-	// 			if (!global_stores.has(v.store_id)) {
-	// 				// add it to the global_stores Map if it isn't already there
-	// 				let store = meerkat_writable(v.value);
-	// 				store.store_id = v.store_id;
-	// 				// Only stores that have children i.e. are part of the
-	// 				// computation graph are considered to be backend stores
-	// 				// If the store is not a backend store, then its value
-	// 				// will not be synchronized with the backend
-	// 				// Frontend only stores are useful to synchronize values
-	// 				// between frontend components
-	// 				store.backend_store = v.has_children;
-	// 				global_stores.set(v.store_id, store);
-	// 			}
-	// 			return global_stores.get(v.store_id);
-	// 		} else if (v.ref_id !== undefined) {
-	// 			if (!global_stores.has(v.ref_id)) {
-	// 				// add it to the global_stores Map if it isn't already there
-	// 				console.log(v);
-	// 				global_stores.set(v.ref_id, writable(v));
-	// 			}
-	// 			return global_stores.get(v.ref_id);
-	// 		}
-	// 		return v;
-	// 	});
-	// }
 </script>
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
@@ -292,15 +247,5 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
-	<svelte:component
-		this={imported_layout}
-		components={config.components}
-		{...config.layout.props}
-	/>
+	<DynamicComponent name={config.component.name} props={config.component.props} />
 </div>
-
-<style>
-	.dragger {
-		@apply opacity-0 hover:opacity-100 absolute top-0 left-0 select-none cursor-grab bg-violet-200 text-violet-600;
-	}
-</style>
