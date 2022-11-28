@@ -6,6 +6,8 @@ from typing import Callable, Dict, List, Union
 from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
+from meerkat.interactive.app.src.lib.component.abstract import Component, ComponentFrontend
+from meerkat.interactive.frontend import FrontendMixin
 
 # from meerkat.interactive.app.src.lib.component.abstract import (
 #     Component,
@@ -43,7 +45,7 @@ class Layout:
 class InterfaceConfig(BaseModel):
 
     layout: LayoutConfig
-    # components: Union[List[ComponentConfig], Dict[str, ComponentConfig]]
+    components: Union[List[ComponentFrontend], Dict[str, ComponentFrontend]]
     name: str
 
 
@@ -55,7 +57,7 @@ class Interface(IdentifiableMixin):
 
     def __init__(
         self,
-        # components: Union[List[Component], Dict[str, Component]] = None,
+        components: Union[List[Component], Dict[str, Component]] = None,
         layout: Layout = None,
         name: str = "Interface",
         id: str = None,
@@ -121,5 +123,5 @@ class Interface(IdentifiableMixin):
         return InterfaceConfig(
             name=self.name,
             layout=self.layout.config,
-            components=nested_apply(self.components, lambda c: c.config),
+            components=nested_apply(self.components, lambda c: c.frontend if isinstance(c, FrontendMixin) else c),
         )

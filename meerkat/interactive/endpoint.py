@@ -82,7 +82,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
         )
 
 
-class EndpointSchema(BaseModel):
+class EndpointFrontend(BaseModel):
     """A schema for sending an endpoint to the frontend."""
 
     endpoint_id: Union[str, None]
@@ -155,8 +155,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         self.route = route
 
     @property
-    def schema(self):
-        return EndpointSchema(
+    def frontend(self):
+        return EndpointFrontend(
             endpoint_id=self.id,
         )
 

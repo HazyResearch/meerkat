@@ -1,18 +1,8 @@
 <script lang="ts">
-	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
-	import { identity } from 'underscore';
-
-	export let subcomponent: any;
-</script>
-
-Hello
-<DynamicComponent name={subcomponent.name} props={subcomponent.props} />
-
-
-<script lang="ts">
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
     import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
+    import {Component} from '$lib/utils/types';
 
 	interface Tab {
 		label: string;

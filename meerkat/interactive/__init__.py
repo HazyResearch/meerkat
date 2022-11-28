@@ -24,7 +24,7 @@ from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
     Store,
-    StoreSchema,
+    StoreFrontend,
     reactive,
     make_store,
     trigger,
@@ -45,7 +45,7 @@ __all__ = [
     "DataFrameModification",
     "Document",
     "Store",
-    "StoreSchema",
+    "StoreFrontend",
     "make_store",
     "trigger",
     "Component",

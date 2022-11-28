@@ -1,7 +1,7 @@
 from typing import ClassVar, Dict
 from dataclasses import is_dataclass, fields
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Extra
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
@@ -10,13 +10,14 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.tools.utils import nested_apply
 
 
-class ComponentSchema(BaseModel):
+class ComponentFrontend(BaseModel):
     component_id: str
     name: str
     props: Dict
 
 
-class Component(BaseModel, IdentifiableMixin, FrontendMixin):
+# need to pass the extra param in order to
+class Component(IdentifiableMixin, FrontendMixin, BaseModel):
 
     """Create
 
@@ -49,17 +50,19 @@ class Component(BaseModel, IdentifiableMixin, FrontendMixin):
 
     @property
     def frontend(self):
-        frontend_props = nested_apply(self.dict(), self._frontend)
-        return ComponentSchema(
+        def _frontend(value):
+            if isinstance(value, FrontendMixin):
+                return value.frontend
+            return value
+
+        frontend_props = nested_apply(
+            {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k},
+            _frontend,
+        )
+        return ComponentFrontend(
             component_id=self.id, name=self.__class__.__name__, props=frontend_props
         )
 
-    @property
-    def _backend_only(self):
-        return ["id", "name", "identifiable_group"]
-
-    @staticmethod
-    def _frontend(value):
-        if isinstance(value, FrontendMixin):
-            return value.frontend
-        return value
+    class Config:
+        arbitrary_types_allowed = True
+        extra = Extra.allow

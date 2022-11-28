@@ -9,4 +9,8 @@ class FrontendMixin(ABC):
     @property
     @abstractmethod
     def frontend(self) -> BaseModel:
+        """Returns a Pydantic model that can be should be sent to the frontend. These
+        models are typically named <something>Frontend (e.g. ComponentFrontend, 
+        StoreFrontend). 
+        """
         raise NotImplementedError()

@@ -418,7 +418,7 @@ class no_react(react):
         super().__init__(reactive=False)
 
 
-class StoreSchema(BaseModel):
+class StoreFrontend(BaseModel):
     store_id: str
     value: Any
     has_children: bool
@@ -439,8 +439,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         self._self_backend_only = backend_only
 
     @property
-    def schema(self):
-        return StoreSchema(
+    def frontend(self):
+        return StoreFrontend(
             store_id=self.id,
             value=self.__wrapped__,
             has_children=self.inode.has_children() if self.inode else False,
@@ -453,7 +453,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def set(self, new_value: T):
         """Set the value of the store."""
         if isinstance(new_value, Store):
-            # if the value is a store, then we need to unpack it soit can be sent to the
+            # if the value is a store, then we need to unpack so it can be sent to the
             # frontend
             new_value = new_value.__wrapped__
 

@@ -1,25 +1,25 @@
 from dataclasses import dataclass, field
 from typing import Mapping, Sequence, Union
 import uuid
+
+from meerkat.interactive.frontend import FrontendMixin
 from ..abstract import Component
 
 
-@dataclass
-class Tab:
+class Tab(FrontendMixin):
     label: str
     component: Component
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     @property
-    def config(self):
+    def frontend(self):
         return {
             "id": self.id,
             "label": self.label,
-            "component": self.component.config,
+            "component": self.component.frontend,
         }
 
 
-@dataclass
 class Tabs(Component):
 
     tabs: Union[Mapping[str, Component], Sequence[Tab]]
