@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 class Row(Component):
 
     df: "DataFrame"
-    # The primary key column.
+    # The primary key column.a
     primary_key_column: Store[str]
     # The Cell specs
     cell_specs: Store[Dict[str, Dict[str, Any]]]
@@ -26,12 +26,3 @@ class Row(Component):
     # - value: the new value (value)
     on_change: Endpoint = None
 
-    # @property
-    # def props(self):
-    #     return {
-    #         "df": self.df.config,  # FIXME
-    #         "idx": self.idx.config,
-    #         "target": self.target.config,
-    #         "cell_specs": self.cell_specs,
-    #         "title": self.title,
-    #     }
