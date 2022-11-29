@@ -501,7 +501,11 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
 def store_field(value: str) -> Field:
     """ Utility for creating a pydantic field with a default factory that creates a 
-    Store object wrapping the given value. """
+    Store object wrapping the given value. 
+    
+    TODO (karan): Take a look at this again. I think we might be able to get rid of this
+    in favor of just passing value.
+    """
     return Field(default_factory=lambda: Store(value))
 
 
