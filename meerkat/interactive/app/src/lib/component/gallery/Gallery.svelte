@@ -12,7 +12,6 @@
 	export let df: Writable;
 	export let main_column: Writable<string>;
 	export let tag_columns: Any; // Writable<Array<string>>;
-	// export let edit_target: Any;
 	export let primary_key: string;
 	export let selected: Writable<Array<string>>;
 
@@ -20,8 +19,6 @@
 	export let per_page: number = 20;
 
 	export let cell_size: number = 24;
-	console.log(main_column);
-	console.log(tag_columns);
 
 	$: schema_promise = $get_schema($df.ref_id);
 

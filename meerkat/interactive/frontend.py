@@ -4,7 +4,12 @@ from abc import ABC, abstractmethod
 
 
 class FrontendMixin(ABC):
-    """A mixin for objects that can be sent to the frontend."""
+    """A mixin for objects that can be sent to the frontend.
+    
+    The purpose of this mixin is currently just to enable clean `isinstance` checks
+    when determining whether an object can be sent to the frontend. Each subclass 
+    needs to implement frontend themselves. 
+    """
 
     @property
     @abstractmethod

@@ -246,9 +246,7 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
-	<DynamicComponent
-		name={config.component.name}
-		path={config.component.path}
-		props={config.component.props}
-	/>
+	<div class="flex flex-col h-screen p-3">
+		<DynamicComponent {...config.component} />
+	</div>
 </div>

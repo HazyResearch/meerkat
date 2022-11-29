@@ -58,8 +58,8 @@ class Sort(Component):
     """
 
     df: DataFrame
-    criteria: List[SortCriterion] = Field(default_factory=list)
-    title: str = "Sort"
+    criteria: Store[List[SortCriterion]] = Field(default_factory=lambda: Store(list))
+    title: Store[str] = Store("Sort")
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

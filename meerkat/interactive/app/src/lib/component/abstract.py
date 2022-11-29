@@ -44,6 +44,10 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
         return value
 
     @property
+    def props(self):
+        return {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k}
+
+    @property
     def frontend(self):
         def _frontend(value):
             if isinstance(value, FrontendMixin):
@@ -51,7 +55,7 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
             return value
 
         frontend_props = nested_apply(
-            {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k},
+            self.props,
             _frontend,
             base_types=(Store),
         )
