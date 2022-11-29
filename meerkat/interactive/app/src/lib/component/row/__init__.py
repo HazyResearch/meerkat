@@ -13,9 +13,9 @@ class Row(Component):
 
     df: "DataFrame"
     # The primary key column.
-    primary_key_column: str
+    primary_key_column: Store[str]
     # The Cell specs
-    cell_specs: Dict[str, Dict[str, Any]]
+    cell_specs: Store[Dict[str, Dict[str, Any]]]
     # The selected key. This should be an element in primary_key_col.
     selected_key: Store[str] = None
     title: str = ""

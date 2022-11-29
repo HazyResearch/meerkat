@@ -166,11 +166,11 @@ class Filter(Component):
     This component will return a Reference object, which can be used downstream.
     """
     df: DataFrame
-    criteria: List[FilterCriterion] = Field(default_factory=list)
-    operations: List[str] = Field(
-        default_factory=lambda: list(_operator_str_to_func.keys())
+    criteria: Store[List[FilterCriterion]] = Field(default_factory=lambda: Store(list()))
+    operations: Store[List[str]] = Field(
+        default_factory=lambda: Store(list(_operator_str_to_func.keys()))
     )
-    title: str = "Filter"
+    title: Store[str] = Store("Filter")
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

@@ -1,7 +1,7 @@
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, Field
 from pydantic.fields import ModelField
 from tqdm import tqdm
 from wrapt import ObjectProxy
@@ -497,6 +497,10 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
                     raise ValidationError(error)
                 return cls(v)
         return v
+
+
+def store_field(value: str):
+    return Field(default_factory=lambda: Store(value))
 
 
 def make_store(value: Union[str, Storeable]) -> Store:

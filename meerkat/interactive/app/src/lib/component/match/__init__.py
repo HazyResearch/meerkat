@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from meerkat.interactive.graph import Store
+from meerkat.interactive.graph import Store, store_field
 from ..abstract import Component
 import re
 from typing import Callable, ClassVar, List, Optional, Tuple
@@ -137,10 +137,10 @@ class Match(Component):
 
     df: DataFrame
     against: Store[str]
-    text: Store[str] = Store("")
+    text: Store[str] = store_field("")
     encoder: str = "clip"
     on_match: Endpoint = None
-    title: Store[str] = Store("Match")
+    title: Store[str] = store_field("Match")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

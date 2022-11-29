@@ -12,7 +12,7 @@
 	export let primary_key_column: Writable<string>;
 	export let selected_key: Writable<string>;
 	export let cell_specs: any;
-	export let title: Writable<string> = "";
+	export let title: string = "";
 
 	export let on_change: Endpoint = null;
 
@@ -54,9 +54,9 @@
 </script>
 
 <div class="bg-slate-100 py-3 px-2 rounded-lg drop-shadow-md flex flex-col space-y-1">
-	{#if $title != ""}
+	{#if title != ""}
 	<div class="font-bold text-xl text-slate-600 self-start pl-2">
-		{$title}
+		{title}
 	</div>
 	{/if}
 	{#await schema_promise}
