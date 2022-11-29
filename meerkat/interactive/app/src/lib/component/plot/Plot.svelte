@@ -24,7 +24,7 @@
 	export let on_select: Endpoint = null;
 
 	// The columns corresponding to metadata to track.
-	export let metadata_columns: Writable<Array<string>>;
+	export let metadata_columns: Array<string>;
 
 	// Array of metadata objects. Each metadata object can have any arbitrary number
 	// of key-value pairs.
@@ -45,7 +45,7 @@
 			$x,
 			$y,
 			$primary_key,
-			...$metadata_columns
+			...metadata_columns
 		]);
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
@@ -57,10 +57,10 @@
 		});
 
 		// Update the metadata array.
-		if ($metadata_columns.length > 0) {
+		if (metadata_columns.length > 0) {
 			metadata = [];
 			rows.rows?.forEach((row: any) => {
-				const metadata_obj = $metadata_columns.reduce(
+				const metadata_obj = metadata_columns.reduce(
 					(accumulator: any, column: string, index: number) => {
 						accumulator[index] = row[index + 3];
 						return accumulator;

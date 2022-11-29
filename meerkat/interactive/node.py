@@ -1,27 +1,28 @@
 from collections import defaultdict
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.interactive.frontend import FrontendMixin
 
 
-class NodeConfig(BaseModel):
+class NodeFrontendModel(BaseModel):
     ref_id: str
     type: str
     is_store: bool = True
 
 
-class Node(IdentifiableMixin):
+class Node(IdentifiableMixin, FrontendMixin):
 
     _self_identifiable_group: str = "nodes"
 
     def __init__(self, obj: any, **kwargs):
-        """ A node in the computational graph. This could be an object or an operation. 
+        """A node in the computational graph. This could be an object or an operation.
 
         Args:
-            obj (any): This could be any class that has NodeMixin (e.g. store, 
-                Operation, DataFrame, Column). 
+            obj (any): This could be any class that has NodeMixin (e.g. store,
+                Operation, DataFrame, Column).
         """
         super().__init__(**kwargs)
         self.obj = obj
@@ -42,8 +43,8 @@ class Node(IdentifiableMixin):
         self.children[child] = triggers | self.children[child]
 
     @property
-    def config(self):
-        return NodeConfig(
+    def frontend(self):
+        return NodeFrontendModel(
             ref_id=self.id,
             type=self.obj.__class__.__name__,
         )
@@ -73,9 +74,9 @@ class Node(IdentifiableMixin):
         return any(self.children.values())
 
 
-class NodeMixin:
+class NodeMixin(FrontendMixin):
     """
-    Mixin for Classes whose objects can be attached to a node in the computation graph. 
+    Mixin for Classes whose objects can be attached to a node in the computation graph.
 
     Add this mixin to any class whose objects should be nodes
     in a graph.
@@ -92,27 +93,6 @@ class NodeMixin:
         # self._self_children: Dict[Node, bool] = dict()
         self._self_inode = None  # Node(self)
         # self._set_node_id()
-
-    @property
-    def config(self):
-        # TODO(karan): maybe this method should be removed
-        # to prevent confusion (so you have to explicitly)
-        # call self.inode.config (and if inode is None, then
-        # create a node yourself and return its config)
-        """Returns the config for the node."""
-        # We used to assert if it wasn't already in the graph
-        # assert (
-        #     self.inode is not None
-        # ), (
-        #     "Something went wrong -- this object must be attached "
-        #     "to a node in the graph."
-        # )
-        if self.inode is None:
-            # to create a config that can be sent to the frontend 
-            # the object must be attached to a node in the graph
-            self.attach_to_inode(self.create_inode())
-
-        return self.inode.config
 
     def attach_to_inode(self, inode: Node):
         """
@@ -159,6 +139,21 @@ class NodeMixin:
     def _set_inode(self):
         """Sets the node for this object."""
         self._self_inode = None
+
+    @property
+    def frontend(self) -> BaseModel:
+        return self.inode.frontend
+
+    @classmethod
+    def __get_validators__(cls):
+        # Needed to ensure that NodeMixins can be used as
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, cls):
+            raise ValidationError(f"Expected {cls.__name__}, got {type(v).__name__}")
+        return v
 
 
 def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:

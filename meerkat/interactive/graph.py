@@ -1,7 +1,8 @@
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, Field
+from pydantic.fields import ModelField
 from tqdm import tqdm
 from wrapt import ObjectProxy
 
@@ -122,7 +123,6 @@ def trigger() -> List[Modification]:
                 new_modifications.extend(mods)
                 pbar.update(1)
         print("done")
-
 
     # Clear out the modification queue
     state.modification_queue.clear()
@@ -418,7 +418,7 @@ class no_react(react):
         super().__init__(reactive=False)
 
 
-class StoreConfig(BaseModel):
+class StoreFrontend(BaseModel):
     store_id: str
     value: Any
     has_children: bool
@@ -433,14 +433,14 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __init__(self, wrapped: T, backend_only: bool = False):
         super().__init__(wrapped=wrapped)
         # Set up these attributes so we can create the
-        # config and detail properties.
-        self._self_config = None
+        # schema and detail properties.
+        self._self_schema = None
         self._self_detail = None
         self._self_backend_only = backend_only
 
     @property
-    def config(self):
-        return StoreConfig(
+    def frontend(self):
+        return StoreFrontend(
             store_id=self.id,
             value=self.__wrapped__,
             has_children=self.inode.has_children() if self.inode else False,
@@ -453,7 +453,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def set(self, new_value: T):
         """Set the value of the store."""
         if isinstance(new_value, Store):
-            # if the value is a store, then we need to unpack it soit can be sent to the
+            # if the value is a store, then we need to unpack so it can be sent to the
             # frontend
             new_value = new_value.__wrapped__
 
@@ -477,6 +477,32 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __add__(self, other):
         # TODO (arjun): This should not fail with karan's changes.
         return super().__add__(other)
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v, field: ModelField):
+        if not isinstance(v, cls):
+            if not field.sub_fields:
+                # Generic parameters were not provided so we don't try to validate
+                # them and just return the value as is
+                return cls(v)
+            else:
+                # Generic parameters were provided so we try to validate them
+                # and return a Store object
+                v, error = field.sub_fields[0].validate(v, {}, loc="value")
+                if error:
+                    raise ValidationError(error)
+                return cls(v)
+        return v
+
+
+def store_field(value: str) -> Field:
+    """ Utility for creating a pydantic field with a default factory that creates a 
+    Store object wrapping the given value. """
+    return Field(default_factory=lambda: Store(value))
 
 
 def make_store(value: Union[str, Storeable]) -> Store:

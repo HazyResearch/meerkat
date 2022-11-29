@@ -14,7 +14,7 @@
 	export let text: Writable<string>;
 	export let title: Writable<string> = '';
 	export let get_match_schema: Endpoint;
-
+	
 	let status: string = 'waiting';
 
 	let schema_promise;
@@ -25,6 +25,7 @@
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
 	}
+	console.log(on_match)
 
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();

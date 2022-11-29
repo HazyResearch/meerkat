@@ -116,6 +116,7 @@
 					content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML
 				}}
 			>
+				{subcontent.column}
 				<Cell {...subcontent} />
 				{#if content_tooltip}
 					<div id="{id}-content-tooltip-{j}" class="hidden">

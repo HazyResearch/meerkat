@@ -10,6 +10,7 @@ from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.markdown import Markdown
 from .app.src.lib.component.match import Match
+from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.row import Row
 from .app.src.lib.component.slicebycards import SliceByCards
@@ -18,12 +19,12 @@ from .app.src.lib.component.stats import Stats
 from .app.src.lib.component.stats_labeler import StatsLabeler
 from .app.src.lib.component.table import Table
 from .app.src.lib.component.textbox import Textbox
-from .app.src.lib.interfaces.abstract import Interface, Layout, interface
+from .interface import Interface, interface
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, make_endpoint
 from .graph import (
     Store,
-    StoreConfig,
+    StoreFrontend,
     reactive,
     make_store,
     trigger,
@@ -44,12 +45,11 @@ __all__ = [
     "DataFrameModification",
     "Document",
     "Store",
-    "StoreConfig",
+    "StoreFrontend",
     "make_store",
     "trigger",
     "Component",
-    "Discover"
-    "Gallery",
+    "Discover" "Gallery",
     "Markdown",
     "Match",
     "Row",
@@ -58,12 +58,12 @@ __all__ = [
     "Stats",
     "EditTarget",
     "Table",
+    "Tabs",
     "Filter",
     "Interface",
     "interface",
     "reactive",
     "start",
-    "Layout",
     "Editor",
     "Sort",
     "StatsLabeler",

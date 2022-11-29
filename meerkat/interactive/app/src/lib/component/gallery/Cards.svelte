@@ -74,7 +74,7 @@
 					}
 				}}
 				content={pivot_height >= 15 || num_columns <= 6
-					? tag_indices.map((z) => ({ data: row[z] }))
+					? tag_indices.map((z) => ({ data: row[z], column: columns[z] }))
 					: []}
 				{layout}
 				pivot_tooltip={true}

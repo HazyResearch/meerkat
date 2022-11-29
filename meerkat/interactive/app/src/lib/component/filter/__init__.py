@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from meerkat.dataframe import DataFrame
 from meerkat.columns.abstract import AbstractColumn
@@ -158,25 +157,20 @@ def filter(
     return data.lz[mask]
 
 
-@dataclass
 class Filter(Component):
-    """This component handles filtering of the pivot dataframe.
+    """This component handles filtering of a dataframe.
 
     Filtering criteria are maintained in a Store. On change of values
     in the store, the dataframe is filtered.
 
     This component will return a Reference object, which can be used downstream.
-
-    We recommend performing filtering before other out-of-place operations,
-    like sorting, to avoid unnecessary computation.
     """
-
     df: DataFrame
-    criteria: List[FilterCriterion] = field(default_factory=list)
-    operations: List[str] = field(
-        default_factory=lambda: list(_operator_str_to_func.keys())
+    criteria: Store[List[FilterCriterion]] = Field(default_factory=lambda: Store(list()))
+    operations: Store[List[str]] = Field(
+        default_factory=lambda: Store(list(_operator_str_to_func.keys()))
     )
-    title: str = "Filter"
+    title: Store[str] = Store("Filter")
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

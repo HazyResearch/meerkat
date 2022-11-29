@@ -10,7 +10,6 @@
 
 	export let df: Writable;
 	export let by: Writable<string>;
-	export let target: Writable<string>;
 	export let on_discover: Endpoint;
 	export let get_discover_schema: Endpoint;
 

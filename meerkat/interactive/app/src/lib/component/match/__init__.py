@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from meerkat.interactive.graph import Store
+from meerkat.interactive.graph import Store, store_field
 from ..abstract import Component
 import re
 from typing import Callable, ClassVar, List, Optional, Tuple
@@ -113,7 +113,6 @@ def set_criterion(
     return criterion.__wrapped__
 
 
-
 @dataclass
 class MatchCriterion:
     against: str
@@ -122,11 +121,10 @@ class MatchCriterion:
     query_embedding: np.ndarray = None
 
 
-
 @reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
-    df = df.view() 
-    if criterion == None: 
+    df = df.view()
+    if criterion == None:
         return df, None
 
     data_embedding = df[criterion.against]
@@ -135,18 +133,17 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     return df, criterion.name
 
 
-@dataclass
 class Match(Component):
 
-    df: "DataFrame"
-    against: str
-    text: str = ""
+    df: DataFrame
+    against: Store[str]
+    text: Store[str] = store_field("")
     encoder: str = "clip"
     on_match: Endpoint = None
-    title: str = "Match"
+    title: Store[str] = store_field("Match")
 
-    def __post_init__(self):
-        super().__post_init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # we do not add the against or the query to the partial, because we don't
         # want them to be maintained on the backend
@@ -170,13 +167,13 @@ class Match(Component):
         self.on_match = on_match
 
     @property
-    def _backend_only(self):
-        return ["criterion"] + super()._backend_only
-    
+    def props(self):
+        props = super().props
+        props["get_match_schema"] = self.get_match_schema
+        return props
+
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:
             df = self.df
 
         return compute_match_scores(df, self.criterion)
-    
-

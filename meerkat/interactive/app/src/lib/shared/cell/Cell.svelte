@@ -3,6 +3,7 @@
 
 	export interface CellInterface {
 		data: any;
+		column?: string;
 		cell_component?: string;
 		cell_props?: object;
 	}
@@ -15,6 +16,7 @@
 	import BasicType from './basic/Basic.svelte';
 
 	export let data: any;
+	export let column: string = null;
 	export let cell_component: string = '';
 	export let cell_props: object = {};
 	export let editable: boolean = false;

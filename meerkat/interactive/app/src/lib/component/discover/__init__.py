@@ -1,16 +1,8 @@
-from dataclasses import dataclass
 from ..abstract import Component
-import re
-from typing import Callable, List, Optional, Tuple
-import ast
-
-from fastapi import HTTPException
-import numpy as np
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
-
-# from meerkat.interactive.modification import Modification
+from meerkat.interactive.graph import Store
 
 
 @endpoint
@@ -41,29 +33,36 @@ def discover(df: DataFrame, by: str, target: str, pred: str):
         n_slices=10,
         n_mixture_components=10,
         n_pca_components=256,
-        use_cache=False
+        use_cache=False,
     )
     return eb
 
 
-@dataclass
 class Discover(Component):
 
-    df: "DataFrame"
-    by: str = None
+    df: DataFrame
+    by: Store[str]
     target: str = None
     pred: str = None
     on_discover: Endpoint = None
 
-    def __post_init__(self):
-        super().__post_init__()
+    @property
+    def props(self):
+        return {
+            "df": self.df,
+            "by": self.by,
+            "on_discover": self.on_discover,
+            "get_discover_schema": self.get_discover_schema,
+        }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.get_discover_schema = get_discover_schema.partial(
             df=self.df,
         )
 
-        on_discover = discover.partial(
-            df=self.df, target=self.target, pred=self.pred)
+        on_discover = discover.partial(df=self.df, target=self.target, pred=self.pred)
         if self.on_discover is not None:
             on_discover = on_discover.compose(self.on_discover)
         self.on_discover = on_discover

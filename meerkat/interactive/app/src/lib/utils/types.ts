@@ -3,6 +3,7 @@ import type { Dictionary } from "underscore";
 
 export interface Component {
     component_id: string;
+    path: string;
     name: string;
     props: any; 
 }
@@ -18,8 +19,7 @@ export interface Layout {
 
 export interface Interface {
     name: string;
-    layout: Layout;
-    components: Array<Component> | any 
+    component: Component
 }
 
 export interface EditTarget {

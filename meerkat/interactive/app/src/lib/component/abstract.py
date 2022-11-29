@@ -1,82 +1,75 @@
-from typing import ClassVar, Dict
+import os
+from typing import Dict
+import inspect
 
-from pydantic import BaseModel
-from meerkat.interactive.endpoint import Endpoint
+from pydantic import BaseModel, Extra, validator
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.graph import Store
+from meerkat.interactive.frontend import FrontendMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.tools.utils import nested_apply
 
 
-class ComponentConfig(BaseModel):
+class ComponentFrontend(BaseModel):
     component_id: str
+    path: str
     name: str
     props: Dict
 
 
-class Component(IdentifiableMixin):
+# need to pass the extra param in order to
+class Component(IdentifiableMixin, FrontendMixin, BaseModel):
 
     _self_identifiable_group: str = "components"
 
-    def __post_init__(self):
-        """This is needed to support dataclasses on Components.
-        https://docs.python.org/3/library/dataclasses.html#post-init-processing
-        """
-        super().__init__()
-
-        # Custom setup
-        self.setup()
-
-        update_dict = {}
-        for k, v in self.__dict__.items():
-            new_v = v
-            if k not in ["_self_id", "name", "identifiable_group"] and not isinstance(v, NodeMixin):
-                # Convert literals to Store objects
-                new_v = Store(v)
-            elif k in ["_self_id", "name", "identifiable_group"]:
-                continue
-
-            # Now new_v is a NodeMixin object
-            # We need to make sure that new_v points to a Node in the graph
+    @validator("*", pre=False)
+    def check_inode(cls, value):
+        if isinstance(value, NodeMixin) and not isinstance(value, Store):
+            # Now value is a NodeMixin object
+            # We need to make sure that value points to a Node in the graph
             # If it doesn't, we need to add it to the graph
-            if not new_v.has_inode():
-                new_v.attach_to_inode(new_v.create_inode())
-            
-            # Now new_v is a NodeMixin object that points to a Node in the graph
-            update_dict[k] = new_v.inode # this will exist
+            if not value.has_inode():
+                value.attach_to_inode(value.create_inode())
 
-            assert isinstance(update_dict[k], Node)
-        
-        self.__dict__.update(update_dict)
-
-    def setup(self):
-        pass
+            # Now value is a NodeMixin object that points to a Node in the graph
+            return value.inode  # this will exist
+        return value
 
     def __getattribute__(self, name):
         value = super().__getattribute__(name)
         if isinstance(value, Node):
+            # because the validator above converts dataframes to nodes, when the
+            # dataframe is accessed we need to convert it back to the dataframe
             return value.obj
         return value
 
     @property
-    def config(self):
-        return ComponentConfig(
-            component_id=self.id, name=self.__class__.__name__, props=self.props
+    def props(self):
+        return {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k}
+
+    @property
+    def frontend(self):
+        def _frontend(value):
+            if isinstance(value, FrontendMixin):
+                return value.frontend
+            return value
+
+        frontend_props = nested_apply(
+            self.props,
+            _frontend,
+            base_types=(Store),
         )
 
-    @property
-    def _backend_only(self):
-        return ["id", "name", "identifiable_group"]
+        return ComponentFrontend(
+            component_id=self.id,
+            path=os.path.join(
+                os.path.dirname(inspect.getfile(self.__class__)),
+                f"{self.__class__.__name__}.svelte",
+            ),
+            name=self.__class__.__name__,
+            props=frontend_props,
+        )
 
-    @property
-    def props(self):
-        props_dict = {}
-        for k, v in self.__dict__.items():
-            if k not in self._backend_only and v is not None:
-                if hasattr(v, "config"):
-                    if isinstance(v, Node) and (isinstance(v.obj, Store) or isinstance(v.obj, Endpoint)):
-                        props_dict[k] = v.obj.config
-                    else:
-                        props_dict[k] = v.config
-                else:
-                    props_dict[k] = v
-        return props_dict
+    class Config:
+        arbitrary_types_allowed = True
+        extra = Extra.allow
