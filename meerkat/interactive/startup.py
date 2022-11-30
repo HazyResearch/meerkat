@@ -3,6 +3,7 @@
 Code is heavily borrowed from Gradio.
 """
 
+import fnmatch
 import os
 import pathlib
 import re
@@ -22,6 +23,17 @@ from meerkat.interactive.server import (
 )
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import NetworkInfo, state
+
+
+def file_find_replace(directory, find, replace, pattern):
+    for path, _, files in os.walk(os.path.abspath(directory)):
+        for filename in fnmatch.filter(files, pattern):
+            filepath = os.path.join(path, filename)
+            with open(filepath) as f:
+                s = f.read()
+            s = s.replace(find, replace)
+            with open(filepath, "w") as f:
+                f.write(s)
 
 
 def is_notebook() -> bool:
@@ -78,6 +90,7 @@ def start(
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
+    dev: bool = True,
 ):
     """Start a Meerkat interactive server.
 
@@ -154,54 +167,92 @@ def start(
         current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
     else:
         current_env.update({"VITE_API_URL": network_info.api_server_url})
-
+    
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
     err_file, err_path = mkstemp(suffix=".err")
+    
+    if dev:
+        npm_process = subprocess.Popen(
+            [
+                "npm",
+                "run",
+                "dev",
+                "--",
+                "--port",
+                str(npm_port),
+                "--logLevel",
+                "info",
+            ],
+            env=current_env,
+            stdout=out_file,
+            stderr=err_file,
+        )
+    else:
+        print("Building Application...")
+        p = subprocess.Popen(
+            [
+                "npm",
+                "run",
+                "build",
+            ],
+            env=current_env,
+            stdout=subprocess.PIPE,
+            stderr=err_file,
+        )
+        while p.poll() is None:
+            out = p.stdout.readline()
+            print(out, end='\r')
+        
+        # find + replace VITE_API_URL_PLACEHOLDER for production
+        buildpath = libpath / "build"
+        file_find_replace(buildpath, "meerkat-api-url?!?!?!?!", network_info.shareable_api_server_url if shareable else network_info.api_server_url, "*.js")
 
-    npm_process = subprocess.Popen(
-        [
-            "npm",
-            "run",
-            "dev",
-            "--",
-            "--port",
-            str(npm_port),
-            "--logLevel",
-            "info",
-        ],
-        env=current_env,
-        stdout=out_file,
-        stderr=err_file,
-    )
+        os.chdir(buildpath)
+        npm_process = subprocess.Popen(
+            [
+                "python",
+                "-m",
+                "http.server",
+                str(npm_port),
+            ],
+            env=current_env,
+            stdout=out_file,
+            stderr=err_file,
+        )
+        os.chdir(libpath)
+        
     network_info.npm_process = npm_process
     network_info.npm_out_path = out_path
-    network_info.npm_err_path = err_path
+    network_info.npm_err_path = err_path    
+        
+    if dev:
+        MAX_WAIT = 10
+        for i in range(MAX_WAIT):
+            time.sleep(0.5)
 
-    MAX_WAIT = 10
-    for i in range(MAX_WAIT):
-        time.sleep(0.5)
+            # this is a hack to address the issue that the vite skips over a port that we
+            # deem to be open per `get_first_available_port`
+            # TODO: remove this once we figure out how to properly check for unavailable
+            # ports in a way that is compatible with vite's port selection logic
+            match = re.search(
+                "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
+                network_info.npm_server_out,
+            )
+            if match is not None:
+                break
 
-        # this is a hack to address the issue that the vite skips over a port that we
-        # deem to be open per `get_first_available_port`
-        # TODO: remove this once we figure out how to properly check for unavailable
-        # ports in a way that is compatible with vite's port selection logic
-        match = re.search(
-            "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
-            network_info.npm_server_out,
-        )
-        if match is not None:
-            break
+        # TODO(Sabri): add check for Vite actually being installed, and provide instructions
+        # in the error message for fixing
 
-    # TODO(Sabri): add check for Vite actually being installed, and provide instructions
-    # in the error message for fixing
-
-    if match is None:
-        raise ValueError(
-            f"Failed to start dev server: \
-            out={network_info.npm_server_out} err={network_info.npm_server_err}"
-        )
-    network_info.npm_server_port = int(match.group(2))
+        if match is None:
+            raise ValueError(
+                f"Failed to start dev server: \
+                out={network_info.npm_server_out} err={network_info.npm_server_err}"
+            )
+        network_info.npm_server_port = int(match.group(2))
+    else:
+        network_info.npm_server_port = npm_port
 
     if shareable:
         domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)

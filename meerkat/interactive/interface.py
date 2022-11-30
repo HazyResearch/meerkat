@@ -74,10 +74,10 @@ class Interface(IdentifiableMixin):
 
         if state.network_info.shareable_npm_server_name is not None:
             url = (
-                f"{state.network_info.shareable_npm_server_url}/interface?id={self.id}"
+                f"{state.network_info.shareable_npm_server_url}?id={self.id}"
             )
         else:
-            url = f"{state.network_info.npm_server_url}/interface?id={self.id}"
+            url = f"{state.network_info.npm_server_url}?id={self.id}"
 
         if return_url:
             return url
