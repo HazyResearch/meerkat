@@ -231,7 +231,7 @@
 </script>
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
-<!-- 
+
 <div class="h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<StoreComponent
@@ -245,4 +245,4 @@
 			<DynamicComponent {...config.component} />
 		{/if}
 	</div>
-</div> -->
+</div>
