@@ -1,19 +1,3 @@
-<script context="module">
-	/** @type {import('./__types/[slug]').Load} */
-	export async function load({ url, fetch }) {
-		let api_server_url = import.meta.env['VITE_API_URL'];
-		const id = url.searchParams.get('id');
-		const response = await fetch(`${api_server_url}/interface/${id}/config`);
-
-		return {
-			status: response.status,
-			props: {
-				config: response.ok && (await response.json())
-			}
-		};
-	}
-</script>
-
 <script lang="ts">
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
@@ -28,8 +12,6 @@
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
 
 	let api_url = writable(import.meta.env['VITE_API_URL']);
-
-	export let config: Interface;
 
 	$: store_trigger = async (store_id: string, value: any) => {
 		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
@@ -201,39 +183,49 @@
 	};
 	$: setContext('Interface', context);
 
+	let config: Interface = null;
 	onMount(async () => {
+		const id = new URLSearchParams(window.location.search).get('id');
+		config = await (
+			await fetch(`${$api_url}/interface/${id}/config`)
+		).json();
+
 		document.title = config.name;
 	});
 
-	config.component = nestedMap(config.component, (v: any) => {
-		if (!v) {
-			return v;
+	$: {
+		if (config && config.component) {
+			config.component = nestedMap(config.component, (v: any) => {
+				if (!v) {
+					return v;
+				}
+				if (v.store_id !== undefined) {
+					// unpack the store
+					if (!global_stores.has(v.store_id)) {
+						// add it to the global_stores Map if it isn't already there
+						let store = meerkat_writable(v.value);
+						store.store_id = v.store_id;
+						// Only stores that have children i.e. are part of the
+						// computation graph are considered to be backend stores
+						// If the store is not a backend store, then its value
+						// will not be synchronized with the backend
+						// Frontend only stores are useful to synchronize values
+						// between frontend components
+						store.backend_store = v.has_children;
+						global_stores.set(v.store_id, store);
+					}
+					return global_stores.get(v.store_id);
+				} else if (v.ref_id !== undefined) {
+					if (!global_stores.has(v.ref_id)) {
+						// add it to the global_stores Map if it isn't already there
+						global_stores.set(v.ref_id, writable(v));
+					}
+					return global_stores.get(v.ref_id);
+				}
+				return v;
+			});
 		}
-		if (v.store_id !== undefined) {
-			// unpack the store
-			if (!global_stores.has(v.store_id)) {
-				// add it to the global_stores Map if it isn't already there
-				let store = meerkat_writable(v.value);
-				store.store_id = v.store_id;
-				// Only stores that have children i.e. are part of the
-				// computation graph are considered to be backend stores
-				// If the store is not a backend store, then its value
-				// will not be synchronized with the backend
-				// Frontend only stores are useful to synchronize values
-				// between frontend components
-				store.backend_store = v.has_children;
-				global_stores.set(v.store_id, store);
-			}
-			return global_stores.get(v.store_id);
-		} else if (v.ref_id !== undefined) {
-			if (!global_stores.has(v.ref_id)) {
-				// add it to the global_stores Map if it isn't already there
-				global_stores.set(v.ref_id, writable(v));
-			}
-			return global_stores.get(v.ref_id);
-		}
-		return v;
-	});
+	}
 </script>
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
@@ -247,6 +239,8 @@
 		/>
 	{/each}
 	<div class="flex flex-col h-screen p-3">
-		<DynamicComponent {...config.component} />
+		{#if config}
+			<DynamicComponent {...config.component} />
+		{/if}
 	</div>
 </div>
