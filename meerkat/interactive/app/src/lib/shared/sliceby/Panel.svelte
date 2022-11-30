@@ -1,18 +1,10 @@
-<script context="module" lang="ts">
-	export type SliceType = {
-		name: string;
-		descriptions: Array<{ score: number; description: string; }>;
-		stats: StatsType;
-		instances: Array<InstanceType>;
-		plot: { PLOT_TYPE: string; matrix: undefined|MatrixType; html: string; };
-	};
-</script>
-
 <script lang="ts">
-	import Instance, { type InstanceType } from './Instance.svelte';
+	import Instance from './Instance.svelte';
+	import type { InstanceType } from '$lib/utils/types';
 	import Description from './Description.svelte';
 	import Matrix, { type MatrixType } from './matrix/Matrix.svelte';
-	import Stats, { type StatsType } from './Stats.svelte';
+	import Stats from './Stats.svelte';
+	import type { StatsType } from '$lib/utils/types';
 
 	export let name: string;
 	export let descriptions: Array<{ score: number; description: string; }>;

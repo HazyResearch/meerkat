@@ -10,11 +10,13 @@
 	import type { EditTarget, Interface } from '$lib/utils/types';
 	import { onMount } from 'svelte';
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
-
-	let api_url = writable(import.meta.env['VITE_API_URL']);
+	
+	// Use VITE_API_URL for dev, VITE_API_URL_PLACEHOLDER for prod
+	// TODO: select based on NODE_ENV instead of OR below
+	const API_URL = import.meta.env['VITE_API_URL'] || import.meta.env['VITE_API_URL_PLACEHOLDER'];
 
 	$: store_trigger = async (store_id: string, value: any) => {
-		let modifications = await modify(`${$api_url}/store/${store_id}/trigger`, { value: value });
+		let modifications = await modify(`${API_URL}/store/${store_id}/trigger`, { value: value });
 		return modifications;
 	};
 
@@ -22,7 +24,7 @@
 		if (endpoint_id === null) {
 			return;
 		}
-		let [result, modifications] = await post(`${$api_url}/endpoint/${endpoint_id}/dispatch`, {
+		let [result, modifications] = await post(`${API_URL}/endpoint/${endpoint_id}/dispatch`, {
 			fn_kwargs: kwargs,
 			payload: payload
 		});
@@ -31,7 +33,7 @@
 	};
 
 	$: get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
-		return await post(`${$api_url}/df/${ref_id}/schema`, { columns: columns });
+		return await post(`${API_URL}/df/${ref_id}/schema`, { columns: columns });
 	};
 
 	$: get_rows = async (
@@ -43,7 +45,7 @@
 		key_column?: string,
 		keys?: Array<string | number>
 	) => {
-		let result = await post(`${$api_url}/df/${ref_id}/rows`, {
+		let result = await post(`${API_URL}/df/${ref_id}/rows`, {
 			start: start,
 			end: end,
 			indices: indices,
@@ -55,7 +57,7 @@
 	};
 
 	$: add = async (ref_id: string, column_name: string) => {
-		let modifications = await modify(`${$api_url}/df/${ref_id}/add`, { column: column_name });
+		let modifications = await modify(`${API_URL}/df/${ref_id}/add`, { column: column_name });
 		return modifications;
 	};
 
@@ -66,7 +68,7 @@
 		row_id: string | number,
 		id_column: string
 	) => {
-		let modifications = await modify(`${$api_url}/df/${ref_id}/edit`, {
+		let modifications = await modify(`${API_URL}/df/${ref_id}/edit`, {
 			value: value,
 			column: column,
 			row_id: row_id,
@@ -85,7 +87,7 @@
 		primary_key: string,
 		metadata: any
 	) => {
-		let modifications = await modify(`${$api_url}/df/${ref_id}/edit_target`, {
+		let modifications = await modify(`${API_URL}/df/${ref_id}/edit_target`, {
 			target: target,
 			value: value,
 			column: column,
@@ -98,7 +100,7 @@
 	};
 
 	$: match = async (ref_id: string, input: string, query: string, col_out: Writable<string>) => {
-		let modifications = await modify(`${$api_url}/ops/${ref_id}/match`, {
+		let modifications = await modify(`${API_URL}/ops/${ref_id}/match`, {
 			input: input,
 			query: query,
 			col_out: col_out.store_id
@@ -107,7 +109,7 @@
 	};
 
 	$: get_sliceby_info = async (ref_id: string) => {
-		return await get_request(`${$api_url}/sliceby/${ref_id}/info`);
+		return await get_request(`${API_URL}/sliceby/${ref_id}/info`);
 	};
 
 	$: get_sliceby_rows = async (
@@ -116,7 +118,7 @@
 		start?: number,
 		end?: number
 	) => {
-		return await post(`${$api_url}/sliceby/${ref_id}/rows`, {
+		return await post(`${API_URL}/sliceby/${ref_id}/rows`, {
 			slice_key: slice_key,
 			start: start,
 			end: end
@@ -126,7 +128,7 @@
 	$: aggregate_sliceby = async (ref_id: string, aggregations: { string: { id: string } }) => {
 		let out = Object();
 		for (const [name, aggregation] of Object.entries(aggregations)) {
-			out[name] = await post(`${$api_url}/sliceby/${ref_id}/aggregate/`, {
+			out[name] = await post(`${API_URL}/sliceby/${ref_id}/aggregate/`, {
 				aggregation_id: aggregation.id,
 				accepts_df: true
 			});
@@ -135,7 +137,7 @@
 	};
 
 	$: remove_row_by_index = async (ref_id: string, row_index: number) => {
-		let modifications = await modify(`${$api_url}/df/${ref_id}/remove_row_by_index`, {
+		let modifications = await modify(`${API_URL}/df/${ref_id}/remove_row_by_index`, {
 			row_index: row_index
 		});
 		return modifications;
@@ -187,7 +189,7 @@
 	onMount(async () => {
 		const id = new URLSearchParams(window.location.search).get('id');
 		config = await (
-			await fetch(`${$api_url}/interface/${id}/config`)
+			await fetch(`${API_URL}/interface/${id}/config`)
 		).json();
 
 		document.title = config.name;
@@ -229,7 +231,7 @@
 </script>
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
-
+<!-- 
 <div class="h-screen">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<StoreComponent
@@ -243,4 +245,4 @@
 			<DynamicComponent {...config.component} />
 		{/if}
 	</div>
-</div>
+</div> -->

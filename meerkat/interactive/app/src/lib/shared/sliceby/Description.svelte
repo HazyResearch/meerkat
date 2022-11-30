@@ -1,10 +1,3 @@
-<script context="module" lang="ts">
-	export type DescriptionType = {
-		score: number;
-		description: string;
-	};
-</script>
-
 <script lang="ts">
     export let score: number;
     export let description: string;

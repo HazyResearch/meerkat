@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import banner from "$lib/assets/banner_small.png"
 
 </script>

@@ -1,8 +1,5 @@
-<script context="module" lang="ts">
-	export type StatsType = Record<string, number>;
-</script>
-
 <script lang="ts">
+	import type { StatsType } from '$lib/utils/types';
 	export let stats: StatsType;
 </script>
 

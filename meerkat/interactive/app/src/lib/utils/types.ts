@@ -1,11 +1,38 @@
 import type { Writable } from "svelte/store";
-import type { Dictionary } from "underscore";
+
+export interface CellInterface {
+    data: any;
+    column?: string;
+    cell_component?: string;
+    cell_props?: object;
+}
+
+export type DescriptionType = {
+    score: number;
+    description: string;
+};
+
+export type SliceType = {
+    name: string;
+    descriptions: Array<{ score: number; description: string; }>;
+    stats: StatsType;
+    instances: Array<InstanceType>;
+    plot: { PLOT_TYPE: string; matrix: undefined | MatrixType; html: string; };
+};
+
+export type StatsType = Record<string, number>;
+
+export type InstanceType = {
+    input: string;
+    tags: Record<string, string>;
+    correct: Record<string, boolean>;
+};
 
 export interface Component {
     component_id: string;
     path: string;
     name: string;
-    props: any; 
+    props: any;
 }
 
 export interface Endpoint {

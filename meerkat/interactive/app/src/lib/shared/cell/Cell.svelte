@@ -1,16 +1,6 @@
-<script context="module" lang="ts">
-	import { createEventDispatcher } from 'svelte';
-
-	export interface CellInterface {
-		data: any;
-		column?: string;
-		cell_component?: string;
-		cell_props?: object;
-	}
-
-</script>
-
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	
 	import Code from './code/Code.svelte';
 	import Image from './image/Image.svelte';
 	import BasicType from './basic/Basic.svelte';

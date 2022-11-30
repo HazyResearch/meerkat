@@ -1,11 +1,3 @@
-<script context="module" lang="ts">
-	export type InstanceType = {
-		input: string;
-		tags: Record<string, string>;
-		correct: Record<string, boolean>;
-	};
-</script>
-
 <script lang="ts">
 	export let input: string;
 	export let tags: Record<string, string>;
