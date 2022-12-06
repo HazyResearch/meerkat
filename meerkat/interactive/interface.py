@@ -1,24 +1,17 @@
 import code
-from dataclasses import dataclass, field
 from functools import partial, wraps
-from typing import Callable, Dict, List, Union
+from typing import Callable
 
 from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
+
 from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentFrontend,
 )
-from meerkat.interactive.frontend import FrontendMixin
-
-# from meerkat.interactive.app.src.lib.component.abstract import (
-#     Component,
-#     ComponentSchema,
-# )
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
-from meerkat.tools.utils import nested_apply
 
 
 def interface(fn: Callable):
@@ -73,9 +66,7 @@ class Interface(IdentifiableMixin):
             )
 
         if state.network_info.shareable_npm_server_name is not None:
-            url = (
-                f"{state.network_info.shareable_npm_server_url}?id={self.id}"
-            )
+            url = f"{state.network_info.shareable_npm_server_url}?id={self.id}"
         else:
             url = f"{state.network_info.npm_server_url}?id={self.id}"
 

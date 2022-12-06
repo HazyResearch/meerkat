@@ -60,16 +60,25 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
             base_types=(Store),
         )
 
+        component_name = self.__class__.__name__
+        # Inheriting an existing Component and modifying it on the Python side
+        # should not change the name of the component used on the frontend
+        if self.__class__.__bases__[0] != Component and issubclass(
+            self.__class__.__bases__[0], Component
+        ):
+            component_name = self.__class__.__bases__[0].__name__
+
         return ComponentFrontend(
             component_id=self.id,
             path=os.path.join(
                 os.path.dirname(inspect.getfile(self.__class__)),
-                f"{self.__class__.__name__}.svelte",
+                f"{component_name}.svelte",
             ),
-            name=self.__class__.__name__,
+            name=component_name,
             props=frontend_props,
         )
 
     class Config:
         arbitrary_types_allowed = True
         extra = Extra.allow
+        copy_on_model_validation = False

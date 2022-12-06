@@ -6,7 +6,6 @@ from meerkat.interactive.endpoint import Endpoint
 from ..abstract import Component
 
 
-@dataclass
 class Document(Component):
 
     df: DataFrame

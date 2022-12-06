@@ -233,7 +233,7 @@
 
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 
-<div class="h-screen">
+<div class="h-screen p-3">
 	{#each Array.from(global_stores.keys()) as store_id}
 		<StoreComponent
 			{store_id}
@@ -241,13 +241,13 @@
 			is_backend_store={global_stores.get(store_id).backend_store}
 		/>
 	{/each}
-	<div class="flex flex-col h-screen p-3">
-		{#if config && config.component}
-			<DynamicComponent {...config.component} />
-		{:else}
-			<div class="flex justify-center h-screen items-center">
-				<img src={banner} alt="Meerkat" class="h-12"/>
-			</div>
-		{/if}
-	</div>
+	<!-- <div class="flex flex-col h-screen p-3"> -->
+	{#if config && config.component}
+		<DynamicComponent {...config.component} />
+	{:else}
+		<div class="flex justify-center h-screen items-center">
+			<img src={banner} alt="Meerkat" class="h-12"/>
+		</div>
+	{/if}
+	<!-- </div> -->
 </div>

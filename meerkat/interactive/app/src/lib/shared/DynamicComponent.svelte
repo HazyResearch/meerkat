@@ -1,7 +1,7 @@
 <script lang="ts">
-	export let component_id: string;
+	// export let component_id: string;
 	export let name: string;
-	export let path: string;
+	// export let path: string;
 	export let props: any;
 
 	import Button from '$lib/component/button/Button.svelte';
@@ -15,7 +15,6 @@
 	import Plot from '$lib/component/plot/Plot.svelte';
 	import Match from '$lib/component/match/Match.svelte';
 	import Row from '$lib/component/row/Row.svelte';
-	import SimpleSearchBar from '$lib/component/simplesearchbar/SimpleSearchBar.svelte';
 	import SliceByCard from '$lib/component/slicebycards/SliceByCard.svelte';
 	import SliceByCards from '$lib/component/slicebycards/SliceByCards.svelte';
 	import Sort from '$lib/component/sort/Sort.svelte';
@@ -24,28 +23,38 @@
 	import Table from '$lib/component/table/Table.svelte';
 	import Tabs from '$lib/component/tabs/Tabs.svelte';
 	import Textbox from '$lib/component/textbox/Textbox.svelte';
-	
+
+	import AutoLayout from '$lib/layouts/AutoLayout.svelte';
+	import Div from '$lib/layouts/Div.svelte';
+	import Flex from '$lib/layouts/Flex.svelte';
+	import Grid from '$lib/layouts/Grid.svelte';
+
 	let all_components = {
-		'Button': Button,
-		'Choice': Choice,
-		'Discover': Discover,
-		'Document': Document,
-		'Editor': Editor,
-		'Filter': Filter,
-		'Gallery': Gallery,
-		'Markdown': Markdown,
-		'Match': Match,
-		'Plot': Plot,
-		'Row': Row,
-		'SimpleSearchBar': SimpleSearchBar,
-		'SliceByCard': SliceByCard,
-		'SliceByCards': SliceByCards,
-		'Sort': Sort,
-		'Stats': Stats,
-		'StatsLabeler': StatsLabeler,
-		'Table': Table,
-		'Tabs': Tabs,
-		'Textbox': Textbox,
+		Button: Button,
+		Choice: Choice,
+		Discover: Discover,
+		Document: Document,
+		Editor: Editor,
+		Filter: Filter,
+		Gallery: Gallery,
+		Markdown: Markdown,
+		Match: Match,
+		Plot: Plot,
+		Row: Row,
+		SliceByCard: SliceByCard,
+		SliceByCards: SliceByCards,
+		Sort: Sort,
+		Stats: Stats,
+		StatsLabeler: StatsLabeler,
+		Table: Table,
+		Tabs: Tabs,
+		Textbox: Textbox,
+
+		// Layout components
+		AutoLayout: AutoLayout,
+		Div: Div,
+		Flex: Flex,
+		Grid: Grid,
 	};
 </script>
 
