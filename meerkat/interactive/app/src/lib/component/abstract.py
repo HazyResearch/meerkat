@@ -1,12 +1,13 @@
+import inspect
 import os
 from typing import Dict
-import inspect
 
 from pydantic import BaseModel, Extra, validator
-from meerkat.interactive.node import Node, NodeMixin
-from meerkat.interactive.graph import Store
+
 from meerkat.interactive.frontend import FrontendMixin
-from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.interactive.graph import Store
+from meerkat.interactive.node import Node, NodeMixin
+from meerkat.mixins.identifiable import IdentifiableMixin, classproperty
 from meerkat.tools.utils import nested_apply
 
 
@@ -19,8 +20,15 @@ class ComponentFrontend(BaseModel):
 
 # need to pass the extra param in order to
 class Component(IdentifiableMixin, FrontendMixin, BaseModel):
-
-    _self_identifiable_group: str = "components"
+    @classproperty
+    def identifiable_group(self):
+        # Ordinarily, we would create a new classproperty for this, like
+        # _self_identifiable_group: str = "components"
+        # However, this causes pydantic to show _self_identifiable_group in
+        # type hints when using the component in the IDE, which might
+        # be confusing to users.
+        # We just override the classproperty here directly as an alternative.
+        return "components"
 
     @validator("*", pre=False)
     def check_inode(cls, value):

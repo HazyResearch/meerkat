@@ -1,7 +1,7 @@
 <script lang="ts">
-	// export let component_id: string;
+	export let component_id: string;
 	export let name: string;
-	// export let path: string;
+	export let path: string;
 	export let props: any;
 
 	import Button from '$lib/component/button/Button.svelte';
@@ -54,16 +54,18 @@
 		AutoLayout: AutoLayout,
 		Div: Div,
 		Flex: Flex,
-		Grid: Grid,
+		Grid: Grid
 	};
 </script>
 
-<!-- {#await import(path)}
-	Loading {name} component.
-{:then Component}
-	<svelte:component this={Component.default} {...props} />
-{:catch error}
-	{error}
-{/await} -->
-
-<svelte:component this={all_components[name]} {...props} />
+{#if name in all_components}
+	<svelte:component this={all_components[name]} {...props} />
+{:else}
+	{#await import(path)}
+		Loading {name} component.
+	{:then Component}
+		<svelte:component this={Component.default} {...props} />
+	<!-- {:catch error}
+		{error} -->
+	{/await}
+{/if}

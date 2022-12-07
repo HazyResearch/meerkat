@@ -64,4 +64,4 @@ class IdentifiableMixin:
         # being redefined in subclasses
         from meerkat.state import state
 
-        return state.identifiables.get(id=id, group=cls._self_identifiable_group)
+        return state.identifiables.get(id=id, group=cls.identifiable_group)
