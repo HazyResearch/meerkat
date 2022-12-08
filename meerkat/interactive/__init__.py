@@ -1,4 +1,5 @@
 import pathlib
+from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
 
 from meerkat.interactive.app.src.lib.layouts import ColumnLayout, Div, Flex, Grid, RowLayout
 
@@ -78,4 +79,5 @@ __all__ = [
     "Div",
     "Flex",
     "Grid",
+    "MultiSelect",
 ]
