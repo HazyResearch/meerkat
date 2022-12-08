@@ -1,7 +1,6 @@
 import meerkat as mk
 
-dp = mk.get("imagenette",).lz[:100]
-dp_pivot = mk.gui.Pivot(dp)
+df = mk.get("imagenette",).lz[:100]
 
 # dp = mk.embed(
 #     dp,
@@ -9,8 +8,8 @@ dp_pivot = mk.gui.Pivot(dp)
 #     batch_size=128,
 # )
 
-match: mk.gui.Component = mk.gui.Match(
-    dp_pivot, 
+match: mk.gui.Component = mk.gui.FormulaBar(
+    df=df,
     against="img",
     col="label"
 )
@@ -25,5 +24,5 @@ match: mk.gui.Component = mk.gui.Match(
 
 mk.gui.start()
 mk.gui.Interface(
-    components=[match]
+    match
 ).launch()
