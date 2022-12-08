@@ -67,11 +67,11 @@ class imagenette(DatasetBuilder):
 
     def build(self):
         df = self._build_df()
-        dp = mk.DataPanel.from_pandas(df)
-        dp["img"] = mk.ImageColumn.from_filepaths(
-            dp["img_path"], base_dir=self.data_dir
+        df = mk.DataFrame.from_pandas(df)
+        df["img"] = mk.ImageColumn.from_filepaths(
+            df["img_path"], base_dir=self.data_dir
         )
-        return dp
+        return df
 
     def download(self):
         url = self.VERSION_TO_URL[self.version]
@@ -120,15 +120,15 @@ def download_imagenette(
         return (pd.read_csv(csv_path), dir_path) if return_df else dir_path
 
     if overwrite or not os.path.exists(dir_path):
-        download_url(
+        cached_tar_path = download_url(
             url=imagenette.VERSION_TO_URL[version],
-            root=download_dir,
+            dataset_dir=download_dir,
         )
         print("Extracting tar archive, this may take a few minutes...")
-        tar = tarfile.open(tar_path)
+        tar = tarfile.open(cached_tar_path)
         tar.extractall(download_dir)
         tar.close()
-        os.remove(tar_path)
+        # os.remove(tar_path)
     else:
         print(f"Directory {dir_path} already exists. Skipping download.")
 
@@ -145,12 +145,12 @@ def download_imagenette(
     return (df, dir_path) if return_df else dir_path
 
 
-def build_imagenette_dp(
+def build_imagenette_df(
     dataset_dir: str,
     download: bool = False,
     version: str = "160px",
-) -> mk.DataPanel:
-    """Build DataPanel for the Imagenette dataset.
+) -> mk.DataFrame:
+    """Build DataFrame for the Imagenette dataset.
 
     Args:
         download_dir (str): The directory path to save to or load from.
@@ -159,7 +159,7 @@ def build_imagenette_dp(
         overwrite (bool, optional): If ``True``, redownload the datasets.
 
     Returns:
-        mk.DataPanel: A DataPanel corresponding to the dataset.
+        mk.DataFrame: A DataFrame corresponding to the dataset.
 
     References:
         https://github.com/fastai/imagenette
@@ -174,6 +174,6 @@ def build_imagenette_dp(
             raise ValueError("Imagenette is not downloaded. Pass `download=True`.")
         df = pd.read_csv(csv_path)
 
-    dp = mk.DataPanel.from_pandas(df)
-    dp["img"] = mk.ImageColumn.from_filepaths(dp["img_path"], base_dir=dir_path)
-    return dp
+    df = mk.DataFrame.from_pandas(df)
+    df["img"] = mk.ImageColumn.from_filepaths(df["img_path"], base_dir=dir_path)
+    return df

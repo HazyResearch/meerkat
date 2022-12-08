@@ -5,7 +5,7 @@ import functools
 import logging
 import numbers
 import os
-from typing import Callable, List, Sequence, Union
+from typing import Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -32,6 +32,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import AbstractColumn
+from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -46,11 +47,11 @@ def getattr_decorator(fn: Callable):
         if isinstance(out, pd.Series):
             return PandasSeriesColumn(out)
         elif isinstance(out, pd.DataFrame):
-            from meerkat import DataPanel
+            from meerkat import DataFrame
 
             # column names must be str in meerkat
             out = out.rename(mapper=str, axis="columns")
-            return DataPanel.from_pandas(out)
+            return DataFrame.from_pandas(out)
         else:
             return out
 
@@ -66,9 +67,9 @@ class _ReturnColumnMixin:
             elif isinstance(attr, pd.Series):
                 return PandasSeriesColumn(attr)
             elif isinstance(attr, pd.DataFrame):
-                from meerkat import DataPanel
+                from meerkat import DataFrame
 
-                return DataPanel.from_pandas(attr)
+                return DataFrame.from_pandas(attr)
             else:
                 return attr
         except AttributeError:
@@ -269,6 +270,29 @@ class PandasSeriesColumn(
             return BasicFormatter(dtype=type(cell.item()).__name__)
 
         return BasicFormatter()
+
+    def _is_valid_primary_key(self):
+        return self.data.is_unique
+
+    def _keyidx_to_posidx(self, keyidx: Any) -> int:
+        # TODO(sabri): when we implement indices, we should use them here if we have
+        # one
+        where_result = np.where(self.data == keyidx)
+
+        if len(where_result[0]) == 0:
+            raise KeyError(f"keyidx {keyidx} not found in column.")
+
+        posidx = where_result[0][0]
+        return int(posidx)
+
+    def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
+        posidxs = np.where(np.isin(self.data, keyidxs))[0]
+
+        diff = np.setdiff1d(keyidxs, self.data[posidxs])
+        if len(diff) > 0:
+            raise KeyError(f"Key indexes {diff} not found in column.")
+
+        return posidxs
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"

@@ -2,7 +2,8 @@
 	import { createTippy } from 'svelte-tippy';
 	import { followCursor } from 'tippy.js';
 
-	import Cell, { type CellInterface } from '$lib/components/cell/Cell.svelte';
+	import Cell from '$lib/shared/cell/Cell.svelte';
+	import type { CellInterface } from '$lib/utils/types';
 	import type { SvelteComponent } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import { createEventDispatcher } from 'svelte';
@@ -116,6 +117,7 @@
 					content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML
 				}}
 			>
+				{subcontent.column}
 				<Cell {...subcontent} />
 				{#if content_tooltip}
 					<div id="{id}-content-tooltip-{j}" class="hidden">

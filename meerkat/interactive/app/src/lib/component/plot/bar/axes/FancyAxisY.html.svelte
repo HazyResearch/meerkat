@@ -8,6 +8,7 @@
 
 	const { padding, xRange, yScale } = getContext('LayerCake');
 
+	const { data } = getContext('LayerCake');
 	$: metadata = getContext('FancyHorizontalBarPlotMetadata').metadata;
 	
 
@@ -29,9 +30,10 @@
 	/** @type {Number} [yTick=-1] - How far up and down to position the text marker. */
 	export let yTick = -1;
 
-	export let width = 128;
+	export let width = 40;
 
 	export let close = true;
+
 
 	$: isBandwidth = typeof $yScale.bandwidth === 'function';
 
@@ -89,7 +91,7 @@
 
 					TODO (arjundd): Make a default value of count so that it doesn't display.
 				-->
-				<FancyTick width="{width}px" name={tick} id={i} size={metadata[i][0] || 0} on:remove />
+				<FancyTick width="{width}px" name={$data[i].y} id={i} size={metadata[i][0] || 0} on:remove />
 			</div>
 		</div>
 	{/each}

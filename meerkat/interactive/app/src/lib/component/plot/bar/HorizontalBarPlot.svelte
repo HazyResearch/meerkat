@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Point2D } from '$lib/components/plot/types';
+	import type { Point2D } from '$lib/shared/plot/types';
 	import { scaleBand } from 'd3-scale';
 	import { Html, LayerCake, Svg } from 'layercake';
 
-	import SvgAxisX from '$lib/components/plot/layercake/axes/AxisX.svg.svelte';
-	import SvgAxisY from '$lib/components/plot/layercake/axes/AxisY.svg.svelte';
-	import SvgBar from '$lib/components/plot/layercake/bar/Bar.svg.svelte';
-	import Label from '$lib/components/plot/layercake/labels/Label.html.svelte';
+	import SvgAxisX from '$lib/shared/plot/layercake/axes/AxisX.svg.svelte';
+	import SvgAxisY from '$lib/shared/plot/layercake/axes/AxisY.svg.svelte';
+	import SvgBar from '$lib/shared/plot/layercake/bar/Bar.svg.svelte';
+	import Label from '$lib/shared/plot/layercake/labels/Label.html.svelte';
 
 	export let data: Array<Point2D>;
 

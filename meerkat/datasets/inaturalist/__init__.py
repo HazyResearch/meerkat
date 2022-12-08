@@ -20,10 +20,10 @@ INFO_URLS = {
 }
 
 
-def build_inaturalist_dp(
+def build_inaturalist_df(
     dataset_dir: str, download: bool = True, splits: List[str] = None
-) -> mk.DataPanel:
-    """Build a DataPanel from the inaturalist dataset.
+) -> mk.DataFrame:
+    """Build a DataFrame from the inaturalist dataset.
 
     Args:
         dataset_dir: The directory to store the dataset in.
@@ -34,7 +34,7 @@ def build_inaturalist_dp(
     if splits is None:
         splits = ["train", "test", "val"]
 
-    dps = []
+    dfs = []
     for split in splits:
         if not os.path.exists(os.path.join(dataset_dir, split)) and download:
             download_and_extract_archive(
@@ -47,31 +47,31 @@ def build_inaturalist_dp(
 
         with open(os.path.join(dataset_dir, f"{split}.json"), "r") as f:
             info = json.load(f)
-            dp = mk.DataPanel(info["images"])
+            df = mk.DataFrame(info["images"])
 
             # need to rename "id" so there aren't conflicts with the "id" in other
-            # datapanels (see annotations below)
-            dp["image_id"] = dp["id"]
-            dp.remove_column("id")
+            # dataframes (see annotations below)
+            df["image_id"] = df["id"]
+            df.remove_column("id")
 
             # add image column
-            dp["image"] = mk.ImageColumn(dp["file_name"], base_dir=dataset_dir)
+            df["image"] = mk.ImageColumn(df["file_name"], base_dir=dataset_dir)
 
-            dp["date"] = pd.to_datetime(dp["date"])
+            df["date"] = pd.to_datetime(df["date"])
 
             # add annotations for each image
             if split != "test":  # no annotations for test set
-                annotation_dp = mk.DataPanel(info["annotations"])
-                annotation_dp["annotation_id"] = annotation_dp["id"]
-                annotation_dp.remove_column("id")
-                dp = dp.merge(annotation_dp, on="image_id")
+                annotation_df = mk.DataFrame(info["annotations"])
+                annotation_df["annotation_id"] = annotation_df["id"]
+                annotation_df.remove_column("id")
+                df = df.merge(annotation_df, on="image_id")
 
                 # join on the category table to get the category name
-                category_dp = mk.DataPanel(info["categories"])
-                category_dp["category_id"] = category_dp["id"]
-                category_dp.remove_column("id")
-                dp = dp.merge(category_dp, on="category_id")
+                category_df = mk.DataFrame(info["categories"])
+                category_df["category_id"] = category_df["id"]
+                category_df.remove_column("id")
+                df = df.merge(category_df, on="category_id")
 
-            dps.append(dp)
+            dfs.append(df)
 
-    return mk.concat(dps) if len(dps) > 1 else dps[0]
+    return mk.concat(dfs) if len(dfs) > 1 else dfs[0]

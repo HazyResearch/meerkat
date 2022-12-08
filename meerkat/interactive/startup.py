@@ -3,6 +3,7 @@
 Code is heavily borrowed from Gradio.
 """
 
+import fnmatch
 import os
 import pathlib
 import re
@@ -22,6 +23,17 @@ from meerkat.interactive.server import (
 )
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import NetworkInfo, state
+
+
+def file_find_replace(directory, find, replace, pattern):
+    for path, _, files in os.walk(os.path.abspath(directory)):
+        for filename in fnmatch.filter(files, pattern):
+            filepath = os.path.join(path, filename)
+            with open(filepath) as f:
+                s = f.read()
+            s = s.replace(find, replace)
+            with open(filepath, "w") as f:
+                f.write(s)
 
 
 def is_notebook() -> bool:
@@ -46,7 +58,9 @@ def get_first_available_port(initial: int, final: int) -> int:
     """Gets the first open port in a specified range of port numbers. Taken
     from https://github.com/gradio-app/gradio/blob/main/gradio/networking.py.
 
-    New solution: https://stackoverflow.com/questions/19196105/how-to-check-if-a-network-port-is-open
+    New solution:
+    https://stackoverflow.com/questions/19196105/how-to-check-if-a-network-port-is-open
+
     Args:
         initial: the initial value in the range of port numbers
         final: final (exclusive) value in the range of port numbers,
@@ -76,24 +90,25 @@ def start(
     api_server_name: str = None,
     api_port: int = None,
     npm_port: int = None,
+    dev: bool = True,
 ):
     """Start a Meerkat interactive server.
-    
+
     Args:
         shareable (bool): whether to share the interface at a publicly accesible link.
-            This feature works by establishing a reverse SSH tunnel to a Meerkat server. 
+            This feature works by establishing a reverse SSH tunnel to a Meerkat server.
             Do not use this feature with private data. In order to use this feature, you
-            will need an SSH key for the server. If you already have one, add it to the 
-            file at f"{config.system.ssh_identity_file}, or set the option 
-            `mk.config.system.ssh_identity_file` to the file where they are stored. If 
-            you don't yet have a key, you can request access by emailing 
-            eyuboglu@stanford.edu. Remember to ensure after downloading it that the 
-            identity file is read/write only by the user (e.g. with 
-            `chmod 600 path/to/id_file`). See `subdomain` arg for controlling the 
+            will need an SSH key for the server. If you already have one, add it to the
+            file at f"{config.system.ssh_identity_file}, or set the option
+            `mk.config.system.ssh_identity_file` to the file where they are stored. If
+            you don't yet have a key, you can request access by emailing
+            eyuboglu@stanford.edu. Remember to ensure after downloading it that the
+            identity file is read/write only by the user (e.g. with
+            `chmod 600 path/to/id_file`). See `subdomain` arg for controlling the
             domain name of the shared link. Defaults to False.
         subdomain (str): the subdomain to use for the shared link. For example, if
             `subdomain="myinterface"`, then the shareable link will have the domain
-            `myinterface.meerkat.wiki`. Defaults to None, in which case a random 
+            `myinterface.meerkat.wiki`. Defaults to None, in which case a random
             subdomain will be generated.
         api_port (int): the port to use for the Meerkat API server. Defaults to None,
             in which case a random port will be used.
@@ -141,9 +156,10 @@ def start(
     )
 
     if shareable:
-        domain = setup_tunnel(network_info.api_server_port, subdomain=f"{subdomain}server")
+        domain = setup_tunnel(
+            network_info.api_server_port, subdomain=f"{subdomain}server"
+        )
         network_info.shareable_api_server_name = domain
-        
 
     # npm run dev -- --port {npm_port}
     current_env = os.environ.copy()
@@ -151,54 +167,92 @@ def start(
         current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
     else:
         current_env.update({"VITE_API_URL": network_info.api_server_url})
-
+    
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
     err_file, err_path = mkstemp(suffix=".err")
+    
+    if dev:
+        npm_process = subprocess.Popen(
+            [
+                "npm",
+                "run",
+                "dev",
+                "--",
+                "--port",
+                str(npm_port),
+                "--logLevel",
+                "info",
+            ],
+            env=current_env,
+            stdout=out_file,
+            stderr=err_file,
+        )
+    else:
+        print("Building Application...")
+        p = subprocess.Popen(
+            [
+                "npm",
+                "run",
+                "build",
+            ],
+            env=current_env,
+            stdout=subprocess.PIPE,
+            stderr=err_file,
+        )
+        while p.poll() is None:
+            out = p.stdout.readline()
+            print(out, end='\r')
+        
+        # find + replace VITE_API_URL_PLACEHOLDER for production
+        buildpath = libpath / "build"
+        file_find_replace(buildpath, "meerkat-api-url?!?!?!?!", network_info.shareable_api_server_url if shareable else network_info.api_server_url, "*.js")
 
-    npm_process = subprocess.Popen(
-        [
-            "npm",
-            "run",
-            "dev",
-            "--",
-            "--port",
-            str(npm_port),
-            "--logLevel",
-            "info",
-        ],
-        env=current_env,
-        stdout=out_file,
-        stderr=err_file,
-    )
+        os.chdir(buildpath)
+        npm_process = subprocess.Popen(
+            [
+                "python",
+                "-m",
+                "http.server",
+                str(npm_port),
+            ],
+            env=current_env,
+            stdout=out_file,
+            stderr=err_file,
+        )
+        os.chdir(libpath)
+        
     network_info.npm_process = npm_process
     network_info.npm_out_path = out_path
-    network_info.npm_err_path = err_path
+    network_info.npm_err_path = err_path    
+        
+    if dev:
+        MAX_WAIT = 10
+        for i in range(MAX_WAIT):
+            time.sleep(0.5)
 
-    MAX_WAIT = 10
-    for i in range(MAX_WAIT):
-        time.sleep(0.5)
+            # this is a hack to address the issue that the vite skips over a port that we
+            # deem to be open per `get_first_available_port`
+            # TODO: remove this once we figure out how to properly check for unavailable
+            # ports in a way that is compatible with vite's port selection logic
+            match = re.search(
+                "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
+                network_info.npm_server_out,
+            )
+            if match is not None:
+                break
 
-        # this is a hack to address the issue that the vite skips over a port that we
-        # deem to be open per `get_first_available_port`
-        # TODO: remove this once we figure out how to properly check for unavailable ports
-        # in a way that is compatible with vite's port selection logic
-        match = re.search(
-            "Local:   http://127.0.0.1:(.*)/", network_info.npm_server_out
-        ) or re.search(
-            "Local:   http://localhost:(.*)/", network_info.npm_server_out
-        )
-        if match is not None:
-            break
-    
-    # TODO(Sabri): add check for Vite actually being installed, and provide instructions
-    # in the error message for fixing 
-    
-    if match is None:
-        raise ValueError(
-            f"Failed to start dev server: out={network_info.npm_server_out} err={network_info.npm_server_err}"
-        )
-    network_info.npm_server_port = int(match.group(1))
+        # TODO(Sabri): add check for Vite actually being installed, and provide instructions
+        # in the error message for fixing
+
+        if match is None:
+            raise ValueError(
+                f"Failed to start dev server: \
+                out={network_info.npm_server_out} err={network_info.npm_server_err}"
+            )
+        network_info.npm_server_port = int(match.group(2))
+    else:
+        network_info.npm_server_port = npm_port
 
     if shareable:
         domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)
@@ -221,7 +275,7 @@ def start(
 def output_startup_message(url: str):
     import rich
 
-    meerkat_header = "[bold violet]\[Meerkat][/bold violet]"
+    meerkat_header = "[bold violet]\[Meerkat][/bold violet]"  # noqa: W605
 
     rich.print("")
     rich.print(

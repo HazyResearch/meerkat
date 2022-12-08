@@ -54,6 +54,7 @@ REQUIRED = [
     "rich",
     "cryptography",
     "fastapi",
+    "wrapt"
 ]
 
 # What packages are optional?

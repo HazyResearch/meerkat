@@ -2,7 +2,7 @@ Configuring Meerkat
 ====================
 
 Several aspects of Meerkat's behavior can be configured by the user. 
-For example, one may wish to change the number of DataPanel rows shown in Jupyter 
+For example, one may wish to change the number of DataFrame rows shown in Jupyter 
 Notebooks.
 
 You can see the current state of the Meerkat configuration with:

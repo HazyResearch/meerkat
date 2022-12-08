@@ -1,16 +1,10 @@
 import os
 import subprocess
-from typing import Dict
-
-import numpy as np
-import pandas as pd
-
-import meerkat as mk
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import download_url, extract
+from ..utils import extract
 
 
 @datasets.register()
@@ -29,7 +23,6 @@ class fer(DatasetBuilder):
     )
 
     def build(self):
-        pass
         return None
 
     def download(self):

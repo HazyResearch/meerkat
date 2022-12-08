@@ -8,21 +8,21 @@ from meerkat.block.abstract import BlockView
 if TYPE_CHECKING:
     from meerkat.columns.abstract import AbstractColumn
     from meerkat.columns.lambda_column import LambdaColumn
-    from meerkat.datapanel import DataPanel
+    from meerkat.dataframe import DataFrame
 
 logger = logging.getLogger(__name__)
 
 
 @doc(data="data")
 def to_lambda(
-    data: Union["DataPanel", "AbstractColumn"],
+    data: Union["DataFrame", "AbstractColumn"],
     function: Callable,
     is_batched_fn: bool = False,
     batch_size: int = 1,
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
     output_type: Union[Mapping[str, type], type] = None,
-) -> Union["DataPanel", "LambdaColumn"]:
+) -> Union["DataFrame", "LambdaColumn"]:
     """_summary_
 
     Examples
@@ -41,38 +41,35 @@ def to_lambda(
             ``{data}`` to keyword arguments of ``function``. Ignored if ``{data}`` is a
             column. When calling ``function`` values from the columns will be fed to
             the corresponding keyword arguments. Defaults to None, in which case the
-            entire datapanel.
+            entire dataframe.
         outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the
             output of ``function`` is mapped to the returned
             :class:`LambdaColumn`(s). Defaults to None.
             * If ``None``, a single :class:`LambdaColumn` is returned.
-            * If a ``Dict[any, str]``, then a :class:`DataPanel` containing
+            * If a ``Dict[any, str]``, then a :class:`DataFrame` containing
             :class:`LambdaColumn`s is returned. This is useful when the output of
             ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
-            to column names in the resulting :class:`DataPanel`.
-            * If a ``Tuple[str]``, then a :class:`DataPanel` containing
+            to column names in the resulting :class:`DataFrame`.
+            * If a ``Tuple[str]``, then a :class:`DataFrame` containing
             :class:`LambdaColumn`s is returned. , This is useful when the output of
             ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
-            ``function`` to column names in the resulting :class:`DataPanel`.
+            ``function`` to column names in the resulting :class:`DataFrame`.
         output_type (Union[Dict[str, type], type], optional): _description_. Defaults
             to None.
 
-    Raises:
-        ValueError: _description_
-
     Returns:
-        _type_: _description_
+        Union[DataFrame, LambdaColumn]: A
     """
     from meerkat import LambdaColumn
     from meerkat.block.lambda_block import LambdaBlock, LambdaOp
     from meerkat.columns.abstract import AbstractColumn
-    from meerkat.datapanel import DataPanel
+    from meerkat.dataframe import DataFrame
 
     # prepare arguments for LambdaOp
     if isinstance(data, AbstractColumn):
         args = [data]
         kwargs = {}
-    elif isinstance(data, DataPanel):
+    elif isinstance(data, DataFrame):
         if isinstance(inputs, Mapping):
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
@@ -97,15 +94,30 @@ def to_lambda(
     block = LambdaBlock.from_block_data(data=op)
 
     if outputs is None:
-        if not (isinstance(output_type, type) or output_type is None):
-            raise ValueError
+        # can only infer output type if the the input columns are nonempty
+        if output_type is None and len(op) > 0:
+            output_type = type(op._get(0))
+
+        if not isinstance(output_type, type):
+            raise ValueError(
+                "Must provide a single `output_type` if `outputs` is None."
+            )
 
         col = LambdaColumn(
             data=BlockView(block_index=None, block=block), output_type=output_type
         )
         return col
     elif isinstance(outputs, Mapping):
-        return DataPanel(
+        if output_type is None:
+            output_type = {
+                outputs[output_key]: type(col) for output_key, col in op._get(0)
+            }
+        if not isinstance(output_type, Mapping):
+            raise ValueError(
+                "Must provide a `output_type` mapping if `outputs` is a mapping."
+            )
+
+        return DataFrame(
             {
                 col: LambdaColumn(
                     data=BlockView(block_index=output_key, block=block),
@@ -115,9 +127,20 @@ def to_lambda(
             }
         )
     elif isinstance(outputs, Sequence):
-        return DataPanel(
+        if output_type is None:
+            output_type = [type(col) for col in op._get(0)]
+        if not isinstance(output_type, Sequence):
+            raise ValueError(
+                "Must provide a `output_type` sequence if `outputs` is a sequence."
+            )
+        return DataFrame(
             {
-                col: LambdaColumn(data=BlockView(block_index=output_key, block=block))
+                col: LambdaColumn(
+                    data=BlockView(
+                        block_index=output_key, block=block
+                    ),
+                    output_type=output_type[output_key],
+                )
                 for output_key, col in enumerate(outputs)
             }
         )
@@ -136,7 +159,7 @@ class LambdaMixin:
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
         output_type: Union[Mapping[str, type], type] = None,
-    ) -> Union["DataPanel", "LambdaColumn"]:
+    ) -> Union["DataFrame", "LambdaColumn"]:
         return to_lambda(
             data=self,
             function=function,

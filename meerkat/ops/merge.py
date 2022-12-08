@@ -3,21 +3,22 @@ from typing import List, Sequence, Union
 
 import numpy as np
 
-from meerkat import DataPanel, ListColumn
+from meerkat import DataFrame, ListColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.pandas_column import PandasSeriesColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.errors import MergeError
-from meerkat.interactive.graph import interface_op
+from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
 
 
 @capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
-@interface_op
+@reactive
 def merge(
-    left: DataPanel,
-    right: DataPanel,
+    left: DataFrame,
+    right: DataFrame,
     how: str = "inner",
     on: Union[str, List[str]] = None,
     left_on: Union[str, List[str]] = None,
@@ -27,7 +28,7 @@ def merge(
     validate=None,
 ):
     if how == "cross":
-        raise ValueError("DataPanel does not support cross merges.")  # pragma: no cover
+        raise ValueError("DataFrame does not support cross merges.")  # pragma: no cover
 
     if (on is None) and (left_on is None) and (right_on is None):
         raise MergeError("Merge expects either `on` or `left_on` and `right_on`")
@@ -42,7 +43,7 @@ def merge(
     _check_merge_columns(left, left_on)
     _check_merge_columns(right, right_on)
 
-    # convert datapanels to dataframes so we can apply Pandas merge
+    # convert mk.DataFrame to pd.DataFrame so we can apply Pandas merge
     # (1) only include columns we are joining on
     left_df = left[left_on].to_pandas()
     right_df = right[right_on].to_pandas()
@@ -72,10 +73,10 @@ def merge(
 
     # reconstruct other columns not in the `left_on & right_on` using `left_indices`
     # and `right_indices`, the row order returned by merge
-    def _cols_to_construct(dp: DataPanel):
+    def _cols_to_construct(df: DataFrame):
         # don't construct columns in both `left_on` and `right_on` because we use
         # `merged_df` for these
-        return [k for k in dp.keys() if k not in (set(left_on) & set(right_on))]
+        return [k for k in df.keys() if k not in (set(left_on) & set(right_on))]
 
     left_cols_to_construct = _cols_to_construct(left)
     right_cols_to_construct = _cols_to_construct(right)
@@ -95,46 +96,62 @@ def merge(
     )
 
     if new_left is None and new_right is not None:
-        merged_dp = new_right
+        merged = new_right
     elif new_left is not None and new_right is None:
-        merged_dp = new_left
+        merged = new_left
     elif new_left is not None and new_right is not None:
-        # concatenate the two new datapanels if both have columns, this should be by
+        # concatenate the two new dataframes if both have columns, this should be by
         # far the most common case
-        merged_dp = new_left.append(new_right, axis="columns", suffixes=suffixes)
+        merged = new_left.append(new_right, axis="columns", suffixes=suffixes)
     else:
-        merged_dp = DataPanel()
+        merged = DataFrame()
 
     # add columns in both `left_on` and `right_on`, casting to the column type in left
     for name, column in merged_df.iteritems():
-        merged_dp.add_column(name, left[name]._clone(data=column.values))
-        merged_dp.data.reorder(merged_dp.columns[-1:] + merged_dp.columns[:-1])
+        merged.add_column(name, left[name]._clone(data=column.values))
+        merged.data.reorder(merged.columns[-1:] + merged.columns[:-1])
 
-    return merged_dp
+    return merged
 
 
-def _construct_from_indices(dp: DataPanel, indices: np.ndarray):
+def _construct_from_indices(df: DataFrame, indices: np.ndarray):
     if np.isnan(indices).any():
         # when performing "outer", "left", and "right" merges, column indices output
         # by pandas merge can include `nan` in rows corresponding to merge keys that
         # only appear in one of the two panels. For these columns, we convert the
         # column to  ListColumn, and fill with "None" wherever indices is "nan".
-        data = {
-            name: ListColumn(
-                [None if np.isnan(index) else col.lz[int(index)] for index in indices]
-            )
-            for name, col in dp.items()
-        }
-        return dp._clone(data=data)
+        data = {}
+        for name, col in df.items():
+            if isinstance(col, (NumpyArrayColumn, TensorColumn, PandasSeriesColumn)):
+                new_col = col.lz[indices.astype(int)]
+
+                if isinstance(new_col, TensorColumn):
+                    new_col = new_col.to(float)
+                elif isinstance(new_col, PandasSeriesColumn):
+                    if new_col.dtype != "object":
+                        new_col = new_col.astype(float)
+                else:
+                    new_col = new_col.astype(float)
+                
+                new_col[np.isnan(indices)] = np.nan
+                data[name] = new_col
+            else:
+                data[name] = ListColumn(
+                    [
+                        None if np.isnan(index) else col.lz[int(index)]
+                        for index in indices
+                    ]
+                )
+        return df._clone(data=data)
     else:
         # if there are no `nan`s in the indices, then we can just lazy index the
         # original column
-        return dp.lz[indices]
+        return df.lz[indices]
 
 
-def _check_merge_columns(dp: DataPanel, on: List[str]):
+def _check_merge_columns(df: DataFrame, on: List[str]):
     for name in on:
-        column = dp[name]
+        column = df[name]
         if isinstance(column, NumpyArrayColumn) or isinstance(column, TensorColumn):
             if len(column.shape) > 1:
                 raise MergeError(

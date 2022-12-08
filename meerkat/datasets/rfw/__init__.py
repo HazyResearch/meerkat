@@ -1,17 +1,17 @@
 import os
-import subprocess
-from multiprocessing.sharedctypes import Value
-from typing import Dict
 
-import numpy as np
 import pandas as pd
-
+import numpy as np
 import meerkat as mk
+import PIL
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import download_url, extract
+
+
+def concat_images(x: PIL.Image.Image, y: PIL.Image.Image):
+    return PIL.Image.fromarray(np.concatenate([np.array(x), np.array(y)], axis=1))
 
 
 @datasets.register()
@@ -55,11 +55,11 @@ class rfw(DatasetBuilder):
         # drop duplicate rows with the same image_id
         df = df.drop_duplicates(subset=["image_id"], keep=False)
 
-        dp = mk.DataPanel.from_pandas(df)
-        dp["image"] = mk.ImageColumn.from_filepaths(
-            dp["image_path"], base_dir=self.dataset_dir
+        df = mk.DataFrame.from_pandas(df)
+        df["image"] = mk.ImageColumn.from_filepaths(
+            df["image_path"], base_dir=self.dataset_dir
         )
-        return dp[["image_id", "identity", "ethnicity", "image"]]
+        return df[["image_id", "identity", "ethnicity", "image"]]
 
         return None
 

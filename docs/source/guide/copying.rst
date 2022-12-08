@@ -34,7 +34,7 @@ copying and viewing behavior.
 
 We'll begin by defining some terms: coreferences, views and copies. These terms describe
 the different relationships that could exist between two variables pointing to 
-:class:`~meerkat.AbstractColumn` or :class:`~meerkat.DataPanel` objects. Then, we'll 
+:class:`~meerkat.AbstractColumn` or :class:`~meerkat.DataFrame` objects. Then, we'll 
 discuss how to know whether indexing a Meerkat data structures will result in a copy, 
 coreference or view.
 
@@ -151,65 +151,65 @@ share memory.
 -  *What about other attributes?* (*e.g.* ``loader`` in an
    ``ImageColumn``) Same as “View” above.
 
-DataPanels
+DataFrames
 ----------
 
-Let’s do the same for two DataPanel variables ``dp1`` and ``dp2``.
+Let’s do the same for two DataFrame variables ``df1`` and ``df2``.
 
-**Coreferences -** Both variables refer to the same ``DataPanel``
+**Coreferences -** Both variables refer to the same ``DataFrame``
 object.
 
 .. code:: python
 
-   >>> dp1 is dp2
+   >>> df1 is df2
    True
 
-Of course, in this case, anything that is done to ``dp1`` will also be
-done to ``dp2`` and vice versa.
+Of course, in this case, anything that is done to ``df1`` will also be
+done to ``df2`` and vice versa.
 
-**Views -** The variables refer to different ``DataPanel`` objects
-(*i.e.* ``dp1 is not dp2``), but some of the columns in ``dp1`` are
+**Views -** The variables refer to different ``DataFrame`` objects
+(*i.e.* ``df1 is not df2``), but some of the columns in ``df1`` are
 `coreferences <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
 or
 `views <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
-of some of the columns in ``dp2``
+of some of the columns in ``df2``
 
--  *How are views created? Views* of a DataPanel are created in one of
+-  *How are views created? Views* of a DataFrame are created in one of
    three ways:
 
-   1. Implicitly with ``dp._clone(data=new_data)`` where ``dp.columns``
+   1. Implicitly with ``df._clone(data=new_data)`` where ``df.columns``
       includes some columns with ``new_data``\ for one of the reasons
       described above.
-   2. Implicitly when a column from one DataPanel is added to another
-      (*e.g.* ``dp1["a"] = dp2["b"]``. Behind the scenes,
-   3. Explicitly with ``dp.view()`` which simply calls ``col.view()`` on
+   2. Implicitly when a column from one DataFrame is added to another
+      (*e.g.* ``df1["a"] = df2["b"]``. Behind the scenes,
+   3. Explicitly with ``df.view()`` which simply calls ``col.view()`` on
       all its columns and then passes them
-      ``dp._clone(data=view_columns)``
+      ``df._clone(data=view_columns)``
 
 -  *What about other attributes?* (*e.g.* ``index_column`` in an
-   ``EntityDataPanel``) It depends.
+   ``EntityDataFrame``) It depends.
 
-   ``dp1`` and ``dp2`` refer to different column objects, so assignment
-   to attributes in ``dp1`` will not affect ``dp2`` (and vice versa):
+   ``df1`` and ``df2`` refer to different column objects, so assignment
+   to attributes in ``df1`` will not affect ``df2`` (and vice versa):
 
    .. code:: python
 
-      >>> dp1.loader = fn1
-      >>> dp1.loader == dp2.loader
+      >>> df1.loader = fn1
+      >>> df1.loader == df2.loader
       False
 
    However, these attributes are not copied! So, stateful changes to the
-   attributes will carry across DataPanels:
+   attributes will carry across DataFrames:
 
    .. code:: python
 
-      >>> dp1.loader.size = 224
-      >>> dp2.loader.size == 224
+      >>> df1.loader.size = 224
+      >>> df2.loader.size == 224
       True
 
-**Copies**\ *–* The variables refer to different ``DataPanel`` objects
-(*i.e.* ``dp1 is not dp2``), and all of the columns in ``dp1`` are
-copies of the the columns in ``dp2``
+**Copies**\ *–* The variables refer to different ``DataFrame`` objects
+(*i.e.* ``df1 is not df2``), and all of the columns in ``df1`` are
+copies of the the columns in ``df2``
 
 -  *How are copies created?* Copies of a column are created in one of
    two ways.
@@ -233,7 +233,7 @@ copies of the the columns in ``dp2``
       data.
 
 -  *What about other attributes?* (*e.g.* ``index_column`` in an
-   ``EntityDataPanel``) Same as “View” above.
+   ``EntityDataFrame``) Same as “View” above.
 
 Behavior when Indexing
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,17 +257,17 @@ We can select rows from an :class:`~meerkat.AbstractColumn`\ …
    # (3) sequence -> a sub column
    new_col: mk.AbstractColumn = col[[0, 4, 6]]
 
-… or from a ``DataPanel``
+… or from a ``DataFrame``
 
 .. code:: python
 
-   dp: mk.DataPanel = ...
+   df: mk.DataFrame = ...
    # (1) int -> dict
-   row: dict = dp[0] 
-   # (2) slice -> a DataPanel slice
-   new_dp: mk.DataPanel = dp[0:10]
-   # (3) sequence -> a DataPanel slice
-   new_dp: mk.Datapanel = dp[[0, 4, 6]]
+   row: dict = df[0] 
+   # (2) slice -> a DataFrame slice
+   new_df: mk.DataFrame = df[0:10]
+   # (3) sequence -> a DataFrame slice
+   new_df: mk.Datapanel = df[[0, 4, 6]]
 
 **From a column.** When selecting rows from a column ``col``, Meerkat
 takes the following approach:
@@ -318,7 +318,7 @@ or a
 `copy <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__,
 depending on the underlying data structure.
 
-**From a DataPanel.** When selecting rows from a DataPanel ``dp``,
+**From a DataFrame.** When selecting rows from a DataFrame ``df``,
 Meerkat takes the following approach:
 
 **Step 1.** Indexes each of the columns using the strategy above.
@@ -328,28 +328,28 @@ BlockManager.
 
 **Step 2.**
 `Clones <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
-the original DataPanel, ``dp``, passing the newly indexed columns. This
-new DataPanel will be:
+the original DataFrame, ``df``, passing the newly indexed columns. This
+new DataFrame will be:
 
 -  either a
    `view <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
-   of the original ``dp``, if any of the indexed columns are views
+   of the original ``df``, if any of the indexed columns are views
 -  or a copy if all of the indexed columns are copies
 
 Indexing columns
 -----------------
 
-In Meerkat, we select columns from a ``DataPanel`` by either indexing
+In Meerkat, we select columns from a ``DataFrame`` by either indexing
 with ``str`` or a ``Sequence[str]`` :
 
 .. code:: python
 
    # (1) `str` -> single column
-   col: mk.AbstractColumn = dp["col_a"]
+   col: mk.AbstractColumn = df["col_a"]
    # (2) `Sequence[str]` -> multiple columns
-   dp: mk.DataPanel = dp[["col_a", "col_b"]]
+   df: mk.DataFrame = df[["col_a", "col_b"]]
 
-When selecting columns from a ``DataPanel``, Meerkat **always** returns
+When selecting columns from a ``DataFrame``, Meerkat **always** returns
 a
 `coreference <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
 to the underlying column(s) – *not* a copy or view.
@@ -363,24 +363,24 @@ to the underlying column(s) – *not* a copy or view.
 .. code:: python
 
    # (1) `str` -> single column
-   >>> col1: mk.AbstractColumn = dp["col_a"]
-   >>> col2: mk.AbstractColumn = dp["col_a"]
+   >>> col1: mk.AbstractColumn = df["col_a"]
+   >>> col2: mk.AbstractColumn = df["col_a"]
    >>> col1 is col2
    True
 
 (2) Indexing multiple columns (*i.e.* with ``Sequence[str]``) returns a
     `view <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
-    of the ``DataPanel`` holding
+    of the ``DataFrame`` holding
     `coreferences <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
-    to the columns in the original ``DataPanel``. This means the
-    :class:`~meerkat.AbstractColumn` objects held in the new ``DataPanel`` are the
-    same :class:`~meerkat.AbstractColumn` objects held in the original ``DataPanel``.
+    to the columns in the original ``DataFrame``. This means the
+    :class:`~meerkat.AbstractColumn` objects held in the new ``DataFrame`` are the
+    same :class:`~meerkat.AbstractColumn` objects held in the original ``DataFrame``.
 
 .. code:: python
 
    # (1) `Sequence[str]` -> single column
-   >>> new_dp: mk.DataPanel = dp[["col_a", "col_b"]]
-   >>> new_dp["col_a"] is dp["col_a"]
+   >>> new_df: mk.DataFrame = df[["col_a", "col_b"]]
+   >>> new_df["col_a"] is df["col_a"]
    True
-   >>> new_dp["col_a"].data is dp["col_a"].data
+   >>> new_df["col_a"].data is df["col_a"].data
    True

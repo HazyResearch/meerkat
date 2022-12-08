@@ -34,8 +34,8 @@ def create_versions_html(versions: List[str]):
 
 
 def get_datasets_table():
-    dp = mk.datasets.catalog
-    df = dp.to_pandas()
+    df = mk.datasets.catalog
+    df = df.to_pandas()
     df["versions"] = df["name"].apply(
         lambda x: create_versions_html(mk.datasets.versions(x))
     )

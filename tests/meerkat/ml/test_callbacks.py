@@ -11,7 +11,7 @@ from numpy.lib.format import open_memmap
 from torch import nn
 from torch.utils.data import DataLoader
 
-from meerkat import DataPanel
+from meerkat import DataFrame
 from meerkat.columns.numpy_column import NumpyArrayColumn
 from meerkat.columns.tensor_column import TensorColumn
 from meerkat.ml import ActivationCallback, load_activations
@@ -42,8 +42,7 @@ class MockModel(pl.LightningModule):
 
 
 def generate_input(num_inputs, input_size: tuple, output_size: tuple):
-
-    dp = DataPanel(
+    df = DataFrame(
         {
             "input": torch.randn(num_inputs, *input_size),
             "index": np.arange(num_inputs),
@@ -51,7 +50,7 @@ def generate_input(num_inputs, input_size: tuple, output_size: tuple):
         }
     )
 
-    return dp
+    return df
 
 
 def train(
@@ -69,13 +68,13 @@ def train(
 
     pl.utilities.seed.seed_everything(seed)
 
-    train_dp = generate_input(num_inputs, input_size, output_size)
-    val_dp = generate_input(num_inputs, input_size, output_size)
+    train_df = generate_input(num_inputs, input_size, output_size)
+    val_df = generate_input(num_inputs, input_size, output_size)
 
     model = MockModel(input_size=input_size, output_size=output_size)
 
     activation_callback = ActivationCallback(
-        target_module=target_module, val_len=len(val_dp), logdir=logdir, mmap=mmap
+        target_module=target_module, val_len=len(val_df), logdir=logdir, mmap=mmap
     )
 
     model.train()
@@ -88,12 +87,12 @@ def train(
         default_root_dir=logdir,
     )
 
-    train_dl = DataLoader(train_dp, batch_size=batch_size, num_workers=num_workers)
-    valid_dl = DataLoader(val_dp, batch_size=batch_size, num_workers=num_workers)
+    train_dl = DataLoader(train_df, batch_size=batch_size, num_workers=num_workers)
+    valid_dl = DataLoader(val_df, batch_size=batch_size, num_workers=num_workers)
 
     trainer.fit(model, train_dl, valid_dl)
 
-    _ = model(val_dp["input"])
+    _ = model(val_df["input"])
     activations = activation_callback.activation_op.extractor.activation.cpu().detach()
 
     return model, activation_callback, activations
@@ -117,7 +116,7 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
 
         if mmap:
             activations = {f"activation_{target_module}": open_memmap(path)}
-            activations = DataPanel.from_batch(activations)
+            activations = DataFrame.from_batch(activations)
             assert isinstance(
                 activations[f"activation_{target_module}"], NumpyArrayColumn
             )
@@ -127,7 +126,7 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
             )
 
         else:
-            activations = DataPanel.read(path)
+            activations = DataFrame.read(path)
             assert isinstance(activations[f"activation_{target_module}"], TensorColumn)
 
         if mmap:
@@ -153,7 +152,7 @@ def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
         num_inputs=num_inputs, mmap=mmap, max_epochs=max_epochs, logdir=tmpdir
     )
 
-    activations_dp = load_activations(
+    activations_df = load_activations(
         target_module=target_module,
         logdir=tmpdir,
         epochs=[*range(max_epochs)],
@@ -161,12 +160,12 @@ def test_load_activations(target_module, num_inputs, mmap, max_epochs, tmpdir):
     )
 
     columns = [f"activation_{target_module}_{epoch}" for epoch in range(max_epochs)]
-    assert set(columns) == set(activations_dp.columns)
+    assert set(columns) == set(activations_df.columns)
 
     for col in columns:
         if mmap:
             assert (
-                torch.from_numpy(activations_dp[col].data) == true_activations
+                torch.from_numpy(activations_df[col].data) == true_activations
             ).all()
         else:
-            assert (activations_dp[col] == true_activations).all()
+            assert (activations_df[col] == true_activations).all()

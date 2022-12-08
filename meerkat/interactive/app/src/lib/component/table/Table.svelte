@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
-	import Table from '$lib/components/table/Table.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
+	import Table from '$lib/shared/table/Table.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let edit_target: Any;
 
 	export let page: number = 0;
@@ -14,8 +14,8 @@
 
 	export let column_widths: Array<number>;
 
-	$: schema_promise = $get_schema($dp.box_id);
-	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
+	$: schema_promise = $get_schema($df.ref_id);
+	$: rows_promise = $get_rows($df.ref_id, page * per_page, (page + 1) * per_page);
 
 	$: schema_promise.then((s: any) => {
 		if (column_widths == null) {
@@ -32,7 +32,7 @@
 		let row_index = rows.indices.indexOf(row);
 		let row_id = rows.rows[row_index][row_id_column_index];
 
-		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
+		$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
 	}
 </script>
 

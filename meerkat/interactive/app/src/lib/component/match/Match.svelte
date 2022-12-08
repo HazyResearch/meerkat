@@ -1,34 +1,31 @@
 <script lang="ts">
-	import { type Writable } from 'svelte/store';
-	import { onMount } from 'svelte';
+	import { get, writable, type Writable } from 'svelte/store';
+	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
+	import { getContext } from 'svelte';
+	import Status from '$lib/shared/common/Status.svelte';
+	import Select from 'svelte-select';
+	import type { Endpoint } from '$lib/utils/types';
 
-	export let dp: Writable;
+	const { get_schema, dispatch } = getContext('Interface');
+
+	export let df: Writable;
 	export let against: Writable<string>;
-	export let col: Writable<string>;
-	export let text: Writable<string>; //we can get rid of this.
-	export let title: string = '';
+	export let on_match: Endpoint;
+	export let text: Writable<string>;
+	export let title: Writable<string> = '';
+	export let get_match_schema: Endpoint;
+	
+	let status: string = 'waiting';
 
-	let divEl: HTMLDivElement = null;
-	let editor;
-	let monaco;
-	onMount(async () => {
-		// @ts-ignore
-		monaco = await import('monaco-editor');
-
-		let regex = 'col';
-		monaco.languages.register({ id: 'mySpecialLanguage' });
-
-		// Register a tokens provider for the language
-		monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
-			tokenizer: {
-				root: [
-					[/\[error.*/, 'custom-error'],
-					[/\[notice.*/, 'custom-notice'],
-					[/\[info.*/, 'custom-info'],
-					[/\[[a-zA-Z 0-9:]+\]/, 'custom-date']
-				]
-			}
+	let schema_promise;
+	let items_promise;
+	$: {
+		schema_promise = $dispatch(get_match_schema.endpoint_id, {}, {});
+		items_promise = schema_promise.then((schema: DataFrameSchema) => {
+			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
+	}
+	console.log(on_match)
 
 		// Define a new theme that contains only rules that match this language
 		monaco.editor.defineTheme('myCoolTheme', {
@@ -45,66 +42,45 @@
 			}
 		});
 
-		// Register a completion item provider for the new language
-		monaco.languages.registerCompletionItemProvider('mySpecialLanguage', {
-			provideCompletionItems: () => {
-				var suggestions = [
-					{
-						label: 'simpleText',
-						kind: monaco.languages.CompletionItemKind.Text,
-						insertText: 'simpleText'
-					},
-					{
-						label: 'testing',
-						kind: monaco.languages.CompletionItemKind.Keyword,
-						insertText: 'testing(${1:condition})',
-						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-					},
-					{
-						label: 'ifelse',
-						kind: monaco.languages.CompletionItemKind.Snippet,
-						insertText: ['if (${1:condition}) {', '\t$0', '} else {', '\t', '}'].join('\n'),
-						insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-						documentation: 'If-Else Statement'
-					}
-				];
-				return { suggestions: suggestions };
-			}
-		});
+	let on_search = async () => {
+		if ($against === '') {
+			status = 'error';
+			return;
+		}
+		status = 'working';
+		let promise = $dispatch(on_match.endpoint_id, {
+			"against": $against,
+			"query": $text
+		}, {});
+		promise
+			.then(() => {
+				status = 'success';
+			})
+			.catch((error: TypeError) => {
+				status = 'error';
+				console.log(error);
+			});
+	};
 
-		editor = monaco.editor.create(divEl, {
-			theme: 'myCoolTheme',
-			value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-			language: 'mySpecialLanguage'
-		});
+	function handleSelect(event) {
+		console.log("here")
+		console.log(against)
+		$against = event.detail.value;
+	}
 
-		return () => {
-			editor.dispose();
-		};
-	});
-
-	// monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
-	// 	tokenizer: {
-	// 		root: [
-	// 			[/\[error.*/, 'custom-error'],
-	// 			[/\[notice.*/, 'custom-notice'],
-	// 			[/\[info.*/, 'custom-info'],
-	// 			[/\[[a-zA-Z 0-9:]+\]/, 'custom-date']
-	// 		]
-	// 	}
-	// });
+	function handleClear() {
+		$against = '';
+	}
+	$: against_item = { value: $against, label: $against };
 </script>
 
-<div bind:this={divEl} class="h-screen" />
-
-<!-- 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
-	{#if title != ''}
-		<div class="font-bold text-xl text-slate-600 self-start pl-2">
-			{title}
+<div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
+	{#if $title != ''}
+		<div class="font-bold text-md text-slate-600 pl-2 text-center">
+			{$title}
 		</div>
 	{/if}
-	<div bind:this={divEl} class="h-screen" /> -->
+	<div bind:this={divEl} class="h-screen" /> 
 <!-- <div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
@@ -138,32 +114,5 @@
 				{/await}
 			</div>
 		</div>
-	</div> -->
-<!-- </div> -->
-<!-- 
-<div class="w-full py-5 px-2 bg-slate-100 ">
-    Match
-
-    <input type="text" bind:value={$against}>
-    <input type="text" bind:value={$text}>
-
-
-    Column: {$col}
-
-    <button class="bg-slate-500" on:click={on_add}> Add </button>
-    
-    {#await schema_promise}
-        waiting....
-    {:then schema}
-        <div class="flex space-x-3">
-            {#each schema.columns as column_info}  
-                <div class="bg-violet-200 rounded-md px-3 font-bold text-slate-700">
-                    {column_info.name}
-                </div>  
-            {/each}
-        </div>
-    {:catch error}
-        {error}
-    {/await}
-
+	</div>
 </div> -->

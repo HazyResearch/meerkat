@@ -34,16 +34,16 @@ Critically, the function inside a lambda column is only called at the time the c
 
     from PIL import Image
     
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "filepath": ["/abs/path/to/image0.jpg", ...], 
             "image_id": ["image0", ...] 
         }
     )
-    dp["image"] = dp["filepath"].to_lambda(fn=Image.open)
+    df["image"] = df["filepath"].to_lambda(fn=Image.open)
 
 Notice how we provide an absolute path to the images. This makes the column useable from any working directory. 
-However, using absolute paths is in other ways not ideal: what if we want to share the DataPanel and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.LambdaColumn` that makes it easy to manage filepaths. 
+However, using absolute paths is in other ways not ideal: what if we want to share the DataFrame and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.LambdaColumn` that makes it easy to manage filepaths. 
 
 FileColumn
 ########### 
@@ -58,24 +58,24 @@ When ``base_dir`` is provided, the paths passed to ``filepaths`` should be relat
 
     from PIL import Image
 
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "filepath": ["image0.jpg", ...], 
             "image_id": ["image0", ...] 
         }
     )
-    dp["image"] = mk.FileColumn.from_filepaths(
-        filepaths=dp["filepath"],
+    df["image"] = mk.FileColumn.from_filepaths(
+        filepaths=df["filepath"],
         loader=Image.open,
         base_dir="/abs/path/to",
     )
 
 
-The ``base_dir`` can then be changed at any time, so if we wanted to share the DataPanel with another user, we could instruct them to reset the base_dir using ``dp["image"].base_dir = "/other/users/abs/path/to"``. Introducing this additional step isn't ideal though, so we recommend using the environment variables technique as described below.
+The ``base_dir`` can then be changed at any time, so if we wanted to share the DataFrame with another user, we could instruct them to reset the base_dir using ``df["image"].base_dir = "/other/users/abs/path/to"``. Introducing this additional step isn't ideal though, so we recommend using the environment variables technique as described below.
 
 .. admonition:: Using Environment Variables in ``base_dir``
 
-    Environment variables in the ``base_dir`` argument are automatically expanded. For example, if you set the environment variable ``MEERKAT_BASE_DIR`` to ``"/abs/path/to"``, then you can use ``dp["image"].base_dir = "$MEERKAT_BASE_DIR/path/to"``. This is ideal for sharing DataPanels between different users and machines. 
+    Environment variables in the ``base_dir`` argument are automatically expanded. For example, if you set the environment variable ``MEERKAT_BASE_DIR`` to ``"/abs/path/to"``, then you can use ``df["image"].base_dir = "$MEERKAT_BASE_DIR/path/to"``. This is ideal for sharing DataFrames between different users and machines. 
 
     Note that the Meerkat dataset registry relies heavily on this technique, using a special environment variable ``MEERKAT_DATASET_DIR`` that points to the ``mk.config.datasets.root_dir``. 
     

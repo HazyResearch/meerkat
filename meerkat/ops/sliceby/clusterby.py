@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 import numpy as np
-import sklearn
 from sklearn.base import ClusterMixin
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ops.cluster import cluster
 
 from .sliceby import SliceBy
@@ -15,7 +14,7 @@ from .sliceby import SliceBy
 class ClusterBy(SliceBy):
     def __init__(
         self,
-        data: DataPanel,
+        data: DataFrame,
         by: Union[List[str], str],
         sets: Dict[Union[str, Tuple[str]], np.ndarray] = None,
     ):
@@ -23,17 +22,17 @@ class ClusterBy(SliceBy):
 
 
 def clusterby(
-    data: DataPanel,
+    data: DataFrame,
     by: Union[str, Sequence[str]],
     method: Union[str, ClusterMixin] = "KMeans",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
 ) -> ClusterBy:
-    """Perform a clusterby operation on a DataPanel.
+    """Perform a clusterby operation on a DataFrame.
 
     Args:
-        data (DataPanel): The datapanel to cluster.
+        data (DataFrame): The dataframe to cluster.
         by (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
             be embedded using the ``encoder`` and the resulting embedding will be used.
         method (Union[str, ClusterMixin]): The clustering method to use.

@@ -11,7 +11,7 @@ from torch.utils.data._utils.collate import default_collate
 
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform
@@ -25,7 +25,7 @@ except ImportError:
     _wilds_available = False
 
 
-def get_wilds_datapanel(
+def get_wilds_dataframe(
     dataset_name: str,
     root_dir: str,
     version: str = None,
@@ -35,14 +35,14 @@ def get_wilds_datapanel(
     use_transform: bool = True,
     include_raw_input: bool = True,
 ):
-    """Get a DataPanel that holds a WildsInputColumn alongside NumpyColumns for
+    """Get a DataFrame that holds a WildsInputColumn alongside NumpyColumns for
     targets and metadata.
 
     Example:
     Run inference on the dataset and store predictions alongside the data.
     .. code-block:: python
 
-        dp = get_wilds_datapanel("fmow", root_dir="/datasets/", split="test")
+        df = get_wilds_dataframe("fmow", root_dir="/datasets/", split="test")
         model = ... # get the model
         model.to(0).eval()
 
@@ -52,7 +52,7 @@ def get_wilds_datapanel(
             out = torch.softmax(model(batch["input"].to(0)), axis=-1)
             return {"pred": out.cpu().numpy().argmax(axis=-1)}
 
-        dp = dp.update(function=predict, batch_size=128, is_batched_fn=True)
+        df = df.update(function=predict, batch_size=128, is_batched_fn=True)
 
 
     Args:
@@ -95,7 +95,7 @@ def get_wilds_datapanel(
         data["raw_input"]._data.transform = lambda x: x
         data["raw_input"]._collate_fn = lambda x: x
 
-    return DataPanel(
+    return DataFrame(
         data,
         column_names=column_names,
         info=info,

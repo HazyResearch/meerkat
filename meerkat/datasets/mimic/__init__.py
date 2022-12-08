@@ -19,7 +19,7 @@ from .reports import ReportColumn
 logger = logging.getLogger(__name__)
 
 
-def build_mimic_dp(
+def build_mimic_df(
     dataset_dir: str,
     gcp_project: str,
     tables: Iterable[str] = None,
@@ -31,13 +31,13 @@ def build_mimic_dp(
     download_jpg: bool = False,
     download_resize: int = None,
     write: bool = False,
-) -> mk.DataPanel:
-    """Builds a `DataPanel` for accessing data from the MIMIC-CXR database
+) -> mk.DataFrame:
+    """Builds a `DataFrame` for accessing data from the MIMIC-CXR database
     https://physionet.org/content/mimic-cxr/2.0.0/ The MIMIC-CXR database
     integrates chest X-ray imaging data with structured EHR data from Beth
     Israel Deaconess Medical Center. The full database has an uncompressed size
-    of over 5 TB. This function quickly builds a `DataPanel` that can be used
-    to explore, slice and download the database. Building the DataPanel takes.
+    of over 5 TB. This function quickly builds a `DataFrame` that can be used
+    to explore, slice and download the database. Building the DataFrame takes.
 
     ~1 minute (when not downloading the radiology reports). The large CXR DICOM
     and JPEG files are not downloaded, but lazily pulled from Google Cloud
@@ -48,8 +48,8 @@ def build_mimic_dp(
     recommended that you cache the JPEG images locally bfore training. This can be
     accomplished by setting a `writer` and running a map over the data.
     ```
-        dp["jpg_img].writer = lambda path, img: x.save(path, img)
-        dp["jpg_img].map(lambda x: True)
+        df["jpg_img].writer = lambda path, img: x.save(path, img)
+        df["jpg_img].map(lambda x: True)
     ```
     The images will be saved in `dataset_dir`. This will take several hours for the full
     dataset. You can also slice down to a subset of the dataset before running the map.
@@ -58,7 +58,7 @@ def build_mimic_dp(
     JPEG in the MIMIC database). Each row is uniquely identified by the "dicom_id"
     column. Note that a single chest X-ray study (identified by "study_id" column) may
     consist of multiple images and a single patient (identified by "subject_id" column)
-    may have multiple studies in the database. The columns in the DataPanel can be
+    may have multiple studies in the database. The columns in the DataFrame can be
     grouped into four categories:
         1. (`PandasSeriesColumn`) Metadata and labels pulled from tables in the MIMIC-IV
             EHR database (e.g."pneumonia", "ethnicity", "view_position", "gender"). For
@@ -71,7 +71,7 @@ def build_mimic_dp(
         3. (`ReportColumn`) The radiology reports for each exam are downloaded to disk,
             and lazily loaded when accessed.
     The arguments below can be used to specify which of the columns to include in the
-    DataPanel.
+    DataFrame.
 
     Args:
         dataset_dir (str): A local directory in which downloaded data will be cached.
@@ -80,29 +80,29 @@ def build_mimic_dp(
             not have GCP project, see instructions for creating one here:
             https://cloud.google.com/resource-manager/docs/creating-managing-projects
         tables (Iterable[str], optional): A subset of ["patient", "admit", "labels",
-            "dicom_meta"] specifying which tables to include in the DataPanel.
+            "dicom_meta"] specifying which tables to include in the DataFrame.
             Defaults to None, in which case all of the tables listed in
             "meerkat.contrib.mimic.TABLES" will be included.
         excluded_tables (Iterable[str], optional): A subset of ["patient", "admit",
             "labels", "dicom_meta"] specifying which tables to exclude from the
-            DataPanel. Defaults to None, in which case none are excluded.
+            DataFrame. Defaults to None, in which case none are excluded.
         reports (bool, optional): Download reports if they aren't already downloaded
-            in `dataset_dir` and add a "report" column to the DataPanel. Defaults to
+            in `dataset_dir` and add a "report" column to the DataFrame. Defaults to
             False.
         cxr_dicom (bool, optional): Add a `GCSImagecolumn` called "cxr_dicom" to the
-            DataPanel for the DICOM files for each image. Defaults to True.
+            DataFrame for the DICOM files for each image. Defaults to True.
         cxr_jpg (bool, optional):  Add a `GCSImagecolumn` called "cxr_jpg" to the
-            DataPanel for the JPEG files for each image. Defaults to True.
+            DataFrame for the JPEG files for each image. Defaults to True.
         split (bool, optional): Add a "split" column with "train", "validate" and "test"
             splits. Defaults to True.
         download_jpg (bool, optional): Download jpegs for all the scans in the dataset
             to `dataset_dir`. Expect this to take several hours. Defaults to False.
         download_resize (bool, optional): Resize the images before saving them to disk.
             Defaults to None, in which case the images are not resized.
-        write (bool, optiional): Write the datapanel to the directory.
+        write (bool, optiional): Write the dataframe to the directory.
 
     Returns:
-        DataPanel: The MIMIC `DataPanel` with columns
+        DataFrame: The MIMIC `DataFrame` with columns
     """
     os.environ["GOOGLE_CLOUD_PROJECT"] = gcp_project
 
@@ -201,15 +201,15 @@ def build_mimic_dp(
     # convert to snake case
     df = df.rename(columns=lambda x: re.sub(r"(?<!^)(?<!_)(?=[A-Z])", "_", x).lower())
 
-    print("Preparing DataPanel...")
-    dp = mk.DataPanel.from_pandas(df)
+    print("Preparing DataFrame...")
+    df = mk.DataFrame.from_pandas(df)
 
     # add GCSImageColumn for the jpg version of the xrays
     if cxr_jpg:
-        paths = pd.Series(dp["dicom_path"].data)
-        dp["jpg_path"] = paths.str.split(".").str[0] + ".jpg"
-        dp["cxr_jpg"] = GCSImageColumn.from_blob_names(
-            blob_names=dp["jpg_path"],
+        paths = pd.Series(df["dicom_path"].data)
+        df["jpg_path"] = paths.str.split(".").str[0] + ".jpg"
+        df["cxr_jpg"] = GCSImageColumn.from_blob_names(
+            blob_names=df["jpg_path"],
             bucket_name="mimic-cxr-jpg-2.0.0.physionet.org",
             project=gcp_project,
             loader=Image.open,
@@ -218,8 +218,8 @@ def build_mimic_dp(
 
     # add GCSImageColumn for the dicoms
     if cxr_dicom:
-        dp["cxr_dicom"] = GCSImageColumn.from_blob_names(
-            blob_names=dp["dicom_path"],
+        df["cxr_dicom"] = GCSImageColumn.from_blob_names(
+            blob_names=df["dicom_path"],
             bucket_name="mimic-cxr-2.0.0.physionet.org",
             project=gcp_project,
             loader=dcmread,
@@ -245,8 +245,8 @@ def build_mimic_dp(
                     os.path.join(dataset_dir, "mimic-cxr-reports"),
                 ]
             )
-        dp["report"] = ReportColumn.from_filepaths(
-            reports_dir + "/" + dp["report_path"]
+        df["report"] = ReportColumn.from_filepaths(
+            reports_dir + "/" + df["report_path"]
         )
 
     if split:
@@ -261,8 +261,8 @@ def build_mimic_dp(
         )
         subprocess.run(["gunzip", filepath])
 
-        dp = dp.merge(
-            mk.DataPanel.from_csv(
+        df = df.merge(
+            mk.DataFrame.from_csv(
                 os.path.join(dataset_dir, "mimic-cxr-2.0.0-split.csv")
             )[["split", "dicom_id"]],
             how="left",
@@ -270,12 +270,12 @@ def build_mimic_dp(
         )
 
     if download_jpg:
-        dp = download_mimic_dp(dp, resize=download_resize)
+        df = download_mimic_df(df, resize=download_resize)
 
     if write:
-        dp.write(os.path.join(dataset_dir, "mimic.mk"))
+        df.write(os.path.join(dataset_dir, "mimic.mk"))
 
-    return dp
+    return df
 
 
 def query_mimic_db(query_str: str, gcp_project: str) -> pd.DataFrame:
@@ -299,10 +299,10 @@ def query_mimic_db(query_str: str, gcp_project: str) -> pd.DataFrame:
     return df
 
 
-def download_mimic_dp(mimic_dp: mk.DataPanel, resize: int = None, **kwargs):
-    col = mimic_dp["cxr_jpg"].view()
+def download_mimic_df(mimic_df: mk.DataFrame, resize: int = None, **kwargs):
+    col = mimic_df["cxr_jpg"].view()
     dataset_dir = col.local_dir
-    paths = mimic_dp["jpg_path"]
+    paths = mimic_df["jpg_path"]
     if resize:
         paths = paths.apply(
             lambda x: os.path.join(
@@ -325,5 +325,5 @@ def download_mimic_dp(mimic_dp: mk.DataPanel, resize: int = None, **kwargs):
         pbar=True,
     )
 
-    mimic_dp[f"cxr_jpg_{resize}"] = mk.ImageColumn.from_filepaths(paths)
-    return mimic_dp
+    mimic_df[f"cxr_jpg_{resize}"] = mk.ImageColumn.from_filepaths(paths)
+    return mimic_df

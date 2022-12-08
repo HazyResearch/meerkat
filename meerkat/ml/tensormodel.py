@@ -5,7 +5,7 @@ from typing import Dict, List
 import torch
 
 from meerkat.columns.tensor_column import TensorColumn
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 from meerkat.ml.instances_column import InstancesColumn
 from meerkat.ml.model import Model
 from meerkat.ml.segmentation_column import SegmentationOutputColumn
@@ -60,7 +60,7 @@ class TensorModel(Model):
 
         return output_dict
 
-    def process_batch(self, batch: DataPanel, input_columns: List[str]):
+    def process_batch(self, batch: DataFrame, input_columns: List[str]):
 
         # Convert the batch to torch.Tensor and move to device
         if self.task == "instance_segmentation":
@@ -72,11 +72,11 @@ class TensorModel(Model):
 
     def semantic_segmentation(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         input_columns: List[str],
         batch_size: int = 32,
         num_classes: int = None,
-    ) -> DataPanel:
+    ) -> DataFrame:
 
         # Handles outputs for semantic_segmentation tasks
 
@@ -93,7 +93,7 @@ class TensorModel(Model):
             logits=predictions["logits"].data, num_classes=num_classes
         )
 
-        output_dp = DataPanel(
+        output_df = DataFrame(
             {
                 "logits": output_col,
                 "probs": SegmentationOutputColumn(output_col.probabilities().data),
@@ -105,15 +105,15 @@ class TensorModel(Model):
         dataset.add_column("probs", output_col.probabilities())
         dataset.add_column("preds", output_col.predictions())
 
-        return output_dp
+        return output_df
 
     def timeseries(
-        self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
-    ) -> DataPanel:
+        self, dataset: DataFrame, input_columns: List[str], batch_size: int = 32
+    ) -> DataFrame:
 
         # Handles outputs for timeseries
 
-        output_dp = dataset.map(
+        output_df = dataset.map(
             function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
@@ -121,17 +121,17 @@ class TensorModel(Model):
             input_cols=input_columns,
         )
 
-        dataset.add_column("preds", output_dp["preds"])
+        dataset.add_column("preds", output_df["preds"])
 
-        return output_dp
+        return output_df
 
     def instance_segmentation(
-        self, dataset: DataPanel, input_columns: List[str], batch_size: int = 32
-    ) -> DataPanel:
+        self, dataset: DataFrame, input_columns: List[str], batch_size: int = 32
+    ) -> DataFrame:
 
         # Handles outputs for instance segmentation
 
-        output_dp = dataset.map(
+        output_df = dataset.map(
             function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
@@ -139,13 +139,13 @@ class TensorModel(Model):
             input_cols=input_columns,
         )
 
-        dataset.add_column("preds", output_dp["preds"])
+        dataset.add_column("preds", output_df["preds"])
 
-        return output_dp
+        return output_df
 
     def output(
         self,
-        dataset: DataPanel,
+        dataset: DataFrame,
         input_columns: List[str],
         batch_size: int = 32,
         num_classes: int = None,

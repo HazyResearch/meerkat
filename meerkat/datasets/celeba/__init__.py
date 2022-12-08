@@ -30,11 +30,11 @@ class celeba(DatasetBuilder):
 
     def build(self):
         df = build_celeba_df(dataset_dir=self.dataset_dir)
-        dp = mk.DataPanel.from_pandas(df)
-        dp["image"] = mk.ImageColumn.from_filepaths(
-            filepaths=dp["img_path"], base_dir=self.var_dataset_dir
+        df = mk.DataFrame.from_pandas(df)
+        df["image"] = mk.ImageColumn.from_filepaths(
+            filepaths=df["img_path"], base_dir=self.var_dataset_dir
         )
-        return dp
+        return df
 
     def download(self):
         download_celeba(self.dataset_dir)
@@ -90,11 +90,11 @@ def get_celeba(dataset_dir: str, download: bool = False):
     if download:
         download_celeba(dataset_dir=dataset_dir)
     df = build_celeba_df(dataset_dir=dataset_dir)
-    dp = mk.DataPanel.from_pandas(df)
-    dp["image"] = mk.ImageColumn.from_filepaths(
-        filepaths=dp["img_path"], base_dir=dataset_dir
+    df = mk.DataFrame.from_pandas(df)
+    df["image"] = mk.ImageColumn.from_filepaths(
+        filepaths=df["img_path"], base_dir=dataset_dir
     )
-    return dp
+    return df
 
 
 def download_celeba(dataset_dir: str):

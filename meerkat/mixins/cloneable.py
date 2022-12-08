@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.provenance import ProvenanceMixin
@@ -34,7 +35,7 @@ class CloneableMixin:
     def view(self) -> object:
         return self._clone()
 
-    def _clone(self, data: object = None):
+    def _clone(self, data: object = None, **kwargs):
         if data is None:
             if isinstance(self, BlockableMixin) and self.is_blockable():
                 data = self._pack_block_view()
@@ -42,6 +43,7 @@ class CloneableMixin:
                 data = self._view_data()
 
         state = self._get_state(clone=True)
+        state.update(kwargs)
 
         obj = self.__class__.__new__(self.__class__)
         obj._set_state(state)
@@ -53,6 +55,10 @@ class CloneableMixin:
 
         if isinstance(self, IdentifiableMixin):
             obj._set_id()
+
+        if isinstance(self, NodeMixin):
+            obj._set_inode()
+            # obj._set_children()
 
         return obj
 

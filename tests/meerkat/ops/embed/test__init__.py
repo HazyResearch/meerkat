@@ -83,38 +83,38 @@ def simple_encoder(monkeypatch):
 def test_embed_images(tmpdir: str, simple_encoder):
     image_testbed = ImageColumnTestBed(tmpdir=tmpdir)
 
-    dp = mk.DataPanel({"image": image_testbed.col})
-    dp = embed(
-        data=dp,
+    df = mk.DataFrame({"image": image_testbed.col})
+    df = embed(
+        data=df,
         input="image",
         encoder="_simple_encoder",
         batch_size=4,
         num_workers=0,
     )
 
-    assert isinstance(dp, mk.DataPanel)
-    assert "_simple_encoder(image)" in dp
+    assert isinstance(df, mk.DataFrame)
+    assert "_simple_encoder(image)" in df
     assert (
-        simple_image_transform(dp["image"][0]).mean()
-        == dp["_simple_encoder(image)"][0].mean()
+        simple_image_transform(df["image"][0]).mean()
+        == df["_simple_encoder(image)"][0].mean()
     )
 
 
 def test_embed_text(simple_encoder):
     testbed = TextColumnTestBed()
 
-    dp = mk.DataPanel({"text": testbed.col})
-    dp = embed(
-        data=dp,
+    df = mk.DataFrame({"text": testbed.col})
+    df = embed(
+        data=df,
         input="text",
         encoder="_simple_encoder",
         batch_size=4,
         num_workers=0,
     )
 
-    assert isinstance(dp, mk.DataPanel)
-    assert "_simple_encoder(text)" in dp
+    assert isinstance(df, mk.DataFrame)
+    assert "_simple_encoder(text)" in df
     assert (
-        simple_text_transform(dp["text"][0]).to(torch.float32).mean()
-        == dp["_simple_encoder(text)"][0].mean()
+        simple_text_transform(df["text"][0]).to(torch.float32).mean()
+        == df["_simple_encoder(text)"][0].mean()
     )

@@ -26,7 +26,6 @@ def lambda_cell_formatter(cell: LambdaCell):
 
 
 def image_formatter(cell: Image.Image):
-
     if not mk.config.display.show_images:
         return repr(cell)
 

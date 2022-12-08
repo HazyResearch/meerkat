@@ -26,7 +26,7 @@ class provenance:
         ```python
         import meerkat as mk
         with mk.provenance():
-            dp = mk.DataPanel.from_batch({...})
+            df = mk.DataFrame.from_batch({...})
         ```
         """
         self.prev = None
@@ -76,12 +76,12 @@ class ProvenanceMixin:
                         isinstance(node, ProvenanceOpNode)
                         and any(
                             [
-                                issubclass(node.type, mk.DataPanel)
+                                issubclass(node.type, mk.DataFrame)
                                 for node, key in node.children
                             ]
                         )
                     )
-                    or issubclass(node.type, mk.DataPanel)
+                    or issubclass(node.type, mk.DataFrame)
                 )
             ]
             edges = [
@@ -224,7 +224,7 @@ def capture_provenance(capture_args: Sequence[str] = None):
 
 
 def get_nested_objs(data):
-    """Recursively get DataPanels and Columns from nested collections."""
+    """Recursively get DataFrames and Columns from nested collections."""
     objs = {}
     _get_nested_objs(objs, (), data)
     return objs
@@ -238,7 +238,7 @@ def _get_nested_objs(objs: Dict, key: Tuple[str], data: object):
     elif isinstance(data, Mapping):
         for curr_key, item in data.items():
             _get_nested_objs(objs, key=(*key, curr_key), data=item)
-    elif isinstance(data, mk.DataPanel):
+    elif isinstance(data, mk.DataFrame):
         objs[key] = data
         for curr_key, item in data.items():
             _get_nested_objs(objs, key=(*key, curr_key), data=item)

@@ -1,26 +1,18 @@
-import functools
 import re
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple
 
-from fastapi import APIRouter, Body, HTTPException
-from pydantic import BaseModel
+from fastapi import HTTPException
 
 import meerkat as mk
-from meerkat.datapanel import DataPanel
-from meerkat.interactive import Modification, trigger
-from meerkat.interactive.graph import BoxModification, StoreModification
-from meerkat.state import state
-
-from ....tools.utils import convert_to_python
-from .datapanel import SchemaResponse
-
-EmbeddedBody = functools.partial(Body, embed=True)
-
-router = APIRouter(
-    prefix="/ops",
-    tags=["ops"],
-    responses={404: {"description": "Not found"}},
+from meerkat.dataframe import DataFrame
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import (
+    Store,
+    StoreModification,
+    trigger,
 )
+from meerkat.interactive.modification import DataFrameModification, Modification
+
 _SUPPORTED_MATCH_OPS = {
     "+": lambda x, y: x + y,
     "-": lambda x, y: x - y,
@@ -65,68 +57,63 @@ def _regex_parse_query(query: str) -> Tuple[List[str], Optional[Callable]]:
     return queries, op
 
 
-@router.post("/{box_id}/match/")
+@endpoint(prefix="/ops", route="/{df}/match/")
 def match(
-    box_id: str, input: str = Body(), query: str = Body(), col_out: str = Body(None)
+    df: DataFrame,
+    input: str = Endpoint.EmbeddedBody(),
+    query: str = Endpoint.EmbeddedBody(),
+    col_out: Store = Endpoint.EmbeddedBody(None),
 ) -> List[Modification]:
-    """Match a query string against a DataPanel column.
+    """Match a query string against a DataFrame column.
 
-    The `datapanel_id` remains the same as the original request.
+    The `dataframe_id` remains the same as the original request.
     """
-    box = state.identifiables.get(group="boxes", id=box_id)
-
-    dp = box.obj
-    if not isinstance(dp, DataPanel):
+    if not isinstance(df, DataFrame):
         raise HTTPException(
-            status_code=400, detail="`match` expects a box containing a datapanel"
+            status_code=400, detail="`match` expects a ref containing a dataframe"
         )
 
     try:
         # Parse the string to see if we should be running some operation on it.
-        # TODO (arjundd): Support more than one op. Potentially parse the string in order?
+        # TODO (arjundd): Support more than one op.
+        # Potentially parse the string in order?
         queries, op = _regex_parse_query(query)
-        dp, match_columns = mk.match(
-            data=dp, query=queries, input=input, return_column_names=True
+        df, match_columns = mk.match(
+            data=df, query=queries, input=input, return_column_names=True
         )
         if len(match_columns) > 1:
             assert op is not None
             col = f"_match_{input}_{query}"
-            dp[col] = _SUPPORTED_MATCH_OPS[op](
-                dp[match_columns[0]], dp[match_columns[1]]
+            df[col] = _SUPPORTED_MATCH_OPS[op](
+                df[match_columns[0]], df[match_columns[1]]
             )
             match_columns = [col] + match_columns
 
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=404, detail=str(e))
 
     modifications = [
-        BoxModification(id=box_id, scope=match_columns),
+        DataFrameModification(id=df.inode.id, scope=match_columns),  # FIXME: check
     ]
 
     if col_out is not None:
-        col_out_store = state.identifiables.get(group="stores", id=col_out)
-        col_out_store.value = match_columns[
-            0
-        ]  # TODO: match probably will only need to return one column in the future
+        # TODO: match probably will only need to return one column in the future
+        col_out.set(match_columns[0])
         modifications.append(
-            StoreModification(id=col_out, value=col_out_store.value),
+            StoreModification(id=col_out.id, value=col_out),  # FIXME: check
         )
 
     modifications = trigger(modifications)
     return modifications
-    # return SchemaResponse(id=pivot.datapanel_id, columns=_get_column_infos(dp, match_columns))
 
 
-@router.post("/{pivot_id}/add/")
-def add_column(pivot_id: str, column: str = EmbeddedBody()):
-    pivot = state.identifiables.get(group="boxes", id=pivot_id)
-    dp = pivot.obj
-
+@endpoint(prefix="/ops", route="/{df}/add/")
+def add_column(df: DataFrame, column: str = Endpoint.EmbeddedBody()):
     import numpy as np
 
-    dp[column] = np.zeros(len(dp))
-
-    modifications = [Modification(box_id=pivot_id, scope=[column])]
+    df[column] = np.zeros(len(df))
+    modifications = [
+        DataFrameModification(id=df.inode.id, scope=[column])
+    ]  # FIXME: check
     modifications = trigger(modifications)
     return modifications

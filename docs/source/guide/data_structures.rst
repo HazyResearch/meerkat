@@ -2,7 +2,7 @@
 Introduction to Data Structures 
 ================================
 
-Meerkat provides two data structures, the column and the datapanel, that together help 
+Meerkat provides two data structures, the column and the dataframe, that together help 
 you build, manage, and explore machine learning datasets . Everything you do with Meerkat will 
 involve one or both of these data structures, so we begin this user guide with their
 high-level introduction. 
@@ -31,9 +31,9 @@ we simply pass filepaths to the :class:`~meerkat.ImageColumn` constructor.
     img_col
 
     @suppress
-    from display import display_dp 
+    from display import display_df 
     @suppress
-    display_dp(img_col, "simple_column")
+    display_df(img_col, "simple_column")
 
 .. raw:: html
    :file: ../html/display/simple_column.html
@@ -69,34 +69,34 @@ appropriate column type.
     tensor = torch.tensor([1,2,3])
     mk.AbstractColumn.from_data(tensor)
 
-DataPanel
+DataFrame
 ----------
-A :class:`DataPanel` is a collection of equal-length columns (analagous to a `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame>`_ in Pandas or R). 
-DataPanels in Meerkat are used to manage datasets and per-example artifacts (*e.g.* model predictions and embeddings).  
+A :class:`DataFrame` is a collection of equal-length columns (analagous to a `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame>`_ in Pandas or R). 
+DataFrames in Meerkat are used to manage datasets and per-example artifacts (*e.g.* model predictions and embeddings).  
 
-Below we combine the columns we created above into a single DataPanel. We also add an 
+Below we combine the columns we created above into a single DataFrame. We also add an 
 additional column containing labels for the images. Note that we can pass non-Meerkat data 
 structures like ``list``, ``np.ndarray``, ``pd.Series``, and ``torch.Tensor``  directly to the 
-DataPanel constructor and Meerkat will infer the column type. We do not need to first 
+DataFrame constructor and Meerkat will infer the column type. We do not need to first 
 convert to a Meerkat column. 
 
 .. ipython:: python
 
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "img": img_col,
             "label": ["boombox", "truck", "dog"],
             "id": id_col, 
         }
     )
-    dp 
+    df 
 
     @suppress
-    from display import display_dp 
+    from display import display_df 
     @suppress
-    display_dp(dp, "simple_dp")
+    display_df(df, "simple_df")
 
 .. raw:: html
-   :file: ../html/display/simple_dp.html
+   :file: ../html/display/simple_df.html
 
-Read on to learn how we access the data in Columns and DataPanels.
+Read on to learn how we access the data in Columns and DataFrames.

@@ -13,7 +13,6 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import AbstractColumn
-from meerkat.display import lambda_cell_formatter
 from meerkat.errors import ConcatWarning, ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -54,10 +53,9 @@ class LambdaColumn(AbstractColumn):
         *args,
         **kwargs,
     ):
-
+        self._output_type = output_type
         super(LambdaColumn, self).__init__(data, *args, **kwargs)
 
-        self._output_type = output_type
 
     def _set(self, index, value):
         raise ImmutableError("LambdaColumn is immutable.")
@@ -119,12 +117,11 @@ class LambdaColumn(AbstractColumn):
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
-            # support old DataPanels.
+            # support old DataFrames.
             warnings.warn(
                 "Reading a LambdaColumn stored in a format that will soon be"
                 " deprecated. Please re-write the column to the new format."
             )
-            print("here")
             meta = yaml.load(
                 open(os.path.join(path, "data", "meta.yaml")),
                 Loader=yaml.FullLoader,
@@ -133,7 +130,7 @@ class LambdaColumn(AbstractColumn):
                 col = AbstractColumn.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
-                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                    "Support for LambdaColumns based on a DataFrame is deprecated."
                 )
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
@@ -146,9 +143,12 @@ class LambdaColumn(AbstractColumn):
                 batch_size=1,
             )
 
-    @staticmethod
-    def _get_default_formatter() -> Callable:
-        from meerkat.interactive.formatter import BasicFormatter
+    def _get_default_formatter(self) -> Callable:
+        from meerkat.interactive.formatter import BasicFormatter, PILImageFormatter
+
+        if self._output_type == Image.Image:
+            return PILImageFormatter()
+
         return BasicFormatter()
 
     def _repr_cell(self, idx):

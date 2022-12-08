@@ -1,16 +1,13 @@
 import subprocess
-import weakref
-from ast import Global
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping
 
 from fastapi import FastAPI, HTTPException
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.datapanel import DataPanel
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
+    from meerkat.interactive.graph import Modification
     from meerkat.interactive.server import Server
     from meerkat.mixins.identifiable import IdentifiableMixin
 
@@ -78,15 +75,15 @@ class NetworkInfo:
     @property
     def shareable_npm_server_url(self):
         if self.shareable_npm_server_name is None:
-            return None 
+            return None
         return f"http://{self.shareable_npm_server_name}"
-    
+
     @property
     def shareable_api_server_url(self):
         if self.shareable_api_server_name is None:
-            return None 
+            return None
         return f"http://{self.shareable_api_server_name}"
-    
+
     @property
     def npm_server_url(self):
         return f"http://{self.npm_server_name}:{self.npm_server_port}"
@@ -136,15 +133,17 @@ class Identifiables:
     """
 
     columns: WeakMapping = field(default_factory=WeakMapping)
-    datapanels: WeakMapping = field(default_factory=WeakMapping)
+    dataframes: WeakMapping = field(default_factory=WeakMapping)
     interfaces: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)
-    boxes: WeakMapping = field(default_factory=WeakMapping)
     box_operations: WeakMapping = field(default_factory=WeakMapping)
     components: WeakMapping = field(default_factory=WeakMapping)
-    boxes: WeakMapping = field(default_factory=WeakMapping)
+    refs: WeakMapping = field(default_factory=WeakMapping)
     stores: WeakMapping = field(default_factory=WeakMapping)
+    endpoints: WeakMapping = field(default_factory=WeakMapping)
+    routers: WeakMapping = field(default_factory=WeakMapping)
+    nodes: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
@@ -163,12 +162,47 @@ class Identifiables:
 
 
 @dataclass
+class ModificationQueue:
+    """A queue of modifications to be applied to a dataframe."""
+
+    queue: List["Modification"] = field(default_factory=list)
+
+    # Boolean attribute that controls whether the queue is accepting new
+    # modifications
+    # When _ready is False, `add` will no-op
+    _ready: bool = False
+
+    def add(self, modification: "Modification"):
+        if self._ready:
+            self.queue.append(modification)
+        # Do nothing if not ready
+
+    def clear(self) -> List["Modification"]:
+        """
+        Clear the modification queue, and return the old queue.
+        """
+        current_queue = self.queue
+        self.queue = []
+        return current_queue
+
+    def ready(self):
+        """
+        Ready the queue for accepting new modifications.
+        """
+        self._ready = True
+    
+    def unready(self):
+        self._ready = False
+
+
+@dataclass
 class GlobalState:
 
     network_info: NetworkInfo = None
     identifiables: Identifiables = field(default_factory=Identifiables)
     secrets: Secrets = field(default_factory=Secrets)
     llm: LanguageModel = field(default_factory=LanguageModel)
+    modification_queue: ModificationQueue = field(default_factory=ModificationQueue)
 
 
 global state

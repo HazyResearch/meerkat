@@ -12,16 +12,18 @@ import pandas as pd
 import torch
 
 import meerkat.config
+from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
-from meerkat.mixins.materialize import MaterializationMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
@@ -43,7 +45,9 @@ class AbstractColumn(
     LambdaMixin,
     MappableMixin,
     MaterializationMixin,
+    NodeMixin,
     ProvenanceMixin,
+    ReactifiableMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
@@ -56,7 +60,7 @@ class AbstractColumn(
     # Create a directory
     logdir.mkdir(parents=True, exist_ok=True)
 
-    identifiable_group: str = "columns"
+    _self_identifiable_group: str = "columns"
 
     def __init__(
         self,
@@ -102,6 +106,39 @@ class AbstractColumn(
         if self.is_blockable():
             data = self._unpack_block_view(data)
         self._data = data
+
+    def _is_valid_primary_key(self):
+        """Subclasses should implement checks for ensuring that the column could be used
+        as a valid primary key. Specifically, the check should ensure that the values
+        in the column are unique. If the check does not pass, returns False.
+        If the subclass has not implemented this method.
+        """
+        return False
+
+    def _keyidx_to_posidx(self, keyidx: Any) -> int:
+        """
+        Get the posidx of the first occurrence of the given keyidx. Raise a key error
+        if the keyidx is not found.
+
+        Args:
+            keyidx: The keyidx to search for.
+
+        Returns:
+            The posidx of the first occurrence of the given keyidx.
+        """
+        raise NotImplementedError()
+
+    def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
+        """Get the posidxs of the given keyidxs. Raise a key error if any of the
+        keyidxs are not found.
+
+        Args:
+            keyidxs: The keyidxs to search for.
+
+        Returns:
+            The posidxs of the given keyidxs.
+        """
+        raise NotImplementedError()
 
     @property
     def data(self):
@@ -390,7 +427,7 @@ class AbstractColumn(
                 use for sampling.
 
         Return:
-            AbstractColumn: A random sample of rows from the DataPanel.
+            AbstractColumn: A random sample of rows from the DataFrame.
         """
         from meerkat import sample
 

@@ -142,7 +142,6 @@ def test_apply_get_multiple(num_blocks, consolidated):
     product([1, 2, 3], [True, False]),
 )
 def test_apply_get_single(num_blocks, consolidated):
-
     mgr = BlockManager()
 
     for dtype in [int, float]:
@@ -191,18 +190,16 @@ def call_count(monkeypatch):
 
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_single_lambda(call_count, consolidated):
-
     mgr = BlockManager()
-
     base_col = mk.NumpyArrayColumn(np.arange(10))
     mgr.add_column(base_col, "a")
-    lambda_column = base_col.to_lambda(lambda x: x + 2)
-    mgr.add_column(lambda_column, "b")
+    # lambda_column = base_col.to_lambda(lambda x: x + 2)
+    # mgr.add_column(lambda_column, "b")
 
     if consolidated:
         mgr.consolidate()
 
-    mgr.apply(method_name="_get", index=1, materialize=False)
+    mgr.apply(method_name="_get", index=1, materialize=True)
 
     # we should only call NumpyBlock._get once
     assert call_count["count"] == 1
@@ -210,7 +207,6 @@ def test_apply_get_single_lambda(call_count, consolidated):
 
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_multiple_lambda(call_count, consolidated):
-
     mgr = BlockManager()
 
     base_col = mk.NumpyArrayColumn(np.arange(10))
@@ -418,7 +414,7 @@ def test_io_lambda_args(tmpdir, column_type, column_order):
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
 
-    # ensure that in the loaded dp, the lambda column points to the same
+    # ensure that in the loaded df, the lambda column points to the same
     # underlying data as the base column
     assert new_mgr[col_name].data.args[0] is new_mgr[base_col_name]
 
@@ -454,7 +450,7 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
 
-    # ensure that in the loaded dp, the lambda column points to the same
+    # ensure that in the loaded df, the lambda column points to the same
     # underlying data as the base column
     # TODO: this should work once we get topological sort correct
     assert new_mgr["c"].data.args[0] is new_mgr["b"]

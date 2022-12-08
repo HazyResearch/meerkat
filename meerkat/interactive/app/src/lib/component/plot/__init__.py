@@ -1,67 +1,44 @@
-from typing import Sequence, Union
+from pydantic import Field
 
-from meerkat.datapanel import DataPanel
-from meerkat.interactive.graph import Pivot, Store, make_store
-from meerkat.ops.sliceby.sliceby import SliceBy
+from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph import Store
 
 from ..abstract import Component
+from meerkat.interactive.endpoint import Endpoint
+
+
+def is_none(x):
+    return (isinstance(x, Store) and x.__wrapped__ is None) or x is None
 
 
 class Plot(Component):
-    name: str = "Plot"
+    # name: str = "Plot"
 
-    def __init__(
-        self,
-        data: Pivot[DataPanel],
-        selection: Union[list, Store],
-        x: Union[str, Store],
-        y: Union[str, Store],
-        x_label: Union[str, Store],
-        y_label: Union[str, Store],
-        id: Union[str, Store] = "key", 
-        type: str = "scatter",
-        slot: str = None,
-        keys_to_remove: Union[str, Store] = None,
-        metadata_columns: Sequence[str] = None,
-        can_remove: bool = True,
-    ) -> None:
-        super().__init__()
-        self.data = data
-        self.selection = make_store(selection)
-        self.x = make_store(x)
-        self.y = make_store(y)
-        self.id = id
-        self.x_label = make_store(x_label)
-        self.y_label = make_store(y_label)
-        self.type = type
-        self.slot = slot
-        self.can_remove = can_remove
-        
-        if metadata_columns is None:
-            metadata_columns = []
-        self.metadata_columns = metadata_columns
+    df: "DataFrame"
+    x: Store[str]
+    y: Store[str]
+    primary_key: Store[str] = None
+    x_label: Store[str] = None
+    y_label: Store[str] = None
+    type: Store[str] = Store("scatter")
+    slot: str = None
+    keys_to_remove: Store[list] = Field(default_factory=lambda: Store(list()))
+    metadata_columns: list = Field(default_factory=list)
 
-        if keys_to_remove is None:
-            keys_to_remove = []
-        self.keys_to_remove = make_store(keys_to_remove)
+    on_select: Endpoint = None
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # FIXME: this is buggy code, will create two stores for x and
+        # x_label if x is a string, and x_label is None
+        # and will create a single store for x and x_label if x is a store
+        # and x_label is None
+        if is_none(self.x_label):
+            self.x_label = self.x
+        if is_none(self.y_label):
+            self.y_label = self.y
 
-    @property
-    def props(self):
-        props = {
-            "dp": self.data.config,
-            "selection": self.selection.config,
-            "x": self.x.config,
-            "y": self.y.config,
-            "x_label": self.x_label.config,
-            "y_label": self.y_label.config,
-            "type": self.type,
-            "id": self.id if isinstance(self.id, str) else self.id.config,
-            "keys_to_remove": self.keys_to_remove.config,
-            "can_remove": self.can_remove,
-        }
-        if self.slot is not None:
-            props["slot"] = self.slot
-        if self.metadata_columns is not None:
-            props["metadata_columns"] = self.metadata_columns
-        return props
+        if not is_none(self.primary_key):
+            self.df = self.df.set_primary_key(self.primary_key)
+        self.primary_key = Store(self.df.primary_key_name)
+        self.selection = Store([0])

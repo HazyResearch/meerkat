@@ -5,16 +5,16 @@ import numpy as np
 import meerkat as mk
 from meerkat.interactive.graph import Store
 
-dp = mk.get("celeba")
+df = mk.get("celeba")
 
 
-def plot(dp: mk.DataPanel) -> mk.gui.Interface:
-    pivot = mk.gui.Pivot(dp)
+def plot(df: mk.DataFrame) -> mk.gui.Interface:
+    pivot = mk.gui.Reference(df)
     selection = mk.gui.Store([])
 
-    @mk.gui.interface_op
-    def sliceby(dp: mk.DataPanel):
-        sb = dp.sliceby(
+    @mk.gui.reactive
+    def sliceby(df: mk.DataFrame):
+        sb = df.sliceby(
             [
                 "male",
                 "brown_hair",
@@ -36,10 +36,10 @@ def plot(dp: mk.DataPanel) -> mk.gui.Interface:
         result = sb["smiling"].mean()
         return result, sb
 
-    sb_dp, sb = sliceby(pivot)
+    sb_df, sb = sliceby(pivot)
 
     plot = mk.gui.Plot(
-        sb_dp,
+        sb_df,
         selection=selection,
         x="smiling",
         y="slice",
@@ -48,24 +48,24 @@ def plot(dp: mk.DataPanel) -> mk.gui.Interface:
         slot="plot",
     )
 
-    @mk.gui.interface_op
+    @mk.gui.reactive
     def filter_selection(
-        dp: mk.DataPanel, sb, sb_dp: mk.DataPanel, selection: List[int]
+        df: mk.DataFrame, sb, sb_df: mk.DataFrame, selection: List[int]
     ):
         if len(selection) == 0:
-            return dp
+            return df
 
         rows = []
         for idx in selection:
-            key = sb_dp["slice"][idx]
+            key = sb_df["slice"][idx]
             rows.extend(sb.slices[key])
 
-        return dp.lz[np.array(rows)]
+        return df.lz[np.array(rows)]
 
-    filtered_dp = filter_selection(pivot, sb, sb_dp, selection)
+    filtered_df = filter_selection(pivot, sb, sb_df, selection)
 
     gallery = mk.gui.Gallery(
-        dp=filtered_dp,
+        df=filtered_df,
         main_column="image",
         tag_columns=["smiling"],
         edit_target=mk.gui.EditTarget(
@@ -85,4 +85,4 @@ def plot(dp: mk.DataPanel) -> mk.gui.Interface:
 
 
 mk.gui.start()
-plot(dp).launch()
+plot(df).launch()

@@ -1,16 +1,12 @@
 import meerkat as mk
 
-dp = mk.get("imagenette", version="160px")
+df = mk.get("imagenette", version="160px")
 
-dp_pivot = mk.gui.Pivot(dp)
+df_pivot = mk.gui.Reference(df)
 
-value="Hello World"
+value = "Hello World"
 
-gallery = mk.gui.Gallery(
-    dp_pivot,
-    main_column="img",
-    tag_columns=["label"]
-)
+gallery = mk.gui.Gallery(df_pivot, main_column="img", tag_columns=["label"])
 
 markdown = mk.gui.Markdown(
     """## Hello World"""

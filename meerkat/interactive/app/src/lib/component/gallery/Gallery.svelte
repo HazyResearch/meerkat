@@ -1,18 +1,17 @@
 <script lang="ts">
-	import Pagination from '$lib/components/pagination/Pagination.svelte';
+	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';
-import Selected from './Selected.svelte';
+	import Selected from './Selected.svelte';
 
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let main_column: Writable<string>;
-	export let tag_columns: Writable<Array<string>>;
-	export let edit_target: Any;
+	export let tag_columns: Any; // Writable<Array<string>>;
 	export let primary_key: string;
 	export let selected: Writable<Array<string>>;
 
@@ -21,21 +20,30 @@ import Selected from './Selected.svelte';
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = $get_schema($dp.box_id);
-	$: rows_promise = $get_rows($dp.box_id, page * per_page, (page + 1) * per_page);
+	$: schema_promise = $get_schema($df.ref_id);
 
-	async function handle_edit(event: any) {
-		let { pivot, pivot_id_column, id_column } = edit_target;
-		let rows = await rows_promise;
+	// create an array with the main_column and the tag_columns
+	$: rows_promise = $get_rows(
+		$df.ref_id,
+		page * per_page,
+		(page + 1) * per_page
+		// TODO (Sabri): we should limit the columns only to the main_column and the
+		// tag_columns and primary_key as described below
+		// null,
+		// [$main_column, primary_key].concat($tag_columns)
+	);
 
-		let { row, column, value } = event.detail;
-		let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
-		let row_index = rows.indices.indexOf(row);
-		let row_id = rows.rows[row_index][row_id_column_index];
+	// async function handle_edit(event: any) {
+	// 	let { pivot, pivot_id_column, id_column } = edit_target;
+	// 	let rows = await rows_promise;
 
-		$edit(pivot.box_id, value, column, row_id, pivot_id_column);
-	}
+	// 	let { row, column, value } = event.detail;
+	// 	let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
+	// 	let row_index = rows.indices.indexOf(row);
+	// 	let row_id = rows.rows[row_index][row_id_column_index];
 
+	// 	$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
+	// }
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
@@ -48,8 +56,8 @@ import Selected from './Selected.svelte';
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
 				<div class="font-semibold self-center px-10 flex space-x-2">
 					{#if $selected.length > 0}
-						<Selected></Selected>
-						<div class="text-violet-600">{$selected.length} </div> 
+						<Selected />
+						<div class="text-violet-600">{$selected.length}</div>
 					{/if}
 				</div>
 				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">

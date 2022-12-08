@@ -1,6 +1,6 @@
 from typing import Dict, List, Union
 
-from meerkat.datapanel import DataPanel
+from meerkat.dataframe import DataFrame
 
 from .celeba import celeba
 from .coco import coco
@@ -42,7 +42,7 @@ def get(
     download_mode: str = "reuse",
     registry: str = None,
     **kwargs,
-) -> Union[DataPanel, Dict[str, DataPanel]]:
+) -> Union[DataFrame, Dict[str, DataFrame]]:
     """Load a dataset into .
 
     Args:
@@ -55,8 +55,9 @@ def get(
             even if it exists, "extract" will reuse any downloaded archives but
             force extracting those archives, and "skip" will not download the dataset
             if it doesn't yet exist. Defaults to `reuse`.
-        registry (str): The registry to use. If None, then checks each supported registry in turn. 
-            Currently, supported registries include `meerkat` and `huggingface`.
+        registry (str): The registry to use. If None, then checks each
+            supported registry in turn. Currently, supported registries
+            include `meerkat` and `huggingface`.
         **kwargs: Additional arguments passed to the dataset.
     """
     if download_mode not in DOWNLOAD_MODES:
@@ -97,10 +98,13 @@ def get(
                     raise ValueError(
                         "Download mode `skip` isn't supported for HuggingFace datasets."
                     )
-                dataset = DataPanel.from_huggingface(
+
+                # Add version argument if specified
+                if version is not None:
+                    kwargs["version"] = version
+                dataset = DataFrame.from_huggingface(
                     path=name,
                     download_mode=mapping[download_mode],
-                    version=version,
                     cache_dir=dataset_dir,
                     **kwargs,
                 )
@@ -118,8 +122,7 @@ def get(
 
 
 def versions(name: str) -> List[str]:
-    """
-    Get the versions of a dataset. These can be passed to the ``version``
+    """Get the versions of a dataset. These can be passed to the ``version``
     argument of the :func:`~meerkat.get` function.
 
     Args:

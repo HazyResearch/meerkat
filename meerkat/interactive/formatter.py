@@ -3,16 +3,17 @@
 1.
 """
 import base64
+import math
 from abc import ABC, abstractmethod
 from io import BytesIO
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
-import PIL
+import pandas as pd
 import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
-import pandas as pd
+
 if TYPE_CHECKING:
     from meerkat.columns.file_column import FileCell
 
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
 class Formatter(ABC):
 
     # one of the front end cell components implemented here:
-    # meerkat/interactive/app/src/lib/components/item
+    # meerkat/interactive/app/src/lib/shared/item
     # (e.g. "image", "code")
     cell_component: str
 
@@ -68,10 +69,15 @@ class BasicFormatter(Formatter):
         self.dtype = dtype
 
     def encode(self, cell: Any):
+        # check for native python nan
+        if isinstance(cell, float) and math.isnan(cell):
+            return "NaN"
+
         if isinstance(cell, np.generic):
             if pd.isna(cell):
-                return "nan"
+                return "NaN"
             return cell.item()
+
         if hasattr(cell, "as_py"):
             return cell.as_py()
         return cell
@@ -101,11 +107,12 @@ class ObjectFormatter(Formatter):
 
 
 class NumpyArrayFormatter(BasicFormatter):
+
     cell_component = "basic"
 
     def encode(self, cell: Any):
         if isinstance(cell, np.ndarray):
-            return str(cell)
+            return str(f"Tensor of shape {cell.shape}")
         return super().encode(cell)
 
     def html(self, cell: Any):
@@ -120,14 +127,14 @@ class IntervalFormatter(NumpyArrayFormatter):
     def encode(self, cell: Any):
         if cell is not np.ndarray:
             return super().encode(cell)
-        
+
         if cell.shape[0] != 3:
             raise ValueError(
                 "Cell used with `IntervalFormatter` must be np.ndarray length 3 "
                 "length 3. Got shape {}".format(cell.shape)
             )
 
-        return [super().encode(v) for v in cell] 
+        return [super().encode(v) for v in cell]
 
     def html(self, cell: Any):
         if isinstance(cell, np.ndarray):
@@ -147,6 +154,22 @@ class TensorFormatter(BasicFormatter):
         if isinstance(cell, torch.Tensor):
             return str(cell)
         return format_array(np.array([cell]), formatter=None)[0]
+
+
+class ImageURLFormatter(Formatter):
+
+    cell_component = "image"
+
+    def encode(self, cell: Any):
+        if isinstance(cell, str):
+            return cell
+        elif isinstance(cell, FileCell):
+            return cell.url
+        else:
+            raise ValueError("ImageURLFormatter can only be used with str or FileCell")
+
+    def html(self, cell: Any):
+        return f"""<img src="{self.encode(cell)}" />"""
 
 
 class PILImageFormatter(Formatter):

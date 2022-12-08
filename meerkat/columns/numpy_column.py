@@ -7,7 +7,7 @@ import numbers
 import os
 import shutil
 from mmap import mmap
-from typing import Callable, List, Sequence, Union
+from typing import Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -193,11 +193,40 @@ class NumpyArrayColumn(
         if self.dtype.type is np.str_:
             return NumpyArrayFormatter(dtype="str")
 
-        cell = self[0]
+        cell = self.data[0]
         if isinstance(cell, np.generic):
             return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
 
         return NumpyArrayFormatter()
+    
+    def _is_valid_primary_key(self):
+        if self.dtype.kind == "f":
+            # can't use floats as primary keys
+            return False
+            
+        if len(self.shape) != 1:
+            # can't use multidimensional arrays as primary keys
+            return False
+        return len(np.unique(self.data)) == len(self)
+
+    def _keyidx_to_posidx(self, keyidx: Any) -> int:
+        # TODO(sabri): when we implement indices, we should use them here if we have
+        # one
+        where_result = np.where(self.data == keyidx)
+        if len(where_result[0]) == 0:
+            raise KeyError(f"keyidx {keyidx} not found in column.")
+
+        posidx = where_result[0][0]
+        return int(posidx)
+
+    def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
+        posidxs = np.where(np.isin(self.data, keyidxs))[0]
+
+        diff = np.setdiff1d(keyidxs, self.data[posidxs])
+        if len(diff) > 0:
+            raise KeyError(f"Key indexes {diff} not found in column.")
+
+        return posidxs
 
     def sort(
         self,

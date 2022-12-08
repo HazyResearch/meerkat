@@ -1,32 +1,14 @@
 from typing import Dict, List
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import HTTPException
 from pydantic import BaseModel
 
+from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.formatter import BasicFormatter
 from meerkat.ops.sliceby.sliceby import SliceBy, SliceKey
 from meerkat.state import state
 
-from .datapanel import RowsResponse, _get_column_infos
-
-
-def get_sliceby(sliceby_id: str) -> SliceBy:
-    try:
-
-        datapanel = state.identifiables.slicebys[sliceby_id]
-
-    except KeyError:
-        raise HTTPException(
-            status_code=404, detail="No datapanel with id {}".format(sliceby_id)
-        )
-    return datapanel
-
-
-router = APIRouter(
-    prefix="/sliceby",
-    tags=["sliceby"],
-    responses={404: {"description": "Not found"}},
-)
+from .dataframe import RowsResponse, _get_column_infos
 
 
 class InfoResponse(BaseModel):
@@ -41,11 +23,9 @@ class InfoResponse(BaseModel):
         smart_union = True
 
 
-@router.get("/{box_id}/info/")
-def get_info(box_id: str) -> InfoResponse:
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
-
+@endpoint(prefix="/sliceby", route="/{sb}/info/", method="GET")
+def get_info(sb: SliceBy) -> InfoResponse:
+    # FIXME Make sure the SliceBy object works for this endpoint
     return InfoResponse(
         id=sb.id,
         type=type(sb).__name__,
@@ -66,15 +46,13 @@ class SliceByRowsRequest(BaseModel):
         smart_union = True
 
 
-@router.post("/{box_id}/rows/")
+@endpoint(prefix="/sliceby", route="/{sb}/rows/")
 def get_rows(
-    box_id: str,
+    sb: SliceBy,
     request: SliceByRowsRequest,
 ) -> RowsResponse:
-    """Get rows from a DataPanel as a JSON object."""
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
-
+    """Get rows from a DataFrame as a JSON object."""
+    # FIXME Make sure the SliceBy object works for this endpoint
     slice_key = request.slice_key
     full_length = sb.get_slice_length(slice_key)
     column_infos = _get_column_infos(sb.data, request.columns)
@@ -82,18 +60,18 @@ def get_rows(
     sb = sb[[info.name for info in column_infos]]
 
     if request.indices is not None:
-        dp = sb.slice[slice_key, request.indices]
+        df = sb.slice[slice_key, request.indices]
         indices = request.indices
     elif request.start is not None:
-        dp = sb.slice[slice_key, request.start : request.end]
+        df = sb.slice[slice_key, request.start : request.end]
         indices = list(range(request.start, request.end))
     else:
         raise ValueError()
 
     rows = []
-    for row in dp.lz:
+    for row in df.lz:
         rows.append(
-            [dp[info.name].formatter.encode(row[info.name]) for info in column_infos]
+            [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
     return RowsResponse(
         column_infos=column_infos,
@@ -103,20 +81,17 @@ def get_rows(
     )
 
 
-@router.post("/{box_id}/aggregate/")
+@endpoint(prefix="/sliceby", route="/{sb}/aggregate/")
 def aggregate(
-    box_id: str,
-    aggregation_id: str = Body(None),
-    aggregation: str = Body(None),
-    accepts_dp: bool = Body(False),
-    columns: List[str] = Body(None),
+    sb: SliceBy,
+    aggregation_id: str = Endpoint.EmbeddedBody(None),
+    aggregation: str = Endpoint.EmbeddedBody(None),
+    accepts_df: bool = Endpoint.EmbeddedBody(False),
+    columns: List[str] = Endpoint.EmbeddedBody(None),
 ) -> Dict:
-    box = state.identifiables.get(group="boxes", id=box_id)
-    sb = box.obj
-
-    sliceby = sb
+    # FIXME Make sure the SliceBy object works for this endpoint
     if columns is not None:
-        sliceby = sliceby[columns]
+        sb = sb[columns]
 
     if (aggregation_id is None) == (aggregation is None):
         raise HTTPException(
@@ -126,16 +101,16 @@ def aggregate(
 
     if aggregation_id is not None:
         aggregation = state.identifiables.get(id=aggregation_id, group="aggregations")
-        value = sliceby.aggregate(aggregation, accepts_dp=accepts_dp)
+        value = sb.aggregate(aggregation, accepts_df=accepts_df)
 
     else:
         if aggregation not in ["mean", "sum", "min", "max"]:
             raise HTTPException(
                 status_code=400, detail=f"Invalid aggregation {aggregation}"
             )
-        value = sliceby.aggregate(aggregation)
+        value = sb.aggregate(aggregation)
 
     # convert to dict format for output
-    df = value.to_pandas().set_index(sliceby.by)
+    df = value.to_pandas().set_index(sb.by)
     dct = df.applymap(BasicFormatter().encode).to_dict()
     return dct

@@ -1,16 +1,14 @@
 from __future__ import annotations
-from ctypes import Union
-from email.policy import default
-import io
-import functools
 
+import functools
+import io
 import logging
 import os
 import urllib.request
 import warnings
+from ctypes import Union
 from string import Template
-from typing import BinaryIO, BinaryIO, Callable, Sequence
-from urllib.error import HTTPError
+from typing import IO, Any, Callable, Sequence
 from urllib.parse import urlparse
 
 import dill
@@ -30,19 +28,57 @@ logger = logging.getLogger(__name__)
 class FileLoader:
     def __init__(
         self,
-        transform: callable = None,
-        loader: callable = None,
-        downloader: Union[str, Callable] = None,
-        fallback_downloader: Callable = None,
-        cache_dir: str = None,
+        loader: Union[str, Callable[[Union[str, IO]], Any]],
         base_dir: str = None,
+        downloader: Union[str, Callable] = None,
+        fallback_downloader: Callable[[Union[str, IO]], None] = None,
+        cache_dir: str = None,
+        transform: Callable[[Any], Any] = None,
     ):
-        """
+        """A simple file loader with support for both local paths and remote URIs.
+        
+        .. warning::
+            In order for the column to be serializable with ``write()``, the 
+            callables passed to the constructor must be pickleable.
+
         Args:
-            downloader (callable): a callable that accepts at least two positional
-                arguments - a URI and a destination (which could be either a string or
-                file object). Optionally, it can accept a `fallback_downloader` argument, which
-                the
+            loader (callable): a callable that accepts a filepath or an I/O
+                stream and returns data.  
+
+            base_dir (str, optional): an absolute path to a directory containing the 
+                files. If provided, the ``filepath`` to be loaded will be joined with
+                the ``base_dir``. As such, this argument should only be used if the 
+                loader will be applied to relative paths. T
+                
+                The ``base_dir`` can also 
+                include environment variables (e.g. ``$DATA_DIR/images``) which will 
+                be expanded prior to loading. This is useful when sharing DataFrames
+                between machines. 
+
+            downloader (Union[str, callable], optional): a callable that accepts at 
+                least two  positional arguments - a URI and a destination (which could 
+                be either a string or file object). 
+
+                Meerkat includes a small set of built-in downloaders ["url", "gcs"]
+                which can be specified via string. 
+
+            fallback_downloader (callable, optional): a callable that will be run each 
+                time the the downloader fails (for any reason). This is useful, for 
+                example, if you expect some of the URIs in a dataset to be broken
+                ``fallback_downloader`` could write an empty file in place of the 
+                original. If ``fallback_downloader`` is not supplied, the original 
+                exception is re-raised. 
+
+            cache_dir (str, optional): the directory on disk where downloaded 
+                files are to be cached. Defaults to None, in which case files will be 
+                re-downloaded on every access of the data. The ``cache_dir`` can also 
+                include environment variables (e.g. ``$DATA_DIR/images``) which will 
+                be expanded prior to loading. This is useful when sharing DataFrames
+                between machines. 
+                
+            transform (callable, optional): an optional callable which will be applied
+                to the data after loading. This is useful, for example, in machine 
+                learning workflows where raw data requires conversion to Tensors.
         """
         self.transform = transform
         self.loader = loader
@@ -63,7 +99,7 @@ class FileLoader:
                 filepath. Otherwise, it is interpreted as a URI from which the file can
                 be downloaded.
         """
-        # support including environment varaiables in the base_dir so that DataPanels
+        # support including environment varaiables in the base_dir so that DataFrames
         # can be easily moved between machines
         if self.base_dir is not None:
 
@@ -106,8 +142,9 @@ class FileLoader:
                     self.downloader(filepath, dst)
                 except Exception as e:
                     if self.fallback_downloader is not None:
-                        # if user passes fallback_downloader, then on any failed download, we
-                        # write the default data to the destination and continue
+                        # if user passes fallback_downloader, then on any
+                        # failed download, we write the default data to the
+                        # destination and continue
                         warnings.warn(
                             f"Failed to download {filepath} with error {e}. Falling "
                             "back to default data."
@@ -137,7 +174,8 @@ class FileLoader:
         return hash((self.loader, self.transform, self.base_dir))
 
     def __setstate__(self, state):
-        # need to add downloader if it is missing from state, for backwards compatibility
+        # need to add downloader if it is missing from state,
+        # for backwards compatibility
         if "downloader" not in state:
             state["downloader"] = None
         if "fallback_downloader" not in state:
@@ -192,13 +230,6 @@ class FileColumn(LambdaColumn):
 
     Args:
         data (Sequence[str]): A list of filepaths to images.
-        transform (callable): A function that transforms the image (e.g.
-            ``torchvision.transforms.functional.center_crop``).
-
-            .. warning::
-                In order for the column to be serializable, the transform function must
-                be pickleable.
-
 
         loader (callable): A callable with signature ``def loader(filepath: str) ->
             PIL.Image:``. Defaults to ``torchvision.datasets.folder.default_loader``.
@@ -206,9 +237,22 @@ class FileColumn(LambdaColumn):
             .. warning::
                 In order for the column to be serializable with ``write()``, the loader
                 function must be pickleable.
+        
+        transform (callable): A function that transforms the loaded data (e.g.
+            ``torchvision.transforms.functional.center_crop``).
 
-        base_dir (str): A base directory that the paths in ``data`` are relative to. If
-            ``None``, the paths are assumed to be absolute.
+            .. warning::
+                In order for the column to be serializable, the transform function must
+                be pickleable.
+
+
+        base_dir (str): an absolute path to a directory containing the 
+            files. If provided, the ``filepath`` to be loaded will be joined with
+            the ``base_dir``. As such, this argument should only be used if the 
+            loader will be applied to relative paths. The ``base_dir`` can also 
+            include environment variables (e.g. ``$DATA_DIR/images``) which will 
+            be expanded prior to loading. This is useful when sharing DataFrames
+            between machines. 
     """
 
     def __init__(
@@ -221,10 +265,15 @@ class FileColumn(LambdaColumn):
         **kwargs,
     ):
         if isinstance(loader, FileLoader):
+            if transform is not None or base_dir is not None:
+                raise ValueError(
+                    "Cannot pass `transform` or `base_dir` when loader is a "
+                    "`FileLoader`."
+                )
+
             fn = loader
             if fn.loader is None:
                 fn.loader = self.default_loader
-
         else:
             fn = FileLoader(
                 transform=transform,
@@ -288,6 +337,23 @@ class FileColumn(LambdaColumn):
         )
 
     @classmethod
+    def from_urls(
+        cls,
+        urls: Sequence[str],
+        transform: callable = None,
+    ):
+        from PIL import Image
+
+        return cls(
+            data=urls,
+            loader=FileLoader(
+                loader=lambda bytes_io: Image.open(bytes_io).convert("RGB"),
+                downloader="url",
+            ),
+            transform=transform,
+        )
+
+    @classmethod
     def default_loader(cls, *args, **kwargs):
         return folder.default_loader(*args, **kwargs)
 
@@ -297,7 +363,7 @@ class FileColumn(LambdaColumn):
             return LambdaOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
-            # support old DataPanels.
+            # support old DataFrames.
             warnings.warn(
                 "Reading a LambdaColumn stored in a format that will not be"
                 " supported in the future. Please re-write the column to the new"
@@ -312,7 +378,7 @@ class FileColumn(LambdaColumn):
                 col = AbstractColumn.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
-                    "Support for LambdaColumns based on a DataPanel is deprecated."
+                    "Support for LambdaColumns based on a DataFrame is deprecated."
                 )
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
@@ -348,7 +414,7 @@ def download_url(url: str, dst: Union[str, io.BytesIO]):
         return dst
 
 
-@functools.lru_cache
+@functools.lru_cache()
 def _get_gcs_bucket(bucket_name: str, project: str = None):
     """Get a GCS bucket."""
     from google.cloud import storage

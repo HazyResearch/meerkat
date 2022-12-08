@@ -4,16 +4,16 @@
 	import X from 'svelte-bootstrap-icons/lib/X.svelte';
 	import Check2 from 'svelte-bootstrap-icons/lib/Check2.svelte';
 
-	import Status from '$lib/components/common/Status.svelte';
+	import Status from '$lib/shared/common/Status.svelte';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
 	import Phases from './Phases.svelte';
-	import Interval from '$lib/components/cell/interval/Interval.svelte';
+	import Interval from '$lib/shared/cell/interval/Interval.svelte';
 	import { map } from 'underscore';
 
 	const { edit_target, get_rows } = getContext('Interface');
 
-	export let dp: Writable;
+	export let df: Writable;
 	export let label_target: EditTarget;
 	export let phase_target: EditTarget;
 	export let primary_key: string;
@@ -34,10 +34,10 @@
 
 	let counts_promise: any;
 	$: {
-		$dp; // needed to trigger on dp change
+		$df; // needed to trigger on df change
 		console.log(col)
 		counts_promise = $get_rows(
-			label_target.target.box_id,
+			label_target.target.ref_id,
 			undefined,
 			undefined,
 			undefined,
@@ -71,7 +71,7 @@
 
 		if (primary_key === undefined) {
 			modifications_promise = $edit_target(
-				$dp.box_id,
+				$df.ref_id,
 				label_target,
 				value,
 				col,
@@ -82,7 +82,7 @@
 			);
 		} else {
 			modifications_promise = $edit_target(
-				$dp.box_id,
+				$df.ref_id,
 				label_target,
 				value,
 				col,
@@ -108,7 +108,7 @@
 	function handle_phase_change(event: CustomEvent) {
 		let new_phase: string = event.detail;
 		$edit_target(
-			phase_target.target.box_id,
+			phase_target.target.ref_id,
 			phase_target,
 			new_phase,
 			'phase',

@@ -6,19 +6,19 @@ import meerkat as mk
 
 
 def get_yesno(dataset_dir: str, download: bool = True):
-    """Load YESNO as a Meerkat DataPanel.
+    """Load YESNO as a Meerkat DataFrame.
 
     Args:
         download_dir: download directory
         frac_val: fraction of training set to use for validation
 
     Returns:
-        a DataPanel containing columns `raw_image`, `image` and `label`
+        a DataFrame containing columns `raw_image`, `image` and `label`
     """
     if download:
         dataset = torchaudio.datasets.YESNO(root=dataset_dir, download=True)
 
-    dp = mk.DataPanel(
+    df = mk.DataFrame(
         {
             "id": dataset._walker,
             "audio": mk.AudioColumn(
@@ -30,4 +30,4 @@ def get_yesno(dataset_dir: str, download: bool = True):
         }
     )
 
-    return dp
+    return df

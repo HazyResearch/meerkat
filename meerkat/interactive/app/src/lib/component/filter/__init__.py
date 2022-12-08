@@ -1,19 +1,18 @@
-import functools
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from meerkat.dataframe import DataFrame
 from meerkat.columns.abstract import AbstractColumn
 from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Box, Store, interface_op, make_store
+from meerkat.interactive.graph import Store, reactive, make_store
 
 from ..abstract import Component
 
 if TYPE_CHECKING:
-    from meerkat import AbstractColumn, DataPanel
+    from meerkat import DataFrame
 
 
 def _in(column: AbstractColumn, value):
@@ -83,22 +82,22 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
     # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
-@interface_op
-def filter_by_operator(
-    data: Union["DataPanel", "AbstractColumn"],
+@reactive
+def filter(
+    data: Union["DataFrame", "AbstractColumn"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
 ):
     """Filter data based on operations.
 
-    This operation adds q columns to the datapanel where q is the number of queries.
-    Note, if data is a datapanel, this operation is performed in-place.
+    This operation adds q columns to the dataframe where q is the number of queries.
+    Note, if data is a dataframe, this operation is performed in-place.
 
     TODO (arjundd): Filter numpy and pandas columns first because of speed.
 
     Args:
-        data: A datapanel or column containing the data to embed.
+        data: A dataframe or column containing the data to embed.
         query: A single or multiple query strings to match against.
-        input: If ``data`` is a datapanel, the name of the column
+        input: If ``data`` is a dataframe, the name of the column
             to embed. If ``data`` is a column, then the parameter is ignored.
             Defaults to None.
         input_modality: The input modality. If None, infer from the input column.
@@ -107,7 +106,7 @@ def filter_by_operator(
             on match.
 
     Returns:
-        mk.DataPanel: A view of ``data`` with a new column containing the embeddings.
+        mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
     import meerkat as mk
@@ -125,11 +124,9 @@ def filter_by_operator(
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
 
     if len(criteria) == 0:
-        # FIXME: Do we need to return a new DataPanel so that it does not point
-        # to the pivot?
-        return data
+        # we view so that the result is a different dataframe than the input
+        return data.view()
 
-    supported_column_types = (mk.PandasSeriesColumn, mk.NumpyArrayColumn)
     # if not all(
     #     isinstance(data[column], supported_column_types) for column in input_columns
     # ):
@@ -151,7 +148,9 @@ def filter_by_operator(
             if isinstance(col, mk.NumpyArrayColumn):
                 value = np.asarray(value, dtype=col.dtype)
 
-        mask = _operator_str_to_func[criterion.op](col, value)
+        # FIXME: Figure out why we cannot pass col for PandasSeriesColumn.
+        # the .data accessor is an interim solution.
+        mask = _operator_str_to_func[criterion.op](col.data, value)
         all_masks.append(np.asarray(mask))
     mask = np.stack(all_masks, axis=1).all(axis=1)
 
@@ -159,44 +158,21 @@ def filter_by_operator(
 
 
 class Filter(Component):
-    """This component handles filtering of the pivot datapanel.
+    """This component handles filtering of a dataframe.
 
     Filtering criteria are maintained in a Store. On change of values
-    in the store, the datapanel is filtered.
+    in the store, the dataframe is filtered.
 
-    This component will return a Derived object, which can be used downstream.
-
-    We recommend performing filtering before other out-of-place operations,
-    like sorting, to avoid unnecessary computation.
+    This component will return a Reference object, which can be used downstream.
     """
+    df: DataFrame
+    criteria: Store[List[FilterCriterion]] = Field(default_factory=lambda: Store(list()))
+    operations: Store[List[str]] = Field(
+        default_factory=lambda: Store(list(_operator_str_to_func.keys()))
+    )
+    title: Store[str] = Store("Filter")
 
-    name = "Filter"
-
-    def __init__(
-        self,
-        dp: Box["DataPanel"],
-        criteria: Union[Store[List[FilterCriterion]], List[FilterCriterion]] = None,
-        title: str = "",
-    ):
-        super().__init__()
-        self.dp = dp
-
-        if criteria is None:
-            criteria = []
-
-        self.criteria = make_store(criteria)  # Dict[str, List[Any]]
-        self.operations = list(_operator_str_to_func.keys())
-        self.title = title
-
-    def derived(self):
-        """Return a derived object that filters the pivot datapanel."""
-        return filter_by_operator(self.dp, self.criteria)
-
-    @property
-    def props(self):
-        return {
-            "dp": self.dp.config,
-            "criteria": self.criteria.config,
-            "operations": self.operations,
-            "title": self.title,
-        }
+    def __call__(self, df: DataFrame = None) -> DataFrame:
+        if df is None:
+            df = self.df
+        return filter(df, self.criteria)

@@ -1,49 +1,55 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import type { DataPanelBox, EditTarget } from '$lib/utils/types';
+	import type { DataFrameBox, EditTarget, Endpoint } from '$lib/utils/types';
 	import { get } from 'svelte/store';
-	import Cell from '$lib/components/cell/Cell.svelte';
-	import BasicCell from '$lib/components/cell/basic/Basic.svelte';
+	import Cell from '$lib/shared/cell/Cell.svelte';
+	import BasicCell from '$lib/shared/cell/basic/Basic.svelte';
 
-	const { get_rows, get_schema, edit_target } = getContext('Interface');
+	const { get_rows, get_schema, dispatch } = getContext('Interface');
 
-	export let dp: Writable<DataPanelBox>;
-	export let idx: Writable<number>;
-	export let target: EditTarget;
-	export let cell_specs: Any = {};
+	export let df: Writable<DataFrameBox>;
+	export let primary_key_column: Writable<string>;
+	export let selected_key: Writable<string>;
+	export let cell_specs: any;
 	export let title: string = "";
 
-	$: schema_promise = $get_schema($dp.box_id);
-       
+	export let on_change: Endpoint = null;
 
-	$: target.target = get(target.target);
+	$: schema_promise = $get_schema($df.ref_id);
 
 	let rows_promise: any = null;
 	$: {
-		if ($idx !== null) {
-			rows_promise = $get_rows($dp.box_id, $idx, $idx + 1);
+		console.log("selected key", $selected_key);
+		if ($selected_key !== null && $selected_key !== "") {
+			rows_promise = $get_rows($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
 		} else {
 			rows_promise = null;
 		}
 	}
 
 	let on_edit = async (event: any, column: string) => {
-		let modifications_promise = $edit_target(
-			$dp.box_id,
-			target,
-			event.detail.value,
-			column,
-			[$idx],
-			null,
-			null
+		if (on_change === null) {
+			return;
+		}
+
+		const promise = $dispatch(
+			on_change.endpoint_id,
+			{
+				"key": $selected_key,
+				"column": column,
+				"value": event.detail.value
+			}
 		);
-		modifications_promise.catch((error: TypeError) => {
+		promise.catch((error: TypeError) => {
 			status = 'error';
 			console.log(error);
 		});
 	};
-    console.log(cell_specs)
+
+	console.log("cell_specs", cell_specs);
+	console.log("cell_specs", $cell_specs["name"].type);
+	console.log("selected_key", $selected_key);
 
 </script>
 
@@ -54,18 +60,18 @@
 	</div>
 	{/if}
 	{#await schema_promise}
-		Loading...
+		Loading schema...
 	{:then schema}
 		{#each schema.columns as column, column_idx}
         
-			{#if cell_specs[column.name].type !== 'stat'}
+			{#if $cell_specs[column.name] && $cell_specs[column.name]["type"] !== 'stat'}
 				<div class="">
 					<div class="text-gray-600 font-mono">
 						{column.name}
 					</div>
 					<div class="w-full flex">
 						{#await rows_promise}
-							Loading...
+							Loading rows...
 						{:then rows}
 							{#if rows == null}
 								No selection
@@ -74,7 +80,7 @@
 									data={rows.rows[0][column_idx]}
 									cell_component={column.cell_component}
 									cell_props={column.cell_props}
-									editable={cell_specs[column.name].type === 'editable'}
+									editable={$cell_specs[column.name].type === 'editable'}
 									on:edit={(event) => on_edit(event, column.name)}
 								/>
 							{/if}
@@ -85,11 +91,11 @@
 		{/each}
 		<div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2 pt-2">
 			{#each schema.columns as column, column_idx}
-				{#if cell_specs[column.name].type === 'stat'}
+				{#if $cell_specs[column.name] && $cell_specs[column.name].type === 'stat'}
 					<div class="bg-white rounded-md flex flex-col shadow-lg">
 						<div class="text-slate-400 px-3 py-1 self-center">
-							{#if cell_specs[column.name].name}
-								{cell_specs[column.name].name}
+							{#if $cell_specs[column.name].name}
+								{$cell_specs[column.name].name}
 							{:else}
 								{column.name}
 							{/if}

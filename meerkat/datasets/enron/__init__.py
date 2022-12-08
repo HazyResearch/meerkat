@@ -29,10 +29,10 @@ def _parse_email(email_string: str):
     return d
 
 
-def build_enron_dp(dataset_dir: str, download: bool = True) -> mk.DataPanel:
-    dp_path = os.path.join(dataset_dir, "enron.mk")
-    if os.path.exists(dp_path):
-        return mk.DataPanel.read(dp_path)
+def build_enron_df(dataset_dir: str, download: bool = True) -> mk.DataFrame:
+    df_path = os.path.join(dataset_dir, "enron.mk")
+    if os.path.exists(df_path):
+        return mk.DataFrame.read(df_path)
 
     downloaded = os.path.exists(os.path.join(dataset_dir, "emails.csv"))
     if not downloaded and download:
@@ -55,14 +55,14 @@ def build_enron_dp(dataset_dir: str, download: bool = True) -> mk.DataPanel:
 
     # load training data
     print("Parsing emails...")
-    dp = mk.DataPanel.from_csv(os.path.join(dataset_dir, "emails.csv"))
+    df = mk.DataFrame.from_csv(os.path.join(dataset_dir, "emails.csv"))
 
-    dp = mk.DataPanel([_parse_email(message) for message in tqdm(dp["message"])])
+    df = mk.DataFrame([_parse_email(message) for message in tqdm(df["message"])])
 
     print("Parsing dates...")
     # need to remove timezone info to save and load with feather
     # otherwise get UnknownTimeZoneError on read
-    dp["date"] = pd.to_datetime(dp["date"], utc=True)
+    df["date"] = pd.to_datetime(df["date"], utc=True)
 
-    dp.write(dp_path)
-    return dp
+    df.write(df_path)
+    return df

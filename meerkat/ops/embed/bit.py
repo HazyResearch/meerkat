@@ -50,7 +50,7 @@ def bit(
 
     try:
         # flake8: noqa
-        import torchvision as tv
+        pass
     except ImportError:
         raise ImportError(
             "To embed with bit install domino with the `bit` submodule. For example, "

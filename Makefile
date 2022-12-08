@@ -30,6 +30,6 @@ livedocs:
 	sphinx-autobuild -b html docs/source/ docs/build/html/
 
 dev:
-	pip install black isort flake8 docformatter pytest-cov sphinx-rtd-theme nbsphinx recommonmark pre-commit
+	pip install black isort flake8 docformatter pytest-cov sphinx-rtd-theme nbsphinx recommonmark pre-commit sphinx-panels jupyter-sphinx pydata-sphinx-theme sphinx-autobuild
 
 all: autoformat lint docs test

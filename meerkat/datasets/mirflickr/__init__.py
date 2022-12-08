@@ -56,7 +56,7 @@ class mirflickr(DatasetBuilder):
             downloaded_path = self.download_url(url)
             extract(downloaded_path, self.dataset_dir)
 
-    def build(self) -> mk.DataPanel:
+    def build(self) -> mk.DataFrame:
         # get list of image ids
         file_names = pd.Series(
             [
@@ -67,10 +67,10 @@ class mirflickr(DatasetBuilder):
         )
         # remove jpg extension
         ids = file_names.str.replace(".jpg", "", regex=False)
-        dp = mk.DataPanel({"id": ids, "file_name": file_names})
-        
-        dp["image"] = mk.ImageColumn.from_filepaths(
-            dp["file_name"], base_dir=os.path.join(self.var_dataset_dir, "mirflickr")
+        df = mk.DataFrame({"id": ids, "file_name": file_names})
+
+        df["image"] = mk.ImageColumn.from_filepaths(
+            df["file_name"], base_dir=os.path.join(self.var_dataset_dir, "mirflickr")
         )
 
         for class_name in MIR_FLICKR_25K_CLASSES:
@@ -82,13 +82,12 @@ class mirflickr(DatasetBuilder):
                     names=["id"],
                 ).astype(str)["id"]
             )
-            dp[class_name] = np.zeros(len(dp))
-            dp[class_name][dp["id"].isin(ids)] = 1
-        return dp
+            df[class_name] = np.zeros(len(df))
+            df[class_name][df["id"].isin(ids)] = 1
+        return df
 
 
-def build_mirflickr_25k_dp(dataset_dir: str, download: bool = False):
-
+def build_mirflickr_25k_df(dataset_dir: str, download: bool = False):
     if download:
         subprocess.run(
             [
@@ -119,9 +118,9 @@ def build_mirflickr_25k_dp(dataset_dir: str, download: bool = False):
 
     # remove jpg extension
     ids = file_names.str.replace(".jpg", "", regex=False)
-    dp = mk.DataPanel({"id": ids, "file_name": file_names})
-    dp["image"] = mk.ImageColumn.from_filepaths(
-        dp["file_name"], base_dir=os.path.join(dataset_dir, "mirflickr")
+    df = mk.DataFrame({"id": ids, "file_name": file_names})
+    df["image"] = mk.ImageColumn.from_filepaths(
+        df["file_name"], base_dir=os.path.join(dataset_dir, "mirflickr")
     )
 
     for class_name in MIR_FLICKR_25K_CLASSES:
@@ -133,9 +132,9 @@ def build_mirflickr_25k_dp(dataset_dir: str, download: bool = False):
                 names=["id"],
             ).astype(str)["id"]
         )
-        dp[class_name] = np.zeros(len(dp))
-        dp[class_name][dp["id"].isin(ids)] = 1
-    return dp
+        df[class_name] = np.zeros(len(df))
+        df[class_name][df["id"].isin(ids)] = 1
+    return df
 
 
 MIR_FLICKR_25K_CLASSES = [

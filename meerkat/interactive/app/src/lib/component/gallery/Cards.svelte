@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { DataPanelRows, ColumnInfo, DataPanelSchema } from '$lib/api/datapanel';
+	import type { DataFrameRows, ColumnInfo, DataFrameSchema } from '$lib/api/dataframe';
 	import { writable, type Writable } from 'svelte/store';
 	import { get, map, without } from 'underscore';
 	import Card from './Card.svelte';
 	import InfoModal from './InfoModal.svelte';
 
-	export let schema: DataPanelSchema;
+	export let schema: DataFrameSchema;
 	let column_infos: Array<ColumnInfo> = schema.columns;
-	export let rows: DataPanelRows | null;
+	export let rows: DataFrameRows | null;
 	export let primary_key: string;
 
 	export let layout = 'gimages'; // 'gimages' or 'masonry'
@@ -74,7 +74,7 @@
 					}
 				}}
 				content={pivot_height >= 15 || num_columns <= 6
-					? tag_indices.map((z) => ({ data: row[z] }))
+					? tag_indices.map((z) => ({ data: row[z], column: columns[z] }))
 					: []}
 				{layout}
 				pivot_tooltip={true}

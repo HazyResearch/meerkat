@@ -1,40 +1,47 @@
-import functools
-from typing import Any, Dict, List, Union
+from typing import List
 
-from fastapi import APIRouter, Body
-
-from meerkat.interactive.graph import Modification, StoreModification, trigger
-
-from ....tools.utils import convert_to_python
-
-router = APIRouter(
-    prefix="/store",
-    tags=["store"],
-    responses={404: {"description": "Not found"}},
-)
-
-EmbeddedBody = functools.partial(Body, embed=True)
+from meerkat.state import state 
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Modification, Store, StoreModification, trigger
 
 
-@router.post("/{store_id}/trigger/")
-def store_trigger(store_id: str, value=EmbeddedBody()) -> List[Modification]:
-    """Triggers the computational graph when a store on the frontend
-    changes."""
-    # Create a store modification
-    store_modification = StoreModification(id=store_id, value=value)
+@endpoint(prefix="/store", route="/{store}/trigger/")
+def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
+    """
+    Triggers the computational graph when a store on the frontend
+    changes.
+    """
+    # TODO: the interface sends store_triggers for all stores when it starts
+    # up -- these requests should not be being sent.
+    # These requests are indirectly ignored here because we check if the
+    # value of the store actually changed (and these initial post requests
+    # do not change the value of the store).
+
 
     # Check if this request would actually change the value of the store
-    current_store_value = store_modification.node.value
-    if current_store_value == value:
+    # current_store_value = store_modification.node
+    if store == value:
         return []
 
     # Set the new value of the store
-    # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type 
-    # of the store. 
-    store_modification.node.value = value
+    # TODO (Sabri): Need to figure out how to get this to preserve the Pydantic type
+    # of the store.
+    # store_modification.node.set(value)
+    state.modification_queue.ready()
+
+    store.set(value)
 
     # Trigger on the store modification: leads to modifications on the graph
-    modifications = trigger([store_modification])
+    modifications = trigger()
+
+    state.modification_queue.unready()
+
+    # only return modifications that are not backend_only
+    modifications = [
+        m
+        for m in modifications
+        if not (isinstance(m, StoreModification) and m.backend_only)
+    ]
 
     # Return the modifications
     return modifications
