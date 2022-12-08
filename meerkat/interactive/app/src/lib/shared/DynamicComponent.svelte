@@ -10,6 +10,7 @@
 	import Document from '$lib/component/document/Document.svelte';
 	import Editor from '$lib/component/editor/Editor.svelte';
 	import Filter from '$lib/component/filter/Filter.svelte';
+	import FormulaBar from '$lib/component/formula_bar/FormulaBar.svelte';
 	import Gallery from '$lib/component/gallery/Gallery.svelte';
 	import Markdown from '$lib/component/markdown/Markdown.svelte';
 	import Plot from '$lib/component/plot/Plot.svelte';
@@ -36,6 +37,7 @@
 		Document: Document,
 		Editor: Editor,
 		Filter: Filter,
+		FormulaBar: FormulaBar, 
 		Gallery: Gallery,
 		Markdown: Markdown,
 		Match: Match,

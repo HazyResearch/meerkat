@@ -9,6 +9,7 @@ from .app.src.lib.component.editor import Editor
 from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.markdown import Markdown
+from .app.src.lib.component.formula_bar import FormulaBar
 from .app.src.lib.component.match import Match
 from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.plot import Plot
@@ -60,6 +61,7 @@ __all__ = [
     "Table",
     "Tabs",
     "Filter",
+    "FormulaBar",
     "Interface",
     "interface",
     "reactive",

@@ -30,5 +30,5 @@ grid = Grid(
     ],
 )
 
-mk.gui.start(dev=False)
+mk.gui.start(dev=True)
 mk.gui.Interface(component=ColumnLayout(components=[gallery, gallery2])).launch()
