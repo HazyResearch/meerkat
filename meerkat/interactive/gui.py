@@ -23,24 +23,20 @@ class DataFrameGUI(GUI):
         **kwargs,
     ) -> IFrame:
         return Interface(
-            components=[
-                mk.gui.Table(
-                    df=self.df,
-                    **kwargs,
-                )
-            ]
+            component=mk.gui.Table(
+                df=self.df,
+                **kwargs,
+            )
         ).launch()
 
     def gallery(self, main_column: str, tag_columns: List[str], **kwargs):
         return Interface(
-            components=[
-                mk.gui.Gallery(
-                    df=self.df,
-                    main_column=main_column,
-                    tag_columns=tag_columns,
-                    **kwargs,
-                )
-            ]
+            component=mk.gui.Gallery(
+                df=self.df,
+                main_column=main_column,
+                tag_columns=tag_columns,
+                **kwargs,
+            )
         ).launch()
 
 
@@ -75,7 +71,7 @@ class SliceByGUI(GUI):
             tag_columns=tag_columns,
             aggregations=aggregations,
         )
-        return mk.gui.Interface(components=[component]).launch()
+        return mk.gui.Interface(component=component).launch()
 
 
 class Aggregation(IdentifiableMixin):
