@@ -1,5 +1,7 @@
 import pathlib
 
+from meerkat.interactive.app.src.lib.layouts import ColumnLayout, Div, Flex, Grid, RowLayout
+
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
@@ -49,7 +51,8 @@ __all__ = [
     "make_store",
     "trigger",
     "Component",
-    "Discover" "Gallery",
+    "Discover",
+    "Gallery",
     "Markdown",
     "Match",
     "Row",
@@ -70,4 +73,9 @@ __all__ = [
     "Choice",
     "Textbox",
     "Button",
+    "ColumnLayout",
+    "RowLayout",
+    "Div",
+    "Flex",
+    "Grid",
 ]
