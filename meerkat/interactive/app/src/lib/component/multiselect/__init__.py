@@ -1,14 +1,11 @@
-from typing import Union
-
 from meerkat.interactive.graph import Store
 
 from ..abstract import Component
 
 
-class Choice(Component):
-    """A choice ref."""
+class MultiSelect(Component):
 
     choices: Store[list]
-    value: Store[str]
-    gui_type: str = "dropdown"
+    selected: Store[list]
+    gui_type: str = "multiselect"
     title: str = None
