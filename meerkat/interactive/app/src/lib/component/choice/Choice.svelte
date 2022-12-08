@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
 
 	export let choices: Writable;
@@ -9,6 +8,7 @@
 	export let title: string = '';
 
 	function handleSelect(event) {
+		console.log("Selected", event.detail.value);
 		$value = event.detail.value;
 	}
 </script>

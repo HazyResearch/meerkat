@@ -12,6 +12,7 @@
 	import Filter from '$lib/component/filter/Filter.svelte';
 	import Gallery from '$lib/component/gallery/Gallery.svelte';
 	import Markdown from '$lib/component/markdown/Markdown.svelte';
+	import MultiSelect from '$lib/component/multiselect/MultiSelect.svelte';
 	import Plot from '$lib/component/plot/Plot.svelte';
 	import Match from '$lib/component/match/Match.svelte';
 	import Row from '$lib/component/row/Row.svelte';
@@ -39,6 +40,7 @@
 		Gallery: Gallery,
 		Markdown: Markdown,
 		Match: Match,
+		MultiSelect: MultiSelect,
 		Plot: Plot,
 		Row: Row,
 		SliceByCard: SliceByCard,
