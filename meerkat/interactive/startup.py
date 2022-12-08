@@ -227,9 +227,9 @@ def start(
     network_info.npm_err_path = err_path    
         
     if dev:
-        MAX_WAIT = 10
+        MAX_WAIT = 200  # wait 20 seconds roughly 
         for i in range(MAX_WAIT):
-            time.sleep(0.5)
+            time.sleep(0.1)
 
             # this is a hack to address the issue that the vite skips over a port that we
             # deem to be open per `get_first_available_port`
