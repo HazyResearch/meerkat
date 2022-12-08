@@ -27,20 +27,10 @@
 	}
 	console.log(on_match)
 
-		// Define a new theme that contains only rules that match this language
-		monaco.editor.defineTheme('myCoolTheme', {
-			base: 'vs',
-			inherit: false,
-			rules: [
-				{ token: 'custom-info', foreground: '808080' },
-				{ token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
-				{ token: 'custom-notice', foreground: 'FFA500' },
-				{ token: 'custom-date', foreground: '008800' }
-			],
-			colors: {
-				'editor.foreground': '#000000'
-			}
-		});
+	const onKeyPress = (e) => {
+		if (e.charCode === 13) on_search();
+		else status = 'waiting';
+	};
 
 	let on_search = async () => {
 		if ($against === '') {
@@ -80,17 +70,14 @@
 			{$title}
 		</div>
 	{/if}
-	<div bind:this={divEl} class="h-screen" /> 
-<!-- <div class="form-control">
+	<div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
 				<Status {status} />
 			</div>
-			
-
 			<input
 				type="text"
-				bind:value={searchValue}
+				bind:value={$text}
 				placeholder="Write some text to be matched..."
 				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
 				on:keypress={onKeyPress}
@@ -115,4 +102,4 @@
 			</div>
 		</div>
 	</div>
-</div> -->
+</div>
