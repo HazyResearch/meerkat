@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let data: any;
+	export let data: Writable<string>;
 	export let dtype: string | undefined = undefined;
     export let precision: number = 3
     export let percentage: boolean = false
@@ -24,7 +24,11 @@
         } else {
             data = data.toPrecision(precision);
         }
-    }
+    } 
+
 </script>
 
-{data}
+<div>
+    {@html $data}
+</div>
+
