@@ -37,13 +37,16 @@ class Interface(IdentifiableMixin):
         component: Component,
         name: str = "Interface",
         id: str = None,
+        height: str = "1000px",
+        width: str = "100%",
     ):
 
         super().__init__(id=id)
 
-        self.name = name
-
         self.component = component
+        self.name = name
+        self.height = height
+        self.width = width
 
     def get(self, id: str):
         try:
@@ -73,7 +76,7 @@ class Interface(IdentifiableMixin):
         if return_url:
             return url
         if is_notebook():
-            return IFrame(url, width="100%", height="1000")
+            return IFrame(url, width=self.width, height=self.height)
         else:
             import webbrowser
 

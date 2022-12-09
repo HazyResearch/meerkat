@@ -1,5 +1,3 @@
-from typing import Union
-
 from meerkat.interactive.graph import Store
 
 from ..abstract import Component
