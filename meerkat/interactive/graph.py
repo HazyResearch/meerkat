@@ -101,7 +101,7 @@ def trigger() -> List[Modification]:
     modifications = state.modification_queue.queue
 
     # build a graph rooted at the stores and refs in the modifications list
-    root_nodes = [mod.node for mod in modifications]
+    root_nodes = [mod.node for mod in modifications if mod.node is not None]
 
     # Sort the nodes in topological order, and keep the Operation nodes
     order = [
