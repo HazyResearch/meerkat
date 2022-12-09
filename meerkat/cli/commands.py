@@ -1,4 +1,7 @@
+import subprocess
 import typer
+
+from meerkat.interactive.startup import start
 
 app = typer.Typer()
 
@@ -16,9 +19,11 @@ def run(
     port: int = 5000,
 ):
     typer.echo(f"Running {script_path}")
+    network_info = start(shareable=shareable, api_port=port, dev=dev)
     typer.echo(f"dev: {dev}")
     typer.echo(f"shareable: {shareable}")
     typer.echo(f"port: {port}")
+    subprocess.run(["python", script_path])
 
 
 @app.command()
