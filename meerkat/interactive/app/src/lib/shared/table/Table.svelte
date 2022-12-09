@@ -144,7 +144,7 @@
 
 	.table-row-group .table-row {
 		@apply border-b border-slate-100 dark:bg-gray-800 dark:border-gray-700  dark:hover:bg-gray-600;
-		@apply h-32 overflow-y-scroll;
+		@apply h-12 overflow-y-scroll;
 	}
 
 	.table-row-group .table-cell {
