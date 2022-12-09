@@ -6,6 +6,7 @@
 	export let store_id: string;
 	export let store: any;
 	export let is_backend_store: boolean;
+	is_backend_store = true;
 
     // this assumes that all the stores are created with meerkat_writable 
     let trigger_store = store.trigger_store;

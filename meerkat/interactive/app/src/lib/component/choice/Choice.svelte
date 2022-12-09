@@ -7,8 +7,7 @@
 	export let gui_type: string;
 	export let title: string = '';
 
-	function handleSelect(event) {
-		console.log("Selected", event.detail.value);
+	let handleSelect = (event) => {
 		$value = event.detail.value;
 	}
 </script>
@@ -24,9 +23,7 @@
 			id="column"
 			value={$value}
 			items={$choices}
-			showIndicator={true}
-			listPlacement="auto"
-			on:select={handleSelect}
+			on:change={handleSelect}
 		/>
 	</div>
 </div>

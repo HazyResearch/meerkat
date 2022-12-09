@@ -1,5 +1,5 @@
 <script lang="ts">
-	import banner from "$lib/assets/banner_small.png"
+	import banner from '$lib/assets/banner_small.png';
 	import { setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 
@@ -11,7 +11,7 @@
 	import type { EditTarget, Interface } from '$lib/utils/types';
 	import { onMount } from 'svelte';
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
-	
+
 	// Use VITE_API_URL for dev, VITE_API_URL_PLACEHOLDER for prod
 	// TODO: select based on NODE_ENV instead of OR below
 	const API_URL = import.meta.env['VITE_API_URL'] || import.meta.env['VITE_API_URL_PLACEHOLDER'];
@@ -189,9 +189,7 @@
 	let config: Interface = null;
 	onMount(async () => {
 		const id = new URLSearchParams(window.location.search).get('id');
-		config = await (
-			await fetch(`${API_URL}/interface/${id}/config`)
-		).json();
+		config = await (await fetch(`${API_URL}/interface/${id}/config`)).json();
 
 		document.title = config.name;
 	});
@@ -234,19 +232,19 @@
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 
 <div class="h-screen p-3">
-	{#each Array.from(global_stores.keys()) as store_id}
-		<StoreComponent
-			{store_id}
-			store={global_stores.get(store_id)}
-			is_backend_store={global_stores.get(store_id).backend_store}
-		/>
-	{/each}
 	<!-- <div class="flex flex-col h-screen p-3"> -->
 	{#if config && config.component}
+		{#each Array.from(global_stores.keys()) as store_id}
+			<StoreComponent
+				{store_id}
+				store={global_stores.get(store_id)}
+				is_backend_store={global_stores.get(store_id).backend_store}
+			/>
+		{/each}
 		<DynamicComponent {...config.component} />
 	{:else}
 		<div class="flex justify-center h-screen items-center">
-			<img src={banner} alt="Meerkat" class="h-12"/>
+			<img src={banner} alt="Meerkat" class="h-12" />
 		</div>
 	{/if}
 	<!-- </div> -->
