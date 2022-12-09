@@ -7,7 +7,6 @@
 	const { get_schema, get_rows, edit } = getContext('Interface');
 
 	export let df: Writable;
-	export let edit_target: Any;
 
 	export let page: number = 0;
 	export let per_page: number = 100;
@@ -24,6 +23,7 @@
 	});
 
 	async function handle_edit(event: any) {
+		return;
 		let { pivot, pivot_id_column, id_column } = edit_target;
 		let rows = await rows_promise;
 
@@ -36,7 +36,7 @@
 	}
 </script>
 
-<div class="flex-1 rounded-lg overflow-hidden bg-slate-50">
+<div class="h-full flex-1 rounded-lg overflow-hidden bg-slate-50">
 	{#await schema_promise}
 		waiting....
 	{:then schema}
