@@ -1,5 +1,3 @@
-import numpy as np
-
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTarget
 

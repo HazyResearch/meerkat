@@ -26,9 +26,7 @@ class Aggregation(IdentifiableMixin):
         }
 
 
-class SliceByCards(Component):
-
-    name = "SliceByCards"
+class SliceByCards(Component): # FIXME: update this component
 
     def __init__(
         self,
@@ -59,13 +57,3 @@ class SliceByCards(Component):
             tag_columns = []
 
         self.tag_columns = make_store(tag_columns)
-
-    @property
-    def props(self):
-        return {
-            "sliceby": self.sliceby.config,  # FIXME
-            "df": self.df.config,  # FIXME
-            "main_column": self.main_column.config,
-            "tag_columns": self.tag_columns.config,
-            "aggregations": {k: v.config for k, v in self.aggregations.items()},
-        }

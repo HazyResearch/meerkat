@@ -30,6 +30,10 @@
 	import Flex from '$lib/layouts/Flex.svelte';
 	import Grid from '$lib/layouts/Grid.svelte';
 
+	import Image from './cell/image/Image.svelte';
+	import Basic from './cell/basic/Basic.svelte';
+	import Code from './cell/code/Code.svelte';
+
 	let all_components = {
 		Button: Button,
 		Choice: Choice,
@@ -56,7 +60,11 @@
 		AutoLayout: AutoLayout,
 		Div: Div,
 		Flex: Flex,
-		Grid: Grid
+		Grid: Grid,
+
+		Image: Image,
+		Text: Basic,
+		Code: Code
 	};
 </script>
 
@@ -67,7 +75,7 @@
 		Loading {name} component.
 	{:then Component}
 		<svelte:component this={Component.default} {...props} />
-	<!-- {:catch error}
+		<!-- {:catch error}
 		{error} -->
 	{/await}
 {/if}
