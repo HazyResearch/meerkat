@@ -1,8 +1,7 @@
 <script lang="ts">
-	import {marked} from 'marked';
+	import Markdown from '@magidoc/plugin-svelte-marked';
 
-	export let value: string;
-
+	export let data: string;
 </script>
 
-<div>{@html marked.parse(value)}</div>
+<Markdown source={data} />
