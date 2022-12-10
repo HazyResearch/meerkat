@@ -1,9 +1,8 @@
 <script lang="ts">
-	export let data: Writable<string>;
+	export let data: any;
 	export let dtype: string | undefined = undefined;
     export let precision: number = 3
     export let percentage: boolean = false
-
     if(dtype === undefined){
         if(typeof data === "number") {
             
@@ -16,7 +15,6 @@
             dtype = "string"
         }
     }
-
     
     if (dtype === "float") {
         if (percentage) {
@@ -24,11 +22,7 @@
         } else {
             data = data.toPrecision(precision);
         }
-    } 
-
+    }
 </script>
 
-<div>
-    {@html $data}
-</div>
-
+{data}

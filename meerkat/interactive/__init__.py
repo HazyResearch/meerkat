@@ -12,6 +12,10 @@ from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
 from meerkat.interactive.app.src.lib.shared.cell.image import Image
 
+from meerkat.interactive.app.src.lib.component.textdisplay import TextDisplay
+from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
+
+
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
@@ -95,4 +99,6 @@ __all__ = [
     "Image",
     "Text",
     "Code",
+    "CodeDisplay",
+    "TextDisplay"
 ]
