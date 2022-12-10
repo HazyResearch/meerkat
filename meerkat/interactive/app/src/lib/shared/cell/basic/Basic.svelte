@@ -3,6 +3,7 @@
 	export let dtype: string | undefined = undefined;
     export let precision: number = 3
     export let percentage: boolean = false
+
     if(dtype === undefined){
         if(typeof data === "number") {
             
@@ -15,6 +16,7 @@
             dtype = "string"
         }
     }
+    
     
     if (dtype === "float") {
         if (percentage) {

@@ -4,6 +4,7 @@
 	
 	export let data: string;
 	export let language: any = 'python';
+	
 	let html = Prism.highlight(data, Prism.languages[language]);
 </script>
 
