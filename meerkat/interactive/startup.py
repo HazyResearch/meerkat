@@ -74,10 +74,11 @@ def get_first_available_port(initial: int, final: int) -> int:
     for port in range(initial, final):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
-            result = s.connect_ex((LOCALHOST_NAME, port))  # Bind to the port
+            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
             s.close()
+            rich.print(f"Found open port: {port}")
+            return port
             if result == 0:
-                rich.print(f"Found open port: {port}")
                 return port
         except OSError:
             pass
