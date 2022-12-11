@@ -1,6 +1,23 @@
 """Meerkat."""
 # flake8: noqa
 
+from json import JSONEncoder
+
+
+def _default(self, obj):
+    # https://stackoverflow.com/a/18561055
+    # Monkey patch json module at import time so
+    # JSONEncoder.default() checks for a "to_json()"
+    # method and uses it to encode objects if it exists
+    if isinstance(obj, gui.Store):
+        return getattr(obj, "to_json", _default.default)()
+    return getattr(obj.__class__, "to_json", _default.default)(obj)
+
+
+_default.default = JSONEncoder().default
+JSONEncoder.default = _default
+
+
 from meerkat.logging.utils import initialize_logging
 
 initialize_logging()

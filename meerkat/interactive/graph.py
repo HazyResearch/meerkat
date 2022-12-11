@@ -436,7 +436,15 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # schema and detail properties.
         self._self_schema = None
         self._self_detail = None
+        self._self_value = None
         self._self_backend_only = backend_only
+
+    @property
+    def value(self):
+        return self.__wrapped__
+
+    def to_json(self):
+        return self.__wrapped__
 
     @property
     def frontend(self):

@@ -425,7 +425,7 @@ class DataFrame(
         
         if self.has_inode():
             # Add a modification if it's on the graph
-            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod = DataFrameModification(id=self.inode.id, scope=self.columns)
             mod.add_to_queue()
 
     def consolidate(self):
