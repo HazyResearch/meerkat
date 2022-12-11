@@ -38,33 +38,6 @@ export class MatchCriterion {
     constructor(readonly column: string, readonly query: string) { }
 }
 
-export async function get_schema(
-    api_url: string, dataframe_id: string, columns: Array<string> | null = null
-): Promise<DataFrameSchema> {
-    return await post(`${api_url}/df/${dataframe_id}/schema`, { columns: columns });
-}
-
-export async function get_rows(
-    api_url: string,
-    dataframe_id: string,
-    start?: number,
-    end?: number,
-    indices?: Array<number>,
-    columns?: Array<string>
-): Promise<DataFrameRows> {
-    console.log(`${api_url}/ref/${dataframe_id}/rows`);
-    console.log(`start: ${start}`);
-    console.log(`end: ${end}`);
-    console.log(`indices: ${indices}`);
-    console.log(`columns: ${columns}`);
-
-    return await post(
-        `${api_url}/ref/${dataframe_id}/rows`,
-        { start: start, end: end, indices: indices, columns: columns }
-    );
-}
-
-
 export async function match(
     api_url: string, dataframe_id: string, match_criterion: MatchCriterion
 ): Promise<DataFrameSchema> {
@@ -87,8 +60,8 @@ export async function filter(
 }
 
 export async function filter_ref(
-    api_url: string, 
-    ref_id: string, 
+    api_url: string,
+    ref_id: string,
     filter_criteria: Array<FilterCriterion>
 ): Promise<DataFrameSchema> {
     const columns: Array<string> = filter_criteria.map(criterion => criterion.column);
@@ -98,8 +71,8 @@ export async function filter_ref(
 }
 
 export async function undo_ref(
-    api_url: string, 
-    ref_id: string, 
+    api_url: string,
+    ref_id: string,
     operation_id: string
 ): Promise<DataFrameSchema> {
     return await post(`${api_url}/ref/${ref_id}/undo`, { operation_id: operation_id });
