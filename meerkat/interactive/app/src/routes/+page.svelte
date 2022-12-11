@@ -232,7 +232,6 @@
 <!-- TODO: Things that are not in the computation graph should have a blank callback. -->
 
 <div class="h-screen p-3">
-	<!-- <div class="flex flex-col h-screen p-3"> -->
 	{#if config && config.component}
 		{#each Array.from(global_stores.keys()) as store_id}
 			<StoreComponent
@@ -247,5 +246,4 @@
 			<img src={banner} alt="Meerkat" class="h-12" />
 		</div>
 	{/if}
-	<!-- </div> -->
 </div>
