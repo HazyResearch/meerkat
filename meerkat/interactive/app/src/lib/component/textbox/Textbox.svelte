@@ -3,6 +3,15 @@
 
 	export let text: Writable<string>;
 	export let title: string = '';
+
+	let timer: any;
+
+	const debounce = (v: string) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			$text = v;
+		}, 300);
+	}
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
@@ -16,11 +25,7 @@
 			type="text"
 			placeholder="Write some text..."
 			class="grow h-10 px-3 rounded-md shadow-md"
-			on:keypress={(e) => {
-				if (e.charCode == 13) {
-					$text = e.target.value;
-				}
-			}}
+			on:keyup={({ target: { value } }) => debounce(value)}
 		/>
 	</div>
 </div>
