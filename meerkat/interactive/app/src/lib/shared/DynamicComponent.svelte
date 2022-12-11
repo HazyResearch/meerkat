@@ -33,6 +33,7 @@
 	import Image from './cell/image/Image.svelte';
 	import Code from './cell/code/Code.svelte';
 	import CodeDisplay from '$lib/component/codedisplay/CodeDisplay.svelte';
+	import Textbox from '$lib/component/textbox/Textbox.svelte';
 
 	let all_components = {
 		Button: Button,
@@ -55,6 +56,7 @@
 		Table: Table,
 		Tabs: Tabs,
 		Text: Text,
+		Textbox: Textbox,
 
 		// Layout components
 		AutoLayout: AutoLayout,

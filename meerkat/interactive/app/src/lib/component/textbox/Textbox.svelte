@@ -11,18 +11,16 @@
 			{title}
 		</div>
 	{/if}
-	<div class="form-control">
-		<div class="input-group w-100% flex items-center">
-			<input
-				type="text"
-				placeholder="Write some text..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={(e) => {
-					if (e.charCode == 13) {
-						$text = e.target.value;
-					}
-				}}
-			/>
-		</div>
+	<div class="px-2 w-full flex items-center">
+		<input
+			type="text"
+			placeholder="Write some text..."
+			class="grow h-10 px-3 rounded-md shadow-md"
+			on:keypress={(e) => {
+				if (e.charCode == 13) {
+					$text = e.target.value;
+				}
+			}}
+		/>
 	</div>
 </div>
