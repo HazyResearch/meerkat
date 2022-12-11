@@ -78,8 +78,6 @@ def get_first_available_port(initial: int, final: int) -> int:
             s.close()
             rich.print(f"Found open port: {port}")
             return port
-            if result == 0:
-                return port
         except OSError:
             pass
 
