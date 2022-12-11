@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 
 	export let text: Writable<string>;
 	export let title: string = '';
