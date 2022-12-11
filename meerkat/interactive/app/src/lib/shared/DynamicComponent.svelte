@@ -23,7 +23,7 @@
 	import StatsLabeler from '$lib/component/stats_labeler/StatsLabeler.svelte';
 	import Table from '$lib/component/table/Table.svelte';
 	import Tabs from '$lib/component/tabs/Tabs.svelte';
-	import Textbox from '$lib/component/textbox/Textbox.svelte';
+	import Text from '$lib/component/text/Text.svelte';
 
 	import AutoLayout from '$lib/layouts/AutoLayout.svelte';
 	import Div from '$lib/layouts/Div.svelte';
@@ -31,8 +31,8 @@
 	import Grid from '$lib/layouts/Grid.svelte';
 
 	import Image from './cell/image/Image.svelte';
-	import Basic from './cell/basic/Basic.svelte';
 	import Code from './cell/code/Code.svelte';
+	import CodeDisplay from '$lib/component/codedisplay/CodeDisplay.svelte';
 
 	let all_components = {
 		Button: Button,
@@ -54,7 +54,7 @@
 		StatsLabeler: StatsLabeler,
 		Table: Table,
 		Tabs: Tabs,
-		Textbox: Textbox,
+		Text: Text,
 
 		// Layout components
 		AutoLayout: AutoLayout,
@@ -63,8 +63,8 @@
 		Grid: Grid,
 
 		Image: Image,
-		Text: Basic,
-		Code: Code
+		Code: Code,
+		CodeDisplay: CodeDisplay
 	};
 </script>
 
