@@ -7,7 +7,7 @@ import pyarrow as pa
 import pytest
 import torch
 
-from meerkat import ArrowScalarColumn
+from meerkat import ArrowArrayColumn
 from meerkat.block.torch_block import TorchBlock
 
 from ..abstract import AbstractColumnTestBed, column_parametrize
@@ -20,7 +20,7 @@ def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
     return array.to_numpy(zero_copy_only=False)
 
 
-class ArrowScalarColumnTestBed(AbstractColumnTestBed):
+class ArrowArrayColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "dtype": ["float", "int", "str"],
@@ -49,7 +49,7 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
         else:
             raise ValueError(f"dtype {dtype} not supported.")
 
-        self.col = ArrowScalarColumn(array)
+        self.col = ArrowArrayColumn(array)
         self.data = array
 
     def get_map_spec(
@@ -66,10 +66,10 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
                 "fn": lambda x, k=0: pa.array(
                     to_numpy(x.data) + salt + (k if self.dtype != "str" else str(k))
                 ),
-                "expected_result": ArrowScalarColumn(
+                "expected_result": ArrowArrayColumn(
                     to_numpy(self.col.data) + salt + kwarg
                 ),
-                "output_type": ArrowScalarColumn,
+                "output_type": ArrowArrayColumn,
             }
 
         else:
@@ -77,10 +77,10 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
                 "fn": lambda x, k=0: x.as_py()
                 + salt
                 + (k if self.dtype != "str" else str(k)),
-                "expected_result": ArrowScalarColumn(
+                "expected_result": ArrowArrayColumn(
                     to_numpy(self.col.data) + salt + kwarg
                 ),
-                "output_type": ArrowScalarColumn,
+                "output_type": ArrowArrayColumn,
             }
 
     def get_filter_spec(
@@ -128,7 +128,7 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture(**column_parametrize([ArrowScalarColumnTestBed]))
+@pytest.fixture(**column_parametrize([ArrowArrayColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
@@ -137,7 +137,7 @@ def testbed(request, tmpdir):
 def test_init_block():
     block_view = TorchBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
-        ArrowScalarColumn(block_view)
+        ArrowArrayColumn(block_view)
 
 
 def test_to_numpy(testbed):

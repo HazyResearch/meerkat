@@ -4,7 +4,7 @@ import pytest
 import torch
 
 from meerkat import TorchTensorColumn
-from meerkat.block.numpy_block import NumpyBlock
+from meerkat.block.torch_block import TorchBlock
 
 from ..abstract import AbstractColumnTestBed, column_parametrize
 
@@ -82,7 +82,7 @@ def testbed(request, tmpdir):
 
 
 def test_init_block():
-    block_view = NumpyBlock(np.zeros((10, 10)))[0]
+    block_view = TorchBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
         TorchTensorColumn(block_view)
 

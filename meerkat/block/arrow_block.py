@@ -90,7 +90,7 @@ class ArrowBlock(AbstractBlock):
         if isinstance(index, pd.Series):
             # need to convert to numpy for boolean indexing
             return index.values
-        from meerkat.columns.pandas_column import ScalarColumn
+        from meerkat.columns.scalar import ScalarColumn
 
         if isinstance(index, ScalarColumn):
             return index.data.values

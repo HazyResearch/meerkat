@@ -16,7 +16,7 @@ from meerkat.errors import ConsolidationError
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
-class TensorBlock(AbstractBlock):
+class TorchBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
         device: torch.device
@@ -26,7 +26,7 @@ class TensorBlock(AbstractBlock):
         klass: type
 
     def __init__(self, data, *args, **kwargs):
-        super(TensorBlock, self).__init__(*args, **kwargs)
+        super(TorchBlock, self).__init__(*args, **kwargs)
         if len(data.shape) <= 1:
             raise ValueError(
                 "Cannot create a `TensorBlock` from data with less than 2 axes."
@@ -36,7 +36,7 @@ class TensorBlock(AbstractBlock):
     @property
     def signature(self) -> Hashable:
         return self.Signature(
-            klass=TensorBlock,
+            klass=TorchBlock,
             device=self.data.device,
             nrows=self.data.shape[0],
             shape=self.data.shape[2:],
@@ -47,7 +47,7 @@ class TensorBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_column_data(cls, data: torch.Tensor) -> Tuple[TensorBlock, BlockView]:
+    def from_column_data(cls, data: torch.Tensor) -> Tuple[TorchBlock, BlockView]:
         """[summary]
 
         Args:

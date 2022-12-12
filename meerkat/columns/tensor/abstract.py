@@ -9,7 +9,10 @@ TensorColumnTypes = Union[np.ndarray, torch.TensorType]
 
 
 class TensorColumn(Column):
-    def __new__(cls, data: TensorColumnTypes):
+    def __new__(cls, data: TensorColumnTypes = None):
+
+        if data is None:
+            return super().__new__(cls)
 
         if isinstance(data, (np.ndarray, List)):
             from .numpy import NumPyTensorColumn

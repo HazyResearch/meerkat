@@ -7,14 +7,14 @@ import pytest
 import torch
 from numpy.lib.format import open_memmap
 
-from meerkat import NumPyTensorColumn
-from meerkat.block.numpy_block import NumpyBlock
+from meerkat import TorchTensorColumn
+from meerkat.block.torch_block import TorchBlock
 
 from ....utils import product_parametrize
 from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
-class NumPyTensorColumnTestBed(AbstractColumnTestBed):
+class NumpyArrayColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "num_dims": [1, 2, 3],
@@ -49,9 +49,9 @@ class NumPyTensorColumnTestBed(AbstractColumnTestBed):
                 mode="w+",
             )
             mmap[:] = array
-            self.col = NumPyTensorColumn.from_array(mmap)
+            self.col = TorchTensorColumn.from_array(mmap)
         else:
-            self.col = NumPyTensorColumn.from_array(array)
+            self.col = TorchTensorColumn.from_array(array)
         self.data = array
 
     def get_map_spec(
@@ -63,7 +63,7 @@ class NumPyTensorColumnTestBed(AbstractColumnTestBed):
     ):
         return {
             "fn": lambda x, k=0: x + salt + k,
-            "expected_result": NumPyTensorColumn.from_array(
+            "expected_result": TorchTensorColumn.from_array(
                 self.col.data + salt + kwarg
             ),
         }
@@ -91,16 +91,16 @@ class NumPyTensorColumnTestBed(AbstractColumnTestBed):
         assert (data1 == data2).all()
 
 
-@pytest.fixture(**column_parametrize([NumPyTensorColumnTestBed]))
+@pytest.fixture(**column_parametrize([NumpyArrayColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
 
 def test_init_block():
-    block_view = NumpyBlock(np.zeros(10, 10))[0]
+    block_view = TorchBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
-        NumPyTensorColumn(block_view)
+        TorchTensorColumn(block_view)
 
 
 @product_parametrize(params={"batched": [True, False]})
@@ -136,9 +136,9 @@ def test_io_mmap(tmp_path, testbed, link, mmap):
 
     assert os.path.islink(os.path.join(path, "data.npy")) == (link and col.is_mmap)
 
-    new_col = NumPyTensorColumn.read(path, mmap=mmap)
+    new_col = TorchTensorColumn.read(path, mmap=mmap)
 
-    assert isinstance(new_col, NumPyTensorColumn)
+    assert isinstance(new_col, TorchTensorColumn)
     assert col.is_equal(new_col)
     assert new_col.is_mmap == mmap
 
@@ -155,7 +155,7 @@ def test_to_tensor(testbed):
 def test_from_array():
     # Build a dataset from a batch
     array = np.random.rand(10, 3, 3)
-    col = NumPyTensorColumn.from_array(array)
+    col = TorchTensorColumn.from_array(array)
 
     assert (col == array).all()
     np_test.assert_equal(len(col), 10)
@@ -180,20 +180,20 @@ def test_repr_pandas(testbed):
 
 def test_ufunc_out():
     out = np.zeros(3)
-    a = NumPyTensorColumn([1, 2, 3])
-    b = NumPyTensorColumn([1, 2, 3])
+    a = TorchTensorColumn([1, 2, 3])
+    b = TorchTensorColumn([1, 2, 3])
     result = np.add(a, b, out=out)
     assert result.data is out
 
 
 def test_ufunc_at():
-    a = NumPyTensorColumn([1, 2, 3])
+    a = TorchTensorColumn([1, 2, 3])
     result = np.add.at(a, [0, 1, 1], 1)
     assert result is None
-    assert a.is_equal(NumPyTensorColumn([2, 4, 3]))
+    assert a.is_equal(TorchTensorColumn([2, 4, 3]))
 
 
 def test_ufunc_unhandled():
-    a = NumPyTensorColumn([1, 2, 3])
+    a = TorchTensorColumn([1, 2, 3])
     with pytest.raises(TypeError):
         a == "a"

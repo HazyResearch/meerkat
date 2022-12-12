@@ -12,7 +12,7 @@ import torch
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
-from meerkat.block.tensor_block import TensorBlock
+from meerkat.block.torch_block import TorchBlock
 from meerkat.interactive.formatter import TensorFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
@@ -45,7 +45,7 @@ class TorchTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
     TensorColumn,
 ):
-    block_class: type = TensorBlock
+    block_class: type = TorchBlock
 
     def __init__(
         self,
@@ -54,7 +54,7 @@ class TorchTensorColumn(
         **kwargs,
     ):
         if isinstance(data, BlockView):
-            if not isinstance(data.block, TensorBlock):
+            if not isinstance(data.block, TorchBlock):
                 raise ValueError(
                     "Cannot create `TensorColumn` from a `BlockView` not "
                     "referencing a `TensorBlock`."

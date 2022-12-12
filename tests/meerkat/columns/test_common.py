@@ -30,11 +30,11 @@ from .tensor.test_torch import TorchTensorColumnTestBed
             NumPyTensorColumnTestBed,
             PandasScalarColumnTestBed,
             TorchTensorColumnTestBed,
-            DeferredColumnTestBed,
+            # DeferredColumnTestBed,
             ArrowScalarColumnTestBed,
-            FileColumnTestBed,
-            ImageColumnTestBed,
-            AudioColumnTestBed,
+            # FileColumnTestBed,
+            # ImageColumnTestBed,
+            # AudioColumnTestBed,
         ]
     )
 )

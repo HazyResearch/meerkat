@@ -12,7 +12,7 @@ from meerkat.block.torch_block import TorchBlock
 from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
-class PandasScalarColumnTestBed(AbstractColumnTestBed):
+class PandasSeriesColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "contiguous_index": [True, False],
@@ -84,13 +84,13 @@ class PandasScalarColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture(**column_parametrize([PandasScalarColumnTestBed]))
+@pytest.fixture(**column_parametrize([PandasSeriesColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@PandasScalarColumnTestBed.parametrize({"dtype": ["str"]})
+@PandasSeriesColumnTestBed.parametrize({"dtype": ["str"]})
 def test_str_accessor(testbed):
     col = testbed.col
     assert col.dtype == object
