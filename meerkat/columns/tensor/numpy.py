@@ -15,6 +15,7 @@ import torch
 from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
 
+from meerkat.columns.abstract import Column
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
 from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
@@ -139,7 +140,16 @@ class NumPyTensorColumn(
     def is_mmap(self):
         # important to check if .base is a python mmap object, since a view of a mmap
         # is also a memmap object, but should not be symlinked or copied
-        return isinstance(self.data, np.memmap) and isinstance(self.data.base, mmap)
+        if len(self.data.shape) == 1:
+            # if the data is a 1D array, then their is a level of indirection to the 
+            # the base object because we did a reshape to add an extra dimension
+            return isinstance(self.data, np.memmap) and isinstance(
+                self._block.data.base.base, mmap
+            )
+        else:
+            return isinstance(self.data, np.memmap) and isinstance(
+                self._block.data.base, mmap
+            )
 
     def _write_data(self, path: str, link: bool = True) -> None:
         path = os.path.join(path, "data.npy")
@@ -166,13 +176,13 @@ class NumPyTensorColumn(
         data = np.concatenate([c.data for c in columns])
         return columns[0]._clone(data=data)
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
         return np.array_equal(self.data, other.data, equal_nan=True)
 
     @classmethod
-    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+    def get_writer(cls, mmap: bool = False, template: Column = None):
         if mmap:
             from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
@@ -247,7 +257,7 @@ class NumPyTensorColumn(
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
-            AbstractColumn: A view of the column with the sorted data.
+            Column: A view of the column with the sorted data.
         """
         # calls argsort() function to retrieve ordered indices
         sorted_index = self.argsort(ascending=ascending, kind=kind)

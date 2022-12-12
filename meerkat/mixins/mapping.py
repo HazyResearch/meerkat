@@ -104,7 +104,6 @@ class MappableMixin:
                         if is_type_mapping
                         else output_type
                     )
-
                     writer = curr_output_type.get_writer(
                         mmap=mmap,
                         template=(

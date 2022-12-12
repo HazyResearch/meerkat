@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import torch
 
-from meerkat import TorchTensorColumn
+from meerkat import TorchTensorColumn, NumPyTensorColumn
 from meerkat.block.torch_block import TorchBlock
 
 from ..abstract import AbstractColumnTestBed, column_parametrize
@@ -84,7 +84,7 @@ def testbed(request, tmpdir):
 def test_init_block():
     block_view = TorchBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
-        TorchTensorColumn(block_view)
+        NumPyTensorColumn(block_view)
 
 
 def test_to_tensor(testbed):

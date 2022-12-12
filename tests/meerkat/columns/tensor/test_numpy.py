@@ -7,7 +7,7 @@ import pytest
 import torch
 from numpy.lib.format import open_memmap
 
-from meerkat import NumPyTensorColumn
+from meerkat import NumPyTensorColumn, TorchTensorColumn
 from meerkat.block.numpy_block import NumpyBlock
 
 from ....utils import product_parametrize
@@ -66,6 +66,7 @@ class NumPyTensorColumnTestBed(AbstractColumnTestBed):
             "expected_result": NumPyTensorColumn.from_array(
                 self.col.data + salt + kwarg
             ),
+            "output_type": NumPyTensorColumn
         }
 
     def get_filter_spec(
@@ -98,9 +99,9 @@ def testbed(request, tmpdir):
 
 
 def test_init_block():
-    block_view = NumpyBlock(np.zeros(10, 10))[0]
+    block_view = NumpyBlock(np.zeros((10, 10)))[0]
     with pytest.raises(ValueError):
-        NumPyTensorColumn(block_view)
+        TorchTensorColumn(block_view)
 
 
 @product_parametrize(params={"batched": [True, False]})
@@ -113,6 +114,7 @@ def test_map_return_single_mmap(tmpdir, testbed: AbstractColumnTestBed, batched:
         return out
 
     mmap_path = os.path.join(tmpdir, "mmap_path")
+
     result = col.map(
         func,
         batch_size=4,
@@ -165,7 +167,7 @@ def test_to_pandas(testbed):
     series = testbed.col.to_pandas()
 
     assert isinstance(series, pd.Series)
-
+ 
     if testbed.col.shape == 1:
         assert (series.values == testbed.col.data).all()
     else:
@@ -183,7 +185,7 @@ def test_ufunc_out():
     a = NumPyTensorColumn([1, 2, 3])
     b = NumPyTensorColumn([1, 2, 3])
     result = np.add(a, b, out=out)
-    assert result.data is out
+    assert (result.data == out).all()
 
 
 def test_ufunc_at():

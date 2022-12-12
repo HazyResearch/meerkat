@@ -513,6 +513,7 @@ class Column(
         from meerkat.writers.concat_writer import ConcatWriter
 
         if mmap:
+            breakpoint()
             raise ValueError("Memmapping not supported with this column type.")
         else:
             return ConcatWriter(output_type=cls, template=template)
