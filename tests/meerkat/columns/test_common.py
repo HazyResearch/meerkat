@@ -10,6 +10,8 @@ from meerkat import (
     ScalarColumn,
     NumPyTensorColumn,
 )
+from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.errors import ImmutableError
 
 from ...utils import product_parametrize
@@ -30,11 +32,11 @@ from .tensor.test_torch import TorchTensorColumnTestBed
             NumPyTensorColumnTestBed,
             PandasScalarColumnTestBed,
             TorchTensorColumnTestBed,
-            # DeferredColumnTestBed,
+            DeferredColumnTestBed,
             ArrowScalarColumnTestBed,
-            # FileColumnTestBed,
-            # ImageColumnTestBed,
-            # AudioColumnTestBed,
+            FileColumnTestBed,
+            ImageColumnTestBed,
+            AudioColumnTestBed,
         ]
     )
 )
@@ -63,8 +65,10 @@ def single_column_testbed(request, tmpdir):
 @product_parametrize(params={"index_type": [np.array, list]})
 def test_getitem(column_testbed, index_type: type):
     col = column_testbed.col
-
-    column_testbed.assert_data_equal(column_testbed.get_data(1), col[1])
+    result = col[1]
+    if isinstance(result, DeferredCell):
+        result = result()
+    column_testbed.assert_data_equal(column_testbed.get_data(1), result)
 
     for index in [
         slice(2, 4, 1),
@@ -74,6 +78,8 @@ def test_getitem(column_testbed, index_type: type):
         col_index = index_type(index) if not isinstance(index, slice) else index
         data = column_testbed.get_data(index)
         result = col[col_index]
+        if isinstance(result, DeferredColumn):
+            result = result()
         column_testbed.assert_data_equal(data, result.data)
 
         if type(result) == type(col):
@@ -86,7 +92,7 @@ def test_getitem(column_testbed, index_type: type):
 
 @product_parametrize(params={"index_type": [np.array, list, pd.Series]})
 def test_set_item(column_testbed, index_type: type):
-    MUTABLE_COLUMNS = (TorchTensorColumn, TorchTensorColumn, ScalarColumn)
+    MUTABLE_COLUMNS = (NumPyTensorColumn, TorchTensorColumn, PandasScalarColumn)
 
     col = column_testbed.col
 

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 import meerkat as mk
-from meerkat import DeferredColumn, ObjectColumn, TorchTensorColumn, NumPyTensorColumn
+from meerkat import DeferredColumn, ObjectColumn, NumPyTensorColumn
 from meerkat.errors import ConcatWarning
 
 from ....testbeds import MockColumn, MockDatapanel
@@ -38,7 +38,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
 
         np.random.seed(seed)
         array = np.random.random(length) * 10
-        self.col = mk.TorchTensorColumn(array).to_lambda(
+        self.col = mk.NumPyTensorColumn(array).to_lambda(
             function=lambda x: x + 2, **to_lambda_kwargs
         )
         self.data = array + 2
@@ -53,7 +53,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
         if materialize:
             return {
                 "fn": lambda x, k=0: x + salt + k,
-                "expected_result": TorchTensorColumn.from_array(
+                "expected_result": NumPyTensorColumn.from_array(
                     self.data + salt + kwarg
                 ),
             }
@@ -63,14 +63,14 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
                     "fn": lambda x, k=0: np.array([cell.get() for cell in x.lz])
                     + salt
                     + k,
-                    "expected_result": TorchTensorColumn.from_array(
+                    "expected_result": NumPyTensorColumn.from_array(
                         self.data + salt + kwarg
                     ),
                 }
             else:
                 return {
                     "fn": lambda x, k=0: x.get() + salt + k,
-                    "expected_result": TorchTensorColumn.from_array(
+                    "expected_result": NumPyTensorColumn.from_array(
                         self.data + salt + kwarg
                     ),
                 }
@@ -86,6 +86,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
 
     @staticmethod
     def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
+        print(data1, data2)
         if isinstance(data1, np.ndarray):
             assert (data1 == data2).all()
         else:
@@ -98,7 +99,7 @@ def testbed(request, tmpdir):
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@pytest.mark.parametrize("col_type", [TorchTensorColumn, TorchTensorColumn, ObjectColumn])
+@pytest.mark.parametrize("col_type", [NumPyTensorColumn, NumPyTensorColumn, ObjectColumn])
 def test_column_to_lambda(col_type: Type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col
@@ -131,7 +132,7 @@ def test_df_to_lambda(use_visible_columns: bool):
 
 @pytest.mark.parametrize(
     "col_type",
-    [TorchTensorColumn, TorchTensorColumn, ObjectColumn],
+    [NumPyTensorColumn, NumPyTensorColumn, ObjectColumn],
 )
 def test_composed_lambda_columns(col_type: Type):
     testbed = MockColumn(col_type=col_type)
@@ -165,7 +166,7 @@ def test_df_concat():
         out = mk.concat([col_a, col_b])
 
 
-@pytest.mark.parametrize("col_type", [TorchTensorColumn, ObjectColumn])
+@pytest.mark.parametrize("col_type", [NumPyTensorColumn, ObjectColumn])
 def test_col_concat(col_type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col

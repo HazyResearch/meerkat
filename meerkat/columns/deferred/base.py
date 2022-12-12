@@ -40,6 +40,9 @@ class DeferredCell(AbstractCell):
     def __repr__(self):
         name = getattr(self.data.fn, "__qualname__", repr(self.data.fn))
         return f"{self.__class__.__qualname__}(fn={name})"
+    
+    def __call__(self):
+        return self.data._get()
 
 
 class DeferredColumn(Column):

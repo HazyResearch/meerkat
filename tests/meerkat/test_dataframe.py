@@ -16,16 +16,15 @@ import meerkat
 from meerkat import TorchTensorColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
-from meerkat.columns.arrow_column import ArrowArrayColumn
+from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.object.base import ObjectColumn
-from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 
 from ..utils import product_parametrize
 from .columns.scalar.test_arrow import ArrowScalarColumnTestBed
-from .columns.test_cell_column import CellColumnTestBed
 from .columns.deferred.test_image import ImageColumnTestBed
 from .columns.tensor.test_numpy import NumPyTensorColumnTestBed
 from .columns.scalar.test_pandas import PandasScalarColumnTestBed
@@ -43,7 +42,6 @@ class DataFrameTestBed:
         "pd": {"testbed_class": PandasScalarColumnTestBed, "n": 2},
         "torch": {"testbed_class": TorchTensorColumnTestBed, "n": 2},
         "img": {"testbed_class": ImageColumnTestBed, "n": 2},
-        "cell": {"testbed_class": CellColumnTestBed, "n": 2},
         "arrow": {"testbed_class": ArrowScalarColumnTestBed, "n": 2},
     }
 
@@ -918,7 +916,7 @@ def test_from_arrow():
     df["a"]._block is df["c"]._block
 
     for col in ["a", "b", "c"]:
-        assert isinstance(df[col], ArrowArrayColumn)
+        assert isinstance(df[col], ArrowScalarColumn)
         assert pa.compute.equal(df[col].data, table[col])
 
 
@@ -961,7 +959,7 @@ def test_to_jsonl(tmpdir: str):
         "d": torch.arange(length),
         # offset the index to test robustness to nonstandard indices
         "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
-        "f": ArrowArrayColumn(np.arange(length)),
+        "f": ArrowScalarColumn(np.arange(length)),
     }
     df = DataFrame.from_batch(batch)
 

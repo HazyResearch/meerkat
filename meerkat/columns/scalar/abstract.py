@@ -12,7 +12,7 @@ ScalarColumnTypes = Union[np.ndarray, torch.TensorType, pd.Series, List]
 
 class ScalarColumn(Column):
     def __new__(cls, data: ScalarColumnTypes=None):
-        if data is None:
+        if (cls is not ScalarColumn) or (data is None):
             return super().__new__(cls)
 
         if isinstance(data, (np.ndarray, torch.TensorType, pd.Series, List)):
@@ -27,3 +27,4 @@ class ScalarColumn(Column):
             raise ValueError(
                 f"Cannot create `ScalarColumn` from object of type {type(data)}."
             )
+    

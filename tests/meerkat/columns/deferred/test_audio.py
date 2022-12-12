@@ -61,7 +61,7 @@ class AudioColumnTestBed(AbstractColumnTestBed):
             filename = "{}.wav".format(i)
             torchaudio.save(
                 os.path.join(tmpdir, filename),
-                torch.tensor(audio),
+                audio,
                 sample_rate=16,
             )
             if use_base_dir:
