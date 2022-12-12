@@ -31,7 +31,7 @@ from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
@@ -45,7 +45,7 @@ def getattr_decorator(fn: Callable):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if isinstance(out, pd.Series):
-            return PandasSeriesColumn(out)
+            return PandasScalarColumn(out)
         elif isinstance(out, pd.DataFrame):
             from meerkat import DataFrame
 
@@ -65,7 +65,7 @@ class _ReturnColumnMixin:
             if isinstance(attr, Callable):
                 return getattr_decorator(attr)
             elif isinstance(attr, pd.Series):
-                return PandasSeriesColumn(attr)
+                return PandasScalarColumn(attr)
             elif isinstance(attr, pd.DataFrame):
                 from meerkat import DataFrame
 
@@ -133,8 +133,8 @@ class _MeerkatCombinedDatetimelikeProperties(CombinedDatetimelikeProperties):
         return obj
 
 
-class PandasSeriesColumn(
-    AbstractColumn,
+class PandasScalarColumn(
+    Column,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
     block_class: type = PandasBlock
@@ -161,7 +161,7 @@ class PandasSeriesColumn(
         else:
             data = pd.Series(data)
 
-        super(PandasSeriesColumn, self)._set_data(data)
+        super(PandasScalarColumn, self)._set_data(data)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         out = kwargs.get("out", ())
@@ -170,16 +170,14 @@ class PandasSeriesColumn(
             # Use ArrayLike instead of type(self) for isinstance to
             # allow subclasses that don't override __array_ufunc__ to
             # handle ArrayLike objects.
-            if not isinstance(x, self._HANDLED_TYPES + (PandasSeriesColumn,)):
+            if not isinstance(x, self._HANDLED_TYPES + (PandasScalarColumn,)):
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
-        inputs = tuple(
-            x.data if isinstance(x, PandasSeriesColumn) else x for x in inputs
-        )
+        inputs = tuple(x.data if isinstance(x, PandasScalarColumn) else x for x in inputs)
         if out:
             kwargs["out"] = tuple(
-                x.data if isinstance(x, PandasSeriesColumn) else x for x in out
+                x.data if isinstance(x, PandasScalarColumn) else x for x in out
             )
         result = getattr(ufunc, method)(*inputs, **kwargs)
 
@@ -231,7 +229,7 @@ class PandasSeriesColumn(
         self._data.iloc[indices] = values
 
     @classmethod
-    def concat(cls, columns: Sequence[PandasSeriesColumn]):
+    def concat(cls, columns: Sequence[PandasScalarColumn]):
         data = pd.concat([c.data for c in columns])
         return columns[0]._clone(data=data)
 
@@ -296,7 +294,7 @@ class PandasSeriesColumn(
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> PandasSeriesColumn:
+    ) -> PandasScalarColumn:
         """Return a sorted view of the column.
 
         Args:
@@ -312,9 +310,7 @@ class PandasSeriesColumn(
         sorted_index = self.argsort(ascending, kind)
         return self[sorted_index]
 
-    def argsort(
-        self, ascending: bool = True, kind: str = "quicksort"
-    ) -> PandasSeriesColumn:
+    def argsort(self, ascending: bool = True, kind: str = "quicksort") -> PandasScalarColumn:
         """Return indices that would sorted the column.
 
         Args:
@@ -358,7 +354,7 @@ class PandasSeriesColumn(
     def to_pandas(self) -> pd.Series:
         return self.data
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
         return (self.data.values == other.data.values).all()
@@ -371,3 +367,6 @@ class PandasSeriesColumn(
                 "Cannot apply mean aggregation to Pandas Series with "
                 f" dtype '{self.data.dtype}'."
             )
+
+
+PandasSeriesColumn = PandasScalarColumn

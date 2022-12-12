@@ -13,14 +13,14 @@ import torch
 import ujson as json
 
 import meerkat
-from meerkat import NumpyArrayColumn
+from meerkat import TorchTensorColumn
 from meerkat.block.manager import BlockManager
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.arrow_column import ArrowArrayColumn
 from meerkat.columns.lambda_column import LambdaColumn
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 
 from ..utils import product_parametrize
@@ -49,7 +49,7 @@ class DataFrameTestBed:
 
     def __init__(
         self,
-        column_configs: Dict[str, AbstractColumn],
+        column_configs: Dict[str, Column],
         consolidated: bool = True,
         length: int = 4,
         tmpdir: str = None,
@@ -67,7 +67,7 @@ class DataFrameTestBed:
             self.df.consolidate()
 
     def _build_column_testbeds(
-        self, column_configs: Dict[str, AbstractColumn], length: int, tmpdir: str
+        self, column_configs: Dict[str, Column], length: int, tmpdir: str
     ):
         def _get_tmpdir(name):
             path = os.path.join(tmpdir, name)
@@ -172,7 +172,7 @@ def test_col_index_single(testbed):
     for name in testbed.columns:
         index = name
         col = df[index]
-        assert isinstance(col, AbstractColumn)
+        assert isinstance(col, Column)
         # enforce that a single column index returns a coreference
         assert col is df._data[index]
 
@@ -214,9 +214,9 @@ def test_row_index_single(testbed):
             np.array,
             pd.Series,
             torch.Tensor,
-            NumpyArrayColumn,
-            PandasSeriesColumn,
-            TensorColumn,
+            TorchTensorColumn,
+            ScalarColumn,
+            TorchTensorColumn,
             list,
         ]
     }
@@ -289,9 +289,9 @@ def test_row_lz_index_single(testbed):
             np.array,
             pd.Series,
             torch.Tensor,
-            NumpyArrayColumn,
-            PandasSeriesColumn,
-            TensorColumn,
+            TorchTensorColumn,
+            ScalarColumn,
+            TorchTensorColumn,
         ]
     }
 )
@@ -416,13 +416,13 @@ def test_row_indexing_view_copy_semantics():
     # slice index
     df2 = df[:8]
     col = "a"
-    assert isinstance(df2[col], NumpyArrayColumn)
+    assert isinstance(df2[col], TorchTensorColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     assert df[col].data is df2[col].data.base
 
     col = "d"
-    assert isinstance(df2[col], TensorColumn)
+    assert isinstance(df2[col], TorchTensorColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     # note `data_ptr` checks whether the tensors have the same memory address of the
@@ -430,7 +430,7 @@ def test_row_indexing_view_copy_semantics():
     assert df[col].data.data_ptr() == df2[col].data.data_ptr()
 
     col = "e"
-    assert isinstance(df2[col], PandasSeriesColumn)
+    assert isinstance(df2[col], ScalarColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     # TODO (sabri): Figure out pandas copying behavior, it's not clear how it works
@@ -440,13 +440,13 @@ def test_row_indexing_view_copy_semantics():
     # slice index
     df2 = df[np.array([0, 1, 2, 5])]
     col = "a"
-    assert isinstance(df2[col], NumpyArrayColumn)
+    assert isinstance(df2[col], TorchTensorColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     assert df[col].data.base is not df2[col].data.base
 
     col = "d"
-    assert isinstance(df2[col], TensorColumn)
+    assert isinstance(df2[col], TorchTensorColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     # note `data_ptr` checks whether the tensors have the same memory address of the
@@ -454,7 +454,7 @@ def test_row_indexing_view_copy_semantics():
     assert df[col].data.data_ptr() != df2[col].data.data_ptr()
 
     col = "e"
-    assert isinstance(df2[col], PandasSeriesColumn)
+    assert isinstance(df2[col], ScalarColumn)
     assert df[col] is not df2[col]
     assert df[col].data is not df2[col].data
     assert df[col].data.values.base is not df2[col].data.values.base
@@ -536,7 +536,7 @@ def test_map_return_single(
         num_workers=num_workers,
         **kwargs,
     )
-    assert isinstance(result, AbstractColumn)
+    assert isinstance(result, Column)
     assert result.is_equal(map_spec["expected_result"])
 
 
@@ -831,7 +831,7 @@ def test_from_csv():
     assert df_new.columns == ["Unnamed: 0", "a", "b", "c"]
     # Skip index column
     for k in data:
-        if isinstance(df_new[k], PandasSeriesColumn):
+        if isinstance(df_new[k], ScalarColumn):
             data_to_compare = df_new[k]._data.tolist()
         else:
             data_to_compare = df_new[k]._data
@@ -874,7 +874,7 @@ def test_from_jsonl():
     assert df_new.columns == ["a", "b", "c"]
     # Skip index column
     for k in data:
-        if isinstance(df_new[k], NumpyArrayColumn):
+        if isinstance(df_new[k], TorchTensorColumn):
             data_to_compare = df_new[k]._data.tolist()
         else:
             data_to_compare = df_new[k]._data
@@ -991,20 +991,20 @@ def test_constructor():
     }
     df = DataFrame(data=data)
     assert len(df) == length
-    assert df["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+    assert df["a"].is_equal(TorchTensorColumn(np.arange(length)))
 
     # from BlockManager
     mgr = BlockManager.from_dict(data)
     df = DataFrame(data=mgr)
     assert len(df) == length
-    assert df["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+    assert df["a"].is_equal(TorchTensorColumn(np.arange(length)))
     assert df.columns == ["a", "b"]
 
     # from list of dictionaries
     data = [{"a": idx, "b": str(idx), "c": {"test": idx}} for idx in range(length)]
     df = DataFrame(data=data)
     assert len(df) == length
-    assert df["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+    assert df["a"].is_equal(TorchTensorColumn(np.arange(length)))
     assert isinstance(df["c"], ListColumn)
     assert df.columns == ["a", "b", "c"]
 
@@ -1017,9 +1017,9 @@ def test_constructor():
     ]
     df = DataFrame(data=data)
     assert len(df) == length
-    assert df["a"].is_equal(NumpyArrayColumn(np.arange(length)))
+    assert df["a"].is_equal(TorchTensorColumn(np.arange(length)))
     assert df["c"].is_equal(
-        NumpyArrayColumn([np.nan if idx % 2 == 0 else idx for idx in range(length)])
+        TorchTensorColumn([np.nan if idx % 2 == 0 else idx for idx in range(length)])
     )
     assert df.columns == ["a", "b", "c"]
 
@@ -1094,7 +1094,7 @@ def test_repr_pandas(testbed, max_rows: int):
     assert len(df) == min(len(df), max_rows + 1)
 
 
-@product_parametrize(params={"column_type": [PandasSeriesColumn, NumpyArrayColumn]})
+@product_parametrize(params={"column_type": [ScalarColumn, TorchTensorColumn]})
 def test_loc_single(testbed, column_type: type):
     df = testbed.df
     # int index => single row (dict)
@@ -1114,7 +1114,7 @@ def test_loc_single(testbed, column_type: type):
         )
 
 
-@product_parametrize(params={"column_type": [PandasSeriesColumn, NumpyArrayColumn]})
+@product_parametrize(params={"column_type": [ScalarColumn, TorchTensorColumn]})
 def test_loc_multiple(testbed, column_type):
     df = testbed.df
     # int index => single row (dict)
@@ -1136,7 +1136,7 @@ def test_loc_multiple(testbed, column_type):
 
 def test_loc_missing():
     df = DataFrame(
-        {"x": NumpyArrayColumn([1, 2, 3]), "y": PandasSeriesColumn([4, 5, 6])}
+        {"x": TorchTensorColumn([1, 2, 3]), "y": ScalarColumn([4, 5, 6])}
     )
     df = df.set_primary_key("y")
 
@@ -1146,18 +1146,18 @@ def test_loc_missing():
 
 def test_primary_key_persistence():
     df = DataFrame(
-        {"a": PandasSeriesColumn(np.arange(16)), "b": PandasSeriesColumn(np.arange(16))}
+        {"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))}
     )
     df = df.set_primary_key("a")
 
     df = df[:4]
     df._primary_key == "a"
-    assert (df.primary_key == PandasSeriesColumn(np.arange(4))).all()
+    assert (df.primary_key == ScalarColumn(np.arange(4))).all()
 
 
 def test_invalid_primary_key():
     # multidimenmsional
-    df = DataFrame({"a": NumpyArrayColumn([[1, 2, 3]])})
+    df = DataFrame({"a": TorchTensorColumn([[1, 2, 3]])})
 
     with pytest.raises(ValueError):
         df.set_primary_key("a")
@@ -1165,17 +1165,17 @@ def test_invalid_primary_key():
 
 def test_primary_key_reset():
     df = DataFrame(
-        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+        {"a": TorchTensorColumn(np.arange(16)), "b": TorchTensorColumn(np.arange(16))}
     )
     df = df.set_primary_key("a")
 
-    df["a"] = NumpyArrayColumn(np.arange(16))
+    df["a"] = TorchTensorColumn(np.arange(16))
     assert df._primary_key is None
 
 
 def test_check_primary_key_reset():
     df = DataFrame(
-        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+        {"a": TorchTensorColumn(np.arange(16)), "b": TorchTensorColumn(np.arange(16))}
     )
     df = df.set_primary_key("a")
 
@@ -1184,12 +1184,12 @@ def test_check_primary_key_reset():
 
 def test_check_primary_key_no_reset():
     df = DataFrame(
-        {"a": NumpyArrayColumn(np.arange(16)), "b": NumpyArrayColumn(np.arange(16))}
+        {"a": TorchTensorColumn(np.arange(16)), "b": TorchTensorColumn(np.arange(16))}
     )
     df = df.set_primary_key("a")
 
     df2 = DataFrame(
-        {"a": NumpyArrayColumn(np.arange(16, 32)), "b": NumpyArrayColumn(np.arange(16))}
+        {"a": TorchTensorColumn(np.arange(16, 32)), "b": TorchTensorColumn(np.arange(16))}
     )
 
     assert df.append(df2).primary_key is None
@@ -1197,14 +1197,14 @@ def test_check_primary_key_no_reset():
 
 @pytest.mark.parametrize("x", [0, 0.0, "hello world", np.nan, np.inf])
 def test_scalar_setitem(x):
-    df = DataFrame({"a": NumpyArrayColumn(np.arange(16))})
+    df = DataFrame({"a": TorchTensorColumn(np.arange(16))})
     df["extra_column"] = x
 
     assert len(df["extra_column"]) == len(df)
     if isinstance(x, str):
-        assert isinstance(df["extra_column"], PandasSeriesColumn)
+        assert isinstance(df["extra_column"], ScalarColumn)
     else:
-        assert isinstance(df["extra_column"], NumpyArrayColumn)
+        assert isinstance(df["extra_column"], TorchTensorColumn)
     if not isinstance(x, str) and (np.isnan(x) or np.isinf(x)):
         if np.isnan(x):
             assert np.all(np.isnan(df["extra_column"]))

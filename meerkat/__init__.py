@@ -8,25 +8,21 @@ initialize_logging()
 import meerkat.interactive as gui
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
-from meerkat.cells.volume import MedicalVolumeCell
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.arrow_column import ArrowArrayColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.audio_column import AudioColumn
-from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.file_column import FileCell, FileColumn, FileLoader
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.spacy_column import SpacyColumn
-from meerkat.columns.tensor_column import TensorColumn
-from meerkat.columns.volume_column import MedicalVolumeColumn
+from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.scalar.pandas import PandasScalarColumn
+from meerkat.columns.scalar.arrow import ArrowScalarColumn
+from meerkat.columns.tensor import TensorColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
 
-# TODO: backwards compat remove before release
-from meerkat.interactive.startup import start as interactive_mode
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
 from meerkat.ops.match import match
@@ -37,11 +33,6 @@ from meerkat.provenance import provenance
 
 from .config import config
 
-# aliases for core column types
-ArrayColumn = NumpyArrayColumn
-SeriesColumn = PandasSeriesColumn
-ArrowColumn = ArrowArrayColumn
-
 # alias for DataFrame for backwards compatibility
 DataPanel = DataFrame
 
@@ -49,26 +40,23 @@ __all__ = [
     "GlobalState",
     "DataFrame",
     "DataPanel",
-    "AbstractColumn",
-    "LambdaColumn",
-    "CellColumn",
-    "FileColumn",
+    "Column",
     "ListColumn",
-    "NumpyArrayColumn",
-    "PandasSeriesColumn",
+    "ScalarColumn",
+    "PandasScalarColumn",
+    "ArrowScalarColumn",
     "TensorColumn",
-    "ArrowArrayColumn",
-    "ArrowColumn",
+    "NumPyTensorColumn",
+    "TorchTensorColumn",
+    "LambdaColumn",
+    "FileColumn",
     "ImageColumn",
     "AudioColumn",
     "VideoColumn",
-    "SpacyColumn",
-    "MedicalVolumeColumn",
     "AbstractCell",
     "LambdaCell",
     "FileCell",
     "FileLoader",
-    "MedicalVolumeCell",
     "get",
     "concat",
     "merge",
@@ -77,6 +65,5 @@ __all__ = [
     "sample",
     "provenance",
     "config",
-    "interactive_mode",
     "gui",
 ]

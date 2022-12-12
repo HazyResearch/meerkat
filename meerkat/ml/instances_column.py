@@ -6,7 +6,7 @@ from typing import Sequence
 from tqdm import tqdm
 
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 ops = LazyLoader("torchvision.ops")
@@ -17,10 +17,10 @@ class InstancesColumn(ListColumn):
 
         super(InstancesColumn, self).__init__(data=data, *args, **kwargs)
 
-    def num_instances(self) -> TensorColumn:
+    def num_instances(self) -> TorchTensorColumn:
         """Returns the number of instances for each image."""
 
-        data_col = TensorColumn([len(instance) for instance in self])
+        data_col = TorchTensorColumn([len(instance) for instance in self])
 
         return data_col
 

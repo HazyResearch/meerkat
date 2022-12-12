@@ -1,20 +1,20 @@
 from typing import TYPE_CHECKING, Mapping, Tuple, Union
 
-from meerkat import AbstractColumn, DataFrame, NumpyArrayColumn, embed
+from meerkat import Column, DataFrame, TorchTensorColumn, embed
 
 if TYPE_CHECKING:
     from domino import Slicer
 
 
 def explain(
-    data: Union[AbstractColumn, DataFrame],
+    data: Union[Column, DataFrame],
     input: str,
     target: Union[str, Mapping[str, str]],
     method: Union[str, "Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
-) -> Tuple[NumpyArrayColumn, "Slicer"]:
+) -> Tuple[TorchTensorColumn, "Slicer"]:
     """Cluster the data in a column. If the column is an unstructured type,
     (e.g. image), the column is first embedded then clustered.
 

@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import torch
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.instances_column import InstancesColumn
 from meerkat.ml.model import Model
@@ -117,7 +117,7 @@ class TensorModel(Model):
             function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
-            output_type=TensorColumn,
+            output_type=TorchTensorColumn,
             input_cols=input_columns,
         )
 

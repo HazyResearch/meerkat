@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from meerkat import TensorColumn
+from meerkat import TorchTensorColumn
 from meerkat.block.abstract import BlockView
 from meerkat.block.ref import BlockRef
 from meerkat.block.tensor_block import TensorBlock
@@ -59,7 +59,7 @@ def test_consolidate_1(num_blocks):
     ]
     cols = [
         {
-            str(slc): TensorColumn(
+            str(slc): TorchTensorColumn(
                 data=BlockView(
                     block=blocks[block_idx],
                     block_index=slc,
@@ -97,7 +97,7 @@ def test_consolidate_mismatched_signature():
     ]
     cols = [
         {
-            str(slc): TensorColumn(
+            str(slc): TorchTensorColumn(
                 data=BlockView(
                     block=blocks[block_idx],
                     block_index=slc,

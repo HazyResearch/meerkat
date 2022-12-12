@@ -30,8 +30,7 @@ from pandas._libs import lib
 
 import meerkat
 from meerkat.block.manager import BlockManager
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.cell_column import CellColumn
+from meerkat.columns.abstract import Column
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -52,7 +51,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 Example = Dict
-Batch = Dict[str, Union[List, AbstractColumn]]
+Batch = Dict[str, Union[List, Column]]
 BatchOrDataset = Union[Batch, "DataFrame"]
 
 
@@ -183,7 +182,7 @@ class DataFrame(
         return list(self.data.keys())
 
     @property
-    def primary_key(self) -> AbstractColumn:
+    def primary_key(self) -> Column:
         """The column acting as the primary key."""
         if self._primary_key is None:
             return None
@@ -250,7 +249,7 @@ class DataFrame(
         return self.nrows, self.ncols
 
     def add_column(
-        self, name: str, data: AbstractColumn.Columnable, overwrite=False
+        self, name: str, data: Column.Columnable, overwrite=False
     ) -> None:
         """Add a column to the DataFrame."""
 
@@ -269,7 +268,7 @@ class DataFrame(
         if name in self.columns:
             self.remove_column(name)
 
-        column = AbstractColumn.from_data(data)
+        column = Column.from_data(data)
 
         assert len(column) == len(self) or len(self.columns) == 0, (
             f"`add_column` failed. "
@@ -327,7 +326,7 @@ class DataFrame(
             )
 
         if isinstance(
-            keyidx, (np.ndarray, list, tuple, pd.Series, torch.Tensor, AbstractColumn)
+            keyidx, (np.ndarray, list, tuple, pd.Series, torch.Tensor, Column)
         ):
             posidxs = self.primary_key._keyidxs_to_posidxs(keyidx)
             return self._clone(
@@ -383,7 +382,7 @@ class DataFrame(
         elif isinstance(posidx, pd.Series):
             index_type = "row"
 
-        elif isinstance(posidx, AbstractColumn):
+        elif isinstance(posidx, Column):
             # column index => multiple row selection (DataFrame)
             index_type = "row"
 
@@ -764,7 +763,7 @@ class DataFrame(
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
-    ) -> Optional[Union[Dict, List, AbstractColumn]]:
+    ) -> Optional[Union[Dict, List, Column]]:
         input_columns = self.columns if input_columns is None else input_columns
         df = self[input_columns]
         return super(DataFrame, df).map(
@@ -1148,7 +1147,7 @@ def is_listlike(obj) -> bool:
     Return:
         bool: True if the object is listlike, False otherwise.
     """
-    is_column = isinstance(obj, AbstractColumn)
+    is_column = isinstance(obj, Column)
     is_sequential = (
         hasattr(obj, "__len__")
         and hasattr(obj, "__getitem__")

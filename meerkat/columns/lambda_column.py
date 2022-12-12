@@ -12,7 +12,7 @@ import yaml
 from meerkat.block.abstract import BlockView
 from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
 from meerkat.cells.abstract import AbstractCell
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.errors import ConcatWarning, ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -42,7 +42,7 @@ class LambdaCell(AbstractCell):
         return f"{self.__class__.__qualname__}(fn={name})"
 
 
-class LambdaColumn(AbstractColumn):
+class LambdaColumn(Column):
 
     block_class: type = LambdaBlock
 
@@ -106,7 +106,7 @@ class LambdaColumn(AbstractColumn):
         # TODO (Sabri): avoid redundant writes in dataframes
         return self.data.write(os.path.join(path, "data"))
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
         return self.data.is_equal(other.data)
@@ -126,8 +126,8 @@ class LambdaColumn(AbstractColumn):
                 open(os.path.join(path, "data", "meta.yaml")),
                 Loader=yaml.FullLoader,
             )
-            if issubclass(meta["dtype"], AbstractColumn):
-                col = AbstractColumn.read(os.path.join(path, "data"))
+            if issubclass(meta["dtype"], Column):
+                col = Column.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
                     "Support for LambdaColumns based on a DataFrame is deprecated."

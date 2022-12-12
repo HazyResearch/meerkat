@@ -30,7 +30,7 @@ class MappableMixin:
         flush_size: int = None,
         **kwargs,
     ):
-        from meerkat.columns.abstract import AbstractColumn
+        from meerkat.columns.abstract import Column
         from meerkat.dataframe import DataFrame
 
         """Map a function over the elements of the column."""
@@ -97,7 +97,7 @@ class MappableMixin:
                     output.items() if is_mapping else [("0", output)]
                 ):
                     curr_output_type = (
-                        type(AbstractColumn.from_data(curr_output))
+                        type(Column.from_data(curr_output))
                         if output_type is None
                         or (is_type_mapping and key not in output_type.keys())
                         else output_type[key]
@@ -109,7 +109,7 @@ class MappableMixin:
                         mmap=mmap,
                         template=(
                             curr_output.copy()
-                            if isinstance(curr_output, AbstractColumn)
+                            if isinstance(curr_output, Column)
                             else None
                         ),
                     )

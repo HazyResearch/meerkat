@@ -10,7 +10,7 @@ from PIL import Image
 from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
 from meerkat.columns.file_column import FileLoader, FileCell, FileColumn
 from meerkat.columns.lambda_column import LambdaCell
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.pandas_column import ScalarColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
 
 
@@ -90,7 +90,7 @@ class FileColumnTestBed(AbstractColumnTestBed):
                 )
 
             index = np.arange(len(self.data))[index]
-            col = PandasSeriesColumn([self.paths[idx] for idx in index])
+            col = ScalarColumn([self.paths[idx] for idx in index])
             return LambdaOp(
                 args=[col], kwargs={}, fn=self.col.fn, is_batched_fn=False, batch_size=1
             )

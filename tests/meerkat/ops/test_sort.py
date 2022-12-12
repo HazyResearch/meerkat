@@ -10,9 +10,9 @@ def make_test_df(
     """Helper function, returns test df."""
     df = mk.DataFrame(
         {
-            "tensor": mk.TensorColumn([3, 1, 2]),
-            "pandas": mk.PandasSeriesColumn([9, 8, 7]),
-            "numpy": mk.NumpyArrayColumn([5, 4, 6]),
+            "tensor": mk.TorchTensorColumn([3, 1, 2]),
+            "pandas": mk.ScalarColumn([9, 8, 7]),
+            "numpy": mk.TorchTensorColumn([5, 4, 6]),
         }
     )
     test = df.sort(by=by, ascending=ascending)
@@ -25,9 +25,9 @@ def make_tiebreaker_test_df(
 ):
     df = mk.DataFrame(
         {
-            "tensor": mk.TensorColumn([3, 2, 1]),
-            "pandas": mk.PandasSeriesColumn([9, 7, 9]),
-            "numpy": mk.NumpyArrayColumn([4, 4, 6]),
+            "tensor": mk.TorchTensorColumn([3, 2, 1]),
+            "pandas": mk.ScalarColumn([9, 7, 9]),
+            "numpy": mk.TorchTensorColumn([4, 4, 6]),
         }
     )
     test = df.sort(by=by, ascending=ascending)
@@ -43,9 +43,9 @@ def test_sort_by_ascending_tensor_column():
 
     test = make_test_df(by=["tensor"])
     assert (
-        (test["tensor"] == mk.TensorColumn([1, 2, 3])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([8, 7, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 6, 5])).all()
+        (test["tensor"] == mk.TorchTensorColumn([1, 2, 3])).all()
+        and (test["pandas"] == mk.ScalarColumn([8, 7, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 6, 5])).all()
     )
 
 
@@ -54,9 +54,9 @@ def test_sort_by_ascending_pandas_on_pandas_column():
 
     test = make_test_df(by=["pandas"])
     assert (
-        (test["tensor"] == mk.TensorColumn([2, 1, 3])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([7, 8, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([6, 4, 5])).all()
+        (test["tensor"] == mk.TorchTensorColumn([2, 1, 3])).all()
+        and (test["pandas"] == mk.ScalarColumn([7, 8, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([6, 4, 5])).all()
     )
 
 
@@ -65,9 +65,9 @@ def test_sort_single_numpy_column_ascending():
 
     test = make_test_df(by=["numpy"])
     assert (
-        (test["tensor"] == mk.TensorColumn([1, 3, 2])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([8, 9, 7])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 5, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([1, 3, 2])).all()
+        and (test["pandas"] == mk.ScalarColumn([8, 9, 7])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 5, 6])).all()
     )
 
 
@@ -80,9 +80,9 @@ def test_sort_single_tensor_column_descending():
 
     test = make_test_df(by=["tensor"], ascending=False)
     assert (
-        (test["tensor"] == mk.TensorColumn([3, 2, 1])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([9, 7, 8])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([5, 6, 4])).all()
+        (test["tensor"] == mk.TorchTensorColumn([3, 2, 1])).all()
+        and (test["pandas"] == mk.ScalarColumn([9, 7, 8])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([5, 6, 4])).all()
     )
 
 
@@ -90,9 +90,9 @@ def test_sort_single_pandas_column_descending():
     """Testing all columns after sorting by a descending pandas column."""
     test = make_test_df(by=["pandas"], ascending=False)
     assert (
-        (test["tensor"] == mk.TensorColumn([3, 1, 2])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([9, 8, 7])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([5, 4, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([3, 1, 2])).all()
+        and (test["pandas"] == mk.ScalarColumn([9, 8, 7])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([5, 4, 6])).all()
     )
 
 
@@ -100,9 +100,9 @@ def test_sort_single_numpy_column_descending():
     """Testing all columns after sorting by a descending numpy column."""
     test = make_test_df(by=["numpy"], ascending=False)
     assert (
-        (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([7, 9, 8])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([6, 5, 4])).all()
+        (test["tensor"] == mk.TorchTensorColumn([2, 3, 1])).all()
+        and (test["pandas"] == mk.ScalarColumn([7, 9, 8])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([6, 5, 4])).all()
     )
 
 
@@ -114,9 +114,9 @@ def test_sort_numpy_and_tensor_ascending():
     (numpy and tensor)"""
     test = make_tiebreaker_test_df(by=["numpy", "tensor"], ascending=True)
     assert (
-        (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([7, 9, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 4, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([2, 3, 1])).all()
+        and (test["pandas"] == mk.ScalarColumn([7, 9, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 4, 6])).all()
     )
 
 
@@ -125,9 +125,9 @@ def test_sort_numpy_and_pandas_ascending():
     and tensor)"""
     test = make_tiebreaker_test_df(by=["numpy", "pandas"], ascending=True)
     assert (
-        (test["tensor"] == mk.TensorColumn([2, 3, 1])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([7, 9, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 4, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([2, 3, 1])).all()
+        and (test["pandas"] == mk.ScalarColumn([7, 9, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 4, 6])).all()
     )
 
 
@@ -136,9 +136,9 @@ def test_sort_numpy_and_pandas_ascending_variable():
     and tensor)"""
     test = make_tiebreaker_test_df(by=["numpy", "pandas"], ascending=[True, False])
     assert (
-        (test["tensor"] == mk.TensorColumn([3, 2, 1])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([9, 7, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 4, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([3, 2, 1])).all()
+        and (test["pandas"] == mk.ScalarColumn([9, 7, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 4, 6])).all()
     )
 
 
@@ -147,16 +147,16 @@ def test_sort_numpy_and_pandas_and_tensor_ascending():
     and pandas and tensor)"""
     df = mk.DataFrame(
         {
-            "tensor": mk.TensorColumn([3, 2, 1]),
-            "pandas": mk.PandasSeriesColumn([9, 7, 7]),
-            "numpy": mk.NumpyArrayColumn([6, 4, 4]),
+            "tensor": mk.TorchTensorColumn([3, 2, 1]),
+            "pandas": mk.ScalarColumn([9, 7, 7]),
+            "numpy": mk.TorchTensorColumn([6, 4, 4]),
         }
     )
     test = df.sort(by=["numpy", "pandas", "tensor"], ascending=True)
     assert (
-        (test["tensor"] == mk.TensorColumn([1, 2, 3])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([7, 7, 9])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([4, 4, 6])).all()
+        (test["tensor"] == mk.TorchTensorColumn([1, 2, 3])).all()
+        and (test["pandas"] == mk.ScalarColumn([7, 7, 9])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([4, 4, 6])).all()
     )
 
 
@@ -165,14 +165,14 @@ def test_sort_tensor_and_pandas_descending():
     (tensor and pandas)."""
     df = mk.DataFrame(
         {
-            "tensor": mk.TensorColumn([3, 2, 2]),
-            "pandas": mk.PandasSeriesColumn([9, 8, 7]),
-            "numpy": mk.NumpyArrayColumn([6, 4, 4]),
+            "tensor": mk.TorchTensorColumn([3, 2, 2]),
+            "pandas": mk.ScalarColumn([9, 8, 7]),
+            "numpy": mk.TorchTensorColumn([6, 4, 4]),
         }
     )
     test = df.sort(by=["tensor", "pandas"], ascending=False)
     assert (
-        (test["tensor"] == mk.TensorColumn([3, 2, 2])).all()
-        and (test["pandas"] == mk.PandasSeriesColumn([9, 8, 7])).all()
-        and (test["numpy"] == mk.NumpyArrayColumn([6, 4, 4])).all()
+        (test["tensor"] == mk.TorchTensorColumn([3, 2, 2])).all()
+        and (test["pandas"] == mk.ScalarColumn([9, 8, 7])).all()
+        and (test["numpy"] == mk.TorchTensorColumn([6, 4, 4])).all()
     )

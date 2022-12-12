@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AbstractColumn(
+class Column(
     AggregateMixin,
     BlockableMixin,
     CloneableMixin,
@@ -80,7 +80,7 @@ class AbstractColumn(
         # Assign to data
         self._set_data(data)
 
-        super(AbstractColumn, self).__init__(
+        super(Column, self).__init__(
             collate_fn=collate_fn,
             *args,
             **kwargs,
@@ -173,7 +173,7 @@ class AbstractColumn(
 
     def _get_batch(
         self, indices: np.ndarray, materialize: bool = True
-    ) -> AbstractColumn:
+    ) -> Column:
         """Get a batch of cells from the column.
 
         Args:
@@ -334,7 +334,7 @@ class AbstractColumn(
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
-    ) -> Optional[AbstractColumn]:
+    ) -> Optional[Column]:
         """Filter the elements of the column using a function."""
 
         # Return if `self` has no examples
@@ -371,7 +371,7 @@ class AbstractColumn(
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> AbstractColumn:
+    ) -> Column:
         """Return a sorted view of the column.
 
         Args:
@@ -387,7 +387,7 @@ class AbstractColumn(
 
     def argsort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> AbstractColumn:
+    ) -> Column:
         """Return indices that would sorted the column.
 
         Args:
@@ -408,7 +408,7 @@ class AbstractColumn(
         replace: bool = False,
         weights: Union[str, np.ndarray] = None,
         random_state: Union[int, np.random.RandomState] = None,
-    ) -> AbstractColumn:
+    ) -> Column:
         """Select a random sample of rows from Column. Roughly equivalent to
         ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
         s.DataFrame.sample.html.
@@ -440,18 +440,18 @@ class AbstractColumn(
             random_state=random_state,
         )
 
-    def append(self, column: AbstractColumn) -> None:
+    def append(self, column: Column) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
 
     @staticmethod
-    def concat(columns: Sequence[AbstractColumn]) -> None:
+    def concat(columns: Sequence[Column]) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         """Tests whether two columns.
 
         Args:
@@ -480,8 +480,8 @@ class AbstractColumn(
             batches of data
         """
         if (
-            self._get_batch.__func__ == AbstractColumn._get_batch
-            and self._get.__func__ == AbstractColumn._get
+            self._get_batch.__func__ == Column._get_batch
+            and self._get.__func__ == Column._get
         ):
             return torch.utils.data.DataLoader(
                 self if materialize else self.lz,
@@ -511,7 +511,7 @@ class AbstractColumn(
             )
 
     @classmethod
-    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+    def get_writer(cls, mmap: bool = False, template: Column = None):
         from meerkat.writers.concat_writer import ConcatWriter
 
         if mmap:
@@ -523,27 +523,31 @@ class AbstractColumn(
 
     @classmethod
     # @capture_provenance()
-    def from_data(cls, data: Union[Columnable, AbstractColumn]):
+    def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        from .numpy_column import NumpyArrayColumn
+        from .numpy_column import NumPyTensorColumn
+        from .pandas_column import ScalarColumn
 
-        if isinstance(data, AbstractColumn):
+
+        if isinstance(data, Column):
             # TODO: Need ton make this view but should decide where to do it exactly
             return data  # .view()
 
         if isinstance(data, pd.Series):
-            from .pandas_column import PandasSeriesColumn
-
-            return PandasSeriesColumn(data)
+            return ScalarColumn(data)
 
         if torch.is_tensor(data):
-            from .tensor_column import TensorColumn
-
-            return TensorColumn(data)
+            from .torch_column import TorchTensorColumn
+            
+            if len(data.shape) == 1:
+                return ScalarColumn(data.cpu().detach().numpy())
+            return TorchTensorColumn(data)
 
         if isinstance(data, np.ndarray):
-            return NumpyArrayColumn(data)
+            if len(data.shape) == 1:
+                return ScalarColumn(data)
+            return TorchTensorColumn(data)
 
         if isinstance(data, Sequence):
             from ..cells.abstract import AbstractCell
@@ -554,32 +558,30 @@ class AbstractColumn(
                 return CellColumn(data)
 
             if len(data) != 0 and isinstance(
-                data[0], (int, float, bool, np.ndarray, np.generic, NumpyArrayColumn)
+                data[0], (np.ndarray, TorchTensorColumn)
             ):
+                return TorchTensorColumn(data)
 
-                return NumpyArrayColumn(data)
-
-            if len(data) != 0 and isinstance(data[0], str):
+            if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
                 from .pandas_column import PandasSeriesColumn
 
-                return PandasSeriesColumn(data)
+                return ScalarColumn(data)
 
             if len(data) != 0 and torch.is_tensor(data[0]):
-                from .tensor_column import TensorColumn
+                from .torch_column import TensorColumn
 
-                return TensorColumn(data)
+                return TorchTensorColumn(data)
 
             from .list_column import ListColumn
-
             return ListColumn(data)
         else:
             raise ValueError(f"Cannot create column out of data of type {type(data)}")
 
-    def head(self, n: int = 5) -> AbstractColumn:
+    def head(self, n: int = 5) -> Column:
         """Get the first `n` examples of the column."""
         return self.lz[:n]
 
-    def tail(self, n: int = 5) -> AbstractColumn:
+    def tail(self, n: int = 5) -> Column:
         """Get the last `n` examples of the column."""
         return self.lz[-n:]
 

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import torch
 
-from meerkat import DataFrame, ListColumn, NumpyArrayColumn
+from meerkat import DataFrame, ListColumn, TorchTensorColumn
 from meerkat.ml import EmbeddingColumn
 from meerkat.pipelines.entitydataframe import EntityDataFrame
 
@@ -160,13 +160,13 @@ def test_convert_entities_to_ids():
 
     train_data = DataFrame(
         {
-            "col1": NumpyArrayColumn(np.array(["x", "z", "z", "y"])),
+            "col1": TorchTensorColumn(np.array(["x", "z", "z", "y"])),
             "col2": [["x", "x"], ["y"], ["z", "x", "x"], ["y"]],
         }
     )
 
     col1 = ent.convert_entities_to_ids(train_data["col1"])
-    assert isinstance(col1, NumpyArrayColumn)
+    assert isinstance(col1, TorchTensorColumn)
     assert all(col1 == np.array([0, 2, 2, 1]))
     col2 = ent.convert_entities_to_ids(train_data["col2"])
     assert isinstance(col2, ListColumn)

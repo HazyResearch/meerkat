@@ -304,8 +304,6 @@ the strategy of the underlying data structure.
          slice, the nature of the modification.
          (`source <https://www.practicaldatascience.org/html/views_and_copies_in_pandas.html>`__)
 
-      One particularly odd behavior that is worht pointing out is as
-      follows
 
 **Step 2.**
 `Clones <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__

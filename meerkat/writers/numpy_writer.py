@@ -3,8 +3,8 @@ from pathlib import Path
 
 from numpy.lib.format import open_memmap
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.writers.abstract import AbstractWriter
 
 
@@ -15,8 +15,8 @@ class NumpyMemmapWriter(AbstractWriter):
         dtype: str = "float32",
         mode: str = "r",
         shape: tuple = None,
-        output_type: type = NumpyArrayColumn,
-        template: AbstractColumn = None,
+        output_type: type = NumPyTensorColumn,
+        template: Column = None,
         *args,
         **kwargs,
     ):
@@ -67,11 +67,11 @@ class NumpyMemmapWriter(AbstractWriter):
         # ‘r+’ Open existing file for reading and writing.
         self.file = open_memmap(self.file.filename, mode="r+")
 
-    def finalize(self, *args, **kwargs) -> AbstractColumn:
+    def finalize(self, *args, **kwargs) -> Column:
         self.flush()
         data = self.file
         if self.template is not None:
-            if isinstance(data, AbstractColumn):
+            if isinstance(data, Column):
                 data = data.data
             data = self.template._clone(data=data)
         else:

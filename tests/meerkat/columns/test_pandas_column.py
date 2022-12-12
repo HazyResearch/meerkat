@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import torch
 
-from meerkat import PandasSeriesColumn
+from meerkat import ScalarColumn
 from meerkat.block.tensor_block import TensorBlock
 
 from .abstract import AbstractColumnTestBed, column_parametrize
@@ -36,7 +36,7 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
         if not contiguous_index:
             series.index = np.arange(1, 1 + 2 * length, 2)
 
-        self.col = PandasSeriesColumn(series)
+        self.col = ScalarColumn(series)
         self.data = series
 
     def get_map_spec(
@@ -50,8 +50,8 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
         kwarg = kwarg if self.dtype != "str" else str(kwarg)
         return {
             "fn": lambda x, k=0: x + salt + (k if self.dtype != "str" else str(k)),
-            "expected_result": PandasSeriesColumn(self.col.data + salt + kwarg),
-            "output_type": PandasSeriesColumn,
+            "expected_result": ScalarColumn(self.col.data + salt + kwarg),
+            "output_type": ScalarColumn,
         }
 
     def get_filter_spec(
@@ -96,23 +96,23 @@ def test_str_accessor(testbed):
     assert col.dtype == object
 
     new_col = col.str.split(".").str[0].astype(int)
-    assert isinstance(new_col, PandasSeriesColumn)
+    assert isinstance(new_col, ScalarColumn)
     assert (new_col == testbed.data.astype(float).astype(int)).all()
 
 
 def test_dt_accessor():
-    col = PandasSeriesColumn(
+    col = ScalarColumn(
         data=[f"01/{idx+1}/2001" for idx in range(16)],
     )
     col = pd.to_datetime(col)
     day_col = col.dt.day
-    assert isinstance(day_col, PandasSeriesColumn)
+    assert isinstance(day_col, ScalarColumn)
     assert (day_col.values == np.arange(16) + 1).all()
 
 
 def test_cat_accessor():
     categories = ["a", "b", "c", "d"]
-    col = PandasSeriesColumn(data=categories * 4)
+    col = ScalarColumn(data=categories * 4)
     col = col.astype("category")
 
     assert (np.array(categories) == col.cat.categories.values).all()
@@ -121,7 +121,7 @@ def test_cat_accessor():
 def test_init_block():
     block_view = TensorBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
-        PandasSeriesColumn(block_view)
+        ScalarColumn(block_view)
 
 
 def test_to_tensor(testbed):
@@ -150,7 +150,7 @@ def test_repr_pandas(testbed):
 
 def test_ufunc_out():
     out = np.zeros(3)
-    a = PandasSeriesColumn([1, 2, 3])
-    b = PandasSeriesColumn([1, 2, 3])
+    a = ScalarColumn([1, 2, 3])
+    b = ScalarColumn([1, 2, 3])
     np.add(a, b, out=out)
     assert (out == np.array([2, 4, 6])).all()

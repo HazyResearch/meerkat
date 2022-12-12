@@ -16,7 +16,7 @@ def get_discover_schema(df: DataFrame):
     columns = [
         k
         for k, v in df.items()
-        if isinstance(v, mk.NumpyArrayColumn) and len(v.shape) == 2
+        if isinstance(v, mk.TorchTensorColumn) and len(v.shape) == 2
     ]
     return SchemaResponse(
         id=df.id,

@@ -225,7 +225,7 @@ def translate_index(index, length: int):
     if not _is_batch_index(index):
         return index
 
-    from ..columns.abstract import AbstractColumn
+    from ..columns.abstract import Column
 
     if isinstance(index, pd.Series):
         index = index.values
@@ -250,7 +250,7 @@ def translate_index(index, length: int):
             indices = np.where(index)[0]
         else:
             return index
-    elif isinstance(index, AbstractColumn):
+    elif isinstance(index, Column):
         # TODO (sabri): get rid of the np.arange here, very slow for large columns
         indices = np.arange(length)[index]
     else:

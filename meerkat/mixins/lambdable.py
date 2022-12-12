@@ -6,7 +6,7 @@ from pandas.util._decorators import doc
 from meerkat.block.abstract import BlockView
 
 if TYPE_CHECKING:
-    from meerkat.columns.abstract import AbstractColumn
+    from meerkat.columns.abstract import Column
     from meerkat.columns.lambda_column import LambdaColumn
     from meerkat.dataframe import DataFrame
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @doc(data="data")
 def to_lambda(
-    data: Union["DataFrame", "AbstractColumn"],
+    data: Union["DataFrame", "Column"],
     function: Callable,
     is_batched_fn: bool = False,
     batch_size: int = 1,
@@ -62,11 +62,11 @@ def to_lambda(
     """
     from meerkat import LambdaColumn
     from meerkat.block.lambda_block import LambdaBlock, LambdaOp
-    from meerkat.columns.abstract import AbstractColumn
+    from meerkat.columns.abstract import Column
     from meerkat.dataframe import DataFrame
 
     # prepare arguments for LambdaOp
-    if isinstance(data, AbstractColumn):
+    if isinstance(data, Column):
         args = [data]
         kwargs = {}
     elif isinstance(data, DataFrame):

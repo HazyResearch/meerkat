@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, Hashable, Mapping, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Hashable, List, Mapping, Sequence, Tuple, Union
 
 import yaml
 
@@ -14,7 +14,7 @@ BlockIndex = Union[int, slice, str]
 
 if TYPE_CHECKING:
     from meerkat.block.ref import BlockRef
-    from meerkat.columns.abstract import AbstractColumn
+    from meerkat.columns.abstract import Column
 
 
 @dataclass
@@ -37,6 +37,9 @@ class AbstractBlock:
     def _get_data(self, index: BlockIndex) -> object:
         """Must return view of the underlying data."""
         raise NotImplementedError()
+    
+    def subblock(self, indices: List[BlockIndex]):
+        raise NotImplementedError  
 
     @property
     def signature(self) -> Hashable:
@@ -54,7 +57,7 @@ class AbstractBlock:
     def consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> Tuple[AbstractBlock, Mapping[str, BlockIndex]]:
         if len(block_refs) == 0:
             raise ConsolidationError("Must pass at least 1 BlockRef to consolidate.")

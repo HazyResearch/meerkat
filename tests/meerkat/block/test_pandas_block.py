@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from meerkat import PandasSeriesColumn
+from meerkat import ScalarColumn
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.block.ref import BlockRef
@@ -36,7 +36,7 @@ def test_consolidate_1(num_blocks):
 
     cols = [
         {
-            str(slc): PandasSeriesColumn(
+            str(slc): ScalarColumn(
                 data=BlockView(
                     block=blocks[idx],
                     block_index=slc,
@@ -75,7 +75,7 @@ def test_consolidate_mismatched_signature():
     ]
     cols = [
         {
-            str(slc): PandasSeriesColumn(
+            str(slc): ScalarColumn(
                 data=BlockView(
                     block=blocks[block_idx],
                     block_index=slc,

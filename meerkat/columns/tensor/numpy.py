@@ -17,10 +17,11 @@ from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumpyBlock
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
+
+from .abstract import AbstractTensorColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -32,15 +33,15 @@ def getattr_decorator(fn: Callable):
     def wrapper(*args, **kwargs):
         out = fn(*args, **kwargs)
         if isinstance(out, np.ndarray):
-            return NumpyArrayColumn(out)
+            return NumPyTensorColumn(out)
         else:
             return out
 
     return wrapper
 
 
-class NumpyArrayColumn(
-    AbstractColumn,
+class NumPyTensorColumn(
+    AbstractTensorColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
 
@@ -60,7 +61,7 @@ class NumpyArrayColumn(
                 )
         elif not isinstance(data, np.memmap):
             data = np.asarray(data)
-        super(NumpyArrayColumn, self).__init__(data=data, *args, **kwargs)
+        super(NumPyTensorColumn, self).__init__(data=data, *args, **kwargs)
 
     # TODO (sabri): need to support str here
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
@@ -72,7 +73,7 @@ class NumpyArrayColumn(
             # Use ArrayLike instead of type(self) for isinstance to
             # allow subclasses that don't override __array_ufunc__ to
             # handle ArrayLike objects.
-            if not isinstance(x, self._HANDLED_TYPES + (NumpyArrayColumn,)) and not (
+            if not isinstance(x, self._HANDLED_TYPES + (NumPyTensorColumn,)) and not (
                 # support for at index
                 method == "at"
                 and isinstance(x, list)
@@ -80,11 +81,11 @@ class NumpyArrayColumn(
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
-        inputs = tuple(x.data if isinstance(x, NumpyArrayColumn) else x for x in inputs)
+        inputs = tuple(x.data if isinstance(x, NumPyTensorColumn) else x for x in inputs)
 
         if out:
             kwargs["out"] = tuple(
-                x.data if isinstance(x, NumpyArrayColumn) else x for x in out
+                x.data if isinstance(x, NumPyTensorColumn) else x for x in out
             )
         result = getattr(ufunc, method)(*inputs, **kwargs)
 
@@ -159,7 +160,7 @@ class NumpyArrayColumn(
         return np.load(data_path)
 
     @classmethod
-    def concat(cls, columns: Sequence[NumpyArrayColumn]):
+    def concat(cls, columns: Sequence[NumPyTensorColumn]):
         data = np.concatenate([c.data for c in columns])
         return columns[0]._clone(data=data)
 
@@ -175,7 +176,7 @@ class NumpyArrayColumn(
 
             return NumpyMemmapWriter()
         else:
-            return ConcatWriter(template=template, output_type=NumpyArrayColumn)
+            return ConcatWriter(template=template, output_type=NumPyTensorColumn)
 
     def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
@@ -198,12 +199,12 @@ class NumpyArrayColumn(
             return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
 
         return NumpyArrayFormatter()
-    
+
     def _is_valid_primary_key(self):
         if self.dtype.kind == "f":
             # can't use floats as primary keys
             return False
-            
+
         if len(self.shape) != 1:
             # can't use multidimensional arrays as primary keys
             return False
@@ -234,7 +235,7 @@ class NumpyArrayColumn(
         axis: int = -1,
         kind: str = "quicksort",
         order: Union[str, List[str]] = None,
-    ) -> NumpyArrayColumn:
+    ) -> NumPyTensorColumn:
         """Return a sorted view of the column.
 
         Args:
@@ -250,9 +251,7 @@ class NumpyArrayColumn(
         sorted_index = self.argsort(ascending=ascending, kind=kind)
         return self[sorted_index]
 
-    def argsort(
-        self, ascending: bool = True, kind: str = "quicksort"
-    ) -> NumpyArrayColumn:
+    def argsort(self, ascending: bool = True, kind: str = "quicksort") -> NumPyTensorColumn:
         """Return indices that would sorted the column.
 
         Args:
@@ -311,9 +310,7 @@ class NumpyArrayColumn(
         )
         return cls(data)
 
-    def mean(
-        self, axis: int = None, keepdims: bool = False, **kwargs
-    ) -> NumpyArrayColumn:
+    def mean(self, axis: int = None, keepdims: bool = False, **kwargs) -> NumPyTensorColumn:
         try:
             return self.data.mean(axis=axis, keepdims=keepdims, **kwargs)
         except (UFuncTypeError, TypeError):

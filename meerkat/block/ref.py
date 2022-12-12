@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING, List, Mapping, Sequence, Union
 
 if TYPE_CHECKING:
     from meerkat.block.abstract import AbstractBlock
-    from meerkat.columns.abstract import AbstractColumn
+    from meerkat.columns.abstract import Column
 
 
 class BlockRef(Mapping):
-    def __init__(self, columns: Mapping[str, AbstractColumn], block: AbstractBlock):
-        self.columns: Mapping[str, AbstractColumn] = columns
+    def __init__(self, columns: Mapping[str, Column], block: AbstractBlock):
+        self.columns: Mapping[str, Column] = columns
         self.block: AbstractBlock = block
 
     def __getitem__(self, index: Union[str, Sequence[str]]):

@@ -8,7 +8,7 @@ from google.cloud import storage
 
 from meerkat import ImageColumn
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.pandas_column import ScalarColumn
 
 
 class GCSImageCell(LambdaCell):
@@ -46,7 +46,7 @@ class GCSImageCell(LambdaCell):
 class GCSImageColumn(ImageColumn):
     def __init__(
         self,
-        blob_names: PandasSeriesColumn = None,
+        blob_names: ScalarColumn = None,
         bucket_name: str = None,
         project: str = None,
         transform: callable = None,
@@ -111,8 +111,8 @@ class GCSImageColumn(ImageColumn):
         *args,
         **kwargs,
     ):
-        if not isinstance(blob_names, PandasSeriesColumn):
-            blob_names = PandasSeriesColumn(blob_names)
+        if not isinstance(blob_names, ScalarColumn):
+            blob_names = ScalarColumn(blob_names)
         return cls(
             blob_names=blob_names,
             loader=loader,

@@ -4,7 +4,7 @@ from typing import List
 
 from numpy.lib.format import open_memmap
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.activation import ActivationOp
 from meerkat.tools.lazy_loader import LazyLoader
@@ -54,7 +54,7 @@ class ActivationCallback(pl.callbacks.Callback):
             self.activation_op = ActivationOp(
                 pl_module, self.target_module, pl_module.device
             )
-            self.writer = TensorColumn.get_writer(mmap=self.mmap)
+            self.writer = TorchTensorColumn.get_writer(mmap=self.mmap)
 
     def on_validation_batch_end(
         self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx

@@ -4,7 +4,7 @@ from typing import Sequence, Tuple, Union
 import cytoolz as tz
 
 from meerkat import DataFrame
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.errors import ConcatError
 from meerkat.provenance import capture_provenance
 from .decorators import check_primary_key
@@ -12,11 +12,11 @@ from .decorators import check_primary_key
 @check_primary_key
 @capture_provenance(capture_args=["axis"])
 def concat(
-    objs: Union[Sequence[DataFrame], Sequence[AbstractColumn]],
+    objs: Union[Sequence[DataFrame], Sequence[Column]],
     axis: Union[str, int] = "rows",
     suffixes: Tuple[str] = None,
     overwrite: bool = False,
-) -> Union[DataFrame, AbstractColumn]:
+) -> Union[DataFrame, Column]:
     """Concatenate a sequence of columns or a sequence of `DataFrame`s. If
     sequence is empty, returns an empty `DataFrame`.
 
@@ -89,7 +89,7 @@ Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
             return objs[0]._clone(data=data)
         else:
             raise ConcatError(f"Invalid axis `{axis}` passed to concat.")
-    elif isinstance(objs[0], AbstractColumn):
+    elif isinstance(objs[0], Column):
         # use the concat method of the column
         return objs[0].concat(objs)
     else:

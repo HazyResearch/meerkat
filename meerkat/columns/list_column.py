@@ -7,7 +7,7 @@ from typing import Sequence
 import cytoolz as tz
 from yaml.representer import Representer
 
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import ObjectFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 
@@ -17,7 +17,7 @@ Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 logger = logging.getLogger(__name__)
 
 
-class ListColumn(AbstractColumn):
+class ListColumn(Column):
     def __init__(
         self,
         data: Sequence = None,
@@ -55,7 +55,7 @@ class ListColumn(AbstractColumn):
             return columns[0]._clone(data=data)
         return cls.from_list(data)
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         return (self.__class__ == other.__class__) and self.data == other.data
 
     def _repr_cell(self, index) -> object:

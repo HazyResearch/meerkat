@@ -24,3 +24,10 @@ class BlockableMixin:
 
     def _pack_block_view(self):
         return BlockView(block_index=self._block_index, block=self._block)
+
+    def run_block_method(self, method: str, *args, **kwargs):
+
+        result = getattr(self._block.subblock([self._block_index]), method)(
+            *args, **kwargs
+        )
+        return result[self._block_index]

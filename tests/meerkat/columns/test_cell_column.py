@@ -3,7 +3,7 @@ from typing import Collection, List, Union
 import numpy as np
 import pytest
 
-from meerkat import NumpyArrayColumn
+from meerkat import TorchTensorColumn
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.cell_column import CellColumn
 
@@ -97,7 +97,7 @@ class CellColumnTestBed(AbstractColumnTestBed):
         if materialize:
             return {
                 "fn": lambda x, k=0: x + salt + k,
-                "expected_result": NumpyArrayColumn.from_array(
+                "expected_result": TorchTensorColumn.from_array(
                     self.data + 1 + salt + kwarg
                 ),
             }
@@ -107,14 +107,14 @@ class CellColumnTestBed(AbstractColumnTestBed):
                     "fn": lambda x, k=0: np.array([cell.data for cell in x.data])
                     + salt
                     + k,
-                    "expected_result": NumpyArrayColumn.from_array(
+                    "expected_result": TorchTensorColumn.from_array(
                         self.data + salt + kwarg
                     ),
                 }
             else:
                 return {
                     "fn": lambda x, k=0: x.data + salt + k,
-                    "expected_result": NumpyArrayColumn.from_array(
+                    "expected_result": TorchTensorColumn.from_array(
                         self.data + salt + kwarg
                     ),
                 }

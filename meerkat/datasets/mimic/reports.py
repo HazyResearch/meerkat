@@ -4,7 +4,7 @@ import logging
 from typing import Collection, Sequence
 
 from meerkat.columns.lambda_column import LambdaColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.pandas_column import ScalarColumn
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class ReportColumn(LambdaColumn):
         **kwargs,
     ):
         super(ReportColumn, self).__init__(
-            PandasSeriesColumn.from_data(data), *args, **kwargs
+            ScalarColumn.from_data(data), *args, **kwargs
         )
         self.loader = self.default_loader if loader is None else loader
         self.transform = transform

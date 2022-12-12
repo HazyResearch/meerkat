@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import torch
 
-from meerkat import TensorColumn
+from meerkat import TorchTensorColumn
 from meerkat.block.numpy_block import NumpyBlock
 
 from .abstract import AbstractColumnTestBed, column_parametrize
@@ -35,7 +35,7 @@ class TensorColumnTestBed(AbstractColumnTestBed):
         )
         array = torch.tensor(array).to({"int": torch.int, "float": torch.float}[dtype])
 
-        self.col = TensorColumn(array)
+        self.col = TorchTensorColumn(array)
         self.data = array
 
     def get_map_spec(
@@ -47,7 +47,7 @@ class TensorColumnTestBed(AbstractColumnTestBed):
     ):
         return {
             "fn": lambda x, k=0: x + salt + k,
-            "expected_result": TensorColumn(self.col.data + salt + kwarg),
+            "expected_result": TorchTensorColumn(self.col.data + salt + kwarg),
         }
 
     def get_filter_spec(
@@ -84,7 +84,7 @@ def testbed(request, tmpdir):
 def test_init_block():
     block_view = NumpyBlock(np.zeros((10, 10)))[0]
     with pytest.raises(ValueError):
-        TensorColumn(block_view)
+        TorchTensorColumn(block_view)
 
 
 def test_to_tensor(testbed):
@@ -114,6 +114,6 @@ def test_repr_pandas(testbed):
 
 
 def test_ufunc_unhandled():
-    a = TensorColumn([1, 2, 3])
+    a = TorchTensorColumn([1, 2, 3])
     with pytest.raises(TypeError):
         a == "a"

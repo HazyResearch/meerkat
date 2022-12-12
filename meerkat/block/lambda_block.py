@@ -12,7 +12,7 @@ from cytoolz import merge_with
 
 import meerkat as mk
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.tools.utils import MeerkatLoader, translate_index
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
@@ -32,7 +32,7 @@ class LambdaCellOp:
 
         if isinstance(arg, AbstractCell):
             return arg.get()
-        elif isinstance(arg, AbstractColumn):
+        elif isinstance(arg, Column):
             return arg[:]
         return arg
 
@@ -63,7 +63,7 @@ class LambdaCellOp:
                 return len(col)
         return 0
 
-    def is_equal(self, other: AbstractColumn):
+    def is_equal(self, other: Column):
         if (
             self.fn != other.fn
             or self.is_batched_fn != other.is_batched_fn
@@ -86,8 +86,8 @@ class LambdaCellOp:
 
 @dataclass
 class LambdaOp:
-    args: List[mk.AbstractColumn]
-    kwargs: Dict[str, mk.AbstractColumn]
+    args: List[mk.Column]
+    kwargs: Dict[str, mk.Column]
     fn: callable
     is_batched_fn: bool
     batch_size: int
@@ -113,7 +113,7 @@ class LambdaOp:
         }
         return op
 
-    def is_equal(self, other: AbstractColumn):
+    def is_equal(self, other: Column):
         if (
             self.fn != other.fn
             or self.is_batched_fn != other.is_batched_fn
@@ -183,7 +183,7 @@ class LambdaOp:
         yaml.dump(meta, open(meta_path, "w"))
 
     @classmethod
-    def read(cls, path, read_inputs: Dict[str, AbstractColumn] = None):
+    def read(cls, path, read_inputs: Dict[str, Column] = None):
         if read_inputs is None:
             read_inputs = {}
 
@@ -199,13 +199,13 @@ class LambdaOp:
         args = [
             read_inputs[arg_path]
             if arg_path in read_inputs
-            else AbstractColumn.read(os.path.join(path, arg_path))
+            else Column.read(os.path.join(path, arg_path))
             for arg_path in meta["args"]
         ]
         kwargs = {
             key: read_inputs[kwarg_path]
             if kwarg_path in read_inputs
-            else AbstractColumn.read(os.path.join(path, kwarg_path))
+            else Column.read(os.path.join(path, kwarg_path))
             for key, kwarg_path in meta["kwargs"]
         }
 
@@ -216,7 +216,7 @@ class LambdaOp:
     def _get(
         self,
         index: Union[int, np.ndarray],
-        indexed_inputs: Dict[int, AbstractColumn] = None,
+        indexed_inputs: Dict[int, Column] = None,
         materialize: bool = True,
     ):
         if indexed_inputs is None:
@@ -369,7 +369,7 @@ class LambdaBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, AbstractColumn] = None,
+        consolidated_inputs: Dict[int, Column] = None,
     ) -> BlockRef:
         if consolidated_inputs is None:
             consolidated_inputs = {}
@@ -464,7 +464,7 @@ class LambdaBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ) -> object:
         path = os.path.join(path, "data.op")
         return LambdaOp.read(path, read_inputs=read_inputs)

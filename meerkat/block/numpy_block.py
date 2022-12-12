@@ -10,7 +10,7 @@ import numpy as np
 import torch
 
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
@@ -76,7 +76,7 @@ class NumpyBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> BlockRef:
         offset = 0
         new_indices = {}
@@ -143,6 +143,7 @@ class NumpyBlock(AbstractBlock):
         }
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
+    
 
     @property
     def is_mmap(self):
@@ -162,7 +163,7 @@ class NumpyBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ):
         data_path = os.path.join(path, "data.npy")
 

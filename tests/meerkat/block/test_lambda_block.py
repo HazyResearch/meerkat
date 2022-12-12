@@ -1,6 +1,6 @@
 import numpy as np
 
-from meerkat import LambdaColumn, NumpyArrayColumn
+from meerkat import LambdaColumn, TorchTensorColumn
 from meerkat.block.lambda_block import LambdaBlock, LambdaOp
 from meerkat.block.ref import BlockRef
 
@@ -13,7 +13,7 @@ def fn(x: int) -> int:
 
 @product_parametrize(params={"num_blocks": [1, 2, 3]})
 def test_consolidate(num_blocks: int):
-    inp = NumpyArrayColumn(np.arange(8))
+    inp = TorchTensorColumn(np.arange(8))
     op = LambdaOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [
@@ -45,7 +45,7 @@ def test_consolidate(num_blocks: int):
 
 
 def test_consolidate_same_index():
-    inp = NumpyArrayColumn(np.arange(8))
+    inp = TorchTensorColumn(np.arange(8))
     op = LambdaOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [

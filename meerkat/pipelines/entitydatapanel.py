@@ -8,7 +8,7 @@ import datasets
 import numpy as np
 import torch
 
-from meerkat import DataFrame, ListColumn, NumpyArrayColumn, TensorColumn
+from meerkat import DataFrame, ListColumn, TorchTensorColumn, NumPyTensorColumn
 from meerkat.ml import EmbeddingColumn
 
 logger = logging.getLogger(__name__)
@@ -317,7 +317,7 @@ class EntityDataFrame(DataFrame):
         return new_embedding_cols
 
     def convert_entities_to_ids(
-        self, column: Union[ListColumn, TensorColumn, NumpyArrayColumn]
+        self, column: Union[ListColumn, TorchTensorColumn, TorchTensorColumn]
     ):
         """Maps column of entity idx to their row ids for the embeddings.
 
@@ -331,7 +331,7 @@ class EntityDataFrame(DataFrame):
                 # TODO: handle UNK entity ids
                 return self._index_to_rowid[seq]
 
-        assert isinstance(column, (ListColumn, TensorColumn, NumpyArrayColumn)), (
+        assert isinstance(column, (ListColumn, TorchTensorColumn, TorchTensorColumn)), (
             "We only support DataFrame list column types "
             "(ListColumn, TensorColumn, NumpyArrayColumn)"
         )

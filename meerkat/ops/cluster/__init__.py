@@ -3,17 +3,17 @@ from typing import Optional, Tuple, Union
 import sklearn.cluster as skcluster
 from sklearn.base import ClusterMixin
 
-from meerkat import AbstractColumn, DataFrame, NumpyArrayColumn, embed
+from meerkat import Column, DataFrame, TorchTensorColumn, embed
 
 
 def cluster(
-    data: Union[AbstractColumn, DataFrame],
+    data: Union[Column, DataFrame],
     input: Optional[str] = None,
     method: Union[str, ClusterMixin] = "KMeans",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
-) -> Tuple[NumpyArrayColumn, ClusterMixin]:
+) -> Tuple[TorchTensorColumn, ClusterMixin]:
     """Cluster the data in a column. If the column is an unstructured type,
     (e.g. image), the column is first embedded then clustered.
 

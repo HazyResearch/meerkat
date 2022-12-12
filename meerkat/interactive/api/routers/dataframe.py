@@ -4,8 +4,8 @@ import numpy as np
 from fastapi import HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.pandas_column import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.endpoint import Endpoint, endpoint
@@ -218,9 +218,9 @@ def edit_target(
                     )
                 default_col = np.full(len(target_df), default)
                 if isinstance(default, str):
-                    default_col = PandasSeriesColumn([default] * len(target_df))
+                    default_col = ScalarColumn([default] * len(target_df))
                 else:
-                    default_col = NumpyArrayColumn(np.full(len(target_df), default))
+                    default_col = NumPyTensorColumn(np.full(len(target_df), default))
                 target_df[column_name] = default_col
             target_df[column_name][mask] = value
 

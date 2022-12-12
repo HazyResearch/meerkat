@@ -6,9 +6,9 @@ import numpy as np
 from meerkat import DataFrame, ListColumn
 from meerkat.columns.cell_column import CellColumn
 from meerkat.columns.lambda_column import LambdaColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
@@ -122,12 +122,12 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
         # column to  ListColumn, and fill with "None" wherever indices is "nan".
         data = {}
         for name, col in df.items():
-            if isinstance(col, (NumpyArrayColumn, TensorColumn, PandasSeriesColumn)):
+            if isinstance(col, (TorchTensorColumn, TorchTensorColumn, ScalarColumn)):
                 new_col = col.lz[indices.astype(int)]
 
-                if isinstance(new_col, TensorColumn):
+                if isinstance(new_col, TorchTensorColumn):
                     new_col = new_col.to(float)
-                elif isinstance(new_col, PandasSeriesColumn):
+                elif isinstance(new_col, ScalarColumn):
                     if new_col.dtype != "object":
                         new_col = new_col.astype(float)
                 else:
@@ -152,7 +152,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
 def _check_merge_columns(df: DataFrame, on: List[str]):
     for name in on:
         column = df[name]
-        if isinstance(column, NumpyArrayColumn) or isinstance(column, TensorColumn):
+        if isinstance(column, TorchTensorColumn) or isinstance(column, TorchTensorColumn):
             if len(column.shape) > 1:
                 raise MergeError(
                     f"Cannot merge on column `{name}`, has more than one dimension."

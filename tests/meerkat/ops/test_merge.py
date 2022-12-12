@@ -6,11 +6,11 @@ import numpy as np
 import pytest
 import torch
 
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.image_column import ImageColumn
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import MergeError
 
@@ -30,7 +30,7 @@ class MergeTestBed(DataFrameTestBed):
 
     def __init__(
         self,
-        column_configs: Dict[str, AbstractColumn],
+        column_configs: Dict[str, Column],
         simple: bool = False,
         lengths: int = 16,
         consolidated: int = 16,
@@ -378,7 +378,7 @@ class TestMerge:
         # check multi-dimensional numpy array
         df1 = DataFrame.from_batch(
             {
-                "a": NumpyArrayColumn(np.stack([np.arange(5)] * length)),
+                "a": TorchTensorColumn(np.stack([np.arange(5)] * length)),
                 "b": list(np.arange(length)),
             }
         )
@@ -389,7 +389,7 @@ class TestMerge:
         # check multi-dimensional numpy array
         df1 = DataFrame.from_batch(
             {
-                "a": TensorColumn(torch.stack([torch.arange(5)] * length)),
+                "a": TorchTensorColumn(torch.stack([torch.arange(5)] * length)),
                 "b": list(np.arange(length)),
             }
         )

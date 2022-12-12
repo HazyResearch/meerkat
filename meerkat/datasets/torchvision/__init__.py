@@ -36,7 +36,7 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
         df = mk.DataFrame(
             {
                 "raw_image": dataset.data,
-                "label": mk.TensorColumn(dataset.targets),
+                "label": mk.TorchTensorColumn(dataset.targets),
             }
         )
 

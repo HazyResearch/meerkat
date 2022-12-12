@@ -64,7 +64,7 @@ def test_rows(df_testbed):
     assert response.json()["full_length"] == 10
 
 
-@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
 def test_edit(column_type):
     df = mk.DataFrame(
         {
@@ -84,7 +84,7 @@ def test_edit(column_type):
     assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "ref"}]
 
 
-@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
 def test_edit_target(column_type):
     df = mk.DataFrame(
         {
@@ -122,7 +122,7 @@ def test_edit_target(column_type):
     assert target_df["value"][18] == "100"
 
 
-@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
 def test_edit_target_keys(column_type):
     df = mk.DataFrame(
         {
@@ -174,7 +174,7 @@ def test_remove_row_by_index(df_testbed):
     assert response.status_code == 200, response.json()
 
 
-@pytest.mark.parametrize("column_type", [mk.PandasSeriesColumn])
+@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
 def test_edit_target_missing_id(column_type):
     df = mk.DataFrame(
         {

@@ -15,12 +15,12 @@ from torchvision.transforms.functional import to_tensor
 import meerkat
 from meerkat import ImageColumn
 from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.file_column import FileCell
 from meerkat.columns.lambda_column import LambdaCell
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.torch_column import TorchTensorColumn
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
@@ -98,7 +98,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 else:
                     return {
                         "fn": lambda x, k=0: x.get() + salt + k,
-                        "expected_result": TensorColumn(
+                        "expected_result": TorchTensorColumn(
                             torch.stack([self.transform(im) for im in self.ims])
                             + salt
                             + kwarg
@@ -117,7 +117,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             else:
                 return {
                     "fn": lambda x, k=0: x + salt + k,
-                    "expected_result": TensorColumn(
+                    "expected_result": TorchTensorColumn(
                         torch.stack([self.transform(im) for im in self.ims])
                         + salt
                         + kwarg
@@ -197,19 +197,19 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 )
 
             index = np.arange(len(self.data))[index]
-            col = PandasSeriesColumn([self.image_paths[idx] for idx in index])
+            col = ScalarColumn([self.image_paths[idx] for idx in index])
             return LambdaOp(
                 args=[col], kwargs={}, fn=self.col.fn, is_batched_fn=False, batch_size=1
             )
 
     @staticmethod
     def assert_data_equal(
-        data1: Union[Image.Image, AbstractColumn, List, torch.Tensor],
-        data2: Union[Image.Image, AbstractColumn, List, torch.Tensor],
+        data1: Union[Image.Image, Column, List, torch.Tensor],
+        data2: Union[Image.Image, Column, List, torch.Tensor],
     ):
         if isinstance(data1, Image.Image) or isinstance(data1, List):
             assert data1 == data2
-        elif isinstance(data1, AbstractColumn):
+        elif isinstance(data1, Column):
             assert data1.is_equal(data2)
         elif torch.is_tensor(data1):
             assert (data1 == data2).all()

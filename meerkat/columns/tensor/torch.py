@@ -13,11 +13,12 @@ from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.tensor_block import TensorBlock
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.interactive.formatter import TensorFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
+
+from .abstract import AbstractTensorColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -33,16 +34,16 @@ def getattr_decorator(fn: Callable):
         if isinstance(out, torch.Tensor):
             if out.ndim == 0:
                 return out.clone().detach()
-            return TensorColumn(out)
+            return TorchTensorColumn(out)
         else:
             return out
 
     return wrapper
 
 
-class TensorColumn(
+class TorchTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
-    AbstractColumn,
+    AbstractTensorColumn,
 ):
     block_class: type = TensorBlock
 
@@ -58,7 +59,7 @@ class TensorColumn(
                     "Cannot create `TensorColumn` from a `BlockView` not "
                     "referencing a `TensorBlock`."
                 )
-        elif data is not None and not isinstance(data, TensorColumn):
+        elif data is not None and not isinstance(data, TorchTensorColumn):
             if (
                 isinstance(data, Sequence)
                 and len(data) > 0
@@ -70,7 +71,7 @@ class TensorColumn(
                 # for map
                 data = torch.stack(data)
             data = torch.as_tensor(data)
-        super(TensorColumn, self).__init__(data=data, *args, **kwargs)
+        super(TorchTensorColumn, self).__init__(data=data, *args, **kwargs)
 
     def __torch_function__(self, func, types, args=(), kwargs=None):
         def _process_arg(arg):
@@ -134,7 +135,7 @@ class TensorColumn(
         self._data[indices] = values
 
     @classmethod
-    def concat(cls, columns: Sequence[TensorColumn]):
+    def concat(cls, columns: Sequence[TorchTensorColumn]):
         data = torch.cat([c.data for c in columns])
         if issubclass(cls, CloneableMixin):
             return columns[0]._clone(data=data)
@@ -145,7 +146,7 @@ class TensorColumn(
         if mmap:
             return NumpyMemmapWriter()
         else:
-            return ConcatWriter(template=template, output_type=TensorColumn)
+            return ConcatWriter(template=template, output_type=TorchTensorColumn)
 
     def _repr_cell(self, index) -> object:
         if len(self.shape) > 1:
@@ -165,7 +166,7 @@ class TensorColumn(
         if torch.is_tensor(data):
             return cls(data)
         else:
-            return super(TensorColumn, cls).from_data(data)
+            return super(TorchTensorColumn, cls).from_data(data)
 
     def _copy_data(self) -> torch.Tensor:
         return self._data.clone()
@@ -183,7 +184,7 @@ class TensorColumn(
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> TensorColumn:
+    ) -> TorchTensorColumn:
         """Return a sorted view of the column.
 
         Args:
@@ -202,7 +203,7 @@ class TensorColumn(
 
     def argsort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> TensorColumn:
+    ) -> TorchTensorColumn:
         """Return indices that would sorted the column.
 
         Args:

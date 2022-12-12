@@ -1,6 +1,6 @@
 import numpy as np
 
-from meerkat import ListColumn, NumpyArrayColumn, TensorColumn
+from meerkat import ListColumn, TorchTensorColumn, NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ops.sliceby.groupby import GroupBy, groupby
 
@@ -22,15 +22,15 @@ def assertNumpyArrayEquality(arr1, arr2):
 def test_group_by_type():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(
                     ["sam", "liam", "sam", "owen", "liam", "connor", "connor"],
                     dtype=str,
                 )
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -42,12 +42,12 @@ def test_group_by_type():
 def test_tensor_column_by():
     df = DataFrame(
         {
-            "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -61,12 +61,12 @@ def test_tensor_column_by():
 def test_group_by_integer_type():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -83,12 +83,12 @@ def test_group_by_integer_type_md():
     b[1, 1] = 3
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn(b),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn(b),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -107,12 +107,12 @@ def test_group_by_integer_type_md():
 def test_group_by_integer_type_axis_passed():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -126,12 +126,12 @@ def test_group_by_integer_type_axis_passed():
 def test_group_by_integer_type_as_prop():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -145,12 +145,12 @@ def test_group_by_integer_type_as_prop():
 def test_group_by_tensor_key():
     df = DataFrame(
         {
-            "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": TensorColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -164,30 +164,30 @@ def test_group_by_tensor_key():
 def test_group_by_string_type():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
     df = groupby(df, "name")
     out = df["b"].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
-    assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
+    assert (out["name"].data == TorchTensorColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_string_type_multiple_keys():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -195,54 +195,54 @@ def test_group_by_string_type_multiple_keys():
     out = df[["b", "a"]].mean()
     assert (np.linalg.norm(out["a"].data - np.array([1.5, 2.5, 1, 2.5]))) < 1e-10
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
-    assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
+    assert (out["name"].data == TorchTensorColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_by_string_type_as_list():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
     df = groupby(df, ["name"])
     out = df["b"].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
-    assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
+    assert (out["name"].data == TorchTensorColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_by_string_type_as_list_key_as_list():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
     df = groupby(df, ["name"])
     out = df[["b"]].mean()
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
-    assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
+    assert (out["name"].data == TorchTensorColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_float_should_fail():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
     try:
@@ -255,12 +255,12 @@ def test_group_by_float_should_fail():
 def test_group_by_float_should_fail_nonexistent_column():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
     try:
@@ -273,12 +273,12 @@ def test_group_by_float_should_fail_nonexistent_column():
 def test_group_by_by_string_type_as_list_key_as_list_mult_key_by_name():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -286,19 +286,19 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_by_name():
     out = df[["b", "c"]].mean()
     assert np.linalg.norm(out["c"].data - np.array([1.55, 3.75, 4.3, 7.05]) < 1e-10)
     assertNumpyArrayEquality(out["b"].data, np.array([2, 3.5, 4, 6.5]))
-    assert (out["name"].data == NumpyArrayColumn(["a", "b", "c", "d"]).data).all()
+    assert (out["name"].data == TorchTensorColumn(["a", "b", "c", "d"]).data).all()
 
 
 def test_group_by_by_string_type_as_list_key_as_list_mult_key():
     df = DataFrame(
         {
-            "a": NumpyArrayColumn([1, 2, 2, 1, 3, 2, 3]),
-            "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "a_diff": TorchTensorColumn([1, 2, 2, 2, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -312,13 +312,13 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key():
 def test_group_by_by_string_type_as_list_key_as_list_mult_key_tensor():
     df = DataFrame(
         {
-            "a": TensorColumn([1, 2, 2, 1, 3, 2, 3]),
-            "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a": TorchTensorColumn([1, 2, 2, 1, 3, 2, 3]),
+            "a_diff": TorchTensorColumn([1, 2, 2, 2, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 
@@ -333,12 +333,12 @@ def test_simple_list_column():
     df = DataFrame(
         {
             "a": ListColumn([1, 2, 2, 1, 3, 2, 3]),
-            "a_diff": NumpyArrayColumn([1, 2, 2, 2, 3, 2, 3]),
-            "name": NumpyArrayColumn(
+            "a_diff": TorchTensorColumn([1, 2, 2, 2, 3, 2, 3]),
+            "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)
             ),
-            "b": NumpyArrayColumn([1, 2, 3, 4, 5, 6, 7]),
-            "c": NumpyArrayColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
+            "b": TorchTensorColumn([1, 2, 3, 4, 5, 6, 7]),
+            "c": TorchTensorColumn([1.0, 3.2, 2.1, 4.3, 5.4, 6.5, 7.6]),
         }
     )
 

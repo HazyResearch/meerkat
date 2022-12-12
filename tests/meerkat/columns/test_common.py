@@ -7,9 +7,9 @@ import pytest
 from meerkat import (
     CellColumn,
     LambdaColumn,
-    NumpyArrayColumn,
-    PandasSeriesColumn,
-    TensorColumn,
+    TorchTensorColumn,
+    ScalarColumn,
+    NumPyTensorColumn,
 )
 from meerkat.errors import ImmutableError
 
@@ -89,7 +89,7 @@ def test_getitem(column_testbed, index_type: type):
 
 @product_parametrize(params={"index_type": [np.array, list, pd.Series]})
 def test_set_item(column_testbed, index_type: type):
-    MUTABLE_COLUMNS = (NumpyArrayColumn, TensorColumn, PandasSeriesColumn, CellColumn)
+    MUTABLE_COLUMNS = (TorchTensorColumn, TorchTensorColumn, ScalarColumn, CellColumn)
 
     col = column_testbed.col
 

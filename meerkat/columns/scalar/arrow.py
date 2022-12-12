@@ -9,13 +9,12 @@ from pyarrow.compute import equal
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
-from meerkat.columns.abstract import AbstractColumn
 from meerkat.errors import ImmutableError
 
+from .abstract import ScalarColumn
 
-class ArrowArrayColumn(
-    AbstractColumn,
-):
+
+class ArrowScalarColumn(ScalarColumn):
 
     block_class: type = ArrowBlock
 
@@ -33,7 +32,7 @@ class ArrowArrayColumn(
         elif not isinstance(data, (pa.Array, pa.ChunkedArray)):
             data = pa.array(data)
 
-        super(ArrowArrayColumn, self).__init__(data=data, *args, **kwargs)
+        super(ArrowScalarColumn, self).__init__(data=data, *args, **kwargs)
 
     def _get(self, index, materialize: bool = True):
         index = ArrowBlock._convert_index(index)
@@ -56,7 +55,7 @@ class ArrowArrayColumn(
     def _repr_cell(self, index) -> object:
         return self.data[index]
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
         return equal(self.data, other.data)
@@ -75,7 +74,7 @@ class ArrowArrayColumn(
         return table["0"]
 
     @classmethod
-    def concat(cls, columns: Sequence[ArrowArrayColumn]):
+    def concat(cls, columns: Sequence[ArrowScalarColumn]):
         data = pa.concat_arrays([c.data for c in columns])
         return columns[0]._clone(data=data)
 

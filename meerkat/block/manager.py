@@ -12,7 +12,7 @@ import yaml
 
 import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.tools.utils import MeerkatLoader
 
 from .lambda_block import LambdaBlock
@@ -23,7 +23,7 @@ class BlockManager(MutableMapping):
     """Manages all blocks in a DataFrame."""
 
     def __init__(self) -> None:
-        self._columns: Dict[str, AbstractColumn] = {}  # ordered as of 3.7
+        self._columns: Dict[str, Column] = {}  # ordered as of 3.7
         self._column_to_block_id: Dict[str, int] = {}
         self._block_refs: Dict[int, BlockRef] = {}
 
@@ -131,7 +131,7 @@ class BlockManager(MutableMapping):
             result = getattr(col, method_name)(*args, **kwargs)
 
             if results is None:
-                results = BlockManager() if isinstance(result, AbstractColumn) else {}
+                results = BlockManager() if isinstance(result, Column) else {}
 
             results[name] = result
 
@@ -149,7 +149,7 @@ class BlockManager(MutableMapping):
             block_ref_groups[block_ref.block.signature].append(block_ref)
 
         # TODO we need to go through these block_ref groups in topological order
-        consolidated_inputs: Dict[int, AbstractColumn] = {}
+        consolidated_inputs: Dict[int, Column] = {}
         for block_refs in block_ref_groups.values():
             if (not consolidate_unitary_groups) and len(block_refs) == 1:
                 # if there is only one block ref in the group, do not consolidate
@@ -194,7 +194,7 @@ class BlockManager(MutableMapping):
 
     def __getitem__(
         self, index: Union[str, Sequence[str]]
-    ) -> Union[AbstractColumn, BlockManager]:
+    ) -> Union[Column, BlockManager]:
         if isinstance(index, str):
             return self._columns[index]
         elif isinstance(index, Sequence):
@@ -225,7 +225,7 @@ class BlockManager(MutableMapping):
             )
 
     def __setitem__(self, index: str, data: Union[str, Sequence[str]]):
-        if isinstance(data, AbstractColumn):
+        if isinstance(data, Column):
             self.add_column(data, name=index)
         else:
             raise ValueError(
@@ -255,7 +255,7 @@ class BlockManager(MutableMapping):
     def get_block_ref(self, name: str):
         return self._block_refs[self._column_to_block_id[name]]
 
-    def add_column(self, col: AbstractColumn, name: str):
+    def add_column(self, col: Column, name: str):
         """Convert data to a meerkat column using the appropriate Column
         type."""
         if len(self) > 0 and len(col) != self.nrows:
@@ -273,7 +273,7 @@ class BlockManager(MutableMapping):
     def from_dict(cls, data: Mapping[str, object]):
         mgr = cls()
         for name, data in data.items():
-            col = AbstractColumn.from_data(data)
+            col = Column.from_data(data)
             mgr.add_column(col=col, name=name)
         return mgr
 
@@ -378,7 +378,7 @@ class BlockManager(MutableMapping):
 
         # maintain a dictionary mapping from paths to columns
         # so that lambda blocks that depend on those columns don't load them again
-        read_inputs: Dict[int, AbstractColumn] = {}
+        read_inputs: Dict[int, Column] = {}
 
         blocks = {}
         mgr = cls()

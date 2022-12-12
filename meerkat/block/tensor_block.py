@@ -9,8 +9,8 @@ import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
@@ -75,7 +75,7 @@ class TensorBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> BlockRef:
         offset = 0
         new_indices = {}
@@ -119,7 +119,9 @@ class TensorBlock(AbstractBlock):
 
     @staticmethod
     def _convert_index(index):
-        if isinstance(index, NumpyArrayColumn) and index.data.dtype == np.bool_:
+        from meerkat.columns.torch_column import TorchTensorColumn
+
+        if isinstance(index, TorchTensorColumn) and index.data.dtype == np.bool_:
             # needed to silence torch deprecation warning
             # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
             # to be interpreted as an index
@@ -143,10 +145,10 @@ class TensorBlock(AbstractBlock):
         if isinstance(index, pd.Series):
             return torch.as_tensor(index.values)
 
-        from meerkat.columns.pandas_column import PandasSeriesColumn
+        from meerkat.columns.pandas_column import ScalarColumn
 
         if (
-            isinstance(index, PandasSeriesColumn)
+            isinstance(index, ScalarColumn)
             and index.data.values.dtype == np.bool_
         ):
             # needed to silence torch deprecation warning
@@ -154,9 +156,8 @@ class TensorBlock(AbstractBlock):
             # to be interpreted as an index
             return torch.as_tensor(index.data.values)
 
-        from meerkat.columns.tensor_column import TensorColumn
 
-        if isinstance(index, TensorColumn):
+        if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing
             return index.data
         return index
@@ -186,6 +187,6 @@ class TensorBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ):
         return torch.load(os.path.join(path, "data.pt"))

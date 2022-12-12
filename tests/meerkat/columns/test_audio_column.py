@@ -10,10 +10,10 @@ import torch
 import torchaudio
 
 from meerkat import AudioColumn
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.file_column import FileCell
 from meerkat.columns.lambda_column import LambdaCell
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.pandas_column import ScalarColumn
 
 from .abstract import AbstractColumnTestBed
 
@@ -93,12 +93,12 @@ class AudioColumnTestBed(AbstractColumnTestBed):
                     base_dir=self.base_dir,
                 )
             index = np.arange(len(self.data))[index]
-            return PandasSeriesColumn([self.audio_paths[idx] for idx in index])
+            return ScalarColumn([self.audio_paths[idx] for idx in index])
 
     @staticmethod
     def assert_data_equal(
-        data1: Union[AbstractColumn, List, torch.Tensor],
-        data2: Union[AbstractColumn, List, torch.Tensor],
+        data1: Union[Column, List, torch.Tensor],
+        data2: Union[Column, List, torch.Tensor],
     ):
         def unpad_and_compare(padded: torch.Tensor, data: List):
             for row_idx in range(padded.shape[0]):
@@ -106,7 +106,7 @@ class AudioColumnTestBed(AbstractColumnTestBed):
                 unpadded_row = padded_row[padded_row != 0]
                 assert torch.allclose(unpadded_row, data[row_idx])
 
-        if isinstance(data1, AbstractColumn) and isinstance(data2, AbstractColumn):
+        if isinstance(data1, Column) and isinstance(data2, Column):
             assert data1.is_equal(data2)
         elif torch.is_tensor(data1) and torch.is_tensor(data2):
             assert torch.allclose(data1, data2)

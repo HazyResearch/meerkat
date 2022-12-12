@@ -15,9 +15,9 @@ import dill
 import yaml
 
 from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.pandas_column import ScalarColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 folder = LazyLoader("torchvision.datasets.folder")
@@ -281,8 +281,8 @@ class FileColumn(LambdaColumn):
                 base_dir=base_dir,
             )
 
-        if not isinstance(data, PandasSeriesColumn):
-            data = PandasSeriesColumn(data)
+        if not isinstance(data, ScalarColumn):
+            data = ScalarColumn(data)
 
         data = LambdaOp(
             args=[data],
@@ -374,8 +374,8 @@ class FileColumn(LambdaColumn):
                 open(os.path.join(path, "data", "meta.yaml")),
                 Loader=yaml.FullLoader,
             )
-            if issubclass(meta["dtype"], AbstractColumn):
-                col = AbstractColumn.read(os.path.join(path, "data"))
+            if issubclass(meta["dtype"], Column):
+                col = Column.read(os.path.join(path, "data"))
             else:
                 raise ValueError(
                     "Support for LambdaColumns based on a DataFrame is deprecated."
@@ -397,7 +397,7 @@ class FileColumn(LambdaColumn):
                 batch_size=1,
             )
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         return (other.__class__ == self.__class__) and self.data.is_equal(other.data)
 
 

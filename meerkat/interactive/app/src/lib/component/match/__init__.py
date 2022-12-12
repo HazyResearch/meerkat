@@ -27,7 +27,7 @@ def get_match_schema(df: DataFrame, encoder: str):
     columns = [
         k
         for k, v in df.items()
-        if isinstance(v, mk.NumpyArrayColumn) and len(v.shape) == 2
+        if isinstance(v, mk.TorchTensorColumn) and len(v.shape) == 2
         # TODO: We should know the provenance of embeddings and where they came from,
         # to explicitly check whether the encoder will match it in size.
     ]
@@ -68,7 +68,7 @@ def _parse_query(
         return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg) for arg in node.args])
     elif isinstance(node, ast.Constant):
         return mk.embed(
-            data=mk.PandasSeriesColumn([node.value]),
+            data=mk.ScalarColumn([node.value]),
             encoder="clip",
             num_workers=0,
             pbar=False,

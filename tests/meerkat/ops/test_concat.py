@@ -6,7 +6,7 @@ import pytest
 
 from meerkat import concat
 from meerkat.columns.list_column import ListColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import ConcatError
 
@@ -98,7 +98,7 @@ def test_concat_same_columns():
 
 
 def test_concat_different_type():
-    a = NumpyArrayColumn.from_array([1, 2, 3])
+    a = NumPyTensorColumn.from_array([1, 2, 3])
     b = ListColumn.from_list([1, 2, 3])
     with pytest.raises(ConcatError):
         concat([a, b])
