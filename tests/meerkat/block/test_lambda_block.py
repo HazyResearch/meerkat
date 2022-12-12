@@ -1,7 +1,7 @@
 import numpy as np
 
-from meerkat import LambdaColumn, TorchTensorColumn
-from meerkat.block.lambda_block import LambdaBlock, LambdaOp
+from meerkat import DeferredColumn, TorchTensorColumn
+from meerkat.block.lambda_block import DeferredBlock, DeferredOp
 from meerkat.block.ref import BlockRef
 
 from ...utils import product_parametrize
@@ -14,17 +14,17 @@ def fn(x: int) -> int:
 @product_parametrize(params={"num_blocks": [1, 2, 3]})
 def test_consolidate(num_blocks: int):
     inp = TorchTensorColumn(np.arange(8))
-    op = LambdaOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
+    op = DeferredOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [
-        LambdaBlock.from_column_data(data=op.with_return_index(i)) for i in range(3)
+        DeferredBlock.from_column_data(data=op.with_return_index(i)) for i in range(3)
     ]
     cols = [
-        {str(block_view.block_index): LambdaColumn(data=block_view)}
+        {str(block_view.block_index): DeferredColumn(data=block_view)}
         for block_view in block_views
     ]
 
-    block_ref = LambdaBlock.consolidate(
+    block_ref = DeferredBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,
@@ -46,19 +46,19 @@ def test_consolidate(num_blocks: int):
 
 def test_consolidate_same_index():
     inp = TorchTensorColumn(np.arange(8))
-    op = LambdaOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
+    op = DeferredOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [
-        LambdaBlock.from_column_data(data=op.with_return_index(0)),
-        LambdaBlock.from_column_data(data=op.with_return_index(0)),
-        LambdaBlock.from_column_data(data=op.with_return_index(1)),
+        DeferredBlock.from_column_data(data=op.with_return_index(0)),
+        DeferredBlock.from_column_data(data=op.with_return_index(0)),
+        DeferredBlock.from_column_data(data=op.with_return_index(1)),
     ]
     cols = [
-        {str(i): LambdaColumn(data=block_view)}
+        {str(i): DeferredColumn(data=block_view)}
         for i, block_view in enumerate(block_views)
     ]
 
-    block_ref = LambdaBlock.consolidate(
+    block_ref = DeferredBlock.consolidate(
         block_refs=[
             BlockRef(
                 block=block_view.block,

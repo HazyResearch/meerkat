@@ -10,8 +10,8 @@ import pytest
 import torch
 from PIL import Image
 
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.deferred.image import ImageColumn
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.dataframe import DataFrame
 
 
@@ -61,7 +61,7 @@ class MockDatapanel:
     ):
         batch = {
             "a": np.arange(length),
-            "b": ListColumn(np.arange(length)),
+            "b": ObjectColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
             "d": torch.arange(length),
             # offset the index to test robustness to nonstandard indices
@@ -92,7 +92,7 @@ class MockColumn:
     def __init__(
         self,
         use_visible_rows: bool = False,
-        col_type: type = ListColumn,
+        col_type: type = ObjectColumn,
         dtype: str = "int",
     ):
         self.array = np.arange(16, dtype=dtype)
@@ -106,7 +106,7 @@ class MockColumn:
 
 
 class MockStrColumn:
-    def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
+    def __init__(self, use_visible_rows: bool = False, col_type: type = ObjectColumn):
         self.array = np.array([f"row_{idx}" for idx in range(16)])
         self.col = col_type(self.array)
 
@@ -122,7 +122,7 @@ class MockAnyColumn:
         self,
         data: Sequence,
         use_visible_rows: bool = False,
-        col_type: type = ListColumn,
+        col_type: type = ObjectColumn,
     ):
         self.array = data
         self.col = col_type(self.array)

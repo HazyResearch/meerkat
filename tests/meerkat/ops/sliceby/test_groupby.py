@@ -1,6 +1,6 @@
 import numpy as np
 
-from meerkat import ListColumn, TorchTensorColumn, NumPyTensorColumn
+from meerkat import ObjectColumn, TorchTensorColumn, NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ops.sliceby.groupby import GroupBy, groupby
 
@@ -332,7 +332,7 @@ def test_group_by_by_string_type_as_list_key_as_list_mult_key_tensor():
 def test_simple_list_column():
     df = DataFrame(
         {
-            "a": ListColumn([1, 2, 2, 1, 3, 2, 3]),
+            "a": ObjectColumn([1, 2, 2, 1, 3, 2, 3]),
             "a_diff": TorchTensorColumn([1, 2, 2, 2, 3, 2, 3]),
             "name": TorchTensorColumn(
                 np.array(["a", "b", "a", "c", "b", "d", "d"], dtype=str)

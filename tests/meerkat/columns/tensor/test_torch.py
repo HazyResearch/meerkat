@@ -6,10 +6,10 @@ import torch
 from meerkat import TorchTensorColumn
 from meerkat.block.numpy_block import NumpyBlock
 
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
-class TensorColumnTestBed(AbstractColumnTestBed):
+class TorchTensorColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "num_dims": [1, 2, 3],
@@ -75,7 +75,7 @@ class TensorColumnTestBed(AbstractColumnTestBed):
         assert (data1 == data2).all()
 
 
-@pytest.fixture(**column_parametrize([TensorColumnTestBed]))
+@pytest.fixture(**column_parametrize([TorchTensorColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)

@@ -95,9 +95,9 @@ class PandasBlock(AbstractBlock):
         if isinstance(index, pd.Series):
             # need to convert to numpy for boolean indexing
             return index.values
-        from meerkat.columns.pandas_column import ScalarColumn
+        from meerkat.columns.scalar.pandas import PandasScalarColumn
 
-        if isinstance(index, ScalarColumn):
+        if isinstance(index, PandasScalarColumn):
             return index.data.values
         return index
 

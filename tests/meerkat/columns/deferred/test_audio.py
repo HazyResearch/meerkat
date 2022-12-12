@@ -11,11 +11,11 @@ import torchaudio
 
 from meerkat import AudioColumn
 from meerkat.columns.abstract import Column
-from meerkat.columns.file_column import FileCell
-from meerkat.columns.lambda_column import LambdaCell
-from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.deferred.file import FileCell
+from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.scalar import ScalarColumn
 
-from .abstract import AbstractColumnTestBed
+from ..abstract import AbstractColumnTestBed
 
 
 def simple_transform(audio):
@@ -117,7 +117,7 @@ class AudioColumnTestBed(AbstractColumnTestBed):
             unpad_and_compare(data1, data2)
         elif torch.is_tensor(data2) and isinstance(data1, List):
             unpad_and_compare(data2, data1)
-        elif isinstance(data1, LambdaCell):
+        elif isinstance(data1, DeferredCell):
             assert data1 == data2
         else:
             raise ValueError(

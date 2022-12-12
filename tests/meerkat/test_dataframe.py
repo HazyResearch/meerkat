@@ -17,19 +17,19 @@ from meerkat import TorchTensorColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.arrow_column import ArrowArrayColumn
-from meerkat.columns.lambda_column import LambdaColumn
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.deferred.base import DeferredColumn
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.pandas_column import ScalarColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 
 from ..utils import product_parametrize
-from .columns.test_arrow_column import ArrowArrayColumnTestBed
+from .columns.scalar.test_arrow import ArrowScalarColumnTestBed
 from .columns.test_cell_column import CellColumnTestBed
-from .columns.test_image_column import ImageColumnTestBed
-from .columns.test_numpy_column import NumpyArrayColumnTestBed
-from .columns.test_pandas_column import PandasSeriesColumnTestBed
-from .columns.test_tensor_column import TensorColumnTestBed
+from .columns.deferred.test_image import ImageColumnTestBed
+from .columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from .columns.scalar.test_pandas import PandasScalarColumnTestBed
+from .columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
 class DataFrameTestBed:
@@ -39,12 +39,12 @@ class DataFrameTestBed:
     }
 
     DEFAULT_COLUMN_CONFIGS = {
-        "np": {"testbed_class": NumpyArrayColumnTestBed, "n": 2},
-        "pd": {"testbed_class": PandasSeriesColumnTestBed, "n": 2},
-        "torch": {"testbed_class": TensorColumnTestBed, "n": 2},
+        "np": {"testbed_class": NumPyTensorColumnTestBed, "n": 2},
+        "pd": {"testbed_class": PandasScalarColumnTestBed, "n": 2},
+        "torch": {"testbed_class": TorchTensorColumnTestBed, "n": 2},
         "img": {"testbed_class": ImageColumnTestBed, "n": 2},
         "cell": {"testbed_class": CellColumnTestBed, "n": 2},
-        "arrow": {"testbed_class": ArrowArrayColumnTestBed, "n": 2},
+        "arrow": {"testbed_class": ArrowScalarColumnTestBed, "n": 2},
     }
 
     def __init__(
@@ -402,7 +402,7 @@ def test_row_indexing_view_copy_semantics():
     length = 16
     batch = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
         "c": [{"a": 2}] * length,
         "d": torch.arange(length),
         # offset the index to test robustness to nonstandard indices
@@ -651,7 +651,7 @@ def test_overwrite_column():
     assert "a" in df
     assert df[["a", "b"]]["a"]._data is a
     # testing removal from block manager, so important to use non-blockable type
-    df["a"] = ListColumn(range(16))
+    df["a"] = ObjectColumn(range(16))
     assert df[["a", "b"]]["a"]._data is not a
     # check that there are no duplicate columns
     assert set(df.columns) == set(["a", "b"])
@@ -709,7 +709,7 @@ def test_io(testbed, tmp_path, move):
         # check that the mmap status is preserved across df loads
         assert isinstance(new_df[name], np.memmap) == isinstance(df[name], np.memmap)
 
-        if isinstance(new_df[name], LambdaColumn):
+        if isinstance(new_df[name], DeferredColumn):
             # the lambda function isn't exactly the same after reading
             new_df[name].data.fn = df[name].data.fn
         if not new_df[name].is_equal(df[name]):
@@ -724,7 +724,7 @@ def test_append_columns():
     length = 16
     batch = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
         "c": [{"a": 2}] * length,
         "d": torch.arange(length),
         # offset the index to test robustness to nonstandard indices
@@ -928,7 +928,7 @@ def test_to_pandas():
     length = 16
     batch = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
         "c": [{"a": 2}] * length,
         "d": torch.arange(length),
         # offset the index to test robustness to nonstandard indices
@@ -957,7 +957,7 @@ def test_to_jsonl(tmpdir: str):
     length = 16
     batch = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
         "d": torch.arange(length),
         # offset the index to test robustness to nonstandard indices
         "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
@@ -987,7 +987,7 @@ def test_constructor():
     # from dictionary
     data = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
     }
     df = DataFrame(data=data)
     assert len(df) == length
@@ -1005,7 +1005,7 @@ def test_constructor():
     df = DataFrame(data=data)
     assert len(df) == length
     assert df["a"].is_equal(TorchTensorColumn(np.arange(length)))
-    assert isinstance(df["c"], ListColumn)
+    assert isinstance(df["c"], ObjectColumn)
     assert df.columns == ["a", "b", "c"]
 
     # from list of dictionaries, missing values
@@ -1050,7 +1050,7 @@ def test_constructor_w_unequal_lengths():
     length = 16
     data = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length - 1)),
+        "b": ObjectColumn(np.arange(length - 1)),
     }
     with pytest.raises(
         ValueError,
@@ -1066,7 +1066,7 @@ def test_shape():
     length = 16
     data = {
         "a": np.arange(length),
-        "b": ListColumn(np.arange(length)),
+        "b": ObjectColumn(np.arange(length)),
     }
     df = DataFrame(data)
     assert df.shape == (16, 2)

@@ -5,14 +5,14 @@ from typing import Sequence
 
 from tqdm import tqdm
 
-from meerkat.columns.list_column import ListColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.object.base import ObjectColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 ops = LazyLoader("torchvision.ops")
 
 
-class InstancesColumn(ListColumn):
+class InstancesColumn(ObjectColumn):
     def __init__(self, data: Sequence = None, *args, **kwargs):
 
         super(InstancesColumn, self).__init__(data=data, *args, **kwargs)
@@ -24,7 +24,7 @@ class InstancesColumn(ListColumn):
 
         return data_col
 
-    def get_field(self, field: str, batch_size: int = 32) -> ListColumn:
+    def get_field(self, field: str, batch_size: int = 32) -> ObjectColumn:
         """Returns a speific field of the Instances object.
 
         Returns:
@@ -39,7 +39,7 @@ class InstancesColumn(ListColumn):
             batch_data = [instance.get_fields()[field] for instance in batch]
             data = list(itertools.chain(data, batch_data))
 
-        data_col = ListColumn(data)
+        data_col = ObjectColumn(data)
 
         return data_col
 
@@ -74,5 +74,5 @@ class InstancesColumn(ListColumn):
             ]
             data = list(itertools.chain(data, batch_data))
 
-        data_col = ListColumn(data)
+        data_col = ObjectColumn(data)
         return data_col

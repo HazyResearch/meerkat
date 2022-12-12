@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from meerkat import concat
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import ConcatError
@@ -14,13 +14,13 @@ from meerkat.errors import ConcatError
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
-from ..columns.test_arrow_column import ArrowArrayColumnTestBed
+from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
 from ..columns.test_cell_column import CellColumnTestBed
-from ..columns.test_image_column import ImageColumnTestBed
-from ..columns.test_lambda_column import LambdaColumnTestBed
-from ..columns.test_numpy_column import NumpyArrayColumnTestBed
-from ..columns.test_pandas_column import PandasSeriesColumnTestBed
-from ..columns.test_tensor_column import TensorColumnTestBed
+from ..columns.deferred.test_image import ImageColumnTestBed
+from ..columns.deferred.test_deferred import DeferredColumnTestBed
+from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 # flake8: noqa: E501
 
@@ -28,11 +28,11 @@ from ..columns.test_tensor_column import TensorColumnTestBed
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
             CellColumnTestBed,
             ImageColumnTestBed,
         ]
@@ -99,7 +99,7 @@ def test_concat_same_columns():
 
 def test_concat_different_type():
     a = NumPyTensorColumn.from_array([1, 2, 3])
-    b = ListColumn.from_list([1, 2, 3])
+    b = ObjectColumn.from_list([1, 2, 3])
     with pytest.raises(ConcatError):
         concat([a, b])
 

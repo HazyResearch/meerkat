@@ -2,9 +2,9 @@ from typing import Callable
 
 import torch
 
-from ..display import audio_file_formatter
-from ..tools.lazy_loader import LazyLoader
-from .file_column import FileColumn
+from ...display import audio_file_formatter
+from ...tools.lazy_loader import LazyLoader
+from .file import FileColumn
 
 torchaudio = LazyLoader("torchaudio")
 

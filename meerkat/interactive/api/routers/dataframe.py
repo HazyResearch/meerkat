@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
-from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.endpoint import Endpoint, endpoint

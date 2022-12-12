@@ -9,10 +9,10 @@ import torch
 from meerkat import ScalarColumn
 from meerkat.block.tensor_block import TensorBlock
 
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
-class PandasSeriesColumnTestBed(AbstractColumnTestBed):
+class PandasScalarColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "contiguous_index": [True, False],
@@ -84,13 +84,13 @@ class PandasSeriesColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture(**column_parametrize([PandasSeriesColumnTestBed]))
+@pytest.fixture(**column_parametrize([PandasScalarColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@PandasSeriesColumnTestBed.parametrize({"dtype": ["str"]})
+@PandasScalarColumnTestBed.parametrize({"dtype": ["str"]})
 def test_str_accessor(testbed):
     col = testbed.col
     assert col.dtype == object

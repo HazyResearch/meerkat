@@ -18,7 +18,7 @@ from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
-from .abstract import AbstractTensorColumn
+from .abstract import TensorColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -43,7 +43,7 @@ def getattr_decorator(fn: Callable):
 
 class TorchTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
-    AbstractTensorColumn,
+    TensorColumn,
 ):
     block_class: type = TensorBlock
 

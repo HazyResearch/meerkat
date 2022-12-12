@@ -119,7 +119,7 @@ class TensorBlock(AbstractBlock):
 
     @staticmethod
     def _convert_index(index):
-        from meerkat.columns.torch_column import TorchTensorColumn
+        from meerkat.columns.tensor.torch import TorchTensorColumn
 
         if isinstance(index, TorchTensorColumn) and index.data.dtype == np.bool_:
             # needed to silence torch deprecation warning
@@ -145,17 +145,16 @@ class TensorBlock(AbstractBlock):
         if isinstance(index, pd.Series):
             return torch.as_tensor(index.values)
 
-        from meerkat.columns.pandas_column import ScalarColumn
+        from meerkat.columns.scalar.pandas import PandasScalarColumn
 
         if (
-            isinstance(index, ScalarColumn)
+            isinstance(index, PandasScalarColumn)
             and index.data.values.dtype == np.bool_
         ):
             # needed to silence torch deprecation warning
             # DeprecationWarning: In future, it will be an error for 'np.bool_' scalars
             # to be interpreted as an index
             return torch.as_tensor(index.data.values)
-
 
         if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing

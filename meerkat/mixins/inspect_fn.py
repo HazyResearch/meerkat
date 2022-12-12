@@ -54,7 +54,7 @@ class FunctionInspectorMixin:
         # lazy import to avoid circular dependency
         from meerkat.columns.abstract import Column
         from meerkat.columns.tensor.numpy import NumPyTensorColumn
-        from meerkat.columns.torch_column import TorchTensorColumn
+        from meerkat.columns.tensor.torch import TorchTensorColumn
 
         if isinstance(output, Mapping):
             # `function` returns a dict output

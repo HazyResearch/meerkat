@@ -7,7 +7,7 @@ from meerkat.block.abstract import BlockView
 
 if TYPE_CHECKING:
     from meerkat.columns.abstract import Column
-    from meerkat.columns.lambda_column import LambdaColumn
+    from meerkat.columns.deferred.base import DeferredColumn
     from meerkat.dataframe import DataFrame
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ def to_lambda(
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
     output_type: Union[Mapping[str, type], type] = None,
-) -> Union["DataFrame", "LambdaColumn"]:
+) -> Union["DataFrame", "DeferredColumn"]:
     """_summary_
 
     Examples
@@ -60,8 +60,8 @@ def to_lambda(
     Returns:
         Union[DataFrame, LambdaColumn]: A
     """
-    from meerkat import LambdaColumn
-    from meerkat.block.lambda_block import LambdaBlock, LambdaOp
+    from meerkat import DeferredColumn
+    from meerkat.block.lambda_block import DeferredBlock, DeferredOp
     from meerkat.columns.abstract import Column
     from meerkat.dataframe import DataFrame
 
@@ -82,7 +82,7 @@ def to_lambda(
         else:
             raise ValueError("")
 
-    op = LambdaOp(
+    op = DeferredOp(
         fn=function,
         args=args,
         kwargs=kwargs,
@@ -91,7 +91,7 @@ def to_lambda(
         return_format=type(outputs),
     )
 
-    block = LambdaBlock.from_block_data(data=op)
+    block = DeferredBlock.from_block_data(data=op)
 
     if outputs is None:
         # can only infer output type if the the input columns are nonempty
@@ -103,7 +103,7 @@ def to_lambda(
                 "Must provide a single `output_type` if `outputs` is None."
             )
 
-        col = LambdaColumn(
+        col = DeferredColumn(
             data=BlockView(block_index=None, block=block), output_type=output_type
         )
         return col
@@ -119,7 +119,7 @@ def to_lambda(
 
         return DataFrame(
             {
-                col: LambdaColumn(
+                col: DeferredColumn(
                     data=BlockView(block_index=output_key, block=block),
                     output_type=output_type[output_key],
                 )
@@ -135,7 +135,7 @@ def to_lambda(
             )
         return DataFrame(
             {
-                col: LambdaColumn(
+                col: DeferredColumn(
                     data=BlockView(
                         block_index=output_key, block=block
                     ),
@@ -159,7 +159,7 @@ class LambdaMixin:
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
         output_type: Union[Mapping[str, type], type] = None,
-    ) -> Union["DataFrame", "LambdaColumn"]:
+    ) -> Union["DataFrame", "DeferredColumn"]:
         return to_lambda(
             data=self,
             function=function,

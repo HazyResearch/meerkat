@@ -10,11 +10,11 @@ from numpy.lib.format import open_memmap
 from meerkat import TorchTensorColumn
 from meerkat.block.tensor_block import TensorBlock
 
-from ...utils import product_parametrize
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ....utils import product_parametrize
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
-class NumpyArrayColumnTestBed(AbstractColumnTestBed):
+class NumPyTensorColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "num_dims": [1, 2, 3],
@@ -91,7 +91,7 @@ class NumpyArrayColumnTestBed(AbstractColumnTestBed):
         assert (data1 == data2).all()
 
 
-@pytest.fixture(**column_parametrize([NumpyArrayColumnTestBed]))
+@pytest.fixture(**column_parametrize([NumPyTensorColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)

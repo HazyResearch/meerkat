@@ -14,10 +14,10 @@ from urllib.parse import urlparse
 import dill
 import yaml
 
-from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
+from meerkat.block.lambda_block import DeferredCellOp, DeferredOp
 from meerkat.columns.abstract import Column
-from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
-from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
+from meerkat.columns.scalar import ScalarColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 folder = LazyLoader("torchvision.datasets.folder")
@@ -183,7 +183,7 @@ class FileLoader:
         self.__dict__.update(state)
 
 
-class FileCell(LambdaCell):
+class FileCell(DeferredCell):
     def from_filepath(
         self,
         transform: callable = None,
@@ -196,7 +196,7 @@ class FileCell(LambdaCell):
 
         self.base_dir = base_dir
 
-        data = LambdaCellOp(
+        data = DeferredCellOp(
             fn=self.fn,
             args=[
                 path,
@@ -220,7 +220,7 @@ class FileCell(LambdaCell):
         return (other.__class__ == self.__class__) and other.data.is_equal(self.data)
 
 
-class FileColumn(LambdaColumn):
+class FileColumn(DeferredColumn):
     """A column where each cell represents an file stored on disk or the web.
     The underlying data is a `PandasSeriesColumn` of strings, where each string
     is the path to a file. The column materializes the files into memory when
@@ -284,7 +284,7 @@ class FileColumn(LambdaColumn):
         if not isinstance(data, ScalarColumn):
             data = ScalarColumn(data)
 
-        data = LambdaOp(
+        data = DeferredOp(
             args=[data],
             kwargs={},
             batch_size=1,
@@ -318,7 +318,7 @@ class FileColumn(LambdaColumn):
     def base_dir(self, base_dir: str):
         self.data.fn.base_dir = base_dir
 
-    def _create_cell(self, data: object) -> LambdaCell:
+    def _create_cell(self, data: object) -> DeferredCell:
         return FileCell(data=data)
 
     @classmethod
@@ -360,7 +360,7 @@ class FileColumn(LambdaColumn):
     @staticmethod
     def _read_data(path: str):
         try:
-            return LambdaOp.read(path=os.path.join(path, "data"))
+            return DeferredOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
             # support old DataFrames.
@@ -389,7 +389,7 @@ class FileColumn(LambdaColumn):
                 base_dir=state["base_dir"],
             )
 
-            return LambdaOp(
+            return DeferredOp(
                 args=[col],
                 kwargs={},
                 fn=fn,

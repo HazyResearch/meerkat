@@ -35,6 +35,8 @@ from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
+from .abstract import ScalarColumn
+
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 logger = logging.getLogger(__name__)
@@ -134,7 +136,7 @@ class _MeerkatCombinedDatetimelikeProperties(CombinedDatetimelikeProperties):
 
 
 class PandasScalarColumn(
-    Column,
+    ScalarColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
     block_class: type = PandasBlock
@@ -174,7 +176,9 @@ class PandasScalarColumn(
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
-        inputs = tuple(x.data if isinstance(x, PandasScalarColumn) else x for x in inputs)
+        inputs = tuple(
+            x.data if isinstance(x, PandasScalarColumn) else x for x in inputs
+        )
         if out:
             kwargs["out"] = tuple(
                 x.data if isinstance(x, PandasScalarColumn) else x for x in out
@@ -310,7 +314,9 @@ class PandasScalarColumn(
         sorted_index = self.argsort(ascending, kind)
         return self[sorted_index]
 
-    def argsort(self, ascending: bool = True, kind: str = "quicksort") -> PandasScalarColumn:
+    def argsort(
+        self, ascending: bool = True, kind: str = "quicksort"
+    ) -> PandasScalarColumn:
         """Return indices that would sorted the column.
 
         Args:

@@ -17,7 +17,7 @@ Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 logger = logging.getLogger(__name__)
 
 
-class ListColumn(Column):
+class ObjectColumn(Column):
     def __init__(
         self,
         data: Sequence = None,
@@ -26,7 +26,7 @@ class ListColumn(Column):
     ):
         if data is not None:
             data = list(data)
-        super(ListColumn, self).__init__(data=data, *args, **kwargs)
+        super(ObjectColumn, self).__init__(data=data, *args, **kwargs)
 
     @classmethod
     def from_list(cls, data: Sequence):
@@ -49,7 +49,7 @@ class ListColumn(Column):
                 yield self[i : i + batch_size]
 
     @classmethod
-    def concat(cls, columns: Sequence[ListColumn]):
+    def concat(cls, columns: Sequence[ObjectColumn]):
         data = list(tz.concat([c.data for c in columns]))
         if issubclass(cls, CloneableMixin):
             return columns[0]._clone(data=data)

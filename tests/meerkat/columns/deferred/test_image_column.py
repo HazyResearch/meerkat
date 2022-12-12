@@ -14,16 +14,16 @@ from torchvision.transforms.functional import to_tensor
 
 import meerkat
 from meerkat import ImageColumn
-from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
+from meerkat.block.lambda_block import DeferredCellOp, DeferredOp
 from meerkat.columns.abstract import Column
-from meerkat.columns.file_column import FileCell
-from meerkat.columns.lambda_column import LambdaCell
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.deferred.file import FileCell
+from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.pandas_column import ScalarColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
-from ...utils import product_parametrize
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ....utils import product_parametrize
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class ImageColumnTestBed(AbstractColumnTestBed):
@@ -91,7 +91,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 if self.transform is None:
                     return {
                         "fn": lambda x, k=0: x.get().rotate(45 + salt + k),
-                        "expected_result": ListColumn(
+                        "expected_result": ObjectColumn(
                             [im.rotate(45 + salt + kwarg) for im in self.ims]
                         ),
                     }
@@ -110,7 +110,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
                     if batched
                     else (lambda x, k=0: x.rotate(45 + salt + k)),
-                    "expected_result": ListColumn(
+                    "expected_result": ObjectColumn(
                         [im.rotate(45 + salt + kwarg) for im in self.ims]
                     ),
                 }
@@ -157,7 +157,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
                     if batched
                     else (lambda x, k=0: x.rotate(45 + salt + k)),
-                    "expected_result": ListColumn(
+                    "expected_result": ObjectColumn(
                         [im.rotate(45 + salt + kwarg) for im in self.ims]
                     ),
                 }
@@ -187,7 +187,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         else:
             if isinstance(index, int):
                 return FileCell(
-                    LambdaCellOp(
+                    DeferredCellOp(
                         args=[self.image_paths[index]],
                         kwargs={},
                         fn=self.col.fn,
@@ -198,7 +198,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
 
             index = np.arange(len(self.data))[index]
             col = ScalarColumn([self.image_paths[idx] for idx in index])
-            return LambdaOp(
+            return DeferredOp(
                 args=[col], kwargs={}, fn=self.col.fn, is_batched_fn=False, batch_size=1
             )
 
@@ -213,9 +213,9 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             assert data1.is_equal(data2)
         elif torch.is_tensor(data1):
             assert (data1 == data2).all()
-        elif isinstance(data1, LambdaCell):
+        elif isinstance(data1, DeferredCell):
             assert data1 == data2
-        elif isinstance(data1, LambdaOp):
+        elif isinstance(data1, DeferredOp):
             assert data1.is_equal(data2)
         else:
             raise ValueError(

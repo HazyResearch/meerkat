@@ -171,9 +171,7 @@ class Column(
         """
         return self._data[index]
 
-    def _get_batch(
-        self, indices: np.ndarray, materialize: bool = True
-    ) -> Column:
+    def _get_batch(self, indices: np.ndarray, materialize: bool = True) -> Column:
         """Get a batch of cells from the column.
 
         Args:
@@ -209,7 +207,7 @@ class Column(
 
     # @capture_provenance()
     def __getitem__(self, index):
-        return self._get(index, materialize=True)
+        return self._get(index, materialize=False)
 
     def _set_cell(self, index, value):
         self._data[index] = value
@@ -526,54 +524,48 @@ class Column(
     def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        from .numpy_column import NumPyTensorColumn
-        from .pandas_column import ScalarColumn
-
+        from .scalar.pandas import PandasScalarColumn
 
         if isinstance(data, Column):
             # TODO: Need ton make this view but should decide where to do it exactly
             return data  # .view()
 
         if isinstance(data, pd.Series):
-            return ScalarColumn(data)
+            return PandasScalarColumn(data)
 
         if torch.is_tensor(data):
-            from .torch_column import TorchTensorColumn
-            
+            from .tensor.torch import TorchTensorColumn
+
             if len(data.shape) == 1:
-                return ScalarColumn(data.cpu().detach().numpy())
+                return PandasScalarColumn(data.cpu().detach().numpy())
             return TorchTensorColumn(data)
 
         if isinstance(data, np.ndarray):
             if len(data.shape) == 1:
-                return ScalarColumn(data)
+                return PandasScalarColumn(data)
             return TorchTensorColumn(data)
 
         if isinstance(data, Sequence):
-            from ..cells.abstract import AbstractCell
+            from .tensor.torch import TorchTensorColumn
 
-            if len(data) != 0 and isinstance(data[0], AbstractCell):
-                from .cell_column import CellColumn
-
-                return CellColumn(data)
-
-            if len(data) != 0 and isinstance(
-                data[0], (np.ndarray, TorchTensorColumn)
-            ):
+            if len(data) != 0 and isinstance(data[0], (np.ndarray, TorchTensorColumn)):
                 return TorchTensorColumn(data)
 
-            if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
-                from .pandas_column import PandasSeriesColumn
+            if len(data) != 0 and isinstance(
+                data[0], (str, int, float, bool, np.generic)
+            ):
+                from .scalar import ScalarColumn
 
                 return ScalarColumn(data)
 
             if len(data) != 0 and torch.is_tensor(data[0]):
-                from .torch_column import TensorColumn
+                from .tensor.torch import TorchTensorColumn
 
                 return TorchTensorColumn(data)
 
-            from .list_column import ListColumn
-            return ListColumn(data)
+            from .object.base import ObjectColumn
+
+            return ObjectColumn(data)
         else:
             raise ValueError(f"Cannot create column out of data of type {type(data)}")
 

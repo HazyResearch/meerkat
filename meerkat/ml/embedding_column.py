@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 faiss = LazyLoader("faiss")

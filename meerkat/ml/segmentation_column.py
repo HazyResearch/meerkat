@@ -8,7 +8,7 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.prediction_column import (
     ClassificationOutputColumn,

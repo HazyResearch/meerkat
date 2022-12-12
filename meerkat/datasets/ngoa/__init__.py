@@ -4,7 +4,7 @@ import subprocess
 import PIL
 
 import meerkat as mk
-from meerkat.columns.image_column import load_image
+from meerkat.columns.deferred.image import load_image
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo

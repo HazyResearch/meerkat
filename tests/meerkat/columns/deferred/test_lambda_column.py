@@ -5,11 +5,11 @@ import numpy as np
 import pytest
 
 import meerkat as mk
-from meerkat import LambdaColumn, ListColumn, TorchTensorColumn, NumPyTensorColumn
+from meerkat import DeferredColumn, ObjectColumn, TorchTensorColumn, NumPyTensorColumn
 from meerkat.errors import ConcatWarning
 
-from ...testbeds import MockColumn, MockDatapanel
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ....testbeds import MockColumn, MockDatapanel
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class LambdaColumnTestBed(AbstractColumnTestBed):
@@ -98,7 +98,7 @@ def testbed(request, tmpdir):
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@pytest.mark.parametrize("col_type", [TorchTensorColumn, TorchTensorColumn, ListColumn])
+@pytest.mark.parametrize("col_type", [TorchTensorColumn, TorchTensorColumn, ObjectColumn])
 def test_column_to_lambda(col_type: Type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col
@@ -106,7 +106,7 @@ def test_column_to_lambda(col_type: Type):
     # Build a dataset from a batch
     lambda_col = col.to_lambda(lambda x: x + 1)
 
-    assert isinstance(lambda_col, LambdaColumn)
+    assert isinstance(lambda_col, DeferredColumn)
     assert (lambda_col[:] == testbed.array[testbed.visible_rows] + 1).all()
 
 
@@ -125,13 +125,13 @@ def test_df_to_lambda(use_visible_columns: bool):
     # Build a dataset from a batch
     lambda_col = df.to_lambda(lambda x: x["a"] + 1)
 
-    assert isinstance(lambda_col, LambdaColumn)
+    assert isinstance(lambda_col, DeferredColumn)
     assert (lambda_col[:].data == np.arange(length)[testbed.visible_rows] + 1).all()
 
 
 @pytest.mark.parametrize(
     "col_type",
-    [TorchTensorColumn, TorchTensorColumn, ListColumn],
+    [TorchTensorColumn, TorchTensorColumn, ObjectColumn],
 )
 def test_composed_lambda_columns(col_type: Type):
     testbed = MockColumn(col_type=col_type)
@@ -156,7 +156,7 @@ def test_df_concat():
 
     out = mk.concat([col_a, col_b])
 
-    assert isinstance(out, LambdaColumn)
+    assert isinstance(out, DeferredColumn)
     assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
     col_a = df.to_lambda(fn)
@@ -165,7 +165,7 @@ def test_df_concat():
         out = mk.concat([col_a, col_b])
 
 
-@pytest.mark.parametrize("col_type", [TorchTensorColumn, ListColumn])
+@pytest.mark.parametrize("col_type", [TorchTensorColumn, ObjectColumn])
 def test_col_concat(col_type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col
@@ -179,7 +179,7 @@ def test_col_concat(col_type):
 
     out = mk.concat([col_a, col_b])
 
-    assert isinstance(out, LambdaColumn)
+    assert isinstance(out, DeferredColumn)
     assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
     col_a = col.to_lambda(fn)

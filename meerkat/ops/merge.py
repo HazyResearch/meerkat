@@ -3,12 +3,11 @@ from typing import List, Sequence, Union
 
 import numpy as np
 
-from meerkat import DataFrame, ListColumn
-from meerkat.columns.cell_column import CellColumn
-from meerkat.columns.lambda_column import LambdaColumn
+from meerkat import DataFrame, ObjectColumn
+from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
-from meerkat.columns.pandas_column import ScalarColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
@@ -136,7 +135,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
                 new_col[np.isnan(indices)] = np.nan
                 data[name] = new_col
             else:
-                data[name] = ListColumn(
+                data[name] = ObjectColumn(
                     [
                         None if np.isnan(index) else col.lz[int(index)]
                         for index in indices
@@ -157,7 +156,7 @@ def _check_merge_columns(df: DataFrame, on: List[str]):
                 raise MergeError(
                     f"Cannot merge on column `{name}`, has more than one dimension."
                 )
-        elif isinstance(column, ListColumn):
+        elif isinstance(column, ObjectColumn):
             if not all(
                 [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
             ):
@@ -165,7 +164,7 @@ def _check_merge_columns(df: DataFrame, on: List[str]):
                     f"Cannot merge on column `{name}`, contains unhashable objects."
                 )
 
-        elif isinstance(column, CellColumn) or isinstance(column, LambdaColumn):
+        elif isinstance(column, DeferredColumn):
             if not all(
                 [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
             ):

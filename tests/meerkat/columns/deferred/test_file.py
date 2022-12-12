@@ -7,10 +7,10 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from meerkat.block.lambda_block import LambdaCellOp, LambdaOp
-from meerkat.columns.file_column import FileLoader, FileCell, FileColumn
-from meerkat.columns.lambda_column import LambdaCell
-from meerkat.columns.pandas_column import ScalarColumn
+from meerkat.block.lambda_block import DeferredCellOp, DeferredOp
+from meerkat.columns.deferred.file import FileLoader, FileCell, FileColumn
+from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.scalar import ScalarColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
 
 
@@ -80,7 +80,7 @@ class FileColumnTestBed(AbstractColumnTestBed):
         else:
             if isinstance(index, int):
                 return FileCell(
-                    LambdaCellOp(
+                    DeferredCellOp(
                         args=[self.paths[index]],
                         kwargs={},
                         fn=self.col.fn,
@@ -91,22 +91,22 @@ class FileColumnTestBed(AbstractColumnTestBed):
 
             index = np.arange(len(self.data))[index]
             col = ScalarColumn([self.paths[idx] for idx in index])
-            return LambdaOp(
+            return DeferredOp(
                 args=[col], kwargs={}, fn=self.col.fn, is_batched_fn=False, batch_size=1
             )
 
     @staticmethod
     def assert_data_equal(
-        data1: Union[np.ndarray, LambdaCell, LambdaOp],
-        data2: Union[np.ndarray, LambdaCell, LambdaOp],
+        data1: Union[np.ndarray, DeferredCell, DeferredOp],
+        data2: Union[np.ndarray, DeferredCell, DeferredOp],
     ):
         if isinstance(data1, (int, np.int64)):
             assert data1 == data2
         elif isinstance(data1, np.ndarray):
             assert (data1 == data2).all()
-        elif isinstance(data1, LambdaCell):
+        elif isinstance(data1, DeferredCell):
             assert data1 == data2
-        elif isinstance(data1, LambdaOp):
+        elif isinstance(data1, DeferredOp):
             assert data1.is_equal(data2)
         else:
             raise ValueError(

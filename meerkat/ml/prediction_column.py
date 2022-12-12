@@ -9,7 +9,7 @@ import torch
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 

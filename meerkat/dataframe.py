@@ -403,7 +403,7 @@ class DataFrame(
 
     # @capture_provenance(capture_args=[])
     def __getitem__(self, posidx):
-        return self._get(posidx, materialize=True)
+        return self._get(posidx, materialize=False)
 
     def __setitem__(self, posidx, value):
         self.add_column(name=posidx, data=value, overwrite=True)
@@ -415,6 +415,9 @@ class DataFrame(
             # Add a modification if it's on the graph
             mod = DataFrameModification(id=self.id, scope=self.columns)
             mod.add_to_queue()
+    
+    def __call__(self):
+        pass 
 
     def set(self, value: DataFrame):
         # FIXME: This should not be called outside of an endpoint. Add explicit check
@@ -619,10 +622,10 @@ class DataFrame(
             batches of data
         """
         cell_columns, batch_columns = [], []
-        from meerkat.columns.lambda_column import LambdaColumn
+        from meerkat.columns.deferred.base import DeferredColumn
 
         for name, column in self.items():
-            if isinstance(column, (CellColumn, LambdaColumn)) and materialize:
+            if isinstance(column, (CellColumn, DeferredColumn)) and materialize:
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)

@@ -10,8 +10,8 @@ from PIL import Image
 import meerkat as mk
 
 if TYPE_CHECKING:
-    from meerkat.columns.file_column import FileCell
-    from meerkat.columns.lambda_column import LambdaCell
+    from meerkat.columns.deferred.file import FileCell
+    from meerkat.columns.deferred.base import DeferredCell
 
 
 def auto_formatter(cell: Any):
@@ -21,7 +21,7 @@ def auto_formatter(cell: Any):
         return repr(cell)
 
 
-def lambda_cell_formatter(cell: LambdaCell):
+def lambda_cell_formatter(cell: DeferredCell):
     return auto_formatter(cell.get())
 
 

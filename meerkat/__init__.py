@@ -9,11 +9,11 @@ import meerkat.interactive as gui
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column
-from meerkat.columns.audio_column import AudioColumn
-from meerkat.columns.file_column import FileCell, FileColumn, FileLoader
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.deferred.audio import AudioColumn
+from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
+from meerkat.columns.deferred.image import ImageColumn
+from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
@@ -41,20 +41,20 @@ __all__ = [
     "DataFrame",
     "DataPanel",
     "Column",
-    "ListColumn",
+    "ObjectColumn",
     "ScalarColumn",
     "PandasScalarColumn",
     "ArrowScalarColumn",
     "TensorColumn",
     "NumPyTensorColumn",
     "TorchTensorColumn",
-    "LambdaColumn",
+    "DeferredColumn",
     "FileColumn",
     "ImageColumn",
     "AudioColumn",
     "VideoColumn",
     "AbstractCell",
-    "LambdaCell",
+    "DeferredCell",
     "FileCell",
     "FileLoader",
     "get",

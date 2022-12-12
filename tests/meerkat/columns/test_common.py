@@ -5,8 +5,7 @@ import pandas as pd
 import pytest
 
 from meerkat import (
-    CellColumn,
-    LambdaColumn,
+    DeferredColumn,
     TorchTensorColumn,
     ScalarColumn,
     NumPyTensorColumn,
@@ -15,26 +14,24 @@ from meerkat.errors import ImmutableError
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
-from .test_arrow_column import ArrowArrayColumnTestBed
-from .test_audio_column import AudioColumnTestBed
-from .test_cell_column import CellColumnTestBed
-from .test_file_column import FileColumnTestBed
-from .test_image_column import ImageColumnTestBed
-from .test_lambda_column import LambdaColumnTestBed
-from .test_numpy_column import NumpyArrayColumnTestBed
-from .test_pandas_column import PandasSeriesColumnTestBed
-from .test_tensor_column import TensorColumnTestBed
+from .scalar.test_arrow import ArrowScalarColumnTestBed
+from .deferred.test_audio import AudioColumnTestBed
+from .deferred.test_file import FileColumnTestBed
+from .deferred.test_image import ImageColumnTestBed
+from .deferred.test_deferred import DeferredColumnTestBed
+from .tensor.test_numpy import NumPyTensorColumnTestBed
+from .scalar.test_pandas import PandasScalarColumnTestBed
+from .tensor.test_torch import TorchTensorColumnTestBed
 
 
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
-            CellColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
             FileColumnTestBed,
             ImageColumnTestBed,
             AudioColumnTestBed,
@@ -49,11 +46,11 @@ def column_testbed(request, tmpdir):
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
         ],
         single=True,
     ),
@@ -89,7 +86,7 @@ def test_getitem(column_testbed, index_type: type):
 
 @product_parametrize(params={"index_type": [np.array, list, pd.Series]})
 def test_set_item(column_testbed, index_type: type):
-    MUTABLE_COLUMNS = (TorchTensorColumn, TorchTensorColumn, ScalarColumn, CellColumn)
+    MUTABLE_COLUMNS = (TorchTensorColumn, TorchTensorColumn, ScalarColumn)
 
     col = column_testbed.col
 
@@ -130,7 +127,7 @@ def test_pickle(column_testbed):
 
     assert isinstance(new_col, type(col))
 
-    if isinstance(new_col, LambdaColumn):
+    if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
         new_col.data.fn = col.fn
     assert col.is_equal(new_col)
@@ -149,7 +146,7 @@ def test_io(tmp_path, column_testbed: AbstractColumnTestBed):
 
     assert isinstance(new_col, type(col))
 
-    if isinstance(new_col, LambdaColumn):
+    if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
         new_col.data.fn = col.fn
 

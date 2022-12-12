@@ -21,7 +21,7 @@ from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
 
-from .abstract import AbstractTensorColumn
+from .abstract import TensorColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -41,7 +41,7 @@ def getattr_decorator(fn: Callable):
 
 
 class NumPyTensorColumn(
-    AbstractTensorColumn,
+    TensorColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
 
@@ -81,7 +81,9 @@ class NumPyTensorColumn(
                 return NotImplemented
 
         # Defer to the implementation of the ufunc on unwrapped values.
-        inputs = tuple(x.data if isinstance(x, NumPyTensorColumn) else x for x in inputs)
+        inputs = tuple(
+            x.data if isinstance(x, NumPyTensorColumn) else x for x in inputs
+        )
 
         if out:
             kwargs["out"] = tuple(
@@ -251,7 +253,9 @@ class NumPyTensorColumn(
         sorted_index = self.argsort(ascending=ascending, kind=kind)
         return self[sorted_index]
 
-    def argsort(self, ascending: bool = True, kind: str = "quicksort") -> NumPyTensorColumn:
+    def argsort(
+        self, ascending: bool = True, kind: str = "quicksort"
+    ) -> NumPyTensorColumn:
         """Return indices that would sorted the column.
 
         Args:
@@ -310,7 +314,9 @@ class NumPyTensorColumn(
         )
         return cls(data)
 
-    def mean(self, axis: int = None, keepdims: bool = False, **kwargs) -> NumPyTensorColumn:
+    def mean(
+        self, axis: int = None, keepdims: bool = False, **kwargs
+    ) -> NumPyTensorColumn:
         try:
             return self.data.mean(axis=axis, keepdims=keepdims, **kwargs)
         except (UFuncTypeError, TypeError):

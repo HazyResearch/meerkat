@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 from typing import Collection, Sequence
 
-from meerkat.columns.lambda_column import LambdaColumn
+from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.pandas_column import ScalarColumn
 
 logger = logging.getLogger(__name__)
 
 
-class ReportColumn(LambdaColumn):
+class ReportColumn(DeferredColumn):
     def __init__(
         self,
         data: Sequence[str] = None,

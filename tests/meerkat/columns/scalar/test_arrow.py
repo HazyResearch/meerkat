@@ -7,10 +7,10 @@ import pyarrow as pa
 import pytest
 import torch
 
-from meerkat import ArrowArrayColumn
+from meerkat import ArrowScalarColumn
 from meerkat.block.tensor_block import TensorBlock
 
-from .abstract import AbstractColumnTestBed, column_parametrize
+from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
@@ -20,7 +20,7 @@ def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
     return array.to_numpy(zero_copy_only=False)
 
 
-class ArrowArrayColumnTestBed(AbstractColumnTestBed):
+class ArrowScalarColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
         "dtype": ["float", "int", "str"],
@@ -49,7 +49,7 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
         else:
             raise ValueError(f"dtype {dtype} not supported.")
 
-        self.col = ArrowArrayColumn(array)
+        self.col = ArrowScalarColumn(array)
         self.data = array
 
     def get_map_spec(
@@ -66,10 +66,10 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
                 "fn": lambda x, k=0: pa.array(
                     to_numpy(x.data) + salt + (k if self.dtype != "str" else str(k))
                 ),
-                "expected_result": ArrowArrayColumn(
+                "expected_result": ArrowScalarColumn(
                     to_numpy(self.col.data) + salt + kwarg
                 ),
-                "output_type": ArrowArrayColumn,
+                "output_type": ArrowScalarColumn,
             }
 
         else:
@@ -77,10 +77,10 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
                 "fn": lambda x, k=0: x.as_py()
                 + salt
                 + (k if self.dtype != "str" else str(k)),
-                "expected_result": ArrowArrayColumn(
+                "expected_result": ArrowScalarColumn(
                     to_numpy(self.col.data) + salt + kwarg
                 ),
-                "output_type": ArrowArrayColumn,
+                "output_type": ArrowScalarColumn,
             }
 
     def get_filter_spec(
@@ -128,7 +128,7 @@ class ArrowArrayColumnTestBed(AbstractColumnTestBed):
             assert data1 == data2
 
 
-@pytest.fixture(**column_parametrize([ArrowArrayColumnTestBed]))
+@pytest.fixture(**column_parametrize([ArrowScalarColumnTestBed]))
 def testbed(request, tmpdir):
     testbed_class, config = request.param
     return testbed_class(**config, tmpdir=tmpdir)
@@ -137,7 +137,7 @@ def testbed(request, tmpdir):
 def test_init_block():
     block_view = TensorBlock(torch.zeros(10, 10))[0]
     with pytest.raises(ValueError):
-        ArrowArrayColumn(block_view)
+        ArrowScalarColumn(block_view)
 
 
 def test_to_numpy(testbed):

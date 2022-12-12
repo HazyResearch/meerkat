@@ -12,7 +12,7 @@ import torch
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 

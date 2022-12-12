@@ -15,7 +15,7 @@ from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import Column
 from meerkat.tools.utils import MeerkatLoader
 
-from .lambda_block import LambdaBlock
+from .lambda_block import DeferredBlock
 from .ref import BlockRef
 
 
@@ -53,7 +53,7 @@ class BlockManager(MutableMapping):
         parents = defaultdict(list)
 
         for block_id, block_ref in self._block_refs.items():
-            if isinstance(block_ref.block, LambdaBlock):
+            if isinstance(block_ref.block, DeferredBlock):
 
                 for arg in block_ref.block.data.args + list(
                     block_ref.block.data.kwargs.values()
@@ -67,7 +67,7 @@ class BlockManager(MutableMapping):
 
         current = []  # get a set of all the nodes without an incoming edge
         for block_id, block_ref in self._block_refs.items():
-            if not parents[block_id] or not isinstance(block_ref.block, LambdaBlock):
+            if not parents[block_id] or not isinstance(block_ref.block, DeferredBlock):
                 current.append((block_id, block_ref))
 
         while current:
@@ -81,13 +81,13 @@ class BlockManager(MutableMapping):
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """"""
-        from .lambda_block import LambdaBlock
+        from .lambda_block import DeferredBlock
 
         results = None
         indexed_inputs = {}
         for _, block_ref in self.topological_block_refs():
 
-            if isinstance(block_ref.block, LambdaBlock):
+            if isinstance(block_ref.block, DeferredBlock):
                 # defer computation of lambda columns, since they may be functions of
                 # the other columns
                 result = block_ref.apply(
@@ -325,7 +325,7 @@ class BlockManager(MutableMapping):
             block: AbstractBlock = block_ref.block
             block_dir = os.path.join(blocks_dir, str(block_id))
 
-            if isinstance(block, LambdaBlock):
+            if isinstance(block, DeferredBlock):
                 block.write(block_dir, written_inputs=written_inputs)
             else:
                 block.write(block_dir)

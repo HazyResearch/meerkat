@@ -58,6 +58,6 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
         dfs.append(df)
     df = mk.concat(dfs)
 
-    df["image"] = mk.LambdaColumn(df["raw_image"], Image.fromarray)
+    df["image"] = mk.DeferredColumn(df["raw_image"], Image.fromarray)
 
     return df

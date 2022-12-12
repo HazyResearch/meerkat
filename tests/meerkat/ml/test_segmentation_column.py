@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.ml.segmentation_column import SegmentationOutputColumn
 
 logits_multi = torch.tensor(

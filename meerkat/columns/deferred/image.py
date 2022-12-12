@@ -7,7 +7,7 @@ from typing import Callable, Union
 
 from PIL import Image
 
-from meerkat.columns.file_column import FileColumn
+from meerkat.columns.deferred.file import FileColumn
 from meerkat.interactive.formatter import PILImageFormatter
 
 logger = logging.getLogger(__name__)

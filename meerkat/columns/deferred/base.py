@@ -10,7 +10,7 @@ import numpy as np
 import yaml
 
 from meerkat.block.abstract import BlockView
-from meerkat.block.lambda_block import LambdaBlock, LambdaCellOp, LambdaOp
+from meerkat.block.lambda_block import DeferredBlock, DeferredCellOp, DeferredOp
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column
 from meerkat.errors import ConcatWarning, ImmutableError
@@ -22,8 +22,8 @@ Image = LazyLoader("PIL.Image")
 logger = logging.getLogger(__name__)
 
 
-class LambdaCell(AbstractCell):
-    def __init__(self, data: LambdaCellOp):
+class DeferredCell(AbstractCell):
+    def __init__(self, data: DeferredCellOp):
         self._data = data
 
     @property
@@ -42,20 +42,23 @@ class LambdaCell(AbstractCell):
         return f"{self.__class__.__qualname__}(fn={name})"
 
 
-class LambdaColumn(Column):
+class DeferredColumn(Column):
 
-    block_class: type = LambdaBlock
+    block_class: type = DeferredBlock
 
     def __init__(
         self,
-        data: Union[LambdaOp, BlockView],
+        data: Union[DeferredOp, BlockView],
         output_type: type = None,
         *args,
         **kwargs,
     ):
         self._output_type = output_type
-        super(LambdaColumn, self).__init__(data, *args, **kwargs)
-
+        super(DeferredColumn, self).__init__(data, *args, **kwargs)
+    
+    def __call__(self):
+        # TODO(Sabri): Make this a more efficient call
+        return self._get(index=np.arange(len(self)), materialize=True)
 
     def _set(self, index, value):
         raise ImmutableError("LambdaColumn is immutable.")
@@ -66,10 +69,10 @@ class LambdaColumn(Column):
         version."""
         return self.data.fn
 
-    def _create_cell(self, data: object) -> LambdaCell:
-        return LambdaCell(data=data)
+    def _create_cell(self, data: object) -> DeferredCell:
+        return DeferredCell(data=data)
 
-    def _get(self, index, materialize: bool = True, _data: np.ndarray = None):
+    def _get(self, index, materialize: bool = False, _data: np.ndarray = None):
         index = self._translate_index(index)
         data = self.data._get(index=index, materialize=materialize)
 
@@ -92,7 +95,7 @@ class LambdaColumn(Column):
         return super()._state_keys() | {"_output_type"}
 
     @staticmethod
-    def concat(columns: Sequence[LambdaColumn]):
+    def concat(columns: Sequence[DeferredColumn]):
         for c in columns:
             if c.fn != columns[0].fn:
                 warnings.warn(
@@ -100,10 +103,9 @@ class LambdaColumn(Column):
                 )
                 break
 
-        return columns[0]._clone(data=LambdaOp.concat([c.data for c in columns]))
+        return columns[0]._clone(data=DeferredOp.concat([c.data for c in columns]))
 
     def _write_data(self, path):
-        # TODO (Sabri): avoid redundant writes in dataframes
         return self.data.write(os.path.join(path, "data"))
 
     def is_equal(self, other: Column) -> bool:
@@ -114,7 +116,7 @@ class LambdaColumn(Column):
     @staticmethod
     def _read_data(path: str):
         try:
-            return LambdaOp.read(path=os.path.join(path, "data"))
+            return DeferredOp.read(path=os.path.join(path, "data"))
         except KeyError:
             # TODO(Sabri): Remove this in a future version, once we no longer need to
             # support old DataFrames.
@@ -135,7 +137,7 @@ class LambdaColumn(Column):
 
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
 
-            return LambdaOp(
+            return DeferredOp(
                 args=[col],
                 kwargs={},
                 fn=state["fn"],

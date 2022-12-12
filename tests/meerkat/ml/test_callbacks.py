@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 from meerkat import DataFrame
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
-from meerkat.columns.torch_column import TorchTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.ml import ActivationCallback, load_activations
 
 

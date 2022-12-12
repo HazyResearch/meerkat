@@ -15,7 +15,7 @@ from pandas.io.formats.format import format_array
 from PIL.Image import Image
 
 if TYPE_CHECKING:
-    from meerkat.columns.file_column import FileCell
+    from meerkat.columns.deferred.file import FileCell
 
 
 class Formatter(ABC):
@@ -179,9 +179,9 @@ class PILImageFormatter(Formatter):
     def encode(
         self, cell: Union["FileCell", Image, torch.Tensor], thumbnail: bool = False
     ) -> str:
-        from meerkat.columns.lambda_column import LambdaCell
+        from meerkat.columns.deferred.base import DeferredCell
 
-        if isinstance(cell, LambdaCell):
+        if isinstance(cell, DeferredCell):
             cell = cell.get()
 
         if torch.is_tensor(cell) or isinstance(cell, np.ndarray):

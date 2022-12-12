@@ -19,7 +19,7 @@ from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
 @dataclass
-class LambdaCellOp:
+class DeferredCellOp:
     args: List[any]
     kwargs: Dict[str, any]
     fn: callable
@@ -28,7 +28,7 @@ class LambdaCellOp:
 
     @staticmethod
     def prepare_arg(arg):
-        from ..columns.lambda_column import AbstractCell
+        from ..columns.deferred.base import AbstractCell
 
         if isinstance(arg, AbstractCell):
             return arg.get()
@@ -85,7 +85,7 @@ class LambdaCellOp:
 
 
 @dataclass
-class LambdaOp:
+class DeferredOp:
     args: List[mk.Column]
     kwargs: Dict[str, mk.Column]
     fn: callable
@@ -95,7 +95,7 @@ class LambdaOp:
     return_index: Union[str, int] = None
 
     @staticmethod
-    def concat(ops: Sequence[LambdaOp]):
+    def concat(ops: Sequence[DeferredOp]):
         """Concatenate a sequence of operations."""
         if len(ops) == 0:
             raise ValueError("Cannot concatenate empty sequence of LambdaOp.")
@@ -252,7 +252,7 @@ class LambdaOp:
                     output = output[self.return_index]
                 return output
             else:
-                return LambdaCellOp(
+                return DeferredCellOp(
                     fn=self.fn,
                     args=args,
                     kwargs=kwargs,
@@ -300,14 +300,14 @@ class LambdaOp:
 
             else:
                 if single_on_batched:
-                    return LambdaCellOp(
+                    return DeferredCellOp(
                         fn=self.fn,
                         args=args,
                         kwargs=kwargs,
                         is_batched_fn=self.is_batched_fn,
                         return_index=self.return_index,
                     )
-                return LambdaOp(
+                return DeferredOp(
                     fn=self.fn,
                     args=args,
                     kwargs=kwargs,
@@ -327,12 +327,12 @@ class LambdaOp:
 
     def with_return_index(self, index: Union[str, int]):
         """Return a copy of the operation with a new return index."""
-        op: LambdaOp = copy(self)
+        op: DeferredOp = copy(self)
         op.return_index = index
         return op
 
 
-class LambdaBlock(AbstractBlock):
+class DeferredBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
         klass: type
@@ -344,25 +344,25 @@ class LambdaBlock(AbstractBlock):
     @property
     def signature(self) -> Hashable:
         return self.Signature(
-            klass=LambdaBlock,
+            klass=DeferredBlock,
             fn=self.data.fn,
             args=tuple(map(id, self.data.args)),
             kwargs=tuple(sorted((k, id(v)) for k, v in self.data.kwargs.items())),
         )
 
-    def __init__(self, data: LambdaOp):
+    def __init__(self, data: DeferredOp):
 
         self.data = data
 
     @classmethod
-    def from_column_data(cls, data: LambdaOp) -> Tuple[LambdaBlock, BlockView]:
+    def from_column_data(cls, data: DeferredOp) -> Tuple[DeferredBlock, BlockView]:
         block_index = data.return_index
         data = data.with_return_index(None)
         block = cls(data=data)
         return BlockView(block=block, block_index=block_index)
 
     @classmethod
-    def from_block_data(cls, data: LambdaOp) -> Tuple[AbstractBlock, BlockView]:
+    def from_block_data(cls, data: DeferredOp) -> Tuple[AbstractBlock, BlockView]:
         return cls(data=data)
 
     @classmethod
@@ -383,7 +383,7 @@ class LambdaBlock(AbstractBlock):
             for kwarg, column in op.kwargs.items()
         }
 
-        block = LambdaBlock.from_block_data(op)
+        block = DeferredBlock.from_block_data(op)
 
         columns = {
             name: col._clone(data=block[col._block_index])
@@ -467,4 +467,4 @@ class LambdaBlock(AbstractBlock):
         path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ) -> object:
         path = os.path.join(path, "data.op")
-        return LambdaOp.read(path, read_inputs=read_inputs)
+        return DeferredOp.read(path, read_inputs=read_inputs)
