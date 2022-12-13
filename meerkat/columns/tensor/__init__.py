@@ -1,5 +1,3 @@
-from .numpy import NumPyTensorColumn
-
-TensorColumn = NumPyTensorColumn
+from .abstract import TensorColumn
 
 __all__ = ["TensorColumn"]

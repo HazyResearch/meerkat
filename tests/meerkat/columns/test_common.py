@@ -29,14 +29,14 @@ from .tensor.test_torch import TorchTensorColumnTestBed
 @pytest.fixture(
     **column_parametrize(
         [
-            NumPyTensorColumnTestBed,
-            PandasScalarColumnTestBed,
-            TorchTensorColumnTestBed,
-            DeferredColumnTestBed,
-            ArrowScalarColumnTestBed,
-            FileColumnTestBed,
+            # NumPyTensorColumnTestBed,
+            # PandasScalarColumnTestBed,
+            # TorchTensorColumnTestBed,
+            # DeferredColumnTestBed,
+            # ArrowScalarColumnTestBed,
+            # FileColumnTestBed,
             ImageColumnTestBed,
-            AudioColumnTestBed,
+            # AudioColumnTestBed,
         ]
     )
 )
@@ -78,6 +78,7 @@ def test_getitem(column_testbed, index_type: type):
         col_index = index_type(index) if not isinstance(index, slice) else index
         data = column_testbed.get_data(index)
         result = col[col_index]
+
         if isinstance(result, DeferredColumn):
             result = result()
         column_testbed.assert_data_equal(data, result.data)

@@ -212,6 +212,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         elif isinstance(data1, Column):
             assert data1.is_equal(data2)
         elif torch.is_tensor(data1):
+            print(data2)
             assert (data1 == data2).all()
         elif isinstance(data1, DeferredCell):
             assert data1 == data2

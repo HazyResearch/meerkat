@@ -12,7 +12,7 @@ from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
 
 from .abstract import ScalarColumn
-
+from ..abstract import Column 
 
 class ArrowScalarColumn(ScalarColumn):
 
