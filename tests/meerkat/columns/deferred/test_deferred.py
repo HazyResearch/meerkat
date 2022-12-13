@@ -31,7 +31,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
         seed: int = 123,
         tmpdir: str = None,
     ):
-        to_lambda_kwargs = {
+        defer_kwargs = {
             "is_batched_fn": batched,
             "batch_size": 4 if batched else 1,
         }
@@ -39,7 +39,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
         np.random.seed(seed)
         array = np.random.random(length) * 10
         self.col = mk.NumPyTensorColumn(array).defer(
-            function=lambda x: x + 2, **to_lambda_kwargs
+            function=lambda x: x + 2, **defer_kwargs
         )
         self.data = array + 2
 
@@ -99,12 +99,12 @@ def testbed(request, tmpdir):
 
 
 @pytest.mark.parametrize("col_type", [NumPyTensorColumn, NumPyTensorColumn, ObjectColumn])
-def test_column_to_lambda(col_type: Type):
+def test_column_defer(col_type: Type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col
 
     # Build a dataset from a batch
-    lambda_col = col.to_lambda(lambda x: x + 1)
+    lambda_col = col.defer(lambda x: x + 1)
 
     assert isinstance(lambda_col, DeferredColumn)
     assert (lambda_col() == testbed.array[testbed.visible_rows] + 1).all()
@@ -114,7 +114,7 @@ def test_column_to_lambda(col_type: Type):
     "use_visible_columns",
     [True, False],
 )
-def test_df_to_lambda(use_visible_columns: bool):
+def test_df_defer(use_visible_columns: bool):
     length = 16
     testbed = MockDatapanel(
         use_visible_columns=use_visible_columns,
@@ -137,8 +137,8 @@ def test_composed_lambda_columns(col_type: Type):
     testbed = MockColumn(col_type=col_type)
 
     # Build a dataset from a batch
-    lambda_col = testbed.col.to_lambda(lambda x: x + 1)
-    lambda_col = lambda_col.to_lambda(lambda x: x + 1)
+    lambda_col = testbed.col.defer(lambda x: x + 1)
+    lambda_col = lambda_col.defer(lambda x: x + 1)
 
     assert (lambda_col() == testbed.array[testbed.visible_rows] + 2).all()
 
@@ -174,15 +174,15 @@ def test_col_concat(col_type):
     def fn(x):
         return x + 1
 
-    col_a = col.to_lambda(fn)
-    col_b = col.to_lambda(fn)
+    col_a = col.defer(fn)
+    col_b = col.defer(fn)
 
     out = mk.concat([col_a, col_b])
 
     assert isinstance(out, DeferredColumn)
     assert (out().data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
-    col_a = col.to_lambda(fn)
-    col_b = col.to_lambda(lambda x: x)
+    col_a = col.defer(fn)
+    col_b = col.defer(lambda x: x)
     with pytest.warns(ConcatWarning):
         out = mk.concat([col_a, col_b])
