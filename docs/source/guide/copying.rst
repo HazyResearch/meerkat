@@ -12,7 +12,7 @@ Consider the following example:
 .. code-block:: python
 
    >>> import meerkat as mk
-   >>> col1 = mk.NumpyArrayColumn(np.arange(10))
+   >>> col1 = mk.TensorColumn(np.arange(10))
    >>> col2 = col1[:4]
    >>> col2[0] = -1
    >>> print(col1[0])
@@ -34,7 +34,7 @@ copying and viewing behavior.
 
 We'll begin by defining some terms: coreferences, views and copies. These terms describe
 the different relationships that could exist between two variables pointing to 
-:class:`~meerkat.AbstractColumn` or :class:`~meerkat.DataFrame` objects. Then, we'll 
+:class:`~meerkat.Column` or :class:`~meerkat.DataFrame` objects. Then, we'll 
 discuss how to know whether indexing a Meerkat data structures will result in a copy, 
 coreference or view.
 
@@ -47,7 +47,7 @@ Columns
 Let’s enumerate the different relationships that could
 exist between two column variables ``col1`` and ``col2``.
 
-**Coreferences -** Both variables refer to the same :class:`~meerkat.AbstractColumn`
+**Coreferences -** Both variables refer to the same :class:`~meerkat.Column`
 object.
 
 .. code:: python
@@ -58,7 +58,7 @@ object.
 Of course, in this case, anything changes made to ``col1`` will also be
 made to ``col2`` and vice versa.
 
-**Views -** The variables refer to different :class:`~meerkat.AbstractColumn` objects
+**Views -** The variables refer to different :class:`~meerkat.Column` objects
 (*i.e.* ``col1 is not col1``), but modifying the data of ``col1``
 affects ``col2`` :
 
@@ -120,7 +120,7 @@ affects ``col2`` :
 
    If we’d like attributes, we’ll have to use "*Deep Copies".*
 
-**Copies**\ *–* The variables refer to different :class:`~meerkat.AbstractColumn`
+**Copies**\ *–* The variables refer to different :class:`~meerkat.Column`
 objects (*i.e.* ``col1 is not col1``), and modifying the data of
 ``col1`` does **not** affect ``col2``
 
@@ -245,17 +245,17 @@ In Meerkat, we select rows by indexing with ``int``, ``slice`` ,
 ``Sequence[int]``, or an ``np.ndarray`` , ``torch.Tensor``,
 ``pandas.Series`` with an integer or boolean type.
 
-We can select rows from an :class:`~meerkat.AbstractColumn`\ …
+We can select rows from an :class:`~meerkat.Column`\ …
 
 .. code:: python
 
-   col: mk.AbstractColumn = ...
+   col: mk.Column = ...
    # (1) int -> single value
    value: object = col[0] 
    # (2) slice -> a sub column
-   new_col: mk.AbstractColumn = col[0:10]
+   new_col: mk.Column = col[0:10]
    # (3) sequence -> a sub column
-   new_col: mk.AbstractColumn = col[[0, 4, 6]]
+   new_col: mk.Column = col[[0, 4, 6]]
 
 … or from a ``DataFrame``
 
@@ -343,7 +343,7 @@ with ``str`` or a ``Sequence[str]`` :
 .. code:: python
 
    # (1) `str` -> single column
-   col: mk.AbstractColumn = df["col_a"]
+   col: mk.Column = df["col_a"]
    # (2) `Sequence[str]` -> multiple columns
    df: mk.DataFrame = df[["col_a", "col_b"]]
 
@@ -353,7 +353,7 @@ a
 to the underlying column(s) – *not* a copy or view.
 
 (1) Indexing a single column (*i.e.* with a ``str``) returns the
-    underlying :class:`~meerkat.AbstractColumn` object directly. In the example below
+    underlying :class:`~meerkat.Column` object directly. In the example below
     ``col1`` and ``col2`` are
     `coreferences <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
     of the same column.
@@ -361,8 +361,8 @@ to the underlying column(s) – *not* a copy or view.
 .. code:: python
 
    # (1) `str` -> single column
-   >>> col1: mk.AbstractColumn = df["col_a"]
-   >>> col2: mk.AbstractColumn = df["col_a"]
+   >>> col1: mk.Column = df["col_a"]
+   >>> col2: mk.Column = df["col_a"]
    >>> col1 is col2
    True
 
@@ -371,8 +371,8 @@ to the underlying column(s) – *not* a copy or view.
     of the ``DataFrame`` holding
     `coreferences <https://www.notion.so/meerkat-working-doc-40d70d094ac0495684d3fd8ddc809343>`__
     to the columns in the original ``DataFrame``. This means the
-    :class:`~meerkat.AbstractColumn` objects held in the new ``DataFrame`` are the
-    same :class:`~meerkat.AbstractColumn` objects held in the original ``DataFrame``.
+    :class:`~meerkat.Column` objects held in the new ``DataFrame`` are the
+    same :class:`~meerkat.Column` objects held in the original ``DataFrame``.
 
 .. code:: python
 

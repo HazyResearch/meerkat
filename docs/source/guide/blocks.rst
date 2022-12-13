@@ -12,7 +12,7 @@ The most important internal piece of the Meerkat :class:`~meerkat.DataFrame` imp
 
   1. A reference to the block (`self.block`)
   2. A set of columns in the :class:`~meerkat.block.manager.BlockManager` whose data live in the `Block`
-- :class:`~meerkat.mixins.blockable.BlockableMixin` - a mixin used with `AbstractColumn` that holds references to a column's block and the columns index in the block
+- :class:`~meerkat.mixins.blockable.BlockableMixin` - a mixin used with `Column` that holds references to a column's block and the columns index in the block
 - :class:`~meerkat.block.abstract.BlockView` - a simple DataClass holding a block and an index into the block. It is typical for new columns to be created from `BlockView`
 
 
@@ -24,7 +24,7 @@ Manages all the columns in a :class:`~meerkat.DataFrame` and holds references
 two collections:
 
 -  ``_columns``, a dictionary mapping from column names to
-   ``AbstractColumn``
+   ``Column``
 -  ``_block_refs``, a dictionary mapping from the blocks id to
    ``BlockRef``
 
@@ -84,5 +84,5 @@ Multiple A block can exist in multiple .
 ``BlockableMixin``
 ~~~~~~~~~~~~~~~~~~
 
-This is mixed into ``AbstractColumn`` subclasses that can take part of a
+This is mixed into ``Column`` subclasses that can take part of a
 block (*e.g.*

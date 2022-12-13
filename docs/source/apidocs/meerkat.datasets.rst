@@ -13,13 +13,18 @@ Subpackages
    meerkat.datasets.dew
    meerkat.datasets.eeg
    meerkat.datasets.enron
+   meerkat.datasets.expw
+   meerkat.datasets.fer
    meerkat.datasets.gqa
    meerkat.datasets.imagenet
    meerkat.datasets.imagenette
    meerkat.datasets.inaturalist
+   meerkat.datasets.lvis
    meerkat.datasets.mimic
-   meerkat.datasets.mir
+   meerkat.datasets.mirflickr
+   meerkat.datasets.ngoa
    meerkat.datasets.pascal
+   meerkat.datasets.rfw
    meerkat.datasets.siim_cxr
    meerkat.datasets.torchaudio
    meerkat.datasets.torchvision
@@ -35,14 +40,6 @@ meerkat.datasets.abstract module
 --------------------------------
 
 .. automodule:: meerkat.datasets.abstract
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-meerkat.datasets.fsdd module
-----------------------------
-
-.. automodule:: meerkat.datasets.fsdd
    :members:
    :undoc-members:
    :show-inheritance:

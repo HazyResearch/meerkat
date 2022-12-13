@@ -1,13 +1,12 @@
 
-Lambda Columns and Lazy Selection
-==================================
+Deferred Columns
+=================
 
-Lambda Columns
---------------
+*Motivation.* When working with multimodal datasets, the data in some columns may fit easily in memory, while others are best kept on disk and loaded only when needed. For example, in an image dataset, the image labels and metadata are small and may fit in memory, while the images themselves are large and should stay on disk until they are needed.
 
-If you check out the implementation of :class:`~meerkat.ImageColumn`, you'll notice that it's a super simple subclass of :class:`~meerkat.LambdaColumn`. 
+In Meerkat, columns like :class:`~meerkat.ImageColumn` and :class:`~meerkat.AudioColumn` make it easy to work with complex data types that can't fit in memory. If you check out the implementation of these classes, you'll notice that they are super simple subclasses of :class:`~meerkat.DeferredColumn`.  
 
-*What's a LambdaColumn?* In Meerkat, high-dimensional data types like images and videos are typically stored in a :class:`~meerkat.LambdaColumn`. A  :class:`~meerkat.LambdaColumn` wraps around another column and applies a function to it's content as it is indexed. 
+*What's a DeferredColumn?* A  :class:`~meerkat.DeferredColumn` wraps around another column and applies a function to it's content. You can think of it as a deferred map operation. 
 
 Consider the following example, where we create a simple Meerkat column...    
 
@@ -15,7 +14,7 @@ Consider the following example, where we create a simple Meerkat column...
 
     import meerkat as mk
 
-    col = mk.NumpyArrayColumn([0,1,2])
+    col = mk.Column([0,1,2])
     col[1]
 
   
@@ -23,11 +22,11 @@ Consider the following example, where we create a simple Meerkat column...
 
 .. ipython:: python
 
-    lambda_col = col.to_lambda(function=lambda x: x + 10)
-    lambda_col[1]  # the function is only called at this point!
+    dcol = col.defer(function=lambda x: x + 10)
+    dcol[[0,2]]()
 
 
-Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.LambdaColumn` that lazily loads images...
+Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.DeferredColumn` that lazily loads images...
 
 .. ipython:: python
     :verbatim:
@@ -40,15 +39,15 @@ Critically, the function inside a lambda column is only called at the time the c
             "image_id": ["image0", ...] 
         }
     )
-    df["image"] = df["filepath"].to_lambda(fn=Image.open)
+    df["image"] = df["filepath"].defer(fn=Image.open)
 
 Notice how we provide an absolute path to the images. This makes the column useable from any working directory. 
-However, using absolute paths is in other ways not ideal: what if we want to share the DataFrame and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.LambdaColumn` that makes it easy to manage filepaths. 
+However, using absolute paths is in other ways not ideal: what if we want to share the DataFrame and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.DeferredColumn` that makes it easy to manage filepaths. 
 
 FileColumn
 ########### 
 
-As discussed above, :class:`~meerkat.LambdaColumn`s are commonly used to load files from disk. To make it easier to work with file loading columns, Meerkat provides the :class:`~meerkat.FileColumn`, a simple subclass of :class:`~meerkat.LambdaColumn`. 
+As discussed above, :class:`~meerkat.DeferredColumn`s are commonly used to load files from disk. To make it easier to work with file loading columns, Meerkat provides the :class:`~meerkat.FileColumn`, a simple subclass of :class:`~meerkat.DeferredColumn`. 
 
 The :class:`~meerkat.FileColumn` constructor takes an additional argument, ``base_dir``, which is the base directory from which all file paths are relative. 
 When ``base_dir`` is provided, the paths passed to ``filepaths`` should be relative to ``base_dir``:
@@ -81,10 +80,3 @@ The ``base_dir`` can then be changed at any time, so if we wanted to share the D
     
 
 An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.FileColumn` like this one, with a few more bells and whistles!
-
-Lazy Selection
---------------
-
-.. todo::
-
-    Fill in this stub.

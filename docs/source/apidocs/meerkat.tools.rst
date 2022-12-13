@@ -12,6 +12,14 @@ meerkat.tools.lazy\_loader module
    :undoc-members:
    :show-inheritance:
 
+meerkat.tools.registry module
+-----------------------------
+
+.. automodule:: meerkat.tools.registry
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.tools.utils module
 --------------------------
 

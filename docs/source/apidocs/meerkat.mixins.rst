@@ -4,6 +4,14 @@ meerkat.mixins package
 Submodules
 ----------
 
+meerkat.mixins.aggregate module
+-------------------------------
+
+.. automodule:: meerkat.mixins.aggregate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.mixins.blockable module
 -------------------------------
 
@@ -28,10 +36,34 @@ meerkat.mixins.collate module
    :undoc-members:
    :show-inheritance:
 
+meerkat.mixins.deferable module
+-------------------------------
+
+.. automodule:: meerkat.mixins.deferable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.mixins.file module
 --------------------------
 
 .. automodule:: meerkat.mixins.file
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.mixins.identifiable module
+----------------------------------
+
+.. automodule:: meerkat.mixins.identifiable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.mixins.indexing module
+------------------------------
+
+.. automodule:: meerkat.mixins.indexing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,14 +84,6 @@ meerkat.mixins.io module
    :undoc-members:
    :show-inheritance:
 
-meerkat.mixins.lambdable module
--------------------------------
-
-.. automodule:: meerkat.mixins.lambdable
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 meerkat.mixins.mapping module
 -----------------------------
 
@@ -68,10 +92,10 @@ meerkat.mixins.mapping module
    :undoc-members:
    :show-inheritance:
 
-meerkat.mixins.materialize module
----------------------------------
+meerkat.mixins.reactifiable module
+----------------------------------
 
-.. automodule:: meerkat.mixins.materialize
+.. automodule:: meerkat.mixins.reactifiable
    :members:
    :undoc-members:
    :show-inheritance:

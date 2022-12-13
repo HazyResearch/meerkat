@@ -4,10 +4,10 @@ meerkat.pipelines package
 Submodules
 ----------
 
-meerkat.pipelines.entitydataframe module
+meerkat.pipelines.entitydatapanel module
 ----------------------------------------
 
-.. automodule:: meerkat.pipelines.entitydataframe
+.. automodule:: meerkat.pipelines.entitydatapanel
    :members:
    :undoc-members:
    :show-inheritance:

@@ -35,7 +35,7 @@ DataFrame.
     :column: col-lg-12 p-2
 
 
-    **Selecting a Single Column**: ``str`` -> :class:`~meerkat.AbstractColumn`
+    **Selecting a Single Column**: ``str`` -> :class:`~meerkat.Column`
     ^^^^^^^^^^^^^^
 
     To select a single column, we simply pass it's name to the index operator. For example,
@@ -199,7 +199,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     * ``np.ndarray[np.integer]`` - a NumPy NDArray with `dtype` `np.integer`.
     * ``pd.Series[np.integer]`` - a Pandas Series with `dtype` `np.integer`.
     * ``torch.Tensor[torch.int64]`` - a PyTorch Tensor with `dtype` `torch.int`.
-    * ``mk.AbstractColumn`` - a Meerkat column who's cells are ``int``, ``np.integer``, or ``torch.int64``.  
+    * ``mk.Column`` - a Meerkat column who's cells are ``int``, ``np.integer``, or ``torch.int64``.  
 
     This is useful when the rows are neither coontiguous nor evenly spaced (otherwise slice 
     indexing, described above, is faster).    
@@ -226,7 +226,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     * ``np.ndarray[bool]`` - a NumPy NDArray with `dtype` `bool`.
     * ``pd.Series[bool]`` - a Pandas Series with `dtype` `bool`.
     * ``torch.Tensor[torch.bool]`` - a PyTorch Tensor with `dtype` `torch.bool`.
-    * ``mk.AbstractColumn`` - a Meerkat column who's cells are ``int``, ``bool``, or ``torch.bool``.  
+    * ``mk.Column`` - a Meerkat column who's cells are ``int``, ``bool``, or ``torch.bool``.  
 
     This is very useful for quickly selecting a subset of rows that satisfy a predicate 
     (like you might do with a ``WHERE`` clause in SQL). 
@@ -244,10 +244,10 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     See :doc:`copying` for more information.
     
     You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
-    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`NumpyArrayColumn`). 
+    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`TensorColumn`). 
     
     In general, columns inherit the copying behavior of their underlying data structure. 
-    For example, a :class:`NumpyArrayColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
+    For example, a :class:`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
     See a more detailed discussion in :doc:`copying`. 
 
 
