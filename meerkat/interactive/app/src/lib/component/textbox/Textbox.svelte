@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { type Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 
 	export let text: Writable<string>;
 	export let title: string = '';
+
+	let timer: any;
+
+	const debounce = (v: string) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			$text = v;
+		}, 300);
+	}
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
@@ -11,18 +20,12 @@
 			{title}
 		</div>
 	{/if}
-	<div class="form-control">
-		<div class="input-group w-100% flex items-center">
-			<input
-				type="text"
-				placeholder="Write some text..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={(e) => {
-					if (e.charCode == 13) {
-						$text = e.target.value;
-					}
-				}}
-			/>
-		</div>
+	<div class="px-2 w-full flex items-center">
+		<input
+			type="text"
+			placeholder="Write some text..."
+			class="grow h-10 px-3 rounded-md shadow-md"
+			on:keyup={({ target: { value } }) => debounce(value)}
+		/>
 	</div>
 </div>

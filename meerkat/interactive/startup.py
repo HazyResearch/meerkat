@@ -3,6 +3,7 @@
 Code is heavily borrowed from Gradio.
 """
 
+import atexit
 import fnmatch
 import os
 import pathlib
@@ -12,6 +13,7 @@ import subprocess
 import time
 from tempfile import mkstemp
 
+import rich
 from uvicorn import Config
 
 from meerkat.interactive.api import MeerkatAPI
@@ -68,11 +70,13 @@ def get_first_available_port(initial: int, final: int) -> int:
     Returns:
         port: the first open port in the range
     """
+    rich.print(f"Trying to find an open port in ({initial}, {final}). ", end="")
     for port in range(initial, final):
         try:
-            s = socket.socket()  # create a socket object
-            s.bind((LOCALHOST_NAME, port))  # Bind to the port
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
+            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
             s.close()
+            rich.print(f"Found open port: {port}")
             return port
         except OSError:
             pass
@@ -137,7 +141,7 @@ def start(
     # Start the npm server
     if npm_port is None:
         npm_port = get_first_available_port(
-            INITIAL_PORT_VALUE, INITIAL_PORT_VALUE + TRY_NUM_PORTS
+            api_port + 1, api_port + 1 + TRY_NUM_PORTS
         )
     else:
         npm_port = get_first_available_port(npm_port, npm_port + 1)
@@ -167,28 +171,73 @@ def start(
         current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
     else:
         current_env.update({"VITE_API_URL": network_info.api_server_url})
-    
+
     # open a temporary file to write the output of the npm process
     out_file, out_path = mkstemp(suffix=".out")
     err_file, err_path = mkstemp(suffix=".err")
-    
+
     if dev:
-        npm_process = subprocess.Popen(
-            [
-                "npm",
-                "run",
-                "dev",
-                "--",
-                "--port",
-                str(npm_port),
-                "--logLevel",
-                "info",
-            ],
-            env=current_env,
-            stdout=out_file,
-        )
+        
+        # KG: this is fallback code because we previously noticed that the
+        # socket.bind call in the get_first_available_port function was not
+        # always working. I've changed that to use the socket.connect_ex
+        # method, which should be more reliable, but I'm leaving this code
+        # here in case we need it again.
+        for i in range(TRY_NUM_PORTS):
+            rich.print("Trying port:", npm_port + i, end="\r")
+
+            # Run the npm server in dev mode
+            # KG: Ideally, this should work on the first go
+            npm_process = subprocess.Popen(
+                [
+                    "npm",
+                    "run",
+                    "dev",
+                    "--",
+                    "--port",
+                    str(npm_port + i),
+                    "--strictPort",
+                    "true",
+                    "--logLevel",
+                    "info",
+                ],
+                env=current_env,
+                stdout=out_file,
+                # stderr=err_file,
+            )
+            network_info.npm_process = npm_process
+            network_info.npm_out_path = out_path
+            network_info.npm_err_path = err_path
+            
+            # We need to wait for the npm server to start up
+            # When it does, we read its stdout to get the port it's using
+
+            # KG: this should no longer be required, since we now use the 
+            # --strictPort flag for vite, which will not allow vite
+            # to automatically select a port if the one we specify is not
+            # available.
+            MAX_WAIT = 100 # 10 seconds total
+            for _ in range(MAX_WAIT):
+                time.sleep(0.1)
+
+                # this is a hack to address the issue that the vite skips over a port that we
+                # deem to be open per `get_first_available_port`
+                # TODO: remove this once we figure out how to properly check for unavailable
+                # ports in a way that is compatible with vite's port selection logic
+                match = re.search(
+                    "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
+                    network_info.npm_server_out,
+                )
+                if match is not None:
+                    break
+
+            if match is not None:
+                break
+            rich.print()
+
     else:
-        print("Building Application...")
+        # Run the npm server in build mode
+        rich.print("Building Application...")
         p = subprocess.Popen(
             [
                 "npm",
@@ -201,12 +250,21 @@ def start(
         )
         while p.poll() is None:
             out = p.stdout.readline()
-            print(out, end='\r')
-        
+            rich.print(out, end="\r")
+        rich.print()
+
         # find + replace VITE_API_URL_PLACEHOLDER for production
         buildpath = libpath / "build"
-        file_find_replace(buildpath, "meerkat-api-url?!?!?!?!", network_info.shareable_api_server_url if shareable else network_info.api_server_url, "*.js")
+        file_find_replace(
+            buildpath,
+            "meerkat-api-url?!?!?!?!",
+            network_info.shareable_api_server_url
+            if shareable
+            else network_info.api_server_url,
+            "*.js",
+        )
 
+        # Run the statically built app with a simple python server
         os.chdir(buildpath)
         npm_process = subprocess.Popen(
             [
@@ -220,34 +278,16 @@ def start(
             stderr=err_file,
         )
         os.chdir(libpath)
-        
+
     network_info.npm_process = npm_process
     network_info.npm_out_path = out_path
-    network_info.npm_err_path = err_path    
-        
+    network_info.npm_err_path = err_path
+
     if dev:
-        MAX_WAIT = 200  # wait 20 seconds roughly 
-        for i in range(MAX_WAIT):
-            time.sleep(0.1)
-
-            # this is a hack to address the issue that the vite skips over a port that we
-            # deem to be open per `get_first_available_port`
-            # TODO: remove this once we figure out how to properly check for unavailable
-            # ports in a way that is compatible with vite's port selection logic
-            match = re.search(
-                "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
-                network_info.npm_server_out,
-            )
-            if match is not None:
-                break
-
-        # TODO(Sabri): add check for Vite actually being installed, and provide instructions
-        # in the error message for fixing
-
         if match is None:
             raise ValueError(
-                f"Failed to start dev server: \
-                out={network_info.npm_server_out} err={network_info.npm_server_err}"
+                f"Failed to start dev server: "
+                f"out={network_info.npm_server_out} err={network_info.npm_server_err}"
             )
         network_info.npm_server_port = int(match.group(2))
     else:
@@ -264,16 +304,27 @@ def start(
     state.network_info = network_info
 
     # Print a message
-    print(
-        f"Meerkat interactive mode started! API on {network_info.api_server_url}, \
-        and GUI server on {network_info.npm_server_url}."
+    rich.print(
+        "Meerkat interactive mode started! API docs on "
+        f"{network_info.api_docs_url} "
+        f"and GUI server on {network_info.npm_server_url}."
     )
     return network_info
 
 
-def output_startup_message(url: str):
-    import rich
+def cleanup():
+    if state.network_info is not None:
+        rich.print("Cleaning up [bold violet]Meerkat[/bold violet]...")
+        state.network_info.api_server.close()
+        state.network_info.npm_process.terminate()
+        state.network_info.npm_process.wait()
 
+
+# Run this when the program exits
+atexit.register(cleanup)
+
+
+def output_startup_message(url: str):
     meerkat_header = "[bold violet]\[Meerkat][/bold violet]"  # noqa: W605
 
     rich.print("")

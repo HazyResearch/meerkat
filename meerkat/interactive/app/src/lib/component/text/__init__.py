@@ -1,11 +1,11 @@
 from typing import Any
-from meerkat.interactive.graph import Store
 
+from meerkat.interactive.graph import Store
 
 from ..abstract import Component
 
 
-class TextDisplay(Component):
+class Text(Component):
 
     data: Store[str]
     dtype: str = None

@@ -31,21 +31,20 @@ export async function post(url: string, data: any): Promise<any> {
 
 
 export async function modify(url: string, data: any): Promise<any> {
-    let modifications = await post(url, data);
+    const modifications = await post(url, data);
     return apply_modifications(modifications);
 }
 
 export function apply_modifications(modifications: Array<any>) {
-    console.log(modifications);
-    for (let modification of modifications) {
+    for (const modification of modifications) {
         if (modification.type === 'ref') {
-            // Box modification
+            // Node modification
             if (!global_stores.has(modification.id)) {
                 // derived objects may not be maintained on the frontend 
                 // TODO: consider adding a mechanism to add new derived objects to the frontend
                 continue
             }
-            let store = global_stores.get(modification.id)
+            const store = global_stores.get(modification.id)
             store.update((value: any) => {
                 value.scope = modification.scope;
                 return value
@@ -53,8 +52,7 @@ export function apply_modifications(modifications: Array<any>) {
             )
         } else if (modification.type === 'store') {
             // Store modification
-            //get_store(store_lock).add(modification.id);
-            let store = global_stores.get(modification.id);
+            const store = global_stores.get(modification.id);
 
             if (store === undefined) {
                 console.log(

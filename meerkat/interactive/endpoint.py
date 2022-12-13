@@ -5,13 +5,17 @@ from typing import Any, Callable, Generic, Union
 
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
-from pydantic.fields import ModelField
 
 from meerkat.interactive.graph import Store, trigger
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
+
+# KG: must declare this dynamically defined model here,
+# otherwise I was getting an error due to FastAPI
+# when only declaring this inside the Endpoint class
+FnPydanticModel = None
 
 
 class SingletonRouter(type):
@@ -300,7 +304,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # - replace arguments that have type-hints which
             #   are subclasses of `IdentifiableMixin` with
             #   strings (i.e. the id of the Identifiable)
-            #   (e.g. `Store` -> `str`, `Reference` -> `str`)
+            #   (e.g. `Store` -> `str`)
             signature = inspect.signature(self.fn)
 
             pydantic_model_params = {}
@@ -310,11 +314,17 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                 has_default = default is not inspect._empty
 
                 if annot is inspect.Parameter.empty:
-                    assert (
-                        has_default
-                    ), f"Parameter {p} must have a type annotation or a default value."
+                    if p == "kwargs":
+                        # Allow arbitrary keyword arguments
+                        pydantic_model_params[p] = (dict, ...)
+                        continue
+
+                    if not has_default:
+                        raise ValueError(
+                            f"Parameter {p} must have a type annotation or a default value."
+                        )
                 elif isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
-                    # e.g. Stores, References must be referred to by str ids when
+                    # e.g. Stores must be referred to by str ids when
                     # passed into the API
                     pydantic_model_params[p] = (str, ...)
                 else:
@@ -327,6 +337,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                 arbitrary_types_allowed = True
 
             # Create the Pydantic model, named `{fn_name}Model`
+            global FnPydanticModel
             FnPydanticModel = create_model(
                 f"{self.fn.__name__.capitalize()}Model",
                 __config__=Config,
@@ -335,23 +346,37 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
             # Create a wrapper function, with kwargs that conform to the
             # Pydantic model, and a return annotation that matches `fn`
-            def _fn(kwargs: FnPydanticModel) -> signature.return_annotation:
+            def _fn(
+                kwargs: FnPydanticModel = Endpoint.EmbeddedBody(),
+            ) -> signature.return_annotation:
                 return self.fn(**kwargs.dict())
 
-            # def _fn(kwargs: Endpoint.EmbeddedBody()) -> signature.return_annotation:
-            #     return self.fn(**kwargs)
+            # from inspect import Parameter, Signature
+            # params = []
+            # for p, (annot, default) in pydantic_model_params.items():
+            #     params.append(
+            #         Parameter(
+            #             p,
+            #             kind=Parameter.POSITIONAL_OR_KEYWORD,
+            #             annotation=annot,
+            #             default=default,
+            #         )
+            #     )
+            # _fn.__signature__ = Signature(params)
 
             # Name the wrapper function the same as `fn`, so it looks nice
             # in the docs
             _fn.__name__ = self.fn.__name__
         else:
+            # If the user specifies a route manually, then they're responsible for
+            # everything, including type-hints and default values.
             signature = inspect.signature(self.fn)
             for p in signature.parameters:
                 annot = signature.parameters[p].annotation
 
                 # If annot is a subclass of `IdentifiableMixin`, replace
                 # it with the `str` type (i.e. the id of the Identifiable)
-                # (e.g. `Store` -> `str`, `Reference` -> `str`)
+                # (e.g. `Store` -> `str`)
                 if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
                     self.fn.__annotations__[p] = str
 
@@ -373,7 +398,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     def __call__(self, *args, **kwargs):
         """Calling the endpoint will just call the raw underlying function."""
         return self.fn(*args, **kwargs)
-    
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -455,10 +480,10 @@ def endpoint(
         return partial(endpoint, prefix=prefix, route=route, method=method)
 
     def _endpoint(fn: Callable):
-        # Gather up all the arguments that are hinted as Stores and References
+        # Gather up all the arguments that are hinted as Stores
         stores = set()
         # Also gather up the hinted arguments that subclass IdentifiableMixin
-        # e.g. Store, Reference, Endpoint, Interface, etc.
+        # e.g. Store, Endpoint, Interface, etc.
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):

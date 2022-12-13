@@ -23,7 +23,7 @@
 	import StatsLabeler from '$lib/component/stats_labeler/StatsLabeler.svelte';
 	import Table from '$lib/component/table/Table.svelte';
 	import Tabs from '$lib/component/tabs/Tabs.svelte';
-	import Textbox from '$lib/component/textbox/Textbox.svelte';
+	import Text from '$lib/component/text/Text.svelte';
 
 	import AutoLayout from '$lib/layouts/AutoLayout.svelte';
 	import Div from '$lib/layouts/Div.svelte';
@@ -31,8 +31,9 @@
 	import Grid from '$lib/layouts/Grid.svelte';
 
 	import Image from './cell/image/Image.svelte';
-	import Basic from './cell/basic/Basic.svelte';
 	import Code from './cell/code/Code.svelte';
+	import CodeDisplay from '$lib/component/codedisplay/CodeDisplay.svelte';
+	import Textbox from '$lib/component/textbox/Textbox.svelte';
 
 	let all_components = {
 		Button: Button,
@@ -54,6 +55,7 @@
 		StatsLabeler: StatsLabeler,
 		Table: Table,
 		Tabs: Tabs,
+		Text: Text,
 		Textbox: Textbox,
 
 		// Layout components
@@ -63,19 +65,21 @@
 		Grid: Grid,
 
 		Image: Image,
-		Text: Basic,
-		Code: Code
+		Code: Code,
+		CodeDisplay: CodeDisplay
 	};
+
+	import { onMount, type ComponentType } from 'svelte';
+	let component: ComponentType;
+	onMount(async () => {
+		if (name in all_components) {
+			component = all_components[name];
+			return;
+		}
+		component = (await import(path)).default;
+	});
 </script>
 
-{#if name in all_components}
-	<svelte:component this={all_components[name]} {...props} />
-{:else}
-	{#await import(path)}
-		Loading {name} component.
-	{:then Component}
-		<svelte:component this={Component.default} {...props} />
-		<!-- {:catch error}
-		{error} -->
-	{/await}
+{#if component}
+	<svelte:component this={component} {...props} />
 {/if}

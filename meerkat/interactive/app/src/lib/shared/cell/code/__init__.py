@@ -5,3 +5,4 @@ class Code(Component):
 
     data: str
     language: str = "python"
+    theme: str = "okaidia"
