@@ -79,7 +79,7 @@ class ArrowScalarColumn(ScalarColumn):
         return columns[0]._clone(data=data)
 
     def to_numpy(self):
-        return self.data.to_numpy(zero_copy_only=False)
+        return self.data.to_numpy()
 
     def to_tensor(self):
         return torch.tensor(self.data.to_numpy())

@@ -145,13 +145,13 @@ def test_to_numpy(testbed):
     array = col.to_numpy()
 
     assert isinstance(array, np.ndarray)
-    assert (col.data.to_numpy(zero_copy_only=False) == array).all()
+    assert (col.data.to_numpy() == array).all()
 
 
 def test_to_tensor(testbed):
     col, _ = testbed.col, testbed.data
     if testbed.dtype == "str":
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             col.to_tensor()
     else:
         tensor = col.to_tensor()

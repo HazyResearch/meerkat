@@ -108,7 +108,7 @@ def test_column_to_lambda(col_type: Type):
     lambda_col = col.to_lambda(lambda x: x + 1)
 
     assert isinstance(lambda_col, DeferredColumn)
-    assert (lambda_col[:] == testbed.array[testbed.visible_rows] + 1).all()
+    assert (lambda_col() == testbed.array[testbed.visible_rows] + 1).all()
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test_df_to_lambda(use_visible_columns: bool):
     lambda_col = df.to_lambda(lambda x: x["a"] + 1)
 
     assert isinstance(lambda_col, DeferredColumn)
-    assert (lambda_col[:].data == np.arange(length)[testbed.visible_rows] + 1).all()
+    assert (lambda_col().data == np.arange(length)[testbed.visible_rows] + 1).all()
 
 
 @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ def test_composed_lambda_columns(col_type: Type):
     lambda_col = testbed.col.to_lambda(lambda x: x + 1)
     lambda_col = lambda_col.to_lambda(lambda x: x + 1)
 
-    assert (lambda_col[:] == testbed.array[testbed.visible_rows] + 2).all()
+    assert (lambda_col() == testbed.array[testbed.visible_rows] + 2).all()
 
 
 def test_df_concat():
@@ -158,7 +158,7 @@ def test_df_concat():
     out = mk.concat([col_a, col_b])
 
     assert isinstance(out, DeferredColumn)
-    assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
+    assert (out().data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
     col_a = df.to_lambda(fn)
     col_b = df.to_lambda(lambda x: x["a"])
@@ -181,7 +181,7 @@ def test_col_concat(col_type):
     out = mk.concat([col_a, col_b])
 
     assert isinstance(out, DeferredColumn)
-    assert (out[:].data == np.concatenate([np.arange(length) + 1] * 2)).all()
+    assert (out().data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
     col_a = col.to_lambda(fn)
     col_b = col.to_lambda(lambda x: x)

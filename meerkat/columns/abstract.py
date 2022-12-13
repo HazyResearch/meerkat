@@ -525,32 +525,31 @@ class Column(
     def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        from .scalar.pandas import PandasScalarColumn
+        from .scalar import ScalarColumn
+        from .tensor import TensorColumn
 
         if isinstance(data, Column):
             # TODO: Need ton make this view but should decide where to do it exactly
             return data  # .view()
 
         if isinstance(data, pd.Series):
-            return PandasScalarColumn(data)
+            return ScalarColumn(data)
 
         if torch.is_tensor(data):
             from .tensor.torch import TorchTensorColumn
 
             if len(data.shape) == 1:
-                return PandasScalarColumn(data.cpu().detach().numpy())
+                return ScalarColumn(data.cpu().detach().numpy())
             return TorchTensorColumn(data)
 
         if isinstance(data, np.ndarray):
             if len(data.shape) == 1:
-                return PandasScalarColumn(data)
-            return TorchTensorColumn(data)
+                return ScalarColumn(data)
+            return TensorColumn(data)
 
         if isinstance(data, Sequence):
-            from .tensor.torch import TorchTensorColumn
-
-            if len(data) != 0 and isinstance(data[0], (np.ndarray, TorchTensorColumn)):
-                return TorchTensorColumn(data)
+            if len(data) != 0 and isinstance(data[0], (np.ndarray, TensorColumn)):
+                return TensorColumn(data)
 
             if len(data) != 0 and isinstance(
                 data[0], (str, int, float, bool, np.generic)
@@ -560,9 +559,7 @@ class Column(
                 return ScalarColumn(data)
 
             if len(data) != 0 and torch.is_tensor(data[0]):
-                from .tensor.torch import TorchTensorColumn
-
-                return TorchTensorColumn(data)
+                return TensorColumn(data)
 
             from .object.base import ObjectColumn
 
