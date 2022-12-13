@@ -14,7 +14,7 @@ from torchvision.transforms.functional import to_tensor
 
 import meerkat
 from meerkat import ImageColumn
-from meerkat.block.lambda_block import DeferredCellOp, DeferredOp
+from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.deferred.base import DeferredCell

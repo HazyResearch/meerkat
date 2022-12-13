@@ -47,7 +47,9 @@ class ArrowScalarColumn(ScalarColumn):
         if self._is_batch_index(index):
             return self._clone(data=data)
         else:
-            return data
+            # Convert to Python object for consistency with other ScalarColumn 
+            # implementations. 
+            return data.as_py()
 
     def _set(self, index, value):
         raise ImmutableError("ArrowArrayColumn is immutable.")
@@ -75,7 +77,15 @@ class ArrowScalarColumn(ScalarColumn):
 
     @classmethod
     def concat(cls, columns: Sequence[ArrowScalarColumn]):
-        data = pa.concat_arrays([c.data for c in columns])
+        arrays = []
+        for c in columns:
+            if isinstance(c.data, pa.Array):
+                arrays.append(c.data)
+            elif isinstance(c.data, pa.ChunkedArray):
+                arrays.extend(c.data.chunks)
+            else:
+                raise ValueError(f"Unexpected type {type(c.data)}")
+        data = pa.concat_arrays(arrays)
         return columns[0]._clone(data=data)
 
     def to_numpy(self):

@@ -82,7 +82,7 @@ class ArrowBlock(AbstractBlock):
         if torch.is_tensor(index):
             # need to convert to numpy for boolean indexing
             return index.numpy()
-        if isinstance(index, TorchTensorColumn):
+        if isinstance(index, NumPyTensorColumn):
             return index.data
         if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing

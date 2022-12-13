@@ -1,7 +1,7 @@
 import numpy as np
 
-from meerkat import DeferredColumn, TorchTensorColumn
-from meerkat.block.lambda_block import DeferredBlock, DeferredOp
+from meerkat import DeferredColumn, TensorColumn
+from meerkat.block.deferred_block import DeferredBlock, DeferredOp
 from meerkat.block.ref import BlockRef
 
 from ...utils import product_parametrize
@@ -13,7 +13,7 @@ def fn(x: int) -> int:
 
 @product_parametrize(params={"num_blocks": [1, 2, 3]})
 def test_consolidate(num_blocks: int):
-    inp = TorchTensorColumn(np.arange(8))
+    inp = TensorColumn(np.arange(8))
     op = DeferredOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [
@@ -41,11 +41,11 @@ def test_consolidate(num_blocks: int):
         assert int(name) == col._block_index
 
     for i in range(num_blocks):
-        assert (block_ref[str(i)][:].data == cols[i][str(i)][:].data).all()
+        assert (block_ref[str(i)]().data == cols[i][str(i)]().data).all()
 
 
 def test_consolidate_same_index():
-    inp = TorchTensorColumn(np.arange(8))
+    inp = TensorColumn(np.arange(8))
     op = DeferredOp(args=[inp], fn=fn, kwargs={}, is_batched_fn=False, batch_size=1)
 
     block_views = [
@@ -74,4 +74,4 @@ def test_consolidate_same_index():
         assert col._block is block_ref.block
 
     for i in range(len(block_views)):
-        assert (block_ref[str(i)][:].data == cols[i][str(i)][:].data).all()
+        assert (block_ref[str(i)]().data == cols[i][str(i)]().data).all()

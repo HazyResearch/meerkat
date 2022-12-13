@@ -163,7 +163,7 @@ def _embed(
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if preprocess is not None:
-        embed_input = col.to_lambda(preprocess)
+        embed_input = col.defer(preprocess)
     else:
         embed_input = col
 

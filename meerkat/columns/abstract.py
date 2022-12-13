@@ -21,7 +21,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
-from meerkat.mixins.lambdable import LambdaMixin
+from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
@@ -513,7 +513,6 @@ class Column(
         from meerkat.writers.concat_writer import ConcatWriter
 
         if mmap:
-            breakpoint()
             raise ValueError("Memmapping not supported with this column type.")
         else:
             return ConcatWriter(output_type=cls, template=template)

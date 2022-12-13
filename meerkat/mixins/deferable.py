@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @doc(data="data")
-def to_lambda(
+def defer(
     data: Union["DataFrame", "Column"],
     function: Callable,
     is_batched_fn: bool = False,
@@ -61,7 +61,7 @@ def to_lambda(
         Union[DataFrame, LambdaColumn]: A
     """
     from meerkat import DeferredColumn
-    from meerkat.block.lambda_block import DeferredBlock, DeferredOp
+    from meerkat.block.deferred_block import DeferredBlock, DeferredOp
     from meerkat.columns.abstract import Column
     from meerkat.dataframe import DataFrame
 
@@ -150,8 +150,8 @@ class LambdaMixin:
     def __init__(self, *args, **kwargs):
         super(LambdaMixin, self).__init__(*args, **kwargs)
 
-    @doc(to_lambda, data="self")
-    def to_lambda(
+    @doc(defer, data="self")
+    def defer(
         self,
         function: Callable,
         is_batched_fn: bool = False,
@@ -160,7 +160,7 @@ class LambdaMixin:
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
         output_type: Union[Mapping[str, type], type] = None,
     ) -> Union["DataFrame", "DeferredColumn"]:
-        return to_lambda(
+        return defer(
             data=self,
             function=function,
             is_batched_fn=is_batched_fn,

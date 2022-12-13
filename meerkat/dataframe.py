@@ -37,10 +37,11 @@ from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
-from meerkat.mixins.lambdable import LambdaMixin
+from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
+from meerkat.row import Row
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
 
 try:
@@ -248,9 +249,7 @@ class DataFrame(
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
 
-    def add_column(
-        self, name: str, data: Column.Columnable, overwrite=False
-    ) -> None:
+    def add_column(self, name: str, data: Column.Columnable, overwrite=False) -> None:
         """Add a column to the DataFrame."""
 
         assert isinstance(
@@ -348,7 +347,7 @@ class DataFrame(
         elif isinstance(posidx, int):
             # int index => single row (dict)
             row = self.data.apply("_get", index=posidx, materialize=materialize)
-            return {k: row[k] for k in self.columns}
+            return Row({k: row[k] for k in self.columns})
 
         # cases where `index` returns a dataframe
         index_type = None
@@ -415,16 +414,16 @@ class DataFrame(
             # Add a modification if it's on the graph
             mod = DataFrameModification(id=self.id, scope=self.columns)
             mod.add_to_queue()
-    
+
     def __call__(self):
-        pass 
+        return self._get(slice(0, len(self), 1), materialize=True)
 
     def set(self, value: DataFrame):
         # FIXME: This should not be called outside of an endpoint. Add explicit check
-        # fot that. 
+        # fot that.
         self._set_data(value._data)
         self._set_state(value._get_state())
-        
+
         if self.has_inode():
             # Add a modification if it's on the graph
             mod = DataFrameModification(id=self.id, scope=self.columns)
@@ -529,11 +528,11 @@ class DataFrame(
     ):
         """Create a Dataset from a pandas DataFrame."""
         from meerkat.block.arrow_block import ArrowBlock
-        from meerkat.columns.arrow_column import ArrowArrayColumn
+        from meerkat.columns.scalar.arrow import ArrowScalarColumn
 
         block_views = ArrowBlock.from_block_data(table)
         return cls.from_batch(
-            {view.block_index: ArrowArrayColumn(view) for view in block_views}
+            {view.block_index: ArrowScalarColumn(view) for view in block_views}
         )
 
     @classmethod
@@ -625,7 +624,7 @@ class DataFrame(
         from meerkat.columns.deferred.base import DeferredColumn
 
         for name, column in self.items():
-            if isinstance(column, (CellColumn, DeferredColumn)) and materialize:
+            if isinstance(column, DeferredColumn) and materialize:
                 cell_columns.append(name)
             else:
                 batch_columns.append(name)
@@ -642,7 +641,7 @@ class DataFrame(
                     continue
                 batch_indices.append(indices[i : i + batch_size])
             batch_dl = torch.utils.data.DataLoader(
-                self[batch_columns] if materialize else self[batch_columns].lz,
+                self[batch_columns],
                 sampler=batch_indices,
                 batch_size=None,
                 batch_sampler=None,
@@ -655,7 +654,7 @@ class DataFrame(
         if cell_columns:
             df = self[cell_columns] if not shuffle else self[cell_columns].lz[indices]
             cell_dl = torch.utils.data.DataLoader(
-                df if materialize else df.lz,
+                df,
                 batch_size=batch_size,
                 collate_fn=self._collate,
                 drop_last=drop_last_batch,
@@ -666,13 +665,14 @@ class DataFrame(
 
         if batch_columns and cell_columns:
             for cell_batch, batch_batch in zip(cell_dl, batch_dl):
-                yield self._clone(data={**cell_batch.data, **batch_batch.data})
+                out = self._clone(data={**cell_batch.data, **batch_batch.data})
+                yield out() if materialize else out
         elif batch_columns:
             for batch_batch in batch_dl:
-                yield batch_batch
+                yield batch_batch() if materialize else batch_batch
         elif cell_columns:
             for cell_batch in cell_dl:
-                yield cell_batch
+                yield cell_batch() if materialize else cell_batch
 
     @capture_provenance(capture_args=["with_indices"])
     def update(

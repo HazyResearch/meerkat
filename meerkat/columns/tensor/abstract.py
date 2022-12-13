@@ -3,6 +3,10 @@ from typing import List, Union
 import numpy as np
 import torch
 
+from meerkat.block.abstract import BlockView
+from meerkat.block.numpy_block import NumPyBlock
+from meerkat.block.torch_block import TorchBlock
+
 from ..abstract import Column
 
 TensorColumnTypes = Union[np.ndarray, torch.TensorType]
@@ -13,6 +17,17 @@ class TensorColumn(Column):
         
         if (cls is not TensorColumn) or (data is None):
             return super().__new__(cls)
+
+        if isinstance(data, BlockView):
+            if isinstance(data.block, TorchBlock):
+                from .torch import TorchTensorColumn
+
+                return super().__new__(TorchTensorColumn)
+            elif isinstance(data.block, NumPyBlock):
+                from .numpy import NumPyTensorColumn
+
+                return super().__new__(NumPyTensorColumn)
+        
 
         if isinstance(data, np.ndarray):
             from .numpy import NumPyTensorColumn

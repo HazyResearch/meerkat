@@ -9,6 +9,7 @@ import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
@@ -87,7 +88,7 @@ class PandasBlock(AbstractBlock):
         if torch.is_tensor(index):
             # need to convert to numpy for boolean indexing
             return index.numpy()
-        if isinstance(index, TorchTensorColumn):
+        if isinstance(index, NumPyTensorColumn):
             return index.data
         if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing

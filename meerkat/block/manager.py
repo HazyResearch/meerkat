@@ -15,7 +15,7 @@ from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import Column
 from meerkat.tools.utils import MeerkatLoader
 
-from .lambda_block import DeferredBlock
+from .deferred_block import DeferredBlock
 from .ref import BlockRef
 
 
@@ -81,7 +81,7 @@ class BlockManager(MutableMapping):
 
     def apply(self, method_name: str = "_get", *args, **kwargs) -> BlockManager:
         """"""
-        from .lambda_block import DeferredBlock
+        from .deferred_block import DeferredBlock
 
         results = None
         indexed_inputs = {}
@@ -96,7 +96,6 @@ class BlockManager(MutableMapping):
                     *args,
                     **kwargs,
                 )
-                # continue  # TODO: fix this to work with chained lambda columns
             else:
                 result = block_ref.apply(method_name=method_name, *args, **kwargs)
 

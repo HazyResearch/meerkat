@@ -134,7 +134,7 @@ def test_change_base_dir(testbed):
     os.rename(testbed.files_dir, new_dir)
     col.base_dir = new_dir
 
-    assert (col[[1, 3, 5]]().data == testbed.get_data([1, 3, 5])).all()
+    assert (col[[1, 3, 5]].data == testbed.get_data([1, 3, 5])).all()
 
 
 def test_downloader(monkeypatch, tmpdir):

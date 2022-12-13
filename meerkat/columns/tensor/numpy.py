@@ -17,7 +17,7 @@ from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
 from meerkat.block.abstract import BlockView
-from meerkat.block.numpy_block import NumpyBlock
+from meerkat.block.numpy_block import NumPyBlock
 from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
@@ -46,7 +46,7 @@ class NumPyTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
 
-    block_class: type = NumpyBlock
+    block_class: type = NumPyBlock
 
     def __init__(
         self,
@@ -55,7 +55,7 @@ class NumPyTensorColumn(
         **kwargs,
     ):
         if isinstance(data, BlockView):
-            if not isinstance(data.block, NumpyBlock):
+            if not isinstance(data.block, NumPyBlock):
                 raise ValueError(
                     "Cannot create `NumpyArrayColumn` from a `BlockView` not "
                     "referencing a `NumpyBlock`."
@@ -122,7 +122,7 @@ class NumPyTensorColumn(
         self._data[indices] = values
 
     def _get(self, index, materialize: bool = True):
-        index = NumpyBlock._convert_index(index)
+        index = NumPyBlock._convert_index(index)
         data = self._data[index]
         if self._is_batch_index(index):
             # only create a numpy array column

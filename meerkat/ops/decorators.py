@@ -18,7 +18,7 @@ def check_primary_key(fn: callable):
                 out._primary_key not in out
                 or not out.primary_key._is_valid_primary_key()
             ):
-                out.set_primary_key(None)
+                out.set_primary_key(None, inplace=True)
         return out
 
     return _wrapper

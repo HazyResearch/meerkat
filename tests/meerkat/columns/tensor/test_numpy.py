@@ -8,7 +8,7 @@ import torch
 from numpy.lib.format import open_memmap
 
 from meerkat import NumPyTensorColumn, TorchTensorColumn
-from meerkat.block.numpy_block import NumpyBlock
+from meerkat.block.numpy_block import NumPyBlock
 
 from ....utils import product_parametrize
 from ..abstract import AbstractColumnTestBed, column_parametrize
@@ -99,7 +99,7 @@ def testbed(request, tmpdir):
 
 
 def test_init_block():
-    block_view = NumpyBlock(np.zeros((10, 10)))[0]
+    block_view = NumPyBlock(np.zeros((10, 10)))[0]
     with pytest.raises(ValueError):
         TorchTensorColumn(block_view)
 

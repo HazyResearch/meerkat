@@ -16,7 +16,7 @@ from meerkat.errors import ConsolidationError
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
-class NumpyBlock(AbstractBlock):
+class NumPyBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
         dtype: np.dtype
@@ -26,7 +26,7 @@ class NumpyBlock(AbstractBlock):
         mmap: Union[bool, int]
 
     def __init__(self, data, *args, **kwargs):
-        super(NumpyBlock, self).__init__(*args, **kwargs)
+        super(NumPyBlock, self).__init__(*args, **kwargs)
         if len(data.shape) <= 1:
             raise ValueError(
                 "Cannot create a `NumpyBlock` from data with less than 2 axes."
@@ -36,7 +36,7 @@ class NumpyBlock(AbstractBlock):
     @property
     def signature(self) -> Hashable:
         return self.Signature(
-            klass=NumpyBlock,
+            klass=NumPyBlock,
             # don't want to consolidate any mmaped blocks
             mmap=id(self) if isinstance(self.data, np.memmap) else False,
             nrows=self.data.shape[0],
@@ -48,7 +48,7 @@ class NumpyBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_column_data(cls, data: np.ndarray) -> Tuple[NumpyBlock, BlockView]:
+    def from_column_data(cls, data: np.ndarray) -> Tuple[NumPyBlock, BlockView]:
         """[summary]
 
         Args:

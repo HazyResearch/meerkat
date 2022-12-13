@@ -10,7 +10,6 @@ import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex, BlockView

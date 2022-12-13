@@ -214,12 +214,12 @@ class TestMerge:
         # check for `values` at unmatched rows
         assert set(out.lz[mask_1]["b_1"]) == a1 - a2
         # check for `None` at unmatched rows
-        assert list(out.lz[mask_1]["b_2"]) == [None] * len(mask_1)
+        assert out.lz[mask_1]["b_2"].isna().all()
 
         # check for `values` at unmatched rows
         assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
         # check for equality at matched rows
-        assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
+        assert out.lz[mask_1]["e_2"].isna().all()
 
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_right(self, testbed, sort):
@@ -257,12 +257,12 @@ class TestMerge:
         # check for `values` at unmatched rows
         assert set(out.lz[mask_2]["b_2"]) == a2 - a1
         # check for `None` at unmatched rows
-        assert list(out.lz[mask_2]["b_1"]) == [None] * len(mask_2)
+        assert (out.lz[mask_2]["b_1"]).isna().all()
 
         # check for `values` at unmatched rows
         assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
         # check for equality at matched rows
-        assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
+        assert (out.lz[mask_2]["e_1"]).isna().all()
 
     def test_merge_output_column_types(self):
         df1 = DataFrame.from_batch(

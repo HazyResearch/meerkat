@@ -6,7 +6,6 @@ from meerkat.dataframe import DataFrame
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
 from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
-from ..columns.test_cell_column import CellColumnTestBed
 from ..columns.deferred.test_image import ImageColumnTestBed
 from ..columns.deferred.test_deferred import DeferredColumnTestBed
 from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
@@ -22,7 +21,6 @@ from ..columns.tensor.test_torch import TorchTensorColumnTestBed
             TorchTensorColumnTestBed,
             DeferredColumnTestBed,
             ArrowScalarColumnTestBed,
-            CellColumnTestBed,
             ImageColumnTestBed,
         ]
     )

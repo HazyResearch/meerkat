@@ -38,7 +38,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
 
         np.random.seed(seed)
         array = np.random.random(length) * 10
-        self.col = mk.NumPyTensorColumn(array).to_lambda(
+        self.col = mk.NumPyTensorColumn(array).defer(
             function=lambda x: x + 2, **to_lambda_kwargs
         )
         self.data = array + 2
@@ -86,7 +86,6 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
 
     @staticmethod
     def assert_data_equal(data1: np.ndarray, data2: np.ndarray):
-        print(data1, data2)
         if isinstance(data1, np.ndarray):
             assert (data1 == data2).all()
         else:
@@ -124,7 +123,7 @@ def test_df_to_lambda(use_visible_columns: bool):
     df = testbed.df
 
     # Build a dataset from a batch
-    lambda_col = df.to_lambda(lambda x: x["a"] + 1)
+    lambda_col = df.defer(lambda x: x["a"] + 1)
 
     assert isinstance(lambda_col, DeferredColumn)
     assert (lambda_col().data == np.arange(length)[testbed.visible_rows] + 1).all()
@@ -152,16 +151,16 @@ def test_df_concat():
     def fn(x):
         return x["a"] + 1
 
-    col_a = df.to_lambda(fn)
-    col_b = df.to_lambda(fn)
+    col_a = df.defer(fn)
+    col_b = df.defer(fn)
 
     out = mk.concat([col_a, col_b])
 
     assert isinstance(out, DeferredColumn)
     assert (out().data == np.concatenate([np.arange(length) + 1] * 2)).all()
 
-    col_a = df.to_lambda(fn)
-    col_b = df.to_lambda(lambda x: x["a"])
+    col_a = df.defer(fn)
+    col_b = df.defer(lambda x: x["a"])
     with pytest.warns(ConcatWarning):
         out = mk.concat([col_a, col_b])
 
