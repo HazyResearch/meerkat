@@ -5,16 +5,21 @@ df = mk.get("imagenette")
 tabs = mk.gui.Tabs(
     tabs={
         label: mk.gui.Gallery(
-            df=df.lz[df["label"] == label],
+            df=df[df["label"] == label],
             main_column="img",
             tag_columns=["label"],
         )
         for label in df["label"].unique()
     }
 )
+gallery = mk.gui.Gallery(
+    df=df, 
+    main_column="img",
+    tag_columns=["label"],
+)
 
 
-mk.gui.start(shareable=False, dev=False)
+network = mk.gui.start(shareable=False, dev=True)
 mk.gui.Interface(
-    component=tabs,
+    component=gallery,
 ).launch()

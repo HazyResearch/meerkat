@@ -186,7 +186,6 @@ def start(
             ],
             env=current_env,
             stdout=out_file,
-            stderr=err_file,
         )
     else:
         print("Building Application...")
