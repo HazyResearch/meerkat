@@ -18,15 +18,15 @@ Consider the following example, where we create a simple Meerkat column...
     col[1]
 
   
-...and wrap it in a lambda column.
+...and create a deferred column, ``dcol``, from the original column.
 
 .. ipython:: python
 
     dcol = col.defer(function=lambda x: x + 10)
-    dcol[[0,2]]()
+    dcol()
 
 
-Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.DeferredColumn` that lazily loads images...
+Critically, the function inside a deferred column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.DeferredColumn` that lazily loads images...
 
 .. ipython:: python
     :verbatim:
