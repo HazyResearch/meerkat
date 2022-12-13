@@ -4,25 +4,18 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from meerkat import (
-    DeferredColumn,
-    TorchTensorColumn,
-    ScalarColumn,
-    NumPyTensorColumn,
-)
+from meerkat import DeferredColumn, NumPyTensorColumn, TorchTensorColumn
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.errors import ImmutableError
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
-from .scalar.test_arrow import ArrowScalarColumnTestBed
-from .deferred.test_audio import AudioColumnTestBed
-from .deferred.test_file import FileColumnTestBed
-from .deferred.test_image import ImageColumnTestBed
 from .deferred.test_deferred import DeferredColumnTestBed
-from .tensor.test_numpy import NumPyTensorColumnTestBed
+from .deferred.test_image import ImageColumnTestBed
+from .scalar.test_arrow import ArrowScalarColumnTestBed
 from .scalar.test_pandas import PandasScalarColumnTestBed
+from .tensor.test_numpy import NumPyTensorColumnTestBed
 from .tensor.test_torch import TorchTensorColumnTestBed
 
 

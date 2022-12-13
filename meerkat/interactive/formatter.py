@@ -35,7 +35,6 @@ class Formatter(ABC):
         displays that don't actually need to apply the lambda in order
         to display the value.
         """
-        pass
 
     @abstractmethod
     def html(self, cell: Any):
@@ -44,7 +43,6 @@ class Formatter(ABC):
 
         This method should produce that static html for the cell.
         """
-        pass
 
     @property
     def cell_props(self):

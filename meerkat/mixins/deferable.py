@@ -136,9 +136,7 @@ def defer(
         return DataFrame(
             {
                 col: DeferredColumn(
-                    data=BlockView(
-                        block_index=output_key, block=block
-                    ),
+                    data=BlockView(block_index=output_key, block=block),
                     output_type=output_type[output_key],
                 )
                 for output_key, col in enumerate(outputs)

@@ -27,22 +27,20 @@ import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
 from meerkat.columns.deferred.audio import AudioColumn
+from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
 from meerkat.columns.deferred.image import ImageColumn
-from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
-from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
+from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.columns.tensor import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
-
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
-from meerkat.ops.match import match
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
 from meerkat.ops.sort import sort

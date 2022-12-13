@@ -74,9 +74,7 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
 
         else:
             return {
-                "fn": lambda x, k=0: x
-                + salt
-                + (k if self.dtype != "str" else str(k)),
+                "fn": lambda x, k=0: x + salt + (k if self.dtype != "str" else str(k)),
                 "expected_result": ArrowScalarColumn(
                     to_numpy(self.col.data) + salt + kwarg
                 ),

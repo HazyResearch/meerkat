@@ -66,7 +66,7 @@ class NumPyTensorColumnTestBed(AbstractColumnTestBed):
             "expected_result": NumPyTensorColumn.from_array(
                 self.col.data + salt + kwarg
             ),
-            "output_type": NumPyTensorColumn
+            "output_type": NumPyTensorColumn,
         }
 
     def get_filter_spec(
@@ -167,7 +167,7 @@ def test_to_pandas(testbed):
     series = testbed.col.to_pandas()
 
     assert isinstance(series, pd.Series)
- 
+
     if testbed.col.shape == 1:
         assert (series.values == testbed.col.data).all()
     else:

@@ -73,7 +73,9 @@ def get_first_available_port(initial: int, final: int) -> int:
     rich.print(f"Trying to find an open port in ({initial}, {final}). ", end="")
     for port in range(initial, final):
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a socket object
+            s = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM
+            )  # create a socket object
             result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
             s.close()
             rich.print(f"Found open port: {port}")
@@ -140,9 +142,7 @@ def start(
 
     # Start the npm server
     if npm_port is None:
-        npm_port = get_first_available_port(
-            api_port + 1, api_port + 1 + TRY_NUM_PORTS
-        )
+        npm_port = get_first_available_port(api_port + 1, api_port + 1 + TRY_NUM_PORTS)
     else:
         npm_port = get_first_available_port(npm_port, npm_port + 1)
 
@@ -177,7 +177,7 @@ def start(
     err_file, err_path = mkstemp(suffix=".err")
 
     if dev:
-        
+
         # KG: this is fallback code because we previously noticed that the
         # socket.bind call in the get_first_available_port function was not
         # always working. I've changed that to use the socket.connect_ex
@@ -208,15 +208,15 @@ def start(
             network_info.npm_process = npm_process
             network_info.npm_out_path = out_path
             network_info.npm_err_path = err_path
-            
+
             # We need to wait for the npm server to start up
             # When it does, we read its stdout to get the port it's using
 
-            # KG: this should no longer be required, since we now use the 
+            # KG: this should no longer be required, since we now use the
             # --strictPort flag for vite, which will not allow vite
             # to automatically select a port if the one we specify is not
             # available.
-            MAX_WAIT = 100 # 10 seconds total
+            MAX_WAIT = 100  # 10 seconds total
             for _ in range(MAX_WAIT):
                 time.sleep(0.1)
 

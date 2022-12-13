@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 import meerkat as mk
-from meerkat import DeferredColumn, ObjectColumn, NumPyTensorColumn
+from meerkat import DeferredColumn, NumPyTensorColumn, ObjectColumn
 from meerkat.errors import ConcatWarning
 
 from ....testbeds import MockColumn, MockDatapanel
@@ -98,7 +98,9 @@ def testbed(request, tmpdir):
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@pytest.mark.parametrize("col_type", [NumPyTensorColumn, NumPyTensorColumn, ObjectColumn])
+@pytest.mark.parametrize(
+    "col_type", [NumPyTensorColumn, NumPyTensorColumn, ObjectColumn]
+)
 def test_column_defer(col_type: Type):
     testbed = MockColumn(col_type=col_type)
     col = testbed.col

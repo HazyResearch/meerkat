@@ -18,11 +18,11 @@ from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
+from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
-from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
@@ -109,17 +109,18 @@ class Column(
         self._data = data
 
     def _is_valid_primary_key(self):
-        """Subclasses should implement checks for ensuring that the column could be used
-        as a valid primary key. Specifically, the check should ensure that the values
-        in the column are unique. If the check does not pass, returns False.
-        If the subclass has not implemented this method.
+        """Subclasses should implement checks for ensuring that the column
+        could be used as a valid primary key.
+
+        Specifically, the check should ensure that the values in the
+        column are unique. If the check does not pass, returns False. If
+        the subclass has not implemented this method.
         """
         return False
 
     def _keyidx_to_posidx(self, keyidx: Any) -> int:
-        """
-        Get the posidx of the first occurrence of the given keyidx. Raise a key error
-        if the keyidx is not found.
+        """Get the posidx of the first occurrence of the given keyidx. Raise a
+        key error if the keyidx is not found.
 
         Args:
             keyidx: The keyidx to search for.
@@ -130,8 +131,8 @@ class Column(
         raise NotImplementedError()
 
     def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
-        """Get the posidxs of the given keyidxs. Raise a key error if any of the
-        keyidxs are not found.
+        """Get the posidxs of the given keyidxs. Raise a key error if any of
+        the keyidxs are not found.
 
         Args:
             keyidxs: The keyidxs to search for.
@@ -550,8 +551,11 @@ class Column(
 
 
 def column(data: Sequence) -> Column:
-    """Create a Meerkat column from data. The Meerkat column type is inferred
-    from the type and structure of the data passed in."""
+    """Create a Meerkat column from data.
+
+    The Meerkat column type is inferred from the type and structure of
+    the data passed in.
+    """
     from .scalar import ScalarColumn
     from .tensor import TensorColumn
 

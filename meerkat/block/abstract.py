@@ -37,9 +37,9 @@ class AbstractBlock:
     def _get_data(self, index: BlockIndex) -> object:
         """Must return view of the underlying data."""
         raise NotImplementedError()
-    
+
     def subblock(self, indices: List[BlockIndex]):
-        raise NotImplementedError  
+        raise NotImplementedError
 
     @property
     def signature(self) -> Hashable:

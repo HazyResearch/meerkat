@@ -9,7 +9,6 @@ import torch
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.image import ImageColumn
 from meerkat.columns.object.base import ObjectColumn
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import MergeError

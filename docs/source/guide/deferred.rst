@@ -2,7 +2,7 @@
 Deferred Columns
 =================
 
-*Motivation.* When working with multimodal datasets, the data in some columns may fit easily in memory, while the data in others are best kept on disk and loaded only when needed. For example, in an image dataset, the image labels and metadata are small and may fit in memory, while the images themselves are large and should stay on disk until they are needed.
+*Motivation.* When working with multimodal datasets, the data in some columns may fit easily in memory, while the data in other columns are best kept on disk and loaded only when needed. For example, in an image dataset, the image labels and metadata are small and may fit in memory, while the images themselves are large and should stay on disk until they are needed.
 
 In Meerkat, columns like :class:`~meerkat.ImageColumn` and :class:`~meerkat.AudioColumn` make it easy to work with complex data types that can't fit in memory. If you check out the implementation of these classes, you'll notice that they are straightforward subclasses of :class:`~meerkat.DeferredColumn`.  
 

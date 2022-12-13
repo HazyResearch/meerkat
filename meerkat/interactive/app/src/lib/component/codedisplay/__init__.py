@@ -1,6 +1,6 @@
 from meerkat.interactive.graph import Store
-from ..abstract import Component
 
+from ..abstract import Component
 
 
 class CodeDisplay(Component):

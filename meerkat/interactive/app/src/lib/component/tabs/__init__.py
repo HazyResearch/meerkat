@@ -1,9 +1,11 @@
+import uuid
 from dataclasses import dataclass, field
 from typing import Mapping, Sequence, Union
-import uuid
 
 from meerkat.interactive.frontend import FrontendMixin
+
 from ..abstract import Component
+
 
 @dataclass
 class Tab(FrontendMixin):

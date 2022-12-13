@@ -11,8 +11,8 @@ import torchaudio
 
 from meerkat import AudioColumn
 from meerkat.columns.abstract import Column
-from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.scalar import ScalarColumn
 
 from ..abstract import AbstractColumnTestBed

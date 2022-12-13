@@ -1,5 +1,4 @@
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.edit import EditTarget
 
 from ..abstract import Component
 

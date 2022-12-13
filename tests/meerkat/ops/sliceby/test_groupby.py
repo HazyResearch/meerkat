@@ -1,6 +1,6 @@
 import numpy as np
 
-from meerkat import ObjectColumn, NumPyTensorColumn
+from meerkat import NumPyTensorColumn, ObjectColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ops.sliceby.groupby import GroupBy, groupby
 

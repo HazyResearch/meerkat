@@ -16,8 +16,8 @@ import meerkat
 from meerkat import ImageColumn
 from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
 from meerkat.columns.abstract import Column
-from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn

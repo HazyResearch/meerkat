@@ -11,8 +11,9 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
 
+from ..abstract import Column
 from .abstract import ScalarColumn
-from ..abstract import Column 
+
 
 class ArrowScalarColumn(ScalarColumn):
 
@@ -47,8 +48,8 @@ class ArrowScalarColumn(ScalarColumn):
         if self._is_batch_index(index):
             return self._clone(data=data)
         else:
-            # Convert to Python object for consistency with other ScalarColumn 
-            # implementations. 
+            # Convert to Python object for consistency with other ScalarColumn
+            # implementations.
             return data.as_py()
 
     def _set(self, index, value):

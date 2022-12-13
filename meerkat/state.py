@@ -178,19 +178,15 @@ class ModificationQueue:
         # Do nothing if not ready
 
     def clear(self) -> List["Modification"]:
-        """
-        Clear the modification queue, and return the old queue.
-        """
+        """Clear the modification queue, and return the old queue."""
         current_queue = self.queue
         self.queue = []
         return current_queue
 
     def ready(self):
-        """
-        Ready the queue for accepting new modifications.
-        """
+        """Ready the queue for accepting new modifications."""
         self._ready = True
-    
+
     def unready(self):
         self._ready = False
 

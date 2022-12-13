@@ -34,10 +34,10 @@ from meerkat.columns.abstract import Column
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
-from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
@@ -197,8 +197,8 @@ class DataFrame(
 
     def set_primary_key(self, column: str, inplace: bool = False) -> DataFrame:
         """Set the DataFrame's primary key using an existing column. This is an
-        out-of-place operation. For more information on primary keys, see the User
-        Guide.
+        out-of-place operation. For more information on primary keys, see the
+        User Guide.
 
         Args:
             column (str): The name of an existing column to set as the primary key.

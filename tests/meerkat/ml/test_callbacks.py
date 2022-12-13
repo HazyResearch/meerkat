@@ -12,7 +12,6 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from meerkat import DataFrame
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.ml import ActivationCallback, load_activations
 
@@ -127,7 +126,9 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
 
         else:
             activations = DataFrame.read(path)
-            assert isinstance(activations[f"activation_{target_module}"], TorchTensorColumn)
+            assert isinstance(
+                activations[f"activation_{target_module}"], TorchTensorColumn
+            )
 
         if mmap:
             assert (

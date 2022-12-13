@@ -1,4 +1,3 @@
-import uuid
 from glob import glob
 from typing import Sequence, Union
 
@@ -6,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.sort import SortCriterion
 from meerkat.interactive.graph import reactive
 from meerkat.ops.sliceby.groupby import groupby
 

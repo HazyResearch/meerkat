@@ -10,15 +10,14 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import ConcatError
 
-
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
-from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
-from ..columns.deferred.test_image import ImageColumnTestBed
 from ..columns.deferred.test_deferred import DeferredColumnTestBed
-from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from ..columns.deferred.test_image import ImageColumnTestBed
+from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
 from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
 from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 # flake8: noqa: E501

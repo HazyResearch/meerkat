@@ -1,17 +1,14 @@
+import ast
 from dataclasses import dataclass
 
-from meerkat.interactive.graph import Store, store_field
-from ..abstract import Component
-import re
-from typing import Callable, ClassVar, List, Optional, Tuple
-import ast
-
-from fastapi import HTTPException
 import numpy as np
+from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import reactive
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Store, reactive, store_field
+
+from ..abstract import Component
 
 # from meerkat.interactive.modification import Modification
 
@@ -20,8 +17,8 @@ from meerkat.interactive.endpoint import Endpoint, endpoint
 def get_match_schema(df: DataFrame, encoder: str):
     import meerkat as mk
     from meerkat.interactive.api.routers.dataframe import (
-        _get_column_infos,
         SchemaResponse,
+        _get_column_infos,
     )
 
     columns = [

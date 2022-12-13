@@ -55,7 +55,7 @@ class DeferredColumn(Column):
     ):
         self._output_type = output_type
         super(DeferredColumn, self).__init__(data, *args, **kwargs)
-    
+
     def __call__(self):
         # TODO(Sabri): Make this a more efficient call
         return self._get(index=np.arange(len(self)), materialize=True)

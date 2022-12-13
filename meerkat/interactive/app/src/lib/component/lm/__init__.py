@@ -1,4 +1,5 @@
 from meerkat.dataframe import DataFrame
+
 from ..abstract import Component
 
 

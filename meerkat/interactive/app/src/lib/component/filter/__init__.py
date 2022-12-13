@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from meerkat.dataframe import DataFrame
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar import ScalarColumn
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import Component

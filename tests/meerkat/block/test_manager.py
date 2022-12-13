@@ -443,13 +443,9 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     mgr = BlockManager()
     base_col = column_type(np.arange(16))
     mgr.add_column(base_col, "a")
-    lambda_column = base_col.defer(
-        lambda x: x + 2
-    )
+    lambda_column = base_col.defer(lambda x: x + 2)
     mgr.add_column(lambda_column, "b")
-    second_lambda_column = lambda_column.defer(
-        lambda x: x + 2
-    )
+    second_lambda_column = lambda_column.defer(lambda x: x + 2)
     mgr.add_column(second_lambda_column, "c")
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))

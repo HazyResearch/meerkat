@@ -2,14 +2,12 @@ from uuid import uuid4
 
 
 class classproperty(property):
-    """
-    Taken from https://stackoverflow.com/a/13624858
+    """Taken from https://stackoverflow.com/a/13624858.
 
-    The behavior of class properties using the @classmethod
-    and @property decorators has changed across Python versions.
-    This class (should) provide consistent behavior across Python
-    versions.
-    See https://stackoverflow.com/a/1800999 for more information.
+    The behavior of class properties using the @classmethod and
+    @property decorators has changed across Python versions. This class
+    (should) provide consistent behavior across Python versions. See
+    https://stackoverflow.com/a/1800999 for more information.
     """
 
     def __get__(self, owner_self, owner_cls):
@@ -17,12 +15,11 @@ class classproperty(property):
 
 
 class IdentifiableMixin:
-    """
-    Mixin for classes, to give objects an id.
+    """Mixin for classes, to give objects an id.
 
-    This class must use _self_{attribute} for all attributes
-    since it will be mixed into the wrapt.ObjectProxy class,
-    which requires this naming convention for it to work.
+    This class must use _self_{attribute} for all attributes since it
+    will be mixed into the wrapt.ObjectProxy class, which requires this
+    naming convention for it to work.
     """
 
     _self_identifiable_group: str

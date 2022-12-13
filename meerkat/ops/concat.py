@@ -7,7 +7,9 @@ from meerkat import DataFrame
 from meerkat.columns.abstract import Column
 from meerkat.errors import ConcatError
 from meerkat.provenance import capture_provenance
+
 from .decorators import check_primary_key
+
 
 @check_primary_key
 @capture_provenance(capture_args=["axis"])

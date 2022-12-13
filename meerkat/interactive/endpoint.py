@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import inspect
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
@@ -19,8 +20,8 @@ FnPydanticModel = None
 
 
 class SingletonRouter(type):
-    """
-    A metaclass that ensures that only one instance of a router is created
+    """A metaclass that ensures that only one instance of a router is created.
+
     *for a given prefix*.
 
     A prefix is a string that is used to identify a router. For example,
@@ -50,8 +51,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
     # As a patch, we're generating one router per Endpoint object
     # (this could generate multiple routers for the same prefix, but
     # that's not a problem).
-    """
-    A very simple FastAPI router.
+    """A very simple FastAPI router.
 
     Only one instance of this router will be created *for a given prefix*, so
     you can call this router multiple times in your code and it will always
@@ -94,8 +94,7 @@ class EndpointFrontend(BaseModel):
 
 # TODO: technically Endpoint doesn't need to be NodeMixin (probably)
 class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
-    """
-    Create an endpoint from a function in Meerkat.
+    """Create an endpoint from a function in Meerkat.
 
     Typically, you will not need to call this class directly, but
     instead use the `endpoint` decorator.
@@ -165,8 +164,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
     def run(self, *args, **kwargs) -> Any:
-        """
-        Actually run the endpoint function `fn`.
+        """Actually run the endpoint function `fn`.
 
         Args:
             *args: Positional arguments to pass to `fn`.
@@ -254,8 +252,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
     def compose(self, fn: Union[Endpoint, callable]) -> Endpoint:
         """Create a new Endpoint that applies `fn` to the return value of this
-        Endpoint.
-        Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
+        Endpoint. Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
 
         Args:
             fn (Endpoint, callable): An Endpoint or a callable function that accepts
@@ -277,13 +274,12 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
     def add_route(self, method: str = "POST") -> None:
-        """
-        Add a FastAPI route for this endpoint to the router. This
-        function will not do anything if the router is None (i.e.
-        no prefix was specified).
+        """Add a FastAPI route for this endpoint to the router. This function
+        will not do anything if the router is None (i.e. no prefix was
+        specified).
 
-        This function is called automatically when the endpoint
-        is created using the `endpoint` decorator.
+        This function is called automatically when the endpoint is
+        created using the `endpoint` decorator.
         """
         if self.router is None:
             return
@@ -425,8 +421,7 @@ def endpoint(
     route: str = None,
     method: str = "POST",
 ):
-    """
-    Decorator to mark a function as an endpoint.
+    """Decorator to mark a function as an endpoint.
 
     An endpoint is a function that can be called to
         - update the value of a Store (e.g. incrementing a counter)
@@ -495,10 +490,8 @@ def endpoint(
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            """
-
-            Subsequent calls to the function will be handled by the graph.
-            """
+            """Subsequent calls to the function will be handled by the
+            graph."""
             # Keep the arguments that were not annotated to be stores or
             # references
             fn_signature = inspect.signature(fn)

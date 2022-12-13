@@ -143,7 +143,6 @@ class NumPyBlock(AbstractBlock):
         }
         # note that the new block may share memory with the old block
         return BlockRef(block=block, columns=columns)
-    
 
     @property
     def is_mmap(self):

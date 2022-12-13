@@ -1,10 +1,13 @@
 from functools import wraps
+
 from meerkat import DataFrame
 
 
 def check_primary_key(fn: callable):
-    """This decorator should wrap meerkat ops that could potentially invalidate a
-    primary key. If the primary key is invalidated, the primary key is removed from
+    """This decorator should wrap meerkat ops that could potentially invalidate
+    a primary key.
+
+    If the primary key is invalidated, the primary key is removed from
     the DataFrame.
     """
 

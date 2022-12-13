@@ -15,9 +15,9 @@ import torch
 from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
 
-from meerkat.columns.abstract import Column
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumPyBlock
+from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
@@ -141,7 +141,7 @@ class NumPyTensorColumn(
         # important to check if .base is a python mmap object, since a view of a mmap
         # is also a memmap object, but should not be symlinked or copied
         if len(self.data.shape) == 1:
-            # if the data is a 1D array, then their is a level of indirection to the 
+            # if the data is a 1D array, then their is a level of indirection to the
             # the base object because we did a reshape to add an extra dimension
             return isinstance(self.data, np.memmap) and isinstance(
                 self._block.data.base.base, mmap

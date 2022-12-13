@@ -8,8 +8,8 @@ import pytest
 from PIL import Image
 
 from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
-from meerkat.columns.deferred.file import FileLoader, FileCell, FileColumn
 from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
 from meerkat.columns.scalar import ScalarColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
 

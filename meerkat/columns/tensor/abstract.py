@@ -14,7 +14,7 @@ TensorColumnTypes = Union[np.ndarray, torch.TensorType]
 
 class TensorColumn(Column):
     def __new__(cls, data: TensorColumnTypes = None):
-        
+
         if (cls is not TensorColumn) or (data is None):
             return super().__new__(cls)
 
@@ -27,7 +27,6 @@ class TensorColumn(Column):
                 from .numpy import NumPyTensorColumn
 
                 return super().__new__(NumPyTensorColumn)
-        
 
         if isinstance(data, np.ndarray):
             from .numpy import NumPyTensorColumn

@@ -40,7 +40,7 @@ class DeferredCell(AbstractCell):
     def __repr__(self):
         name = getattr(self.data.fn, "__qualname__", repr(self.data.fn))
         return f"{self.__class__.__qualname__}(fn={name})"
-    
+
     def __call__(self):
         return self.data._get()
 
@@ -58,7 +58,7 @@ class DeferredColumn(Column):
     ):
         self._output_type = output_type
         super(DeferredColumn, self).__init__(data, *args, **kwargs)
-    
+
     def __call__(self):
         # TODO(Sabri): Make this a more efficient call
         return self._get(index=np.arange(len(self)), materialize=True)

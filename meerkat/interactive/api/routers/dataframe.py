@@ -4,13 +4,13 @@ import numpy as np
 from fastapi import HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import trigger
-from meerkat.interactive.modification import DataFrameModification, Modification
+from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
 
@@ -126,14 +126,15 @@ def rows(
 
 
 @endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
-def remove_row_by_index(
-    df: DataFrame, row_index: int = Endpoint.EmbeddedBody()
-):
+def remove_row_by_index(df: DataFrame, row_index: int = Endpoint.EmbeddedBody()):
     df = df.lz[np.arange(len(df)) != row_index]
 
     # TODO: shouldn't have to issue this manually
     from meerkat.state import state
-    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=df.columns))
+
+    state.modification_queue.add(
+        DataFrameModification(id=df.inode.id, scope=df.columns)
+    )
 
 
 @endpoint(prefix="/df", route="/{df}/edit/")
@@ -151,8 +152,8 @@ def edit(
 
     # TODO: shouldn't have to issue this manually
     from meerkat.state import state
-    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=[column]))
 
+    state.modification_queue.add(DataFrameModification(id=df.inode.id, scope=[column]))
 
 
 @endpoint(prefix="/df", route="/{df}/edit_target/")

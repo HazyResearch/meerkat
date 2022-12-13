@@ -18,6 +18,7 @@ from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
+from ..abstract import Column
 from .abstract import TensorColumn
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -142,7 +143,7 @@ class TorchTensorColumn(
         return cls(data)
 
     @classmethod
-    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+    def get_writer(cls, mmap: bool = False, template: Column = None):
         if mmap:
             return NumpyMemmapWriter()
         else:
@@ -161,7 +162,7 @@ class TorchTensorColumn(
         return TensorFormatter()
 
     @classmethod
-    def from_data(cls, data: Union[Columnable, AbstractColumn]):
+    def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to an EmbeddingColumn."""
         if torch.is_tensor(data):
             return cls(data)
@@ -194,7 +195,7 @@ class TorchTensorColumn(
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
-            AbstractColumn: A view of the column with the sorted data.
+            Column: A view of the column with the sorted data.
         """
         # calls argsort() function to retrieve ordered indices
 
@@ -230,7 +231,7 @@ class TorchTensorColumn(
         else:  # Case 2: The array has more than one column, raise error.
             raise Exception("No implementation for array with more than one column.")
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         return (other.__class__ == self.__class__) and (self.data == other.data).all()
 
     def to_tensor(self) -> torch.Tensor:

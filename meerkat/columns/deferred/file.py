@@ -35,49 +35,50 @@ class FileLoader:
         cache_dir: str = None,
         transform: Callable[[Any], Any] = None,
     ):
-        """A simple file loader with support for both local paths and remote URIs.
-        
+        """A simple file loader with support for both local paths and remote
+        URIs.
+
         .. warning::
-            In order for the column to be serializable with ``write()``, the 
+            In order for the column to be serializable with ``write()``, the
             callables passed to the constructor must be pickleable.
 
         Args:
             loader (callable): a callable that accepts a filepath or an I/O
-                stream and returns data.  
+                stream and returns data.
 
-            base_dir (str, optional): an absolute path to a directory containing the 
+            base_dir (str, optional): an absolute path to a directory containing the
                 files. If provided, the ``filepath`` to be loaded will be joined with
-                the ``base_dir``. As such, this argument should only be used if the 
+                the ``base_dir``. As such, this argument should only be used if the
                 loader will be applied to relative paths. T
-                
-                The ``base_dir`` can also 
-                include environment variables (e.g. ``$DATA_DIR/images``) which will 
-                be expanded prior to loading. This is useful when sharing DataFrames
-                between machines. 
 
-            downloader (Union[str, callable], optional): a callable that accepts at 
-                least two  positional arguments - a URI and a destination (which could 
-                be either a string or file object). 
+                The ``base_dir`` can also
+                include environment variables (e.g. ``$DATA_DIR/images``) which will
+                be expanded prior to loading. This is useful when sharing DataFrames
+                between machines.
+
+            downloader (Union[str, callable], optional): a callable that accepts at
+                least two  positional arguments - a URI and a destination (which could
+                be either a string or file object).
 
                 Meerkat includes a small set of built-in downloaders ["url", "gcs"]
-                which can be specified via string. 
+                which can be specified via string.
 
-            fallback_downloader (callable, optional): a callable that will be run each 
-                time the the downloader fails (for any reason). This is useful, for 
+            fallback_downloader (callable, optional): a callable that will be run each
+                time the the downloader fails (for any reason). This is useful, for
                 example, if you expect some of the URIs in a dataset to be broken
-                ``fallback_downloader`` could write an empty file in place of the 
-                original. If ``fallback_downloader`` is not supplied, the original 
-                exception is re-raised. 
+                ``fallback_downloader`` could write an empty file in place of the
+                original. If ``fallback_downloader`` is not supplied, the original
+                exception is re-raised.
 
-            cache_dir (str, optional): the directory on disk where downloaded 
-                files are to be cached. Defaults to None, in which case files will be 
-                re-downloaded on every access of the data. The ``cache_dir`` can also 
-                include environment variables (e.g. ``$DATA_DIR/images``) which will 
+            cache_dir (str, optional): the directory on disk where downloaded
+                files are to be cached. Defaults to None, in which case files will be
+                re-downloaded on every access of the data. The ``cache_dir`` can also
+                include environment variables (e.g. ``$DATA_DIR/images``) which will
                 be expanded prior to loading. This is useful when sharing DataFrames
-                between machines. 
-                
+                between machines.
+
             transform (callable, optional): an optional callable which will be applied
-                to the data after loading. This is useful, for example, in machine 
+                to the data after loading. This is useful, for example, in machine
                 learning workflows where raw data requires conversion to Tensors.
         """
         self.transform = transform
@@ -237,7 +238,7 @@ class FileColumn(DeferredColumn):
             .. warning::
                 In order for the column to be serializable with ``write()``, the loader
                 function must be pickleable.
-        
+
         transform (callable): A function that transforms the loaded data (e.g.
             ``torchvision.transforms.functional.center_crop``).
 
@@ -246,13 +247,13 @@ class FileColumn(DeferredColumn):
                 be pickleable.
 
 
-        base_dir (str): an absolute path to a directory containing the 
+        base_dir (str): an absolute path to a directory containing the
             files. If provided, the ``filepath`` to be loaded will be joined with
-            the ``base_dir``. As such, this argument should only be used if the 
-            loader will be applied to relative paths. The ``base_dir`` can also 
-            include environment variables (e.g. ``$DATA_DIR/images``) which will 
+            the ``base_dir``. As such, this argument should only be used if the
+            loader will be applied to relative paths. The ``base_dir`` can also
+            include environment variables (e.g. ``$DATA_DIR/images``) which will
             be expanded prior to loading. This is useful when sharing DataFrames
-            between machines. 
+            between machines.
     """
 
     def __init__(

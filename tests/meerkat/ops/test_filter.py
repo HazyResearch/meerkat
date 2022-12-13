@@ -3,8 +3,8 @@ import pytest
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
 from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
-from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
 from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
 from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
@@ -15,7 +15,9 @@ from ..columns.tensor.test_torch import TorchTensorColumnTestBed
                 config={"num_dims": [1], "dim_length": [1]}
             ),
             PandasScalarColumnTestBed,
-            TorchTensorColumnTestBed.get_params(config={"num_dims": [1], "dim_length": [1]}),
+            TorchTensorColumnTestBed.get_params(
+                config={"num_dims": [1], "dim_length": [1]}
+            ),
             ArrowScalarColumnTestBed,
         ]
     )

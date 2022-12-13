@@ -16,20 +16,20 @@ import meerkat
 from meerkat import TorchTensorColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
-from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.row import Row
 
 from ..utils import product_parametrize
-from .columns.scalar.test_arrow import ArrowScalarColumnTestBed
 from .columns.deferred.test_image import ImageColumnTestBed
-from .columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from .columns.scalar.test_arrow import ArrowScalarColumnTestBed
 from .columns.scalar.test_pandas import PandasScalarColumnTestBed
+from .columns.tensor.test_numpy import NumPyTensorColumnTestBed
 from .columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
@@ -124,10 +124,12 @@ class DataFrameTestBed:
                 "ids": [str(config) for config in configs],
             }
         else:
+
             def _repr_value(value):
                 if isinstance(value, type):
                     return value.__name__
                 return str(value)
+
             argvalues = list(product(configs, *params.values()))
             return {
                 "argnames": "testbed," + ",".join(params.keys()),
@@ -663,10 +665,10 @@ def test_overwrite_column():
 def test_rename():
     a = NumPyTensorColumn(np.arange(16))
     b = NumPyTensorColumn(np.arange(16) * 2)
-    
+
     df = DataFrame.from_batch({"a": a, "b": b})
     assert "a" in df
-    
+
     new_df = df.rename({"a": "A"})
 
     # make sure "a" was renamed to "A"
@@ -692,6 +694,7 @@ def test_rename():
     # make sure rename happened out of place
     assert df["a"]._data is a._data
     assert df["b"]._data is b._data
+
 
 @product_parametrize(params={"move": [True, False]})
 def test_io(testbed, tmp_path, move):
@@ -1022,8 +1025,10 @@ def test_constructor():
     assert len(df) == length
     assert df["a"].is_equal(ScalarColumn(np.arange(length)))
     # need to fillna because nan comparisons return false in pandas
-    assert df["c"].fillna(0).is_equal(
-        ScalarColumn([0 if idx % 2 == 0 else idx for idx in range(length)])
+    assert (
+        df["c"]
+        .fillna(0)
+        .is_equal(ScalarColumn([0 if idx % 2 == 0 else idx for idx in range(length)]))
     )
     assert df.columns == ["a", "b", "c"]
 
@@ -1139,9 +1144,7 @@ def test_loc_multiple(testbed, column_type):
 
 
 def test_loc_missing():
-    df = DataFrame(
-        {"x": TorchTensorColumn([1, 2, 3]), "y": ScalarColumn([4, 5, 6])}
-    )
+    df = DataFrame({"x": TorchTensorColumn([1, 2, 3]), "y": ScalarColumn([4, 5, 6])})
     df = df.set_primary_key("y")
 
     with pytest.raises(KeyError):
@@ -1149,9 +1152,7 @@ def test_loc_missing():
 
 
 def test_primary_key_persistence():
-    df = DataFrame(
-        {"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))}
-    )
+    df = DataFrame({"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))})
     df = df.set_primary_key("a")
 
     df = df[:4]
@@ -1168,9 +1169,7 @@ def test_invalid_primary_key():
 
 
 def test_primary_key_reset():
-    df = DataFrame(
-        {"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))}
-    )
+    df = DataFrame({"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))})
     df = df.set_primary_key("a")
 
     df["a"] = ScalarColumn(np.arange(16))
@@ -1178,18 +1177,14 @@ def test_primary_key_reset():
 
 
 def test_check_primary_key_reset():
-    df = DataFrame(
-        {"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))}
-    )
+    df = DataFrame({"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))})
     df = df.set_primary_key("a")
 
     assert df.append(df).primary_key is None
 
 
 def test_check_primary_key_no_reset():
-    df = DataFrame(
-        {"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))}
-    )
+    df = DataFrame({"a": ScalarColumn(np.arange(16)), "b": ScalarColumn(np.arange(16))})
     df = df.set_primary_key("a")
 
     df2 = DataFrame(

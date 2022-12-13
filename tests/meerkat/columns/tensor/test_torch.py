@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import torch
 
-from meerkat import TorchTensorColumn, NumPyTensorColumn
+from meerkat import NumPyTensorColumn, TorchTensorColumn
 from meerkat.block.torch_block import TorchBlock
 
 from ..abstract import AbstractColumnTestBed, column_parametrize

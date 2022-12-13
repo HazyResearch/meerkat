@@ -5,7 +5,6 @@ import numpy as np
 
 from meerkat import DataFrame, ObjectColumn
 from meerkat.columns.deferred.base import DeferredColumn
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
@@ -131,7 +130,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
                         new_col = new_col.astype(float)
                 else:
                     new_col = new_col.astype(float)
-                
+
                 new_col[np.isnan(indices)] = np.nan
                 data[name] = new_col
             else:
@@ -151,7 +150,9 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
 def _check_merge_columns(df: DataFrame, on: List[str]):
     for name in on:
         column = df[name]
-        if isinstance(column, TorchTensorColumn) or isinstance(column, TorchTensorColumn):
+        if isinstance(column, TorchTensorColumn) or isinstance(
+            column, TorchTensorColumn
+        ):
             if len(column.shape) > 1:
                 raise MergeError(
                     f"Cannot merge on column `{name}`, has more than one dimension."

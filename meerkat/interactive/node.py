@@ -3,8 +3,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, ValidationError
 
-from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.interactive.frontend import FrontendMixin
+from meerkat.mixins.identifiable import IdentifiableMixin
 
 
 class NodeFrontendModel(BaseModel):
@@ -18,7 +18,8 @@ class Node(IdentifiableMixin, FrontendMixin):
     _self_identifiable_group: str = "nodes"
 
     def __init__(self, obj: any, **kwargs):
-        """A node in the computational graph. This could be an object or an operation.
+        """A node in the computational graph. This could be an object or an
+        operation.
 
         Args:
             obj (any): This could be any class that has NodeMixin (e.g. store,
@@ -75,8 +76,8 @@ class Node(IdentifiableMixin, FrontendMixin):
 
 
 class NodeMixin(FrontendMixin):
-    """
-    Mixin for Classes whose objects can be attached to a node in the computation graph.
+    """Mixin for Classes whose objects can be attached to a node in the
+    computation graph.
 
     Add this mixin to any class whose objects should be nodes
     in a graph.
@@ -95,18 +96,14 @@ class NodeMixin(FrontendMixin):
         # self._set_node_id()
 
     def attach_to_inode(self, inode: Node):
-        """
-        Attach this object to a node.
-        """
+        """Attach this object to a node."""
         # The object should point to the node
         self._self_inode = inode
         # The node should point to the object
         inode.obj = self
 
     def detach_inode(self) -> Node:
-        """
-        Detach this object from its node.
-        """
+        """Detach this object from its node."""
         # Grab the node
         inode = self._self_inode
         # Point the node to None
@@ -117,9 +114,9 @@ class NodeMixin(FrontendMixin):
         return inode
 
     def create_inode(self, inode_id: str = None) -> Node:
-        """
-        Creates a node for this object. Doesn't attach the
-        node to the object yet.
+        """Creates a node for this object.
+
+        Doesn't attach the node to the object yet.
         """
         return Node(None, id=inode_id)
 
