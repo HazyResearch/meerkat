@@ -134,7 +134,7 @@ Instead, images are only loaded into memory at the moment they are selected.
 
      
     Lazy selection is critical for manipulating and managing DataFrames in Meerkat. 
-    It is discussed in more detail in the guide on :doc:`lambda`.
+    It is discussed in more detail in the guide on :doc:`deferred`.
     
 
 

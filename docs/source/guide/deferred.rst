@@ -2,11 +2,11 @@
 Deferred Columns
 =================
 
-*Motivation.* When working with multimodal datasets, the data in some columns may fit easily in memory, while others are best kept on disk and loaded only when needed. For example, in an image dataset, the image labels and metadata are small and may fit in memory, while the images themselves are large and should stay on disk until they are needed.
+*Motivation.* When working with multimodal datasets, the data in some columns may fit easily in memory, while the data in others are best kept on disk and loaded only when needed. For example, in an image dataset, the image labels and metadata are small and may fit in memory, while the images themselves are large and should stay on disk until they are needed.
 
-In Meerkat, columns like :class:`~meerkat.ImageColumn` and :class:`~meerkat.AudioColumn` make it easy to work with complex data types that can't fit in memory. If you check out the implementation of these classes, you'll notice that they are super simple subclasses of :class:`~meerkat.DeferredColumn`.  
+In Meerkat, columns like :class:`~meerkat.ImageColumn` and :class:`~meerkat.AudioColumn` make it easy to work with complex data types that can't fit in memory. If you check out the implementation of these classes, you'll notice that they are straightforward subclasses of :class:`~meerkat.DeferredColumn`.  
 
-*What's a DeferredColumn?* A  :class:`~meerkat.DeferredColumn` wraps around another column and applies a function to it's content. You can think of it as a deferred map operation. 
+*What's a DeferredColumn?* A  :class:`~meerkat.DeferredColumn` wraps around another column and *represents* what you would get if you applied a function to its content. You can think of it as a deferred map operation. 
 
 Consider the following example, where we create a simple Meerkat column...    
 
@@ -14,19 +14,29 @@ Consider the following example, where we create a simple Meerkat column...
 
     import meerkat as mk
 
-    col = mk.Column([0,1,2])
-    col[1]
+    col = mk.column(list(range(10)))
 
   
-...and create a deferred column, ``dcol``, from the original column.
+...and create a deferred column, ``dcol``, based on it:
 
 .. ipython:: python
 
     dcol = col.defer(function=lambda x: x + 10)
-    dcol()
+    dcol
 
+Like other columns, deferred columns can be subselected.
 
-Critically, the function inside a deferred column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.DeferredColumn` that lazily loads images...
+.. ipython:: python
+
+    small_dcol = dcol[:5]
+
+Unlike other columns, deferred columns are **callable**. When we call a deferred column, we apply the function to the underlying column.
+
+.. ipython:: python
+
+    small_dcol()
+
+Critically, the function inside a deferred column is called neither on creation or selection, but only later once the column is called! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a :class:`~meerkat.DeferredColumn` that lazily loads images...
 
 .. ipython:: python
     :verbatim:
@@ -41,7 +51,7 @@ Critically, the function inside a deferred column is only called at the time the
     )
     df["image"] = df["filepath"].defer(fn=Image.open)
 
-Notice how we provide an absolute path to the images. This makes the column useable from any working directory. 
+Notice how we provide an absolute path to the images. This makes the column usable from any working directory. 
 However, using absolute paths is in other ways not ideal: what if we want to share the DataFrame and open it on a different machine? In the section below, we discuss a subclass of :class:`~meerkat.DeferredColumn` that makes it easy to manage filepaths. 
 
 FileColumn
@@ -80,3 +90,11 @@ The ``base_dir`` can then be changed at any time, so if we wanted to share the D
     
 
 An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.FileColumn` like this one, with a few more bells and whistles!
+
+
+Chaining Deferred Columns
+##########################
+
+.. todo::
+
+    Fill in this stub.

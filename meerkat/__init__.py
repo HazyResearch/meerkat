@@ -25,7 +25,7 @@ initialize_logging()
 import meerkat.interactive as gui
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
-from meerkat.columns.abstract import Column
+from meerkat.columns.abstract import Column, column
 from meerkat.columns.deferred.audio import AudioColumn
 from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
 from meerkat.columns.deferred.image import ImageColumn
@@ -58,6 +58,7 @@ __all__ = [
     "DataFrame",
     "DataPanel",
     "Column",
+    "column",
     "ObjectColumn",
     "ScalarColumn",
     "PandasScalarColumn",

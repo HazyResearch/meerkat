@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 
 import meerkat.config
@@ -524,47 +525,7 @@ class Column(
     def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        from .scalar import ScalarColumn
-        from .tensor import TensorColumn
-
-        if isinstance(data, Column):
-            # TODO: Need ton make this view but should decide where to do it exactly
-            return data  # .view()
-
-        if isinstance(data, pd.Series):
-            return ScalarColumn(data)
-
-        if torch.is_tensor(data):
-            from .tensor.torch import TorchTensorColumn
-
-            if len(data.shape) == 1:
-                return ScalarColumn(data.cpu().detach().numpy())
-            return TorchTensorColumn(data)
-
-        if isinstance(data, np.ndarray):
-            if len(data.shape) == 1:
-                return ScalarColumn(data)
-            return TensorColumn(data)
-
-        if isinstance(data, Sequence):
-            if len(data) != 0 and isinstance(data[0], (np.ndarray, TensorColumn)):
-                return TensorColumn(data)
-
-            if len(data) != 0 and isinstance(
-                data[0], (str, int, float, bool, np.generic)
-            ):
-                from .scalar import ScalarColumn
-
-                return ScalarColumn(data)
-
-            if len(data) != 0 and torch.is_tensor(data[0]):
-                return TensorColumn(data)
-
-            from .object.base import ObjectColumn
-
-            return ObjectColumn(data)
-        else:
-            raise ValueError(f"Cannot create column out of data of type {type(data)}")
+        return column(data)
 
     def head(self, n: int = 5) -> Column:
         """Get the first `n` examples of the column."""
@@ -586,3 +547,44 @@ class Column(
     @property
     def is_mmap(self):
         return False
+
+
+def column(data: Sequence) -> Column:
+    """Create a Meerkat column from data. The Meerkat column type is inferred
+    from the type and structure of the data passed in."""
+    from .scalar import ScalarColumn
+    from .tensor import TensorColumn
+
+    if isinstance(data, Column):
+        # TODO: Need ton make this view but should decide where to do it exactly
+        return data  # .view()
+
+    if isinstance(data, pd.Series) or isinstance(data, pa.Array):
+        return ScalarColumn(data)
+
+    if torch.is_tensor(data):
+        if len(data.shape) == 1:
+            return ScalarColumn(data.cpu().detach().numpy())
+        return TensorColumn(data)
+
+    if isinstance(data, np.ndarray):
+        if len(data.shape) == 1:
+            return ScalarColumn(data)
+        return TensorColumn(data)
+
+    if isinstance(data, Sequence):
+        if len(data) != 0 and (
+            isinstance(data[0], (np.ndarray, TensorColumn)) or torch.is_tensor(data[0])
+        ):
+            return TensorColumn(data)
+
+        if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
+            from .scalar import ScalarColumn
+
+            return ScalarColumn(data)
+
+        from .object.base import ObjectColumn
+
+        return ObjectColumn(data)
+    else:
+        raise ValueError(f"Cannot create column out of data of type {type(data)}")
