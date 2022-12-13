@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { get, writable, type Writable } from 'svelte/store';
-	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
+	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
     import * as monaco from 'monaco-editor';
 	import { getContext } from 'svelte';
 	import Status from '$lib/components/common/Status.svelte';
@@ -46,7 +46,7 @@
 
 	$: {
 		schema_promise = $get_schema($dp.box_id);
-		items_promise = schema_promise.then((schema: DataPanelSchema) => {
+		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.filter((column) => {
 				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
 			}).map(column => {
