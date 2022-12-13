@@ -1,4 +1,3 @@
-from typing import Any
 
 from meerkat.interactive.graph import Store
 

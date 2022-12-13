@@ -8,7 +8,7 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.prediction_column import (
     ClassificationOutputColumn,
@@ -43,14 +43,14 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
 
     def binarymask(
         self, class_index: int
-    ) -> TensorColumn:  # TODO(Priya): Check column type
+    ) -> TorchTensorColumn:  # TODO(Priya): Check column type
 
         if self.num_classes > 2 and class_index is None:
             raise ValueError("Provide class_index in case of multi-class segmentation")
 
         if self.num_classes == 2:
             # Binary mask is same as predictions
-            mask = TensorColumn(
+            mask = TorchTensorColumn(
                 self.data
                 if self._ctype == _ClassifierOutputType.PREDICTION
                 else self.predictions().data
@@ -62,7 +62,7 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
                 if self._ctype == _ClassifierOutputType.PREDICTION
                 else self.predictions().data
             )
-            mask = TensorColumn(torch.where(preds == class_index, 1, 0))
+            mask = TorchTensorColumn(torch.where(preds == class_index, 1, 0))
 
         return mask
 
@@ -74,7 +74,7 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
         resize_dim=None,
         to_nan: bool = False,
         batch_size: int = 32,
-    ) -> TensorColumn:
+    ) -> TorchTensorColumn:
 
         masks = []
 
@@ -89,7 +89,7 @@ class SegmentationOutputColumn(ClassificationOutputColumn):
 
             masks = list(itertools.chain(masks, batch_masks))
 
-        masks_col = TensorColumn(masks)
+        masks_col = TorchTensorColumn(masks)
         dataset.add_column(f"Binary Mask (from {input_columns[0]})", masks_col)
 
         return masks_col

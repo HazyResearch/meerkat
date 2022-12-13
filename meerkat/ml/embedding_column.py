@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 faiss = LazyLoader("faiss")
@@ -22,14 +22,14 @@ Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 logger = logging.getLogger(__name__)
 
 
-class EmbeddingColumn(TensorColumn):
+class EmbeddingColumn(TorchTensorColumn):
     def __init__(
         self,
         data: Sequence = None,
         *args,
         **kwargs,
     ):
-        if data is not None and isinstance(data, TensorColumn):
+        if data is not None and isinstance(data, TorchTensorColumn):
             data = data._data
         super(EmbeddingColumn, self).__init__(data=data, *args, **kwargs)
 

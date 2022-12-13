@@ -4,40 +4,32 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from meerkat import (
-    CellColumn,
-    LambdaColumn,
-    NumpyArrayColumn,
-    PandasSeriesColumn,
-    TensorColumn,
-)
+from meerkat import DeferredColumn, NumPyTensorColumn, TorchTensorColumn
+from meerkat.columns.deferred.base import DeferredCell
+from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.errors import ImmutableError
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
-from .test_arrow_column import ArrowArrayColumnTestBed
-from .test_audio_column import AudioColumnTestBed
-from .test_cell_column import CellColumnTestBed
-from .test_file_column import FileColumnTestBed
-from .test_image_column import ImageColumnTestBed
-from .test_lambda_column import LambdaColumnTestBed
-from .test_numpy_column import NumpyArrayColumnTestBed
-from .test_pandas_column import PandasSeriesColumnTestBed
-from .test_tensor_column import TensorColumnTestBed
+from .deferred.test_deferred import DeferredColumnTestBed
+from .deferred.test_image import ImageColumnTestBed
+from .scalar.test_arrow import ArrowScalarColumnTestBed
+from .scalar.test_pandas import PandasScalarColumnTestBed
+from .tensor.test_numpy import NumPyTensorColumnTestBed
+from .tensor.test_torch import TorchTensorColumnTestBed
 
 
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
-            CellColumnTestBed,
-            FileColumnTestBed,
+            # NumPyTensorColumnTestBed,
+            # PandasScalarColumnTestBed,
+            # TorchTensorColumnTestBed,
+            # DeferredColumnTestBed,
+            # ArrowScalarColumnTestBed,
+            # FileColumnTestBed,
             ImageColumnTestBed,
-            AudioColumnTestBed,
+            # AudioColumnTestBed,
         ]
     )
 )
@@ -49,11 +41,11 @@ def column_testbed(request, tmpdir):
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
         ],
         single=True,
     ),
@@ -66,8 +58,10 @@ def single_column_testbed(request, tmpdir):
 @product_parametrize(params={"index_type": [np.array, list]})
 def test_getitem(column_testbed, index_type: type):
     col = column_testbed.col
-
-    column_testbed.assert_data_equal(column_testbed.get_data(1), col[1])
+    result = col[1]
+    if isinstance(result, DeferredCell):
+        result = result()
+    column_testbed.assert_data_equal(column_testbed.get_data(1), result)
 
     for index in [
         slice(2, 4, 1),
@@ -77,6 +71,9 @@ def test_getitem(column_testbed, index_type: type):
         col_index = index_type(index) if not isinstance(index, slice) else index
         data = column_testbed.get_data(index)
         result = col[col_index]
+
+        if isinstance(result, DeferredColumn):
+            result = result()
         column_testbed.assert_data_equal(data, result.data)
 
         if type(result) == type(col):
@@ -89,7 +86,7 @@ def test_getitem(column_testbed, index_type: type):
 
 @product_parametrize(params={"index_type": [np.array, list, pd.Series]})
 def test_set_item(column_testbed, index_type: type):
-    MUTABLE_COLUMNS = (NumpyArrayColumn, TensorColumn, PandasSeriesColumn, CellColumn)
+    MUTABLE_COLUMNS = (NumPyTensorColumn, TorchTensorColumn, PandasScalarColumn)
 
     col = column_testbed.col
 
@@ -130,7 +127,7 @@ def test_pickle(column_testbed):
 
     assert isinstance(new_col, type(col))
 
-    if isinstance(new_col, LambdaColumn):
+    if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
         new_col.data.fn = col.fn
     assert col.is_equal(new_col)
@@ -149,7 +146,7 @@ def test_io(tmp_path, column_testbed: AbstractColumnTestBed):
 
     assert isinstance(new_col, type(col))
 
-    if isinstance(new_col, LambdaColumn):
+    if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
         new_col.data.fn = col.fn
 

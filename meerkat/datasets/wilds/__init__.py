@@ -9,8 +9,8 @@ import pandas as pd
 from datasets import DatasetInfo
 from torch.utils.data._utils.collate import default_collate
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
 
 from .config import base_config, populate_defaults
@@ -103,7 +103,7 @@ def get_wilds_dataframe(
     )
 
 
-class WILDSInputColumn(AbstractColumn):
+class WILDSInputColumn(Column):
     def __init__(
         self,
         dataset_name: str = "fmow",
@@ -149,7 +149,7 @@ class WILDSInputColumn(AbstractColumn):
                 ]
             self.metadata_columns.update(
                 {
-                    field: NumpyArrayColumn(data=series.values)
+                    field: NumPyTensorColumn(data=series.values)
                     for field, series in metadata_df.iteritems()
                 }
             )
@@ -178,7 +178,7 @@ class WILDSInputColumn(AbstractColumn):
 
         self.metadata_columns.update(
             {
-                f"meta_{field}": NumpyArrayColumn(data=dataset.metadata_array[:, idx])
+                f"meta_{field}": NumPyTensorColumn(data=dataset.metadata_array[:, idx])
                 for idx, field in enumerate(dataset.metadata_fields)
             }
         )
@@ -192,7 +192,7 @@ class WILDSInputColumn(AbstractColumn):
         the `y_array` and `metadata_array` properties which are universal across WILDS
         datasets.
         """
-        return NumpyArrayColumn(data=self.data.y_array)
+        return NumPyTensorColumn(data=self.data.y_array)
 
     def get_metadata_columns(self):
         return self.metadata_columns

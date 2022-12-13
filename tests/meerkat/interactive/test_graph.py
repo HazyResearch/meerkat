@@ -1,4 +1,3 @@
-import random
 from typing import List
 
 import numpy as np
@@ -57,7 +56,6 @@ def _add_to_list(_keys: List[str], new_key: str):
 
 
 def test_react_context_manager_basic():
-
     df = _create_dummy_df()
 
     with mk.gui.react():

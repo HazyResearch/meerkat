@@ -9,7 +9,7 @@ import torch
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -51,7 +51,7 @@ class _ClassifierOutputType(Enum):
         return self.names[0]
 
 
-class ClassificationOutputColumn(TensorColumn):
+class ClassificationOutputColumn(TorchTensorColumn):
     def __init__(
         self,
         logits: Columnable = None,
@@ -100,7 +100,7 @@ class ClassificationOutputColumn(TensorColumn):
 
         data, ctype = valid_data[0]
 
-        if isinstance(data, TensorColumn):
+        if isinstance(data, TorchTensorColumn):
             data = data.data  # unwrap tensor out of TensorColumn
 
         if ctype == _ClassifierOutputType.PREDICTION and not multi_label and one_hot:
@@ -191,7 +191,7 @@ class ClassificationOutputColumn(TensorColumn):
 
     preds = predictions
 
-    def bincount(self) -> TensorColumn:
+    def bincount(self) -> TorchTensorColumn:
         """Compute the count (cardinality) for each category.
 
         Categories which are not available will have a count of 0.
@@ -213,19 +213,19 @@ class ClassificationOutputColumn(TensorColumn):
                 "mode for multi-dimensional tensors is not currently supported"
             )
         if preds.ndim == 1:
-            return TensorColumn(torch.bincount(preds, minlength=self.num_classes))
+            return TorchTensorColumn(torch.bincount(preds, minlength=self.num_classes))
         else:
             out = preds.sum(dim=0)
             if len(out) < self.num_classes:
                 pad = (0,) * (2 * (out.ndim - 1)) + (0, self.num_classes - len(out))
                 out = F.pad(out, pad=pad)
-            return TensorColumn(out)
+            return TorchTensorColumn(out)
 
     def mode(self):
         count = self.bincount()
         return torch.argmax(count.data)
 
-    def entropy(self) -> TensorColumn:
+    def entropy(self) -> TorchTensorColumn:
         """Compute the entropy for each example.
 
         If ``self.multi_label`` is True, each category is treated as a binary
@@ -246,7 +246,7 @@ class ClassificationOutputColumn(TensorColumn):
         elif probs.ndim > 2:
             # make channels last
             probs = probs.transpose((0,) + tuple(range(2, probs.ndim)) + (1,))
-        return TensorColumn(Categorical(probs=probs).entropy())
+        return TorchTensorColumn(Categorical(probs=probs).entropy())
 
     @classmethod
     def _state_keys(cls) -> set:

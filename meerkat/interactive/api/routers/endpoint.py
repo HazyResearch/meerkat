@@ -1,9 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Tuple
 
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.state import state
-from meerkat.interactive.graph import Modification, trigger
-
+from meerkat.interactive.graph import Modification
 
 if TYPE_CHECKING:
     from meerkat.interactive.modification import Modification

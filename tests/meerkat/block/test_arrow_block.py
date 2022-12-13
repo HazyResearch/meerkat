@@ -5,7 +5,7 @@ import pytest
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.ref import BlockRef
-from meerkat.columns.arrow_column import ArrowArrayColumn
+from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConsolidationError
 
 
@@ -35,7 +35,7 @@ def test_consolidate_1(num_blocks):
 
     cols = [
         {
-            str(slc): ArrowArrayColumn(
+            str(slc): ArrowScalarColumn(
                 data=BlockView(
                     block=blocks[idx],
                     block_index=slc,
@@ -73,7 +73,7 @@ def test_consolidate_mismatched_signature():
     ]
     cols = [
         {
-            str(slc): ArrowArrayColumn(
+            str(slc): ArrowScalarColumn(
                 data=BlockView(
                     block=blocks[block_idx],
                     block_index=slc,

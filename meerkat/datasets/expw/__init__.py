@@ -77,7 +77,7 @@ class expw(DatasetBuilder):
             "face_box_left",
             "face_box_right",
             "face_box_bottom",
-        ].to_lambda(crop)
+        ].defer(crop)
 
         return df
 

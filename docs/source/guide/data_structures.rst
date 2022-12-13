@@ -10,7 +10,7 @@ high-level introduction.
 Column
 -------
 A column is a sequential data structure (analagous to a `Series <https://pandas.pydata.org/docs/reference/api/pandas.Series.html>`_ in Pandas or a `Vector <https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Simple-manipulations-numbers-and-vectors>`_ in R). 
-Meerkat supports a diverse set of column types (*e.g.* :class:`~meerkat.NumpyArrayColumn`, 
+Meerkat supports a diverse set of column types (*e.g.* :class:`~meerkat.TensorColumn`, 
 :class:`~meerkat.ImageColumn`), each intended for different kinds of data. To see a
 list of the core column types and their capabilities, see :doc:`column_types`.
 
@@ -38,8 +38,8 @@ we simply pass filepaths to the :class:`~meerkat.ImageColumn` constructor.
 .. raw:: html
    :file: ../html/display/simple_column.html
 
-All Meerkat columns are subclasses of :class:`~meerkat.AbstractColumn` and share a common 
-interface, which includes :meth:`~meerkat.AbstractColumn.__len__`, :meth:`~meerkat.AbstractColumn.__getitem__`, :meth:`~meerkat.AbstractColumn.__setitem__`, :meth:`~meerkat.AbstractColumn.filter`, :meth:`~meerkat.AbstractColumn.map`, and :meth:`~meerkat.AbstractColumn.concat`. Below we get the length of the column we just created. 
+All Meerkat columns are subclasses of :class:`~meerkat.Column` and share a common 
+interface, which includes :meth:`~meerkat.Column.__len__`, :meth:`~meerkat.Column.__getitem__`, :meth:`~meerkat.Column.__setitem__`, :meth:`~meerkat.Column.filter`, :meth:`~meerkat.Column.map`, and :meth:`~meerkat.Column.concat`. Below we get the length of the column we just created. 
 
 .. ipython:: python
 
@@ -47,12 +47,12 @@ interface, which includes :meth:`~meerkat.AbstractColumn.__len__`, :meth:`~meerk
 
 
 Certain column types may expose additional functionality. For example, 
-:class:`~meerkat.NumpyArrayColumn` inherits most of the functionality of an
+:class:`~meerkat.TensorColumn` inherits most of the functionality of an
 `ndarray <https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html>`_.
 
 .. ipython:: python
 
-    id_col = mk.NumpyArrayColumn([0, 1, 2])
+    id_col = mk.TensorColumn([0, 1, 2])
     id_col.sum()
     id_col == 1
 
@@ -60,14 +60,14 @@ To see the full list of methods available to a column type,
 
 If you don't know which column type to use, you can just pass a familiar data 
 structure like a ``list``, ``np.ndarray``, ``pd.Series``, and ``torch.Tensor`` to 
-:meth:`~meerkat.AbstractColumn.from_data` and Meerkat will automatically pick an
+:meth:`~meerkat.Column.from_data` and Meerkat will automatically pick an
 appropriate column type. 
 
 .. ipython:: python
 
     import torch
     tensor = torch.tensor([1,2,3])
-    mk.AbstractColumn.from_data(tensor)
+    mk.Column.from_data(tensor)
 
 DataFrame
 ----------

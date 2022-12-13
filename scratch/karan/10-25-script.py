@@ -1,4 +1,3 @@
-import uuid
 from glob import glob
 from typing import Sequence, Union
 
@@ -6,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.sort import SortCriterion
 from meerkat.interactive.graph import reactive
 from meerkat.ops.sliceby.groupby import groupby
 
@@ -96,8 +94,8 @@ ngoa_images = ngoa_images.lz[~ngoa_images["uuid"].to_pandas().duplicated()]
 def filter_na(df: mk.DataFrame):
     for name in df.columns:
         col = df[name]
-        is_pd_na = isinstance(col, mk.PandasSeriesColumn) and np.any(pd.isna(col.data))
-        is_np_na = isinstance(col, mk.NumpyArrayColumn) and np.any(np.isnan(col.data))
+        is_pd_na = isinstance(col, mk.ScalarColumn) and np.any(pd.isna(col.data))
+        is_np_na = isinstance(col, mk.TorchTensorColumn) and np.any(np.isnan(col.data))
         if is_pd_na or is_np_na:
             df.remove_column(name)
             print(name)

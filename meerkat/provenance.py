@@ -242,7 +242,7 @@ def _get_nested_objs(objs: Dict, key: Tuple[str], data: object):
         objs[key] = data
         for curr_key, item in data.items():
             _get_nested_objs(objs, key=(*key, curr_key), data=item)
-    elif isinstance(data, mk.AbstractColumn):
+    elif isinstance(data, mk.Column):
         objs[key] = data
 
 

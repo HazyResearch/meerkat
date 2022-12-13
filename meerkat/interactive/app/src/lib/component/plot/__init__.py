@@ -1,10 +1,10 @@
 from pydantic import Field
 
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.graph import Store
 
 from ..abstract import Component
-from meerkat.interactive.endpoint import Endpoint
 
 
 def is_none(x):

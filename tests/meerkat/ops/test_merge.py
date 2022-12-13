@@ -6,11 +6,10 @@ import numpy as np
 import pytest
 import torch
 
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.list_column import ListColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.deferred.image import ImageColumn
+from meerkat.columns.object.base import ObjectColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.errors import MergeError
 
@@ -30,7 +29,7 @@ class MergeTestBed(DataFrameTestBed):
 
     def __init__(
         self,
-        column_configs: Dict[str, AbstractColumn],
+        column_configs: Dict[str, Column],
         simple: bool = False,
         lengths: int = 16,
         consolidated: int = 16,
@@ -214,12 +213,12 @@ class TestMerge:
         # check for `values` at unmatched rows
         assert set(out.lz[mask_1]["b_1"]) == a1 - a2
         # check for `None` at unmatched rows
-        assert list(out.lz[mask_1]["b_2"]) == [None] * len(mask_1)
+        assert out.lz[mask_1]["b_2"].isna().all()
 
         # check for `values` at unmatched rows
         assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
         # check for equality at matched rows
-        assert list(out.lz[mask_1]["e_2"]) == [None] * len(mask_1)
+        assert out.lz[mask_1]["e_2"].isna().all()
 
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_right(self, testbed, sort):
@@ -257,21 +256,21 @@ class TestMerge:
         # check for `values` at unmatched rows
         assert set(out.lz[mask_2]["b_2"]) == a2 - a1
         # check for `None` at unmatched rows
-        assert list(out.lz[mask_2]["b_1"]) == [None] * len(mask_2)
+        assert (out.lz[mask_2]["b_1"]).isna().all()
 
         # check for `values` at unmatched rows
         assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
         # check for equality at matched rows
-        assert list(out.lz[mask_2]["e_1"]) == [None] * len(mask_2)
+        assert (out.lz[mask_2]["e_1"]).isna().all()
 
     def test_merge_output_column_types(self):
         df1 = DataFrame.from_batch(
-            {"a": np.arange(3), "b": ListColumn(["1", "2", "3"])}
+            {"a": np.arange(3), "b": ObjectColumn(["1", "2", "3"])}
         )
         df2 = df1.copy()
 
         out = df1.merge(df2, on="b", how="inner")
-        assert isinstance(out["b"], ListColumn)
+        assert isinstance(out["b"], ObjectColumn)
 
     def test_image_merge(self, tmpdir):
         length = 16
@@ -350,7 +349,7 @@ class TestMerge:
         # check dictionary not hashable
         df1 = DataFrame.from_batch(
             {
-                "a": ListColumn([{"a": 1}] * length),
+                "a": ObjectColumn([{"a": 1}] * length),
                 "b": list(np.arange(length)),
             }
         )
@@ -363,7 +362,7 @@ class TestMerge:
         # check dictionary not hashable
         df1 = DataFrame.from_batch(
             {
-                "a": ListColumn([{"a": 1}] * length),
+                "a": ObjectColumn([{"a": 1}] * length),
                 "b": list(np.arange(length)),
             }
         )
@@ -378,7 +377,7 @@ class TestMerge:
         # check multi-dimensional numpy array
         df1 = DataFrame.from_batch(
             {
-                "a": NumpyArrayColumn(np.stack([np.arange(5)] * length)),
+                "a": TorchTensorColumn(np.stack([np.arange(5)] * length)),
                 "b": list(np.arange(length)),
             }
         )
@@ -389,7 +388,7 @@ class TestMerge:
         # check multi-dimensional numpy array
         df1 = DataFrame.from_batch(
             {
-                "a": TensorColumn(torch.stack([torch.arange(5)] * length)),
+                "a": TorchTensorColumn(torch.stack([torch.arange(5)] * length)),
                 "b": list(np.arange(length)),
             }
         )
@@ -400,7 +399,7 @@ class TestMerge:
         # checks that **all** cells are hashable (not just the first)
         df1 = DataFrame.from_batch(
             {
-                "a": ListColumn(["hello"] + [{"a": 1}] * (length - 1)),
+                "a": ObjectColumn(["hello"] + [{"a": 1}] * (length - 1)),
                 "b": list(np.arange(length)),
             }
         )
@@ -422,7 +421,7 @@ class TestMerge:
         # checks that having a column called __right_indices__ raises a merge error
         df1 = DataFrame.from_batch(
             {
-                "a": ListColumn(["hello"] + [{"a": 1}] * (length - 1)),
+                "a": ObjectColumn(["hello"] + [{"a": 1}] * (length - 1)),
                 "b": list(np.arange(length)),
                 "__right_indices__": list(np.arange(length)),
             }

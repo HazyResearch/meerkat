@@ -52,9 +52,8 @@ class FunctionInspectorMixin:
             output = function(data, **kwargs)
 
         # lazy import to avoid circular dependency
-        from meerkat.columns.abstract import AbstractColumn
-        from meerkat.columns.numpy_column import NumpyArrayColumn
-        from meerkat.columns.tensor_column import TensorColumn
+        from meerkat.columns.abstract import Column
+        from meerkat.columns.tensor.torch import TorchTensorColumn
 
         if isinstance(output, Mapping):
             # `function` returns a dict output
@@ -78,11 +77,11 @@ class FunctionInspectorMixin:
         elif (
             isinstance(output, (bool, np.bool_))
             or (
-                isinstance(output, (np.ndarray, NumpyArrayColumn))
+                isinstance(output, (np.ndarray, TorchTensorColumn))
                 and output.dtype == bool
             )
             or (
-                isinstance(output, (torch.Tensor, TensorColumn))
+                isinstance(output, (torch.Tensor, TorchTensorColumn))
                 and output.dtype == torch.bool
             )
         ):
@@ -90,7 +89,7 @@ class FunctionInspectorMixin:
             # `function` returns a bool
             bool_output = True
 
-        elif isinstance(output, (Sequence, AbstractColumn, torch.Tensor, np.ndarray)):
+        elif isinstance(output, (Sequence, Column, torch.Tensor, np.ndarray)):
             # `function` returns a list
             list_output = True
             if is_batched_fn and (

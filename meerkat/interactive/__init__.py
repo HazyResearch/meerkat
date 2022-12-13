@@ -1,6 +1,8 @@
 import pathlib
 
+from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
+from meerkat.interactive.app.src.lib.component.text import Text
 from meerkat.interactive.app.src.lib.layouts import (
     ColumnLayout,
     Div,
@@ -11,10 +13,6 @@ from meerkat.interactive.app.src.lib.layouts import (
 from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
 from meerkat.interactive.app.src.lib.shared.cell.image import Image
-
-from meerkat.interactive.app.src.lib.component.text import Text
-from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
-
 
 from .app.src.lib.component.abstract import Component
 from .app.src.lib.component.button import Button
@@ -100,5 +98,5 @@ __all__ = [
     "Text",
     "Code",
     "CodeDisplay",
-    "Text"
+    "Text",
 ]

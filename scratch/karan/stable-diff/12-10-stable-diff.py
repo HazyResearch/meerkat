@@ -1,5 +1,4 @@
 import meerkat as mk
-from manifest import Manifest
 import argparse
 import os
 import time

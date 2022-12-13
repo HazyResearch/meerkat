@@ -1,28 +1,26 @@
 import pytest
 
-from meerkat import LambdaColumn
+from meerkat import DeferredColumn
 from meerkat.dataframe import DataFrame
 
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
-from ..columns.test_arrow_column import ArrowArrayColumnTestBed
-from ..columns.test_cell_column import CellColumnTestBed
-from ..columns.test_image_column import ImageColumnTestBed
-from ..columns.test_lambda_column import LambdaColumnTestBed
-from ..columns.test_numpy_column import NumpyArrayColumnTestBed
-from ..columns.test_pandas_column import PandasSeriesColumnTestBed
-from ..columns.test_tensor_column import TensorColumnTestBed
+from ..columns.deferred.test_deferred import DeferredColumnTestBed
+from ..columns.deferred.test_image import ImageColumnTestBed
+from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
+from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed,
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed,
-            LambdaColumnTestBed,
-            ArrowArrayColumnTestBed,
-            CellColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
             ImageColumnTestBed,
         ]
     )
@@ -37,7 +35,7 @@ def test_map_return_single(
     column_testbed: AbstractColumnTestBed, batched: bool, materialize: bool
 ):
     """`map`, single return,"""
-    if not (isinstance(column_testbed.col, LambdaColumn) or materialize):
+    if not (isinstance(column_testbed.col, DeferredColumn) or materialize):
         # skip columns for which materialize has no effect
         return
 
@@ -64,7 +62,7 @@ def test_map_return_single_w_kwarg(
     column_testbed: AbstractColumnTestBed, batched: bool, materialize: bool
 ):
     """`map`, single return,"""
-    if not (isinstance(column_testbed.col, LambdaColumn) or materialize):
+    if not (isinstance(column_testbed.col, DeferredColumn) or materialize):
         # skip columns for which materialize has no effect
         return
 
@@ -94,7 +92,7 @@ def test_map_return_multiple(
     column_testbed: AbstractColumnTestBed, batched: bool, materialize: bool
 ):
     """`map`, single return,"""
-    if not (isinstance(column_testbed.col, LambdaColumn) or materialize):
+    if not (isinstance(column_testbed.col, DeferredColumn) or materialize):
         # skip columns for which materialize has no effect
         return
 

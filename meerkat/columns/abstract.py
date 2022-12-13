@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 
 import meerkat.config
@@ -17,11 +18,11 @@ from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
+from meerkat.mixins.deferable import LambdaMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
-from meerkat.mixins.lambdable import LambdaMixin
 from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
@@ -34,7 +35,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AbstractColumn(
+class Column(
     AggregateMixin,
     BlockableMixin,
     CloneableMixin,
@@ -80,7 +81,7 @@ class AbstractColumn(
         # Assign to data
         self._set_data(data)
 
-        super(AbstractColumn, self).__init__(
+        super(Column, self).__init__(
             collate_fn=collate_fn,
             *args,
             **kwargs,
@@ -108,17 +109,18 @@ class AbstractColumn(
         self._data = data
 
     def _is_valid_primary_key(self):
-        """Subclasses should implement checks for ensuring that the column could be used
-        as a valid primary key. Specifically, the check should ensure that the values
-        in the column are unique. If the check does not pass, returns False.
-        If the subclass has not implemented this method.
+        """Subclasses should implement checks for ensuring that the column
+        could be used as a valid primary key.
+
+        Specifically, the check should ensure that the values in the
+        column are unique. If the check does not pass, returns False. If
+        the subclass has not implemented this method.
         """
         return False
 
     def _keyidx_to_posidx(self, keyidx: Any) -> int:
-        """
-        Get the posidx of the first occurrence of the given keyidx. Raise a key error
-        if the keyidx is not found.
+        """Get the posidx of the first occurrence of the given keyidx. Raise a
+        key error if the keyidx is not found.
 
         Args:
             keyidx: The keyidx to search for.
@@ -129,8 +131,8 @@ class AbstractColumn(
         raise NotImplementedError()
 
     def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
-        """Get the posidxs of the given keyidxs. Raise a key error if any of the
-        keyidxs are not found.
+        """Get the posidxs of the given keyidxs. Raise a key error if any of
+        the keyidxs are not found.
 
         Args:
             keyidxs: The keyidxs to search for.
@@ -171,9 +173,7 @@ class AbstractColumn(
         """
         return self._data[index]
 
-    def _get_batch(
-        self, indices: np.ndarray, materialize: bool = True
-    ) -> AbstractColumn:
+    def _get_batch(self, indices: np.ndarray, materialize: bool = True) -> Column:
         """Get a batch of cells from the column.
 
         Args:
@@ -209,7 +209,7 @@ class AbstractColumn(
 
     # @capture_provenance()
     def __getitem__(self, index):
-        return self._get(index, materialize=True)
+        return self._get(index, materialize=False)
 
     def _set_cell(self, index, value):
         self._data[index] = value
@@ -334,7 +334,7 @@ class AbstractColumn(
         materialize: bool = True,
         pbar: bool = False,
         **kwargs,
-    ) -> Optional[AbstractColumn]:
+    ) -> Optional[Column]:
         """Filter the elements of the column using a function."""
 
         # Return if `self` has no examples
@@ -371,7 +371,7 @@ class AbstractColumn(
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> AbstractColumn:
+    ) -> Column:
         """Return a sorted view of the column.
 
         Args:
@@ -387,7 +387,7 @@ class AbstractColumn(
 
     def argsort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
-    ) -> AbstractColumn:
+    ) -> Column:
         """Return indices that would sorted the column.
 
         Args:
@@ -408,7 +408,7 @@ class AbstractColumn(
         replace: bool = False,
         weights: Union[str, np.ndarray] = None,
         random_state: Union[int, np.random.RandomState] = None,
-    ) -> AbstractColumn:
+    ) -> Column:
         """Select a random sample of rows from Column. Roughly equivalent to
         ``sample`` in Pandas https://pandas.pydata.org/docs/reference/api/panda
         s.DataFrame.sample.html.
@@ -440,18 +440,18 @@ class AbstractColumn(
             random_state=random_state,
         )
 
-    def append(self, column: AbstractColumn) -> None:
+    def append(self, column: Column) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
 
     @staticmethod
-    def concat(columns: Sequence[AbstractColumn]) -> None:
+    def concat(columns: Sequence[Column]) -> None:
         # TODO(Sabri): implement a naive `ComposedColumn` for generic append and
         # implement specific ones for ListColumn, NumpyColumn etc.
         raise NotImplementedError
 
-    def is_equal(self, other: AbstractColumn) -> bool:
+    def is_equal(self, other: Column) -> bool:
         """Tests whether two columns.
 
         Args:
@@ -480,8 +480,8 @@ class AbstractColumn(
             batches of data
         """
         if (
-            self._get_batch.__func__ == AbstractColumn._get_batch
-            and self._get.__func__ == AbstractColumn._get
+            self._get_batch.__func__ == Column._get_batch
+            and self._get.__func__ == Column._get
         ):
             return torch.utils.data.DataLoader(
                 self if materialize else self.lz,
@@ -511,7 +511,7 @@ class AbstractColumn(
             )
 
     @classmethod
-    def get_writer(cls, mmap: bool = False, template: AbstractColumn = None):
+    def get_writer(cls, mmap: bool = False, template: Column = None):
         from meerkat.writers.concat_writer import ConcatWriter
 
         if mmap:
@@ -523,63 +523,16 @@ class AbstractColumn(
 
     @classmethod
     # @capture_provenance()
-    def from_data(cls, data: Union[Columnable, AbstractColumn]):
+    def from_data(cls, data: Union[Columnable, Column]):
         """Convert data to a meerkat column using the appropriate Column
         type."""
-        from .numpy_column import NumpyArrayColumn
+        return column(data)
 
-        if isinstance(data, AbstractColumn):
-            # TODO: Need ton make this view but should decide where to do it exactly
-            return data  # .view()
-
-        if isinstance(data, pd.Series):
-            from .pandas_column import PandasSeriesColumn
-
-            return PandasSeriesColumn(data)
-
-        if torch.is_tensor(data):
-            from .tensor_column import TensorColumn
-
-            return TensorColumn(data)
-
-        if isinstance(data, np.ndarray):
-            return NumpyArrayColumn(data)
-
-        if isinstance(data, Sequence):
-            from ..cells.abstract import AbstractCell
-
-            if len(data) != 0 and isinstance(data[0], AbstractCell):
-                from .cell_column import CellColumn
-
-                return CellColumn(data)
-
-            if len(data) != 0 and isinstance(
-                data[0], (int, float, bool, np.ndarray, np.generic, NumpyArrayColumn)
-            ):
-
-                return NumpyArrayColumn(data)
-
-            if len(data) != 0 and isinstance(data[0], str):
-                from .pandas_column import PandasSeriesColumn
-
-                return PandasSeriesColumn(data)
-
-            if len(data) != 0 and torch.is_tensor(data[0]):
-                from .tensor_column import TensorColumn
-
-                return TensorColumn(data)
-
-            from .list_column import ListColumn
-
-            return ListColumn(data)
-        else:
-            raise ValueError(f"Cannot create column out of data of type {type(data)}")
-
-    def head(self, n: int = 5) -> AbstractColumn:
+    def head(self, n: int = 5) -> Column:
         """Get the first `n` examples of the column."""
         return self.lz[:n]
 
-    def tail(self, n: int = 5) -> AbstractColumn:
+    def tail(self, n: int = 5) -> Column:
         """Get the last `n` examples of the column."""
         return self.lz[-n:]
 
@@ -595,3 +548,47 @@ class AbstractColumn(
     @property
     def is_mmap(self):
         return False
+
+
+def column(data: Sequence) -> Column:
+    """Create a Meerkat column from data.
+
+    The Meerkat column type is inferred from the type and structure of
+    the data passed in.
+    """
+    from .scalar import ScalarColumn
+    from .tensor import TensorColumn
+
+    if isinstance(data, Column):
+        # TODO: Need ton make this view but should decide where to do it exactly
+        return data  # .view()
+
+    if isinstance(data, pd.Series) or isinstance(data, pa.Array):
+        return ScalarColumn(data)
+
+    if torch.is_tensor(data):
+        if len(data.shape) == 1:
+            return ScalarColumn(data.cpu().detach().numpy())
+        return TensorColumn(data)
+
+    if isinstance(data, np.ndarray):
+        if len(data.shape) == 1:
+            return ScalarColumn(data)
+        return TensorColumn(data)
+
+    if isinstance(data, Sequence):
+        if len(data) != 0 and (
+            isinstance(data[0], (np.ndarray, TensorColumn)) or torch.is_tensor(data[0])
+        ):
+            return TensorColumn(data)
+
+        if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
+            from .scalar import ScalarColumn
+
+            return ScalarColumn(data)
+
+        from .object.base import ObjectColumn
+
+        return ObjectColumn(data)
+    else:
+        raise ValueError(f"Cannot create column out of data of type {type(data)}")

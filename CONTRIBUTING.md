@@ -110,6 +110,7 @@ Follow these steps to start contributing:
    ```bash
    $ make lint
    ```
+   Note: if you have a bunch of unused import warnings, you can run `autoflake --remove-all-unused-imports . -ri` to remove them. (You may need to pip install autoflake.)
 
    If you're modifying documents under `docs/source`, make sure to validate that
    they can still be built. This check also runs in CI. To run a local check

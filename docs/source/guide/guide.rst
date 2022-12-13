@@ -8,8 +8,8 @@ Meerkat Basics
 
    data_structures
    slicing
-   lambda
    column_types
+   deferred
    io
    map
    ops

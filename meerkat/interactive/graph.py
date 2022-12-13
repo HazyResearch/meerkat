@@ -1,7 +1,7 @@
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Union
 
-from pydantic import BaseModel, ValidationError, Field
+from pydantic import BaseModel, Field, ValidationError
 from pydantic.fields import ModelField
 from tqdm import tqdm
 from wrapt import ObjectProxy
@@ -23,11 +23,10 @@ def _update_result(
     update: Union[list, tuple, dict, "Store", Primitive],
     modifications: List[Modification],
 ) -> Union[list, tuple, dict, "Store", Primitive]:
-    """
-    Update the result object with the update object. This recursive
-    function will perform a nested update to the result with the update.
-    This function will also update the modifications list
-    with the changes made to the result object.
+    """Update the result object with the update object. This recursive function
+    will perform a nested update to the result with the update. This function
+    will also update the modifications list with the changes made to the result
+    object.
 
     Args:
         result: The result object to update.
@@ -90,8 +89,7 @@ def _update_result(
 
 
 def trigger() -> List[Modification]:
-    """
-    Trigger the computation graph of an interface based on a list of
+    """Trigger the computation graph of an interface based on a list of
     modifications.
 
     Return:
@@ -169,8 +167,7 @@ def _add_op_as_child(
     *nodeables: NodeMixin,
     triggers: bool = True,
 ):
-    """
-    Add the operation as a child of the nodeables.
+    """Add the operation as a child of the nodeables.
 
     Args:
         op: The operation to add as a child.
@@ -209,10 +206,9 @@ def reactive(
     fn: Callable = None,
     nested_return: bool = None,
 ) -> Callable:
-    """
-    Decorator that is used to mark a function as an interface operation.
-    Functions decorated with this will create nodes in the operation graph, which
-    are executed whenever their inputs are modified.
+    """Decorator that is used to mark a function as an interface operation.
+    Functions decorated with this will create nodes in the operation graph,
+    which are executed whenever their inputs are modified.
 
     A basic example that adds two numbers:
     .. code-block:: python
@@ -263,12 +259,12 @@ def reactive(
     def _reactive(fn: Callable):
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            """
-            This `wrapper` function is only run once. It creates a node in the
-            operation graph and returns a `Reference` object that wraps the
+            """This `wrapper` function is only run once. It creates a node in
+            the operation graph and returns a `Reference` object that wraps the
             output of the function.
 
-            Subsequent calls to the function will be handled by the graph.
+            Subsequent calls to the function will be handled by the
+            graph.
             """
             # nested_return is False because any operations on the outputs of the
             # function should recursively generate Stores / References.
@@ -508,18 +504,17 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
 
 def store_field(value: str) -> Field:
-    """ Utility for creating a pydantic field with a default factory that creates a 
-    Store object wrapping the given value. 
-    
-    TODO (karan): Take a look at this again. I think we might be able to get rid of this
-    in favor of just passing value.
+    """Utility for creating a pydantic field with a default factory that
+    creates a Store object wrapping the given value.
+
+    TODO (karan): Take a look at this again. I think we might be able to
+    get rid of this in favor of just passing value.
     """
     return Field(default_factory=lambda: Store(value))
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
-    """
-    Make a Store.
+    """Make a Store.
 
     If value is a Store, return it. Otherwise, return a
     new Store that wraps value.
@@ -548,13 +543,12 @@ class Operation(NodeMixin):
         self.result = result
 
     def __call__(self) -> List[Modification]:
-        """
-        Execute the operation. Unpack the arguments and keyword arguments
-        and call the function. Then, update the result Reference with the result
-        and return a list of modifications.
+        """Execute the operation. Unpack the arguments and keyword arguments
+        and call the function. Then, update the result Reference with the
+        result and return a list of modifications.
 
-        These modifications describe the delta changes made to the result Reference,
-        and are used to update the state of the GUI.
+        These modifications describe the delta changes made to the
+        result Reference, and are used to update the state of the GUI.
         """
         # Dereference the nodes.
         args = _replace_nodes_with_nodeables(self.args)

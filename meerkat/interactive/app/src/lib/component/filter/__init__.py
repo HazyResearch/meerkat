@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
+from meerkat.columns.abstract import Column
+from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.interactive.graph import Store, reactive, make_store
+from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import Component
 
@@ -15,10 +15,10 @@ if TYPE_CHECKING:
     from meerkat import DataFrame
 
 
-def _in(column: AbstractColumn, value):
+def _in(column: Column, value):
     if not isinstance(value, (tuple, list)):
         value = [value]
-    if not isinstance(column, PandasSeriesColumn):
+    if not isinstance(column, ScalarColumn):
         data = pd.Series(column.data)
     else:
         data = column.data
@@ -84,7 +84,7 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
 
 @reactive
 def filter(
-    data: Union["DataFrame", "AbstractColumn"],
+    data: Union["DataFrame", "Column"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
 ):
     """Filter data based on operations.
@@ -141,11 +141,11 @@ def filter(
         # values should be split by "," when using in/not-in operators.
         if "in" in criterion.op:
             value = [x.strip() for x in criterion.value.split(",")]
-            if isinstance(col, mk.NumpyArrayColumn):
+            if isinstance(col, mk.TorchTensorColumn):
                 value = np.asarray(value, dtype=col.dtype).tolist()
         else:
             value = col.dtype.type(criterion.value)
-            if isinstance(col, mk.NumpyArrayColumn):
+            if isinstance(col, mk.TorchTensorColumn):
                 value = np.asarray(value, dtype=col.dtype)
 
         # FIXME: Figure out why we cannot pass col for PandasSeriesColumn.
@@ -165,8 +165,11 @@ class Filter(Component):
 
     This component will return a Reference object, which can be used downstream.
     """
+
     df: DataFrame
-    criteria: Store[List[FilterCriterion]] = Field(default_factory=lambda: Store(list()))
+    criteria: Store[List[FilterCriterion]] = Field(
+        default_factory=lambda: Store(list())
+    )
     operations: Store[List[str]] = Field(
         default_factory=lambda: Store(list(_operator_str_to_func.keys()))
     )

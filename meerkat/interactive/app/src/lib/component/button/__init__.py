@@ -1,8 +1,8 @@
-from dataclasses import dataclass
-from ..abstract import Component
 
-from meerkat.interactive.graph import Store
 from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.graph import Store
+
+from ..abstract import Component
 
 
 class Button(Component):

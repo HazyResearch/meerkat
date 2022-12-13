@@ -10,13 +10,13 @@ import numpy as np
 import torch
 
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.errors import ConsolidationError
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
 
-class NumpyBlock(AbstractBlock):
+class NumPyBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
         dtype: np.dtype
@@ -26,7 +26,7 @@ class NumpyBlock(AbstractBlock):
         mmap: Union[bool, int]
 
     def __init__(self, data, *args, **kwargs):
-        super(NumpyBlock, self).__init__(*args, **kwargs)
+        super(NumPyBlock, self).__init__(*args, **kwargs)
         if len(data.shape) <= 1:
             raise ValueError(
                 "Cannot create a `NumpyBlock` from data with less than 2 axes."
@@ -36,7 +36,7 @@ class NumpyBlock(AbstractBlock):
     @property
     def signature(self) -> Hashable:
         return self.Signature(
-            klass=NumpyBlock,
+            klass=NumPyBlock,
             # don't want to consolidate any mmaped blocks
             mmap=id(self) if isinstance(self.data, np.memmap) else False,
             nrows=self.data.shape[0],
@@ -48,7 +48,7 @@ class NumpyBlock(AbstractBlock):
         return self.data[:, index]
 
     @classmethod
-    def from_column_data(cls, data: np.ndarray) -> Tuple[NumpyBlock, BlockView]:
+    def from_column_data(cls, data: np.ndarray) -> Tuple[NumPyBlock, BlockView]:
         """[summary]
 
         Args:
@@ -76,7 +76,7 @@ class NumpyBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> BlockRef:
         offset = 0
         new_indices = {}
@@ -162,7 +162,7 @@ class NumpyBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ):
         data_path = os.path.join(path, "data.npy")
 

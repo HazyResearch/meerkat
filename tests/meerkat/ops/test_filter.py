@@ -2,21 +2,23 @@ import pytest
 
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
-from ..columns.test_arrow_column import ArrowArrayColumnTestBed
-from ..columns.test_numpy_column import NumpyArrayColumnTestBed
-from ..columns.test_pandas_column import PandasSeriesColumnTestBed
-from ..columns.test_tensor_column import TensorColumnTestBed
+from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
+from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
+from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
 @pytest.fixture(
     **column_parametrize(
         [
-            NumpyArrayColumnTestBed.get_params(
+            NumPyTensorColumnTestBed.get_params(
                 config={"num_dims": [1], "dim_length": [1]}
             ),
-            PandasSeriesColumnTestBed,
-            TensorColumnTestBed.get_params(config={"num_dims": [1], "dim_length": [1]}),
-            ArrowArrayColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed.get_params(
+                config={"num_dims": [1], "dim_length": [1]}
+            ),
+            ArrowScalarColumnTestBed,
         ]
     )
 )

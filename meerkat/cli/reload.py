@@ -1,12 +1,11 @@
-"""Adapted from https://github.com/srush/streambook/blob/main/streambook/cli.py"""
-import logging
+"""Adapted from
+https://github.com/srush/streambook/blob/main/streambook/cli.py."""
 import subprocess
-import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from watchdog.events import FileSystemEventHandler, LoggingEventHandler
+from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 

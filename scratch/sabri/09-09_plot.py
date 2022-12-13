@@ -3,7 +3,6 @@ from typing import List
 import numpy as np
 
 import meerkat as mk
-from meerkat.interactive.graph import Store
 
 df = mk.get("celeba")
 

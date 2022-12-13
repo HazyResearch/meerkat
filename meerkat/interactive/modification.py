@@ -4,13 +4,11 @@ from typing import TYPE_CHECKING, Any, List
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from meerkat.interactive.graph import Store
     from meerkat.interactive.node import Node
 
 
 class Modification(BaseModel, ABC):
-    """
-    Base class for modifications.
+    """Base class for modifications.
 
     Modifications are used to track changes to Reference and Store nodes
     in the graph.
@@ -60,14 +58,13 @@ class StoreModification(Modification):
     def backend_only(self) -> bool:
         """Whether this modification should not be sent to frontend."""
         from meerkat.state import state
+
         store = state.identifiables.get(group="stores", id=self.id)
         return store._self_backend_only
-
 
     @property
     def node(self) -> "Node":
         from meerkat.state import state
-
 
         # FIXME: what's going on with this try-except here?
         try:

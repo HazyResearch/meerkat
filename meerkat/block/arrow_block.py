@@ -10,9 +10,9 @@ import pyarrow as pa
 import torch
 
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
@@ -52,7 +52,7 @@ class ArrowBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> BlockRef:
         table = pa.Table.from_pydict(
             # need to ignore index when concatenating
@@ -82,17 +82,17 @@ class ArrowBlock(AbstractBlock):
         if torch.is_tensor(index):
             # need to convert to numpy for boolean indexing
             return index.numpy()
-        if isinstance(index, NumpyArrayColumn):
+        if isinstance(index, NumPyTensorColumn):
             return index.data
-        if isinstance(index, TensorColumn):
+        if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing
             return index.data.numpy()
         if isinstance(index, pd.Series):
             # need to convert to numpy for boolean indexing
             return index.values
-        from meerkat.columns.pandas_column import PandasSeriesColumn
+        from meerkat.columns.scalar import ScalarColumn
 
-        if isinstance(index, PandasSeriesColumn):
+        if isinstance(index, ScalarColumn):
             return index.data.values
 
         return index
@@ -157,6 +157,6 @@ class ArrowBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ):
         return ArrowBlock._read_table(os.path.join(path, "data.arrow"), mmap=mmap)

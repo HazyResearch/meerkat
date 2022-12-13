@@ -1,12 +1,12 @@
-from meerkat.columns.abstract import AbstractColumn
+from meerkat.columns.abstract import Column
 from meerkat.writers.abstract import AbstractWriter
 
 
 class ConcatWriter(AbstractWriter):
     def __init__(
         self,
-        output_type: type = AbstractColumn,
-        template: AbstractColumn = None,
+        output_type: type = Column,
+        template: Column = None,
         *args,
         **kwargs,
     ):
@@ -20,10 +20,10 @@ class ConcatWriter(AbstractWriter):
     def write(self, data, **kwargs) -> None:
         # convert to Meerkat column if not already
         if self.template is not None:
-            if isinstance(data, AbstractColumn):
+            if isinstance(data, Column):
                 data = data.data
             data = self.template._clone(data=data)
-        elif not isinstance(data, AbstractColumn):
+        elif not isinstance(data, Column):
             data = self.output_type(data)
 
         self.outputs.append(data)

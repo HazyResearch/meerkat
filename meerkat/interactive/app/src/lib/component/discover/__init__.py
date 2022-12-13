@@ -1,22 +1,22 @@
-from ..abstract import Component
-
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store
+
+from ..abstract import Component
 
 
 @endpoint
 def get_discover_schema(df: DataFrame):
     import meerkat as mk
     from meerkat.interactive.api.routers.dataframe import (
-        _get_column_infos,
         SchemaResponse,
+        _get_column_infos,
     )
 
     columns = [
         k
         for k, v in df.items()
-        if isinstance(v, mk.NumpyArrayColumn) and len(v.shape) == 2
+        if isinstance(v, mk.TorchTensorColumn) and len(v.shape) == 2
     ]
     return SchemaResponse(
         id=df.id,

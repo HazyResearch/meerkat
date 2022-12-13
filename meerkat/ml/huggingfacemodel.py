@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 import cytoolz as tz
 import torch
 
-from meerkat.columns.list_column import ListColumn
+from meerkat.columns.object.base import ObjectColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
@@ -103,7 +103,7 @@ class HuggingfaceModel(Model):
             function=self._predict,
             is_batched_fn=True,
             batch_size=batch_size,
-            output_type=ListColumn,
+            output_type=ObjectColumn,
             input_cols=input_columns,
         )
 

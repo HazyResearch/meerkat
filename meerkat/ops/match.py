@@ -1,13 +1,13 @@
 from typing import List, Optional, Tuple, Union
 
-from meerkat import AbstractColumn, DataFrame, PandasSeriesColumn
+from meerkat import Column, DataFrame, ScalarColumn
 
 from .embed import embed
 
 
 def match(
-    data: Union[DataFrame, AbstractColumn],
-    query: Union[str, List[str], Tuple[str], PandasSeriesColumn, DataFrame],
+    data: Union[DataFrame, Column],
+    query: Union[str, List[str], Tuple[str], ScalarColumn, DataFrame],
     against: Optional[str] = None,
     against_modality: Optional[str] = None,
     query_modality: Optional[str] = None,
@@ -41,10 +41,10 @@ def match(
     encoder = "clip"
     data_embedding = data[against]
 
-    if not isinstance(query, AbstractColumn):
+    if not isinstance(query, Column):
         if isinstance(query, str):
             query = [query]
-        query = PandasSeriesColumn(query)
+        query = ScalarColumn(query)
     # Text cannot be embedded with num_workers > 0 because the clip text encoder
     # is not pickleable.
     to_embedding = embed(

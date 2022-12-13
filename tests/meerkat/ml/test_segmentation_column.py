@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.ml.segmentation_column import SegmentationOutputColumn
 
 logits_multi = torch.tensor(
@@ -77,7 +77,7 @@ def test_binarymask(logits, expected_mask, class_index):
     logit_col = SegmentationOutputColumn(logits=logits)
     mask = logit_col.binarymask(class_index)
 
-    assert isinstance(mask, TensorColumn)
+    assert isinstance(mask, TorchTensorColumn)
 
     assert (mask == expected_mask).all()
     assert (

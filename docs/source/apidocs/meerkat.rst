@@ -9,8 +9,10 @@ Subpackages
 
    meerkat.block
    meerkat.cells
+   meerkat.cli
    meerkat.columns
    meerkat.datasets
+   meerkat.interactive
    meerkat.logging
    meerkat.mixins
    meerkat.ml
@@ -38,6 +40,14 @@ meerkat.dataframe module
    :undoc-members:
    :show-inheritance:
 
+meerkat.datapanel module
+------------------------
+
+.. automodule:: meerkat.datapanel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.display module
 ----------------------
 
@@ -58,6 +68,22 @@ meerkat.provenance module
 -------------------------
 
 .. automodule:: meerkat.provenance
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.row module
+------------------
+
+.. automodule:: meerkat.row
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+meerkat.state module
+--------------------
+
+.. automodule:: meerkat.state
    :members:
    :undoc-members:
    :show-inheritance:

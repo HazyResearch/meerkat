@@ -1,9 +1,9 @@
 
-Subclassing DataFrame and AbstractColumn
+Subclassing DataFrame and Column
 =========================================
 
 
-Subclassing AbstractColumn
+Subclassing Column
 ---------------------------
 
 .. todo::

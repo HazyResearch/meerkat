@@ -13,11 +13,11 @@ from ...utils import product_parametrize
 
 def test_consolidate_no_op():
     mgr = BlockManager()
-    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    col1 = mk.TensorColumn(data=np.arange(10))
     mgr.add_column(col1, "a")
-    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    col2 = mk.TensorColumn(np.arange(10) * 2)
     mgr.add_column(col2, "b")
-    col2 = mk.NumpyArrayColumn(np.arange(10, dtype=float) * 2)
+    col2 = mk.TensorColumn(np.arange(10, dtype=float) * 2)
     mgr.add_column(col2, "c")
     block_ref = mgr.get_block_ref("c")
 
@@ -32,13 +32,13 @@ def test_consolidate_no_op():
 def test_consolidate():
     mgr = BlockManager()
 
-    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    col1 = mk.TensorColumn(data=np.arange(10))
     mgr.add_column(col1, "col1")
-    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    col2 = mk.TensorColumn(np.arange(10) * 2)
     mgr.add_column(col2, "col2")
-    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    col3 = mk.ScalarColumn(np.arange(10) * 3)
     mgr.add_column(col3, "col3")
-    col4 = mk.PandasSeriesColumn(np.arange(10) * 4)
+    col4 = mk.ScalarColumn(np.arange(10) * 4)
     mgr.add_column(col4, "col4")
     col5 = mk.TensorColumn(torch.arange(10) * 5)
     mgr.add_column(col5, "col5")
@@ -72,10 +72,10 @@ def test_consolidate_multiple_types():
 
     for dtype in [int, float]:
         for idx in range(3):
-            col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype))
+            col = mk.TensorColumn(np.arange(10, dtype=dtype))
             mgr.add_column(col, f"col{idx}_{dtype}")
-    mgr.add_column(mk.PandasSeriesColumn(np.arange(10) * 4), "col4_pandas")
-    mgr.add_column(mk.PandasSeriesColumn(np.arange(10) * 5), "col5_pandas")
+    mgr.add_column(mk.ScalarColumn(np.arange(10) * 4), "col4_pandas")
+    mgr.add_column(mk.ScalarColumn(np.arange(10) * 5), "col5_pandas")
 
     assert len(mgr._block_refs) == 8
     mgr.consolidate()
@@ -85,11 +85,11 @@ def test_consolidate_multiple_types():
 def test_consolidate_preserves_order():
     mgr = BlockManager()
 
-    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    col1 = mk.TensorColumn(data=np.arange(10))
     mgr.add_column(col1, "col1")
-    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    col2 = mk.TensorColumn(np.arange(10) * 2)
     mgr.add_column(col2, "col2")
-    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    col3 = mk.ScalarColumn(np.arange(10) * 3)
     mgr.add_column(col3, "col3")
 
     order = ["col2", "col3", "col1"]
@@ -108,7 +108,7 @@ def test_apply_get_multiple(num_blocks, consolidated):
 
     for dtype in [int, float]:
         for idx in range(num_blocks):
-            col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype) * idx)
+            col = mk.TensorColumn(np.arange(10, dtype=dtype) * idx)
             mgr.add_column(col, f"col{idx}_{dtype}")
     if consolidated:
         mgr.consolidate()
@@ -146,7 +146,7 @@ def test_apply_get_single(num_blocks, consolidated):
 
     for dtype in [int, float]:
         for idx in range(num_blocks):
-            col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype) * idx)
+            col = mk.TensorColumn(np.arange(10, dtype=dtype) * idx)
             mgr.add_column(col, f"col{idx}_{dtype}")
     if consolidated:
         mgr.consolidate()
@@ -162,28 +162,28 @@ def test_apply_get_single(num_blocks, consolidated):
 
 @pytest.fixture()
 def call_count(monkeypatch):
-    from meerkat import NumpyArrayColumn
-    from meerkat.block.numpy_block import NumpyBlock
+    from meerkat import TensorColumn
+    from meerkat.block.numpy_block import NumPyBlock
 
     calls = {"count": 0}
 
-    block_get = NumpyBlock._get
+    block_get = NumPyBlock._get
 
     def patched_get(self, *args, **kwargs):
         nonlocal calls
         calls["count"] += 1
         return block_get(self, *args, **kwargs)
 
-    monkeypatch.setattr(NumpyBlock, "_get", patched_get)
+    monkeypatch.setattr(NumPyBlock, "_get", patched_get)
 
-    col_get = NumpyArrayColumn._get
+    col_get = TensorColumn._get
 
     def patched_get_col(self, *args, **kwargs):
         nonlocal calls
         calls["count"] += 1
         return col_get(self, *args, **kwargs)
 
-    monkeypatch.setattr(NumpyArrayColumn, "_get", patched_get_col)
+    monkeypatch.setattr(TensorColumn, "_get", patched_get_col)
 
     return calls
 
@@ -191,9 +191,9 @@ def call_count(monkeypatch):
 @product_parametrize({"consolidated": [True, False]})
 def test_apply_get_single_lambda(call_count, consolidated):
     mgr = BlockManager()
-    base_col = mk.NumpyArrayColumn(np.arange(10))
+    base_col = mk.TensorColumn(np.arange(10))
     mgr.add_column(base_col, "a")
-    # lambda_column = base_col.to_lambda(lambda x: x + 2)
+    # lambda_column = base_col.defer(lambda x: x + 2)
     # mgr.add_column(lambda_column, "b")
 
     if consolidated:
@@ -209,9 +209,9 @@ def test_apply_get_single_lambda(call_count, consolidated):
 def test_apply_get_multiple_lambda(call_count, consolidated):
     mgr = BlockManager()
 
-    base_col = mk.NumpyArrayColumn(np.arange(10))
+    base_col = mk.TensorColumn(np.arange(10))
     mgr.add_column(base_col, "a")
-    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    lambda_column = base_col.defer(lambda x: x + 2)
     mgr.add_column(lambda_column, "b")
 
     if consolidated:
@@ -232,9 +232,9 @@ def test_apply_get_multiple_lambda(call_count, consolidated):
 )
 def test_remove(consolidated):
     mgr = BlockManager()
-    col = mk.NumpyArrayColumn(np.arange(10))
+    col = mk.TensorColumn(np.arange(10))
     mgr.add_column(col, "a")
-    col = mk.NumpyArrayColumn(np.arange(10))
+    col = mk.TensorColumn(np.arange(10))
     mgr.add_column(col, "b")
 
     if consolidated:
@@ -256,9 +256,9 @@ def test_remove(consolidated):
 
 def test_getitem():
     mgr = BlockManager()
-    a = mk.NumpyArrayColumn(np.arange(10))
+    a = mk.TensorColumn(np.arange(10))
     mgr.add_column(a, "a")
-    b = mk.NumpyArrayColumn(np.arange(10))
+    b = mk.TensorColumn(np.arange(10))
     mgr.add_column(b, "b")
 
     # check that manager holds coreference of original column, but returns a coreference
@@ -284,9 +284,9 @@ def test_getitem():
 
 def test_setitem():
     mgr = BlockManager()
-    a = mk.NumpyArrayColumn(np.arange(10))
+    a = mk.TensorColumn(np.arange(10))
     mgr["a"] = a
-    b = mk.NumpyArrayColumn(np.arange(10)) * 2
+    b = mk.TensorColumn(np.arange(10)) * 2
     mgr["b"] = b
 
     # check that manager holds coreference of original column, and returns a coreference
@@ -302,9 +302,9 @@ def test_setitem():
 
 def test_contains():
     mgr = BlockManager()
-    col = mk.NumpyArrayColumn(np.arange(10))
+    col = mk.TensorColumn(np.arange(10))
     mgr.add_column(col, "a")
-    col = mk.NumpyArrayColumn(np.arange(10))
+    col = mk.TensorColumn(np.arange(10))
     mgr.add_column(col, "b")
 
     assert "a" in mgr
@@ -320,7 +320,7 @@ def test_len(num_blocks, consolidated):
     mgr = BlockManager()
     for dtype in [int, float]:
         for idx in range(num_blocks):
-            col = mk.NumpyArrayColumn(np.arange(10, dtype=dtype) * idx)
+            col = mk.TensorColumn(np.arange(10, dtype=dtype) * idx)
             mgr.add_column(col, f"col{idx}_{dtype}")
 
     if consolidated:
@@ -333,21 +333,21 @@ def test_io(tmpdir):
     tmpdir = os.path.join(tmpdir, "test")
     mgr = BlockManager()
 
-    col1 = mk.NumpyArrayColumn(data=np.arange(10))
+    col1 = mk.TensorColumn(data=np.arange(10))
     mgr.add_column(col1, "col1")
-    col2 = mk.NumpyArrayColumn(np.arange(10) * 2)
+    col2 = mk.TensorColumn(np.arange(10) * 2)
     mgr.add_column(col2, "col2")
-    col3 = mk.PandasSeriesColumn(np.arange(10) * 3)
+    col3 = mk.ScalarColumn(np.arange(10) * 3)
     mgr.add_column(col3, "col3")
-    col4 = mk.PandasSeriesColumn(np.arange(10) * 4)
+    col4 = mk.ScalarColumn(np.arange(10) * 4)
     mgr.add_column(col4, "col4")
     col5 = mk.TensorColumn(torch.arange(10) * 5)
     mgr.add_column(col5, "col5")
     col6 = mk.TensorColumn(torch.arange(10) * 6)
     mgr.add_column(col6, "col6")
-    col7 = mk.ListColumn(list(range(10)))
+    col7 = mk.ObjectColumn(list(range(10)))
     mgr.add_column(col7, "col7")
-    col8 = mk.ListColumn(list(range(10)))
+    col8 = mk.ObjectColumn(list(range(10)))
     mgr.add_column(col8, "col8")
     col9 = mk.TensorColumn(torch.ones(10, 5).to(int) * 9)
     mgr.add_column(col9, "col9")
@@ -364,7 +364,7 @@ def test_io(tmpdir):
         assert mgr[f"col{idx}"].data == new_mgr[f"col{idx}"].data
 
     # test overwriting
-    col1 = mk.NumpyArrayColumn(data=np.arange(10) * 100)
+    col1 = mk.TensorColumn(data=np.arange(10) * 100)
     mgr.add_column(col1, "col1")
     mgr.remove("col9")
     assert os.path.exists(os.path.join(tmpdir, "columns", "col9"))
@@ -396,9 +396,9 @@ def test_io_no_overwrite(tmpdir):
 @product_parametrize(
     {
         "column_type": [
-            mk.NumpyArrayColumn,
-            mk.PandasSeriesColumn,
-            mk.ArrowArrayColumn,
+            mk.TensorColumn,
+            mk.PandasScalarColumn,
+            mk.ArrowScalarColumn,
             mk.TensorColumn,
         ],
         "column_order": [("z", "a"), ("a", "z")],
@@ -409,7 +409,7 @@ def test_io_lambda_args(tmpdir, column_type, column_order):
     base_col_name, col_name = column_order
     base_col = column_type(np.arange(16))
     mgr.add_column(base_col, base_col_name)  # want to order backwards
-    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    lambda_column = base_col.defer(lambda x: x + 2)
     mgr.add_column(lambda_column, col_name)
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
@@ -432,10 +432,10 @@ def test_io_lambda_args(tmpdir, column_type, column_order):
 @product_parametrize(
     {
         "column_type": [
-            mk.NumpyArrayColumn,
-            mk.PandasSeriesColumn,
-            mk.ArrowArrayColumn,
-            mk.TensorColumn,
+            mk.NumPyTensorColumn,
+            mk.PandasScalarColumn,
+            mk.ArrowScalarColumn,
+            mk.TorchTensorColumn,
         ]
     }
 )
@@ -443,9 +443,9 @@ def test_io_chained_lambda_args(tmpdir, column_type):
     mgr = BlockManager()
     base_col = column_type(np.arange(16))
     mgr.add_column(base_col, "a")
-    lambda_column = base_col.to_lambda(lambda x: x + 2)
+    lambda_column = base_col.defer(lambda x: x + 2)
     mgr.add_column(lambda_column, "b")
-    second_lambda_column = lambda_column.to_lambda(lambda x: x + 2)
+    second_lambda_column = lambda_column.defer(lambda x: x + 2)
     mgr.add_column(second_lambda_column, "c")
     mgr.write(os.path.join(tmpdir, "test"))
     new_mgr = BlockManager.read(os.path.join(tmpdir, "test"))
@@ -468,13 +468,13 @@ def test_io_chained_lambda_args(tmpdir, column_type):
 
 def test_topological_block_refs():
     mgr = BlockManager()
-    base_col = mk.NumpyArrayColumn(np.arange(16))
+    base_col = mk.TensorColumn(np.arange(16))
 
     lambda_columns = []
     expected_order = [id(base_col._block)]
     curr_col = base_col
     for _ in range(10):
-        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        curr_col = curr_col.defer(lambda x: x + 2)
         expected_order.append(id(curr_col._block))
         lambda_columns.append(curr_col)
 
@@ -490,12 +490,12 @@ def test_topological_block_refs():
 
 def test_topological_block_refs_w_gap():
     mgr = BlockManager()
-    base_col = mk.NumpyArrayColumn(np.arange(16))
+    base_col = mk.TensorColumn(np.arange(16))
 
     lambda_columns = []
     curr_col = base_col
     for _ in range(10):
-        curr_col = curr_col.to_lambda(lambda x: x + 2)
+        curr_col = curr_col.defer(lambda x: x + 2)
         lambda_columns.append(curr_col)
 
     mgr.add_column(lambda_columns[0], "first")

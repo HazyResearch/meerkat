@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Dict, Hashable, Sequence, Tuple, Union
+from typing import Dict, Hashable, List, Sequence, Tuple, Union
 
 import pandas as pd
 import torch
 
 from meerkat.block.ref import BlockRef
-from meerkat.columns.abstract import AbstractColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.abstract import Column
+from meerkat.columns.tensor.numpy import NumPyTensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
@@ -36,6 +36,9 @@ class PandasBlock(AbstractBlock):
     def _get_data(self, index: BlockIndex) -> pd.Series:
         return self.data[index]
 
+    def subblock(self, indices: List[BlockIndex]) -> PandasBlock:
+        return PandasBlock(data=self.data[indices])
+
     @classmethod
     def from_column_data(cls, data: pd.Series) -> Tuple[PandasBlock, BlockView]:
         """[summary]
@@ -58,7 +61,7 @@ class PandasBlock(AbstractBlock):
     def _consolidate(
         cls,
         block_refs: Sequence[BlockRef],
-        consolidated_inputs: Dict[int, "AbstractColumn"] = None,
+        consolidated_inputs: Dict[int, "Column"] = None,
     ) -> BlockRef:
         df = pd.DataFrame(
             # need to ignore index when concatenating
@@ -85,17 +88,17 @@ class PandasBlock(AbstractBlock):
         if torch.is_tensor(index):
             # need to convert to numpy for boolean indexing
             return index.numpy()
-        if isinstance(index, NumpyArrayColumn):
+        if isinstance(index, NumPyTensorColumn):
             return index.data
-        if isinstance(index, TensorColumn):
+        if isinstance(index, TorchTensorColumn):
             # need to convert to numpy for boolean indexing
             return index.data.numpy()
         if isinstance(index, pd.Series):
             # need to convert to numpy for boolean indexing
             return index.values
-        from meerkat.columns.pandas_column import PandasSeriesColumn
+        from meerkat.columns.scalar.pandas import PandasScalarColumn
 
-        if isinstance(index, PandasSeriesColumn):
+        if isinstance(index, PandasScalarColumn):
             return index.data.values
         return index
 
@@ -128,6 +131,9 @@ class PandasBlock(AbstractBlock):
 
     @staticmethod
     def _read_data(
-        path: str, mmap: bool = False, read_inputs: Dict[str, AbstractColumn] = None
+        path: str, mmap: bool = False, read_inputs: Dict[str, Column] = None
     ):
         return pd.read_feather(os.path.join(path, "data.feather"))
+
+    def mean(self):
+        return self.data.mean()

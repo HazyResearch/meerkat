@@ -1,5 +1,6 @@
 from pydantic import Field
-from meerkat.interactive.graph import Store, store_field
+
+from meerkat.interactive.graph import Store
 
 from ..abstract import Component
 

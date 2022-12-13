@@ -3,12 +3,10 @@ from typing import List, Sequence, Union
 
 import numpy as np
 
-from meerkat import DataFrame, ListColumn
-from meerkat.columns.cell_column import CellColumn
-from meerkat.columns.lambda_column import LambdaColumn
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat import DataFrame, ObjectColumn
+from meerkat.columns.deferred.base import DeferredColumn
+from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
@@ -122,21 +120,21 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
         # column to  ListColumn, and fill with "None" wherever indices is "nan".
         data = {}
         for name, col in df.items():
-            if isinstance(col, (NumpyArrayColumn, TensorColumn, PandasSeriesColumn)):
+            if isinstance(col, (TorchTensorColumn, TorchTensorColumn, ScalarColumn)):
                 new_col = col.lz[indices.astype(int)]
 
-                if isinstance(new_col, TensorColumn):
+                if isinstance(new_col, TorchTensorColumn):
                     new_col = new_col.to(float)
-                elif isinstance(new_col, PandasSeriesColumn):
+                elif isinstance(new_col, ScalarColumn):
                     if new_col.dtype != "object":
                         new_col = new_col.astype(float)
                 else:
                     new_col = new_col.astype(float)
-                
+
                 new_col[np.isnan(indices)] = np.nan
                 data[name] = new_col
             else:
-                data[name] = ListColumn(
+                data[name] = ObjectColumn(
                     [
                         None if np.isnan(index) else col.lz[int(index)]
                         for index in indices
@@ -152,12 +150,14 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
 def _check_merge_columns(df: DataFrame, on: List[str]):
     for name in on:
         column = df[name]
-        if isinstance(column, NumpyArrayColumn) or isinstance(column, TensorColumn):
+        if isinstance(column, TorchTensorColumn) or isinstance(
+            column, TorchTensorColumn
+        ):
             if len(column.shape) > 1:
                 raise MergeError(
                     f"Cannot merge on column `{name}`, has more than one dimension."
                 )
-        elif isinstance(column, ListColumn):
+        elif isinstance(column, ObjectColumn):
             if not all(
                 [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
             ):
@@ -165,7 +165,7 @@ def _check_merge_columns(df: DataFrame, on: List[str]):
                     f"Cannot merge on column `{name}`, contains unhashable objects."
                 )
 
-        elif isinstance(column, CellColumn) or isinstance(column, LambdaColumn):
+        elif isinstance(column, DeferredColumn):
             if not all(
                 [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
             ):

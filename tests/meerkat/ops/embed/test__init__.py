@@ -42,7 +42,7 @@ class ImageColumnTestBed:
 class TextColumnTestBed:
     def __init__(self, length: int = 16):
         self.data = ["Row " * idx for idx in range(length)]
-        self.col = mk.PandasSeriesColumn(self.data)
+        self.col = mk.ScalarColumn(self.data)
 
 
 EMB_SIZE = 4

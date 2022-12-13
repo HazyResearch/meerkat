@@ -1,12 +1,10 @@
-import numpy as np
+from typing import Any, Dict
+
 from meerkat.dataframe import DataFrame
-from typing import Any, Dict, Optional
-from meerkat.interactive.edit import EditTarget
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.graph import Store
 
 from ..abstract import Component
-from meerkat.interactive.endpoint import Endpoint
-from dataclasses import dataclass, field
 
 
 class Row(Component):

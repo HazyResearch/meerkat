@@ -30,7 +30,7 @@ def sort(
     """
     if by is None:
         return data
-        
+
     by = [by] if isinstance(by, str) else by
 
     if isinstance(ascending, bool):

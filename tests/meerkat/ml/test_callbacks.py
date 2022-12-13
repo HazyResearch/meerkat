@@ -12,8 +12,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from meerkat import DataFrame
-from meerkat.columns.numpy_column import NumpyArrayColumn
-from meerkat.columns.tensor_column import TensorColumn
+from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.ml import ActivationCallback, load_activations
 
 
@@ -118,7 +117,7 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
             activations = {f"activation_{target_module}": open_memmap(path)}
             activations = DataFrame.from_batch(activations)
             assert isinstance(
-                activations[f"activation_{target_module}"], NumpyArrayColumn
+                activations[f"activation_{target_module}"], TorchTensorColumn
             )
             assert (
                 activations[f"activation_{target_module}"][0].shape
@@ -127,7 +126,9 @@ def test_callback(target_module, num_inputs, mmap, max_epochs, tmpdir):
 
         else:
             activations = DataFrame.read(path)
-            assert isinstance(activations[f"activation_{target_module}"], TensorColumn)
+            assert isinstance(
+                activations[f"activation_{target_module}"], TorchTensorColumn
+            )
 
         if mmap:
             assert (

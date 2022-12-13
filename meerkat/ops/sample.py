@@ -2,17 +2,17 @@ from typing import Union
 
 import numpy as np
 
-from meerkat import AbstractColumn, DataFrame
+from meerkat import Column, DataFrame
 
 
 def sample(
-    data: Union[DataFrame, AbstractColumn],
+    data: Union[DataFrame, Column],
     n: int = None,
     frac: float = None,
     replace: bool = False,
     weights: Union[str, np.ndarray] = None,
     random_state: Union[int, np.random.RandomState] = None,
-) -> Union[DataFrame, AbstractColumn]:
+) -> Union[DataFrame, Column]:
     """Select a random sample of rows from DataFrame or Column. Roughly
     equivalent to ``sample`` in Pandas
     https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sample.html.
@@ -41,7 +41,7 @@ def sample(
     from pandas.core.sample import sample as _sample
 
     if isinstance(weights, str):
-        if isinstance(data, AbstractColumn):
+        if isinstance(data, Column):
             raise ValueError(
                 "Weights passed to `sample` must be a numpy array if data is a Column."
             )

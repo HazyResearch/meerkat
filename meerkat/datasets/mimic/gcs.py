@@ -7,11 +7,11 @@ from typing import Sequence
 from google.cloud import storage
 
 from meerkat import ImageColumn
-from meerkat.columns.lambda_column import LambdaCell, LambdaColumn
-from meerkat.columns.pandas_column import PandasSeriesColumn
+from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
+from meerkat.columns.pandas_column import ScalarColumn
 
 
-class GCSImageCell(LambdaCell):
+class GCSImageCell(DeferredCell):
     def __init__(
         self,
         transform: callable = None,
@@ -46,7 +46,7 @@ class GCSImageCell(LambdaCell):
 class GCSImageColumn(ImageColumn):
     def __init__(
         self,
-        blob_names: PandasSeriesColumn = None,
+        blob_names: ScalarColumn = None,
         bucket_name: str = None,
         project: str = None,
         transform: callable = None,
@@ -76,9 +76,9 @@ class GCSImageColumn(ImageColumn):
         # what we want as it makes dataframe visualization very slow
         return None
 
-    def _create_cell(self, data: object) -> LambdaCell:
+    def _create_cell(self, data: object) -> DeferredCell:
         # don't want to create a lambda
-        return LambdaColumn._create_cell(self, data)
+        return DeferredColumn._create_cell(self, data)
 
     def fn(self, blob_name: str):
         if (
@@ -111,8 +111,8 @@ class GCSImageColumn(ImageColumn):
         *args,
         **kwargs,
     ):
-        if not isinstance(blob_names, PandasSeriesColumn):
-            blob_names = PandasSeriesColumn(blob_names)
+        if not isinstance(blob_names, ScalarColumn):
+            blob_names = ScalarColumn(blob_names)
         return cls(
             blob_names=blob_names,
             loader=loader,

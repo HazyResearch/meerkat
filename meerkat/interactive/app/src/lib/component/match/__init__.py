@@ -1,17 +1,14 @@
+import ast
 from dataclasses import dataclass
 
-from meerkat.interactive.graph import Store, store_field
-from ..abstract import Component
-import re
-from typing import Callable, ClassVar, List, Optional, Tuple
-import ast
-
-from fastapi import HTTPException
 import numpy as np
+from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import reactive
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Store, reactive, store_field
+
+from ..abstract import Component
 
 # from meerkat.interactive.modification import Modification
 
@@ -20,14 +17,14 @@ from meerkat.interactive.endpoint import Endpoint, endpoint
 def get_match_schema(df: DataFrame, encoder: str):
     import meerkat as mk
     from meerkat.interactive.api.routers.dataframe import (
-        _get_column_infos,
         SchemaResponse,
+        _get_column_infos,
     )
 
     columns = [
         k
         for k, v in df.items()
-        if isinstance(v, mk.NumpyArrayColumn) and len(v.shape) == 2
+        if isinstance(v, mk.TorchTensorColumn) and len(v.shape) == 2
         # TODO: We should know the provenance of embeddings and where they came from,
         # to explicitly check whether the encoder will match it in size.
     ]
@@ -68,7 +65,7 @@ def _parse_query(
         return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg) for arg in node.args])
     elif isinstance(node, ast.Constant):
         return mk.embed(
-            data=mk.PandasSeriesColumn([node.value]),
+            data=mk.ScalarColumn([node.value]),
             encoder="clip",
             num_workers=0,
             pbar=False,

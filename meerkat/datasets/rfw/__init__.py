@@ -1,9 +1,10 @@
 import os
 
-import pandas as pd
 import numpy as np
-import meerkat as mk
+import pandas as pd
 import PIL
+
+import meerkat as mk
 
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo

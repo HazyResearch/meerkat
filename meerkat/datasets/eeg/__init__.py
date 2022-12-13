@@ -86,7 +86,7 @@ def build_eeg_df(
         compute_slice_matrix, time_step_size=step_size, clip_len=clip_len, stride=stride
     )
 
-    eeg_input_col = df[["clip_idx", "h5_fn"]].to_lambda(fn=eeg_loader)
+    eeg_input_col = df[["clip_idx", "h5_fn"]].defer(fn=eeg_loader)
 
     df.add_column(
         "eeg_input",
@@ -161,7 +161,7 @@ def build_stanford_eeg_df(
 
     df = mk.DataFrame(data)
 
-    eeg_input_col = df[["sz_start_index", "filepath", "split"]].to_lambda(
+    eeg_input_col = df[["sz_start_index", "filepath", "split"]].defer(
         fn=partial(stanford_eeg_loader, clip_len=clip_len)
     )
 

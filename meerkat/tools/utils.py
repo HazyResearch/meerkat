@@ -44,7 +44,7 @@ def nested_getattr(obj, attr, *args):
     return reduce(lambda o, a: getattr(o, a, *args), [obj] + attr.split("."))
 
 
-def nested_apply(obj: object, fn: callable, base_types: Tuple[type]= ()):
+def nested_apply(obj: object, fn: callable, base_types: Tuple[type] = ()):
     if isinstance(obj, base_types):
         return fn(obj)
     elif isinstance(obj, list):
@@ -52,7 +52,9 @@ def nested_apply(obj: object, fn: callable, base_types: Tuple[type]= ()):
     elif isinstance(obj, tuple):
         return tuple(nested_apply(v, fn=fn, base_types=base_types) for v in obj)
     elif isinstance(obj, dict):
-        return {k: nested_apply(v, fn=fn, base_types=base_types) for k, v in obj.items()}
+        return {
+            k: nested_apply(v, fn=fn, base_types=base_types) for k, v in obj.items()
+        }
     else:
         return fn(obj)
 
@@ -225,7 +227,7 @@ def translate_index(index, length: int):
     if not _is_batch_index(index):
         return index
 
-    from ..columns.abstract import AbstractColumn
+    from ..columns.abstract import Column
 
     if isinstance(index, pd.Series):
         index = index.values
@@ -250,7 +252,7 @@ def translate_index(index, length: int):
             indices = np.where(index)[0]
         else:
             return index
-    elif isinstance(index, AbstractColumn):
+    elif isinstance(index, Column):
         # TODO (sabri): get rid of the np.arange here, very slow for large columns
         indices = np.arange(length)[index]
     else:

@@ -20,6 +20,14 @@ meerkat.block.arrow\_block module
    :undoc-members:
    :show-inheritance:
 
+meerkat.block.deferred\_block module
+------------------------------------
+
+.. automodule:: meerkat.block.deferred_block
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.block.manager module
 ----------------------------
 
@@ -52,10 +60,10 @@ meerkat.block.ref module
    :undoc-members:
    :show-inheritance:
 
-meerkat.block.tensor\_block module
-----------------------------------
+meerkat.block.torch\_block module
+---------------------------------
 
-.. automodule:: meerkat.block.tensor_block
+.. automodule:: meerkat.block.torch_block
    :members:
    :undoc-members:
    :show-inheritance:

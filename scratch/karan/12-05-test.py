@@ -15,10 +15,8 @@ button2 = mk.gui.Button(title="Click me!")
 button3 = mk.gui.Button(title="Click me!")
 
 from meerkat.interactive.app.src.lib.layouts import (
-    Flex,
     Div,
     Grid,
-    AutoLayout,
     ColumnLayout,
 )
 

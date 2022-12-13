@@ -17,10 +17,10 @@ from .transformers import transformers
 __all__ = ["clip", "bit", "transformers", "robust", "embed"]
 
 
-def infer_modality(col: mk.AbstractColumn):
+def infer_modality(col: mk.Column):
     if isinstance(col, mk.ImageColumn):
         return "image"
-    elif isinstance(col, (mk.PandasSeriesColumn, str)):
+    elif isinstance(col, (mk.ScalarColumn, str)):
         return "text"
     elif isinstance(col, mk.ArrowArrayColumn):
         import pyarrow
@@ -38,7 +38,7 @@ def infer_modality(col: mk.AbstractColumn):
 
 # @cache(params=["encoder", "modality", ""])
 def embed(
-    data: Union[mk.DataFrame, mk.AbstractColumn, str, PIL.Image.Image],
+    data: Union[mk.DataFrame, mk.Column, str, PIL.Image.Image],
     input: str = None,
     encoder: Union[str, Encoder] = "clip",
     modality: str = None,
@@ -49,7 +49,7 @@ def embed(
     batch_size: int = 128,
     pbar: bool = True,
     **kwargs,
-) -> Union[mk.DataFrame, mk.AbstractColumn]:
+) -> Union[mk.DataFrame, mk.Column]:
     """Embed a column of data with an encoder from the encoder registry.
 
     Examples
@@ -101,7 +101,7 @@ def embed(
         mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
-    col = data if isinstance(data, mk.AbstractColumn) else data[input]
+    col = data if isinstance(data, mk.Column) else data[input]
 
     if len(data) == 0:
         return data
@@ -117,7 +117,7 @@ def embed(
         # TODO(karan): a hacky way to handle error with processing
         # pyarrow.lib.StringScalars in a mk.ArrowArrayColumn
         if modality == "text" and isinstance(col, mk.ArrowArrayColumn):
-            col = mk.PandasSeriesColumn(col.to_pandas())
+            col = mk.ScalarColumn(col.to_pandas())
 
     encoder = encoders.get(encoder, device=device, **kwargs)
 
@@ -146,7 +146,7 @@ def embed(
 
 
 def _embed(
-    col: mk.AbstractColumn,
+    col: mk.Column,
     encode: Callable,
     preprocess: Callable,
     collate: Callable,
@@ -163,7 +163,7 @@ def _embed(
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if preprocess is not None:
-        embed_input = col.to_lambda(preprocess)
+        embed_input = col.defer(preprocess)
     else:
         embed_input = col
 
@@ -171,7 +171,7 @@ def _embed(
         embed_input.collate_fn = collate
 
     def _prepare_input(x):
-        if isinstance(x, mk.AbstractColumn):
+        if isinstance(x, mk.Column):
             x = x.data
         if torch.is_tensor(x):
             x = x.to(device)
