@@ -68,16 +68,18 @@
 		Code: Code,
 		CodeDisplay: CodeDisplay
 	};
+
+	import { onMount, type ComponentType } from 'svelte';
+	let component: ComponentType;
+	onMount(async () => {
+		if (name in all_components) {
+			component = all_components[name];
+			return;
+		}
+		component = (await import(path)).default;
+	});
 </script>
 
-{#if name in all_components}
-	<svelte:component this={all_components[name]} {...props} />
-{:else}
-	{#await import(path)}
-		Loading {name} component.
-	{:then Component}
-		<svelte:component this={Component.default} {...props} />
-		<!-- {:catch error}
-		{error} -->
-	{/await}
+{#if component}
+	<svelte:component this={component} {...props} />
 {/if}

@@ -130,7 +130,25 @@ with mk.gui.react():
     # Autosave labels whenever the user updates `story_sentence_df` with a new label
     save_labels(story_sentence_df)
 
+# This will not work as a reactive function anymore
+# save_labels(story_sentence_df)
+
 # Launch the interface
 mk.gui.Interface(
     component=RowLayout(components=[doc_id_choice, document]),
 ).launch()
+
+
+# Layouts are also Components: everything is a Component for GUI stuff
+# and then you just pass it to Interface
+# Way to layout components
+# mk.gui.Flex(components=[
+#     doc_id_choice,
+#     document
+# ], classes="...") # TAILWIND CSS
+# equivalent to 
+# <div class="flex flex-row">
+
+
+# Flex, Grid, Div, RowLayout, ColumnLayout
+# Div(components=[Flex(...), Flex(...)])
