@@ -49,16 +49,6 @@ def _as_tensor(data: Union[torch.Tensor, np.ndarray, pd.Series]) -> torch.Tensor
     return torch.as_tensor(data)
 
 
-def _from_sequence(data: Sequence):
-    """
-    np.asarray supports a list of numpy arrays (it simply stacks them
-    before putting them into an array) but torch.as_tensor does not.
-    we want to support this for consistency and because it is important
-    for map
-    """
-    pass
-
-
 class TorchTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
     TensorColumn,
