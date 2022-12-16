@@ -17,7 +17,7 @@ interactive applications:
 
 #. Compared to tools like `Streamlit <streamlit.io>`_, Meerkat is much more focused on supporting data and machine learning use cases. It is likely to be a better fit for users that want to bring the full power of a frontend framework like Svelte to their data science workflows.
 #. Compared to tools like `Gradio <gradio.app>`_, Meerkat is much more focused on complex, reactive applications, rather than demos. It is likely to be a better fit for users that want to build full-blown applications that involve ML models, graphing and interactivity.
-#. Compared to Python-to-React compilation approaches like `Pynecone <pynecone.ai>`, Meerkat is more opinionated about providing a solution for the average data science and machine learning user.
+#. Compared to Python-to-React compilation approaches like `Pynecone <pynecone.io>`, Meerkat is more opinionated about providing a solution for the average data science and machine learning user.
 
 Most data science and machine learning workflows revolve around Python, and Meerkat brings the 
 ability to build reactive data apps in Python to these users.
