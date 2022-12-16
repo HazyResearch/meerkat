@@ -31,6 +31,9 @@ class ArrowScalarColumn(ScalarColumn):
                     "ArrowArrayColumn can only be initialized with ArrowBlock."
                 )
         elif not isinstance(data, (pa.Array, pa.ChunkedArray)):
+            # Arrow cannot construct an array from a torch.Tensor.
+            if isinstance(data, torch.Tensor):
+                data = data.numpy()
             data = pa.array(data)
 
         super(ArrowScalarColumn, self).__init__(data=data, *args, **kwargs)

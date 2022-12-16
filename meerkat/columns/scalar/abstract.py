@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -15,27 +15,32 @@ ScalarColumnTypes = Union[np.ndarray, torch.TensorType, pd.Series, List]
 
 
 class ScalarColumn(Column):
-    def __new__(cls, data: ScalarColumnTypes = None):
+    def __new__(cls, data: ScalarColumnTypes = None, backend: str = None):
+        from .arrow import ArrowScalarColumn
+        from .pandas import PandasScalarColumn
+
         if (cls is not ScalarColumn) or (data is None):
             return super().__new__(cls)
 
+        backends = {"arrow": ArrowScalarColumn, "pandas": PandasScalarColumn}
+        if backend is not None:
+            if backend not in backends:
+                raise ValueError(
+                    f"Cannot create `ScalarColumn` with backend '{backend}'. "
+                    f"Expected one of {list(backends.keys())}"
+                )
+            else:
+                return super().__new__(backends[backend])
+
         if isinstance(data, BlockView):
             if isinstance(data.block, PandasBlock):
-                from .pandas import PandasScalarColumn
-
                 return super().__new__(PandasScalarColumn)
             elif isinstance(data.block, ArrowBlock):
-                from .arrow import ArrowScalarColumn
-
                 return super().__new__(ArrowScalarColumn)
 
-        if isinstance(data, (np.ndarray, torch.TensorType, pd.Series, List)):
-            from .pandas import PandasScalarColumn
-
+        if isinstance(data, (np.ndarray, torch.TensorType, pd.Series, List, Tuple)):
             return super().__new__(PandasScalarColumn)
         elif isinstance(data, pa.Array):
-            from .arrow import ArrowScalarColumn
-
             return super().__new__(ArrowScalarColumn)
         else:
             raise ValueError(

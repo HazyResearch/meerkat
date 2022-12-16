@@ -39,21 +39,13 @@ class TensorColumn(Column):
 
         if isinstance(data, BlockView):
             if isinstance(data.block, TorchBlock):
-                from .torch import TorchTensorColumn
-
                 return super().__new__(TorchTensorColumn)
             elif isinstance(data.block, NumPyBlock):
-                from .numpy import NumPyTensorColumn
-
                 return super().__new__(NumPyTensorColumn)
 
         if isinstance(data, np.ndarray):
-            from .numpy import NumPyTensorColumn
-
             return super().__new__(NumPyTensorColumn)
         elif torch.is_tensor(data):
-            from .torch import TorchTensorColumn
-
             return super().__new__(TorchTensorColumn)
         elif isinstance(data, List):
             if len(data) == 0:
@@ -61,12 +53,8 @@ class TensorColumn(Column):
                     "Cannot create `TensorColumn` from empty list of tensors."
                 )
             elif torch.is_tensor(data[0]):
-                from .torch import TorchTensorColumn
-
                 return super().__new__(TorchTensorColumn)
             else:
-                from .numpy import NumPyTensorColumn
-
                 return super().__new__(NumPyTensorColumn)
 
         else:
