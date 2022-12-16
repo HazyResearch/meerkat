@@ -15,8 +15,8 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-# Load functions from the script '11-04-clean-data.py'
-utils = importlib.import_module("11-04-clean-data")
+# Load functions from the script '12-16-clean-data.py'
+utils = importlib.import_module("12-16-clean-data")
 
 ##### Load the data #####
 try:
