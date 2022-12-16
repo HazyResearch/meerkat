@@ -13,7 +13,7 @@ from cytoolz import merge_with
 import meerkat as mk
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
-from meerkat.tools.utils import MeerkatLoader, translate_index
+from meerkat.tools.utils import MeerkatLoader, meerkat_dill_load, translate_index
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
@@ -209,7 +209,7 @@ class DeferredOp:
             for key, kwarg_path in meta["kwargs"]
         }
 
-        state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        state = meerkat_dill_load(os.path.join(path, "state.dill"))
 
         return cls(args=args, kwargs=kwargs, **state)
 

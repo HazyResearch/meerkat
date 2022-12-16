@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Dict, Hashable, List, Mapping, Sequence, Tuple
 import yaml
 
 from meerkat.errors import ConsolidationError
+from meerkat.tools.utils import MeerkatLoader
 
 # an index into a block that specifies where a column's data lives in the block
 BlockIndex = Union[int, slice, str]
@@ -92,7 +93,7 @@ class AbstractBlock:
     def read(cls, path: str, *args, **kwargs):
         assert os.path.exists(path), f"`path` {path} does not exist."
         metadata_path = os.path.join(path, "meta.yaml")
-        metadata = dict(yaml.load(open(metadata_path), Loader=yaml.FullLoader))
+        metadata = dict(yaml.load(open(metadata_path), Loader=MeerkatLoader))
 
         block_class = metadata["klass"]
         data = block_class._read_data(path, *args, **kwargs)

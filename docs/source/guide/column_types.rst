@@ -25,7 +25,7 @@ There are four core column types in Meerkat, each with a different interface.
     Meerkat is unopinionated when it comes to the choice of data structure underlying columns. This provides users the **flexibility** to choose the best data structure for their use case.
     For example, a `TensorColumn` can be backed by either a `NumPy Array  <https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html>`_) or a `PyTorch Tensor <https://pytorch.org/docs/stable/tensors.html>`_. 
     
-    Each ``ScalarColumn`` object in Meerkat is actually an instance of one of its subclasses (:class:`~meerkat.PandasScalarColumn`, :class:`~meerkat.ArrowScalarColumn`). These subclasses are responsible for implementing the :class:`ScalarColumn` interface for a choice of data structure. Similarly, each ``TensorColumn`` object is an instance of its subclasses (:class:`~meerkat.NumPyTensorColumn`, :class:`~meerkat.TorchTensorColumn`). 
+    Each ``ScalarColumn`` object in Meerkat is actually an instance of one of its subclasses (:class:`~meerkat.PandasScalarColumn`, :class:`~meerkat.ArrowScalarColumn`). These subclasses are responsible for implementing the :class:`ScalarColumn` interface for a particular choice of data structure. Similarly, each ``TensorColumn`` object is an instance of its subclasses (:class:`~meerkat.NumPyTensorColumn`, :class:`~meerkat.TorchTensorColumn`). 
 
     *How to pick a subclass?* In general, users should not have to think about which subclass to use. Meerkat chooses a subclass based on the data structure of the input data. For example, the following code creates a ``ScalarColumn`` backed by a Pandas Series:
 

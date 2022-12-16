@@ -2,6 +2,8 @@ import weakref
 from collections import defaultdict
 from collections.abc import Mapping
 from functools import reduce
+import os
+import dill
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -59,6 +61,21 @@ def nested_apply(obj: object, fn: callable, base_types: Tuple[type] = ()):
         return fn(obj)
 
 
+BACKWARDS_COMPAT_REPLACEMENTS = [
+    ("meerkat.ml", "meerkat.nn"),
+    ("meerkat.columns.numpy_column", "meerkat.columns.tensor.numpy"),
+    ("NumpyArrayColumn", "NumPyTensorColumn"),
+    ("meerkat.columns.tensor_column", "meerkat.columns.tensor.torch"),
+    ("meerkat.columns.pandas_column", "meerkat.columns.scalar.pandas"),
+    ("meerkat.columns.arrow_column", "meerkat.columns.scalar.arrow"),
+    ("meerkat.columns.image_column", "meerkat.columns.deferred.image"),
+    ("meerkat.columns.file_column", "meerkat.columns.deferred.file"),
+    ("meerkat.block.lambda_block", "meerkat.block.deferred_block"),
+    ("LambdaBlock", "DeferredBlock"),
+    ("NumpyBlock", "NumPyBlock")
+]
+
+
 class MeerkatLoader(yaml.FullLoader):
     """PyYaml does not load unimported modules for safety reasons.
 
@@ -76,9 +93,10 @@ class MeerkatLoader(yaml.FullLoader):
             return super().find_python_module(name=name, mark=mark, unsafe=unsafe)
 
     def find_python_name(self, name: str, mark, unsafe=False):
-        if "meerkat.nn" in name:
-            # backwards compatibility with old name
-            name = name.replace("meerkat.nn", "meerkat.ml")
+
+        for old, new in BACKWARDS_COMPAT_REPLACEMENTS:
+            if old in name:
+                name = name.replace(old, new)
 
         if "." in name:
             module_name, _ = name.rsplit(".", 1)
@@ -93,6 +111,22 @@ class MeerkatLoader(yaml.FullLoader):
             else:
                 raise e
             return super().find_python_name(name=name, mark=mark, unsafe=unsafe)
+
+
+class MeerkatUnpickler(dill.Unpickler):
+    def find_class(self, module, name):
+        try:
+            return super().find_class(module, name)
+        except:
+            for old, new in BACKWARDS_COMPAT_REPLACEMENTS:
+                if old in module:
+                    module = module.replace(old, new)
+            return super().find_class(module, name)
+
+
+def meerkat_dill_load(path: str):
+    """Load dill file with backwards compatibility for old column names."""
+    return MeerkatUnpickler(open(path, "rb")).load()
 
 
 def convert_to_batch_column_fn(
