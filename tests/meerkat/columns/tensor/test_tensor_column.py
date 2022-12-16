@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 import torch
 
-from meerkat import TorchTensorColumn
+from meerkat import TensorColumn, TorchTensorColumn
 from meerkat.block.numpy_block import NumPyBlock
 
 from ..abstract import AbstractColumnTestBed, column_parametrize
@@ -117,3 +117,24 @@ def test_ufunc_unhandled():
     a = TorchTensorColumn([1, 2, 3])
     with pytest.raises(TypeError):
         a == "a"
+
+
+@pytest.mark.parametrize(
+    "data",
+    [[1, 2, 3], np.asarray([1, 2, 3]), torch.tensor([1, 2, 3]), pd.Series([1, 2, 3])],
+)
+@pytest.mark.parametrize("backend", ["numpy", "torch"])
+def test_backend(data, backend: str):
+    col = TensorColumn(data, backend=backend)
+
+    expected_type = {"numpy": np.ndarray, "torch": torch.Tensor}[backend]
+    assert isinstance(col.data, expected_type)
+
+    col_data = col.data
+    if isinstance(col_data, torch.Tensor):
+        col_data = col_data.numpy()
+    if isinstance(data, torch.Tensor):
+        data = data.numpy()
+    col_data = np.asarray(col_data)
+    data = np.asarray(data)
+    assert (col_data == data).all()

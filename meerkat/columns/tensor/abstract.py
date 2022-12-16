@@ -13,7 +13,26 @@ TensorColumnTypes = Union[np.ndarray, torch.TensorType]
 
 
 class TensorColumn(Column):
-    def __new__(cls, data: TensorColumnTypes = None):
+    def __new__(cls, data: TensorColumnTypes = None, backend: str = None):
+        from .numpy import NumPyTensorColumn
+        from .torch import TorchTensorColumn
+
+        backends = {"torch": TorchTensorColumn, "numpy": NumPyTensorColumn}
+
+        if backend is not None:
+            if backend not in backends:
+                raise ValueError(
+                    f"Backend {backend} not supported. "
+                    f"Expected one of {list(backends.keys())}"
+                )
+            else:
+                return super().__new__(backends[backend])
+
+        if isinstance(data, BlockView):
+            if isinstance(data.block, TorchBlock):
+                backend = TorchTensorColumn
+            elif isinstance(data.block, NumPyBlock):
+                backend = NumPyTensorColumn
 
         if (cls is not TensorColumn) or (data is None):
             return super().__new__(cls)
