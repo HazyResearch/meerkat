@@ -51,6 +51,16 @@ from .config import config
 # alias for DataFrame for backwards compatibility
 DataPanel = DataFrame
 
+# aliases for columns
+scalar = ScalarColumn
+tensor = TensorColumn
+deferred = DeferredColumn
+objects = ObjectColumn
+files = FileColumn
+image = ImageColumn
+audio = AudioColumn
+
+
 __all__ = [
     "GlobalState",
     "DataFrame",
@@ -68,7 +78,6 @@ __all__ = [
     "FileColumn",
     "ImageColumn",
     "AudioColumn",
-    "VideoColumn",
     "AbstractCell",
     "DeferredCell",
     "FileCell",
