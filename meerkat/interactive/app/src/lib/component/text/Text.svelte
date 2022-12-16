@@ -28,7 +28,7 @@
 </script>
 
 <div
-	class="w-full flex space-x-2 items-center bg-slate-100 py-1 rounded-lg px-2 drop-shadow-md z-20"
+	class="space-x-2 bg-slate-100 py-1 rounded-lg px-2 drop-shadow-md z-20"
 >
 	{$data}
 </div>

@@ -27,6 +27,16 @@ Common Use Cases
    model_training
    model_evaluation
    error_analysis
+   
+Interactive GUIs
+----------------
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   ./interactive/*
+   
 
 Advanced Topics
 ---------------- 
