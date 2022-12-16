@@ -59,4 +59,4 @@ def sample(
         weights=weights,
         random_state=rs,
     )
-    return data.lz[sampled_indices]
+    return data[sampled_indices]

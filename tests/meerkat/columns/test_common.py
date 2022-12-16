@@ -101,9 +101,9 @@ def test_set_item(column_testbed, index_type: type):
         if isinstance(col, MUTABLE_COLUMNS):
             col[col_index] = data_to_set
             if isinstance(index, int):
-                column_testbed.assert_data_equal(data_to_set, col.lz[col_index])
+                column_testbed.assert_data_equal(data_to_set, col[col_index])
             else:
-                column_testbed.assert_data_equal(data_to_set, col.lz[col_index].data)
+                column_testbed.assert_data_equal(data_to_set, col[col_index].data)
         else:
             with pytest.raises(ImmutableError):
                 col[col_index] = data_to_set
@@ -158,7 +158,7 @@ def test_head(single_column_testbed: AbstractColumnTestBed):
     length = 10
     result = testbed.col.head(length)
     assert len(result) == length
-    assert result.is_equal(testbed.col.lz[:length])
+    assert result.is_equal(testbed.col[:length])
 
 
 def test_tail(single_column_testbed: AbstractColumnTestBed):
@@ -166,7 +166,7 @@ def test_tail(single_column_testbed: AbstractColumnTestBed):
     length = 10
     result = testbed.col.tail(length)
     assert len(result) == length
-    assert result.is_equal(testbed.col.lz[-length:])
+    assert result.is_equal(testbed.col[-length:])
 
 
 def test_repr_html(single_column_testbed: AbstractColumnTestBed):

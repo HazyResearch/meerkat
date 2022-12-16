@@ -69,7 +69,7 @@ def get_rows(
         raise ValueError()
 
     rows = []
-    for row in df.lz:
+    for row in df:
         rows.append(
             [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )

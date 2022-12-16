@@ -1,6 +1,6 @@
 import meerkat as mk
 
-df = mk.get("imagenette", version="160px").lz[:2000]
+df = mk.get("imagenette", version="160px")[:2000]
 
 # df = mk.get("imdb", registry="huggingface")  # pull text data from huggingface example
 # df = df["train"]
@@ -8,8 +8,8 @@ df = mk.get("imagenette", version="160px").lz[:2000]
 # df["text"] = df["text"].to_pandas()
 # df["label"] = df["label"].to_pandas()
 
-# df = mk.get("ngoa")["published_images"].lz[:100] # national gallery of art multimodal data example
-# df = mk.get("coco", version="2014", download_mode="force").lz[:200] # pull ms-coco multimodal data example
+# df = mk.get("ngoa")["published_images"][:100] # national gallery of art multimodal data example
+# df = mk.get("coco", version="2014", download_mode="force")[:200] # pull ms-coco multimodal data example
 
 # emb_df = mk.DataFrame.read(
 #     "ngoa_published_images_224_clip.mk/"

@@ -122,7 +122,7 @@ Instead, images are only loaded into memory at the moment they are selected.
     
     .. ipython:: python
 
-        row = df.lz[2]
+        row = df[2]
         row
     
     Notice that instead of holding the image in memory, ``row`` holds a :class:`~meerkat.FileCell` object. 
@@ -236,7 +236,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     .. ipython:: python
         :okwarning:
         
-        small_df.lz[small_df["label"] == "parachute"]
+        small_df[small_df["label"] == "parachute"]
     
 
 .. admonition:: Copy vs. Reference

@@ -169,7 +169,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
         data = {}
         for name, col in df.items():
             if isinstance(col, (TorchTensorColumn, TorchTensorColumn, ScalarColumn)):
-                new_col = col.lz[indices.astype(int)]
+                new_col = col[indices.astype(int)]
 
                 if isinstance(new_col, TorchTensorColumn):
                     new_col = new_col.to(float)
@@ -184,7 +184,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
             else:
                 data[name] = ObjectColumn(
                     [
-                        None if np.isnan(index) else col.lz[int(index)]
+                        None if np.isnan(index) else col[int(index)]
                         for index in indices
                     ]
                 )
@@ -192,7 +192,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
     else:
         # if there are no `nan`s in the indices, then we can just lazy index the
         # original column
-        return df.lz[indices]
+        return df[indices]
 
 
 def _check_merge_columns(df: DataFrame, on: List[str]):

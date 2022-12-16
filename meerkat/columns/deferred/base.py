@@ -157,4 +157,4 @@ class DeferredColumn(Column):
         return BasicFormatter()
 
     def _repr_cell(self, idx):
-        return self.lz[idx]
+        return self[idx]

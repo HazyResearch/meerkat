@@ -12,7 +12,7 @@ ngoa = mk.get(
     "ngoa",
     "/Users/krandiash/Desktop/workspace/projects/datasci/data/ngoa/opendata/",
 )
-ngoa_images = ngoa["published_images"].lz[:200]
+ngoa_images = ngoa["published_images"][:200]
 ngoa_images["image_1000_url"] = ngoa_images["iiifurl"].map(
     lambda x: f"{x}/full/!1000,1000/0/default.jpg", pbar=True
 )

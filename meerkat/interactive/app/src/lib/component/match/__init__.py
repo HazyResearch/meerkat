@@ -65,7 +65,7 @@ def _parse_query(
         return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg) for arg in node.args])
     elif isinstance(node, ast.Constant):
         return mk.embed(
-            data=mk.ScalarColumn([node.value]),
+            data=mk.column([node.value]),
             encoder="clip",
             num_workers=0,
             pbar=False,
@@ -105,6 +105,7 @@ def set_criterion(
         )
 
     except Exception as e:
+        raise e
         raise HTTPException(status_code=500, detail=str(e))
 
     return criterion.__wrapped__

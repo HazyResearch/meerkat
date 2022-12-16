@@ -60,7 +60,7 @@ class DeferredColumnTestBed(AbstractColumnTestBed):
         else:
             if batched:
                 return {
-                    "fn": lambda x, k=0: np.array([cell.get() for cell in x.lz])
+                    "fn": lambda x, k=0: np.array([cell.get() for cell in x])
                     + salt
                     + k,
                     "expected_result": NumPyTensorColumn.from_array(

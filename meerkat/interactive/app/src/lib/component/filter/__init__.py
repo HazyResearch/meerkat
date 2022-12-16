@@ -154,7 +154,7 @@ def filter(
         all_masks.append(np.asarray(mask))
     mask = np.stack(all_masks, axis=1).all(axis=1)
 
-    return data.lz[mask]
+    return data[mask]
 
 
 class Filter(Component):

@@ -80,7 +80,7 @@ def build_audioset_df(
         df.remove_column("positive_labels")
 
         # Filter missing audio
-        df = df.lz[df["audio_path"].apply(os.path.exists)]
+        df = df[df["audio_path"].apply(os.path.exists)]
 
         if audio_column:
             df["audio"] = mk.AudioColumn(df["audio_path"])

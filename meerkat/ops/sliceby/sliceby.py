@@ -96,7 +96,7 @@ class SliceBy(IdentifiableMixin):
             if self.slice_type == "scores":
                 raise NotImplementedError
             else:
-                slice_df = self.data.lz[self.slices[slice_key]]
+                slice_df = self.data[self.slices[slice_key]]
                 slice_values: Dict[str, Any] = slice_df.aggregate(
                     f, accepts_df=accepts_df
                 )
@@ -126,7 +126,7 @@ class SliceBy(IdentifiableMixin):
                 self.slices[slice_key][index], materialize=materialize
             )
         else:
-            sorted = self.data.lz[np.argsort(-np.array(self.slices[slice_key]))]
+            sorted = self.data[np.argsort(-np.array(self.slices[slice_key]))]
             return sorted._get(index, materialize=materialize)
 
     def get_slice_length(self, slice_key: SliceKey) -> int:

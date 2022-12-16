@@ -81,7 +81,7 @@ def test_concat(column_testbed: AbstractColumnTestBed, n: int):
     assert len(out) == len(col) * n
     assert isinstance(out, type(col))
     for i in range(n):
-        assert out.lz[i * len(col) : (i + 1) * len(col)].is_equal(col)
+        assert out[i * len(col) : (i + 1) * len(col)].is_equal(col)
 
 
 def test_concat_same_columns():

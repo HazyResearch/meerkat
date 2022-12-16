@@ -31,7 +31,7 @@ def reassign(value: mk.gui.Store):
 
 @mk.gui.reactive
 def filter(df: mk.DataFrame, value: int):
-    return df.lz[10 * value :]
+    return df[10 * value :]
 
 
 df = mk.get("imagenette", version="160px")

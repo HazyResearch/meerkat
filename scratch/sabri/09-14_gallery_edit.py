@@ -9,7 +9,7 @@ df = mk.gui.Reference(df)
 
 @mk.gui.reactive
 def filter(df: mk.DataFrame):
-    return df.lz[df["label"] == "gas pump"]
+    return df[df["label"] == "gas pump"]
 
 
 filtered_df = filter(df)

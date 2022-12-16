@@ -1,6 +1,6 @@
 import meerkat as mk
 
-df = mk.get("imagenette", version="160px").lz[:2000]
+df = mk.get("imagenette", version="160px")[:2000]
 df_pivot = mk.gui.Reference(df)
 
 df = mk.embed(

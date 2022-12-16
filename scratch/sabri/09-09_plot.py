@@ -59,7 +59,7 @@ def plot(df: mk.DataFrame) -> mk.gui.Interface:
             key = sb_df["slice"][idx]
             rows.extend(sb.slices[key])
 
-        return df.lz[np.array(rows)]
+        return df[np.array(rows)]
 
     filtered_df = filter_selection(pivot, sb, sb_df, selection)
 

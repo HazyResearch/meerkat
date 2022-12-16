@@ -61,9 +61,9 @@ def build_gqa_dfs(dataset_dir: str, write: bool = False) -> Dict[str, mk.DataFra
     )
     object_df["object_image"] = object_df.to_lambda(crop_object)
     # filter out objects with no width or height
-    object_df = object_df.lz[(object_df["h"] != 0) & (object_df["w"] != 0)]
+    object_df = object_df[(object_df["h"] != 0) & (object_df["w"] != 0)]
     # filter out objects whose bounding boxes are not contained within the image
-    object_df = object_df.lz[
+    object_df = object_df[
         (object_df["x"] < object_df["width"]) & (object_df["y"] < object_df["height"])
     ]
 

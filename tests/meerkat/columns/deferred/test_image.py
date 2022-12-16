@@ -137,9 +137,9 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     "fn": lambda x, k=0: [
                         int(os.path.splitext(os.path.basename(cell.data))[0])
                         < (4 + salt + k)
-                        for cell in x.lz
+                        for cell in x
                     ],
-                    "expected_result": self.col.lz[: 4 + salt + kwarg],
+                    "expected_result": self.col[: 4 + salt + kwarg],
                 }
             else:
                 return {
@@ -149,7 +149,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                         )
                         < (4 + salt + k)
                     ),
-                    "expected_result": self.col.lz[: 4 + salt + kwarg],
+                    "expected_result": self.col[: 4 + salt + kwarg],
                 }
         else:
             if self.transform is None:
@@ -166,7 +166,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     "fn": lambda x, k=0: (
                         (x.mean(dim=[1, 2, 3]) if batched else x.mean()) > salt + k
                     ).to(bool),
-                    "expected_result": self.col.lz[
+                    "expected_result": self.col[
                         torch.stack([self.transform(im) for im in self.ims])
                         .mean(dim=[1, 2, 3])
                         .numpy()

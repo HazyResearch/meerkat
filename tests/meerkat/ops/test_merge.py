@@ -49,7 +49,7 @@ class MergeTestBed(DataFrameTestBed):
                     "d": (torch.arange(lengths["left"]) % 3),
                     "e": [f"1_{i}" for i in np.arange(lengths["left"])],
                 }
-            ).lz[np.random.permutation(np.arange(lengths["left"]))]
+            )[np.random.permutation(np.arange(lengths["left"]))]
 
             self.side_to_df["right"] = DataFrame.from_batch(
                 {
@@ -78,7 +78,7 @@ class MergeTestBed(DataFrameTestBed):
 
                 if side == "left":
                     np.random.seed(1)
-                    df = df.lz[np.random.permutation(np.arange(len(df)))]
+                    df = df[np.random.permutation(np.arange(len(df)))]
                 self.side_to_df[side] = df
 
 
@@ -161,20 +161,20 @@ class TestMerge:
         mask_1 = np.where([val in (a1 - a2) for val in out["key"]])[0]
         mask_2 = np.where([val in (a2 - a1) for val in out["key"]])[0]
         # check for equality at matched rows
-        assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
+        assert list(out[mask_both]["b_1"]) == list(out[mask_both]["b_2"])
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_1]["b_1"]) == a1 - a2
-        assert set(out.lz[mask_2]["b_2"]) == a2 - a1
+        assert set(out[mask_1]["b_1"]) == a1 - a2
+        assert set(out[mask_2]["b_2"]) == a2 - a1
         # check for `None` at unmatched rows
-        assert np.isnan(out.lz[mask_1]["b_2"]).all()
-        assert np.isnan(out.lz[mask_2]["b_1"]).all()
+        assert np.isnan(out[mask_1]["b_2"]).all()
+        assert np.isnan(out[mask_2]["b_1"]).all()
 
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
-        assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
+        assert set(out[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
+        assert set(out[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
         # check for equality at matched rows
-        assert out.lz[mask_1]["e_2"].isna().all()
-        assert out.lz[mask_2]["e_1"].isna().all()
+        assert out[mask_1]["e_2"].isna().all()
+        assert out[mask_2]["e_1"].isna().all()
 
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_left(self, testbed, sort):
@@ -209,16 +209,16 @@ class TestMerge:
         mask_1 = np.where([val in (a1 - a2) for val in out["key"]])[0]
 
         # check for equality at matched rows
-        assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
+        assert list(out[mask_both]["b_1"]) == list(out[mask_both]["b_2"])
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_1]["b_1"]) == a1 - a2
+        assert set(out[mask_1]["b_1"]) == a1 - a2
         # check for `None` at unmatched rows
-        assert out.lz[mask_1]["b_2"].isna().all()
+        assert out[mask_1]["b_2"].isna().all()
 
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
+        assert set(out[mask_1]["e_1"]) == set([f"1_{i}" for i in a1 - a2])
         # check for equality at matched rows
-        assert out.lz[mask_1]["e_2"].isna().all()
+        assert out[mask_1]["e_2"].isna().all()
 
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_right(self, testbed, sort):
@@ -252,16 +252,16 @@ class TestMerge:
         mask_both = np.where([val in (a1 & a2) for val in out["key"]])[0]
         mask_2 = np.where([val in (a2 - a1) for val in out["key"]])[0]
         # check for equality at matched rows
-        assert list(out.lz[mask_both]["b_1"]) == list(out.lz[mask_both]["b_2"])
+        assert list(out[mask_both]["b_1"]) == list(out[mask_both]["b_2"])
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_2]["b_2"]) == a2 - a1
+        assert set(out[mask_2]["b_2"]) == a2 - a1
         # check for `None` at unmatched rows
-        assert (out.lz[mask_2]["b_1"]).isna().all()
+        assert (out[mask_2]["b_1"]).isna().all()
 
         # check for `values` at unmatched rows
-        assert set(out.lz[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
+        assert set(out[mask_2]["e_2"]) == set([f"1_{i}" for i in a2 - a1])
         # check for equality at matched rows
-        assert (out.lz[mask_2]["e_1"]).isna().all()
+        assert (out[mask_2]["e_1"]).isna().all()
 
     def test_merge_output_column_types(self):
         df1 = DataFrame.from_batch(

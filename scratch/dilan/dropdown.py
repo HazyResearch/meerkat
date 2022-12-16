@@ -2,7 +2,7 @@ import meerkat as mk
 
 df = mk.get(
     "imagenette",
-).lz[:100]
+)[:100]
 df_pivot = mk.gui.Reference(df)
 
 df = mk.embed(

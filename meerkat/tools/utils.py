@@ -145,14 +145,14 @@ def convert_to_batch_column_fn(
             # Apply the unbatched function
             if with_indices:
                 output = function(
-                    batch[i] if materialize else batch.lz[i],
+                    batch[i] if materialize else batch[i],
                     indices[i],
                     *args,
                     **kwargs,
                 )
             else:
                 output = function(
-                    batch[i] if materialize else batch.lz[i],
+                    batch[i] if materialize else batch[i],
                     *args,
                     **kwargs,
                 )
@@ -198,14 +198,14 @@ def convert_to_batch_fn(
             # Apply the unbatched function
             if with_indices:
                 output = function(
-                    {k: v[i] if materialize else v.lz[i] for k, v in batch.items()},
+                    {k: v[i] if materialize else v[i] for k, v in batch.items()},
                     indices[i],
                     *args,
                     **kwargs,
                 )
             else:
                 output = function(
-                    {k: v[i] if materialize else v.lz[i] for k, v in batch.items()},
+                    {k: v[i] if materialize else v[i] for k, v in batch.items()},
                     *args,
                     **kwargs,
                 )

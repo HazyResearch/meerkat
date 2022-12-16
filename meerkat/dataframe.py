@@ -311,11 +311,11 @@ class DataFrame(
 
     def head(self, n: int = 5) -> DataFrame:
         """Get the first `n` examples of the DataFrame."""
-        return self.lz[:n]
+        return self[:n]
 
     def tail(self, n: int = 5) -> DataFrame:
         """Get the last `n` examples of the DataFrame."""
-        return self.lz[-n:]
+        return self[-n:]
 
     def _get_loc(self, keyidx, materialize: bool = False):
         if self.primary_key is None:
@@ -652,7 +652,7 @@ class DataFrame(
             )
 
         if cell_columns:
-            df = self[cell_columns] if not shuffle else self[cell_columns].lz[indices]
+            df = self[cell_columns] if not shuffle else self[cell_columns][indices]
             cell_dl = torch.utils.data.DataLoader(
                 df,
                 batch_size=batch_size,
@@ -833,7 +833,7 @@ class DataFrame(
         indices = np.where(outputs)[0]
 
         # filter returns a new dataframe
-        return self.lz[indices]
+        return self[indices]
 
     def merge(
         self,

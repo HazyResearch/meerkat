@@ -89,17 +89,17 @@ def rows(
     full_length = len(df)
     column_infos = _get_column_infos(df, columns)
 
-    df = df.lz[[info.name for info in column_infos]]
+    df = df[[info.name for info in column_infos]]
 
     if indices is not None:
-        df = df.lz[indices]
+        df = df[indices]
         indices = indices
     elif start is not None:
         if end is None:
             end = len(df)
         else:
             end = min(end, len(df))
-        df = df.lz[start:end]
+        df = df[start:end]
         indices = list(range(start, end))
     elif keys is not None:
         if key_column is None:
@@ -108,12 +108,12 @@ def rows(
             raise ValueError("Must provide key_column if keys are provided")
 
         # FIXME(sabri): this will only work if key_column is a pandas column
-        df = df.lz[df[key_column].isin(keys)]
+        df = df[df[key_column].isin(keys)]
     else:
         raise ValueError()
 
     rows = []
-    for row in df.lz:
+    for row in df:
         rows.append(
             [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
@@ -127,7 +127,7 @@ def rows(
 
 @endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
 def remove_row_by_index(df: DataFrame, row_index: int = Endpoint.EmbeddedBody()):
-    df = df.lz[np.arange(len(df)) != row_index]
+    df = df[np.arange(len(df)) != row_index]
 
     # TODO: shouldn't have to issue this manually
     from meerkat.state import state
@@ -190,7 +190,7 @@ def edit_target(
             # TODO(): make this work once we've implemented primary_key
             raise NotImplementedError()
             # primary_key = target_df.primary_key
-        source_ids = df[target.source_id_column].lz[np.isin(df[primary_key], row_keys)]
+        source_ids = df[target.source_id_column][np.isin(df[primary_key], row_keys)]
 
     mask = np.isin(target_df[target.target_id_column], source_ids)
 

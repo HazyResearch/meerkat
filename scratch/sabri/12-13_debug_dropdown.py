@@ -1,6 +1,6 @@
 import meerkat as mk
 
-df = mk.get("imagenette",).lz[:100]
+df = mk.get("imagenette",)[:100]
 
 # dp = mk.embed(
 #     dp,

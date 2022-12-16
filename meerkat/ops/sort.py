@@ -47,4 +47,4 @@ def sort(
     df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)
     sorted_indices = df["_sort_idx_"]
 
-    return data.lz[sorted_indices]
+    return data[sorted_indices]

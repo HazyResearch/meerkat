@@ -2,7 +2,7 @@ import meerkat as mk
 from meerkat.interactive.graph import endpoint
 
 
-df = mk.get("imagenette", version="160px").lz[:2000]
+df = mk.get("imagenette", version="160px")[:2000]
 df_ref = mk.gui.Reference(df)
 
 # df = mk.embed(

@@ -82,13 +82,13 @@ ngoa_images = df.merge(
     on="objectid",
 )
 # Filter duplicates
-ngoa_images = ngoa_images.lz[~ngoa_images["uuid"].to_pandas().duplicated()]
+ngoa_images = ngoa_images[~ngoa_images["uuid"].to_pandas().duplicated()]
 
 # ngoa = mk.get(
 #     "ngoa",
 #     "/data/datasets/opendata/",
 # )
-# ngoa_images = ngoa["published_images"].lz[:100]#.lz["uuid", "image"]
+# ngoa_images = ngoa["published_images"][:100]#["uuid", "image"]
 
 
 def filter_na(df: mk.DataFrame):

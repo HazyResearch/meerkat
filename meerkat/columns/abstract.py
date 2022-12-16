@@ -367,7 +367,7 @@ class Column(
             **kwargs,
         )
         indices = np.where(outputs)[0]
-        return self.lz[indices]
+        return self[indices]
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
@@ -484,7 +484,7 @@ class Column(
             and self._get.__func__ == Column._get
         ):
             return torch.utils.data.DataLoader(
-                self if materialize else self.lz,
+                self.mz if materialize else self,
                 batch_size=batch_size,
                 collate_fn=self.collate if collate else lambda x: x,
                 drop_last=drop_last_batch,
@@ -500,7 +500,7 @@ class Column(
                     continue
                 batch_indices.append(indices[i : i + batch_size])
             return torch.utils.data.DataLoader(
-                self if materialize else self.lz,
+                self.mz if materialize else self,
                 sampler=batch_indices,
                 batch_size=None,
                 batch_sampler=None,
@@ -530,14 +530,14 @@ class Column(
 
     def head(self, n: int = 5) -> Column:
         """Get the first `n` examples of the column."""
-        return self.lz[:n]
+        return self[:n]
 
     def tail(self, n: int = 5) -> Column:
         """Get the last `n` examples of the column."""
-        return self.lz[-n:]
+        return self[-n:]
 
     def to_pandas(self) -> pd.Series:
-        return pd.Series([self.lz[int(idx)] for idx in range(len(self))])
+        return pd.Series([self[int(idx)] for idx in range(len(self))])
 
     def _copy_data(self) -> object:
         return copy(self._data)

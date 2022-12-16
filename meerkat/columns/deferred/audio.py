@@ -47,7 +47,7 @@ class AudioColumn(FileColumn):
         return torchaudio.load(*args, **kwargs)[0]
 
     def _repr_cell(self, idx):
-        return self.lz[idx]
+        return self[idx]
 
     def collate(self, batch):
         tensors = [b.t() for b in batch]

@@ -34,9 +34,9 @@ class FunctionInspectorMixin:
         # Run the function to test it
         if data is None:
             if is_batched_fn:
-                data = self[:2] if materialize else self.lz[:2]
+                data = self[:2] if materialize else self[:2]
             else:
-                data = self[0] if materialize else self.lz[0]
+                data = self[0] if materialize else self[0]
 
         if indices is None:
             if is_batched_fn:

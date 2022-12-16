@@ -116,7 +116,7 @@ def embed(
 
         # TODO(karan): a hacky way to handle error with processing
         # pyarrow.lib.StringScalars in a mk.ArrowArrayColumn
-        if modality == "text" and isinstance(col, mk.ArrowArrayColumn):
+        if modality == "text" and isinstance(col, mk.ArrowScalarColumn):
             col = mk.ScalarColumn(col.to_pandas())
 
     encoder = encoders.get(encoder, device=device, **kwargs)

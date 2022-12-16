@@ -767,7 +767,7 @@ def test_batch(testbed, shuffle: bool, batch_size: int, materialize: bool):
             if materialize:
                 col.is_equal(df[batch["idx"]][name])
             else:
-                col.is_equal(df.lz[batch["idx"]][name])
+                col.is_equal(df[batch["idx"]][name])
     order = np.array(order).flatten()
 
     if shuffle:
@@ -813,8 +813,8 @@ def test_subclass():
         {"c": np.arange(3), "d": ["2021", "2022", "2023"]}
     )
 
-    assert isinstance(df1.lz[np.asarray([0, 1])], DataFrameSubclass)
-    assert isinstance(df1.lz[:2], DataFrameSubclass)
+    assert isinstance(df1[np.asarray([0, 1])], DataFrameSubclass)
+    assert isinstance(df1[:2], DataFrameSubclass)
     assert isinstance(df1[:2], DataFrameSubclass)
 
     assert isinstance(df1.merge(df2, left_on="a", right_on="c"), DataFrameSubclass)
