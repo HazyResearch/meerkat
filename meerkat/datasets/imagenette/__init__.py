@@ -71,6 +71,7 @@ class imagenette(DatasetBuilder):
         df["img"] = mk.ImageColumn.from_filepaths(
             df["img_path"], base_dir=self.data_dir
         )
+        df.set_primary_key("img_id", inplace=True)
         return df
 
     def download(self):
@@ -89,6 +90,7 @@ class imagenette(DatasetBuilder):
         df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
         df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
         df["img_path"] = df.path
+        df["img_id"] = df["path"].apply(lambda x: x.split("/")[-1].split(".")[0])
         return df
 
 

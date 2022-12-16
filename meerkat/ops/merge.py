@@ -6,13 +6,16 @@ import numpy as np
 from meerkat import DataFrame, ObjectColumn
 from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
+from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import reactive
 from meerkat.provenance import capture_provenance
+from meerkat.ops.decorators import check_primary_key
 
 
 @capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
+@check_primary_key
 @reactive
 def merge(
     left: DataFrame,
@@ -24,7 +27,46 @@ def merge(
     sort: bool = False,
     suffixes: Sequence[str] = ("_x", "_y"),
     validate=None,
-):
+) -> DataFrame:
+    """ Perform a database-style join operationn between two DataFrames.  
+
+
+
+    Args:
+        left (DataFrame): Left DataFrame.
+        right (DataFrame): Right DataFrame.
+        how (str, optional): The join type. Defaults to "inner".
+        on (Union[str, List[str]], optional): The columns(s) to join on. 
+            These columns must be :class:`~meerkat.ScalarColumn`.
+            Defaults to None, in which case the `left_on` and `right_on` parameters
+            must be passed.
+        left_on (Union[str, List[str]], optional): The column(s) in the left DataFrame
+            to join on. These columns must be :class:`~meerkat.ScalarColumn`. 
+            Defaults to None.
+        right_on (Union[str, List[str]], optional): The column(s) in the right DataFrame
+            to join on. These columns must be :class:`~meerkat.ScalarColumn`.
+            Defaults to None.
+        sort (bool, optional): Whether to sort the result DataFrame by the join key(s).
+            Defaults to False.
+        suffixes (Sequence[str], optional): Suffixes to use in the case their are 
+            conflicting column names in the result DataFrame. Should be a sequence of
+            length two, with ``suffixes[0]`` the suffix for the column from the left
+            DataFrame and ``suffixes[1]`` the suffix for the right.  
+            Defaults to ("_x", "_y").
+        validate (_type_, optional): The check to perform on the result DataFrame. 
+            Defaults to None, in which case no check is performed. Valid options are:
+
+            * “one_to_one” or “1:1”: check if merge keys are unique in both left and right datasets.
+
+            * “one_to_many” or “1:m”: check if merge keys are unique in left dataset.
+
+            * “many_to_one” or “m:1”: check if merge keys are unique in right dataset.
+
+            * “many_to_many” or “m:m”: allowed, but does not result in checks.
+
+    Returns:
+        DataFrame: The merged DataFrame.
+    """
     if how == "cross":
         raise ValueError("DataFrame does not support cross merges.")  # pragma: no cover
 
@@ -109,6 +151,16 @@ def merge(
         merged.add_column(name, left[name]._clone(data=column.values))
         merged.data.reorder(merged.columns[-1:] + merged.columns[:-1])
 
+    # set primary key if either the `left` or `right` has a primary key in the result
+    # note, the `check_primary_key` wrapper wrapper ensures that the primary_key is
+    # actually valid
+    if (left.primary_key_name is not None) and left.primary_key_name in merged:
+        merged.set_primary_key(left.primary_key_name, inplace=True)
+    elif (
+        right.primary_key_name is not None
+    ) and right.primary_key_name in merged:
+        merged.set_primary_key(right.primary_key_name, inplace=True)
+
     return merged
 
 
@@ -150,25 +202,19 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
 def _check_merge_columns(df: DataFrame, on: List[str]):
     for name in on:
         column = df[name]
-        if isinstance(column, TorchTensorColumn) or isinstance(
-            column, TorchTensorColumn
-        ):
+        if isinstance(column, TensorColumn):
             if len(column.shape) > 1:
                 raise MergeError(
-                    f"Cannot merge on column `{name}`, has more than one dimension."
+                    f"Cannot merge on a TensorColumn column `{name}` that has more "
+                    "than one dimension."
                 )
         elif isinstance(column, ObjectColumn):
-            if not all(
-                [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
-            ):
+            if not all([isinstance(cell, collections.abc.Hashable) for cell in column]):
                 raise MergeError(
                     f"Cannot merge on column `{name}`, contains unhashable objects."
                 )
 
         elif isinstance(column, DeferredColumn):
-            if not all(
-                [isinstance(cell, collections.abc.Hashable) for cell in column.lz]
-            ):
-                raise MergeError(
-                    f"Cannot merge on column `{name}`, contains unhashable cells."
-                )
+            raise MergeError(f"Cannot merge on DeferredColumn `{name}`.")
+        elif not isinstance(column, ScalarColumn):
+            raise MergeError(f"Cannot merge on column `{name}` of type {type(column)}.")
