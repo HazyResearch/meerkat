@@ -76,7 +76,10 @@
 			component = all_components[name];
 			return;
 		}
-		component = (await import(path)).default;
+		component = (await import(
+			/* @vite-ignore */
+			path
+		)).default;
 	});
 </script>
 

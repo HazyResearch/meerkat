@@ -47,8 +47,7 @@ _index = dict(
     )
 )
 _sentence_index = (
-    mk.ArrayColumn(story_sentence_df["doc_id"])[None, :]
-    == mk.ArrayColumn(story_sentence_df["doc_id"].unique())[:, None]
+    story_sentence_df["doc_id"].to_numpy()[None, :] == story_sentence_df["doc_id"].unique()[:, None]
 )
 _get_sentences = lambda idx: np.where(_sentence_index[idx])[0]
 

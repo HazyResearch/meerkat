@@ -27,7 +27,7 @@ sys.setrecursionlimit(1500)
 # -- Project information -----------------------------------------------------
 
 project = "Meerkat"
-copyright = "2021 Meerkat"
+copyright = "2022 Meerkat"
 author = "The Meerkat Team"
 
 # The full version, including alpha/beta/rc tags
