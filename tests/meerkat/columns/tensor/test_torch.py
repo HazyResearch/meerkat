@@ -108,6 +108,26 @@ def test_to_pandas(testbed):
             assert (series.iloc[idx] == testbed.col[idx]).all()
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        pd.Series([1, 2, 3]),
+        [1, 2, 3],
+        [[1, 2, 3], [4, 5, 6]],
+        [np.asarray([1, 2, 3]), np.asarray([4, 5, 6])],
+    ],
+)
+def test_from_numpyable(data):
+    """
+    Test that numpyable objects can also be
+    converted to TorchTensorColumn.
+    """
+    col = TorchTensorColumn(data)
+
+    assert isinstance(col, TorchTensorColumn)
+    assert (col.data == torch.as_tensor(np.asarray(data))).all()
+
+
 def test_repr_pandas(testbed):
     series = testbed.col.to_pandas()
     assert isinstance(series, pd.Series)

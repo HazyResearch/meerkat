@@ -42,6 +42,23 @@ def getattr_decorator(fn: Callable):
     return wrapper
 
 
+def _as_tensor(data: Union[torch.Tensor, np.ndarray, pd.Series]) -> torch.Tensor:
+    """ "Overloaded as_tensor function to support other data types."""
+    if not isinstance(data, (np.ndarray, torch.Tensor)):
+        data = np.asarray(data)
+    return torch.as_tensor(data)
+
+
+def _from_sequence(data: Sequence):
+    """
+    np.asarray supports a list of numpy arrays (it simply stacks them
+    before putting them into an array) but torch.as_tensor does not.
+    we want to support this for consistency and because it is important
+    for map
+    """
+    pass
+
+
 class TorchTensorColumn(
     np.lib.mixins.NDArrayOperatorsMixin,
     TensorColumn,
@@ -61,17 +78,20 @@ class TorchTensorColumn(
                     "referencing a `TensorBlock`."
                 )
         elif data is not None and not isinstance(data, TorchTensorColumn):
-            if (
-                isinstance(data, Sequence)
-                and len(data) > 0
-                and torch.is_tensor(data[0])
-            ):
-                # np.asarray supports a list of numpy arrays (it simply stacks them
-                # before putting them into an array) but torch.as_tensor does not.
-                # we want to support this for consistency and because it is important
-                # for map
-                data = torch.stack(data)
-            data = torch.as_tensor(data)
+            if isinstance(data, Sequence) and len(data) > 0:
+                # TODO: We need to apply this check and do proper conversion of every
+                # element in the sequence.
+                # e.g. a list of mixed ndarrays and torch tensors
+                # [np.array, torch.Tensor] should work.
+                if torch.is_tensor(data[0]):
+                    # np.asarray supports a list of numpy arrays (it simply stacks them
+                    # before putting them into an array) but torch.as_tensor does not.
+                    # we want to support this for consistency and because it is important
+                    # for map
+                    data = torch.stack(data)
+                else:
+                    data = np.asarray(data)
+            data = _as_tensor(data)
         super(TorchTensorColumn, self).__init__(data=data, *args, **kwargs)
 
     def __torch_function__(self, func, types, args=(), kwargs=None):
