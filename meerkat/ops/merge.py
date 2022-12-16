@@ -28,32 +28,30 @@ def merge(
     suffixes: Sequence[str] = ("_x", "_y"),
     validate=None,
 ) -> DataFrame:
-    """ Perform a database-style join operationn between two DataFrames.  
-
-
+    """Perform a database-style join operation between two DataFrames.
 
     Args:
         left (DataFrame): Left DataFrame.
         right (DataFrame): Right DataFrame.
         how (str, optional): The join type. Defaults to "inner".
-        on (Union[str, List[str]], optional): The columns(s) to join on. 
+        on (Union[str, List[str]], optional): The columns(s) to join on.
             These columns must be :class:`~meerkat.ScalarColumn`.
             Defaults to None, in which case the `left_on` and `right_on` parameters
             must be passed.
         left_on (Union[str, List[str]], optional): The column(s) in the left DataFrame
-            to join on. These columns must be :class:`~meerkat.ScalarColumn`. 
+            to join on. These columns must be :class:`~meerkat.ScalarColumn`.
             Defaults to None.
         right_on (Union[str, List[str]], optional): The column(s) in the right DataFrame
             to join on. These columns must be :class:`~meerkat.ScalarColumn`.
             Defaults to None.
         sort (bool, optional): Whether to sort the result DataFrame by the join key(s).
             Defaults to False.
-        suffixes (Sequence[str], optional): Suffixes to use in the case their are 
+        suffixes (Sequence[str], optional): Suffixes to use in the case their are
             conflicting column names in the result DataFrame. Should be a sequence of
             length two, with ``suffixes[0]`` the suffix for the column from the left
-            DataFrame and ``suffixes[1]`` the suffix for the right.  
+            DataFrame and ``suffixes[1]`` the suffix for the right.
             Defaults to ("_x", "_y").
-        validate (_type_, optional): The check to perform on the result DataFrame. 
+        validate (_type_, optional): The check to perform on the result DataFrame.
             Defaults to None, in which case no check is performed. Valid options are:
 
             * “one_to_one” or “1:1”: check if merge keys are unique in both left and right datasets.
@@ -156,9 +154,7 @@ def merge(
     # actually valid
     if (left.primary_key_name is not None) and left.primary_key_name in merged:
         merged.set_primary_key(left.primary_key_name, inplace=True)
-    elif (
-        right.primary_key_name is not None
-    ) and right.primary_key_name in merged:
+    elif (right.primary_key_name is not None) and right.primary_key_name in merged:
         merged.set_primary_key(right.primary_key_name, inplace=True)
 
     return merged

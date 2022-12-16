@@ -77,10 +77,9 @@ def defer(
             args = [data[col_name] for col_name in inputs]
             kwargs = {}
         elif inputs is None:
-            args = [data]
-            kwargs = {}
+            raise ValueError("Must provide `inputs` when calling `defer` on a DataFrame.")
         else:
-            raise ValueError("")
+            raise ValueError("`inputs` must be a mapping or sequence.")
 
     op = DeferredOp(
         fn=function,
