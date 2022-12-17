@@ -1,34 +1,54 @@
-import inspect
-import os
-from typing import Dict
-
 from pydantic import BaseModel, Extra, validator
 
-from meerkat.interactive.frontend import FrontendMixin
+from meerkat.interactive.endpoint import endpoint
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.mixins.identifiable import IdentifiableMixin, classproperty
-from meerkat.tools.utils import nested_apply
 
 
-class ComponentFrontend(BaseModel):
-    component_id: str
-    path: str
-    name: str
-    props: Dict
+class EndpointMixin:
+    def __init__(self, prefix=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._endpoints = {}
+
+        if prefix is None:
+            prefix = f"/{self.__class__.__name__.lower()}"
+
+        # Access all the user-defined attributes of the instance to create endpoints
+        # Here, we keep only methods that:
+        # - are defined in this subclass of Component, but not in any of its superclasses
+        #   (e.g. Component, IdentifiableMixin, EndpointMixin etc.)
+        # - don't begin with "_"
+        # - are callables
+        names = set(dir(self.__class__)) - set(
+            sum([dir(e) for e in self.__class__.mro()[1:]], [])
+        )
+        for attrib in names:
+            if attrib.startswith("_"):
+                continue
+            obj = self.__getattribute__(attrib)
+            if callable(obj):
+                if attrib not in self._endpoints:
+                    print(attrib)
+                    self._endpoints[attrib] = endpoint(
+                        obj, prefix=prefix + f"/{self.id}"
+                    )
+
+    @property
+    def endpoints(self):
+        return self._endpoints
 
 
-# need to pass the extra param in order to
-class Component(IdentifiableMixin, FrontendMixin, BaseModel):
+class State(EndpointMixin, IdentifiableMixin, BaseModel):
     @classproperty
     def identifiable_group(self):
         # Ordinarily, we would create a new classproperty for this, like
-        # _self_identifiable_group: str = "components"
+        # _self_identifiable_group: str = "states"
         # However, this causes pydantic to show _self_identifiable_group in
         # type hints when using the component in the IDE, which might
         # be confusing to users.
         # We just override the classproperty here directly as an alternative.
-        return "components"
+        return "states"
 
     @validator("*", pre=False)
     def _check_inode(cls, value):
@@ -49,42 +69,11 @@ class Component(IdentifiableMixin, FrontendMixin, BaseModel):
             # because the validator above converts dataframes to nodes, when the
             # dataframe is accessed we need to convert it back to the dataframe
             return value.obj
+        if callable(value) and hasattr(self, "_endpoints"):
+            if name not in self._endpoints:
+                return value
+            return self._endpoints[name]
         return value
-
-    @property
-    def props(self):
-        return {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k}
-
-    @property
-    def frontend(self):
-        def _frontend(value):
-            if isinstance(value, FrontendMixin):
-                return value.frontend
-            return value
-
-        frontend_props = nested_apply(
-            self.props,
-            _frontend,
-            base_types=(Store),
-        )
-
-        component_name = self.__class__.__name__
-        # Inheriting an existing Component and modifying it on the Python side
-        # should not change the name of the component used on the frontend
-        if self.__class__.__bases__[0] != Component and issubclass(
-            self.__class__.__bases__[0], Component
-        ):
-            component_name = self.__class__.__bases__[0].__name__
-
-        return ComponentFrontend(
-            component_id=self.id,
-            path=os.path.join(
-                os.path.dirname(inspect.getfile(self.__class__)),
-                f"{component_name}.svelte",
-            ),
-            name=component_name,
-            props=frontend_props,
-        )
 
     class Config:
         arbitrary_types_allowed = True

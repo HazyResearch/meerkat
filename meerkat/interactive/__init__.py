@@ -34,7 +34,7 @@ from .app.src.lib.component.table import Table
 from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.textbox import Textbox
 from .edit import EditTarget
-from .endpoint import Endpoint, endpoint, make_endpoint
+from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from .graph import (
     Store,
     StoreFrontend,
@@ -48,12 +48,15 @@ from .graph import (
 from .interface import Interface, interface
 from .modification import DataFrameModification, Modification
 from .startup import start
+from .state import State
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
     "Endpoint",
+    "State",
     "endpoint",
+    "endpoints",
     "react",
     "no_react",
     "is_reactive",

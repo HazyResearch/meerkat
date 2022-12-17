@@ -335,7 +335,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # Create the Pydantic model, named `{fn_name}Model`
             global FnPydanticModel
             FnPydanticModel = create_model(
-                f"{self.fn.__name__.capitalize()}Model",
+                f"{self.fn.__name__.capitalize()}{self.prefix.replace('/', '').capitalize()}Model",
                 __config__=Config,
                 **pydantic_model_params,
             )
@@ -425,24 +425,23 @@ def endpoint(
 
     An endpoint is a function that can be called to
         - update the value of a Store (e.g. incrementing a counter)
-        - update an object referenced by a Reference (e.g. editing the
-            contents of a DataFrame)
+        - update a DataFrame (e.g. adding a new row)
         - run a computation and return its result to the frontend
         - run a function in response to a frontend event (e.g. button
             click)
 
-    Endpoints differ from operations in that they are not automatically
-    triggered by changes in their inputs. Instead, they are triggered by
-    explicit calls to the endpoint function.
+    Endpoints differ from reactive functions in that they are not 
+    automatically triggered by changes in their inputs. Instead, 
+    they are triggered by explicit calls to the endpoint function.
 
-    The Store and Reference objects that are modified inside the endpoint
-    function will automatically trigger operations in the graph that
+    The Store and DataFrame objects that are modified inside the endpoint
+    function will automatically trigger reactive functions that
     depend on them.
 
     Warning: Due to this, we do not recommend running endpoints manually
     in your Python code. This can lead to unexpected behavior e.g.
-    running an endpoint inside an operation may change a Store or
-    Reference  that causes the operation to be triggered repeatedly,
+    running an endpoint inside an operation may change a Store 
+    that causes the operation to be triggered repeatedly,
     leading to an infinite loop.
 
     Almost all use cases can be handled by using the frontend to trigger
@@ -467,6 +466,13 @@ def endpoint(
 
     Args:
         fn: The function to decorate.
+        prefix: The prefix to add to the route. If a string, it will be
+            prepended to the route. If an APIRouter, the route will be
+            added to the router.
+        route: The route to add to the endpoint. If not specified, the
+            route will be the name of the function.
+        method: The HTTP method to use for the endpoint. Defaults to
+            "POST".
 
     Returns:
         The decorated function, as an Endpoint object.
@@ -490,8 +496,6 @@ def endpoint(
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            """Subsequent calls to the function will be handled by the
-            graph."""
             # Keep the arguments that were not annotated to be stores or
             # references
             fn_signature = inspect.signature(fn)
@@ -554,3 +558,64 @@ def endpoint(
         return endpoint
 
     return _endpoint(fn)
+
+
+def endpoints(cls=None, prefix=None):
+    """Decorator to mark a class as containing a collection of 
+    endpoints. All instance methods in the marked class will be 
+    converted to endpoints.
+    
+    This decorator is useful when you want to create a class
+    that contains some logical state variables (e.g. a Counter 
+    class), along with methods to manipulate the values of those
+    variables (e.g. increment or decrement the counter).
+    """
+    
+    if cls is None:
+        return partial(endpoints, prefix=prefix)
+    
+    _ids = {}
+    _max_ids = {}
+    if cls not in _ids:
+        _ids[cls] = {}
+        _max_ids[cls] = 1
+    
+    def _endpoints(cls):
+    
+        class EndpointClass:
+            def __init__(self, *args, **kwargs):
+                self.instance = cls(*args, **kwargs)
+                self.endpoints = {}
+                
+                # Access all the user-defined attributes of the instance to create endpoints
+                for attrib in dir(self.instance):
+                    if attrib.startswith("__"):
+                        continue
+                    obj = self.instance.__getattribute__(attrib)
+                    if callable(obj):
+                        if attrib not in self.endpoints:
+                            self.endpoints[attrib] = endpoint(obj, prefix=prefix + f"/{_ids[cls][self]}")
+                    
+                
+            def __getattribute__(self, attrib):
+                if self not in _ids[cls]:
+                    _ids[cls][self] = _max_ids[cls]
+                    _max_ids[cls] += 1
+                
+                try:
+                    obj = super().__getattribute__(attrib)
+                    return obj
+                except AttributeError:
+                    pass
+
+                obj = self.instance.__getattribute__(attrib)
+                if callable(obj):
+                    if attrib not in self.endpoints:
+                        return obj
+                    return self.endpoints[attrib]
+                else:
+                    return obj
+
+        return EndpointClass
+    
+    return _endpoints(cls)

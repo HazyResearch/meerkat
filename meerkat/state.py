@@ -144,6 +144,7 @@ class Identifiables:
     endpoints: WeakMapping = field(default_factory=WeakMapping)
     routers: WeakMapping = field(default_factory=WeakMapping)
     nodes: WeakMapping = field(default_factory=WeakMapping)
+    states: WeakMapping = field(default_factory=WeakMapping)
 
     def add(self, obj: "IdentifiableMixin"):
         group = getattr(self, obj.identifiable_group)
