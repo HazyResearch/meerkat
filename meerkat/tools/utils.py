@@ -2,10 +2,9 @@ import weakref
 from collections import defaultdict
 from collections.abc import Mapping
 from functools import reduce
-import os
-import dill
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
+import dill
 import numpy as np
 import pandas as pd
 import torch
@@ -72,7 +71,7 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
     ("meerkat.columns.file_column", "meerkat.columns.deferred.file"),
     ("meerkat.block.lambda_block", "meerkat.block.deferred_block"),
     ("LambdaBlock", "DeferredBlock"),
-    ("NumpyBlock", "NumPyBlock")
+    ("NumpyBlock", "NumPyBlock"),
 ]
 
 
@@ -117,7 +116,7 @@ class MeerkatUnpickler(dill.Unpickler):
     def find_class(self, module, name):
         try:
             return super().find_class(module, name)
-        except:
+        except Exception:
             for old, new in BACKWARDS_COMPAT_REPLACEMENTS:
                 if old in module:
                     module = module.replace(old, new)

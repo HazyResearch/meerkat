@@ -10,8 +10,8 @@ from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
 from meerkat.interactive.graph import reactive
-from meerkat.provenance import capture_provenance
 from meerkat.ops.decorators import check_primary_key
+from meerkat.provenance import capture_provenance
 
 
 @capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
@@ -54,7 +54,8 @@ def merge(
         validate (_type_, optional): The check to perform on the result DataFrame.
             Defaults to None, in which case no check is performed. Valid options are:
 
-            * “one_to_one” or “1:1”: check if merge keys are unique in both left and right datasets.
+            * “one_to_one” or “1:1”: check if merge keys are unique in both left and
+              right datasets.
 
             * “one_to_many” or “1:m”: check if merge keys are unique in left dataset.
 
@@ -183,10 +184,7 @@ def _construct_from_indices(df: DataFrame, indices: np.ndarray):
                 data[name] = new_col
             else:
                 data[name] = ObjectColumn(
-                    [
-                        None if np.isnan(index) else col[int(index)]
-                        for index in indices
-                    ]
+                    [None if np.isnan(index) else col[int(index)] for index in indices]
                 )
         return df._clone(data=data)
     else:

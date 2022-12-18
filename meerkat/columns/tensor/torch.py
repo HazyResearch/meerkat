@@ -43,7 +43,7 @@ def getattr_decorator(fn: Callable):
 
 
 def _as_tensor(data: Union[torch.Tensor, np.ndarray, pd.Series]) -> torch.Tensor:
-    """ "Overloaded as_tensor function to support other data types."""
+    """Overloaded as_tensor function to support other data types."""
     if not isinstance(data, (np.ndarray, torch.Tensor)):
         data = np.asarray(data)
     return torch.as_tensor(data)
@@ -76,8 +76,8 @@ class TorchTensorColumn(
                 if torch.is_tensor(data[0]):
                     # np.asarray supports a list of numpy arrays (it simply stacks them
                     # before putting them into an array) but torch.as_tensor does not.
-                    # we want to support this for consistency and because it is important
-                    # for map
+                    # we want to support this for consistency and because it is
+                    # important for map
                     data = torch.stack(data)
                 else:
                     data = np.asarray(data)

@@ -118,10 +118,8 @@ def test_to_pandas(testbed):
     ],
 )
 def test_from_numpyable(data):
-    """
-    Test that numpyable objects can also be
-    converted to TorchTensorColumn.
-    """
+    """Test that numpyable objects can also be converted to
+    TorchTensorColumn."""
     col = TorchTensorColumn(data)
 
     assert isinstance(col, TorchTensorColumn)

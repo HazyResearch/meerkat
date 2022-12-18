@@ -54,13 +54,13 @@ REQUIRED = [
     "rich",
     "cryptography",
     "fastapi",
-    "wrapt"
+    "wrapt",
 ]
 
 # What packages are optional?
 EXTRAS = {
     "dev": [
-        "black>=21.5b0",
+        "black==22.12.0",
         "isort>=5.7.0",
         "flake8>=3.8.4",
         "docformatter>=1.4",

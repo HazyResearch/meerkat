@@ -317,7 +317,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
                     if not has_default:
                         raise ValueError(
-                            f"Parameter {p} must have a type annotation or a default value."
+                            f"Parameter {p} must have a type annotation or "
+                            "a default value."
                         )
                 elif isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
                     # e.g. Stores must be referred to by str ids when
@@ -335,7 +336,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # Create the Pydantic model, named `{fn_name}Model`
             global FnPydanticModel
             FnPydanticModel = create_model(
-                f"{self.fn.__name__.capitalize()}{self.prefix.replace('/', '').capitalize()}Model",
+                f"{self.fn.__name__.capitalize()}{self.prefix.replace('/', '').capitalize()}Model",  # noqa: E501
                 __config__=Config,
                 **pydantic_model_params,
             )
@@ -430,8 +431,8 @@ def endpoint(
         - run a function in response to a frontend event (e.g. button
             click)
 
-    Endpoints differ from reactive functions in that they are not 
-    automatically triggered by changes in their inputs. Instead, 
+    Endpoints differ from reactive functions in that they are not
+    automatically triggered by changes in their inputs. Instead,
     they are triggered by explicit calls to the endpoint function.
 
     The Store and DataFrame objects that are modified inside the endpoint
@@ -440,7 +441,7 @@ def endpoint(
 
     Warning: Due to this, we do not recommend running endpoints manually
     in your Python code. This can lead to unexpected behavior e.g.
-    running an endpoint inside an operation may change a Store 
+    running an endpoint inside an operation may change a Store
     that causes the operation to be triggered repeatedly,
     leading to an infinite loop.
 
@@ -561,47 +562,47 @@ def endpoint(
 
 
 def endpoints(cls=None, prefix=None):
-    """Decorator to mark a class as containing a collection of 
-    endpoints. All instance methods in the marked class will be 
-    converted to endpoints.
-    
-    This decorator is useful when you want to create a class
-    that contains some logical state variables (e.g. a Counter 
-    class), along with methods to manipulate the values of those
-    variables (e.g. increment or decrement the counter).
+    """Decorator to mark a class as containing a collection of endpoints. All
+    instance methods in the marked class will be converted to endpoints.
+
+    This decorator is useful when you want to create a class that
+    contains some logical state variables (e.g. a Counter class), along
+    with methods to manipulate the values of those variables (e.g.
+    increment or decrement the counter).
     """
-    
+
     if cls is None:
         return partial(endpoints, prefix=prefix)
-    
+
     _ids = {}
     _max_ids = {}
     if cls not in _ids:
         _ids[cls] = {}
         _max_ids[cls] = 1
-    
+
     def _endpoints(cls):
-    
         class EndpointClass:
             def __init__(self, *args, **kwargs):
                 self.instance = cls(*args, **kwargs)
                 self.endpoints = {}
-                
-                # Access all the user-defined attributes of the instance to create endpoints
+
+                # Access all the user-defined attributes of the instance
+                # to create endpoints
                 for attrib in dir(self.instance):
                     if attrib.startswith("__"):
                         continue
                     obj = self.instance.__getattribute__(attrib)
                     if callable(obj):
                         if attrib not in self.endpoints:
-                            self.endpoints[attrib] = endpoint(obj, prefix=prefix + f"/{_ids[cls][self]}")
-                    
-                
+                            self.endpoints[attrib] = endpoint(
+                                obj, prefix=prefix + f"/{_ids[cls][self]}"
+                            )
+
             def __getattribute__(self, attrib):
                 if self not in _ids[cls]:
                     _ids[cls][self] = _max_ids[cls]
                     _max_ids[cls] += 1
-                
+
                 try:
                     obj = super().__getattribute__(attrib)
                     return obj
@@ -617,5 +618,5 @@ def endpoints(cls=None, prefix=None):
                     return obj
 
         return EndpointClass
-    
+
     return _endpoints(cls)

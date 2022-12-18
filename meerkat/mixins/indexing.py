@@ -16,7 +16,7 @@ class _MaterializeIndexer:
 
     def __len__(self):
         return len(self.obj)
-    
+
     @property
     def loc(self):
         return _LocIndexer(self.obj, materialize=True)
@@ -32,7 +32,7 @@ class _LocIndexer:
 
     def __len__(self):
         return len(self.obj)
-    
+
     @property
     def mz(self):
         return _LocIndexer(self.obj, materialize=True)
