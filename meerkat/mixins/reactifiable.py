@@ -20,12 +20,12 @@ class ReactifiableMixin:
 
         Currently properties and attributes are not reactified.
         """
-        from meerkat.interactive.graph import is_reactive, reactive
+        from meerkat.interactive.graph import get_reactive_kwargs, is_reactive, reactive
 
         if name in _REACTIVE_KEYS:  # FIXME
             out = super().__getattribute__(name)
             if isinstance(out, Callable) and is_reactive():
-                out = reactive(out)
+                out = reactive(out, **get_reactive_kwargs())
             return out
         else:
             return super().__getattribute__(name)

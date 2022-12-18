@@ -1,5 +1,5 @@
 from functools import partial, wraps
-from typing import Any, Callable, Dict, Generic, List, Union
+from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, Union, cast
 
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.fields import ModelField
@@ -207,6 +207,7 @@ def reactive(
     nested_return: bool = None,
 ) -> Callable:
     """Decorator that is used to mark a function as an interface operation.
+
     Functions decorated with this will create nodes in the operation graph,
     which are executed whenever their inputs are modified.
 
@@ -390,28 +391,119 @@ def _replace_nodes_with_nodeables(obj):
 # A stack that manages if reactive mode is enabled
 # The stack is reveresed so that the top of the stack is
 # the last index in the list.
-_IS_REACTIVE = []
+class _ReactiveState:
+    def __init__(self, *, reactive: bool, nested_return: Optional[bool]) -> None:
+        self.reactive = reactive
+        self.kwargs = dict(nested_return=nested_return)
+
+    def __bool__(self):
+        return self.reactive
+
+
+_IS_REACTIVE: List[_ReactiveState] = []
 
 
 def is_reactive():
     return len(_IS_REACTIVE) > 0 and _IS_REACTIVE[-1]
 
 
+def get_reactive_kwargs() -> Dict[str, Any]:
+    return _IS_REACTIVE[-1].kwargs
+
+
+# Used for annotating decorator usage of 'react'.
+# Adapted from PyTorch:
+# https://mypy.readthedocs.io/en/latest/generics.html#declaring-decorators
+FuncType = Callable[..., Any]
+F = TypeVar("F", bound=FuncType)
+
+
 class react:
-    def __init__(self, reactive: bool = True):
+    """Context-manager that is used control if code is an interface operation.
+
+    Code-blocks in this context manager will create nodes
+    in the operation graph, which are executed whenever their inputs
+    are modified.
+
+    A basic example that adds two numbers:
+    .. code-block:: python
+
+        a = Store(1)
+        b = Store(2)
+        with react():
+            c = a + b
+
+    When either `a` or `b` is modified, the code block will re-execute
+    with the new values of `a` and `b`.
+
+    Also functions as a decorator. (Make sure to instantiate with parenthesis.):
+    .. code-block:: python
+
+            @react()
+            def add(a: int, b: int) -> int:
+                return a + b
+
+            a = Store(1)
+            b = Store(2)
+            c = add(a, b)
+
+    A more complex example that concatenates two mk.DataFrame objects:
+    .. code-block:: python
+
+        @react()
+        def concat(df1: mk.DataFrame, df2: mk.DataFrame) -> mk.DataFrame:
+            return mk.concat([df1, df2])
+
+        df1 = mk.DataFrame(...)
+        df2 = mk.DataFrame(...)
+        df3 = concat(df1, df2)
+
+    Args:
+        reactive: The function to decorate.
+        nested_return: Whether the function returns an object (e.g. List, Dict) with
+            a nested structure. If True, a `Store` or `Reference` will be created for
+            every element in the nested structure. If False, a single `Store` or
+            `Reference` wrapping the entire object will be created. For example, if the
+            function returns two DataFrames in a tuple, then `nested_return` should be
+            `True`. However, if the functions returns a variable length list of ints,
+            then `nested_return` should likely be `False`.
+
+    Returns:
+        A decorated function that creates an operation node in the operation graph.
+    """
+
+    def __init__(self, reactive: bool = True, *, nested_return: bool = None):
         self._reactive = reactive
+        self._nested_return = nested_return
+
+    def __call__(self, func):
+        @wraps(func)
+        def decorate_context(*args, **kwargs):
+            with self.clone():
+                return reactive(func, nested_return=self._nested_return)(
+                    *args, **kwargs
+                )
+
+        return cast(F, decorate_context)
 
     def __enter__(self):
-        _IS_REACTIVE.append(self._reactive)
+        _IS_REACTIVE.append(
+            _ReactiveState(reactive=self._reactive, nested_return=self._nested_return)
+        )
         return self
 
     def __exit__(self, type, value, traceback):
         _IS_REACTIVE.pop(-1)
 
+    def clone(self):
+        return self.__class__(
+            reactive=self._reactive, nested_return=self._nested_return
+        )
+
 
 class no_react(react):
-    def __init__(self):
-        super().__init__(reactive=False)
+    def __init__(self, nested_return: bool = None):
+        super().__init__(reactive=False, nested_return=nested_return)
 
 
 class StoreFrontend(BaseModel):

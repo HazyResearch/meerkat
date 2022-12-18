@@ -2,9 +2,10 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import meerkat as mk
-from meerkat.interactive.graph import reactive, trigger
+from meerkat.interactive.graph import is_reactive, reactive, trigger
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
@@ -75,7 +76,9 @@ def test_react_context_manager_nested():
 
     with mk.gui.react():
         keys_reactive = df.keys()
+        assert is_reactive()
         with mk.gui.no_react():
+            assert not is_reactive()
             keys = df.keys()
 
     assert isinstance(keys_reactive, mk.gui.Store)
@@ -108,6 +111,25 @@ def test_react_context_instance_method():
 
     assert keys0 != keys1
     assert keys1 != keys2
+
+
+@pytest.mark.parametrize("react", [False, True])
+def test_react_as_decorator(react: bool):
+    @mk.gui.react(react)
+    def add(a, b):
+        return a + b
+
+    a = mk.gui.Store(1)
+    b = mk.gui.Store(2)
+    c = add(a, b)
+
+    expected_type = mk.gui.Store if react else int
+    assert isinstance(c, expected_type)
+
+    if react:
+        assert a.inode.has_trigger_children() and b.inode.has_trigger_children()
+    else:
+        assert a.inode is None and b.inode is None
 
 
 def test_default_nested_return():
