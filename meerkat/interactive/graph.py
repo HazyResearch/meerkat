@@ -111,7 +111,8 @@ def trigger() -> List[Modification]:
     if len(order) > 0:
         print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
         with tqdm(total=len(order)) as pbar:
-            # Go through all the operations in order: run them and add their modifications
+            # Go through all the operations in order: run them and add
+            # their modifications
             # to the new_modifications list
             for op in order:
                 pbar.set_postfix_str(f"Running {op.fn.__name__}")
@@ -269,7 +270,8 @@ def reactive(
             """
             # nested_return is False because any operations on the outputs of the
             # function should recursively generate Stores / References.
-            # For example, if fn returns a list. The reactified fn will return a Store(list).
+            # For example, if fn returns a list. The reactified fn will return
+            # a Store(list).
             # Then, Store(list)[0] should also return a Store.
             # TODO (arjun): These if this assumption holds.
             nonlocal nested_return
@@ -569,11 +571,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         # storing the attributes as a state would give us.
         return reactive(attr) if callable(attr) else attr
 
-    @reactive()
-    def __add__(self, other):
-        # TODO (arjun): This should not fail with karan's changes.
-        return super().__add__(other)
-
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -593,6 +590,300 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
                     raise ValidationError(error)
                 return cls(v)
         return v
+
+    @reactive
+    def __lt__(self, other):
+        return super().__lt__(other)
+
+    @reactive
+    def __le__(self, other):
+        return super().__le__(other)
+
+    @reactive
+    def __eq__(self, other):
+        return super().__eq__(other)
+
+    @reactive
+    def __ne__(self, other):
+        return super().__ne__(other)
+
+    @reactive
+    def __gt__(self, other):
+        return super().__gt__(other)
+
+    @reactive
+    def __ge__(self, other):
+        return super().__ge__(other)
+
+    # def __hash__(self):
+    #     return hash(self.__wrapped__)
+
+    @reactive
+    def __nonzero__(self):
+        return super().__nonzero__()
+
+    @reactive
+    def __bool__(self):
+        return super().__bool__()
+
+    @reactive
+    def __add__(self, other):
+        return super().__add__(other)
+
+    @reactive
+    def __sub__(self, other):
+        return super().__sub__(other)
+
+    @reactive
+    def __mul__(self, other):
+        return super().__mul__(other)
+
+    @reactive
+    def __div__(self, other):
+        return super().__div__(other)
+
+    @reactive
+    def __truediv__(self, other):
+        return super().__truediv__(other)
+
+    @reactive
+    def __floordiv__(self, other):
+        return super().__floordiv__(other)
+
+    @reactive
+    def __mod__(self, other):
+        return super().__mod__(other)
+
+    @reactive
+    def __divmod__(self, other):
+        return super().__divmod__(other)
+
+    @reactive
+    def __pow__(self, other, *args):
+        return super().__pow__(other, *args)
+
+    @reactive
+    def __lshift__(self, other):
+        return super().__lshift__(other)
+
+    @reactive
+    def __rshift__(self, other):
+        return super().__rshift__(other)
+
+    @reactive
+    def __and__(self, other):
+        return super().__and__(other)
+
+    @reactive
+    def __xor__(self, other):
+        return super().__xor__(other)
+
+    @reactive
+    def __or__(self, other):
+        return super().__or__(other)
+
+    @reactive
+    def __radd__(self, other):
+        return super().__radd__(other)
+
+    @reactive
+    def __rsub__(self, other):
+        return super().__rsub__(other)
+
+    @reactive
+    def __rmul__(self, other):
+        return super().__rmul__(other)
+
+    @reactive
+    def __rdiv__(self, other):
+        return super().__rdiv__(other)
+
+    @reactive
+    def __rtruediv__(self, other):
+        return super().__rtruediv__(other)
+
+    @reactive
+    def __rfloordiv__(self, other):
+        return super().__rfloordiv__(other)
+
+    @reactive
+    def __rmod__(self, other):
+        return super().__rmod__(other)
+
+    @reactive
+    def __rdivmod__(self, other):
+        return super().__rdivmod__(other)
+
+    @reactive
+    def __rpow__(self, other, *args):
+        return super().__rpow__(other, *args)
+
+    @reactive
+    def __rlshift__(self, other):
+        return super().__rlshift__(other)
+
+    @reactive
+    def __rrshift__(self, other):
+        return super().__rrshift__(other)
+
+    @reactive
+    def __rand__(self, other):
+        return super().__rand__(other)
+
+    @reactive
+    def __rxor__(self, other):
+        return super().__rxor__(other)
+
+    @reactive
+    def __ror__(self, other):
+        return super().__ror__(other)
+
+    # def __iadd__(self, other):
+    #     self.__wrapped__ += other
+    #     return self
+
+    # def __isub__(self, other):
+    #     self.__wrapped__ -= other
+    #     return self
+
+    # def __imul__(self, other):
+    #     self.__wrapped__ *= other
+    #     return self
+
+    # def __idiv__(self, other):
+    #     self.__wrapped__ = operator.idiv(self.__wrapped__, other)
+    #     return self
+
+    # def __itruediv__(self, other):
+    #     self.__wrapped__ = operator.itruediv(self.__wrapped__, other)
+    #     return self
+
+    # def __ifloordiv__(self, other):
+    #     self.__wrapped__ //= other
+    #     return self
+
+    # def __imod__(self, other):
+    #     self.__wrapped__ %= other
+    #     return self
+
+    # def __ipow__(self, other):
+    #     self.__wrapped__ **= other
+    #     return self
+
+    # def __ilshift__(self, other):
+    #     self.__wrapped__ <<= other
+    #     return self
+
+    # def __irshift__(self, other):
+    #     self.__wrapped__ >>= other
+    #     return self
+
+    # def __iand__(self, other):
+    #     self.__wrapped__ &= other
+    #     return self
+
+    # def __ixor__(self, other):
+    #     self.__wrapped__ ^= other
+    #     return self
+
+    # def __ior__(self, other):
+    #     self.__wrapped__ |= other
+    #     return self
+
+    @reactive
+    def __neg__(self):
+        return super().__neg__()
+
+    @reactive
+    def __pos__(self):
+        return super().__pos__()
+
+    @reactive
+    def __abs__(self):
+        return super().__abs__()
+
+    @reactive
+    def __invert__(self):
+        return super().__invert__()
+
+    @reactive
+    def __int__(self):
+        return super().__int__()
+
+    @reactive
+    def __long__(self):
+        return super().__long__()
+
+    @reactive
+    def __float__(self):
+        return super().__float__()
+
+    @reactive
+    def __complex__(self):
+        return super().__complex__()
+
+    @reactive
+    def __oct__(self):
+        return super().__oct__()
+
+    @reactive
+    def __hex__(self):
+        return super().__hex__()
+
+    @reactive
+    def __index__(self):
+        return super().__index__()
+
+    @reactive
+    def __len__(self):
+        return super().__len__()
+
+    @reactive
+    def __contains__(self, value):
+        return super().__contains__(value)
+
+    @reactive
+    def __getitem__(self, key):
+        return super().__getitem__(key)
+
+    # def __setitem__(self, key, value):
+    #     self.__wrapped__[key] = value
+
+    # def __delitem__(self, key):
+    #     del self.__wrapped__[key]
+
+    @reactive
+    def __getslice__(self, i, j):
+        return super().__getslice__(i, j)
+
+    # def __setslice__(self, i, j, value):
+    #     self.__wrapped__[i:j] = value
+
+    # def __delslice__(self, i, j):
+    #     del self.__wrapped__[i:j]
+
+    # def __enter__(self):
+    #     return self.__wrapped__.__enter__()
+
+    # def __exit__(self, *args, **kwargs):
+    #     return self.__wrapped__.__exit__(*args, **kwargs)
+
+    # def __iter__(self):
+    #     return iter(self.__wrapped__)
+
+    # def __copy__(self):
+    #     raise NotImplementedError('object proxy must define __copy__()')
+
+    # def __deepcopy__(self, memo):
+    #     raise NotImplementedError('object proxy must define __deepcopy__()')
+
+    # def __reduce__(self):
+    #     raise NotImplementedError(
+    #             'object proxy must define __reduce_ex__()')
+
+    # def __reduce_ex__(self, protocol):
+    #     raise NotImplementedError(
+    #             'object proxy must define __reduce_ex__()')
 
 
 def store_field(value: str) -> Field:
