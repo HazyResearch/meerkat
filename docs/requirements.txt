@@ -7,3 +7,5 @@ sphinx-panels
 sphinx-autobuild
 jupyter-book
 sphinx-external-toc
+sphinx_book_theme
+myst_nb

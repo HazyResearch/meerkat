@@ -45,7 +45,7 @@ Here's a simple example that illustrates this with ``Store`` objects.
     @mk.gui.endpoint
     def foo_a():
         a.set(a + 1)
-        # Now we have to manually ensure all dependent state variables are updated
+        # We have to manually ensure all dependent state variables are updated
         # ..in every endpoint that updates a state variable
         b.set(add_one(a))
         c.set(add_two(a))
@@ -140,7 +140,7 @@ Another great feature of reactivity in Meerkat is the ability to write reactive 
     def foo(x: mk.gui.Store):
         x.set(x + 1)
 
-This is a very powerful feature, since it allows us to write reactive code in a very natural way. It's common to have code in Jupyter notebooks that constructs views of a ``DataFrame``. With reactive statements, we can easily convert this code into a Meerkat app.
+This is a very powerful feature, since it allows us to write reactive code in a natural way. It's common to have code in Jupyter notebooks that constructs views of a ``DataFrame``. With reactive statements, we can easily convert this code into a Meerkat app.
 
 Final Thoughts
 --------------
