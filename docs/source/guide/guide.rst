@@ -16,6 +16,7 @@ Meerkat Basics
    visualization
    configure
    patterns
+   test
 
 Common Use Cases
 ----------------

@@ -100,6 +100,14 @@ meerkat.interactive.startup module
    :undoc-members:
    :show-inheritance:
 
+meerkat.interactive.state module
+--------------------------------
+
+.. automodule:: meerkat.interactive.state
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.interactive.tunneling module
 ------------------------------------
 

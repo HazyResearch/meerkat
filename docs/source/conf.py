@@ -47,11 +47,14 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx_rtd_theme",
     "nbsphinx",
-    "recommonmark",
-    "sphinx_panels",
+    # "recommonmark",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
-    "jupyter_sphinx",
+    "myst_nb",
+    "sphinx.ext.intersphinx",
+    "sphinx_panels",
+    "sphinx_book_theme",
+    "sphinx_external_toc",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -67,7 +70,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "pydata_sphinx_theme"
+html_theme = "sphinx_book_theme"
 html_logo = "../assets/meerkat_banner_padded.svg"
 html_favicon = "../assets/meerkat_logo.png"
 
@@ -79,6 +82,13 @@ html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
 ]
+
+# From jupyter-book default sphinx config
+# https://github.com/executablebooks/jupyter-book/blob/421f6198728b21c94726a10b61776fb4cc097d72/jupyter_book/config.py#L23
+html_add_permalinks = "¶"
+html_sourcelink_suffix = ""
+numfig = True
+panels_add_bootstrap_css = False
 
 # Don't show module names in front of class names.
 add_module_names = False
@@ -93,3 +103,28 @@ panels_css_variables = {
 }
 
 todo_include_todos = True
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".ipynb": "myst-nb",
+    ".myst": "myst-nb",
+    ".md": "myst-nb",
+}
+
+external_toc_path = "_toc.yml"
+
+html_theme_options = {
+    "repository_url": "https://github.com/robustness-gym/meerkat/",
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+    "path_to_docs": "doc/source",
+    "home_page_in_toc": False,
+    "show_navbar_depth": 1,
+    "launch_buttons": {
+        "notebook_interface": "jupyterlab",
+        "binderhub_url": "https://mybinder.org",
+        "colab_url": "https://colab.research.google.com",
+    },
+    "announcement": "<div class='topnav'></div>",
+}

@@ -119,27 +119,4 @@ Next Steps
 .. _Issues: https://github.com/robustness-gym/meerkat/issues/
 
 
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-
-   guide/guide
-   datasets/datasets
-   examples/navigation
-
-
-.. toctree::
-    :hidden:
-    :maxdepth: 2
-
-    apidocs/index
-
-
-..
-    Indices and tables
-    ==================
-
-    * :ref:`genindex`
-    * :ref:`modindex`
-    * :ref:`search`
 
