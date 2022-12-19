@@ -1,9 +1,14 @@
 format: jb-book
 root: index
 parts:
+  - caption: Getting started
+    chapters:
+      - file: start/install
+      - file: start/walkthrough
+
   - caption: User Guide
     chapters:
-      - file: guide/data_structures
+      - file: guide/dataframe/intro
         title: "DataFrame"
         sections:
           - file: guide/dataframe/selection

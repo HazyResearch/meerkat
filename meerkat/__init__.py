@@ -38,6 +38,7 @@ from meerkat.columns.tensor import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
+from meerkat.row import Row
 from meerkat.datasets import get
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
@@ -65,6 +66,7 @@ __all__ = [
     "GlobalState",
     "DataFrame",
     "DataPanel",
+    "Row",
     "Column",
     "column",
     "ObjectColumn",

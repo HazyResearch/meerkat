@@ -1,5 +1,5 @@
 
-Introduction to Data Structures 
+Introduction to DataFrames 
 ================================
 
 Meerkat provides two data structures, the column and the dataframe, that together help 

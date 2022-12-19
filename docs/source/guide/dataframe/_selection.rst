@@ -16,8 +16,10 @@ Throughout, we'll be selecting data from the following DataFrame, which holds th
    @suppress
    display_df(df.head()[["img", "label", "label_id", "label_idx", "split", "img_path"]], "imagenette_head")
 
-.. raw:: html
-   :file: ../html/display/imagenette_head.html
+
+
+
+
 
 Selecting Columns
 ------------------
@@ -31,8 +33,7 @@ below displays the column names in the Imagenette dataframe we loaded above:
 Using these column names, we can pull out an individual column or a subset of them as a new
 DataFrame. 
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
 
     **Selecting a Single Column**: ``str`` -> :class:`~meerkat.Column`
@@ -50,8 +51,7 @@ DataFrame.
 It may be helpful to think of a DataFrame as a dictionary mapping column names to columns. 
 Indeed, a DataFrame implements other parts of the ``dict`` interface including :meth:`~meerkat.DataFrame.keys()`, :meth:`~meerkat.DataFrame.values()`, and :meth:`~meerkat.DataFrame.items()`. Unlike a dictionary, multiple columns in a DataFrame can be selected at once.
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
 
     **Selecting Multiple Columns**: ``Sequence[str]`` -> :class:`~meerkat.DataFrame`
@@ -78,6 +78,9 @@ Indeed, a DataFrame implements other parts of the ``dict`` interface including :
 Selecting Rows
 ---------------
 
+Selecting Rows by Position
+***************************
+
 In Meerkat, the rows of a DataFrame or Column are ordered. This means that rows are 
 uniquely identified by their position in the DataFrame or Column (similar to how the 
 elements of a `Python List <https://www.w3schools.com/python/python_lists.asp>`_ are 
@@ -95,8 +98,7 @@ to columns. Equivalently, it also may be helpful to think of a DataFrame as a li
 dictionaries mapping column names to values. The DataFrame interface supports both of these 
 views – under the hood, storage is organized so as to make both column and row accesses fast.
     
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
 
     **Selecting a Single Row from a DataFrame**: ``int`` -> :class:`Dict[str, Any]`
@@ -140,8 +142,7 @@ Instead, images are only loaded into memory at the moment they are selected.
 
 The same position-based indexing works for selecting a single cell from a Column.
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
     **Selecting a Single Cell from a Column**: ``int`` -> :class:`Any`
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -158,8 +159,7 @@ The same position-based indexing works for selecting a single cell from a Column
 
 There are three different ways to select a subset of rows from a DataFrame: via ``slice``, ``Sequence[int]``, or ``Sequence[bool]``.  
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
     **Selecting Multiple Rows from a DataFrame**: ``slice`` -> :class:`~meerkat.DataFrame`
     ^^^^^^^^^^^^^^^
@@ -172,7 +172,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
         new_df = df[50:100]
         new_df
     
-    We can also use integer slices to select a set of evenly spaced rows from a DataFrame ``[start:end:step]``. For example, below we select everyt tenth row from the first 100 rows in the DataFrame.
+    We can also use integer slices to select a set of evenly spaced rows from a DataFrame ``[start:end:step]``. For example, below we select every tenth row from the first 100 rows in the DataFrame.
 
     .. ipython:: python
      
@@ -180,8 +180,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
         new_df
     
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
     **Selecting Multiple Rows from a DataFrame**: ``Sequence[int]`` -> :class:`~meerkat.DataFrame`
     ^^^^^^^^^^^^^^
@@ -205,8 +204,7 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     indexing, described above, is faster).    
 
 
-.. panels::
-    :column: col-lg-12 p-2
+.. card:: 
 
     **Selecting Multiple Rows from a DataFrame**: ``Sequence[bool]`` -> :class:`~meerkat.DataFrame`
     ^^^^^^^^^^^^^^
@@ -239,17 +237,10 @@ There are three different ways to select a subset of rows from a DataFrame: via 
         small_df[small_df["label"] == "parachute"]
     
 
-.. admonition:: Copy vs. Reference
 
-    See :doc:`copying` for more information.
-    
-    You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
-    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`TensorColumn`). 
-    
-    In general, columns inherit the copying behavior of their underlying data structure. 
-    For example, a :class:`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
-    See a more detailed discussion in :doc:`copying`. 
 
+Selecting Rows by Primary Key
+******************************
 
 .. admonition:: For Pandas Users
 
@@ -262,5 +253,20 @@ There are three different ways to select a subset of rows from a DataFrame: via 
     This is **not** supported in Meerkat. Instead you should chain the indexing operators together. For example,
     ``df["label"][2]``. In general, you should index the column first and then the row. Doing it in the reverse order
     could be wasteful, since the other cells in the row would be loaded for no reason.  
+
+
+
+.. admonition:: Copy vs. Reference
+
+    See :doc:`copying` for more information.
+    
+    You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
+    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`TensorColumn`). 
+    
+    In general, columns inherit the copying behavior of their underlying data structure. 
+    For example, a :class:`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
+    See a more detailed discussion in :doc:`copying`. 
+
+
 
 

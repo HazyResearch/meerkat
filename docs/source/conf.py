@@ -45,16 +45,15 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
-    "sphinx_rtd_theme",
     "nbsphinx",
     # "recommonmark",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
     "myst_nb",
     "sphinx.ext.intersphinx",
-    "sphinx_panels",
     "sphinx_book_theme",
     "sphinx_external_toc",
+    "sphinx_design"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -85,7 +84,7 @@ html_css_files = [
 
 # From jupyter-book default sphinx config
 # https://github.com/executablebooks/jupyter-book/blob/421f6198728b21c94726a10b61776fb4cc097d72/jupyter_book/config.py#L23
-html_add_permalinks = "¶"
+html_permalinks_icon = "¶"
 html_sourcelink_suffix = ""
 numfig = True
 panels_add_bootstrap_css = False
