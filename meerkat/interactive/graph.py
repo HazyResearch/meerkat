@@ -898,12 +898,14 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
+    @reactive
     def __setslice__(self, i, j, value):
         obj = self.__wrapped__.copy()
         obj[i:j] = value
         warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
+    @reactive
     def __delslice__(self, i, j):
         obj = self.__wrapped__.copy()
         del obj[i:j]
