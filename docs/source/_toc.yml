@@ -18,6 +18,9 @@ parts:
         file: guide/interactive/introduction
         sections: 
           - file: guide/interactive/endpoint
+          - file: guide/interactive/reactive
+          - file: guide/interactive/store
+          - file: guide/interactive/why-reactive
 
   - caption: Use Cases
     chapters:
