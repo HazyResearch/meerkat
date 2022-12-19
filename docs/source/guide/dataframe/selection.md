@@ -196,14 +196,14 @@ the ``"label"`` column. We could do this using the following code:
 
 ```{admonition} Copy vs. Reference
 
-    See :doc:`copying` for more information.
-    
-    You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
-    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`TensorColumn`). 
-    
-    In general, columns inherit the copying behavior of their underlying data structure. 
-    For example, a :class:`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
-    See a more detailed discussion in :doc:`copying`. 
+See {doc}`advanced/copying.rst` for more information.
+
+You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
+This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* {class}`PandasSeriesColumn`, {class}`TensorColumn`). 
+
+In general, columns inherit the copying behavior of their underlying data structure. 
+For example, a {class}`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
+See a more detailed discussion in {doc}`advanced/copying.rst` . 
 ```
 
 
@@ -237,14 +237,16 @@ Passing a ``str|int`` that isn't in the primary key will raise a ``KeyError``.
 
 ```{admonition} For Pandas Users
 
-    ``.iloc`` **and** ``.loc``:
-    Pandas users are likely familiar with ``.iloc`` and ``.loc`` properties of DataFrames and Series.
-    These properties are used to select data by integer position and by label in the index, respectively.In Meerkat, DataFrames and Columns do **not** have a designated index object as do DataFrames and Series. In Meerkat, the primary way to select rows in Meerkat is by integer position or boolean mask, so there is no need for distinct ``.iloc`` and ``loc`` indexers. 
+``index vs. primary key``:
+Pandas DataFrames maintain an index object that is separate from the DataFrame's columns.
+The index object is used to select rows by key using the ``.loc[]`` indexer.
+In Meerkat, there is no separate index object. 
+Instead, we designate one of the columns the primary key and can select rows based on the values in that column using ``.loc[]``.
+The Meerkat approach, where the primary key is a column in the DataFrame, resembles the approach taken by most SQL databases. 
 
-    **Indexing Cells**:
-    In Pandas, it's possible to select a cell directly from a DataFrame with a single index like ``df.loc[2, "label"]``. 
-    This is **not** supported in Meerkat. Instead you should chain the indexing operators together. For example,
-    ``df["label"][2]``. In general, you should index the column first and then the row. Doing it in the reverse order
-    could be wasteful, since the other cells in the row would be loaded for no reason.  
+``.iloc``:
+Pandas users are likely familiar with ``.loc`` properties of DataFrame and Series.
+These properties are used to select data by integer position and by key in the index, respectively. 
+In Meerkat, we do not support ``.iloc`` – to index by position, simply apply the index operator `[]` directly to the object.
 ```
 

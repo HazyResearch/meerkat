@@ -27,6 +27,11 @@ parts:
               - file: guide/dataframe/ops/concat
               - file: guide/dataframe/ops/sort_sample
           - file: guide/dataframe/io
+          - title: Advanced
+            file: guide/dataframe/advanced/overview
+            sections:
+              - file: guide/dataframe/advanced/copying
+              - file: guide/dataframe/advanced/blocks
       
       - title: Interactive
         file: guide/interactive/introduction
