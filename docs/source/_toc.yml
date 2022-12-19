@@ -12,11 +12,20 @@ parts:
         title: "DataFrame"
         sections:
           - file: guide/dataframe/selection
-          - file: guide/dataframe/column_types
-          - file: guide/dataframe/deferred
-          - file: guide/dataframe/ops
+          - file: guide/dataframe/columns/overview
             sections:
-              - file: guide/dataframe/map
+              - file: guide/dataframe/columns/scalar
+              - file: guide/dataframe/columns/tensor
+              - file: guide/dataframe/columns/deferred
+              - file: guide/dataframe/columns/object
+
+          - file: guide/dataframe/ops/overview
+            sections:
+              - file: guide/dataframe/ops/map
+              - file: guide/dataframe/ops/merge
+              - file: guide/dataframe/ops/groupby
+              - file: guide/dataframe/ops/concat
+              - file: guide/dataframe/ops/sort_sample
           - file: guide/dataframe/io
       
       - title: Interactive
@@ -30,7 +39,6 @@ parts:
               - file: guide/interactive/concepts/reactive
               - file: guide/interactive/concepts/component
               - file: guide/interactive/concepts/state
-              - file: guide/interactive/concepts/core-concepts-nutshell
           - file: guide/interactive/details/why-reactive
 
   - caption: Use Cases

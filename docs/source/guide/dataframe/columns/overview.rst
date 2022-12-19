@@ -1,5 +1,5 @@
 
-Overview of Column Types
+Column Types
 =========================
 
 There are four core column types in Meerkat, each with a different interface.
@@ -38,3 +38,5 @@ There are four core column types in Meerkat, each with a different interface.
     .. ipython:: python
 
         mk.ArrowScalarColumn([0,1,2])
+
+

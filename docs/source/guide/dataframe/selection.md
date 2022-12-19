@@ -18,6 +18,10 @@ import meerkat as mk
 df = mk.get("imagenette")
 ```
 
+Below is an overview of the data selection methods discussed in this guide. 
+```{contents}
+:local:
+```
 
 ## Selecting Columns
 The columns in a DataFrame are uniquely identified by `str` names. The code
@@ -190,6 +194,19 @@ the ``"label"`` column. We could do this using the following code:
 ```
 
 
+```{admonition} Copy vs. Reference
+
+    See :doc:`copying` for more information.
+    
+    You may be wondering whether the rows returned by indexing are copies or references of the rows in the original DataFrame. 
+    This depends on (1) which of the selection strategies above you use (``slice`` vs. ``Sequence[int]`` vs. ``Sequence[bool]``)  and (2) the column type (*e.g.* :class:`PandasSeriesColumn`, :class:`TensorColumn`). 
+    
+    In general, columns inherit the copying behavior of their underlying data structure. 
+    For example, a :class:`TensorColumn` has the copying behavior of a NumPy array, as described in the `Numpy indexing documentation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_.  
+    See a more detailed discussion in :doc:`copying`. 
+```
+
+
 
 ## Selecting Rows by Key
 It is also possible to select rows from a DataFrame by a key column. 
@@ -217,3 +234,17 @@ We can also select a subset of rows in a DataFrame by passing a list of key valu
 ```
 
 Passing a ``str|int`` that isn't in the primary key will raise a ``KeyError``.
+
+```{admonition} For Pandas Users
+
+    ``.iloc`` **and** ``.loc``:
+    Pandas users are likely familiar with ``.iloc`` and ``.loc`` properties of DataFrames and Series.
+    These properties are used to select data by integer position and by label in the index, respectively.In Meerkat, DataFrames and Columns do **not** have a designated index object as do DataFrames and Series. In Meerkat, the primary way to select rows in Meerkat is by integer position or boolean mask, so there is no need for distinct ``.iloc`` and ``loc`` indexers. 
+
+    **Indexing Cells**:
+    In Pandas, it's possible to select a cell directly from a DataFrame with a single index like ``df.loc[2, "label"]``. 
+    This is **not** supported in Meerkat. Instead you should chain the indexing operators together. For example,
+    ``df["label"][2]``. In general, you should index the column first and then the row. Doing it in the reverse order
+    could be wasteful, since the other cells in the row would be loaded for no reason.  
+```
+
