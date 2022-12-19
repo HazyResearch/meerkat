@@ -1,3 +1,4 @@
+import warnings
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, Union, cast
 
@@ -738,57 +739,89 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __ror__(self, other):
         return super().__ror__(other)
 
-    # def __iadd__(self, other):
-    #     self.__wrapped__ += other
-    #     return self
+    # We do not need to decorate i-methods because they call their
+    # out-of-place counterparts, which are reactive
+    def __iadd__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__iadd__ is out-of-place. Use __add__ instead."
+        )
+        return self.__add__(other)
 
-    # def __isub__(self, other):
-    #     self.__wrapped__ -= other
-    #     return self
+    def __isub__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__isub__ is out-of-place. Use __sub__ instead."
+        )
+        return self.__sub__(other)
 
-    # def __imul__(self, other):
-    #     self.__wrapped__ *= other
-    #     return self
+    def __imul__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__imul__ is out-of-place. Use __mul__ instead."
+        )
+        return self.__mul__(other)
 
-    # def __idiv__(self, other):
-    #     self.__wrapped__ = operator.idiv(self.__wrapped__, other)
-    #     return self
+    def __idiv__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__idiv__ is out-of-place. Use __div__ instead."
+        )
+        return self.__div__(other)
 
-    # def __itruediv__(self, other):
-    #     self.__wrapped__ = operator.itruediv(self.__wrapped__, other)
-    #     return self
+    def __itruediv__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__itruediv__ is out-of-place. "
+            "Use __truediv__ instead."
+        )
+        return self.__truediv__(other)
 
-    # def __ifloordiv__(self, other):
-    #     self.__wrapped__ //= other
-    #     return self
+    def __ifloordiv__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__ifloordiv__ is out-of-place. "
+            "Use __floordiv__ instead."
+        )
+        return self.__floordiv__(other)
 
-    # def __imod__(self, other):
-    #     self.__wrapped__ %= other
-    #     return self
+    def __imod__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__imod__ is out-of-place. Use __mod__ instead."
+        )
+        return self.__mod__(other)
 
-    # def __ipow__(self, other):
-    #     self.__wrapped__ **= other
-    #     return self
+    def __ipow__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__ipow__ is out-of-place. Use __pow__ instead."
+        )
+        return self.__pow__(other)
 
-    # def __ilshift__(self, other):
-    #     self.__wrapped__ <<= other
-    #     return self
+    def __ilshift__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__ilshift__ is out-of-place. "
+            "Use __lshift__ instead."
+        )
+        return self.__lshift__(other)
 
-    # def __irshift__(self, other):
-    #     self.__wrapped__ >>= other
-    #     return self
+    def __irshift__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__irshift__ is out-of-place. "
+            "Use __rshift__ instead."
+        )
+        return self.__rshift__(other)
 
-    # def __iand__(self, other):
-    #     self.__wrapped__ &= other
-    #     return self
+    def __iand__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__iand__ is out-of-place. Use __and__ instead."
+        )
+        return self.__and__(other)
 
-    # def __ixor__(self, other):
-    #     self.__wrapped__ ^= other
-    #     return self
+    def __ixor__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__ixor__ is out-of-place. Use __xor__ instead."
+        )
+        return self.__xor__(other)
 
-    # def __ior__(self, other):
-    #     self.__wrapped__ |= other
-    #     return self
+    def __ior__(self, other):
+        warnings.warn(
+            f"{type(self).__name__}.__ior__ is out-of-place. Use __or__ instead."
+        )
+        return self.__or__(other)
 
     @reactive
     def __neg__(self):
@@ -846,21 +879,36 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __getitem__(self, key):
         return super().__getitem__(key)
 
-    # def __setitem__(self, key, value):
-    #     self.__wrapped__[key] = value
+    @reactive
+    def __setitem__(self, key, value):
+        # Make a shallow copy of the value because this operation is not in-place.
+        obj = self.__wrapped__.copy()
+        obj[key] = value
+        warnings.warn(f"{type(self).__name__}.__setitem__ is out-of-place.")
+        return type(self)(obj, backend_only=self._self_backend_only)
 
-    # def __delitem__(self, key):
-    #     del self.__wrapped__[key]
+    @reactive
+    def __delitem__(self, key):
+        obj = self.__wrapped__.copy()
+        del obj[key]
+        warnings.warn(f"{type(self).__name__}.__delitem__ is out-of-place.")
+        return type(self)(obj, backend_only=self._self_backend_only)
 
     @reactive
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
-    # def __setslice__(self, i, j, value):
-    #     self.__wrapped__[i:j] = value
+    def __setslice__(self, i, j, value):
+        obj = self.__wrapped__.copy()
+        obj[i:j] = value
+        warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
+        return type(self)(obj, backend_only=self._self_backend_only)
 
-    # def __delslice__(self, i, j):
-    #     del self.__wrapped__[i:j]
+    def __delslice__(self, i, j):
+        obj = self.__wrapped__.copy()
+        del obj[i:j]
+        warnings.warn(f"{type(self).__name__}.__delslice__ is out-of-place.")
+        return type(self)(obj, backend_only=self._self_backend_only)
 
     # def __enter__(self):
     #     return self.__wrapped__.__enter__()
@@ -870,20 +918,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     # def __iter__(self):
     #     return iter(self.__wrapped__)
-
-    # def __copy__(self):
-    #     raise NotImplementedError('object proxy must define __copy__()')
-
-    # def __deepcopy__(self, memo):
-    #     raise NotImplementedError('object proxy must define __deepcopy__()')
-
-    # def __reduce__(self):
-    #     raise NotImplementedError(
-    #             'object proxy must define __reduce_ex__()')
-
-    # def __reduce_ex__(self, protocol):
-    #     raise NotImplementedError(
-    #             'object proxy must define __reduce_ex__()')
 
 
 def store_field(value: str) -> Field:
