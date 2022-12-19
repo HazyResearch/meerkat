@@ -22,7 +22,16 @@ parts:
       - title: Interactive
         file: guide/interactive/introduction
         sections: 
-          - file: guide/interactive/endpoint
+          - file: guide/interactive/concepts/core-concepts-nutshell
+            sections:
+              - file: guide/interactive/concepts/store
+              - file: guide/interactive/concepts/dataframe
+              - file: guide/interactive/concepts/endpoint
+              - file: guide/interactive/concepts/reactive
+              - file: guide/interactive/concepts/component
+              - file: guide/interactive/concepts/state
+              - file: guide/interactive/concepts/core-concepts-nutshell
+          - file: guide/interactive/details/why-reactive
 
   - caption: Use Cases
     chapters:
