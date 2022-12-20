@@ -458,20 +458,6 @@ class DataFrame(
 
     @classmethod
     @capture_provenance()
-    def from_dict(
-        cls,
-        d: Dict,
-    ) -> DataFrame:
-        """Convert a dictionary to a dataset.
-
-        Alias for Dataset.from_batch(..).
-        """
-        return cls.from_batch(
-            batch=d,
-        )
-
-    @classmethod
-    @capture_provenance()
     def from_pandas(
         cls,
         df: pd.DataFrame,

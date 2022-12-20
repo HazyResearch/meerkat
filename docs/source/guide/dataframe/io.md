@@ -8,10 +8,22 @@ kernelspec:
 
 # I/O
 
-In this guide, we will discuss how to bring data into Meerkat from various file formats and other Python libraries. 
-We will also discuss how to export data in Meerkat back into these formats. Finally, we'll also discuss how to persist Meerkat DataFrames to disk
+In this guide, we will discuss how to bring data into Meerkat from various file formats and external libraries.  We will also discuss how to export data in Meerkat DataFrames back into these formats. Finally, we'll also discuss how to persist Meerkat DataFrames using {func}`~meerkat.DataFrame.write` and {func}`~meerkat.DataFrame.read`.
 
-## Importing into Meerkat
+```{admonition} Should I export or persist?
+
+This guide discusses two different ways of saving data in Meerkat: exporting and persisting.
+They serve different purposes:
+1. **Export** your DataFrame to another format using one of the `to_*` methods if you need to use the data with other libraries or tools. (See the section on {ref}`exporting`.)
+2. **Persist** your DataFrame using {func}`~meerkat.DataFrame.write` if you simply want to save it to disk for later use. (See the section on {ref}`persisting`.)
+```
+
+
+```{contents}
+:local:
+```
+
+## Importing DataFrames
 
 Meerkat has a number of built-in functions for reading in data from various file formats and Python libraries. 
 We'll provide one in depth example for reading in data from a CSV file, and then provide a list of the other supported file formats and libraries.
@@ -24,6 +36,8 @@ We will be using a small sample of data from the [National Gallery of Art Open D
 We will use the {func}`~meerkat.from_csv` function to read in the data.
 
 ```{code-cell} ipython3
+:tags: [output_scroll]
+
 import meerkat as mk
 
 df = mk.from_csv("_data/art_ngoa.csv")
@@ -37,8 +51,10 @@ Using {func}`~meerkat.image`, we can download the thumbnail image and display it
 
 
 ```{code-cell} ipython3
+:tags: [output_scroll]
+
 df["image"] = mk.image(df["iiifthumburl"], downloader="url")
-df[["title", "attribution", "image"]].head()
+df[["image", "title", "attribution"]].head()
 ```
 The function `mk.image` creates a {class}`~meerkat.ImageColumn` which defers the downloading of images from the URLs until the data is needed. 
 
@@ -54,7 +70,9 @@ df.loc[221224]
 ```
 The {func}`~meerkat.from_csv` function has a utility parameter `primary_key` which can be used to set the primary key when the DataFrame is created. 
 ```{code-cell} ipython3
-df = mk.from_csv("_data/art_ngoa.csv", primary_key="objectid")
+:tags: [output_scroll]
+
+mk.from_csv("_data/art_ngoa.csv", primary_key="objectid")
 ```
 ```{admonition} Primary Keys
 To learn more about primary keys and key-based indexing, check out the section {ref}`key-based-selection`. 
@@ -80,13 +98,12 @@ It's also posible to import data from third-party Python libraries like [Pandas]
 
 - {func}`~meerkat.from_arrow()`: Converts an [Arrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table) to a Meerkat DataFrame.
 
-- {func}`~meerkat.from_dict()`: Converts a Python dictionary to a Meerkat DataFrame.
 
 - {func}`~meerkat.from_huggingface()`: Converts a HuggingFace Dataset to a Meerkat DataFrame. By default, the index of the HuggingFace Dataset will be used as the primary key for the Meerkat DataFrame.
 
 
-
-## Exporting from Meerkat
+(exporting)=
+## Exporting DataFrames
 Meerkat supports exporting DataFrames from Meerkat to other file formats and libraries. These methods are useful for converting data into formats that can be used by other libraries or software.
 
 ````{warning}
@@ -103,6 +120,12 @@ Continuing with the example above, let's export the DataFrame to a CSV file.
 ```{code-cell} ipython3 
 df.to_csv("_data/art_ngoa_export.csv")
 ```
+
+If we inspect the first 5 lines of the CSV file from the command line, we can see that the `image` column is missing. This is because the `image` column is a {class}`~meerkat.DeferredColumn` and was not exported.
+```{code-cell} bash
+!head -n 5 _data/art_ngoa_export.csv
+```
+When columns are dropped during export, a warning is raised.
 
 ### Exporting to storage formats
 
@@ -125,13 +148,32 @@ It is also possible to export Meerkat DataFrames to other Python DataFrame libra
 - {func}`~meerkat.DataFrame.to_pandas()`: Converts the DataFrame to a [Pandas DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html)
 - {func}`~meerkat.DataFrame.to_arrow()`: Converts the DataFrame to an [Arrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table).
 
-
+(persisting)=
+## Persisting DataFrames
+In this section, we discuss how to persist Meerkat DataFrames to disk using the {func}`~meerkat.DataFrame.write()` method. Unlike the export methods discussed above, {func}`~meerkat.DataFrame.write()` guarantees that the DataFrame read back in with {func}`~meerkat.read` will contain the exact sam columns as the original DataFrame.
 (writing-dataframes)=
-## Writing Meerkat DataFrames to disk
-If you would
+### Writing DataFrames 
+Above we saw how some column types in Meerkat DataFrames cannot be exported to a single file format. Specifically, we saw that the column we created to display images was dropped when exporting to CSV.
 
+{func}`~meerkat.DataFrame.write` allows us to persist the DataFrame to disk in a way that will preserve the image column.
 
-## Reading Meerkat DataFrames from disk 
+```{code-cell} ipython3
+df.write("_data/art_ngoa.mk")
+```
+
+*How does it work?* Under the hood, {func}`~meerkat.DataFrame.write` works by splitting the DataFrame among several different files. For example, the {class}`~meerkat.ScalarColumn`s could be stored together in a [Feather file](https://arrow.apache.org/docs/python/feather.html), while the {class}`~meerkat.TensorColumn`s could be stored in [NPY format](https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html#module-numpy.lib.format). The path passed to {func}`~meerkat.DataFrame.write` is the directory where the files will be stored. The directory will also contain a `meta.yaml` file that contains information about the DataFrame. This file is used by {func}`~meerkat.read()` to reconstruct the DataFrame.
+
+### Reading DataFrames 
+To read the DataFrame back in from disk, we can use the {func}`~meerkat.read()` function.
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+mk.read("_data/art_ngoa.mk")
+```
+
+Note that all the columns are present, including the `image` column, which had previously been lost with {func}`~meerkat.DataFrame.to_csv`.
+
 
 
 
