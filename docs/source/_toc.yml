@@ -5,6 +5,7 @@ parts:
     chapters:
       - file: start/install
       - file: start/walkthrough
+      - file: start/configure
 
   - caption: User Guide
     chapters:

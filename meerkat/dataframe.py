@@ -461,16 +461,6 @@ class DataFrame(
 
     @classmethod
     @capture_provenance()
-    def from_jsonl(
-        cls,
-        json_path: str,
-    ) -> DataFrame:
-        """Load a dataset from a .jsonl file on disk, where each line of the
-        json file consists of a single example."""
-        return cls.from_pandas(pd.read_json(json_path, orient="records", lines=True))
-
-    @classmethod
-    @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
@@ -537,14 +527,16 @@ class DataFrame(
 
     @classmethod
     @capture_provenance(capture_args=["filepath"])
-    def from_csv(cls, filepath: str, *args, **kwargs):
-        """Create a Dataset from a csv file.
+    def from_csv(cls, filepath: str, *args, **kwargs) -> DataFrame:
+        """Create a DataFrame from a csv file.
+        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
+
 
         Args:
             filepath (str): The file path or buffer to load from.
                 Same as :func:`pandas.read_csv`.
             *args: Argument list for :func:`pandas.read_csv`.
-            **kwargs: Keyword arguments for :func:`pandas.read_csv`.
+            **kwargs: Keyword arguments forwarded to :func:`pandas.read_csv`.
 
         Returns:
             DataFrame: The constructed dataframe.
@@ -555,12 +547,69 @@ class DataFrame(
     @capture_provenance()
     def from_feather(
         cls,
-        path: str,
-    ):
-        """Create a Dataset from a feather file."""
-        return cls.from_batch(
-            pd.read_feather(path).to_dict("list"),
+        filepath: str,
+        columns: Optional[Sequence[str]] = None,
+        use_threads: bool = True,
+        **kwargs,
+    ) -> DataFrame:
+        """Create a DataFrame from a feather file.
+        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
+
+        Args:
+            filepath (str): The file path or buffer to load from.
+                Same as :func:`pandas.read_feather`.
+            columns (Optional[Sequence[str]]): The columns to load.
+                Same as :func:`pandas.read_feather`.
+            use_threads (bool): Whether to use threads to read the file.
+                Same as :func:`pandas.read_feather`.
+            **kwargs: Keyword arguments forwarded to :func:`pandas.read_feather`.
+
+        Returns:
+            DataFrame: The constructed dataframe.
+        """
+        return cls.from_pandas(
+            pd.read_feather(
+                filepath, columns=columns, use_threads=use_threads, **kwargs
+            )
         )
+
+    @classmethod
+    @capture_provenance()
+    def from_parquet(
+        cls,
+        filepath: str,
+        engine: str = "auto",
+        columns: Optional[Sequence[str]] = None,
+        **kwargs,
+    ) -> DataFrame:
+        """Create a DataFrame from a parquet file.
+        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
+
+        Args:
+            filepath (str): The file path or buffer to load from.
+                Same as :func:`pandas.read_parquet`.
+            engine (str): The parquet engine to use.
+                Same as :func:`pandas.read_parquet`.
+            columns (Optional[Sequence[str]]): The columns to load.
+                Same as :func:`pandas.read_parquet`.
+            **kwargs: Keyword arguments forwarded to :func:`pandas.read_parquet`.
+
+        Returns:
+            DataFrame: The constructed dataframe.
+        """
+        return cls.from_pandas(
+            pd.read_parquet(filepath, engine=engine, columns=columns, **kwargs)
+        )
+
+    @classmethod
+    @capture_provenance()
+    def from_jsonl(
+        cls,
+        json_path: str,
+    ) -> DataFrame:
+        """Load a dataset from a .jsonl file on disk, where each line of the
+        json file consists of a single example."""
+        return cls.from_pandas(pd.read_json(json_path, orient="records", lines=True))
 
     @capture_provenance()
     def to_pandas(self) -> pd.DataFrame:

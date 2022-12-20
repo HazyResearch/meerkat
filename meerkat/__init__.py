@@ -61,6 +61,12 @@ files = FileColumn
 image = ImageColumn
 audio = AudioColumn
 
+# aliases for io
+from_csv = DataFrame.from_csv
+from_feather = DataFrame.from_feather
+
+
+
 
 __all__ = [
     "GlobalState",
@@ -93,4 +99,6 @@ __all__ = [
     "provenance",
     "config",
     "gui",
+    "from_csv",
+    "from_json",
 ]
