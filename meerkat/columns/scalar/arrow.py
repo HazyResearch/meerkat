@@ -98,5 +98,8 @@ class ArrowScalarColumn(ScalarColumn):
     def to_tensor(self):
         return torch.tensor(self.data.to_numpy())
 
-    def to_pandas(self):
+    def to_pandas(self, allow_objects: bool = False):
         return self.data.to_pandas()
+
+    def to_arrow(self) -> pa.Array:
+        return self.data

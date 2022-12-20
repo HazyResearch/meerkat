@@ -20,6 +20,7 @@ from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
+from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
@@ -928,7 +929,7 @@ def test_from_arrow():
         assert pa.compute.equal(df[col].data, table[col])
 
 
-def test_to_pandas():
+def test_to_pandas_allow_objects():
     import pandas as pd
 
     length = 16
@@ -943,7 +944,7 @@ def test_to_pandas():
         "f": np.ones((length, 5)).astype(int),
         "g": torch.ones(length, 5).to(int),
     }
-    df = DataFrame.from_batch(batch)
+    df = DataFrame(batch, allow_objects=True)
 
     df_pd = df.to_pandas()
     assert isinstance(df_pd, pd.DataFrame)
@@ -959,32 +960,112 @@ def test_to_pandas():
     assert (df_pd["e"].values == df["e"].values).all()
 
 
-def test_to_jsonl(tmpdir: str):
-    length = 16
-    batch = {
-        "a": np.arange(length),
-        "b": ObjectColumn(np.arange(length)),
-        "d": torch.arange(length),
-        # offset the index to test robustness to nonstandard indices
-        "e": pd.Series(np.arange(length), index=np.arange(1, 1 + length)),
-        "f": ArrowScalarColumn(np.arange(length)),
-    }
-    df = DataFrame.from_batch(batch)
+def test_to_pandas_disallow_objects(testbed):
+    df = testbed.df
 
-    df.to_jsonl(os.path.join(tmpdir, "test.jsonl"))
-    df_pd = pd.read_json(
-        os.path.join(tmpdir, "test.jsonl"), lines=True, orient="records"
-    )
+    pdf = df.to_pandas(allow_objects=False)
 
-    assert isinstance(df_pd, pd.DataFrame)
-    assert list(df_pd.columns) == list(df.columns)
-    assert len(df) == len(df_pd)
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in pdf
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in pdf
+        else:
+            assert name in pdf
 
-    assert (df_pd["a"].values == df["a"].data).all()
-    assert list(df_pd["b"]) == list(df["b"].data)
-    assert (df_pd["d"].values == df["d"].values).all()
-    assert (df_pd["e"].values == df["e"].values).all()
-    assert (df_pd["f"] == df["f"].to_pandas()).all()
+
+def test_to_arrow(testbed):
+    df = testbed.df
+
+    adf = df.to_arrow()
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in adf.column_names
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in adf.column_names
+        else:
+            assert name in adf.column_names
+            assert (adf[name].to_numpy() == col.to_numpy()).all()
+
+
+@product_parametrize(params={"engine": ["arrow", "pandas"]})
+def test_csv_io(testbed, tmpdir, engine):
+    df = testbed.df
+    filepath = os.path.join(tmpdir, "test.csv")
+
+    with pytest.warns():
+        df.to_csv(filepath, engine=engine)
+
+    df2 = DataFrame.from_csv(filepath)
+
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in df2
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in df2
+        else:
+            # note we do not check equality because writing to CSV can lead to
+            # casting issues
+            assert name in df2
+
+
+@product_parametrize(params={"engine": ["arrow", "pandas"]})
+def test_feather_io(testbed, tmpdir, engine):
+    df = testbed.df
+    filepath = os.path.join(tmpdir, "test.feather")
+
+    with pytest.warns():
+        df.to_feather(filepath, engine=engine)
+
+    df2 = DataFrame.from_feather(filepath)
+
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in df2
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in df2
+        else:
+            assert name in df2
+            assert (df2[name].to_numpy() == col.to_numpy()).all()
+
+
+@product_parametrize(params={"engine": ["arrow", "pandas"]})
+def test_parquet_io(testbed, tmpdir, engine):
+    df = testbed.df
+    filepath = os.path.join(tmpdir, "test.parquet")
+
+    with pytest.warns():
+        df.to_parquet(filepath, engine=engine)
+
+    df2 = DataFrame.from_parquet(filepath)
+
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in df2
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in df2
+        else:
+            assert name in df2
+            assert (df2[name].to_numpy() == col.to_numpy()).all()
+
+
+def test_json_io(testbed, tmpdir):
+    df = testbed.df
+    filepath = os.path.join(tmpdir, "test.json")
+
+    with pytest.warns():
+        df.to_json(filepath)
+
+    df2 = DataFrame.from_json(filepath)
+
+    for name, col in df.items():
+        if isinstance(col, ObjectColumn) or isinstance(col, DeferredColumn):
+            assert name not in df2
+        elif isinstance(col, TensorColumn) and len(col.shape) > 1:
+            assert name not in df2
+        else:
+            assert name in df2
+            assert np.allclose(df2[name].to_numpy(), col.to_numpy())
 
 
 def test_constructor():
@@ -1079,10 +1160,6 @@ def test_shape():
     }
     df = DataFrame(data)
     assert df.shape == (16, 2)
-
-
-def test_streamlit(testbed):
-    testbed.df.streamlit()
 
 
 def test_str(testbed):

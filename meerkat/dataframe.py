@@ -18,6 +18,7 @@ from typing import (
     Tuple,
     Union,
 )
+import warnings
 
 import cytoolz as tz
 import dill
@@ -31,6 +32,8 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
+from meerkat.columns.scalar.arrow import ArrowScalarColumn
+from meerkat.errors import ConversionError
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -118,9 +121,6 @@ class DataFrame(
         df, formatters = self._repr_pandas_(max_rows=max_rows)
 
         return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
-
-    def streamlit(self):
-        return self._repr_pandas_()
 
     def __repr__(self):
         return (
@@ -433,33 +433,6 @@ class DataFrame(
         self.data.consolidate()
 
     @classmethod
-    def from_huggingface(cls, *args, **kwargs):
-        """Load a Huggingface dataset as a DataFrame.
-
-        Use this to replace `datasets.load_dataset`, so
-
-        >>> dict_of_datasets = datasets.load_dataset('boolq')
-
-        becomes
-
-        >>> dict_of_dataframes = DataFrame.from_huggingface('boolq')
-        """
-        import datasets
-
-        # Load the dataset
-        dataset = datasets.load_dataset(*args, **kwargs)
-
-        if isinstance(dataset, dict):
-            return dict(
-                map(
-                    lambda t: (t[0], cls.from_arrow(t[1]._data)),
-                    dataset.items(),
-                )
-            )
-        else:
-            return cls.from_arrow(dataset._data)
-
-    @classmethod
     @capture_provenance()
     def from_batch(
         cls,
@@ -502,13 +475,47 @@ class DataFrame(
     def from_pandas(
         cls,
         df: pd.DataFrame,
-    ):
-        """Create a Dataset from a pandas DataFrame."""
+        index: bool = True,
+        primary_key: Optional[str] = None,
+    ) -> DataFrame:
+        """Create a Meerkat DataFrame from a Pandas DataFrame.
+
+        .. warning::
+
+            In Meerkat, column names must be strings, so non-string column
+            names in the Pandas DataFrame will be converted.
+
+        Args:
+            df: The Pandas DataFrame to convert.
+            index: Whether to include the index of the Pandas DataFrame as a
+                column in the Meerkat DataFrame.
+            primary_key: The name of the column to use as the primary key.
+                If `index` is True and `primary_key` is None, the index will
+                be used as the primary key. If `index` is False, then no
+                primary key will be set. Optional default is None.
+
+        Returns:
+            DataFrame: The Meerkat DataFrame.
+
+        """
+
         # column names must be str in meerkat
         df = df.rename(mapper=str, axis="columns")
-        return cls.from_batch(
-            df.to_dict("series"),
+        pandas_df = df
+
+        df = cls.from_batch(
+            pandas_df.to_dict("series"),
         )
+
+        if index:
+            df["index"] = pandas_df.index.to_series()
+            if primary_key is None:
+                df.set_primary_key("index", inplace=True)
+
+        if primary_key is not None:
+            df.set_primary_key(primary_key, inplace=True)
+
+        return df
 
     @classmethod
     @capture_provenance()
@@ -524,6 +531,33 @@ class DataFrame(
         return cls.from_batch(
             {view.block_index: ArrowScalarColumn(view) for view in block_views}
         )
+
+    @classmethod
+    def from_huggingface(cls, *args, **kwargs):
+        """Load a Huggingface dataset as a DataFrame.
+
+        Use this to replace `datasets.load_dataset`, so
+
+        >>> dict_of_datasets = datasets.load_dataset('boolq')
+
+        becomes
+
+        >>> dict_of_dataframes = DataFrame.from_huggingface('boolq')
+        """
+        import datasets
+
+        # Load the dataset
+        dataset = datasets.load_dataset(*args, **kwargs)
+
+        if isinstance(dataset, dict):
+            return dict(
+                map(
+                    lambda t: (t[0], cls.from_arrow(t[1]._data)),
+                    dataset.items(),
+                )
+            )
+        else:
+            return cls.from_arrow(dataset._data)
 
     @classmethod
     @capture_provenance(capture_args=["filepath"])
@@ -543,7 +577,7 @@ class DataFrame(
         Returns:
             DataFrame: The constructed dataframe.
         """
-        df = cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+        df = cls.from_pandas(pd.read_csv(filepath, *args, **kwargs), index=False)
         if primary_key is not None:
             df.set_primary_key(primary_key, inplace=True)
         return df
@@ -576,7 +610,8 @@ class DataFrame(
         df = cls.from_pandas(
             pd.read_feather(
                 filepath, columns=columns, use_threads=use_threads, **kwargs
-            )
+            ),
+            index=False,
         )
         if primary_key is not None:
             df.set_primary_key(primary_key, inplace=True)
@@ -608,7 +643,8 @@ class DataFrame(
             DataFrame: The constructed dataframe.
         """
         df = cls.from_pandas(
-            pd.read_parquet(filepath, engine=engine, columns=columns, **kwargs)
+            pd.read_parquet(filepath, engine=engine, columns=columns, **kwargs),
+            index=False,
         )
         if primary_key is not None:
             df.set_primary_key(primary_key, inplace=True)
@@ -616,27 +652,164 @@ class DataFrame(
 
     @classmethod
     @capture_provenance()
-    def from_jsonl(
+    def from_json(
         cls,
-        json_path: str,
+        filepath: str,
+        primary_key: str = None,
+        orient: str = "records",
+        lines: bool = False,
+        **kwargs,
     ) -> DataFrame:
-        """Load a dataset from a .jsonl file on disk, where each line of the
-        json file consists of a single example."""
-        return cls.from_pandas(pd.read_json(json_path, orient="records", lines=True))
+        """Load a DataFrame from a json file.
 
-    @capture_provenance()
-    def to_pandas(self) -> pd.DataFrame:
-        """Convert a Dataset to a pandas DataFrame."""
-        return pd.DataFrame(
-            {
-                name: column.to_pandas().reset_index(drop=True)
-                for name, column in self.items()
-            }
+        By default, data in the JSON file should be a list of dictionaries, each with
+        an entry for each column. This is the ``orient="records"`` format. If the data
+        is in a different format in the JSON, you can specify the ``orient`` parameter.
+        See :func:`pandas.read_json` for more details.
+
+        Args:
+            filepath (str): The file path or buffer to load from.
+                Same as :func:`pandas.read_json`.
+            orient (str): The expected JSON string format. Options are:
+                "split", "records", "index", "columns", "values".
+                Same as :func:`pandas.read_json`.
+            lines (bool): Whether the json file is a jsonl file.
+                Same as :func:`pandas.read_json`.
+            **kwargs: Keyword arguments forwarded to :func:`pandas.read_json`.
+
+        Returns:
+            DataFrame: The constructed dataframe.
+        """
+        df = cls.from_pandas(
+            pd.read_json(filepath, orient=orient, lines=lines, **kwargs), index=False
         )
+        if primary_key is not None:
+            df.set_primary_key(primary_key, inplace=True)
+        return df
 
-    def to_jsonl(self, path: str) -> None:
-        """Save a Dataset to a jsonl file."""
-        self.to_pandas().to_json(path, lines=True, orient="records")
+    def _to_base(self, base: str = "pandas", **kwargs) -> Dict[str, Any]:
+        """Helper method to convert a Meerkat DataFrame to a base format."""
+        data = {}
+        for name, column in self.items():
+            try:
+                converted_column = getattr(column, f"to_{base}")(**kwargs)
+            except ConversionError:
+                warnings.warn(
+                    f"Could not convert column {name} of type {type(column)}, it will "
+                    "be dropped from the output."
+                )
+                continue
+            data[name] = converted_column
+        return data
+
+    def to_pandas(
+        self, index: bool = False, allow_objects: bool = False
+    ) -> pd.DataFrame:
+        """Convert a Meerkat DataFrame to a Pandas DataFrame.
+
+        Args:
+            index (bool): Use the primary key as the index of the Pandas
+                DataFrame. Defaults to False.
+
+        Returns:
+            pd.DataFrame: The constructed dataframe.
+        """
+
+        df = pd.DataFrame(self._to_base(base="pandas", allow_objects=allow_objects))
+        if index:
+            df.set_index(self.primary_key, inplace=True)
+        return df
+
+    def to_arrow(self) -> pd.DataFrame:
+        """Convert a Meerkat DataFrame to an Arrow Table.
+
+        Returns:
+            pa.Table: The constructed table.
+        """
+        return pa.table(self._to_base(base="arrow"))
+
+    def _choose_engine(self):
+        """Choose which library to use for export.
+        If any of the columns are ArrowScalarColumn, then use Arrow.
+        """
+        for column in self.values():
+            if isinstance(column, ArrowScalarColumn):
+                return "arrow"
+        return "pandas"
+
+    def to_csv(self, filepath: str, engine: str = "auto"):
+        """Save a DataFrame to a csv file.
+
+        The engine used to write the csv to disk.
+
+        Args:
+            filepath (str): The file path to save to.
+            engine (str): The library to use to write the csv. One of ["pandas",
+                "arrow", "auto"]. If "auto", then the library will be chosen based on
+                the column types.
+        """
+        if engine == "auto":
+            engine = self._choose_engine()
+
+        if engine == "arrow":
+            from pyarrow.csv import write_csv
+
+            write_csv(self.to_arrow(), filepath)
+        else:
+            self.to_pandas().to_csv(filepath, index=False)
+
+    def to_feather(self, filepath: str, engine: str = "auto"):
+        """Save a DataFrame to a feather file.
+
+        The engine used to write the feather to disk.
+
+        Args:
+            filepath (str): The file path to save to.
+            engine (str): The library to use to write the feather. One of ["pandas",
+                "arrow", "auto"]. If "auto", then the library will be chosen based on
+                the column types.
+        """
+        if engine == "auto":
+            engine = self._choose_engine()
+
+        if engine == "arrow":
+            from pyarrow.feather import write_feather
+
+            write_feather(self.to_arrow(), filepath)
+        else:
+            self.to_pandas().to_feather(filepath)
+
+    def to_parquet(self, filepath: str, engine: str = "auto"):
+        """Save a DataFrame to a parquet file.
+
+        The engine used to write the parquet to disk.
+
+        Args:
+            filepath (str): The file path to save to.
+            engine (str): The library to use to write the parquet. One of ["pandas",
+                "arrow", "auto"]. If "auto", then the library will be chosen based on
+                the column types.
+        """
+        if engine == "auto":
+            engine = self._choose_engine()
+
+        if engine == "arrow":
+            from pyarrow.parquet import write_table
+
+            write_table(self.to_arrow(), filepath)
+        else:
+            self.to_pandas().to_parquet(filepath)
+
+    def to_json(self, filepath: str, lines: bool = False, orient: str = "records") -> None:
+        """Save a Dataset to a json file.
+
+        Args:
+            filepath (str): The file path to save to.
+            lines (bool): Whether to write the json file as a jsonl file.
+            orient (str): The orientation of the json file.
+                Same as :func:`pandas.DataFrame.to_json`.
+        """
+        self.to_pandas().to_json(filepath, lines=lines, orient=orient)
 
     def _get_collate_fns(self, columns: Iterable[str] = None):
         columns = self.data.keys() if columns is None else columns

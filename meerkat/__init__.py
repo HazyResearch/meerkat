@@ -64,6 +64,11 @@ audio = AudioColumn
 # aliases for io
 from_csv = DataFrame.from_csv
 from_feather = DataFrame.from_feather
+from_json = DataFrame.from_json
+from_parquet = DataFrame.from_parquet
+from_pandas = DataFrame.from_pandas
+from_arrow = DataFrame.from_arrow
+from_huggingface = DataFrame.from_huggingface
 
 
 

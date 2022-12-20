@@ -6,6 +6,7 @@ from typing import Sequence
 
 import cytoolz as tz
 from yaml.representer import Representer
+import pandas as pd
 
 from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import ObjectFormatter
@@ -64,3 +65,6 @@ class ObjectColumn(Column):
     @staticmethod
     def _get_default_formatter() -> ObjectFormatter:
         return ObjectFormatter()
+
+    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+        return pd.Series([self[int(idx)] for idx in range(len(self))])

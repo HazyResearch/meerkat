@@ -9,6 +9,7 @@ from typing import Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 from pandas.core.accessor import CachedAccessor
 from pandas.core.arrays.categorical import CategoricalAccessor
@@ -357,8 +358,11 @@ class PandasScalarColumn(
     def to_numpy(self) -> torch.Tensor:
         return self.values
 
-    def to_pandas(self) -> pd.Series:
-        return self.data
+    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+        return self.data.reset_index(drop=True)
+
+    def to_arrow(self) -> pa.Array:
+        return pa.array(self.data.values)
 
     def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:

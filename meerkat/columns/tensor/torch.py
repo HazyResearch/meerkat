@@ -9,6 +9,7 @@ from typing import Callable, List, Mapping, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import torch
+import pyarrow as pa
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
@@ -247,15 +248,25 @@ class TorchTensorColumn(
     def to_tensor(self) -> torch.Tensor:
         return self.data
 
-    def to_pandas(self) -> pd.Series:
+    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         if len(self.shape) == 1:
             return pd.Series(self.to_numpy())
+        elif allow_objects:
+            # can only create a 1-D series
+            data = self.to_numpy()
+            return pd.Series([data[int(idx)] for idx in range(len(self))])
         else:
             # can only create a 1-D series
             return super().to_pandas()
 
     def to_numpy(self) -> pd.Series:
         return self.data.detach().cpu().numpy()
+
+    def to_arrow(self) -> pa.Array:
+        if len(self.shape) == 1:
+            return pa.array(self.to_numpy())
+        else:
+            return super().to_arrow()
 
     def mean(
         self, dim: int = None, keepdim: bool = False, *args, **kwargs

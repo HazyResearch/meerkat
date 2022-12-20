@@ -13,6 +13,7 @@ import pyarrow as pa
 import torch
 
 import meerkat.config
+from meerkat.errors import ConversionError
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
@@ -536,8 +537,57 @@ class Column(
         """Get the last `n` examples of the column."""
         return self[-n:]
 
-    def to_pandas(self) -> pd.Series:
-        return pd.Series([self[int(idx)] for idx in range(len(self))])
+    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+        """Convert the column to a Pandas Series.
+
+        If the column cannot be converted to a Pandas Series, this method will raise a
+        `~meerkat.errors.ConversionError`.
+
+        Returns:
+            pd.Series: The column as a Pandas Series.
+        """
+        raise ConversionError(
+            f"Cannot convert column of type {type(self)} to Pandas Series."
+        )
+
+    def to_arrow(self) -> pa.Array:
+        """Convert the column to an Arrow Array.
+
+        If the column cannot be converted to an Arrow Array, this method will raise a
+        `~meerkat.errors.ConversionError`.
+
+        Returns:
+            pa.Array: The column as an Arrow Array.
+        """
+        raise ConversionError(
+            f"Cannot convert column of type {type(self)} to Arrow Array."
+        )
+
+    def to_torch(self) -> torch.Tensor:
+        """Convert the column to a PyTorch Tensor.
+
+        If the column cannot be converted to a PyTorch Tensor, this method will raise a
+        `~meerkat.errors.ConversionError`.
+
+        Returns:
+            torch.Tensor: The column as a PyTorch Tensor.
+        """
+        raise ConversionError(
+            f"Cannot convert column of type {type(self)} to PyTorch Tensor."
+        )
+
+    def to_numpy(self) -> np.ndarray:
+        """Convert the column to a Numpy array.
+
+        If the column cannot be converted to a Numpy array, this method will raise a
+        `~meerkat.errors.ConversionError`.
+
+        Returns:
+            np.ndarray: The column as a Numpy array.
+        """
+        raise ConversionError(
+            f"Cannot convert column of type {type(self)} to Numpy array."
+        )
 
     def _copy_data(self) -> object:
         return copy(self._data)

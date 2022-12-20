@@ -69,15 +69,47 @@ Meerkat supports importing data from a number of other file formats. As in the e
 
 - {func}`~meerkat.from_parquet()`: Reads in data from a [Parquet file](https://parquet.apache.org/). Parquet is a columnar storage format that is designed for efficiency. 
 
+- {func}`~meerkat.from_json()`: Reads in data from a JSON file. 
+
+If your data is in a format not listed here, load it into a Pandas DataFrame and use {func}`~meerkat.from_pandas()` to convert it to a Meerkat DataFrame.
+
 ### Importing from other libraries 
 It's also posible to import data from third-party Python libraries like [Pandas](https://pandas.pydata.org/) and [HuggingFace Datasets](https://huggingface.co/datasets).
+
+- {func}`~meerkat.from_pandas()`: Converts a Pandas DataFrame to a Meerkat DataFrame. By default, the index of the Pandas DataFrame will be used as the primary key for the Meerkat DataFrame.
+
+- {func}`~meerkat.from_arrow()`: Converts an Arrow Table to a Meerkat DataFrame.
+
+- {func}`~meerkat.from_dict()`: Converts a Python dictionary to a Meerkat DataFrame.
+
+- {func}`~meerkat.from_huggingface()`: Converts a HuggingFace Dataset to a Meerkat DataFrame. By default, the index of the HuggingFace Dataset will be used as the primary key for the Meerkat DataFrame.
 
 
 
 ## Exporting from Meerkat
+Meerkat supports exporting DataFrames from Meerkat to other file formats and libraries. These methods are useful for converting data into formats that can be used by other libraries or software.
+
+````{warning}
+
+Most file formats designed for tabular data do not offer the same flexibility as Meerkat DataFrames, especially when it comes to storing complex data types and multi-dimensional tensors. As a result, exporting a Meerkat DataFrame to a file format may result in data loss.
+
+Specifically, any {class}`~meerkat.DeferredColumn` (or its subclasses) will not be exported. If you want to export a {class}`DeferredColumn`, you should first materialize the column(s) by calling the DataFrame. Also, depending on the export destination, any {class}`~meerkat.TensorColumn` and/or {class}`~meerkat.ObjectColumn` in the DataFrame may not be exported.
+````
+
+If you simply want to save a Meerkat DataFrame to disk, you should use {func}`~meerkat.DataFrame.write()` instead (see {ref}`writing-dataframes`). This will persist the DataFrame in a format that can be read back into Meerkat without any data loss.
+
+Continuing with the example above, let's export the DataFrame to a CSV file.
+    
+```{code-cell} ipython3 
+df.to_csv("_data/art_ngoa_export.csv")
+```
+
+- {func}`~meerkat.DataFrame.to_csv()`: Writes the DataFrame to a CSV file.
 
 
+(writing-dataframes)=
 ## Writing Meerkat DataFrames to disk
+If you would
 
 
 ## Reading Meerkat DataFrames from disk 

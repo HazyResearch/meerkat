@@ -11,6 +11,7 @@ from typing import Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import torch
 from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
@@ -290,18 +291,23 @@ class NumPyTensorColumn(
 
         return idxs
 
-    def to_tensor(self) -> torch.Tensor:
-        """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
-        very slow."""
-        # TODO (Sabri): understand why `torch.tensor(column)` is so slow
+    def to_torch(self) -> torch.Tensor:
         return torch.tensor(self.data)
 
-    def to_pandas(self) -> pd.Series:
+    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         if len(self.shape) == 1:
             return pd.Series(self.data)
-        else:
+        elif allow_objects:
             # can only create a 1-D series
+            return pd.Series([self[int(idx)] for idx in range(len(self))])
+        else:
             return super().to_pandas()
+
+    def to_arrow(self) -> pa.Array:
+        if len(self.shape) == 1:
+            return pa.array(self.data)
+        else:
+            return super().to_arrow()
 
     def to_numpy(self) -> np.ndarray:
         return self.data
