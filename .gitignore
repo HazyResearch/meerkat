@@ -2,6 +2,10 @@ scratch/sabri/**.ipynb
 # Meerkat written
 *.mk
 
+docs/source/guide/dataframe/_data/art_ngoa_export.csv
+docs/source/guide/dataframe/_data/art_ngoa_export_arrow.csv
+
+
 # Jupyter notebooks
 notebooks/
 scratch/sabri/data

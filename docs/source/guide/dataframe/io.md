@@ -62,7 +62,7 @@ The function `mk.image` creates a {class}`~meerkat.ImageColumn` which defers the
 If you're wondering how {class}`~meerkat.ImageColumn` works, check out the guide on {doc}`columns/deferred`. 
 ```
 
-**Adding a primary key**.The `objectid` column contains a unique identifier for each work of art. We can use {func}`~meerkat.set_primary_key` to set this column as the primary key for the DataFrame, which allows us to perform key-based indexing on the DataFrame.
+**Adding a primary key.** The `objectid` column contains a unique identifier for each work of art. We can use {func}`~meerkat.set_primary_key` to set this column as the primary key for the DataFrame, which allows us to perform key-based indexing on the DataFrame.
 
 ```{code-cell} ipython3
 df = df.set_primary_key("objectid")
@@ -129,7 +129,7 @@ When columns are dropped during export, a warning is raised.
 
 ### Exporting to storage formats
 
-Meerkat supports exporting DataFrames to a number of file formats, with the :class:`~meerkat.DataFrame` class providing the methods listed below. 
+Meerkat supports exporting DataFrames to a number of file formats, with the {class}`~meerkat.DataFrame` class providing the methods listed below. 
 
 - {func}`~meerkat.DataFrame.to_csv()`: Writes the DataFrame to a CSV file. CSV files are a common format for storing tabular data. Unlike some alternatives, CSV files are human-readable in a text-editor and can be easily imported into spreadsheet software.
 - {func}`~meerkat.DataFrame.to_feather()`: Writes the DataFrame to a [Feather file](https://arrow.apache.org/docs/python/feather.html). Feather is a language-agnostic file format for storing DataFrames. It can provide significantly faster I/O than CSV.
