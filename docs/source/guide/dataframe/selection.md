@@ -207,7 +207,7 @@ See a more detailed discussion in {doc}`advanced/copying.rst` .
 ```
 
 
-
+(key-based-selection)=
 ## Selecting Rows by Key
 It is also possible to select rows from a DataFrame by a key column. 
 In Meerkat, a key column is a {class}`~meerkat.ScalarColumn` containing `str` or `int` values that uniquely identify each row. The primary key in Meerkat is analogous to the primary key in a SQL database or the index in a Pandas DataFrame.

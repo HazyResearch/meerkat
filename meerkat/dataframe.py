@@ -527,7 +527,9 @@ class DataFrame(
 
     @classmethod
     @capture_provenance(capture_args=["filepath"])
-    def from_csv(cls, filepath: str, *args, **kwargs) -> DataFrame:
+    def from_csv(
+        cls, filepath: str, primary_key: str = None, *args, **kwargs
+    ) -> DataFrame:
         """Create a DataFrame from a csv file.
         All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
 
@@ -541,13 +543,17 @@ class DataFrame(
         Returns:
             DataFrame: The constructed dataframe.
         """
-        return cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+        df = cls.from_pandas(pd.read_csv(filepath, *args, **kwargs))
+        if primary_key is not None:
+            df.set_primary_key(primary_key, inplace=True)
+        return df
 
     @classmethod
     @capture_provenance()
     def from_feather(
         cls,
         filepath: str,
+        primary_key: str = None,
         columns: Optional[Sequence[str]] = None,
         use_threads: bool = True,
         **kwargs,
@@ -567,17 +573,21 @@ class DataFrame(
         Returns:
             DataFrame: The constructed dataframe.
         """
-        return cls.from_pandas(
+        df = cls.from_pandas(
             pd.read_feather(
                 filepath, columns=columns, use_threads=use_threads, **kwargs
             )
         )
+        if primary_key is not None:
+            df.set_primary_key(primary_key, inplace=True)
+        return df
 
     @classmethod
     @capture_provenance()
     def from_parquet(
         cls,
         filepath: str,
+        primary_key: str = None,
         engine: str = "auto",
         columns: Optional[Sequence[str]] = None,
         **kwargs,
@@ -597,9 +607,12 @@ class DataFrame(
         Returns:
             DataFrame: The constructed dataframe.
         """
-        return cls.from_pandas(
+        df = cls.from_pandas(
             pd.read_parquet(filepath, engine=engine, columns=columns, **kwargs)
         )
+        if primary_key is not None:
+            df.set_primary_key(primary_key, inplace=True)
+        return df
 
     @classmethod
     @capture_provenance()

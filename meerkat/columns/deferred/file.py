@@ -261,15 +261,16 @@ class FileColumn(DeferredColumn):
         data: Sequence[str] = None,
         loader: callable = None,
         transform: callable = None,
+        downloader: Union[callable | str] = None,
         base_dir: str = None,
         *args,
         **kwargs,
     ):
         if isinstance(loader, FileLoader):
-            if transform is not None or base_dir is not None:
+            if transform is not None or base_dir is not None or downloader is not None:
                 raise ValueError(
-                    "Cannot pass `transform` or `base_dir` when loader is a "
-                    "`FileLoader`."
+                    "Cannot pass `transform`, `base_dir`, `downloader`, when loader is "
+                    "a `FileLoader`."
                 )
 
             fn = loader
@@ -280,6 +281,7 @@ class FileColumn(DeferredColumn):
                 transform=transform,
                 loader=self.default_loader if loader is None else loader,
                 base_dir=base_dir,
+                downloader=downloader
             )
 
         if not isinstance(data, ScalarColumn):
