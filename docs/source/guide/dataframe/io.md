@@ -76,9 +76,9 @@ If your data is in a format not listed here, load it into a Pandas DataFrame and
 ### Importing from other libraries 
 It's also posible to import data from third-party Python libraries like [Pandas](https://pandas.pydata.org/) and [HuggingFace Datasets](https://huggingface.co/datasets).
 
-- {func}`~meerkat.from_pandas()`: Converts a Pandas DataFrame to a Meerkat DataFrame. By default, the index of the Pandas DataFrame will be used as the primary key for the Meerkat DataFrame.
+- {func}`~meerkat.from_pandas()`: Converts a [Pandas DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html) to a Meerkat DataFrame. By default, the index of the Pandas DataFrame will be used as the primary key for the Meerkat DataFrame.
 
-- {func}`~meerkat.from_arrow()`: Converts an Arrow Table to a Meerkat DataFrame.
+- {func}`~meerkat.from_arrow()`: Converts an [Arrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table) to a Meerkat DataFrame.
 
 - {func}`~meerkat.from_dict()`: Converts a Python dictionary to a Meerkat DataFrame.
 
@@ -104,7 +104,26 @@ Continuing with the example above, let's export the DataFrame to a CSV file.
 df.to_csv("_data/art_ngoa_export.csv")
 ```
 
-- {func}`~meerkat.DataFrame.to_csv()`: Writes the DataFrame to a CSV file.
+### Exporting to storage formats
+
+Meerkat supports exporting DataFrames to a number of file formats, with the :class:`~meerkat.DataFrame` class providing the methods listed below. 
+
+- {func}`~meerkat.DataFrame.to_csv()`: Writes the DataFrame to a CSV file. CSV files are a common format for storing tabular data. Unlike some alternatives, CSV files are human-readable in a text-editor and can be easily imported into spreadsheet software.
+- {func}`~meerkat.DataFrame.to_feather()`: Writes the DataFrame to a [Feather file](https://arrow.apache.org/docs/python/feather.html). Feather is a language-agnostic file format for storing DataFrames. It can provide significantly faster I/O than CSV.
+- {func}`~meerkat.DataFrame.to_parquet()`: Writes the DataFrame to a [Parquet file](https://parquet.apache.org/). Parquet is a columnar storage format that is designed for efficiency.
+- {func}`~meerkat.DataFrame.to_json()`: Writes the DataFrame to a JSON file.
+
+Note that several of the methods take an optional `engine` parameter. This parameter allows you to control the underlying library that is used to write the DataFrame to disk. Options include: `pandas` and `arrow`. If no `engine` is specified, one is automatically chosen based on the columns in the DataFrame. For example, we can write the DataFrame to a CSV file using the Arrow library instead of Pandas.
+```{code-cell} ipython3
+df.to_csv("_data/art_ngoa_export_arrow.csv", engine="arrow")
+```
+
+### Exporting to other libraries
+
+It is also possible to export Meerkat DataFrames to other Python DataFrame libraries. 
+
+- {func}`~meerkat.DataFrame.to_pandas()`: Converts the DataFrame to a [Pandas DataFrame](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html)
+- {func}`~meerkat.DataFrame.to_arrow()`: Converts the DataFrame to an [Arrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table).
 
 
 (writing-dataframes)=

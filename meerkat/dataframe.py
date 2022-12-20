@@ -800,7 +800,9 @@ class DataFrame(
         else:
             self.to_pandas().to_parquet(filepath)
 
-    def to_json(self, filepath: str, lines: bool = False, orient: str = "records") -> None:
+    def to_json(
+        self, filepath: str, lines: bool = False, orient: str = "records"
+    ) -> None:
         """Save a Dataset to a json file.
 
         Args:

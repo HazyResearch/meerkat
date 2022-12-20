@@ -106,4 +106,9 @@ __all__ = [
     "gui",
     "from_csv",
     "from_json",
+    "from_parquet",
+    "from_feather",
+    "from_pandas",
+    "from_arrow",
+    "from_huggingface",
 ]
