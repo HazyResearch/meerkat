@@ -33,7 +33,7 @@ class DeferredCellOp:
         if isinstance(arg, AbstractCell):
             return arg.get()
         elif isinstance(arg, Column):
-            return arg[:]
+            return arg()
         return arg
 
     def _get(self):

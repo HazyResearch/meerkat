@@ -37,7 +37,7 @@ from meerkat.errors import ConversionError
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
-from meerkat.mixins.deferable import LambdaMixin
+from meerkat.mixins.deferable import DeferrableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
@@ -64,8 +64,7 @@ class DataFrame(
     FunctionInspectorMixin,
     IdentifiableMixin,
     NodeMixin,
-    LambdaMixin,
-    MappableMixin,
+    DeferrableMixin,
     MaterializationMixin,
     IndexerMixin,
     ProvenanceMixin,
@@ -973,37 +972,28 @@ class DataFrame(
 
         return new_df
 
-    @capture_provenance()
     def map(
         self,
-        function: Optional[Callable] = None,
-        with_indices: bool = False,
-        input_columns: Optional[Union[str, List[str]]] = None,
+        function: Callable,
         is_batched_fn: bool = False,
-        batch_size: Optional[int] = 1,
-        drop_last_batch: bool = False,
-        num_workers: int = 0,
-        output_type: Union[type, Dict[str, type]] = None,
-        mmap: bool = False,
-        mmap_path: str = None,
+        batch_size: int = 1,
+        inputs: Union[Mapping[str, str], Sequence[str]] = None,
+        outputs: Union[Mapping[any, str], Sequence[str]] = None,
+        output_type: Union[Mapping[str, type], type] = None,
         materialize: bool = True,
-        pbar: bool = False,
         **kwargs,
     ) -> Optional[Union[Dict, List, Column]]:
-        input_columns = self.columns if input_columns is None else input_columns
-        df = self[input_columns]
-        return super(DataFrame, df).map(
+        from meerkat.ops.map import map
+
+        return map(
+            data=self,
             function=function,
-            with_indices=with_indices,
             is_batched_fn=is_batched_fn,
             batch_size=batch_size,
-            drop_last_batch=drop_last_batch,
-            num_workers=num_workers,
+            inputs=inputs,
+            outputs=outputs,
             output_type=output_type,
-            mmap=mmap,
-            mmap_path=mmap_path,
             materialize=materialize,
-            pbar=pbar,
             **kwargs,
         )
 

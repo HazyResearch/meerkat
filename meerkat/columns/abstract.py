@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 import abc
+from ast import Dict
 import logging
 import pathlib
 import reprlib
 from copy import copy
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Sequence, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import numpy as np
 import pandas as pd
@@ -19,12 +29,11 @@ from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.mixins.collate import CollateMixin
-from meerkat.mixins.deferable import LambdaMixin
+from meerkat.mixins.deferable import DeferrableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
-from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
@@ -44,8 +53,7 @@ class Column(
     ColumnIOMixin,
     FunctionInspectorMixin,
     IdentifiableMixin,
-    LambdaMixin,
-    MappableMixin,
+    DeferrableMixin,
     MaterializationMixin,
     NodeMixin,
     ProvenanceMixin,
@@ -320,6 +328,31 @@ class Column(
             max_rows=max_rows,
             formatters={col_name: formatter},
             escape=False,
+        )
+
+    def map(
+        self,
+        function: Callable,
+        is_batched_fn: bool = False,
+        batch_size: int = 1,
+        inputs: Union[Mapping[str, str], Sequence[str]] = None,
+        outputs: Union[Mapping[any, str], Sequence[str]] = None,
+        output_type: Union[Mapping[str, type], type] = None,
+        materialize: bool = True,
+        **kwargs,
+    ) -> Optional[Union[Dict, List, Column]]:
+        from meerkat.ops.map import map
+
+        return map(
+            data=self,
+            function=function,
+            is_batched_fn=is_batched_fn,
+            batch_size=batch_size,
+            inputs=inputs,
+            outputs=outputs,
+            output_type=output_type,
+            materialize=materialize,
+            **kwargs,
         )
 
     @capture_provenance()

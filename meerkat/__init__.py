@@ -49,6 +49,7 @@ from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
 from meerkat.ops.sort import sort
+from meerkat.ops.map import map, defer
 from meerkat.provenance import provenance
 
 from .config import config
@@ -97,6 +98,8 @@ __all__ = [
     "DeferredCell",
     "FileCell",
     # <<<< Operations >>>>
+    "map", 
+    "defer",
     "concat",
     "merge",
     "embed",
