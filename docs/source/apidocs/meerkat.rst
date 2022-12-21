@@ -17,7 +17,6 @@ Subpackages
    meerkat.mixins
    meerkat.ml
    meerkat.ops
-   meerkat.pipelines
    meerkat.tools
    meerkat.writers
 

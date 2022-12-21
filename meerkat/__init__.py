@@ -42,6 +42,10 @@ from meerkat.row import Row
 from meerkat.datasets import get
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
+from meerkat.ops.sliceby.groupby import groupby
+from meerkat.ops.sliceby.clusterby import clusterby
+from meerkat.ops.sliceby.explainby import explainby
+from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
 from meerkat.ops.sort import sort
@@ -72,15 +76,12 @@ from_huggingface = DataFrame.from_huggingface
 read = DataFrame.read
 
 
-
-
 __all__ = [
-    "GlobalState",
     "DataFrame",
-    "DataPanel",
     "Row",
-    "Column",
+    # <<<< Columns >>>>
     "column",
+    "Column",
     "ObjectColumn",
     "ScalarColumn",
     "PandasScalarColumn",
@@ -95,16 +96,17 @@ __all__ = [
     "AbstractCell",
     "DeferredCell",
     "FileCell",
-    "FileLoader",
-    "get",
+    # <<<< Operations >>>>
     "concat",
     "merge",
     "embed",
     "sort",
     "sample",
-    "provenance",
-    "config",
-    "gui",
+    "groupby",
+    "clusterby",
+    "explainby",
+    "aggregate",
+    # <<<< I/O >>>>
     "from_csv",
     "from_json",
     "from_parquet",
@@ -113,4 +115,20 @@ __all__ = [
     "from_arrow",
     "from_huggingface",
     "read",
+    # <<<< Misc >>>>
+    "provenance",
+    "config",
+    "gui",
+    "FileLoader",
+    "get",
+    "GlobalState",
+    # <<<< Aliases >>>>
+    "DataPanel",
+    "scalar",
+    "tensor",
+    "deferred",
+    "objects",
+    "files",
+    "image",
+    "audio",
 ]
