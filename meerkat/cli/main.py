@@ -41,7 +41,14 @@ def init(
         progress.add_task(description="Setting up installer...", total=None)
         try:
             subprocess.run(
-                ["npm", "install", "create-svelte@latest"],
+                ["curl https://bun.sh/install | sh"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=True,
+            )
+            subprocess.run(
+                ["bun", "add", "create-svelte@latest"],
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -86,7 +93,8 @@ await create("../{name}", {{
 
         try:
             subprocess.run(
-                ["npm", "install"],
+                # ["npm", "install"],
+                ["bun", "install"],
                 cwd="installer",
                 check=True,
                 stdout=subprocess.PIPE,
@@ -127,7 +135,8 @@ await create("../{name}", {{
         # Run the npm install for the new app
         try:
             subprocess.run(
-                ["npm", "install"],
+                # ["npm", "install"],
+                ["bun", "install"],
                 cwd=name,
                 check=True,
                 stdout=subprocess.PIPE,
