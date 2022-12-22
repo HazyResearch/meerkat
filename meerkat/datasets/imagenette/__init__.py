@@ -144,8 +144,6 @@ def download_imagenette(
     df[["img_path", "label", "label_id", "label_idx", "split"]].to_csv(
         csv_path, index=False
     )
-    return (df, dir_path) if return_df else dir_path
-
 
 def build_imagenette_df(
     dataset_dir: str,

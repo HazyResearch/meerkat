@@ -5,11 +5,15 @@ kernelspec:
 ---
 
 (guide/dataframe/ops/mapping)=
-# Mapping
+# Mapping: `map`, `update`, `filter`
 
 In this guide, we discuss how we can create new columns by applying a function to each row of existing columns: we call this *mapping*. We provide detailed examples of how to the {func}`~meerkat.map` operation. We also introduce the {func}`~meerkat.update` and {func}`~meerkat.filter` operations, which are utilities that wrap the {func}`~meerkat.map` operation. 
 
-## Standard map
+```{contents}
+:local:
+```
+
+## Map
 
 Let's warm up with an example: converting a column of birth years to a column of ages. We start with a small DataFrame of voters with two columns: `birth_year`, which contains the birth year of each person, and `voter`, which indicates whether or not they voted in the last election.
 
@@ -131,7 +135,9 @@ In this section, we discuss how we can chain together multiple map operations us
 If you're unfamiliar with DeferredColumns, you may want to read the guide on {doc}`../columns/deferred` before diving into this section. 
 ```
 
-**Deferred maps**. In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature (*i.e.* all that was discussed in the previous section around multiple inputs and ouputs also applies to {func}`~meerkat.defer`), the difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
+### Simple deferred map
+ 
+In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature (*i.e.* all that was discussed in the previous section around multiple inputs and ouputs also applies to {func}`~meerkat.defer`), the difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
 
 To demonstrate, let's repeat the example above, this time using a deferred map to create a 2-step chain of operations. 
 
@@ -151,8 +157,9 @@ df
 
 The only difference between this code and the code in the previous section is that here we use {func}`~meerkat.defer` instead of {func}`~meerkat.map` when creating the `age` column. The result is the same, but here the computation of both `"age"` and `"ma_eligible"` is performed together at the end, instead of in two stages. 
 
+### Chaining deferred maps
 
-**A more involved example.** Let's motivate the use of deferred maps with a more involved example: processing a dataset of images. We're going to use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91), a small subset of the original [ImageNet](https://www.image-net.org/update-mar-11-2021.php).   We can load it from the Meerkat dataset registry with the {func}`~meerkat.get` function. This dataset is made up of 10 classes (e.g. "garbage truck", "gas pump", "golf ball"), but we'll focus on a simpler binary classification task: "parachute" vs. "golf ball".
+Let's motivate the use of deferred maps with a more involved example: processing a dataset of images. We're going to use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91), a small subset of the original [ImageNet](https://www.image-net.org/update-mar-11-2021.php).   We can load it from the Meerkat dataset registry with the {func}`~meerkat.get` function. This dataset is made up of 10 classes (e.g. "garbage truck", "gas pump", "golf ball"), but we'll focus on a simpler binary classification task: "parachute" vs. "golf ball".
 
 ```{code-cell} ipython3
 :tags: [output_scroll]
