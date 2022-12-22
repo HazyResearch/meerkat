@@ -1,7 +1,7 @@
 
 # Operations
 
-Meerkat provides a set of data-wrangling operations that can be applied over DataFrames. This page provides an overview of the operations available in Meerkat. 
+Meerkat provides a set of data manipulation operations that can be applied on DataFrames and Columns. This page provides an overview of the operations available in Meerkat. 
 
 
 ### Mapping

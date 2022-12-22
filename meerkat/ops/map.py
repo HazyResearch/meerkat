@@ -1,4 +1,5 @@
 from typing import Union, Callable, Mapping, Sequence, TYPE_CHECKING
+from inspect import getfullargspec, signature
 
 from pandas.util._decorators import doc
 
@@ -99,9 +100,18 @@ def defer(
             args = [data[col_name] for col_name in inputs]
             kwargs = {}
         elif inputs is None:
-            raise ValueError(
-                "Must provide `inputs` when calling `defer` on a DataFrame."
-            )
+            # infer mapping from function signature
+            args = []
+            kwargs = {}
+            for name, param in signature(function).parameters.items():
+                if name in data:
+                    kwargs[name] = data[name]
+                elif param.default is param.empty:
+                    raise ValueError(
+                        f"Non-default argument {name} does not have a corresponding "
+                        f"column in the DataFrame. Please provide an `inputs` mapping "
+                        f"pass a lambda function with a different signature."
+                    )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
 

@@ -107,7 +107,7 @@ class DataFrame(
             max_rows = meerkat.config.display.max_rows
 
         df, formatters = self.data._repr_pandas_(max_rows=max_rows)
-        rename = {k: f"{k} ({v.__class__.__name__})" for k, v in self.items()}
+        rename = {k: f"{k}" for k, v in self.items()}
         return (
             df[self.columns].rename(columns=rename),
             {rename[k]: v for k, v in formatters.items()},

@@ -31,6 +31,14 @@ meerkat.ops.decorators module
    :undoc-members:
    :show-inheritance:
 
+meerkat.ops.map module
+----------------------
+
+.. automodule:: meerkat.ops.map
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 meerkat.ops.match module
 ------------------------
 

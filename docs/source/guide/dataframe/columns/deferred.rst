@@ -90,11 +90,3 @@ The ``base_dir`` can then be changed at any time, so if we wanted to share the D
     
 
 An :class:`~meerkat.ImageColumn` is a just a :class:`~meerkat.FileColumn` like this one, with a few more bells and whistles!
-
-
-Chaining Deferred Columns
-##########################
-
-.. todo::
-
-    Fill in this stub.
