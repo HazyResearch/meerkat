@@ -141,7 +141,7 @@ def download_imagenette(
     df["label_idx"] = df["label_id"].replace(ID_TO_IDX)
     df["split"] = df["is_valid"].replace({False: "train", True: "valid"})
     df["img_path"] = df.path
-    df[["img_path", "label", "label_id", "label_idx", "split"]].to_csv(
+    df[["label", "split", "img_path"]].to_csv(
         csv_path, index=False
     )
 

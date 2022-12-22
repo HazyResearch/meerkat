@@ -37,7 +37,7 @@ Let's take a look at the CSV.
 
 !head -n 5 downloads/imagenette2-160/imagenette.csv
 ```
-
+Next, we'll load it into a Meerkat `DataFrame`.
 
 ## 📸 Creating an image `DataFrame`
 Meerkat's core contribution is the DataFrame, a simple columnar data abstraction. The Meerkat DataFrame can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs.
@@ -76,12 +76,12 @@ print(f"Indexing a slice of the `ImageColumn` returns a: {type(imgs)}.")
 display(imgs)
 ```
 
-### 📎 _Aside_: `ImageColumn` under the hood, `LambdaColumn`.
+### 📎 _Aside_: `ImageColumn` under the hood, `DeferredColumn`.
 
-If you check out the implementation of `ImageColumn` (at [meerkat/columns/image_column.py](https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py)), you'll notice that it's a super simple subclass of `LambdaColumn`. 
+If you check out the implementation of `ImageColumn` (at [meerkat/columns/image_column.py](https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py)), you'll notice that it's a super simple subclass of `DeferredColumn`. 
 
-_What's a `LambdaColumn`?_
-In `meerkat`, high-dimensional data types like images and videos are typically stored in a `LambdaColumn`. A  `LambdaColumn` wraps around another column and lazily applies a function to it's content as it is indexed. Consider the following example, where we create a simple `meerkat` column...    
+_What's a `DeferredColumn`?_
+In `meerkat`, high-dimensional data types like images and videos are typically stored in a `DeferredColumn`. A  `DeferredColumn` wraps around another column and lazily applies a function to it's content as it is indexed. Consider the following example, where we create a simple `meerkat` column...    
 ```
   >>> col = mk.NumpyArrayColumn([0,1,2])
   >>> col[0]
@@ -93,12 +93,12 @@ In `meerkat`, high-dimensional data types like images and videos are typically s
   >>> lambda_col[0]  # the function is only called at this point!
   10
 ```
-Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a `LambdaColumn` that lazily loads images...
+Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a `DeferredColumn` that lazily loads images...
 ```
   >>> filepath_col = mk.PandasSeriesColumn(["path/to/image0.jpg", ...])
   >>> img_col = filepath.to_lambda
 ```
-An `ImageColumn` is a just a `LambdaColumn` like this one, with a few more bells and whistles!
+An `ImageColumn` is a just a `DeferredColumn` like this one, with a few more bells and whistles!
 
 
 ### 🦥 Lazy indexing.
@@ -116,7 +116,7 @@ Note: **cells can survive on their own.** Everything we need to materialize the 
 cell()
 ```
 
-Using the lazy indexer and one of the following indexing schemes, we can also access a **subset** of a `LambdaColumn`, returning a smaller `LambdaColumn`.
+Using the lazy indexer and one of the following indexing schemes, we can also access a **subset** of a `DeferredColumn`, returning a smaller `DeferredColumn`.
 - **Slice indexing**: _e.g._ `column[4:10]`
 - **Integer array indexing**: _e.g._ `column[[0, 4, 6, 11]]`
 - **Boolean array indexing**: _e.g._ `column[np.array([True, False, False ..., True, False])]`
