@@ -147,7 +147,9 @@ def start(
         npm_port = get_first_available_port(npm_port, npm_port + 1)
 
     # Enter the "app/" directory
-    libpath = pathlib.Path(__file__).parent.resolve() / "app"
+    from meerkat.constants import APP_DIR
+
+    libpath = APP_DIR  # pathlib.Path(__file__).parent.resolve() / "app"
     currdir = os.getcwd()
     os.chdir(libpath)
 
@@ -319,11 +321,10 @@ def cleanup():
         state.network_info.api_server.close()
         state.network_info.npm_process.terminate()
         state.network_info.npm_process.wait()
-        
+
         # Delete SvelteKit routes for all interfaces
         for _, interface in state.identifiables.interfaces.items():
             interface._remove_svelte()
-                    
 
 
 # Run this when the program exits

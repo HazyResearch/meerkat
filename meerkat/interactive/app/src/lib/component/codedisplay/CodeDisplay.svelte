@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Prism from 'prismjs';
-	import 'prismjs/components/prism-python.js';
+	// import 'prismjs/components/prism-python.js';
 	import type { Writable } from 'svelte/store';
 
 	export let data: Writable<string>;

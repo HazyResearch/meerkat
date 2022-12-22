@@ -49,8 +49,20 @@ class Interface(IdentifiableMixin):
         self.name = name
         self.height = height
         self.width = width
+        
+        self.write_component_wrappers()
+        self.write_sveltekit_route()
 
     def _to_svelte(self):
+
+        # Check if we're in a Meerkat generated app
+        # These apps are generated with the `mk init` command
+        # They have a .mk file in the `app` directory
+        import_prefix = "$lib"
+        if os.path.exists(os.path.join(APP_DIR, ".mk")):
+            # In a Meerkat generated app
+            # Use the @meerkat-ml/meerkat package instead of $lib
+            import_prefix = "@meerkat-ml/meerkat"
 
         all_components = list(sorted(self.component.get_components()))
         import_block = "\n".join(
@@ -66,9 +78,8 @@ class Interface(IdentifiableMixin):
         svelte = f"""\
 <script lang="ts">
     import banner from '$lib/assets/banner_small.png';
-    import {{ API_URL }} from '$lib/constants';
-    import Interface from '$lib/shared/Interface.svelte';
-    import type {{ InterfaceType }} from '$lib/utils/types';
+    import {{ API_URL }} from '{import_prefix}';
+    import { "Interface" if import_prefix == "$lib" else "{ Interface }" } from '{import_prefix}';
     import {{ onMount, setContext }} from 'svelte';
 
 {import_block}
@@ -77,7 +88,7 @@ class Interface(IdentifiableMixin):
 {component_mapping}
     }})
 
-    let config: InterfaceType | null = null;
+    let config: Interface | null = null;
     onMount(async () => {{
         config = await (await fetch(`${{$API_URL}}/interface/{self.id}/config`)).json();
         document.title = "{self.name}";

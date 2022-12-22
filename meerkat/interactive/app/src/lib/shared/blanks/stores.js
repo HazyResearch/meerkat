@@ -1,4 +1,4 @@
-import { nestedMap } from "$lib/utils/tools";
+import { nestedMap } from "../../utils/tools";
 import { writable } from "svelte/store";
 
 export function meerkat_writable(value) {

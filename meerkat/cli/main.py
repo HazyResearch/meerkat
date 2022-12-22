@@ -227,6 +227,21 @@ plugins: []
 
         # Copy favicon.png to the new app
         shutil.copy(favicon_path, f"{name}/static/favicon.png")
+        
+        # Get path to banner_small.png at "../interactive/app/src/lib/assets/banner_small.png"
+        banner_small_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "interactive",
+            "app",
+            "src",
+            "lib",
+            "assets",
+            "banner_small.png",
+        )
+        
+        # Copy banner_small.png to the new app
+        os.makedirs(f"{name}/src/lib/assets", exist_ok=True)
+        shutil.copy(banner_small_path, f"{name}/src/lib/assets/banner_small.png")
 
         # Create a "src/lib/components" directory
         os.makedirs(f"{name}/src/lib/components", exist_ok=True)
@@ -274,7 +289,18 @@ mk.gui.Interface(component=example_component).launch()
 # This is the Meerkat config file
 APP_DIR: app/
 """)
+            
+        # Add a .mk file inside the app directory
+        with open(f"{name}/.mk", "w") as f:
+            f.write("")
         
+        # Create a src/lib/constants.js file
+        with open(f"{name}/src/lib/constants.js", "w") as f:
+            f.write(
+                f"""\
+import {{ writable }} from "svelte/store";
+export const API_URL = writable(import.meta.env['VITE_API_URL'] || import.meta.env['VITE_API_URL_PLACEHOLDER']);
+""")
         
         # Rename the app folder to app
         os.rename(f"{name}", f"app")
