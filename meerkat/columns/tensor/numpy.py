@@ -61,8 +61,12 @@ class NumPyTensorColumn(
                     "Cannot create `NumpyArrayColumn` from a `BlockView` not "
                     "referencing a `NumpyBlock`."
                 )
-        elif not isinstance(data, np.memmap):
-            data = np.asarray(data)
+        elif not isinstance(data, np.memmap) and not isinstance(data, np.ndarray):
+            if len(data) > 0 and isinstance(data[0], np.ndarray):
+                data = np.stack(data)
+            else:
+                data = np.asarray(data)
+
         super(NumPyTensorColumn, self).__init__(data=data, *args, **kwargs)
 
     # TODO (sabri): need to support str here

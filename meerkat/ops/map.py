@@ -32,7 +32,7 @@ def map(
         output_type=output_type,
         materialize=materialize,
     )
-    return _materialize(deferred)
+    return _materialize(deferred, batch_size=batch_size)
 
 
 @doc(data="data")
@@ -179,6 +179,10 @@ def defer(
 
 def _materialize(
     data: Union["DataFrame", "Column"],
+    batch_size: int
 ):
-    # TODO(Sabri): Add support for implementing this with ray.
-    return data._get(slice(0, len(data), 1), materialize=True)
+    from .concat import concat
+    result = []
+    for batch_start in range(0, len(data), batch_size):
+        result.append(data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True))
+    return concat(result)

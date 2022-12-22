@@ -94,17 +94,19 @@ df
 The only difference between this code and the code in the previous section is that here we use {func}`~meerkat.defer` instead of {func}`~meerkat.map` when creating the `age` column. The result is the same, but here the computation of both `"age"` and `"ma_eligible"` is performed together at the end, instead of in two stages. 
 
 
-**A more involved example.** Let's motivate the use of deferred maps with a more involved example: processing a dataset of images. We're going to use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91), a small subset of the original [ImageNet](https://www.image-net.org/update-mar-11-2021.php).  This dataset is made up of 10 classes (e.g. "garbage truck", "gas pump", "golf ball"). We can load it from the Meerkat dataset registry with the {func}`~meerkat.get` function. 
+**A more involved example.** Let's motivate the use of deferred maps with a more involved example: processing a dataset of images. We're going to use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91), a small subset of the original [ImageNet](https://www.image-net.org/update-mar-11-2021.php).   We can load it from the Meerkat dataset registry with the {func}`~meerkat.get` function. This dataset is made up of 10 classes (e.g. "garbage truck", "gas pump", "golf ball"), but we'll focus on a simpler binary classification task: "parachute" vs. "golf ball".
 
 ```{code-cell} ipython3
 :tags: [output_scroll]
 
-df = mk.get("imagenette").sample(100)
-df.head()
+df = mk.get("imagenette")
+df = df[df["label"].isin(["parachute", "golf ball"])].sample(500)
+df[["img", "label", "path"]]
 ```
 
-We'd like to apply the following 
+Below, we've defined a classifier with a silly decision rule: it classifies an image as containing a parachute if in more than half of the pixels, the **blue** channel has the highest value (the logic being that parachutes are often photographed in the sky). 
 
+The classifier has two methods: `preprocess` and `predict`. The `preprocess` method takes an image and returns a NumPy array of shape `(224, 224, 3)`. The `predict` method takes a batch of images and returns a boolean array with predictions.
 
 ```{code-cell} ipython3
 from PIL.Image import Image
@@ -114,15 +116,20 @@ class ParachuteClassifier:
     
     def preprocess(self, img: Image) -> np.ndarray:
         """Prepare an image for classification."""
-        return np.array(img.convert("RGB"))
+        return np.array(img.convert("RGB").resize((224, 224)))
     
     def predict(self, batch: np.ndarray) -> np.ndarray:
         """Classify a batch of images as containing a parachute or not."""
-        print("here", batch.shape, batch.data)
-        return batch[:, :, :, 2].mean(axis=1).mean(axis=1) > 0.5
+        return (np.argmax(batch, axis=3) == 2).mean(axis=1).mean(axis=1) > 0.5
 
 classifier = ParachuteClassifier()
 ```
+
+Note that `preprocess` takes a single image, while `predict` takes a batch of images. This is a common pattern in computer vision: we often need to preprocess images before feeding them to a model.
+
+To 
+
+
 
 ```{code-cell} ipython3
 preprocessed = df["img"].defer(classifier.preprocess)
