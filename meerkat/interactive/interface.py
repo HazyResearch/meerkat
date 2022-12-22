@@ -79,7 +79,7 @@ class Interface(IdentifiableMixin):
 <script lang="ts">
     import banner from '$lib/assets/banner_small.png';
     import {{ API_URL }} from '{import_prefix}';
-    import { "Interface" if import_prefix == "$lib" else "{ Interface }" } from '{import_prefix}';
+    import {{ Interface }} from '{import_prefix}';
     import {{ onMount, setContext }} from 'svelte';
 
 {import_block}

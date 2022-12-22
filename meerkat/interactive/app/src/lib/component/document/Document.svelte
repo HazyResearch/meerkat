@@ -22,31 +22,32 @@
 	// These match what's in the Document class on the Python side.
 	// These are Writable store objects, which means that it can be read from and written to.
 	// *** To access the value of the store, use $store_name, so e.g. $data or get(store_name), so e.g. get(data)***
-	export let df: Writable;
+	export let df;
+	console.log(df);
 	// More component props
-	export let text_column: Writable<string>;
-	export let paragraph_column: Writable<string>;
-	export let label_column: Writable<string>;
-	export let id_column: Writable<string>;
+	export let text_column: string;
+	export let paragraph_column: string;
+	export let label_column: string;
+	export let id_column: string;
 	export let on_sentence_label: Endpoint;
 
 	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $text_column
-	$: text_df_promise = get_rows($df.ref_id, 0, null, null, [$text_column]);
+	// This fetches all the data from the text_column
+	$: text_df_promise = get_rows(df.ref_id, 0, null, null, [text_column]);
 
 	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $paragraph_column if it's not null
+	// This fetches all the data from the paragraph_column if it's not null
 	let paragraph_df_promise: any;
-	$: if ($paragraph_column) {
-		paragraph_df_promise = get_rows($df.ref_id, 0, null, null, [$paragraph_column]);
+	$: if (paragraph_column) {
+		paragraph_df_promise = get_rows(df.ref_id, 0, null, null, [paragraph_column]);
 	}
 
 	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $label_column and id_column
+	// This fetches all the data from the label_column and id_column
 	let label_id_df_promise: any;
-	$: if ($label_column) {
+	$: if (label_column) {
 		// The name of the id_column was told to us by the edit_target
-		label_id_df_promise = get_rows($df.ref_id, 0, null, null, [$label_column, $id_column]);
+		label_id_df_promise = get_rows(df.ref_id, 0, null, null, [label_column, id_column]);
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)

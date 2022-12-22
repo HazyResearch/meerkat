@@ -12,7 +12,7 @@
 		match,
 		remove_row_by_index,
 		store_trigger
-	} from '$lib/api/api';
+	} from './api/api';
 	import { setContext } from 'svelte/internal';
 
 	export const context = {
@@ -27,7 +27,7 @@
 		get_sliceby_rows: get_sliceby_rows,
 		match: match,
 		remove_row_by_index: remove_row_by_index,
-		store_trigger: store_trigger,
+		store_trigger: store_trigger
 	};
 
 	$: {

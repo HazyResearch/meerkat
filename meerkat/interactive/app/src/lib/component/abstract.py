@@ -4,6 +4,7 @@ from typing import Dict, List, Literal, Set
 
 from pydantic import BaseModel, Extra, validator
 from meerkat.constants import APP_DIR
+from meerkat.dataframe import DataFrame
 
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
@@ -49,7 +50,7 @@ class WrappableMixin:
 
 <{self.component_name} \
 {" ".join(["bind:" + prop + "={$" +  prop + "}"
-if self.__fields__[prop].type_ == Store 
+if self.__fields__[prop].type_ == Store or self.__fields__[prop].type_ == DataFrame
 else "{" + prop + "}" for prop in self.props])}>
     <slot />
 </{self.component_name}>

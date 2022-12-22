@@ -1,17 +1,18 @@
-export {
-    add,
-    aggregate_sliceby,
-    dispatch,
-    edit,
-    edit_target,
-    get_rows,
-    get_schema,
-    get_sliceby_info,
-    get_sliceby_rows,
-    match,
-    remove_row_by_index,
-    store_trigger
-} from './api/api.js';
+// export {
+//     add,
+//     aggregate_sliceby,
+//     dispatch,
+//     edit,
+//     edit_target,
+//     get_rows,
+//     get_schema,
+//     get_sliceby_info,
+//     get_sliceby_rows,
+//     match,
+//     remove_row_by_index,
+//     store_trigger
+// } from './api/api.js';
+// This import causes an ssr error!
 export { default as Button } from './component/button/Button.svelte';
 export { default as Choice } from './component/choice/Choice.svelte';
 export { default as CodeDisplay } from './component/codedisplay/CodeDisplay.svelte';

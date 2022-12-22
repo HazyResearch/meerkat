@@ -149,7 +149,7 @@ def start(
     # Enter the "app/" directory
     from meerkat.constants import APP_DIR
 
-    libpath = APP_DIR  # pathlib.Path(__file__).parent.resolve() / "app"
+    libpath = pathlib.Path(APP_DIR)  # pathlib.Path(__file__).parent.resolve() / "app"
     currdir = os.getcwd()
     os.chdir(libpath)
 

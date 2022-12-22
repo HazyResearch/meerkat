@@ -297,7 +297,8 @@ def reactive(
                 fn = _fn_outer_wrapper(fn_class)
 
             # Call the function on the args and kwargs
-            result = fn(*args, **kwargs)
+            with no_react():
+                result = fn(*args, **kwargs)
 
             if not is_reactive():
                 # If we are not in a reactive context, then we don't need to create
@@ -616,8 +617,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __ge__(self, other):
         return super().__ge__(other)
 
-    # def __hash__(self):
-    #     return hash(self.__wrapped__)
+    def __hash__(self):
+        return hash(self.__wrapped__)
 
     @reactive
     def __nonzero__(self):

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { store_trigger } from '$lib';
+	import { store_trigger } from '../api/api';
 
 	export let store_id: string;
 	export let store: any;
