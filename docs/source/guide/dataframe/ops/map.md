@@ -9,7 +9,7 @@ kernelspec:
 
 In this guide, we discuss how we can create new columns by applying a function to each row of existing columns: we call this *mapping*. We provide detailed examples of how to the {func}`~meerkat.map` operation. We also introduce the {func}`~meerkat.update` and {func}`~meerkat.filter` operations, which are utilities that wrap the {func}`~meerkat.map` operation. 
 
-## Map
+## Standard map
 
 Let's warm up with an example: converting a column of birth years to a column of ages. We start with a small DataFrame of voters with two columns: `birth_year`, which contains the birth year of each person, and `voter`, which indicates whether or not they voted in the last election.
 
@@ -23,7 +23,8 @@ df = mk.DataFrame({
 })
 ```
 
-**Mapping a single column.** We want to create a new column, `age`, which contains the age of each person. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes a birth year and returns the age. 
+### Map with a single input column
+We want to create a new column, `age`, which contains the age of each person. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes a birth year and returns the age. 
     
 ```{code-cell} ipython3
 :tags: [output_scroll]
@@ -36,7 +37,8 @@ df
 ```
 Note that we add the new column to the DataFrame in-place by assigning the result of the {func}`~meerkat.map` operation to the `age` column. 
 
-**Mapping multiple columns.** We can also map a function that takes more than one column as argument. For example, say we wanted to create new column `ma_eligible` that indicates whether or not a person is eligible to vote in Massachusetts. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes age and residence.
+### Map with multiple input columns 
+We can also map a function that takes more than one column as argument. For example, say we wanted to create new column `ma_eligible` that indicates whether or not a person is eligible to vote in Massachusetts. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes age and residence.
 
 ```{code-cell} ipython3
 :tags: [output_scroll]
@@ -53,6 +55,10 @@ We can also specify the correspondance between arguments and columns explicitly 
 ```{code-cell} ipython3
 :tags: [output_scroll]
 
+def eligibile(age, residence):
+    old_enough = age >= 18
+    return (residence == "MA") and old_enough, (residence == "LA") and old_enough
+
 df["ma_eligible"] = df.map(
     lambda x, y: (x == "MA") and (y >= 18),
     inputs={"age": "y", "residence": "x"}
@@ -65,15 +71,67 @@ Some readers may wonder whether `func`{map} was the right choice
 in the above example. After all, we could have written a vectorized expression `df["ma_eligible"] = (df["residence"] == "MA") & (df["age"] >= 18)`. In many cases, this would indeed be more efficient. The example above is meant to illustrate the general pattern of using {func}`~meerkat.map`. The examples in the following sections will highlight the benefits of {func}`~meerkat.map`.
 ```
 
+### Map with multiple output columns 
+It's also possible to map a single function that returns multiple values. 
 
-## Deferred maps and chaining
+For example, say we wanted to create a two columns `ma_eligible` and `la_eligible` that indicate whether or not a person is eligible to vote in Massachusetts and Louisiana, respectively. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes age and residence and returns a tuple of two booleans.
+
+The code below has a **problem**. Instead of outputting two columns, one for each state, it outputs a single {func}`~meerkat.ObjectColumn` containing tuples. As we discuss in {doc}`../columns/object`, {func}`~meerkat.ObjectColumn` is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is **much** slower than other column types. 
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+def is_eligibile(age, residence):
+    old_enough = age >= 18
+    return (residence == "MA") and old_enough, (residence == "LA") and old_enough
+
+df.map(is_eligibile)
+```
+
+We can split the output of the function into multiple columns by passing a tuple of column names to the `outputs` argument of {func}`~meerkat.map`. 
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+df.map(is_eligibile, outputs=("ma_eligible", "la_eligible"))
+```
+
+If the function returns a dictionary, we can skip the `outputs` argument and {func}`~meerkat.map` will automatically use the keys of the dictionary as column names.
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+def is_eligibile(age, residence):
+    old_enough = age >= 18
+    return {
+        "ma_eligible": (residence == "MA") and old_enough,
+        "la_eligible": (residence == "LA") and old_enough
+    }
+
+df.map(is_eligibile)
+```
+If we would like to use a different name for the columns or only use a subset of the keys, we can pass a dictionary to the `outputs` argument. 
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+df.map(is_eligibile, outputs={"ma_eligible": "ma", "la_eligible": "la"})
+```
+
+```{warning}
+*Consistent number of outputs.* If a function returns multiple values (either as a tuple or a dictionary), the number of values or the keys must be consistent across all calls to the function. 
+
+*Consistent type of outputs.* It is also important to note that the type of the resulting column is inferred by the first row of the input column(s). As a result, if later rows return values of a different type or shape, an error may be raised because the value cannot be inserted in the inferred column type. To explicitly specify the type of the output column, use the `output_types` argument to {func}`~meerkat.map`.
+```
+
+## Deferred map and chaining
 In this section, we discuss how we can chain together multiple map operations using deferred maps. This produces a chain of operations that can be executed together. In the following section, we'll discuss how we can pipeline chained operations to take advantage of parallelism.
 
 ```{note}
-If you're unfamiliar with DeferredColumns, you may want to read the guide on {doc}`guide/dataframe/columns/deferred` before diving into this section. 
+If you're unfamiliar with DeferredColumns, you may want to read the guide on {doc}`../columns/deferred` before diving into this section. 
 ```
 
-**Deferred maps**. In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature, the difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
+**Deferred maps**. In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature (*i.e.* all that was discussed in the previous section around multiple inputs and ouputs also applies to {func}`~meerkat.defer`), the difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
 
 To demonstrate, let's repeat the example above, this time using a deferred map to create a 2-step chain of operations. 
 
@@ -106,7 +164,11 @@ df[["img", "label", "path"]]
 
 Below, we've defined a classifier with a silly decision rule: it classifies an image as containing a parachute if in more than half of the pixels, the **blue** channel has the highest value (the logic being that parachutes are often photographed in the sky). 
 
-The classifier has two methods: `preprocess` and `predict`. The `preprocess` method takes an image and returns a NumPy array of shape `(224, 224, 3)`. The `predict` method takes a batch of images and returns a boolean array with predictions.
+The classifier has two methods which we need to chain together: `preprocess` and `predict`. The `preprocess` method takes an image and returns a NumPy array of shape `(224, 224, 3)`. The `predict` method takes a batch of images and returns a boolean array with predictions.
+
+```{margin} To batch or not to batch?
+Note that `preprocess` takes a single image, while `predict` takes a batch of images. This is a common pattern in machine learning: preprocessing functions are often singleton while predict functions are often batched. Consider, for example, the `preprocess` and `embed_image` functions in the implementation of [CLIP](https://github.com/openai/CLIP), a popular image encoder.
+```
 
 ```{code-cell} ipython3
 from PIL.Image import Image
@@ -119,17 +181,14 @@ class ParachuteClassifier:
         return np.array(img.convert("RGB").resize((224, 224)))
     
     def predict(self, batch: np.ndarray) -> np.ndarray:
-        """Classify a batch of images as containing a parachute or not."""
+        """Classify a batch of images as containing a parachute or not, using a 
+        simple decision rule. 
+        """
         return (np.argmax(batch, axis=3) == 2).mean(axis=1).mean(axis=1) > 0.5
 
 classifier = ParachuteClassifier()
 ```
-
-Note that `preprocess` takes a single image, while `predict` takes a batch of images. This is a common pattern in computer vision: we often need to preprocess images before feeding them to a model.
-
-To 
-
-
+Because only one of the two methods is batched, chaining them correctly is a bit tricky (one approach might invovle a double for-loop). Fortunately, with deferred maps, we can chain together functions that use different batching strategies. First, we create a deferred column that applies `preprocess` to each image – by default `is_batched_fn=False`, so the `preprocess` method is applied to each image individually. Next, we map the `predict` method over the deferred column. Because `predict` is batched, we can use `is_batched_fn=True` an specify a `batch_size` to indicate that the `predict` method should be applied to batches of images.
 
 ```{code-cell} ipython3
 preprocessed = df["img"].defer(classifier.preprocess)
@@ -138,25 +197,47 @@ df["prediction"] = preprocessed.map(
 )
 ```
 
+Finally we can compute the accuracy of the classifier by mapping a simple function that compares the predictions to the ground truth labels. 
+
 ```{code-cell} ipython3
 accuracy = df.map(lambda prediction, label: prediction == (label == "parachute")).mean()
-accuracy
+print(f"Accuracy: {accuracy:.2%}")
+``` 
+Not too bad! I guess you can get pretty far in machine learning relying on spurious correlations. 
+
+We could have chained all of these operations together into a single chain. 
+```{code-cell} ipython3
+preprocessed = df["img"].defer(classifier.preprocess)
+df["prediction"] = preprocessed.defer(
+    classifier.predict, is_batched_fn=True, batch_size=32
+)
+accuracy = df.map(lambda prediction, label: prediction == (label == "parachute")).mean()
+```
+
+Here's a trick question: *How long is the resulting chain?* At first glance, it seems like the chain is three maps long: `preprocess`, `predict`, then `accuracy`. However, recall from the guide on {doc}`../columns/deferred` that images and other complex data types are typically stored in {class}`~meerkat.DeferredColumn`s – that is, the `"img"` column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like `df["img"] = df["filepath"].defer(load_image)`. Because our first {func}`~meerkat.defer` call in the cell above was made on the `"img"` column, the resulting chain is actually four maps long: load, preprocess, predict, then accuracy. 
+
+```{figure} _figures/map_chain.png
+---
+name: map-chain
+---
+The chain of maps created by the code above. Although we only called {func}`~meerkat.defer` or {func}`~meerkat.map` three times, the resulting chain is four maps long because the `"img"` column is itself a deferred map.
+% Google drawing: https://docs.google.com/drawings/d/13NQT5B54-RMItlPezt2AJwl4tZg4P4X46ujxkCoXWKE/edit?usp=sharing
 ```
 
 
-
+*Why not just use multiple `map` calls?* Chaining together deferred maps has two main advantages over simply calling `map` multiple times. 
+1. **Memory.** If one of the intermediate maps produces images or other large data types (as does `preprocess` in this example), then the resulting column may not be able to fit in memory. With a regular `map`, that entire column will be materialized before the next `map` begins. If we use a deferred map, then intermediate results are released from memory once they are consumed by the next map in the chain. This enables us to process data types that are too large to fit in memory (*e.g.* images, video, audio).
+2. **Parallelism.** Using deferred maps allows us to better take advantage of the parallelism afforded by our system, especially if each map in the chain depends on different system resources (*e.g.* CPU vs. GPU vs. I/O bandwidth). Meerkat supports pipelining chained maps, which allows us to run multiple maps in parallel. We discuss this in the next section. 
 
 ## Pipelining and Parallelism 
 
+Because map applies the same function to each row, it is a [delightlfully parallelizable](https://en.wikipedia.org/wiki/Embarrassingly_parallel) operation. In this section, we discuss how to parallelize maps and how to pipeline a chain of parrallel maps. 
+
+```{danger} WIP
+Pipelining is currently an experimental feature. It will be implemented using [Ray](https://docs.ray.io/en/latest/data/pipelining-compute.html). 
+```
 
 
-
-
-
-
-
-
-### Pipelining Computation 
 
 
 
