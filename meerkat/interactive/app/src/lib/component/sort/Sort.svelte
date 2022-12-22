@@ -7,7 +7,7 @@
 	import { dndzone } from 'svelte-dnd-action';
 	import { v4 as uuidv4 } from 'uuid';
 	import SvelteTooltip from 'svelte-tooltip';
-	const { get_schema, filter } = getContext('Interface');
+	const { get_schema, filter } = getContext('Meerkat');
 	export let df: Writable;
 	// TODO: Figure out if we should have a frontend_criteria
 	// to control the frontend display of criteria, which allows
@@ -32,7 +32,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $get_schema($df.ref_id);
+		schema_promise = get_schema($df.ref_id);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {

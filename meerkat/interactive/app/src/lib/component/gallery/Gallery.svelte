@@ -7,7 +7,7 @@
 	import { BarLoader } from 'svelte-loading-spinners';
 	import Selected from './Selected.svelte';
 
-	const { get_schema, get_rows, edit } = getContext('Interface');
+	const { get_schema, get_rows, edit } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let main_column: Writable<string>;
@@ -20,10 +20,10 @@
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = $get_schema($df.ref_id);
+	$: schema_promise = get_schema($df.ref_id);
 
 	// create an array with the main_column and the tag_columns
-	$: rows_promise = $get_rows(
+	$: rows_promise = get_rows(
 		$df.ref_id,
 		page * per_page,
 		(page + 1) * per_page
@@ -42,7 +42,7 @@
 	// 	let row_index = rows.indices.indexOf(row);
 	// 	let row_id = rows.rows[row_index][row_id_column_index];
 
-	// 	$edit(pivot.ref_id, value, column, row_id, pivot_id_column);
+	// 	edit(pivot.ref_id, value, column, row_id, pivot_id_column);
 	// }
 </script>
 

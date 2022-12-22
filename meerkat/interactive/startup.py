@@ -132,7 +132,7 @@ def start(
             INITIAL_PORT_VALUE, INITIAL_PORT_VALUE + TRY_NUM_PORTS
         )
     else:
-        api_port = get_first_available_port(api_port, api_port + 1)
+        api_port = get_first_available_port(api_port, api_port + TRY_NUM_PORTS)
 
     # Start the FastAPI server
     api_server = Server(
@@ -315,9 +315,15 @@ def start(
 def cleanup():
     if state.network_info is not None:
         rich.print("Cleaning up [bold violet]Meerkat[/bold violet]...")
+        # Shut down servers
         state.network_info.api_server.close()
         state.network_info.npm_process.terminate()
         state.network_info.npm_process.wait()
+        
+        # Delete SvelteKit routes for all interfaces
+        for _, interface in state.identifiables.interfaces.items():
+            interface._remove_svelte()
+                    
 
 
 # Run this when the program exits

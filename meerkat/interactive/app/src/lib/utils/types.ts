@@ -28,11 +28,13 @@ export type InstanceType = {
     correct: Record<string, boolean>;
 };
 
-export interface Component {
+export interface ComponentType {
     component_id: string;
     path: string;
     name: string;
     props: any;
+    slots: any;
+    library: string;
 }
 
 export interface Endpoint {
@@ -44,26 +46,13 @@ export interface Layout {
     props: any;
 }
 
-export interface Interface {
+export interface InterfaceType {
     name: string;
-    component: Component
+    component: ComponentType
 }
 
 export interface EditTarget {
-    target: Writable<Box>
+    target: Writable<any>
     target_id_column: string
     source_id_column: string
-}
-
-export interface Box {
-    ref_id: string
-    type: "SliceBy" | "DataFrame"
-}
-
-export interface SliceByBox extends Box {
-    type: "SliceBy"
-}
-
-export interface DataFrameBox extends Box {
-    type: "DataFrame"
 }

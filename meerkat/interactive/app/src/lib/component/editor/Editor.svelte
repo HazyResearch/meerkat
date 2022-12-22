@@ -5,7 +5,7 @@
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
 
-	const { get_schema, edit_target } = getContext('Interface');
+	const { get_schema, edit_target } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let target: EditTarget;
@@ -23,7 +23,7 @@
 	$: target.target = get(target.target);
 
 	$: {
-		schema_promise = $get_schema(target.target.ref_id);
+		schema_promise = get_schema(target.target.ref_id);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
@@ -48,9 +48,9 @@
 
 		let modifications_promise;
 		if (primary_key === undefined) {
-			modifications_promise = $edit_target($df.ref_id, target, $text, $col, $selected);
+			modifications_promise = edit_target($df.ref_id, target, $text, $col, $selected);
 		} else {
-			modifications_promise = $edit_target(
+			modifications_promise = edit_target(
 				$df.ref_id,
 				target,
 				$text,

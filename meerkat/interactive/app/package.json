@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"livebuild": "vite build --watch",
 		"package": "svelte-package",
 		"preview": "vite preview",
 		"test": "playwright test",

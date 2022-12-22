@@ -6,7 +6,7 @@
 	import Select from 'svelte-select';
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { dispatch } = getContext('Interface');
+	const { dispatch } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let by: Writable<string>;
@@ -18,7 +18,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = $dispatch(get_discover_schema.endpoint_id, {}, {});
+		schema_promise = dispatch(get_discover_schema.endpoint_id, {}, {});
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
@@ -30,7 +30,7 @@
 			return;
 		}
 		status = 'working';
-		let promise = $dispatch(
+		let promise = dispatch(
 			on_discover.endpoint_id,
 			{
 				by: $by

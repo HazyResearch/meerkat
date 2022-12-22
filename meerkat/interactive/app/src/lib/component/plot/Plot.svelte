@@ -9,7 +9,7 @@
 	import type { Point2D } from '$lib/shared/plot/types';
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { get_rows, get_schema, dispatch } = getContext('Interface');
+	const { get_rows, get_schema, dispatch } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let x: Writable<string>;
@@ -33,7 +33,7 @@
 	let page: number = 0;
 	let per_page: number = 30;
 
-	$: schema_promise = $get_schema($df.ref_id);
+	$: schema_promise = get_schema($df.ref_id);
 
 	let get_datum = async (
 		ref_id: string,
@@ -41,7 +41,7 @@
 		per_page: number
 	): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await $get_rows(ref_id, page * per_page, (page + 1) * per_page, undefined, [
+		let rows = await get_rows(ref_id, page * per_page, (page + 1) * per_page, undefined, [
 			$x,
 			$y,
 			$primary_key,
@@ -83,7 +83,7 @@
 		}
 
 		status = 'working';
-		const promise = $dispatch(
+		const promise = dispatch(
 			on_select.endpoint_id,
 			{
 				// FIXME: Should we support multiple selections?

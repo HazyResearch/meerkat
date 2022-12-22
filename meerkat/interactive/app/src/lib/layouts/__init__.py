@@ -1,6 +1,8 @@
 from typing import Sequence
 
-from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.abstract import (
+    Component,
+)
 
 
 class Flex(Component):
@@ -12,6 +14,11 @@ class Flex(Component):
 class Grid(Component):
 
     components: Sequence[Component]
+    classes: str = "grid-cols-2"
+
+
+class SlotGrid(Component):
+
     classes: str = "grid-cols-2"
 
 
