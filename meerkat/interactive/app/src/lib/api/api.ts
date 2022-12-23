@@ -10,6 +10,7 @@ export const store_trigger = async (store_id: string, value: any) => {
 };
 
 export const dispatch = async (endpoint_id: string, kwargs: any, payload: any = {}) => {
+    console.log(endpoint_id, kwargs, payload);
     if (endpoint_id === null) {
         return;
     }

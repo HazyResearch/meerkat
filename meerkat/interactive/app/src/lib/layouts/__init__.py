@@ -2,6 +2,7 @@ from typing import Sequence
 
 from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
+    Slottable,
 )
 
 
@@ -17,7 +18,7 @@ class Grid(Component):
     classes: str = "grid-cols-2"
 
 
-class SlotGrid(Component):
+class SlotGrid(Slottable, Component):
 
     classes: str = "grid-cols-2"
 

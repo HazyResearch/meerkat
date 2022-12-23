@@ -45,3 +45,4 @@ export { default as Code } from './shared/cell/code/Code.svelte';
 export { default as Image } from './shared/cell/image/Image.svelte';
 export { default as Interface } from './shared/Interface.svelte';
 export { nestedMap } from './utils/tools.js';
+export { default as Meerkat } from './Meerkat.svelte';

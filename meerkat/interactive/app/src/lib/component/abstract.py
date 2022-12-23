@@ -1,11 +1,13 @@
 import inspect
 import os
-from typing import Dict, List, Literal, Set
+from typing import Any, Dict, List, Literal, Optional, Set
 
-from pydantic import BaseModel, Extra, validator
+from pydantic import BaseModel, Extra, validator, root_validator
+from pydantic.fields import ModelField
 from meerkat.constants import APP_DIR
 from meerkat.dataframe import DataFrame
 
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
@@ -41,18 +43,40 @@ class WrappableMixin:
             import_statement = f"import {{ {self.component_name} }} from '{self.path}';"
 
         prop_exports = "\n".join([f"    export let {prop};" for prop in self.props])
+        event_exports = "\n".join(
+            [f"    export let on_{event};" for event in self.events()]
+        )
+
+        prop_bindings = " ".join(
+            [
+                "bind:" + prop + "={$" + prop + "}"
+                if self.__fields__[prop].type_ == Store
+                or self.__fields__[prop].type_ == DataFrame
+                else "{" + prop + "}"
+                for prop in self.props
+            ]
+        )
+
+        event_bindings = " ".join(
+            [
+                f"on:{event}={{ (e) => on_{event} ? dispatch(on_{event}.endpoint_id, {{}}, {{detail: e.detail}}) : null }}"
+                for event in self.events()
+            ]
+        )
+
         return f"""\
 <script>
     {import_statement}
+    import {{ getContext }} from 'svelte';
+	const {{ dispatch }} = getContext('Meerkat');
         
 {prop_exports}
+
+{event_exports}
 </script>
 
-<{self.component_name} \
-{" ".join(["bind:" + prop + "={$" +  prop + "}"
-if self.__fields__[prop].type_ == Store or self.__fields__[prop].type_ == DataFrame
-else "{" + prop + "}" for prop in self.props])}>
-    <slot />
+<{self.component_name} {prop_bindings} {event_bindings}>
+    {"<slot />" if self.slottable else ""}
 </{self.component_name}>
 """
 
@@ -144,14 +168,53 @@ class SlotsMixin:
         return False
 
 
+class EventsMixin:
+    @classmethod
+    def events(cls) -> List[str]:
+        return []
+
+
 class Component(
     IdentifiableMixin,
     FrontendMixin,
     SlotsMixin,
+    EventsMixin,
     WrappableMixin,
     PythonToSvelteMixin,
     BaseModel,
 ):
+    @classmethod
+    def add_fields(cls, **field_definitions: Any):
+        new_fields: Dict[str, ModelField] = {}
+        new_annotations: Dict[str, Optional[type]] = {}
+        
+        for f_name, f_def in field_definitions.items():
+            if isinstance(f_def, tuple):
+                try:
+                    f_annotation, f_value = f_def
+                except ValueError as e:
+                    raise Exception(
+                        "field definitions should either be a tuple of (<type>, <default>) or just a "
+                        "default value, unfortunately this means tuples as "
+                        "default values are not allowed"
+                    ) from e
+            else:
+                f_annotation, f_value = None, f_def
+
+            if f_annotation:
+                new_annotations[f_name] = f_annotation
+            
+            new_fields[f_name] = ModelField.infer(
+                name=f_name,
+                value=f_value,
+                annotation=f_annotation,
+                class_validators=None,
+                config=cls.__config__,
+            )
+
+        cls.__fields__.update(new_fields)
+        cls.__annotations__.update(new_annotations)
+
     @property
     def library(self):
         return "@meerkat-ml/meerkat"
@@ -199,6 +262,13 @@ class Component(
         # We just override the classproperty here directly as an alternative.
         return "components"
 
+    @root_validator(pre=True)
+    def _dummy_init(cls, values):
+        events = cls.events()
+        if events:
+            cls.add_fields(**{f"on_{event}": (Endpoint, None) for event in events})
+        return values
+
     @validator("*", pre=False)
     def _check_inode(cls, value):
         if isinstance(value, NodeMixin) and not isinstance(value, Store):
@@ -222,7 +292,14 @@ class Component(
 
     @property
     def props(self):
-        return {k: self.__getattribute__(k) for k in self.__fields__ if "_self_id" != k}
+        prop_names = [k for k in self.__fields__ if not k.startswith("on_") and "_self_id" != k]
+        return {k: self.__getattribute__(k) for k in prop_names}
+    
+    @property
+    def virtual_props(self):
+        """Props, and all events (as_*) as props."""
+        prop_names = [k for k in self.__fields__ if "_self_id" != k]
+        return {k: self.__getattribute__(k) for k in prop_names}
 
     @property
     def frontend(self):
@@ -232,7 +309,7 @@ class Component(
             return value
 
         frontend_props = nested_apply(
-            self.props,
+            self.virtual_props,
             _frontend,
             base_types=(Store),
         )

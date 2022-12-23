@@ -301,6 +301,21 @@ APP_DIR: app/
 import {{ writable }} from "svelte/store";
 export const API_URL = writable(import.meta.env['VITE_API_URL'] || import.meta.env['VITE_API_URL_PLACEHOLDER']);
 """)
+    
+        # Write the +layout.svelte file
+        with open(f"{name}/src/routes/+layout.svelte", "w") as f:
+            f.write(
+                f"""\
+<script>
+    import Meerkat from '@meerkat-ml/meerkat/Meerkat.svelte';
+    import "../app.css";
+</script>
+
+<Meerkat>
+	<slot />
+</Meerkat>
+""")
+            
         
         # Rename the app folder to app
         os.rename(f"{name}", f"app")
