@@ -44,8 +44,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@magidoc/plugin-svelte-marked": "^2.14.5",
 		"@datastructures-js/priority-queue": "^6.1.2",
+		"@magidoc/plugin-svelte-marked": "^2.14.5",
 		"@types/underscore": "^1.11.4",
 		"@zerodevx/svelte-toast": "^0.7.2",
 		"carbon-components-svelte": "^0.67.4",
