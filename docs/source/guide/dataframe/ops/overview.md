@@ -4,23 +4,23 @@
 Meerkat provides a set of data manipulation operations that can be applied on DataFrames and Columns. This page provides an overview of the operations available in Meerkat. 
 
 
-### Mapping
+**{doc}`mapping`**
 - {func}`~meerkat.map`: Applies a function to each row of a DataFrame and returns a {class}`~meerkat.Column` or {class}`~meerkat.DataFrame` with the resulting values.
 - {func}`~meerkat.update`: Same as {func}`~meerkat.map`, but adds the new column to the original DataFrame in-place. 
 - {func}`~meerkat.filter`: Applies a function to each row of a DataFrame and returns a new DataFrame with only the rows for which the function returned `True`.
 
-### Combining
+**{doc}`combining`**
 - {func}`~meerkat.concat`: Combines multiple DataFrames by stacking them vertically or horizontally.
 - {func}`~meerkat.merge`: Joins two DataFrames based on common columns or indices.
 
-### Grouping
+**{doc}`grouping`**
 - {func}`~meerkat.groupby`: Groups a DataFrame by a specified column(s) and applies a function to each group.
 - {func}`~meerkat.clusterby`: Groups a DataFrame by a specified column or index and applies a function to each group, returning a new DataFrame with the resulting values.
 - {func}`~meerkat.explainby`: Groups a DataFrame by a specified column or index and returns summary statistics for each group.
 
-### Aggregating
+**Aggregating**
 - {func}`~meerkat.aggregate`: Applies an aggregation function to each column of a DataFrame. 
 
-### Sort, Sample
+**Sorting and sampling**
 - {func}`~meerkat.sort`: Sorts a DataFrame by one or more columns.
 - {func}`~meerkat.sample`: Returns a new DataFrame with a random sample of rows.

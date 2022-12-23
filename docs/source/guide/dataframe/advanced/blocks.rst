@@ -1,5 +1,5 @@
 
-DataFrame Internals: Blocks
+Blocks and the BlockManager
 ============================
 In Meerkat, the columns of a DataFrame are grouped together into *blocks*, sets of columns with similar underlying storage (*e.g.* NumPy arrays). Organizing columns into blocks enables:
 

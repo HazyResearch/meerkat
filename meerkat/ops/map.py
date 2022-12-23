@@ -67,21 +67,21 @@ def defer(
             entire dataframe.
         outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the
             output of ``function`` is mapped to the returned
-            :class:`LambdaColumn`(s). Defaults to None.
-            * If ``None``, a single :class:`LambdaColumn` is returned.
+            :class:`DeferredColumn`(s). Defaults to None.
+            * If ``None``, a single :class:`DeferredColumn` is returned.
             * If a ``Dict[any, str]``, then a :class:`DataFrame` containing
-            :class:`LambdaColumn`s is returned. This is useful when the output of
+            :class:`DeferredColumn`s is returned. This is useful when the output of
             ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
             to column names in the resulting :class:`DataFrame`.
             * If a ``Tuple[str]``, then a :class:`DataFrame` containing
-            :class:`LambdaColumn`s is returned. , This is useful when the output of
+            :class:`DeferredColumn`s is returned. , This is useful when the output of
             ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
             ``function`` to column names in the resulting :class:`DataFrame`.
         output_type (Union[Dict[str, type], type], optional): _description_. Defaults
             to None.
 
     Returns:
-        Union[DataFrame, LambdaColumn]: A
+        Union[DataFrame, DeferredColumn]: A
     """
     from meerkat import DeferredColumn
     from meerkat.block.deferred_block import DeferredBlock, DeferredOp
@@ -126,10 +126,17 @@ def defer(
 
     block = DeferredBlock.from_block_data(data=op)
 
-    if outputs is None:
+    first_row = op._get(0) if len(op) > 0 else None
+
+    if outputs is None and isinstance(first_row, Mapping):
+        # support for splitting a dict into multiple columns without specifying outputs
+        outputs = {output_key: output_key for output_key in first_row}
+        op.return_format = type(outputs)
+
+    if outputs is None or outputs == "single":
         # can only infer output type if the the input columns are nonempty
-        if output_type is None and len(op) > 0:
-            output_type = type(op._get(0))
+        if output_type is None and first_row is not None:
+            output_type = type(first_row)
 
         if not isinstance(output_type, type):
             raise ValueError(
@@ -143,7 +150,7 @@ def defer(
     elif isinstance(outputs, Mapping):
         if output_type is None:
             output_type = {
-                outputs[output_key]: type(col) for output_key, col in op._get(0)
+                outputs[output_key]: type(col) for output_key, col in first_row.items()
             }
         if not isinstance(output_type, Mapping):
             raise ValueError(
@@ -154,14 +161,14 @@ def defer(
             {
                 col: DeferredColumn(
                     data=BlockView(block_index=output_key, block=block),
-                    output_type=output_type[output_key],
+                    output_type=output_type[outputs[output_key]],
                 )
                 for output_key, col in outputs.items()
             }
         )
     elif isinstance(outputs, Sequence):
         if output_type is None:
-            output_type = [type(col) for col in op._get(0)]
+            output_type = [type(col) for col in first_row]
         if not isinstance(output_type, Sequence):
             raise ValueError(
                 "Must provide a `output_type` sequence if `outputs` is a sequence."
@@ -177,12 +184,12 @@ def defer(
         )
 
 
-def _materialize(
-    data: Union["DataFrame", "Column"],
-    batch_size: int
-):
+def _materialize(data: Union["DataFrame", "Column"], batch_size: int):
     from .concat import concat
+
     result = []
     for batch_start in range(0, len(data), batch_size):
-        result.append(data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True))
+        result.append(
+            data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True)
+        )
     return concat(result)

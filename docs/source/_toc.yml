@@ -22,11 +22,9 @@ parts:
 
           - file: guide/dataframe/ops/overview
             sections:
-              - file: guide/dataframe/ops/map
-              - file: guide/dataframe/ops/merge
-              - file: guide/dataframe/ops/groupby
-              - file: guide/dataframe/ops/concat
-              - file: guide/dataframe/ops/sort_sample
+              - file: guide/dataframe/ops/mapping
+              - file: guide/dataframe/ops/combining
+              - file: guide/dataframe/ops/grouping
           - file: guide/dataframe/io
           - title: Advanced
             file: guide/dataframe/advanced/overview
