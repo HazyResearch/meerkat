@@ -366,7 +366,7 @@ class Column(
         drop_last_batch: bool = False,
         num_workers: Optional[int] = 0,
         materialize: bool = True,
-        pbar: bool = False,
+        # pbar: bool = False,
         **kwargs,
     ) -> Optional[Column]:
         """Filter the elements of the column using a function."""
@@ -397,7 +397,7 @@ class Column(
             drop_last_batch=drop_last_batch,
             num_workers=num_workers,
             materialize=materialize,
-            pbar=pbar,
+            # pbar=pbar,
             **kwargs,
         )
         indices = np.where(outputs)[0]

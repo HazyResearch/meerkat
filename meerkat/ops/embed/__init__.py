@@ -180,14 +180,14 @@ def _embed(
     with torch.no_grad():
         out = embed_input.map(
             _encode,
-            pbar=pbar,
+            # pbar=pbar,
             is_batched_fn=True,
             batch_size=batch_size,
-            num_workers=num_workers,
-            mmap=mmap_dir is not None,
-            mmap_path=None
-            if mmap_dir is None
-            else os.path.join(mmap_dir, "emb_mmap.npy"),
-            flush_size=128,
+            # num_workers=num_workers,
+            # mmap=mmap_dir is not None,
+            # mmap_path=None
+            # if mmap_dir is None
+            # else os.path.join(mmap_dir, "emb_mmap.npy"),
+            # flush_size=128,
         )
     return out

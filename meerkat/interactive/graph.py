@@ -297,7 +297,8 @@ def reactive(
                 fn = _fn_outer_wrapper(fn_class)
 
             # Call the function on the args and kwargs
-            result = fn(*args, **kwargs)
+            with no_react():
+                result = fn(*args, **kwargs)
 
             if not is_reactive():
                 # If we are not in a reactive context, then we don't need to create
