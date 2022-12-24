@@ -93,7 +93,7 @@ panels_add_bootstrap_css = False
 add_module_names = False
 
 # Sort members by group
-autodoc_member_order = "groupwise"
+autodoc_member_order = "bysource"
 
 # Color Scheme
 panels_css_variables = {
