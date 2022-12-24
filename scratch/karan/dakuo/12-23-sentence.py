@@ -47,13 +47,16 @@ gui_info = mk.gui.start(shareable=False)
 search_keywords = mk.gui.Textbox(title="type keywords here")
 
 story_sentence_df = story_sentence_df.head(200)
-story_sentence_df = mk.embed(story_sentence_df, input="text", encoder="clip", out_col="embed")
+story_sentence_df = mk.embed(
+    story_sentence_df, input="text", encoder="clip", out_col="embed"
+)
+
 
 @mk.gui.reactive
 def search_sentences_by_keywords(sentence_df: mk.DataFrame, keywords: str = None):
     kw_df = mk.DataFrame({"text": [keywords or "abc"]})
     kw_embed = mk.embed(kw_df, input="text", encoder="clip", out_col="embed")
-    sentence_df['scores'] = sentence_df['embed'] @ kw_embed['embed'][0].T
+    sentence_df["scores"] = sentence_df["embed"] @ kw_embed["embed"][0].T
     sort_by_keyword_df = sentence_df.sort(by="scores", ascending=False)
     sort_by_keyword_df.create_primary_key("id")
     sort_by_keyword_df["section"] = sort_by_keyword_df["id"]
@@ -61,9 +64,7 @@ def search_sentences_by_keywords(sentence_df: mk.DataFrame, keywords: str = None
 
 
 with mk.gui.react():
-    document_df = search_sentences_by_keywords(
-        story_sentence_df, search_keywords.text
-    )
+    document_df = search_sentences_by_keywords(story_sentence_df, search_keywords.text)
 
 from meerkat.interactive.api.routers.dataframe import edit
 
@@ -74,8 +75,10 @@ document = mk.gui.Document(
     paragraph_column="section",  # the column that contains the paragraph index
     label_column="label",  # the column that contains the label
     id_column="id",  # the column that contains the sentence id
-    on_sentence_label=edit.partial(
-        df=story_sentence_df, column="label", id_column="id"
+    on_label=edit.partial(
+        df=story_sentence_df,
+        column="label",
+        id_column="id",
     ),
 )
 

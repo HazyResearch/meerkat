@@ -36,6 +36,17 @@ class WrappableMixin:
         else:
             return "default"
 
+    def _get_prop_bindings(self):
+        return " ".join(
+            [
+                "bind:" + prop + "={$" + prop + "}"
+                if self.__fields__[prop].type_ == Store
+                or self.__fields__[prop].type_ == DataFrame
+                else "{" + prop + "}"
+                for prop in self.props
+            ]
+        )
+
     def _to_svelte_wrapper(self):
         if self.wrapper_import_style == "named":
             import_statement = f"import {self.component_name} from '{self.path}';"
@@ -47,15 +58,7 @@ class WrappableMixin:
             [f"    export let on_{event};" for event in self.events()]
         )
 
-        prop_bindings = " ".join(
-            [
-                "bind:" + prop + "={$" + prop + "}"
-                if self.__fields__[prop].type_ == Store
-                or self.__fields__[prop].type_ == DataFrame
-                else "{" + prop + "}"
-                for prop in self.props
-            ]
-        )
+        prop_bindings = self._get_prop_bindings()
 
         event_bindings = " ".join(
             [
@@ -187,7 +190,7 @@ class Component(
     def add_fields(cls, **field_definitions: Any):
         new_fields: Dict[str, ModelField] = {}
         new_annotations: Dict[str, Optional[type]] = {}
-        
+
         for f_name, f_def in field_definitions.items():
             if isinstance(f_def, tuple):
                 try:
@@ -203,7 +206,7 @@ class Component(
 
             if f_annotation:
                 new_annotations[f_name] = f_annotation
-            
+
             new_fields[f_name] = ModelField.infer(
                 name=f_name,
                 value=f_value,
@@ -279,7 +282,13 @@ class Component(
                 value.attach_to_inode(value.create_inode())
 
             # Now value is a NodeMixin object that points to a Node in the graph
-            return value.inode  # this will exist
+
+            # We replace `value` with `value.inode`, and will send
+            # this to the frontend
+            # Effectively, NodeMixin objects (except Store) are "by reference"
+            # and not "by value" (this is also why we explicitly exclude
+            # Store from this check, which is "by value")
+            return value.inode
         return value
 
     def __getattribute__(self, name):
@@ -292,9 +301,11 @@ class Component(
 
     @property
     def props(self):
-        prop_names = [k for k in self.__fields__ if not k.startswith("on_") and "_self_id" != k]
+        prop_names = [
+            k for k in self.__fields__ if not k.startswith("on_") and "_self_id" != k
+        ]
         return {k: self.__getattribute__(k) for k in prop_names}
-    
+
     @property
     def virtual_props(self):
         """Props, and all events (as_*) as props."""
@@ -330,3 +341,42 @@ class Component(
         arbitrary_types_allowed = True
         extra = Extra.allow
         copy_on_model_validation = False
+
+
+class AutoComponent(Component):
+    """Component with simple defaults."""
+
+    def _get_prop_bindings(self):
+        return " ".join(["bind:" + prop + "={$" + prop + "}" for prop in self.props])
+
+    @root_validator(pre=False)
+    def _convert_fields(cls, values):
+        for name, value in values.items():
+            # Wrap all the fields that are not NodeMixins in a Store
+            # (i.e. this will exclude DataFrame, Endpoint etc. as well as
+            # fields that are already Stores)
+            if cls.__fields__[name].type_ == Endpoint:
+                # Separately skip Endpoint fields by looking at the field type,
+                # since they are assigned None by default and would be missed
+                # by the condition below
+                continue
+
+            if not isinstance(value, NodeMixin) and not isinstance(value, Node):
+                value = values[name] = Store(value)
+
+            # Now make sure that all the `Store` objects have inodes
+            if hasattr(value, "has_inode") and not value.has_inode():
+                value.attach_to_inode(value.create_inode())
+
+        return values
+
+    @property
+    def component_name(self):
+        # Inheriting an existing AutoComponent and modifying it on the Python side
+        # should not change the name of the component used on the frontend
+        if self.__class__.__bases__[0] != AutoComponent and issubclass(
+            self.__class__.__bases__[0], AutoComponent
+        ):
+            return self.__class__.__bases__[0].__name__
+
+        return self.__class__.__name__

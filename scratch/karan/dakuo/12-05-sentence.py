@@ -109,8 +109,10 @@ document = mk.gui.Document(
     paragraph_column="section",  # the column that contains the paragraph index
     label_column="label",  # the column that contains the label
     id_column="id",  # the column that contains the sentence id
-    on_sentence_label=edit.partial(
-        df=story_sentence_df, column="label", id_column="id"
+    on_label=edit.partial(
+        df=story_sentence_df, 
+        column="label", 
+        id_column="id",
     ),
 )
 
