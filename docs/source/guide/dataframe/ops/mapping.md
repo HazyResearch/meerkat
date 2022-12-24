@@ -80,8 +80,6 @@ It's also possible to map a single function that returns multiple values.
 
 For example, say we wanted to create a two columns `ma_eligible` and `la_eligible` that indicate whether or not a person is eligible to vote in Massachusetts and Louisiana, respectively. We can do this with the {func}`~meerkat.map` operation, passing a lambda function that takes age and residence and returns a tuple of two booleans.
 
-The code below has a **problem**. Instead of outputting two columns, one for each state, it outputs a single {func}`~meerkat.ObjectColumn` containing tuples. As we discuss in {doc}`../columns/object`, {func}`~meerkat.ObjectColumn` is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is **much** slower than other column types. 
-
 ```{code-cell} ipython3
 :tags: [output_scroll]
 
@@ -92,12 +90,24 @@ def is_eligibile(age, residence):
 df.map(is_eligibile)
 ```
 
-We can split the output of the function into multiple columns by passing a tuple of column names to the `outputs` argument of {func}`~meerkat.map`. 
+Note that the output of the function was split into two columns. The names of the columns are just the indices in the tuple returned by the function. We can rename the columns by passing a tuple of column names to the `outputs` argument of {func}`~meerkat.map`. 
 
 ```{code-cell} ipython3
 :tags: [output_scroll]
 
 df.map(is_eligibile, outputs=("ma_eligible", "la_eligible"))
+```
+
+Instead of outputting two columns, one for each state, we may want to output a single {func}`~meerkat.ObjectColumn` containing tuples. To accomplish this we can pass `"single"` to the outputs argument. 
+
+```{code-cell} ipython3
+:tags: [output_scroll]
+
+df.map(is_eligibile, outputs="single")
+```
+
+```{warning} 
+func}`~meerkat.ObjectColumn` is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is **much** slower than other column types. We discuss this more in the guide on {doc}`../columns/object`.
 ```
 
 If the function returns a dictionary, we can skip the `outputs` argument and {func}`~meerkat.map` will automatically use the keys of the dictionary as column names.
