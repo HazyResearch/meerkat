@@ -56,7 +56,7 @@ class Node(IdentifiableMixin, FrontendMixin):
         return [child for child, triggers in self.children.items() if triggers]
 
     def __repr__(self) -> str:
-        return f"Node({self.obj}, {len(self.children)} children)"
+        return f"Node({repr(self.obj)}, {len(self.children)} children)"
 
     def __hash__(self):
         """Hash is based on the id of the node."""
@@ -171,6 +171,7 @@ def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
     # but are not triggered by the node
     parents = defaultdict(set)
     nodes = set()
+    # TODO (arjun): Add check for cycles.
     while root_nodes:
         node = root_nodes.pop(0)
         for child in node.trigger_children:

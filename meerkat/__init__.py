@@ -38,19 +38,19 @@ from meerkat.columns.tensor import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
-from meerkat.row import Row
 from meerkat.datasets import get
+from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
 from meerkat.ops.embed import embed
-from meerkat.ops.sliceby.groupby import groupby
-from meerkat.ops.sliceby.clusterby import clusterby
-from meerkat.ops.sliceby.explainby import explainby
-from meerkat.ops.aggregate.aggregate import aggregate
+from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
+from meerkat.ops.sliceby.clusterby import clusterby
+from meerkat.ops.sliceby.explainby import explainby
+from meerkat.ops.sliceby.groupby import groupby
 from meerkat.ops.sort import sort
-from meerkat.ops.map import map, defer
 from meerkat.provenance import provenance
+from meerkat.row import Row
 
 from .config import config
 
@@ -98,7 +98,7 @@ __all__ = [
     "DeferredCell",
     "FileCell",
     # <<<< Operations >>>>
-    "map", 
+    "map",
     "defer",
     "concat",
     "merge",

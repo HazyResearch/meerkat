@@ -21,5 +21,6 @@ class ImmutableError(ValueError):
 class ConversionError(ValueError):
     pass
 
+
 class ExperimentalWarning(FutureWarning):
     pass

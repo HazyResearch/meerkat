@@ -16,14 +16,15 @@ with mk.gui.react():
         against=EMBED_COLUMN,
         title="Search Examples",
     )
-    examples_df = match(df)
+    examples_df = match(df)[0]
 
     # Sort
-    # df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)[0]
+    df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
 
+print(df_sorted)
 # Gallery
 gallery = mk.gui.Gallery(
-    df=df,
+    df=df_sorted,
     main_column=IMAGE_COLUMN,
 )
 

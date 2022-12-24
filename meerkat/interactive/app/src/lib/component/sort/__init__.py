@@ -58,7 +58,7 @@ class Sort(Component):
     """
 
     df: DataFrame
-    criteria: Store[List[SortCriterion]] = Field(default_factory=lambda: Store(list))
+    criteria: Store[Union[List[SortCriterion], SortCriterion]] = Field(default_factory=lambda: Store(list))
     title: Store[str] = Store("Sort")
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
@@ -67,6 +67,7 @@ class Sort(Component):
         return sort_by_criteria(df, self.criteria)
 
     @staticmethod
+    @reactive
     def create_criterion(column: str, ascending: bool, source: str = ""):
         return SortCriterion(
             id=str(uuid.uuid4()),

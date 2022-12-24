@@ -567,11 +567,12 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self.__wrapped__, name)
 
-        # Only executing functions/methods should make the output reactifiable.
-        # TODO: See if we want accessing attributes/properties to be reactifiable.
-        # The reason they are not reactifiable now is that it is not clear what
-        # storing the attributes as a state would give us.
-        return reactive(attr) if callable(attr) else attr
+        if callable(attr):
+            # Instance method
+            return reactive(attr)
+        else:
+            # Attribute
+            return reactive(lambda store: getattr(store.__wrapped__, name))(self)
 
     @classmethod
     def __get_validators__(cls):
@@ -624,8 +625,10 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __nonzero__(self):
         return super().__nonzero__()
 
-    @reactive
     def __bool__(self):
+        # __bool__ cannot be reactive because Python expects
+        # bool to return a bool and not a Store.
+        # This means stores cannot be used in logical statements.
         return super().__bool__()
 
     @reactive
@@ -961,6 +964,11 @@ class Operation(NodeMixin):
         self.args = args
         self.kwargs = kwargs
         self.result = result
+
+    def __repr__(self):
+        return (
+            f"Operation({self.fn.__name__}, {self.args}, {self.kwargs}, {self.result})"
+        )
 
     def __call__(self) -> List[Modification]:
         """Execute the operation. Unpack the arguments and keyword arguments

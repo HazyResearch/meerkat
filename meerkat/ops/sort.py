@@ -28,8 +28,14 @@ def sort(
     Return:
         DataFrame: A sorted view of DataFrame.
     """
+    # TODO: This unpacking should happen outside of this function.
+    from meerkat.interactive.graph import Store
+
+    if isinstance(by, Store):
+        by = by.value
+
     if by is None:
-        return data
+        return data.view()
 
     by = [by] if isinstance(by, str) else by
 
