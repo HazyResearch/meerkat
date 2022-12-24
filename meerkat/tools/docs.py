@@ -1,5 +1,6 @@
 import abc
 from textwrap import dedent, indent
+from string import Template
 from typing import Any, Callable, Dict
 
 FuncType = Callable[..., Any]
@@ -45,8 +46,8 @@ def doc(source: Dict[str, str] = None, **kwargs) -> Callable[[FuncType], FuncTyp
             for key, value in source.items()
         }
 
-        docstring = docstring.format(**{**fixed_source, **kwargs})
-        docstring = docstring.format(**kwargs)
+        docstring = Template(docstring).safe_substitute(**fixed_source)
+        docstring = Template(docstring).safe_substitute(**kwargs)
 
         decorated.__doc__ = docstring
         return decorated
@@ -61,6 +62,20 @@ class DocComponent(abc.ABC):
     @abc.abstractmethod
     def fix_indentation(self, docstring: str) -> str:
         raise NotImplementedError()
+
+
+class Arg(DocComponent):
+    def fix_indentation(self, docstring: str) -> str:
+        # get common leading whitespace from docstring ignoring first line 
+        lines = docstring.splitlines()
+        leading_whitespace = min(
+            len(line) - len(line.lstrip()) for line in lines[1:] if line.strip()
+        )
+
+        prefix = (leading_whitespace + 4) * " "
+        text = indent(dedent(self.text), prefix)
+
+        return text
 
 
 class ArgDescription(DocComponent):
