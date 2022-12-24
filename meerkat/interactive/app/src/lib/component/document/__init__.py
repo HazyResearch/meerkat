@@ -12,4 +12,7 @@ class Document(Component):
     paragraph_column: Store[str] = None
     label_column: Store[str] = None
     id_column: Store[str] = None
-    on_sentence_label: Endpoint = None
+    
+    @classmethod
+    def events(cls):
+        return ['label']

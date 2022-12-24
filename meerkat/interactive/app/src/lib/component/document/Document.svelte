@@ -1,20 +1,16 @@
 <script lang="ts">
 	// Load in getContext from svelte (always)
-	import { getContext } from 'svelte';
-	// Load in the type Writable from svelte/store (always)
-	import { get, type Writable } from 'svelte/store';
+	import { createEventDispatcher, getContext } from 'svelte';
 
 	// Icons
 	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte';
 	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
 	import Help from 'carbon-icons-svelte/lib/Help.svelte';
 
-	import type { Endpoint } from '$lib/utils/types';
-
 	// Running getContext('Meerkat') returns an object which contains useful functions
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
-	const { get_rows, dispatch } = getContext('Meerkat');
+	const { get_rows } = getContext('Meerkat');
 	// the `get_rows` function is used to fetch data from a dataframe in the Python backend
 	// the `edit` function is used to send edits to a dataframe in the Python backend
 
@@ -23,13 +19,21 @@
 	// These are Writable store objects, which means that it can be read from and written to.
 	// *** To access the value of the store, use $store_name, so e.g. $data or get(store_name), so e.g. get(data)***
 	export let df;
-	console.log(df);
+
 	// More component props
 	export let text_column: string;
 	export let paragraph_column: string;
 	export let label_column: string;
 	export let id_column: string;
-	export let on_sentence_label: Endpoint;
+
+	let dispatch = createEventDispatcher();
+
+	function dispatchLabel(id: string, label: number) {
+		dispatch('label', {
+			row_id: id,
+			value: label
+		});
+	}
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the text_column
@@ -112,43 +116,30 @@
 										{sentence}
 										<div class="text_interactions">
 											<div class="selecting">
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-red-500 rounded-full hover:bg-slate-400"
 													class:bg-red-500={label === 0}
 													class:text-red-100={label === 0}
-													on:click={() => {
-														console.log(on_sentence_label.endpoint_id);
-														dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 0
-														});
-													}}
+													on:click={() => dispatchLabel(id, 0)}
 												>
 													<CloseOutline size={32} />
 												</i>
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-emerald-500 rounded-full hover:bg-slate-400"
 													class:bg-emerald-400={label === 1}
 													class:text-emerald-100={label === 1}
-													on:click={() => {
-														dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 1
-														});
-													}}
+													on:click={() => dispatchLabel(id, 1)}
 												>
 													<CheckmarkOutline size={32} />
 												</i>
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-orange-500 rounded-full hover:bg-slate-400"
 													class:bg-orange-400={label === 2}
 													class:text-orange-100={label === 2}
-													on:click={() => {
-														dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 2
-														});
-													}}
+													on:click={() => dispatchLabel(id, 2)}
 												>
 													<Help size={32} />
 												</i>
