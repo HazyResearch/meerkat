@@ -143,6 +143,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         if fn is None:
             self.id = None
         self.fn = fn
+        self._validate_fn()
 
         if prefix is None:
             # No prefix, no router
@@ -156,7 +157,29 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         self.prefix = prefix
         self.route = route
-
+        
+    @staticmethod
+    def _has_var_positional(foo):
+        # Check if `foo` has a `*args` parameter
+        signature = inspect.signature(foo)
+        return any(p.kind == p.VAR_POSITIONAL for p in signature.parameters.values())
+        
+    def _validate_fn(self):
+        """Validate the function `fn`."""
+        if not callable(self.fn):
+            raise TypeError(
+                f"Endpoint function {self.fn} is not callable."
+            )
+            
+        # Disallow *args
+        if self._has_var_positional(self.fn):
+            raise TypeError(
+                f"Endpoint function {self.fn} has a `*args` parameter."
+                " Please use keyword arguments instead."
+            )
+        
+        # Do we allow lambdas?
+        
     @property
     def frontend(self):
         return EndpointFrontend(

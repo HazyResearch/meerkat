@@ -9,15 +9,11 @@ export const store_trigger = async (store_id: string, value: any) => {
     return modifications;
 };
 
-export const dispatch = async (endpoint_id: string, kwargs: any, payload: any = {}) => {
-    console.log(endpoint_id, kwargs, payload);
+export const dispatch = async (endpoint_id: string, payload: any = {}) => {
     if (endpoint_id === null) {
         return;
     }
-    const [result, modifications] = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, {
-        fn_kwargs: kwargs,
-        payload: payload
-    });
+    const [result, modifications] = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
     apply_modifications(modifications);
     return result;
 };

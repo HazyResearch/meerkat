@@ -59,7 +59,7 @@ class WrappableMixin:
 
         event_bindings = " ".join(
             [
-                f"on:{event}={{ (e) => on_{event} ? dispatch(on_{event}.endpoint_id, {{}}, {{detail: e.detail}}) : null }}"
+                f"on:{event}={{ (e) => on_{event} ? dispatch(on_{event}.endpoint_id, {{detail: e.detail}}) : null }}"
                 for event in self.events()
             ]
         )
