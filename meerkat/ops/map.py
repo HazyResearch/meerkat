@@ -1,9 +1,9 @@
 from typing import Union, Callable, Mapping, Sequence, TYPE_CHECKING
 from inspect import getfullargspec, signature
 
-from pandas.util._decorators import doc
 
 from meerkat.block.abstract import BlockView
+import meerkat.tools.docs as docs
 
 if TYPE_CHECKING:
     from meerkat import DataFrame, Column
@@ -11,31 +11,26 @@ if TYPE_CHECKING:
     from meerkat.dataframe import DataFrame
 
 
-def map(
-    data: Union["DataFrame", "Column"],
-    function: Callable,
-    is_batched_fn: bool = False,
-    batch_size: int = 1,
-    inputs: Union[Mapping[str, str], Sequence[str]] = None,
-    outputs: Union[Mapping[any, str], Sequence[str]] = None,
-    output_type: Union[Mapping[str, type], type] = None,
-    materialize: bool = True,
-):
+_SHARED_DOCS_ = {
+    "outputs": docs.ArgDescription(
+        """Controls how the output of ``function`` is mapped to the output of the map. 
+        Defaults to ``None``.
 
-    deferred = defer(
-        data=data,
-        function=function,
-        is_batched_fn=is_batched_fn,
-        batch_size=batch_size,
-        inputs=inputs,
-        outputs=outputs,
-        output_type=output_type,
-        materialize=materialize,
+        *   If ``None``: a single :class:`DeferredColumn` is returned.
+        *   If a ``Dict[any, str]``: then a :class:`DataFrame` containing
+            DeferredColumns is returned. This is useful when the output of
+            ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
+            to column names in the resulting :class:`DataFrame`.
+        *   If a ``Tuple[str]``: then a :class:`DataFrame` containing 
+            output :class:`DeferredColumn` is returned. This is useful when the 
+            of ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
+            ``function`` to column names in the resulting :class:`DataFrame`.
+"""
     )
-    return _materialize(deferred, batch_size=batch_size)
+}
 
 
-@doc(data="data")
+@docs.doc(source=_SHARED_DOCS_, data="data")
 def defer(
     data: Union["DataFrame", "Column"],
     function: Callable,
@@ -48,12 +43,19 @@ def defer(
 ) -> Union["DataFrame", "DeferredColumn"]:
     """_summary_
 
+    Learn more in the user guide:  :ref:`guide/dataframe/ops/mapping/deferred`.
+
+    .. note:: 
+        This functions is also available as a method of :class:`DataFrame` and
+        :class:`Column` under the name ``defer``.
+
     Examples
     ---------
 
 
     Args:
-        {data}:
+        {data} (DataFrame): The :class:`DataFrame` or :class:`Column` to which the
+            function will be applied.
         function (Callable): The function that will be applied to the rows of
             ``{data}``.
         is_batched_fn (bool, optional): Whether the function must be applied on a
@@ -65,18 +67,7 @@ def defer(
             column. When calling ``function`` values from the columns will be fed to
             the corresponding keyword arguments. Defaults to None, in which case the
             entire dataframe.
-        outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the
-            output of ``function`` is mapped to the returned
-            :class:`DeferredColumn`(s). Defaults to None.
-            * If ``None``, a single :class:`DeferredColumn` is returned.
-            * If a ``Dict[any, str]``, then a :class:`DataFrame` containing
-            :class:`DeferredColumn`s is returned. This is useful when the output of
-            ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
-            to column names in the resulting :class:`DataFrame`.
-            * If a ``Tuple[str]``, then a :class:`DataFrame` containing
-            :class:`DeferredColumn`s is returned. , This is useful when the output of
-            ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
-            ``function`` to column names in the resulting :class:`DataFrame`.
+        outputs (Union[Dict[any, str], Tuple[str]], optional): {outputs}
         output_type (Union[Dict[str, type], type], optional): _description_. Defaults
             to None.
 
@@ -184,11 +175,41 @@ def defer(
         )
 
 
-def _materialize(data: Union["DataFrame", "Column"], batch_size: int):
+def map(
+    data: Union["DataFrame", "Column"],
+    function: Callable,
+    is_batched_fn: bool = False,
+    batch_size: int = 1,
+    inputs: Union[Mapping[str, str], Sequence[str]] = None,
+    outputs: Union[Mapping[any, str], Sequence[str]] = None,
+    output_type: Union[Mapping[str, type], type] = None,
+    materialize: bool = True,
+    pbar: bool = False,
+    **kwargs,
+):
+    """
+    hkllsdfjklhsdf
+    """
+
+    deferred = defer(
+        data=data,
+        function=function,
+        is_batched_fn=is_batched_fn,
+        batch_size=batch_size,
+        inputs=inputs,
+        outputs=outputs,
+        output_type=output_type,
+        materialize=materialize,
+    )
+    return _materialize(deferred, batch_size=batch_size, pbar=pbar)
+
+
+def _materialize(data: Union["DataFrame", "Column"], batch_size: int, pbar: bool):
     from .concat import concat
+    from tqdm import tqdm
 
     result = []
-    for batch_start in range(0, len(data), batch_size):
+    for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
         result.append(
             data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True)
         )

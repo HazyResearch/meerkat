@@ -70,7 +70,13 @@ class DataFrame(
     ProvenanceMixin,
     ReactifiableMixin,
 ):
-    """Meerkat DataFrame class."""
+    """ A collection of equal length columns.
+
+    Args:
+        data (Union[dict, list]): A dictionary of columns or a list of dictionaries.
+        primary_key (str, optional): The name of the primary key column. 
+            Defaults to ``None``.
+    """
 
     _self_identifiable_group: str = "dataframes"
 

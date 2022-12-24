@@ -128,6 +128,8 @@ df.map(is_eligibile, outputs={"ma_eligible": "ma", "la_eligible": "la"})
 *Consistent type of outputs.* It is also important to note that the type of the resulting column is inferred by the first row of the input column(s). As a result, if later rows return values of a different type or shape, an error may be raised because the value cannot be inserted in the inferred column type. To explicitly specify the type of the output column, use the `output_types` argument to {func}`~meerkat.map`.
 ```
 
+
+(guide/dataframe/ops/mapping/deferred)=
 ## Deferred map and chaining
 In this section, we discuss how we can chain together multiple map operations using deferred maps. This produces a chain of operations that can be executed together. In the following section, we'll discuss how we can pipeline chained operations to take advantage of parallelism.
 

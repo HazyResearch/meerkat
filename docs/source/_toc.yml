@@ -57,4 +57,4 @@ parts:
 
   - caption: API Reference
     chapters:
-      - file: apidocs/index.rst
+      - file: apidocs/index
