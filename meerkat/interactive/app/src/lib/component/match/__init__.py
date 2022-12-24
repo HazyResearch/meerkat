@@ -108,8 +108,6 @@ def set_criterion(
         raise e
         raise HTTPException(status_code=500, detail=str(e))
 
-    return criterion.__wrapped__
-
 
 @dataclass
 class MatchCriterion:

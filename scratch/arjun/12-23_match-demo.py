@@ -3,7 +3,7 @@ import meerkat as mk
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
 
-df = mk.get("imagenette", dataset_dir="/Users/arjundd/.cache/meerkat/datasets", version="160px")
+df = mk.get("imagenette", version="160px")
 df = df[100:150]
 
 # Embed the image.
