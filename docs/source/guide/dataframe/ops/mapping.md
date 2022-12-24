@@ -5,7 +5,7 @@ kernelspec:
 ---
 
 (guide/dataframe/ops/mapping)=
-# Mapping: `map`, `update`, `filter`
+# Mapping: `map`, `defer`, `update`, `filter`
 
 In this guide, we discuss how we can create new columns by applying a function to each row of existing columns: we call this *mapping*. We provide detailed examples of how to the {func}`~meerkat.map` operation. We also introduce the {func}`~meerkat.update` and {func}`~meerkat.filter` operations, which are utilities that wrap the {func}`~meerkat.map` operation. 
 
@@ -15,7 +15,7 @@ In this guide, we discuss how we can create new columns by applying a function t
 
 ## Map
 
-Let's warm up with an example: converting a column of birth years to a column of ages. We start with a small DataFrame of voters with two columns: `birth_year`, which contains the birth year of each person, and `voter`, which indicates whether or not they voted in the last election.
+Let's warm up with an example: converting a column of birth years to a column of ages. We start with a small DataFrame of voters with two columns: `birth_year`, which contains the birth year of each person, and `residence`, which contains the state in which each person lives.
 
 ```{code-cell} ipython3
 :tags: [output_scroll]

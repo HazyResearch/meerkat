@@ -29,7 +29,7 @@ def load_doc_csv(path, id):
 def load_fairytale_qa_doc(doc_path):
     # Create a Document DataFrame
     doc_df = mk.DataFrame(
-        {"path": glob(doc_path + "/*/*.csv")}
+        {"path": list(glob(doc_path + "/*/*.csv"))}
     )  # put in a column called 'path' with all the paths to the csv files
     
     # Create some useful columns

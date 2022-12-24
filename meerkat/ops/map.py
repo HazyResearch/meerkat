@@ -223,7 +223,7 @@ def defer(
                     )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
-
+    
     op = DeferredOp(
         fn=function,
         args=args,
@@ -244,7 +244,7 @@ def defer(
 
     if outputs is None and isinstance(first_row, Tuple):
         # support for splitting a tuple into multiple columns without specifying outputs
-        outputs = tuple(map(str, range(len(first_row))))
+        outputs = tuple([str(i) for i in range(len(first_row))])
         op.return_format = type(outputs)
 
     if outputs is None or outputs == "single":
