@@ -152,8 +152,7 @@ class Match(Component):
         )
 
         self.criterion: MatchCriterion = Store(
-            MatchCriterion(against=None, query=None, name=None),
-            backend_only=True
+            MatchCriterion(against=None, query=None, name=None), backend_only=True
         )
 
         on_match = set_criterion.partial(

@@ -562,7 +562,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         mod.add_to_queue()
 
     def __repr__(self) -> str:
-        return f"Store({self.__wrapped__})"
+        return f"Store({repr(self.__wrapped__)})"
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self.__wrapped__, name)

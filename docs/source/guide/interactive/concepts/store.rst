@@ -54,3 +54,27 @@ Faux Paus
     # This will trigger reactions.
     my_stores = mk.gui.Store([mk.gui.Store(0), mk.gui.Store(1)])
     my_stores.append(mk.gui.Store(2))
+
+- ``Store(None)`` is not ``None``, but is equal to ``None``
+
+.. code-block:: python
+
+    Store(None) is None  # False
+
+    Store(None) == None  # True
+
+- Using shortcut operators (``and``, ``or``, ``not``) with Stores will not return Stores, but using Meerkat's built-in overloads (``mk.cand``, ``mk.cor``, ``mk.cnot``) will return Stores
+
+.. code-block:: python
+
+    store = Store("")
+    with mk.gui.react():
+        # These will not return Stores
+        type(store or "default")  # str
+        type(store and "default")  # str
+        type(not store)  # bool
+
+        # These will return Stores
+        type(mk.cor(store, "default"))  # Store
+        type(mk.cand(store, "default"))  # Store
+        type(mk.cnot(store))  # Store

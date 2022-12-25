@@ -41,6 +41,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
+from meerkat.ops.cond import cand, cnot, cor
 from meerkat.ops.embed import embed
 from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
@@ -109,6 +110,9 @@ __all__ = [
     "clusterby",
     "explainby",
     "aggregate",
+    "cand",
+    "cor",
+    "cnot",
     # <<<< I/O >>>>
     "from_csv",
     "from_json",
