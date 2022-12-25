@@ -63,7 +63,7 @@ Faux Paus
 
     Store(None) == None  # True
 
-- Using shortcut operators (``and``, ``or``, ``not``) with Stores will not return Stores, but using Meerkat's built-in overloads (``mk.cand``, ``mk.cor``, ``mk.cnot``) will return Stores
+- Using shortcut operators (``and``, ``or``, ``not``) with Stores will not return Stores, but using Meerkat's built-in overloads (``mk.cand``, ``mk.cor``, ``mk.cnot``) will
 
 .. code-block:: python
 
