@@ -618,8 +618,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __ge__(self, other):
         return super().__ge__(other)
 
-    # def __hash__(self):
-    #     return hash(self.__wrapped__)
+    def __hash__(self):
+        return hash(self.__wrapped__)
 
     @reactive
     def __nonzero__(self):
