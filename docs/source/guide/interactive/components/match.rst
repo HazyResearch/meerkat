@@ -27,37 +27,34 @@ It does not sort the results. However, it can be combined with other operations 
 
     .. code-block:: python
 
-      IMAGE_COLUMN = "img"
-      EMBED_COLUMN = "img_clip"
+        import meerkat as mk
 
-      path = "~/.meerkat/dataframes/demo/imagenette_clip.mk"
-      path = os.path.abspath(os.path.expanduser(path))
-      if not os.path.exists(path):
-          df = mk.get("imagenette", version="160px")
+        IMAGE_COLUMN = "img"
+        EMBED_COLUMN = "img_clip"
 
-          # Embed the image.
-          # This can take a while on the CPU.
-          df: mk.DataFrame = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN)
-          df.write("~/.meerkat/dataframes/imagenette_clip.mk")
-      else:
-          df = mk.DataFrame.read(path)
+        df = mk.get("imagenette", version="160px")
+        # Download the precomupted CLIP embeddings for imagenette.
+        # You can also embed the images yourself with mk.embed. This will take some time.
+        # To embed: df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN, encoder="clip").
+        df_clip = mk.DataFrame.read("https://huggingface.co/datasets/arjundd/meerkat-dataframes/resolve/main/imagenette_clip.mk.tar.gz")
+        df = df.merge(df_clip, on="img_id")
 
-      with mk.gui.react():
-          # Match
-          match = mk.gui.Match(df=df, against=EMBED_COLUMN)
-          examples_df = match(df)[0]
+        with mk.gui.react():
+            # Match
+            match = mk.gui.Match(df=df, against=EMBED_COLUMN)
+            examples_df = match(df)[0]
 
-          # Sort - Takes the output of match and sorts it.
-          df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
+            # Sort
+            df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
 
-      # Gallery - To display the results
-      gallery = mk.gui.Gallery(
-          df=df_sorted,
-          main_column=IMAGE_COLUMN,
-      )
+        # Gallery
+        gallery = mk.gui.Gallery(
+            df=df_sorted,
+            main_column=IMAGE_COLUMN,
+        )
 
-      mk.gui.start(shareable=False)
-      mk.gui.Interface(component=mk.gui.RowLayout(components=[match, gallery])).launch()
+        mk.gui.start(shareable=False)
+        mk.gui.Interface(component=mk.gui.RowLayout(components=[match, gallery])).launch()
 
 
 .. raw:: html

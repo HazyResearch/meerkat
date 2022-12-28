@@ -1244,10 +1244,18 @@ class DataFrame(
     def read(
         cls,
         path: str,
+        overwrite: bool = False,
         *args,
         **kwargs,
     ) -> DataFrame:
         """Load a DataFrame stored on disk."""
+        from meerkat.datasets.utils import download_df
+
+        # URL
+        if path.startswith("http://") or path.startswith("https://"):
+            return download_df(path, overwrite=overwrite)
+        elif not os.path.exists(path):
+            raise ValueError(f"Path does not exist: {path}")
 
         # Load the metadata
         metadata = dict(

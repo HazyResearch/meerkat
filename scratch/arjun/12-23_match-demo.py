@@ -1,19 +1,14 @@
-import os
 import meerkat as mk
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
 
-path = "~/.meerkat/dataframes/imagenette_clip.mk"
-path = os.path.abspath(os.path.expanduser(path))
-if not os.path.exists(path):
-    df = mk.get("imagenette", version="160px")
-
-    # Embed the image.
-    df: mk.DataFrame = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN)
-    df.write("~/.meerkat/dataframes/imagenette_clip.mk")
-else:
-    df = mk.DataFrame.read(path)
+df = mk.get("imagenette", version="160px")
+# Download the precomupted CLIP embeddings for imagenette.
+# You can also embed the images yourself with mk.embed. This will take some time.
+# To embed: df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN, encoder="clip").
+df_clip = mk.DataFrame.read("https://huggingface.co/datasets/arjundd/meerkat-dataframes/resolve/main/imagenette_clip.mk.tar.gz")
+df = df.merge(df_clip, on="img_id")
 
 with mk.gui.react():
     # Match
