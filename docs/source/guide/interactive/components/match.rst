@@ -20,8 +20,14 @@ The user can type in the query they would like to run in the text box.
 They can also select the column corresponding to the target embedding in the dropdown.
 
 Note: :class:`mk.gui.Match` 1) embeds the text query and 2) computes the inner product between the query embedding and the target embedding(s).
-It does not sort the results. However, it can be combined with other operations like :func:`mk.sort` to sort the results as shown below:
+It does not sort the results. However, it can be combined with other operations like :func:`mk.sort` to sort the results.
 
+Example
+-------
+Let's look at creating an image search interface for the imagenette dataset.
+We can combine :class:`mk.gui.Match` with other operations (:func:`mk.sort`) and components (:class:`mk.gui.Gallery`) to search over images in the dataset.
+
+You can also do arithmetic on the embeddings. For example, you can subtract similarity scores between queries (e.g. ``"dog" - "cat"``)
 
 .. collapse:: Code
 
@@ -56,8 +62,6 @@ It does not sort the results. However, it can be combined with other operations 
         mk.gui.start(shareable=False)
         mk.gui.Interface(component=mk.gui.RowLayout(components=[match, gallery])).launch()
 
-
 .. raw:: html
 
-  <div style="position: relative; padding-bottom: 62.14039125431531%; height: 0;"><iframe src="https://www.loom.com/embed/cda949c144054320ac2ede5dee76f460" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
-
+    <div style="position: relative; padding-bottom: 62.14039125431531%; height: 0;"><iframe src="https://www.loom.com/embed/bc1d4e145b6946b4ac8f25e721685bb5" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>

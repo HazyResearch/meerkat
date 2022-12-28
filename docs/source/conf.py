@@ -54,8 +54,8 @@ extensions = [
     "sphinx_book_theme",
     "sphinx_external_toc",
     "sphinx_design",
-    # Collapsable sections
     "sphinx_toolbox.collapse",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -10,3 +10,4 @@ sphinx-external-toc
 sphinx_book_theme
 myst_nb
 sphinx-toolbox
+sphinx-copybutton
