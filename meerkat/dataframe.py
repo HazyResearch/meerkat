@@ -1281,6 +1281,7 @@ class DataFrame(
     ) -> None:
         """Save a DataFrame to disk."""
         # Make all the directories to the path
+        path = os.path.abspath(os.path.expanduser(path))
         os.makedirs(path, exist_ok=True)
 
         # Get the DataFrame state

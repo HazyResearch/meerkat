@@ -1,12 +1,19 @@
+import os
 import meerkat as mk
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
 
-df = mk.get("imagenette", version="160px")
+path = "~/.meerkat/dataframes/imagenette_clip.mk"
+path = os.path.abspath(os.path.expanduser(path))
+if not os.path.exists(path):
+    df = mk.get("imagenette", version="160px")
 
-# Embed the image.
-df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN)
+    # Embed the image.
+    df: mk.DataFrame = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN)
+    df.write("~/.meerkat/dataframes/imagenette_clip.mk")
+else:
+    df = mk.DataFrame.read(path)
 
 with mk.gui.react():
     # Match
