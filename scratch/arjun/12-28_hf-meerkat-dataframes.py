@@ -4,12 +4,14 @@
 - This script should be run sparingly, as it will upload a lot of data and can be computationally expensive.
 """
 
-from huggingface_hub.repository import Repository
 import os
 import pathlib
-import meerkat as mk
-import tarfile
 import subprocess
+import tarfile
+
+from huggingface_hub.repository import Repository
+
+import meerkat as mk
 
 _PATH = pathlib.Path(os.path.abspath(os.path.expanduser("~/.meerkat/hf/dataframes-gen")))
 _HF_PATH = pathlib.Path(os.path.abspath(os.path.expanduser("~/.meerkat/hf/dataframes")))

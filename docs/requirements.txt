@@ -11,3 +11,4 @@ sphinx_book_theme
 myst_nb
 sphinx-toolbox
 sphinx-copybutton
+sphinx_design

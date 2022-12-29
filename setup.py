@@ -73,6 +73,7 @@ EXTRAS = {
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
         "sphinx-copybutton",
+        "sphinx_design",
         "twine",
     ],
     "embeddings-mac": [
