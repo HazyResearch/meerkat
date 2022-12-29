@@ -2,7 +2,7 @@
 	import { get, writable, type Writable } from 'svelte/store';
 	import { MatchCriterion, type DataPanelSchema } from '$lib/api/datapanel';
     import * as monaco from 'monaco-editor';
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import Status from '$lib/components/common/Status.svelte';
 	import Select from 'svelte-select';
 
@@ -14,8 +14,21 @@
     import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 	import { Model } from 'carbon-icons-svelte';
 
+	type SuggestionOption = {
+		name:string,
+		type: string, 
+		cell_props: Record<any, any>,
+		cell_component: string
+	}
+	type Suggestion = {
+		key: string, 
+		name: string, 
+	}
+
 
 	const { get_schema, match } = getContext('Interface');
+
+
 
 	export let dp: Writable;
 	export let against: Writable<string>;
@@ -28,32 +41,49 @@
 	let schema_promise;
 	let items_promise;
 	let searchValue: string="";
-	let columns: Array<Object>=[];
+	
 
 	let divEl: HTMLDivElement = null;
     let editor: monaco.editor.IStandaloneCodeEditor;
     let Monaco;
-
-
-	let keywords: Array<string>=[]; 
-	let regex="col\\(";
+	
+	let columns: SuggestionOption[] = [];
+	let columnKeywords: Array<string>=[]; 
+	let suggestions: Array<Suggestion>=[];
 	//if we wanted to add more regex, it would look like: 
 	//i.e. add row as another keyword: 
 	//regex = "(col\\()|(row\\()|(tag\\() etc..."
-	console.log({regex});
+
+	let searchString: string="";
+	let matchedSuggestions: Array<Suggestion>=[]; 
+	let userClosed: boolean=false;
+
+	const onBodyClick = () => {
+		userClosed = true; 
+	}
+
+	document.addEventListener("click", onBodyClick) 
+	onDestroy(() => {
+		document.body.removeEventListener("click", onBodyClick)
+	})
+
+
 
 	//onMount will happen after the other calls in the <script/>
 
 	$: {
 		schema_promise = $get_schema($dp.box_id);
 		items_promise = schema_promise.then((schema: DataPanelSchema) => {
-			return schema.columns.filter((column) => {
-				return schema.columns.map((col) => col.name).includes(`clip(${column.name})`)
-			}).map(column => {
+			console.log("DILAND DILAN ");
+			console.log(schema.columns);
+			let clipRegex = /clip\((.*)\)/;
+			return schema.columns.filter((column) => 
+				column.name.match(clipRegex)
+			).map(column => {
 				console.log("this is a column: ");
-				console.log({column});
-				columns.push(column);
-				keywords.push(`col(` + column.name + `)`);
+				console.log(column.name.match(clipRegex));
+				const name = column.name.match(clipRegex)?.[1] ?? column.name;
+				suggestions.push({name, key: `col(${name})`});
 				console.log({columns});
 			return({value: column.name, label: column.name})})
 		});
@@ -63,92 +93,52 @@
 	onMount(async () => {
 		//col prompts
 		//img is the value
-		monaco.languages.register({id: 'myLang'});
-		monaco.languages.setMonarchTokensProvider('myLang', {
-			keywords, 
-			tokenizer:{
-				root:[[
-					regex, {
-						cases:{
-							'@keywords': 'keyword',
-							'@default': 'variable',
-						} 
-					}
-				]
-				]
-			}
-		});
-
-		monaco.languages.registerCompletionItemProvider('myLang', {
-			provideCompletionItems: (model, position) => {
-				const suggestions = [
-					...keywords.map(keyword => {
-						return {
-							label: keyword,
-							kind: monaco.languages.CompletionItemKind.Keyword,
-							insertText: keyword
-						}
-					})
-				]
-				return {suggestions: suggestions};
-			}
-		})
-		let width = window.innerWidth;
-		let options : monaco.editor.IStandaloneEditorConstructionOptions = {
-			wordWrap: 'off',
-            lineNumbers: 'off',
-            lineDecorationsWidth: 0,
-			lineHeight: 40,
-            overviewRulerLanes: 0,
-            overviewRulerBorder: false,
-            scrollbar: { horizontal: 'hidden', vertical: 'hidden' },
-			value: "",
-            language: 'myLang',
-			minimap: {enabled: false},
-			renderLineHighlight: "none",
-			// showFoldingControls: "never",
-			padding: {bottom: 0}
-
-	};
-	 const editor =	monaco.editor.create(divEl,options);
-
-	 editor.onKeyDown(e => {
-            if (e.keyCode == monaco.KeyCode.Enter) {
-                // We only prevent enter when the suggest model is not active
-                if (editor?.getContribution('editor.contrib.suggestController')?.model?.state == 0) {
-                    e.preventDefault();
-                }
-            }
-        });
-
-		editor.onDidPaste(e => {
-           if (e.range.endLineNumber > 1) {
-               let newContent = "";
-               let lineCount = editor.getModel()?.getLineCount();
-               for (let i = 0; i < (lineCount || 1); i++) {
-                   newContent += editor.getModel()?.getLineContent(i + 1);
-               }
-               editor.getModel()?.setValue(newContent);
-           }
-        });
+		
 		
     });
 
-	const onKeyPress = (e) => {
+	const onKeyPress = () => {
+
+		//see if search result matches regex
+		//if so, filter for all results with that starting
+		
+		// if(searchString?.match(columnRegex)){
+		// 	let results = columns.filter(column => )
+		// }
+
 		//match with column names. 
-		console.log(e.key);
+		//console.log(e.key);
+		// let results = columns.filter((column) => {
+		// 	return column.includes()
+		// })
+
 		console.log({columns});
-		console.log({searchValue});
-		if(searchValue.includes('col(')){
-			columns.map(column => {
-				console.log({column});
-			})
+		console.log({searchString});
+		// if(searchString.includes('col(')){
+		// 	columns.map(column => {
+		// 		console.log({column});
+		// 		console.log("FOUND");
+		// 	})
+		// }
+		matchedSuggestions = suggestions.filter((suggestion) => {
+			const searchStringTokens = searchString.split(" ");
+			const token = searchStringTokens.pop() ;
+			return token && suggestion.key.toLowerCase().includes(token.toLowerCase());
 		}
-		if (e.charCode === 13) on_search();
-		else status = 'waiting';
+
+		);
+		
+		
+		// //if (e.charCode === 13) on_search();
+		// else status = 'waiting';
 	};
 
+	//see if last character is a space, then cut the word
+	//if the user types in col(, automatically add in parentheses and put the clicker in the middle
+	//if a user types c, co, col, it should pop up with dropdown
+	// colorize text in command line. 
 
+	
 
 	let on_search = async () => {
 		
@@ -178,6 +168,21 @@
 	}
 	$: against_item = { value: $against, label: $against };
 
+	const handleChange = (e) => {
+		searchValue = e.target.value;
+		console.log({searchValue});
+		
+	}
+
+	const selectSuggestion = (key: string) => (e: MouseEvent) => {
+		e.preventDefault();
+		const searchStringTokens = searchString.split(" ");
+		searchStringTokens[searchStringTokens.length-1] = key;
+		searchString = searchStringTokens.join(" ");
+		document.getElementById("queryInput")?.focus();
+	}
+
+	
 	
 </script>
 
@@ -188,13 +193,32 @@
 	}
 </style>
 
+
+ 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md z-50 flex flex-col">
+
+	
 	{#if title != ''}
 		<div class="font-bold text-xl text-slate-600 self-start pl-2">
 			{title}
 		</div>
 	{/if}
-	<div class="form-control">
+	
+	<div style="bg-red">
+		<input id="queryInput" bind:value="{searchString}" on:keyup={onKeyPress} type="search" name="search" placeholder="Begin your query" class="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none"/>
+	</div>
+	<p>This is search string {searchString}</p>
+
+	{#if matchedSuggestions && searchString}
+		{console.log("OPEN DROPDOWN")}
+		{console.log({userClosed})}
+		<div class="bg-white rounded mt-2 text-black overflow-hidden z-50">
+			{#each matchedSuggestions as result}
+				<a class="search" href="" on:click={selectSuggestion(result.key)}>{result.key}</a>
+			{/each}
+		</div>
+	{/if}
+	<!-- <div class="form-control">
 		<div class="input-group w-100% flex items-center">
 			<div class="px-3">
 				<Status {status} />
@@ -202,16 +226,17 @@
 			
 			<div bind:this={divEl} style="" class="command-line input mr-5  grow h-10 rounded-md shadow-md" />
 
-			<!-- <input
-				type="text"
-				bind:value={searchValue}
-				placeholder="Write some text to be matched..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={onKeyPress}
-			/> -->
 		</div>
-	</div>
+	</div> -->
 </div>
+
+<!-- <input
+	type="text"
+	bind:value={searchValue}
+	placeholder="Write some text to be matched..."
+	class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
+	on:keypress={onKeyPress}
+/> -->
 <!-- 
 <div class="w-full py-5 px-2 bg-slate-100 ">
     Match
