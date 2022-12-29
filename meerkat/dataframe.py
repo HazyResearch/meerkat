@@ -41,7 +41,6 @@ from meerkat.mixins.deferable import DeferrableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
-from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.row import Row

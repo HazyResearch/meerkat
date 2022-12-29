@@ -26,8 +26,7 @@ class Aggregation(IdentifiableMixin):
         }
 
 
-class SliceByCards(Component): # FIXME: update this component
-
+class SliceByCards(Component):  # FIXME: update this component
     def __init__(
         self,
         sliceby: SliceBy,

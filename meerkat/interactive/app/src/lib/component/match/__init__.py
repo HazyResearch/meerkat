@@ -120,7 +120,7 @@ class MatchCriterion:
 @reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
-    if criterion == None or criterion.against is None:
+    if criterion == None or criterion.against is None:  # noqa: E711
         return df, None
 
     data_embedding = df[criterion.against]

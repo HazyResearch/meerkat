@@ -23,4 +23,3 @@ class Row(Component):
     # - column: the column name (column)
     # - value: the new value (value)
     on_change: Endpoint = None
-
