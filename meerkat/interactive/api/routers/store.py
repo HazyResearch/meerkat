@@ -1,7 +1,8 @@
 from typing import List
 
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.graph import Modification, Store, StoreModification, trigger
+from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.modification import Modification, StoreModification
 from meerkat.state import state
 
 

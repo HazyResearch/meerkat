@@ -6,8 +6,12 @@ from fastapi import HTTPException
 import meerkat as mk
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.graph import Store, StoreModification, trigger
-from meerkat.interactive.modification import DataFrameModification, Modification
+from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.modification import (
+    DataFrameModification,
+    Modification,
+    StoreModification,
+)
 
 _SUPPORTED_MATCH_OPS = {
     "+": lambda x, y: x + y,
