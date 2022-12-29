@@ -10,42 +10,6 @@ from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
 
-@reactive
-def binary_op(df_1: mk.DataFrame, df_2: mk.DataFrame):
-    return mk.DataFrame({"a": df_1["a"] + df_2["a"]})
-
-
-@reactive
-def unary_op(df_1):
-    return mk.DataFrame({"a": df_1["a"] * 3})
-
-
-def test_trigger():
-    # FIXME: fix this test
-    df_1 = mk.DataFrame({"a": np.arange(10)})
-    df_2 = mk.DataFrame({"a": np.arange(10)})
-
-    derived_1 = binary_op(df_1, df_2)
-    derived_2 = unary_op(derived_1)
-    derived_3 = binary_op(derived_1, derived_2)
-    derived_4 = binary_op(derived_3, df_2)
-
-    df_1 = mk.DataFrame({"a": np.arange(10, 20)})
-    df_2 = mk.DataFrame({"a": np.arange(10, 20)})
-    modifications = trigger(
-        [
-            DataFrameModification(id=df_1.inode.id, scope=[]),
-            DataFrameModification(id=df_2.inode.id, scope=[]),
-        ],
-    )
-
-    assert len(modifications) == 6
-    assert (derived_1.obj["a"] == np.arange(10, 20) * 2).all()
-    assert (derived_2.obj["a"] == derived_1.obj["a"] * 3).all()
-    assert (derived_3.obj["a"] == derived_2.obj["a"] + derived_1.obj["a"]).all()
-    assert (derived_4.obj["a"] == derived_3.obj["a"] + np.arange(10, 20)).all()
-
-
 def _create_dummy_df() -> mk.DataFrame:
     df = pd.DataFrame({"a": np.arange(10), "b": np.arange(10) + 10})
     return mk.DataFrame.from_pandas(df)
@@ -153,60 +117,3 @@ def test_default_nested_return():
     with mk.gui.react():
         out = _return_list()
     assert isinstance(out, mk.gui.Store)
-
-
-@pytest.mark.parametrize("react", [False, True])
-def test_store_reactive_methods(react: bool):
-    """Test basic math methods are reactive.
-
-    A method is reactive if it:
-        1. Returns a Store
-        2. Creates a connection based on the op.
-    """
-    store = mk.gui.Store(1)
-
-    expected = {
-        "add": 2,
-        "sub": 0,
-        "mul": 1,
-        "div": 1,
-        "mod": 0,
-        "pow": 1,
-        "neg": -1,
-        "pos": 1,
-        "abs": 1,
-        "lt": False,
-        "le": True,
-        "eq": True,
-        "ne": False,
-        "gt": False,
-        "ge": True,
-    }
-
-    out = {}
-    with mk.gui.react(reactive=react):
-        out["add"] = store + 1
-        out["sub"] = store - 1
-        out["mul"] = store * 1
-        out["div"] = store / 1
-        out["mod"] = store % 1
-        out["pow"] = store**1
-        out["neg"] = -store
-        out["pos"] = +store
-        out["abs"] = abs(store)
-        out["lt"] = store < 1
-        out["le"] = store <= 1
-        out["eq"] = store == 1
-        out["ne"] = store != 1
-        out["gt"] = store > 1
-        out["ge"] = store >= 1
-
-    for k, v in out.items():
-        if react:
-            assert isinstance(v, mk.gui.Store)
-            assert store.inode.has_trigger_children()
-            # TODO: Check the parent of the current child.
-            assert v == expected[k]
-        else:
-            assert not isinstance(v, mk.gui.Store)
-            assert store.inode is None
