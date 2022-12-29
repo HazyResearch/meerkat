@@ -97,7 +97,7 @@ def test_react_as_decorator(react: bool):
 
 
 def test_default_nested_return():
-    """By default, nested return is True for functions returning tuples."""
+    """By default, nested return is False."""
 
     @reactive
     def _return_tuple():
@@ -110,7 +110,7 @@ def test_default_nested_return():
     with mk.gui.react():
         out = _return_tuple()
         a, b = out
-    assert not isinstance(out, mk.gui.Store)
+    assert isinstance(out, mk.gui.Store)
     assert isinstance(a, mk.gui.Store)
     assert isinstance(b, mk.gui.Store)
 

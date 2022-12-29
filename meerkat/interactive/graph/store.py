@@ -163,7 +163,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __mod__(self, other):
         return super().__mod__(other)
 
-    @reactive
+    @reactive(nested_return=False)
     def __divmod__(self, other):
         return super().__divmod__(other)
 
@@ -426,8 +426,13 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     # def __exit__(self, *args, **kwargs):
     #     return self.__wrapped__.__exit__(*args, **kwargs)
 
-    # def __iter__(self):
-    #     return iter(self.__wrapped__)
+    @reactive
+    def __next__(self):
+        return next(self.__wrapped__)
+
+    @reactive
+    def __iter__(self):
+        return iter(self.__wrapped__)
 
 
 def store_field(value: str) -> Field:

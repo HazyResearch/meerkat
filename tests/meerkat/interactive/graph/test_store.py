@@ -1,3 +1,5 @@
+from typing import Iterator
+
 import pytest
 
 import meerkat as mk
@@ -20,7 +22,7 @@ def test_store_reactive_math(react: bool):
         "truediv": 1,
         "floordiv": 1,
         "mod": 0,
-        # "divmod": (1, 0),
+        "divmod": (1, 0),
         "pow": 1,
         "neg": -1,
         "pos": 1,
@@ -34,14 +36,14 @@ def test_store_reactive_math(react: bool):
     }
 
     out = {}
-    with mk.gui.react(reactive=react, nested_return=False):
+    with mk.gui.react(reactive=react):
         out["add"] = store + 1
         out["sub"] = store - 1
         out["mul"] = store * 1
         out["truediv"] = store.__truediv__(1)
         out["floordiv"] = store // 1
         out["mod"] = store % 1
-        # out["divmod"] = divmod(store, 1)
+        out["divmod"] = divmod(store, 1)
         out["pow"] = store**1
         out["neg"] = -store
         out["pos"] = +store
@@ -95,3 +97,27 @@ def test_store_imethod(other):
         assert isinstance(v, mk.gui.Store), f"{k} did not return a Store."
         assert id(v) != id(original), f"{k} did not return a new Store."
         assert v == expected[k], f"{k} did not return the correct value."
+
+
+@pytest.mark.parametrize("react", [False, True])
+def test_store_as_iterator(react: bool):
+    store = mk.gui.Store((1, 2))
+
+    with mk.gui.react(react):
+        store_iter = iter(store)
+    assert isinstance(store_iter, mk.gui.Store if react else Iterator)
+
+    with mk.gui.react(react):
+        for x in store_iter:
+            assert isinstance(x, mk.gui.Store if react else int)
+
+
+@pytest.mark.parametrize("react", [False, True])
+def test_tuple_unpack(react: bool):
+    store = mk.gui.Store((1, 2))
+
+    with mk.gui.react(react):
+        a, b = store
+
+    assert isinstance(a, mk.gui.Store if react else int)
+    assert isinstance(b, mk.gui.Store if react else int)
