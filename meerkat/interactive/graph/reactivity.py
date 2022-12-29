@@ -190,6 +190,14 @@ class _ReactiveState:
     def __bool__(self):
         return self.reactive
 
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"reactive={self.reactive}, "
+            f"nested_return={self.kwargs['nested_return']}"
+            ")"
+        )
+
 
 _IS_REACTIVE: List[_ReactiveState] = []
 

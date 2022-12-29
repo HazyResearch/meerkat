@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Tuple
 
 import pytest
 
@@ -73,25 +73,27 @@ def test_store_imethod(other):
     stores."""
     store = original = mk.gui.Store(1)
 
-    expected = {
-        "__iadd__": store + other,
-        "__isub__": store - other,
-        "__imul__": store * other,
-        "__itruediv__": store.__itruediv__(other),
-        "__ifloordiv__": store // other,
-        "__imod__": store % other,
-        "__ipow__": store**other,
-        "__ilshift__": store << other,
-        "__irshift__": store >> other,
-        "__iand__": store & other,
-        "__ixor__": store ^ other,
-        "__ior__": store | other,
-    }
+    with pytest.warns(UserWarning):
+        expected = {
+            "__iadd__": store + other,
+            "__isub__": store - other,
+            "__imul__": store * other,
+            "__itruediv__": store.__itruediv__(other),
+            "__ifloordiv__": store // other,
+            "__imod__": store % other,
+            "__ipow__": store**other,
+            "__ilshift__": store << other,
+            "__irshift__": store >> other,
+            "__iand__": store & other,
+            "__ixor__": store ^ other,
+            "__ior__": store | other,
+        }
 
     out = {}
     with mk.gui.react():
         for k in expected:
-            out[k] = getattr(store, k)(other)
+            with pytest.warns(UserWarning):
+                out[k] = getattr(store, k)(other)
 
     for k, v in out.items():
         assert isinstance(v, mk.gui.Store), f"{k} did not return a Store."
@@ -118,6 +120,23 @@ def test_tuple_unpack(react: bool):
 
     with mk.gui.react(react):
         a, b = store
+
+    assert isinstance(a, mk.gui.Store if react else int)
+    assert isinstance(b, mk.gui.Store if react else int)
+
+
+@pytest.mark.parametrize("react", [False, True])
+def test_tuple_unpack_return_value(react: bool):
+    @mk.gui.react()
+    def add(seq: Tuple[int]):
+        return tuple(x + 1 for x in seq)
+
+    store = mk.gui.Store((1, 2))
+    # We need to use the `react` decorator here because tuple unpacking
+    # happens outside of the function `add`. Without the decorator, the
+    # tuple unpacking will not be reactive.
+    with mk.gui.react():
+        a, b = add(store)
 
     assert isinstance(a, mk.gui.Store if react else int)
     assert isinstance(b, mk.gui.Store if react else int)
