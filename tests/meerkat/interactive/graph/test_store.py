@@ -4,7 +4,7 @@ import meerkat as mk
 
 
 @pytest.mark.parametrize("react", [False, True])
-def test_store_reactive_methods(react: bool):
+def test_store_reactive_math(react: bool):
     """Test basic math methods are reactive.
 
     A method is reactive if it:
@@ -17,8 +17,10 @@ def test_store_reactive_methods(react: bool):
         "add": 2,
         "sub": 0,
         "mul": 1,
-        "div": 1,
+        "truediv": 1,
+        "floordiv": 1,
         "mod": 0,
+        # "divmod": (1, 0),
         "pow": 1,
         "neg": -1,
         "pos": 1,
@@ -32,12 +34,14 @@ def test_store_reactive_methods(react: bool):
     }
 
     out = {}
-    with mk.gui.react(reactive=react):
+    with mk.gui.react(reactive=react, nested_return=False):
         out["add"] = store + 1
         out["sub"] = store - 1
         out["mul"] = store * 1
-        out["div"] = store / 1
+        out["truediv"] = store.__truediv__(1)
+        out["floordiv"] = store // 1
         out["mod"] = store % 1
+        # out["divmod"] = divmod(store, 1)
         out["pow"] = store**1
         out["neg"] = -store
         out["pos"] = +store
@@ -54,7 +58,40 @@ def test_store_reactive_methods(react: bool):
             assert isinstance(v, mk.gui.Store)
             assert store.inode.has_trigger_children()
             # TODO: Check the parent of the current child.
-            assert v == expected[k]
         else:
             assert not isinstance(v, mk.gui.Store)
             assert store.inode is None
+
+        assert v == expected[k]
+
+
+@pytest.mark.parametrize("other", [1, 2])
+def test_store_imethod(other):
+    """Test traditional inplace methods are reactive, but return different
+    stores."""
+    store = original = mk.gui.Store(1)
+
+    expected = {
+        "__iadd__": store + other,
+        "__isub__": store - other,
+        "__imul__": store * other,
+        "__itruediv__": store.__itruediv__(other),
+        "__ifloordiv__": store // other,
+        "__imod__": store % other,
+        "__ipow__": store**other,
+        "__ilshift__": store << other,
+        "__irshift__": store >> other,
+        "__iand__": store & other,
+        "__ixor__": store ^ other,
+        "__ior__": store | other,
+    }
+
+    out = {}
+    with mk.gui.react():
+        for k in expected:
+            out[k] = getattr(store, k)(other)
+
+    for k, v in out.items():
+        assert isinstance(v, mk.gui.Store), f"{k} did not return a Store."
+        assert id(v) != id(original), f"{k} did not return a new Store."
+        assert v == expected[k], f"{k} did not return the correct value."

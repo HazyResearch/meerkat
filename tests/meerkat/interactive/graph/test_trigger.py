@@ -7,17 +7,17 @@ from meerkat.state import state
 
 
 @mk.gui.reactive
-def binary_op(df_1: mk.DataFrame, df_2: mk.DataFrame):
+def binary_op(df_1: mk.DataFrame, df_2: mk.DataFrame) -> mk.DataFrame:
     return mk.DataFrame({"a": df_1["a"] + df_2["a"]})
 
 
 @mk.gui.reactive
-def unary_op(df_1):
+def unary_op(df_1) -> mk.DataFrame:
     return mk.DataFrame({"a": df_1["a"] * 3})
 
 
 @mk.gui.endpoint
-def update_df(df: mk.DataFrame, col: str, value: np.ndarray):
+def update_df(df: mk.DataFrame, col: str, value: np.ndarray) -> mk.DataFrame:
     df[col] = value
     return df
 

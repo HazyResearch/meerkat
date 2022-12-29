@@ -131,7 +131,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     def __bool__(self):
         # __bool__ cannot be reactive because Python expects
-        # bool to return a bool and not a Store.
+        # __bool__ to return a bool and not a Store.
         # This means stores cannot be used in logical statements.
         return super().__bool__()
 
