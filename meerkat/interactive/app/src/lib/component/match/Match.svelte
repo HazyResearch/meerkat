@@ -49,7 +49,7 @@
 	
 	let columns: SuggestionOption[] = [];
 	let columnKeywords: Array<string>=[]; 
-	let suggestions: Array<Suggestion>=[];
+	let suggestions: Array<Suggestion>=[{key: 'match(', name:'match'}];
 	//if we wanted to add more regex, it would look like: 
 	//i.e. add row as another keyword: 
 	//regex = "(col\\()|(row\\()|(tag\\() etc..."
@@ -57,6 +57,8 @@
 	let searchString: string="";
 	let matchedSuggestions: Array<Suggestion>=[]; 
 	let userClosed: boolean=false;
+
+	let selectionStart: number=0;
 
 	const onBodyClick = () => {
 		userClosed = true; 
@@ -74,17 +76,12 @@
 	$: {
 		schema_promise = $get_schema($dp.box_id);
 		items_promise = schema_promise.then((schema: DataPanelSchema) => {
-			console.log("DILAND DILAN ");
-			console.log(schema.columns);
 			let clipRegex = /clip\((.*)\)/;
 			return schema.columns.filter((column) => 
 				column.name.match(clipRegex)
 			).map(column => {
-				console.log("this is a column: ");
-				console.log(column.name.match(clipRegex));
 				const name = column.name.match(clipRegex)?.[1] ?? column.name;
 				suggestions.push({name, key: `col(${name})`});
-				console.log({columns});
 			return({value: column.name, label: column.name})})
 		});
 	}
@@ -97,7 +94,7 @@
 		
     });
 
-	const onKeyPress = () => {
+	const onKeyPress = (e: KeyboardEvent) => {
 
 		//see if search result matches regex
 		//if so, filter for all results with that starting
@@ -120,15 +117,16 @@
 		// 		console.log("FOUND");
 		// 	})
 		// }
+		selectionStart = (e.target as HTMLInputElement).selectionStart || 0;
 		matchedSuggestions = suggestions.filter((suggestion) => {
 			const searchStringTokens = searchString.split(" ");
-			const token = searchStringTokens.pop() ;
-			return token && suggestion.key.toLowerCase().includes(token.toLowerCase());
+			const tokenIndex = findCurrentGroupIndex(searchString, selectionStart);
+			const token = searchStringTokens[tokenIndex];
+			return token && suggestion.key.toLowerCase().match(new RegExp('^' + escapeRegExp(token).toLowerCase()));
 		}
 
 		);
-		
-		
+		 
 		// //if (e.charCode === 13) on_search();
 		// else status = 'waiting';
 	};
@@ -177,12 +175,31 @@
 	const selectSuggestion = (key: string) => (e: MouseEvent) => {
 		e.preventDefault();
 		const searchStringTokens = searchString.split(" ");
-		searchStringTokens[searchStringTokens.length-1] = key;
+		const tokenIndex = findCurrentGroupIndex(searchString, selectionStart);
+		searchStringTokens[tokenIndex] = key;
+		const newCursorPosition = searchStringTokens.slice(tokenIndex).join(" ").length;
 		searchString = searchStringTokens.join(" ");
-		document.getElementById("queryInput")?.focus();
+		const queryInput = document.getElementById("queryInput") as HTMLInputElement;
+		if(queryInput){
+			queryInput.focus();
+			console.log({newCursorPosition});
+			queryInput.setSelectionRange(newCursorPosition, newCursorPosition);
+		}
 	}
 
-	
+	const findCurrentGroupIndex = (str: string, cursorPosition: number) => {
+		const tokens = str.split(" ");
+		//cp = 8. 
+		let i = 0;
+		return tokens.findIndex((token) => {
+			i += token.length+1;
+			return cursorPosition <= i;
+		})
+	}
+
+	function escapeRegExp(text: string) {
+  		return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+	}
 	
 </script>
 
@@ -215,6 +232,7 @@
 		<div class="bg-white rounded mt-2 text-black overflow-hidden z-50">
 			{#each matchedSuggestions as result}
 				<a class="search" href="" on:click={selectSuggestion(result.key)}>{result.key}</a>
+				<br/>
 			{/each}
 		</div>
 	{/if}
