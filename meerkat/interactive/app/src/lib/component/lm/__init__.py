@@ -17,5 +17,5 @@ class SchemaTree(Component):
     @property
     def props(self):
         return {
-            "df": self.df.config, # FIXME
+            "df": self.df.config,  # FIXME
         }

@@ -30,7 +30,7 @@ def sort(
     """
     # Use "==" because `by` can be a Store.
     # Store(None) == None is True, but `Store(None) is None` evalutes to False.
-    if by is None or by == None:
+    if by is None or by == None:  # noqa: E711
         return data.view()
 
     by = [by] if isinstance(by, str) else by

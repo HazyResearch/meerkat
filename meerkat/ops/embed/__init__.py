@@ -1,4 +1,3 @@
-import os
 from typing import Callable, Union
 
 import PIL

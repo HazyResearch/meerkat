@@ -2,7 +2,6 @@ import pathlib
 
 from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
-from meerkat.interactive.app.src.lib.component.text import Text
 from meerkat.interactive.app.src.lib.layouts import (
     ColumnLayout,
     Div,

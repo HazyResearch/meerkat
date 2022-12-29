@@ -7,7 +7,9 @@ from meerkat.dataframe import DataFrame
 
 
 class EditTargetConfig(BaseModel):
-    target: Any  # FIXME: this used to be ReferenceConfig (ref_id: str, is_store = True, type = "DataFrame")
+    # FIXME: this used to be ReferenceConfig
+    # (ref_id: str, is_store = True, type = "DataFrame")
+    target: Any
     target_id_column: str
     source_id_column: str
 

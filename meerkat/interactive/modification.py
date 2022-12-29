@@ -45,7 +45,7 @@ class DataFrameModification(Modification):
         try:
             df = state.identifiables.get(group="dataframes", id=self.id)
             return df.inode
-        except Exception as e:
+        except Exception:
             return state.identifiables.get(group="nodes", id=self.id)
 
 
@@ -70,5 +70,5 @@ class StoreModification(Modification):
         try:
             store = state.identifiables.get(group="stores", id=self.id)
             return store.inode
-        except Exception as e:
+        except Exception:
             return state.identifiables.get(group="nodes", id=self.id)

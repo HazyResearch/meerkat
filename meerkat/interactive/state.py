@@ -16,7 +16,7 @@ class EndpointMixin:
 
         # Access all the user-defined attributes of the instance to create endpoints
         # Here, we keep only methods that:
-        # - are defined in this subclass of Component, but not in any of its superclasses
+        # - are defined in this subclass, but not in any of its superclasses
         #   (e.g. Component, IdentifiableMixin, EndpointMixin etc.)
         # - don't begin with "_"
         # - are callables

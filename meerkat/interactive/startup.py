@@ -76,7 +76,7 @@ def get_first_available_port(initial: int, final: int) -> int:
             s = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )  # create a socket object
-            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
+            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port  # noqa: F841
             s.close()
             rich.print(f"Found open port: {port}")
             return port
@@ -220,10 +220,11 @@ def start(
             for _ in range(MAX_WAIT):
                 time.sleep(0.1)
 
-                # this is a hack to address the issue that the vite skips over a port that we
-                # deem to be open per `get_first_available_port`
-                # TODO: remove this once we figure out how to properly check for unavailable
-                # ports in a way that is compatible with vite's port selection logic
+                # this is a hack to address the issue that the vite skips
+                # over a port that we deem to be open per `get_first_available_port`
+                # TODO: remove this once we figure out how to properly check for
+                # unavailable ports in a way that is compatible with vite's port
+                # selection logic.
                 match = re.search(
                     "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
                     network_info.npm_server_out,
