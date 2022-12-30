@@ -46,6 +46,7 @@ parts:
           - file: guide/interactive/details/why-reactive
           - file: guide/interactive/components/component
             sections:
+              - file: guide/interactive/components/display
               - file: guide/interactive/components/match
 
   - caption: Use Cases

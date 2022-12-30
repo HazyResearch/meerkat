@@ -67,6 +67,7 @@ __all__ = [
     "StoreFrontend",
     "make_store",
     "trigger",
+    # Components
     "Component",
     "Discover",
     "Gallery",

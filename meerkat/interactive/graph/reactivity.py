@@ -24,6 +24,7 @@ def reactive(
     to mk.gui.Store, we no longer need to support nested return values.
 
     A basic example that adds two numbers:
+
     .. code-block:: python
 
         @reactive
@@ -38,6 +39,7 @@ def reactive(
     with the new values of `a` and `b`.
 
     A more complex example that concatenates two mk.DataFrame objects:
+
     .. code-block:: python
 
         @reactive
@@ -235,6 +237,7 @@ class react:
     are modified.
 
     A basic example that adds two numbers:
+
     .. code-block:: python
 
         a = Store(1)
@@ -246,6 +249,7 @@ class react:
     with the new values of `a` and `b`.
 
     Also functions as a decorator. (Make sure to instantiate with parenthesis.):
+
     .. code-block:: python
 
             @react()
@@ -257,6 +261,7 @@ class react:
             c = add(a, b)
 
     A more complex example that concatenates two mk.DataFrame objects:
+
     .. code-block:: python
 
         @react()

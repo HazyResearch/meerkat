@@ -40,6 +40,7 @@ def get_wilds_dataframe(
 
     Example:
     Run inference on the dataset and store predictions alongside the data.
+
     .. code-block:: python
 
         df = get_wilds_dataframe("fmow", root_dir="/datasets/", split="test")
