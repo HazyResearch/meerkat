@@ -1,13 +1,25 @@
-import json
+import importlib
 import os
-import shutil
 import subprocess
+import sys
 
 import rich
 import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from meerkat.interactive import start
+from meerkat.interactive.interface import Interface
+from meerkat.interactive.server import API_PORT, FRONTEND_PORT
+from meerkat.interactive.startup import (
+    get_subclasses_recursive,
+    output_startup_message,
+    run_frontend,
+    run_script,
+    to_py_module_name,
+    wrap_all_components,
+)
+from meerkat.interactive.svelte import SvelteWriter
+from meerkat.constants import APP_DIR
+from meerkat.state import APIInfo, state
 
 cli = typer.Typer()
 
@@ -19,7 +31,14 @@ def init(
         help="Name of the app",
     ),
 ):
-    
+    """
+    Create a new Meerkat app. This will create a new folder called `app` in
+    the current directory and install all the necessary packages.
+
+    Internally, Meerkat uses SvelteKit to create the app, and adds all the
+    setup required by Meerkat to the app.
+    """
+
     # Check if app folder exists, and tell the user to delete it if it does
     if os.path.exists("app"):
         rich.print(
@@ -27,298 +46,93 @@ def init(
             "Please delete it before running this command.[/red]"
         )
         raise typer.Exit(1)
-    
+
     rich.print(
         f":seedling: Creating [purple]Meerkat[/purple] app: [green]{name}[/green]"
     )
+
+    svelte_writer = SvelteWriter(appname=name, _appdir=os.path.join(os.getcwd(), "app"))
+
     with Progress(
         SpinnerColumn(spinner_name="material"),
         TextColumn("[progress.description]{task.description}"),
-        # transient=True,
+        transient=True,
     ) as progress:
 
-        # Create a new Svelte app, but only output the stdout if there is an error
+        # Install prerequisites: package manager and create-svelte
         progress.add_task(description="Setting up installer...", total=None)
         try:
-            subprocess.run(
-                ["curl https://bun.sh/install | sh"],
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                shell=True,
-            )
-            subprocess.run(
-                ["bun", "add", "create-svelte@latest"],
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            svelte_writer.install_bun()
+            svelte_writer.add_svelte()
         except subprocess.CalledProcessError as e:
             rich.print(e.stdout.decode("utf-8"))
             raise e
 
-        os.makedirs("installer", exist_ok=True)
-
-        with open("installer/installer.js", "w") as f:
-            f.write(
-                f"""\
-import {{ create }} from 'create-svelte';
-
-await create("../{name}", {{
-    name: '{name}',
-    template: 'skeleton',
-    types: 'typescript',
-    prettier: true,
-    eslint: true,
-    playwright: false,
-    vitest: false
-}});
-"""
-            )
-        # Create a package.json for the installer
-        with open("installer/package.json", "w") as f:
-            json.dump(
-                {
-                    "name": "meerkat-installer",
-                    "main": "installer.js",
-                    "type": "module",
-                    "scripts": {"install": "node installer.js"},
-                    "dependencies": {"create-svelte": "latest"},
-                },
-                f,
-            )
+        # Create an installer that will call create-svelte
+        # Rather than directly calling create-svelte, we use an installer
+        # to make it easier to add additional setup steps (programatically)
+        # in the future
+        svelte_writer.write_installer()
 
         # Run the installer to create the app
         progress.add_task(description="Creating app...", total=None)
-
         try:
-            subprocess.run(
-                # ["npm", "install"],
-                ["bun", "install"],
-                cwd="installer",
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            svelte_writer.install_packages(cwd="installer")
+            svelte_writer.delete_installer()
         except subprocess.CalledProcessError as e:
             rich.print(e.stdout.decode("utf-8"))
             raise e
 
-        # Delete the installer
-        subprocess.run(["rm", "-rf", "installer"])
+        # Rename the app folder (`name`) to `app` before proceeding
+        os.rename(name, "app")
+        svelte_writer.update_package_json()
 
-        # Install dependencies for the new app
-        progress.add_task(description="Installing dependencies...", total=None)
-
-        # Update the package.json
-        #   Add "@meerkat-ml/meerkat" to dependencies
-        #   Add "tailwindcss" "postcss" "autoprefixer" to devDependencies
-        with open(f"{name}/package.json") as f:
-            package = json.load(f)
-
-        if "dependencies" not in package:
-            package["dependencies"] = {}
-        package["dependencies"]["@meerkat-ml/meerkat"] = "latest"
-
-        package["devDependencies"] = {
-            **package["devDependencies"],
-            **{
-                "tailwindcss": "latest",
-                "postcss": "latest",
-                "autoprefixer": "latest",
-            },
-        }
-
-        with open(f"{name}/package.json", "w") as f:
-            json.dump(package, f)
-
-        # Run the npm install for the new app
+        # Install packages for the new app
+        progress.add_task(description="Installing packages...", total=None)
         try:
-            subprocess.run(
-                # ["npm", "install"],
-                ["bun", "install"],
-                cwd=name,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            svelte_writer.install_packages()
         except subprocess.CalledProcessError as e:
             rich.print(e.stdout.decode("utf-8"))
             raise e
 
-        # Install Tailwind
+        # Install TailwindCSS
         progress.add_task(description="Getting tailwind...", total=None)
         try:
-            subprocess.run(
-                ["npx", "tailwindcss", "init", "tailwind.config.cjs", "-p"],
-                cwd=name,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
+            svelte_writer.install_tailwind()
         except subprocess.CalledProcessError as e:
             rich.print(e.stdout.decode("utf-8"))
             raise e
 
-        # Write svelte.config.js
-        with open(f"{name}/svelte.config.js", "w") as f:
-            f.write(
-                f"""\
-import adapter from '@sveltejs/adapter-auto';
-import {{ vitePreprocess }} from '@sveltejs/kit/vite';
+        # Configure and setup the app for Meerkat
 
-/** @type {{import('@sveltejs/kit').Config}} */
-const config = {{
-kit: {{
-    adapter: adapter()
-}},
-preprocess: vitePreprocess()
-}};
+        # These need to be done first, .mk allows Meerkat
+        # to recognize the app as a Meerkat app
+        svelte_writer.write_libdir()  # src/lib
+        svelte_writer.write_dot_mk()  # .mk file
 
-export default config;
-"""
-            )
+        # Write an ExampleComponent.svelte and __init__.py file
+        # and a script example.py that uses the component
+        svelte_writer.write_example_component()
+        svelte_writer.write_example_py()
 
-        # Write tailwind.config.cjs
-        with open(f"{name}/tailwind.config.cjs", "w") as f:
-            f.write(
-                f"""\
-/** @type {{import('tailwindcss').Config}} */
-module.exports = {{
-content: ['./src/**/*.{{html,js,svelte,ts}}'],
-theme: {{
-    extend: {{}}
-}},
-plugins: []
-}};
-"""
-            )
+        svelte_writer.write_app_css()  # app.css
+        svelte_writer.write_constants_js()  # constants.js
+        # TODO: add adapter static to svelte.config.js
+        svelte_writer.write_svelte_config()  # svelte.config.js
+        svelte_writer.write_tailwind_config()  # tailwind.config.cjs
 
-        # Add an app.css file inside the src directory
-        with open(f"{name}/src/app.css", "w") as f:
-            f.write(
-                f"""\
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-"""
-            )
+        svelte_writer.import_app_components()
+        svelte_writer.write_all_component_wrappers()  # src/lib/components/wrappers
+        svelte_writer.write_component_context()  # ComponentContext.svelte
+        svelte_writer.write_layout()  # +layout.svelte, layout.js
+        svelte_writer.write_slug_route()  # [slug]/+page.svelte
 
-        # Create "src/routes/+layout.svelte" file
-        with open(f"{name}/src/routes/+layout.svelte", "w") as f:
-            f.write(
-                f"""\
-<script>
-    import "../app.css";
-</script>
+        svelte_writer.write_gitignore()  # .gitignore
+        svelte_writer.write_setup_py()  # setup.py
 
-<slot />
-"""
-            )
-
-        # Get path to favicon.png, at "../interactive/app/static/favicon.png"
-        favicon_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "interactive",
-            "app",
-            "static",
-            "favicon.png",
-        )
-
-        # Copy favicon.png to the new app
-        shutil.copy(favicon_path, f"{name}/static/favicon.png")
-        
-        # Get path to banner_small.png at "../interactive/app/src/lib/assets/banner_small.png"
-        banner_small_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "interactive",
-            "app",
-            "src",
-            "lib",
-            "assets",
-            "banner_small.png",
-        )
-        
-        # Copy banner_small.png to the new app
-        os.makedirs(f"{name}/src/lib/assets", exist_ok=True)
-        shutil.copy(banner_small_path, f"{name}/src/lib/assets/banner_small.png")
-
-        # Create a "src/lib/components" directory
-        os.makedirs(f"{name}/src/lib/components", exist_ok=True)
-
-        # Create an ExampleComponent.svelte file
-        with open(f"{name}/src/lib/components/ExampleComponent.svelte", "w") as f:
-            f.write(
-                f"""\
-<script lang="ts">
-    export let name: string = "World";
-</script>
-
-<h1 class="text-center text-xl underline bg-purple-200">Hello {{name}}!</h1>
-"""
-            )
-        # Create an __init__.py file
-        with open(f"{name}/src/lib/components/__init__.py", "w") as f:
-            f.write(
-                f"""\
-import meerkat as mk
-
-class ExampleComponent(mk.gui.Component):
-    name: str = "World"
-"""
-            )
-        
-        # Create a test script example.py
-        with open(f"example.py", "w") as f:
-            f.write(
-                f"""\
-import meerkat as mk
-from app.src.lib.components import ExampleComponent
-
-# Import and use the ExampleComponent
-example_component = ExampleComponent(name="Meerkat")
-
-# Launch the Meerkat GUI
-mk.gui.start()
-mk.gui.Interface(component=example_component).launch()
-""")
-        # Add a config file called meerkat.config.yaml
-        with open(f"meerkat.config.yaml", "w") as f:
-            f.write(
-                f"""\
-# This is the Meerkat config file
-APP_DIR: app/
-""")
-            
-        # Add a .mk file inside the app directory
-        with open(f"{name}/.mk", "w") as f:
-            f.write("")
-        
-        # Create a src/lib/constants.js file
-        with open(f"{name}/src/lib/constants.js", "w") as f:
-            f.write(
-                f"""\
-import {{ writable }} from "svelte/store";
-export const API_URL = writable(import.meta.env['VITE_API_URL'] || import.meta.env['VITE_API_URL_PLACEHOLDER']);
-""")
-    
-        # Write the +layout.svelte file
-        with open(f"{name}/src/routes/+layout.svelte", "w") as f:
-            f.write(
-                f"""\
-<script>
-    import Meerkat from '@meerkat-ml/meerkat/Meerkat.svelte';
-    import "../app.css";
-</script>
-
-<Meerkat>
-	<slot />
-</Meerkat>
-""")
-            
-        
-        # Rename the app folder to app
-        os.rename(f"{name}", f"app")
+        svelte_writer.copy_banner_small()  # banner_small.png
+        svelte_writer.copy_favicon()  # favicon.png
+        # TODO add example_ipynb
 
     # Pretty print information to console
     rich.print(f":tada: Created [purple]{name}[/purple]!")
@@ -339,25 +153,84 @@ def run(
     script_path: str = typer.Argument(
         ..., help="Path to a Python script to run in Meerkat"
     ),
-    dev: bool = typer.Option(False, "--dev/--prod", help="Run in development mode"),
+    dev: bool = typer.Option(True, "--dev/--prod", help="Run in development mode"),
     shareable: bool = typer.Option(False, help="Run in public sharing mode"),
-    port: int = typer.Option(5000, help="Meerkat API port"),
-    
+    api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
+    frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
+    target: str = typer.Option("interface", help="Target to run in script"),
+    package_manager: str = typer.Option(
+        "npm", show_choices=["npm", "bun"], help="Package manager to use"
+    ),
+    subdomain: str = typer.Option(
+        "app", help="Subdomain to use for public sharing mode"
+    ),
 ):
     """
     Launch a Meerkat app, given a path to a Python script.
     """
-    
-    rich.print(f"Running {script_path}")
-    # start(shareable=shareable, api_port=port, dev=dev)
-    # breakpoint()
-    subprocess.run(["python", script_path])
-    
+    # Pretty print information to console
+    rich.print(
+        f"[green][Log][/green] :rocket: Running [bold violet]{script_path}[/bold violet]"
+    )
+    if dev:
+        rich.print(
+            "[green][Log][/green] :wrench: Dev mode is [bold violet]on[/bold violet]"
+        )
+        rich.print(
+            "[green][Log][/green] :hammer: Live reload is [bold violet]enabled[/bold violet]"
+        )
+    else:
+        rich.print(
+            "[green][Log][/green] :wrench: Production mode is [bold violet]on[/bold violet]"
+        )
+    rich.print()
 
+    # Dump wrapper Component subclasses, ComponentContext
+    svelte_writer = SvelteWriter()
+    svelte_writer.import_app_components()
+    svelte_writer.write_all_component_wrappers()
+    svelte_writer.write_component_context()
 
-@cli.command()
-def install():
-    rich.print("Installing Meerkat")
+    # Run the frontend
+    # TODO: make the dummy API info take in the actual hostname
+    dummy_api_info = APIInfo(None, api_port, name="localhost")
+    frontend_info = run_frontend(
+        package_manager,
+        frontend_port,
+        dev,
+        shareable,
+        subdomain,
+        dummy_api_info.url,
+        svelte_writer.appdir,
+    )
+
+    # Run the uvicorn server
+    api_info = run_script(
+        script_path,
+        port=api_port,
+        dev=dev,
+        target=target,
+        frontend_url=frontend_info.url,
+        apiurl=dummy_api_info.url,
+    )
+
+    output_startup_message(frontend_info.url, api_info.docs_url)
+
+    # Put it in the global state
+    state.api_info = api_info
+    state.frontend_info = frontend_info
+
+    while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
+        api_stdout = api_info.process.stdout.readline().decode("utf-8")
+        if "Reloading..." in api_stdout:
+            rich.print(
+                f"[purple][Reload][/purple] {api_stdout.lstrip('WARNING:  ')}", end=""
+            )
+        else:
+            if api_stdout:
+                rich.print(
+                    f"[medium_purple1][Script][/medium_purple1] {api_stdout}", end=""
+                )
 
 
 if __name__ == "__main__":

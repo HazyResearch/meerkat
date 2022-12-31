@@ -12,8 +12,6 @@
 		};
 	}
 	
-	// Setup context
-	
 </script>
 
 {#each Array.from(global_stores.keys()) as store_id}

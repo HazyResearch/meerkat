@@ -14,7 +14,7 @@ from meerkat.interactive.app.src.lib.layouts import (
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
 from meerkat.interactive.app.src.lib.shared.cell.image import Image
 
-from .app.src.lib.component.abstract import Component
+from .app.src.lib.component.abstract import AutoComponent, Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.discover import Discover
@@ -50,9 +50,14 @@ from .modification import DataFrameModification, Modification
 from .startup import start
 from .state import State
 
+from meerkat.interactive.app.src.lib.component import carbon
+from meerkat.interactive.app.src.lib.component import svelteui
+
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
+    "carbon",
+    "svelteui",
     "Endpoint",
     "State",
     "endpoint",
@@ -68,6 +73,7 @@ __all__ = [
     "StoreFrontend",
     "make_store",
     "trigger",
+    "AutoComponent",
     "Component",
     "Discover",
     "Gallery",

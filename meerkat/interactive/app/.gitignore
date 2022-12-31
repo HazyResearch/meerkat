@@ -12,3 +12,4 @@ src/routes/*
 !/src/routes/*.svelte
 !/src/routes/*.js
 !/src/routes/*.ts
+!/src/routes/*slug*

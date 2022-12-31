@@ -7,24 +7,27 @@ import atexit
 import fnmatch
 import os
 import pathlib
-import re
 import socket
-import subprocess
+import re
 import time
-from tempfile import mkstemp
+import subprocess
+from typing import List, Literal
 
 import rich
 from uvicorn import Config
 
+from meerkat.constants import APP_DIR, BASE_DIR
 from meerkat.interactive.api import MeerkatAPI
 from meerkat.interactive.server import (
-    INITIAL_PORT_VALUE,
+    API_PORT,
+    FRONTEND_PORT,
     LOCALHOST_NAME,
     TRY_NUM_PORTS,
     Server,
 )
+from meerkat.interactive.svelte import SvelteWriter, svelte_writer
 from meerkat.interactive.tunneling import setup_tunnel
-from meerkat.state import NetworkInfo, state
+from meerkat.state import APIInfo, FrontendInfo, state
 
 
 def file_find_replace(directory, find, replace, pattern):
@@ -42,7 +45,8 @@ def is_notebook() -> bool:
     """Check if the current environment is a notebook.
 
     Taken from
-    https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook.
+    https://stackoverflow.com/questions/15411967/how-can-i-check-if-code\
+-is-executed-in-the-ipython-notebook.
     """
     try:
         shell = get_ipython().__class__.__name__
@@ -60,7 +64,7 @@ def get_first_available_port(initial: int, final: int) -> int:
     """Gets the first open port in a specified range of port numbers. Taken
     from https://github.com/gradio-app/gradio/blob/main/gradio/networking.py.
 
-    New solution:
+    More reading:
     https://stackoverflow.com/questions/19196105/how-to-check-if-a-network-port-is-open
 
     Args:
@@ -70,7 +74,7 @@ def get_first_available_port(initial: int, final: int) -> int:
     Returns:
         port: the first open port in the range
     """
-    rich.print(f"Trying to find an open port in ({initial}, {final}). ", end="")
+    # rich.print(f"Trying to find an open port in ({initial}, {final}). ", end="")
     for port in range(initial, final):
         try:
             s = socket.socket(
@@ -78,7 +82,7 @@ def get_first_available_port(initial: int, final: int) -> int:
             )  # create a socket object
             result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
             s.close()
-            rich.print(f"Found open port: {port}")
+            # rich.print(f"Found open port: {port}")
             return port
         except OSError:
             pass
@@ -90,17 +94,368 @@ def get_first_available_port(initial: int, final: int) -> int:
     )
 
 
-def start(
+def snake_case_to_camel_case(snake_case: str) -> str:
+    """Converts a snake case string to camel case.
+
+    Args:
+        snake_case (str): the snake case string to convert.
+
+    Returns:
+        str: the camel case string.
+    """
+    substrings = snake_case.split("_")
+    return substrings[0] + "".join(x.title() for x in substrings[1:])
+
+
+def to_py_module_name(script: str) -> str:
+    """Converts a script name to a Python module name.
+
+    Args:
+        script (str): the script name to convert.
+
+    Returns:
+        str: the Python module name.
+    """
+    # Make sure script is in module format.
+    if script.endswith(".py"):
+        # Strip the .py extension.
+        script = script[:-3]
+        # Replace all / with .
+        script = script.replace("/", ".")
+
+    return script
+
+
+def run_script(
+    script: str,
+    server_name: str = LOCALHOST_NAME,
+    port: int = API_PORT,
+    dev: bool = True,
+    target: str = "interface",
     shareable: bool = False,
-    subdomain: str = None,
-    api_server_name: str = None,
-    api_port: int = None,
-    npm_port: int = None,
+    subdomain: str = "app",
+    frontend_url: str = None,
+    apiurl: str = None,
+) -> APIInfo:
+    """Run a script with uvicorn.
+
+    Args:
+        script (str): the script to run.
+        server_name (str, optional): the name of the server to run the script on. Defaults
+            to "localhost".
+        port (int, optional): the port to run the script on. Defaults to the default API
+            port in Meerkat, which is 5000.
+        dev (bool, optional): whether to run the script in development mode. Defaults to
+            True.
+        target (str, optional): the target `Interface` instance to run. Defaults to
+            "interface".
+    """
+    # Make sure script is in module format.
+    script = to_py_module_name(script)
+
+    # Run the script with uvicorn. This will start the FastAPI server and serve the
+    # backend.
+    env = os.environ.copy()
+    if frontend_url is not None:
+        env["MEERKAT_FRONTEND_URL"] = frontend_url
+    if apiurl is not None:
+        env["MEERKAT_API_URL"] = apiurl
+
+    process = subprocess.Popen(
+        [
+            "uvicorn",
+            f"{script}:{target}",
+            "--port",
+            str(port),
+            "--host",
+            server_name,
+            "--log-level",
+            "warning",
+            "--factory",
+        ]
+        + (["--reload"] if dev else []),
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    # If shareable, start the tunnel
+    if shareable:
+        server_name = setup_tunnel(port, subdomain=f"{subdomain}server")
+
+    return APIInfo(
+        api=MeerkatAPI,
+        port=port,
+        name=server_name,
+        shared=shareable,
+        process=process,
+    )
+
+
+def run_api_server(
+    server_name: str = LOCALHOST_NAME,
+    port: int = API_PORT,
+    dev: bool = True,
+    shareable: bool = False,
+    subdomain: str = "app",
+) -> APIInfo:
+    # Move to the base directory at meerkat/
+    currdir = os.getcwd()
+    os.chdir(BASE_DIR)
+
+    # Start the FastAPI server
+    server = Server(
+        Config(
+            "meerkat.interactive.api.main:app",
+            port=port,
+            host=server_name,
+            # log_level="info" if dev else "warning",
+            log_level="warning",
+            # reload=True if dev else False,
+            # reload_includes=["*.py"],
+            # reload_dirs=[
+            #     # `meerkat.interactive` folder
+            #     str(pathlib.Path(__file__).parent.resolve()),
+            #     # script folder
+            #     currdir,
+            # ],
+        )
+    )
+    server.run_in_thread()
+    os.chdir(currdir)
+
+    # If shareable, start the tunnel
+    if shareable:
+        server_name = setup_tunnel(port, subdomain=f"{subdomain}server")
+
+    return APIInfo(
+        api=MeerkatAPI,
+        server=server,
+        port=port,
+        name=server_name,
+        shared=shareable,
+    )
+
+
+def run_frontend_dev(
+    port: int,
+    package_manager: Literal["npm", "bun"] = "npm",
+    env: dict = {},
+) -> subprocess.Popen:
+    # Run the npm server in dev mode
+    process = subprocess.Popen(
+        [
+            package_manager,
+            "run",
+            "dev",
+            "--",
+            "--port",
+            str(port),
+            "--strictPort",
+            "true",
+            "--logLevel",
+            "info",
+        ],
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    # Make a regex for `Local:   http://127.0.0.1:8000/\n`
+    regex = re.compile(r"http://" + LOCALHOST_NAME + r":(\d+)/\n")
+
+    # Need to check if it started successfully
+    start_time = time.time()
+    while process.poll() is None:
+        out = process.stdout.readline().decode("utf-8")
+        match = regex.search(out)
+        if match:
+            break
+
+        if time.time() - start_time > 10:
+            raise TimeoutError(
+                """Could not start frontend dev server.
+
+Here are the stderr logs:
+"""
+                + process.stderr.read().decode("utf-8")
+            )
+    return process
+
+
+def get_subclasses_recursive(cls: type) -> List[type]:
+    """Recursively find all subclasses of a class.
+
+    Args:
+        cls (type): the class to find subclasses of.
+
+    Returns:
+        List[type]: a list of all subclasses of cls.
+    """
+    subclasses = []
+    for subclass in cls.__subclasses__():
+        subclasses.append(subclass)
+        subclasses.extend(get_subclasses_recursive(subclass))
+    return subclasses
+
+
+def wrap_all_components(exclude_meerkat: bool = False):
+    from meerkat.interactive import Component
+
+    # Recursively find all subclasses of Component
+    subclasses = get_subclasses_recursive(Component)
+    exclude = set(["AutoComponent", "Component"])
+    for subclass in subclasses:
+        if subclass.__name__ in exclude:
+            continue
+
+        if subclass.namespace == "@meerkat-ml/meerkat" and exclude_meerkat:
+            continue
+
+        # Use subclass.__name__ as the component name, instead of
+        # subclass.component_name, because the latter is not guaranteed to be unique.
+        component_name = subclass.__name__
+
+        # Make a file for the component, inside a subdirectory for the namespace
+        # e.g. src/lib/wrappers/__meerkat/Component.svelte
+        os.makedirs(f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}", exist_ok=True)
+        with open(
+            f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}/{component_name}.svelte",
+            "w",
+        ) as f:
+            f.write(subclass._to_svelte_wrapper())
+
+
+def run_frontend_prod(
+    port: int,
+    api_url: str,
+    libpath: pathlib.Path,
+    package_manager: Literal["npm", "bun"] = "npm",
+    env: dict = {},
+) -> subprocess.Popen:
+    # Location of the build folder
+    buildpath = libpath / "build"
+
+    rich.print("Building Application...")
+    build_process = subprocess.Popen(
+        [
+            package_manager,
+            "run",
+            "build",
+            # "--",
+            # "--watch",
+        ],
+        env=env,
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.STDOUT,
+    )
+
+    # Print the output of the build process
+    # while build_process.poll() is None:
+    #     out = build_process.stdout.readline().decode("utf-8")
+    #     rich.print(out, end="\r")
+    # rich.print(end="\n")
+    # rich.print("Build Complete!")
+
+    # Find + replace VITE_API_URL_PLACEHOLDER for production
+    file_find_replace(
+        directory=buildpath,
+        find="meerkat-api-url?!?!?!?!",
+        replace=api_url,
+        pattern="*.js",
+    )
+
+    # Run the statically built app with a simple python server
+    env.update({"VITE_API_URL_PLACEHOLDER": api_url})
+    process = subprocess.Popen(
+        [
+            package_manager,
+            "run",
+            "preview",
+            "--",
+            "--port",
+            str(port),
+        ],
+        env=env,
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.STDOUT,
+    )
+    # os.chdir(buildpath)
+    # process = subprocess.Popen(
+    #     [
+    #         "python",
+    #         "-m",
+    #         "http.server",
+    #         str(port),
+    #     ],
+    #     env=env,
+    #     stdout=subprocess.PIPE,
+    #     stderr=subprocess.STDOUT,
+    # )
+    # os.chdir(libpath)
+
+    return process
+
+
+def run_frontend(
+    package_manager: Literal["npm", "bun"] = "npm",
+    port: int = FRONTEND_PORT,
+    dev: bool = True,
+    shareable: bool = False,
+    subdomain: str = "app",
+    apiurl: str = None,
+    appdir: str = APP_DIR,
+) -> FrontendInfo:
+
+    svelte_writer.write_all_component_wrappers()
+
+    currdir = os.getcwd()
+
+    # Search for the first available port in the range
+    # [port, port + TRY_NUM_PORTS)
+    port = get_first_available_port(int(port), int(port) + TRY_NUM_PORTS)
+
+    # Enter the "app/" directory
+    libpath = pathlib.Path(appdir)
+    os.chdir(libpath)
+
+    # Update the VITE_API_URL environment variable
+    env = os.environ.copy()
+    env.update({"VITE_API_URL": apiurl})
+
+    # Start the frontend server
+    if dev:
+        process = run_frontend_dev(port, package_manager, env)
+    else:
+        process = run_frontend_prod(port, apiurl, libpath, package_manager, env)
+
+    if shareable:
+        domain = setup_tunnel(port, subdomain=subdomain)
+
+    os.chdir(currdir)
+
+    return FrontendInfo(
+        package_manager=package_manager,
+        port=port,
+        name="localhost" if not shareable else domain,
+        shared=shareable,
+        process=process,
+    )
+
+
+def start(
+    package_manager: Literal["npm", "bun"] = "npm",
+    shareable: bool = False,
+    subdomain: str = "app",
+    api_server_name: str = LOCALHOST_NAME,
+    api_port: int = API_PORT,
+    frontend_port: int = FRONTEND_PORT,
     dev: bool = True,
 ):
     """Start a Meerkat interactive server.
 
     Args:
+        package_manager (str): the frontend package_manager to use. Defaults to "npm".
         shareable (bool): whether to share the interface at a publicly accesible link.
             This feature works by establishing a reverse SSH tunnel to a Meerkat server.
             Do not use this feature with private data. In order to use this feature, you
@@ -121,227 +476,75 @@ def start(
         npm_port (int): the port to use for the Meerkat Vite server. Defaults to None,
             in which case a random port will be used.
     """
-    if subdomain is None:
-        subdomain = "app"
+    from meerkat.interactive.svelte import SvelteWriter
+    svelte_writer = SvelteWriter()
+    # Run the API server
+    api_info = run_api_server(api_server_name, api_port, dev, shareable, subdomain)
 
-    api_server_name = api_server_name or LOCALHOST_NAME
-
-    # if port is not specified, search for first available port
-    if api_port is None:
-        api_port = get_first_available_port(
-            INITIAL_PORT_VALUE, INITIAL_PORT_VALUE + TRY_NUM_PORTS
-        )
-    else:
-        api_port = get_first_available_port(api_port, api_port + TRY_NUM_PORTS)
-
-    # Start the FastAPI server
-    api_server = Server(
-        Config(MeerkatAPI, port=api_port, host=api_server_name, log_level="warning")
+    # Run the frontend server
+    frontend_info = run_frontend(
+        package_manager,
+        frontend_port,
+        dev,
+        shareable,
+        subdomain,
+        api_info.url,
+        svelte_writer.appdir,
     )
-    api_server.run_in_thread()
-
-    # Start the npm server
-    if npm_port is None:
-        npm_port = get_first_available_port(api_port + 1, api_port + 1 + TRY_NUM_PORTS)
-    else:
-        npm_port = get_first_available_port(npm_port, npm_port + 1)
-
-    # Enter the "app/" directory
-    from meerkat.constants import APP_DIR
-
-    libpath = pathlib.Path(APP_DIR)  # pathlib.Path(__file__).parent.resolve() / "app"
-    currdir = os.getcwd()
-    os.chdir(libpath)
-
-    network_info = NetworkInfo(
-        api=MeerkatAPI,
-        api_server=api_server,
-        api_server_name=api_server_name,
-        api_server_port=api_port,
-        npm_server_port=npm_port,
-    )
-
-    if shareable:
-        domain = setup_tunnel(
-            network_info.api_server_port, subdomain=f"{subdomain}server"
-        )
-        network_info.shareable_api_server_name = domain
-
-    # npm run dev -- --port {npm_port}
-    current_env = os.environ.copy()
-    if shareable:
-        current_env.update({"VITE_API_URL": network_info.shareable_api_server_url})
-    else:
-        current_env.update({"VITE_API_URL": network_info.api_server_url})
-
-    # open a temporary file to write the output of the npm process
-    out_file, out_path = mkstemp(suffix=".out")
-    err_file, err_path = mkstemp(suffix=".err")
-
-    if dev:
-
-        # KG: this is fallback code because we previously noticed that the
-        # socket.bind call in the get_first_available_port function was not
-        # always working. I've changed that to use the socket.connect_ex
-        # method, which should be more reliable, but I'm leaving this code
-        # here in case we need it again.
-        for i in range(TRY_NUM_PORTS):
-            rich.print("Trying port:", npm_port + i, end="\r")
-
-            # Run the npm server in dev mode
-            # KG: Ideally, this should work on the first go
-            npm_process = subprocess.Popen(
-                [
-                    "npm",
-                    "run",
-                    "dev",
-                    "--",
-                    "--port",
-                    str(npm_port + i),
-                    "--strictPort",
-                    "true",
-                    "--logLevel",
-                    "info",
-                ],
-                env=current_env,
-                stdout=out_file,
-                # stderr=err_file,
-            )
-            network_info.npm_process = npm_process
-            network_info.npm_out_path = out_path
-            network_info.npm_err_path = err_path
-
-            # We need to wait for the npm server to start up
-            # When it does, we read its stdout to get the port it's using
-
-            # KG: this should no longer be required, since we now use the
-            # --strictPort flag for vite, which will not allow vite
-            # to automatically select a port if the one we specify is not
-            # available.
-            MAX_WAIT = 100  # 10 seconds total
-            for _ in range(MAX_WAIT):
-                time.sleep(0.1)
-
-                # this is a hack to address the issue that the vite skips over a port that we
-                # deem to be open per `get_first_available_port`
-                # TODO: remove this once we figure out how to properly check for unavailable
-                # ports in a way that is compatible with vite's port selection logic
-                match = re.search(
-                    "Local:   http:\/\/(127\.0\.0\.1|localhost):(.*)/",  # noqa: W605
-                    network_info.npm_server_out,
-                )
-                if match is not None:
-                    break
-
-            if match is not None:
-                break
-            rich.print()
-
-    else:
-        # Run the npm server in build mode
-        rich.print("Building Application...")
-        p = subprocess.Popen(
-            [
-                "npm",
-                "run",
-                "build",
-            ],
-            env=current_env,
-            stdout=subprocess.PIPE,
-            stderr=err_file,
-        )
-        while p.poll() is None:
-            out = p.stdout.readline()
-            rich.print(out, end="\r")
-        rich.print()
-
-        # find + replace VITE_API_URL_PLACEHOLDER for production
-        buildpath = libpath / "build"
-        file_find_replace(
-            buildpath,
-            "meerkat-api-url?!?!?!?!",
-            network_info.shareable_api_server_url
-            if shareable
-            else network_info.api_server_url,
-            "*.js",
-        )
-
-        # Run the statically built app with a simple python server
-        os.chdir(buildpath)
-        npm_process = subprocess.Popen(
-            [
-                "python",
-                "-m",
-                "http.server",
-                str(npm_port),
-            ],
-            env=current_env,
-            stdout=out_file,
-            stderr=err_file,
-        )
-        os.chdir(libpath)
-
-    network_info.npm_process = npm_process
-    network_info.npm_out_path = out_path
-    network_info.npm_err_path = err_path
-
-    if dev:
-        if match is None:
-            raise ValueError(
-                f"Failed to start dev server: "
-                f"out={network_info.npm_server_out} err={network_info.npm_server_err}"
-            )
-        network_info.npm_server_port = int(match.group(2))
-    else:
-        network_info.npm_server_port = npm_port
-
-    if shareable:
-        domain = setup_tunnel(network_info.npm_server_port, subdomain=subdomain)
-        network_info.shareable_npm_server_name = domain
-
-    # Back to the original directory
-    os.chdir(currdir)
 
     # Store in global state
-    state.network_info = network_info
+    state.frontend_info = frontend_info
+    state.api_info = api_info
 
-    # Print a message
-    rich.print(
-        "Meerkat interactive mode started! API docs on "
-        f"{network_info.api_docs_url} "
-        f"and GUI server on {network_info.npm_server_url}."
-    )
-    return network_info
+    return api_info, frontend_info
 
 
 def cleanup():
-    if state.network_info is not None:
-        rich.print("Cleaning up [bold violet]Meerkat[/bold violet]...")
-        # Shut down servers
-        state.network_info.api_server.close()
-        state.network_info.npm_process.terminate()
-        state.network_info.npm_process.wait()
 
-        # Delete SvelteKit routes for all interfaces
-        for _, interface in state.identifiables.interfaces.items():
-            interface._remove_svelte()
+    if state.frontend_info is not None:
+        # Shut down servers
+        rich.print(
+            "[green][Log][/green] Cleaning up [bold violet]Meerkat frontend[/bold violet]."
+        )
+        if state.frontend_info.process:
+            state.frontend_info.process.terminate()
+            state.frontend_info.process.wait()
+
+    if state.api_info is not None:
+        rich.print(
+            "[green][Log][/green] Cleaning up [bold violet]Meerkat API[/bold violet]."
+        )
+        if state.api_info.server:
+            state.api_info.server.close()
+        if state.api_info.process:
+            state.api_info.process.terminate()
+            state.api_info.process.wait()
+
+    # Delete SvelteKit routes for all interfaces
+    for _, interface in state.identifiables.interfaces.items():
+        interface._remove_svelte()
 
 
 # Run this when the program exits
 atexit.register(cleanup)
 
 
-def output_startup_message(url: str):
+def output_startup_message(url: str, docs_url: str = None):
     meerkat_header = "[bold violet]\[Meerkat][/bold violet]"  # noqa: W605
 
     rich.print("")
     rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green] [bold] Open interface at: "
-        f"[/bold] [turqoise] {url} [/turqoise]"
+        f"{meerkat_header} [bold green]➜[/bold green][bold] Open interface at "
+        f"[/bold][turqoise]{url}[/turqoise]"
     )
+    if docs_url:
+        rich.print(
+            f"{meerkat_header} [bold green]➜[/bold green][bold] Open API docs at "
+            f"[/bold][turqoise]{docs_url}[/turqoise]"
+        )
     rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green] [bold] Interact with Meerkat "
-        " programatically with the console below. Use [yellow]quit()[/yellow] to end "
-        "session. [/bold]"
+        f"{meerkat_header} [bold green]➜[/bold green][bold] Interact with Meerkat "
+        "programatically with the console below. Use [yellow]quit()[/yellow] to end "
+        "session.[/bold]"
     )
     rich.print("")

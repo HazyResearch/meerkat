@@ -1,6 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
-console.log(path.resolve(__dirname, 'src/lib/main.js'));
+
 /** @type {import('vite').UserConfig} */
 const config = {
 	plugins: [sveltekit()],

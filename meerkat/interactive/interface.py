@@ -3,7 +3,6 @@ import os
 from functools import partial, wraps
 from typing import Callable
 
-from fastapi import HTTPException
 from IPython.display import IFrame
 from pydantic import BaseModel
 
@@ -49,9 +48,16 @@ class Interface(IdentifiableMixin):
         self.name = name
         self.height = height
         self.width = width
-        
-        self.write_component_wrappers()
-        self.write_sveltekit_route()
+
+        # self.write_component_wrappers()
+        # self.write_sveltekit_route()
+
+    def __call__(self):
+        """Return the FastAPI object, this allows Interface objects
+        to be targeted by uvicorn when running a script."""
+        from meerkat.interactive.api import MeerkatAPI
+
+        return MeerkatAPI
 
     def _to_svelte(self):
 
@@ -107,24 +113,17 @@ class Interface(IdentifiableMixin):
 """
         return svelte
 
-    def write_component_wrappers(self):
-        wrappers = self.component.to_svelte_wrapper()
-        os.makedirs(f"{APP_DIR}/src/lib/wrappers/{self.id}/", exist_ok=True)
-        for component_name, wrapper in wrappers.items():
-            with open(
-                f"{APP_DIR}/src/lib/wrappers/{self.id}/{component_name}.svelte",
-                "w",
-            ) as f:
-                f.write(wrapper)
-
     def write_sveltekit_route(self):
         """Each Interface writes to a new SvelteKit route."""
         os.makedirs(f"{APP_DIR}/src/routes/{self.id}", exist_ok=True)
-        if os.path.exists(f"{APP_DIR}/src/routes/{self.id}/+page.svelte"):
-            raise ValueError(
-                f"Interface with id {self.id} already exists. "
-                "Please use a different id."
-            )
+        # In dev mode, we allow reloading the same interface,
+        # so we don't raise an error if the file already exists.
+        # TODO: make this logic case on dev mode
+        # if os.path.exists(f"{APP_DIR}/src/routes/{self.id}/+page.svelte"):
+        #     raise ValueError(
+        #         f"Interface with id {self.id} already exists. "
+        #         "Please use a different id."
+        #     )
         with open(f"{APP_DIR}/src/routes/{self.id}/+page.svelte", "w") as f:
             f.write(self._to_svelte())
 
@@ -133,38 +132,39 @@ class Interface(IdentifiableMixin):
 
     def _remove_svelte(self):
         # Remove all SvelteKit routes
-        os.remove(f"{APP_DIR}/src/routes/{self.id}/+page.svelte")
-        os.rmdir(f"{APP_DIR}/src/routes/{self.id}")
+        try:
+            os.remove(f"{APP_DIR}/src/routes/{self.id}/+page.svelte")
+        except OSError:
+            pass
+        try:
+            os.rmdir(f"{APP_DIR}/src/routes/{self.id}")
+        except OSError:
+            pass
 
         # Remove all component wrappers
         for component_name in self.component.get_components():
-            os.remove(f"{APP_DIR}/src/lib/wrappers/{self.id}/{component_name}.svelte")
-        os.rmdir(f"{APP_DIR}/src/lib/wrappers/{self.id}")
+            try:
+                os.remove(
+                    f"{APP_DIR}/src/lib/wrappers/{self.id}/{component_name}.svelte"
+                )
+            except OSError:
+                pass
 
-    def get(self, id: str):
         try:
-            from meerkat.state import state
-
-            interface = state.identifiables.get(id, "interfaces")
-        except KeyError:
-            raise HTTPException(
-                status_code=404, detail="No interface with id {}".format(id)
-            )
-        return interface
+            os.rmdir(f"{APP_DIR}/src/lib/wrappers/{self.id}")
+        except OSError:
+            pass
 
     def launch(self, return_url: bool = False):
         from meerkat.interactive.startup import is_notebook, output_startup_message
 
-        if state.network_info is None:
+        if state.frontend_info is None:
             raise ValueError(
-                "Interactive mode not initialized."
+                "Interactive mode not initialized. "
                 "Run `network = mk.gui.start()` first."
             )
 
-        if state.network_info.shareable_npm_server_name is not None:
-            url = f"{state.network_info.shareable_npm_server_url}/{self.id}"
-        else:
-            url = f"{state.network_info.npm_server_url}/{self.id}"
+        url = f"{state.frontend_info.url}/{self.id}"
 
         if return_url:
             return url
@@ -173,9 +173,8 @@ class Interface(IdentifiableMixin):
         else:
             import webbrowser
 
+            output_startup_message(url=url, docs_url=state.api_info.docs_url)
             webbrowser.open(url)
-
-            output_startup_message(url=url)
 
             # get locals of the main module when running in script.
             import __main__
