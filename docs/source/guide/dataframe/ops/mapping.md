@@ -5,7 +5,7 @@ kernelspec:
 ---
 
 (guide/dataframe/ops/mapping)=
-# Mapping: `map`, `defer`, `update`, `filter`
+# Mapping: `map` and `defer`
 
 In this guide, we discuss how we can create new columns by applying a function to each row of existing columns: we call this *mapping*. We provide detailed examples of how to the {func}`~meerkat.map` operation. We also introduce the {func}`~meerkat.update` and {func}`~meerkat.filter` operations, which are utilities that wrap the {func}`~meerkat.map` operation. 
 

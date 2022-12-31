@@ -5,8 +5,8 @@ import logging
 from typing import Sequence
 
 import cytoolz as tz
-from yaml.representer import Representer
 import pandas as pd
+from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter import ObjectFormatter

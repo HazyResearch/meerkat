@@ -1,6 +1,6 @@
 import abc
-from textwrap import dedent, indent
 from string import Template
+from textwrap import dedent, indent
 from typing import Any, Callable, Dict
 
 FuncType = Callable[..., Any]
@@ -66,7 +66,7 @@ class DocComponent(abc.ABC):
 
 class Arg(DocComponent):
     def fix_indentation(self, docstring: str) -> str:
-        # get common leading whitespace from docstring ignoring first line 
+        # get common leading whitespace from docstring ignoring first line
         lines = docstring.splitlines()
         leading_whitespace = min(
             len(line) - len(line.lstrip()) for line in lines[1:] if line.strip()

@@ -180,7 +180,7 @@ def _embed(
     with torch.no_grad():
         out = embed_input.map(
             _encode,
-            # pbar=pbar,
+            pbar=pbar,
             is_batched_fn=True,
             batch_size=batch_size,
             # num_workers=num_workers,

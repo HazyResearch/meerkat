@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+import warnings
 from typing import (
     Any,
     Callable,
@@ -18,7 +19,6 @@ from typing import (
     Tuple,
     Union,
 )
-import warnings
 
 import cytoolz as tz
 import dill
@@ -70,11 +70,11 @@ class DataFrame(
     ProvenanceMixin,
     ReactifiableMixin,
 ):
-    """ A collection of equal length columns.
+    """A collection of equal length columns.
 
     Args:
         data (Union[dict, list]): A dictionary of columns or a list of dictionaries.
-        primary_key (str, optional): The name of the primary key column. 
+        primary_key (str, optional): The name of the primary key column.
             Defaults to ``None``.
     """
 
@@ -487,7 +487,6 @@ class DataFrame(
 
         Returns:
             DataFrame: The Meerkat DataFrame.
-
         """
 
         # column names must be str in meerkat
@@ -555,9 +554,8 @@ class DataFrame(
     def from_csv(
         cls, filepath: str, primary_key: str = None, *args, **kwargs
     ) -> DataFrame:
-        """Create a DataFrame from a csv file.
-        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
-
+        """Create a DataFrame from a csv file. All of the columns will be
+        :class:`meerkat.ScalarColumn` with backend Pandas.
 
         Args:
             filepath (str): The file path or buffer to load from.
@@ -583,8 +581,8 @@ class DataFrame(
         use_threads: bool = True,
         **kwargs,
     ) -> DataFrame:
-        """Create a DataFrame from a feather file.
-        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
+        """Create a DataFrame from a feather file. All of the columns will be
+        :class:`meerkat.ScalarColumn` with backend Pandas.
 
         Args:
             filepath (str): The file path or buffer to load from.
@@ -618,8 +616,8 @@ class DataFrame(
         columns: Optional[Sequence[str]] = None,
         **kwargs,
     ) -> DataFrame:
-        """Create a DataFrame from a parquet file.
-        All of the columns will be :class:`meerkat.ScalarColumn` with backend Pandas.
+        """Create a DataFrame from a parquet file. All of the columns will be
+        :class:`meerkat.ScalarColumn` with backend Pandas.
 
         Args:
             filepath (str): The file path or buffer to load from.
@@ -721,6 +719,7 @@ class DataFrame(
 
     def _choose_engine(self):
         """Choose which library to use for export.
+
         If any of the columns are ArrowScalarColumn, then use Arrow.
         """
         for column in self.values():

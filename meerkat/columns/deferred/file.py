@@ -281,7 +281,7 @@ class FileColumn(DeferredColumn):
                 transform=transform,
                 loader=self.default_loader if loader is None else loader,
                 base_dir=base_dir,
-                downloader=downloader
+                downloader=downloader,
             )
 
         if not isinstance(data, ScalarColumn):

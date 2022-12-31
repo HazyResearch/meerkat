@@ -1,12 +1,11 @@
-from typing import Dict, Tuple, Union, Callable, Mapping, Sequence, TYPE_CHECKING
 from inspect import getfullargspec, signature
+from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Union
 
-
-from meerkat.block.abstract import BlockView
 import meerkat.tools.docs as docs
+from meerkat.block.abstract import BlockView
 
 if TYPE_CHECKING:
-    from meerkat import DataFrame, Column
+    from meerkat import Column, DataFrame
     from meerkat.columns.deferred.base import DeferredColumn
     from meerkat.dataframe import DataFrame
 
@@ -80,8 +79,8 @@ def defer(
     output_type: Union[Mapping[str, type], type] = None,
     materialize: bool = True,
 ) -> Union["DataFrame", "DeferredColumn"]:
-    """Create one or more DeferredColumns that lazily applies a function to each row
-    in ${data}.
+    """Create one or more DeferredColumns that lazily applies a function to
+    each row in ${data}.
 
     This function shares nearly the exact same signature
     with :func:`map`, the difference is that :func:`~meerkat.defer` returns a column
@@ -223,7 +222,7 @@ def defer(
                     )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
-    
+
     op = DeferredOp(
         fn=function,
         args=args,
@@ -311,9 +310,8 @@ def map(
     pbar: bool = False,
     **kwargs,
 ):
-    """
-    Create a new :class:`Column` or :class:`DataFrame` by applying a function to each
-    row in ${data}.
+    """Create a new :class:`Column` or :class:`DataFrame` by applying a
+    function to each row in ${data}.
 
     This function shares nearly the exact same signature
     with :func:`defer`, the difference is that :func:`~meerkat.defer` returns a column
@@ -347,8 +345,8 @@ def map(
         dictionary are used as column names. The ``outputs`` argument can be used to
         override the column names.
 
-    *   If ``function`` returns a tuple, then ``map`` will return a :class:`DataFrame`. 
-        The column names will be integers. The column names can be overriden by passing 
+    *   If ``function`` returns a tuple, then ``map`` will return a :class:`DataFrame`.
+        The column names will be integers. The column names can be overriden by passing
         a tuple to the ``outputs`` argument.
 
     *   If ``function`` returns a tuple or a dictionary, then passing ``"single"`` to the
@@ -427,8 +425,9 @@ def map(
 
 
 def _materialize(data: Union["DataFrame", "Column"], batch_size: int, pbar: bool):
-    from .concat import concat
     from tqdm import tqdm
+
+    from .concat import concat
 
     result = []
     for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):

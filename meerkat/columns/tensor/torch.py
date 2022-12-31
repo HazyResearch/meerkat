@@ -8,8 +8,8 @@ from typing import Callable, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
-import torch
 import pyarrow as pa
+import torch
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView

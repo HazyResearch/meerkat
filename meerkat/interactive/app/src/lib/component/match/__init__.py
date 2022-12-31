@@ -24,7 +24,7 @@ def get_match_schema(df: DataFrame, encoder: str):
     columns = [
         k
         for k, v in df.items()
-        if isinstance(v, mk.TorchTensorColumn) and len(v.shape) == 2
+        if isinstance(v, mk.TensorColumn) and len(v.shape) == 2
         # TODO: We should know the provenance of embeddings and where they came from,
         # to explicitly check whether the encoder will match it in size.
     ]
@@ -108,8 +108,6 @@ def set_criterion(
         raise e
         raise HTTPException(status_code=500, detail=str(e))
 
-    return criterion.__wrapped__
-
 
 @dataclass
 class MatchCriterion:
@@ -122,7 +120,7 @@ class MatchCriterion:
 @reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
-    if criterion == None:
+    if criterion == None or criterion.against is None:
         return df, None
 
     data_embedding = df[criterion.against]
@@ -153,7 +151,10 @@ class Match(Component):
             encoder=self.encoder,
         )
 
-        self.criterion: MatchCriterion = Store(None, backend_only=True)
+        self.criterion: MatchCriterion = Store(
+            MatchCriterion(against=None, query=None, name=None),
+            backend_only=True
+        )
 
         on_match = set_criterion.partial(
             df=self.df,
