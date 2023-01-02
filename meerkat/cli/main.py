@@ -219,13 +219,14 @@ def run(
     # Put it in the global state
     state.api_info = api_info
     state.frontend_info = frontend_info
-    
+
     reload_index = 1
     while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
         api_stdout = api_info.process.stdout.readline().decode("utf-8")
         if "Reloading..." in api_stdout:
             rich.print(
-                f"[purple][Reload #{reload_index}][/purple] {api_stdout.lstrip('WARNING:  ')}", end=""
+                f"[purple][Reload #{reload_index}][/purple] {api_stdout.lstrip('WARNING:  ')}",
+                end="",
             )
             reload_index += 1
         else:
@@ -233,6 +234,22 @@ def run(
                 rich.print(
                     f"[medium_purple1][Script][/medium_purple1] {api_stdout}", end=""
                 )
+
+
+@cli.command()
+def update():
+    """
+    Update the Meerkat CLI to the latest version.
+    """
+    # Check if there's an app/ folder in the current directory
+    if os.path.exists("app"):
+        # Run `npm i @meerkat-ml/meerkat` in the app/ folder
+        subprocess.run(["npm", "i", "@meerkat-ml/meerkat"], cwd="app")
+        rich.print(":tada: Updated Meerkat npm package to the latest version!")
+    else:
+        rich.print(
+            ":x: Could not find [purple]app[/purple] folder in the current directory."
+        )
 
 
 if __name__ == "__main__":

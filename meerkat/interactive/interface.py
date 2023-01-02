@@ -100,14 +100,14 @@ class Interface(IdentifiableMixin):
         if is_notebook():
             return IFrame(url, width=self.width, height=self.height)
         else:
-            import webbrowser
 
             rich.print(
                 f":rocket: Interface [turqoise]{self.id}[/turqoise] "
                 f"is at [turqoise]{url}[/turqoise]."
             )
 
-            webbrowser.open(url)
+            # import webbrowser
+            # webbrowser.open(url)
 
             in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
             if not in_mk_run_subprocess:

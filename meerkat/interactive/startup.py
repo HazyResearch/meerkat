@@ -486,6 +486,7 @@ def start(
             "Cannot call `start` from a script run with `mk run`. "
             "Ignoring and continuing..."
         )
+        return
 
     from meerkat.interactive.svelte import svelte_writer
 
