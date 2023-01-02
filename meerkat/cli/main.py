@@ -193,7 +193,7 @@ def run(
 
     # Run the frontend
     # TODO: make the dummy API info take in the actual hostname
-    dummy_api_info = APIInfo(None, api_port, name="localhost")
+    dummy_api_info = APIInfo(api=None, port=api_port, name="127.0.0.1")
     frontend_info = run_frontend(
         package_manager,
         frontend_port,
@@ -219,13 +219,15 @@ def run(
     # Put it in the global state
     state.api_info = api_info
     state.frontend_info = frontend_info
-
+    
+    reload_index = 1
     while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
         api_stdout = api_info.process.stdout.readline().decode("utf-8")
         if "Reloading..." in api_stdout:
             rich.print(
-                f"[purple][Reload][/purple] {api_stdout.lstrip('WARNING:  ')}", end=""
+                f"[purple][Reload #{reload_index}][/purple] {api_stdout.lstrip('WARNING:  ')}", end=""
             )
+            reload_index += 1
         else:
             if api_stdout:
                 rich.print(

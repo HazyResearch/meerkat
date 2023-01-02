@@ -160,6 +160,7 @@ def run_script(
         env["MEERKAT_FRONTEND_URL"] = frontend_url
     if apiurl is not None:
         env["MEERKAT_API_URL"] = apiurl
+    env["MEERKAT_RUN"] = str(1)
 
     process = subprocess.Popen(
         [
@@ -204,6 +205,8 @@ def run_api_server(
     os.chdir(BASE_DIR)
 
     # Start the FastAPI server
+    # Note: it isn't possible to support live reloading
+    # via uvicorn with this method
     server = Server(
         Config(
             "meerkat.interactive.api.main:app",
@@ -211,14 +214,6 @@ def run_api_server(
             host=server_name,
             # log_level="info" if dev else "warning",
             log_level="warning",
-            # reload=True if dev else False,
-            # reload_includes=["*.py"],
-            # reload_dirs=[
-            #     # `meerkat.interactive` folder
-            #     str(pathlib.Path(__file__).parent.resolve()),
-            #     # script folder
-            #     currdir,
-            # ],
         )
     )
     server.run_in_thread()
@@ -332,38 +327,47 @@ def run_frontend_prod(
     libpath: pathlib.Path,
     package_manager: Literal["npm", "bun"] = "npm",
     env: dict = {},
+    skip_build: bool = False,
 ) -> subprocess.Popen:
-    # Location of the build folder
-    buildpath = libpath / "build"
+    # # Location of the build folder
+    # buildpath = libpath / "build"
 
-    rich.print("Building Application...")
-    build_process = subprocess.Popen(
-        [
-            package_manager,
-            "run",
-            "build",
-            # "--",
-            # "--watch",
-        ],
-        env=env,
-        # stdout=subprocess.PIPE,
-        # stderr=subprocess.STDOUT,
-    )
+    if not skip_build:
+        build_process = subprocess.Popen(
+            [
+                package_manager,
+                "run",
+                "build",
+                "--",
+                "--watch",
+            ],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
 
-    # Print the output of the build process
-    # while build_process.poll() is None:
-    #     out = build_process.stdout.readline().decode("utf-8")
-    #     rich.print(out, end="\r")
-    # rich.print(end="\n")
-    # rich.print("Build Complete!")
+        # Print a progress bar with rich, show the time elapsed
+        start_time = time.time()
+        while build_process.poll() is None:
+            output = build_process.stdout.readline().decode("utf-8").strip()
+            if "node_modules/" in output:
+                continue
+            # Remove any symbols that would mess up the progress bar
+            rich.print(f"Building... {time.time() - start_time:.2f}s | {output}", end="\r")
+            if 'Wrote site to "build"' in output:
+                rich.print("\n")
+                rich.print(f"Build completed in {time.time() - start_time:.2f}s")
+                break
+        
+        rich.print("")
 
-    # Find + replace VITE_API_URL_PLACEHOLDER for production
-    file_find_replace(
-        directory=buildpath,
-        find="meerkat-api-url?!?!?!?!",
-        replace=api_url,
-        pattern="*.js",
-    )
+    # # Find + replace VITE_API_URL_PLACEHOLDER for production
+    # file_find_replace(
+    #     directory=buildpath,
+    #     find="meerkat-api-url?!?!?!?!",
+    #     replace=api_url,
+    #     pattern="*.js",
+    # )
 
     # Run the statically built app with a simple python server
     env.update({"VITE_API_URL_PLACEHOLDER": api_url})
@@ -377,8 +381,8 @@ def run_frontend_prod(
             str(port),
         ],
         env=env,
-        # stdout=subprocess.PIPE,
-        # stderr=subprocess.STDOUT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
     )
     # os.chdir(buildpath)
     # process = subprocess.Popen(
@@ -476,8 +480,15 @@ def start(
         npm_port (int): the port to use for the Meerkat Vite server. Defaults to None,
             in which case a random port will be used.
     """
-    from meerkat.interactive.svelte import SvelteWriter
-    svelte_writer = SvelteWriter()
+    in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
+    if in_mk_run_subprocess:
+        rich.print(
+            "Cannot call `start` from a script run with `mk run`. "
+            "Ignoring and continuing..."
+        )
+
+    from meerkat.interactive.svelte import svelte_writer
+
     # Run the API server
     api_info = run_api_server(api_server_name, api_port, dev, shareable, subdomain)
 
@@ -500,9 +511,9 @@ def start(
 
 
 def cleanup():
-
-    if state.frontend_info is not None:
-        # Shut down servers
+    # Shut down servers
+    in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
+    if state.frontend_info is not None and not in_mk_run_subprocess:
         rich.print(
             "[green][Log][/green] Cleaning up [bold violet]Meerkat frontend[/bold violet]."
         )
@@ -510,7 +521,7 @@ def cleanup():
             state.frontend_info.process.terminate()
             state.frontend_info.process.wait()
 
-    if state.api_info is not None:
+    if state.api_info is not None and not in_mk_run_subprocess:
         rich.print(
             "[green][Log][/green] Cleaning up [bold violet]Meerkat API[/bold violet]."
         )

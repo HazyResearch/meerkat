@@ -26,6 +26,9 @@ jinja_env = Environment(
 
 @dataclasses.dataclass
 class SvelteWriter:
+    """
+    Class that handles writing Svelte components to the Meerkat app.
+    """
 
     appname: str = "meerkat_app"
     cwd: str = dataclasses.field(default_factory=os.getcwd)
@@ -34,8 +37,10 @@ class SvelteWriter:
 
     def __post_init__(self):
         if self._appdir:
+            # User defined appdir
             return
         if os.path.exists(os.path.join(self.cwd, "app")):
+            # Otherwise, check if we're in a Meerkat generated app
             self._appdir = os.path.join(self.cwd, "app")
         else:
             self._appdir = APP_DIR
@@ -61,6 +66,7 @@ class SvelteWriter:
         )
 
     def copy_banner_small(self):
+        """Copy the Meerkat banner to the new app."""
         # Get path to banner at
         # "meerkat/interactive/app/src/lib/assets/banner_small.png"
         banner_path = os.path.join(
@@ -80,6 +86,7 @@ class SvelteWriter:
         shutil.copy(banner_path, f"{dir}/banner_small.png")
 
     def copy_favicon(self):
+        """Copy the Meerkat favicon to the new app."""
         # Get path to favicon.png, at "meerkat/interactive/app/static/favicon.png"
         favicon_path = os.path.join(
             BASE_DIR,
@@ -94,12 +101,23 @@ class SvelteWriter:
         shutil.copy(favicon_path, f"{self.appdir}/static/favicon.png")
 
     def delete_installer(self):
+        """Delete the Meerkat app installer directory."""
         return subprocess.run(["rm", "-rf", "installer"])
 
     def get_all_components(
         self,
         exclude_classes: Set[str] = {"AutoComponent", "Component"},
     ) -> List[Type["Component"]]:
+        """Get all subclasses of Component, excluding the ones in
+        `exclude_classes`.
+
+        Args:
+            exclude_classes (Set[str], optional): Set of classes
+                to exclude. Defaults to {"AutoComponent", "Component"}.
+
+        Returns:
+            List[Type["Component"]]: List of subclasses of Component.
+        """
         from meerkat.interactive.startup import get_subclasses_recursive
 
         # Import user components
@@ -210,6 +228,7 @@ class SvelteWriter:
         )
 
     def render_component_wrapper(self, component: Type[Component]):
+        # TODO: fix line breaks in Wrapper.svelte
         template = jinja_env.get_template("Wrapper.svelte")
 
         return template.render(
@@ -253,7 +272,7 @@ class SvelteWriter:
         if self.is_user_appdir:
             # Use the @meerkat-ml/meerkat package instead of $lib
             # in a Meerkat generated app
-            return "@meerkat-ml/meerkat"
+            return NPM_PACKAGE
         return "$lib"
 
     def render_route(self, interface: "Interface"):
@@ -302,7 +321,8 @@ class SvelteWriter:
 
         if "dependencies" not in package:
             package["dependencies"] = {}
-        package["dependencies"]["@meerkat-ml/meerkat"] = "latest"
+        package["dependencies"][NPM_PACKAGE] = "latest"
+        package["dependencies"]["@sveltejs/adapter-static"] = "latest"
 
         package["devDependencies"] = {
             **package["devDependencies"],
@@ -419,4 +439,5 @@ class SvelteWriter:
         )
 
 
+# Create an instance that can be used by other modules
 svelte_writer = SvelteWriter()
