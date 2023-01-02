@@ -1,6 +1,6 @@
 {
     "name": "@meerkat-ml/meerkat",
-    "version": "0.0.1l",
+    "version": "0.0.2a",
     "description": "The Meerkat Svelte Library",
     "scripts": {
         "dev": "vite dev",

@@ -50,12 +50,12 @@ class SvelteWriter:
         return self._appdir
 
     @property
-    def is_user_appdir(self):
+    def is_user_appdir(self) -> bool:
         """Check if a Meerkat generated app can be used.
         These apps are generated with the `mk init` command."""
-
         if os.path.exists(os.path.join(self.appdir, ".mk")):
             return True
+        return False
 
     def add_svelte(self):
         return subprocess.run(
