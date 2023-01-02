@@ -355,7 +355,7 @@ def run_frontend_prod(
             # Remove any symbols that would mess up the progress bar
             rich.print(f"Building... {time.time() - start_time:.2f}s | {output}", end="\r")
             if 'Wrote site to "build"' in output:
-                rich.print("\n")
+                rich.print(f"Building... {time.time() - start_time:.2f}s | {output}", end="\r")
                 rich.print(f"Build completed in {time.time() - start_time:.2f}s")
                 break
         
