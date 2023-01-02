@@ -56,6 +56,7 @@ REQUIRED = [
     "fastapi",
     "wrapt",
     "typer",
+    "jinja2",
 ]
 
 # What packages are optional?
