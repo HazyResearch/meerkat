@@ -89,11 +89,10 @@ class Interface(IdentifiableMixin):
                 ":newspaper: "
                 f"API docs are at [turqoise]{state.api_info.docs_url}[/turqoise]."
             )
+            rich.print()
 
             in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
             if not in_mk_run_subprocess:
-                output_startup_message(url=url, docs_url=state.api_info.docs_url)
-
                 # get locals of the main module when running in script.
                 import __main__
 

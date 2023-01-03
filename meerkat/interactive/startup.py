@@ -538,7 +538,7 @@ def cleanup():
         return
 
     rich.print(
-        ":electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
+        "\n:electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
     )
 
     if state.frontend_info is not None:
