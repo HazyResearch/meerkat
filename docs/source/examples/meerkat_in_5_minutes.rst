@@ -1,5 +1,5 @@
 Meerkat in 5 Minutes
-====
+=====================
 
 Once Meerkat is installed, make sure everything is working by running
 
@@ -9,7 +9,7 @@ Once Meerkat is installed, make sure everything is working by running
     
     
 A First Interactive GUI
-=====================
+-----------------------
 To start playing around with Meerkat, create or open any directory and run,
 
 .. code-block:: bash
