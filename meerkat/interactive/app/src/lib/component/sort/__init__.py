@@ -59,7 +59,7 @@ class Sort(Component):
 
     df: DataFrame
     criteria: Store[Union[List[SortCriterion], SortCriterion]] = Field(
-        default_factory=lambda: Store(list)
+        default_factory=lambda: Store([])
     )
     title: Store[str] = Store("Sort")
 

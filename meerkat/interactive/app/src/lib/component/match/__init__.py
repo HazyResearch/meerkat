@@ -95,14 +95,14 @@ def set_criterion(
     try:
         query_embedding = parse_query(query)
 
-        criterion.set(
-            MatchCriterion(
-                query=query,
-                against=against,
-                query_embedding=query_embedding,
-                name=f"match({against}, {query})",
-            )
+        match_criterion = MatchCriterion(
+            query=query,
+            against=against,
+            query_embedding=query_embedding,
+            name=f"match({against}, {query})",
         )
+        criterion.set(match_criterion)
+        return match_criterion
 
     except Exception as e:
         raise e

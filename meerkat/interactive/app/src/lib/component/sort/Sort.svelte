@@ -45,10 +45,14 @@
 
 	const trigger_sort = () => {
 		// Need to reset the array to trigger.
+		console.log("trigger sort", criteria_frontend);
+		console.log("criteria", criteria);
 		criteria.set(criteria_frontend);
 	};
 
 	const onInputChange = (criterion: SortCriterion, input_id: string, value: any) => {
+		console.log("Input change", criterion);
+
 		const is_same_value = criterion[input_id] === value;
 		criterion[input_id] = value;
 		// Required for reactivity.
@@ -146,13 +150,14 @@
 						/>
 					</div>
 
+					<!-- Column selector -->
 					<div class="themed px-1 grow">
 						{#await items_promise}
 							<Select
 								id="column"
 								placeholder="...a column."
-								isWaiting={true}
-								showIndicator={true}
+								loading={true}
+								showChevron={true}
 							/>
 						{:then items}
 							<Select
@@ -160,13 +165,13 @@
 								placeholder="...a column."
 								value={criterion.column}
 								{items}
-								showIndicator={true}
-								listPlacement="auto"
-								on:select={(event) => onInputChange(criterion, 'column', event.detail.value)}
+								showChevron={true}
+								on:input={(event) => onInputChange(criterion, 'column', event.detail.value)}
 							/>
 						{/await}
 					</div>
 
+					<!-- Ascending / Descending button -->
 					<div class="px-1">
 						<button
 							disabled={cellDisabled(criterion)}
@@ -211,6 +216,8 @@
 							</SvelteTooltip>
 						</button>
 					</div>
+
+					<!-- Delete button -->
 					<div class="px-1">
 						<button class="" on:click={() => deleteCriterion(i)}>
 							<svg

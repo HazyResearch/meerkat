@@ -139,16 +139,15 @@
 
 				<div class="px-1 grow">
 					{#await items_promise}
-						<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
+						<Select id="column" placeholder="...a column." loading={true} showChevron={true} />
 					{:then items}
 						<Select
 							id="column"
 							placeholder="...a column."
 							value={criterion.column}
 							{items}
-							showIndicator={true}
-							listPlacement="auto"
-							on:select={(event) => onInputChange(criterion, 'column', event.detail.value)}
+							showChevron={true}
+							on:change={(event) => onInputChange(criterion, 'column', event.detail.value)}
 						/>
 					{/await}
 				</div>
@@ -159,9 +158,8 @@
 						placeholder="...an operation."
 						value={criterion.op}
 						items={$operations}
-						showIndicator={true}
-						listPlacement="auto"
-						on:select={(event) => onInputChange(criterion, 'op', event.detail.value)}
+						showChevron={true}
+						on:change={(event) => onInputChange(criterion, 'op', event.detail.value)}
 					/>
 				</div>
 

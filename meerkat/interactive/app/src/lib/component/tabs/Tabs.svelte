@@ -11,7 +11,7 @@
 	export let tabs: Array<Tab> = [];
     console.log(tabs);
     
-    let activeTabId = '';
+    let activeTabId = tabs[0].id;
 
 	function setActiveTab(id: string): void {
 		if (id === activeTabId) {
