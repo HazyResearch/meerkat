@@ -263,6 +263,7 @@ def run_frontend_dev(
     start_time = time.time()
     while process.poll() is None:
         out = process.stdout.readline().decode("utf-8")
+        print(out)
         match = regex.search(out)
         if match:
             break
