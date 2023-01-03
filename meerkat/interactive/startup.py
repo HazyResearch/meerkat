@@ -532,15 +532,17 @@ def start(
 def cleanup():
     # Shut down servers
     in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
-    if not in_mk_run_subprocess:
-        rich.print(":electric_plug: Cleaning up [violet]Meerkat[/violet].")
-        rich.print(":wave: Bye!")
-    if state.frontend_info is not None and not in_mk_run_subprocess:
+    if in_mk_run_subprocess:
+        return
+
+    rich.print(":electric_plug: Cleaning up [violet]Meerkat[/violet].")
+    rich.print(":wave: Bye!")
+    if state.frontend_info is not None:
         if state.frontend_info.process:
             state.frontend_info.process.terminate()
             state.frontend_info.process.wait()
 
-    if state.api_info is not None and not in_mk_run_subprocess:
+    if state.api_info is not None:
         if state.api_info.server:
             state.api_info.server.close()
         if state.api_info.process:

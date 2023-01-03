@@ -37,8 +37,8 @@ class Interface(IdentifiableMixin):
     def __init__(
         self,
         component: Component,
+        id: str,
         name: str = "Interface",
-        id: str = None,
         height: str = "1000px",
         width: str = "100%",
     ):
