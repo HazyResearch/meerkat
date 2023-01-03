@@ -256,16 +256,19 @@ def run_frontend_dev(
         stderr=subprocess.PIPE,
     )
 
-    # Make a regex for `Local:   http://127.0.0.1:8000/\n`
-    regex = re.compile(r"http://" + LOCALHOST_NAME + r":(\d+)/\n")
-
+    # Make a regex for `Local:   http://127.0.0.1:8000/\n` and 
+    # `Local:   http://localhost:8000/\n`
+    regex_1 = re.compile(r"http://" + "127.0.0.1" + r":(\d+)/\n")
+    regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/\n")
+    
     # Need to check if it started successfully
     start_time = time.time()
     while process.poll() is None:
         out = process.stdout.readline().decode("utf-8")
         print(out)
-        match = regex.search(out)
-        if match:
+        match_1 = regex_1.search(out)
+        match_2 = regex_2.search(out)
+        if match_1 or match_2:
             break
 
         if time.time() - start_time > 10:
