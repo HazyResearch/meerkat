@@ -85,9 +85,10 @@ class Interface(IdentifiableMixin):
                 f"Interface [turqoise]{self.id}[/turqoise] "
                 f"is at [turqoise]{url}[/turqoise]."
             )
-
-            # import webbrowser
-            # webbrowser.open(url)
+            rich.print(
+                ":newspaper: "
+                f"API docs are at [turqoise]{state.api_info.docs_url}[/turqoise]."
+            )
 
             in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
             if not in_mk_run_subprocess:
