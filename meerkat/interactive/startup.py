@@ -529,14 +529,18 @@ def start(
     return api_info, frontend_info
 
 
+@atexit.register
 def cleanup():
+    """Clean up Meerkat processes and files when exiting."""
     # Shut down servers
     in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
     if in_mk_run_subprocess:
         return
 
-    rich.print(":electric_plug: Cleaning up [violet]Meerkat[/violet].")
-    rich.print(":wave: Bye!")
+    rich.print(
+        ":electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
+    )
+
     if state.frontend_info is not None:
         if state.frontend_info.process:
             state.frontend_info.process.terminate()
@@ -551,10 +555,6 @@ def cleanup():
 
     svelte_writer = SvelteWriter()
     svelte_writer.cleanup_run()
-
-
-# Run this when the program exits
-atexit.register(cleanup)
 
 
 def output_startup_message(url: str, docs_url: str = None):
