@@ -7,11 +7,11 @@ import atexit
 import fnmatch
 import os
 import pathlib
-import socket
 import re
-import time
+import socket
 import subprocess
-from typing import List, Literal
+import time
+from typing import List, Literal, Tuple
 
 import rich
 from uvicorn import Config
@@ -25,7 +25,7 @@ from meerkat.interactive.server import (
     TRY_NUM_PORTS,
     Server,
 )
-from meerkat.interactive.svelte import SvelteWriter, svelte_writer
+from meerkat.interactive.svelte import SvelteWriter
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import APIInfo, FrontendInfo, state
 
@@ -256,16 +256,15 @@ def run_frontend_dev(
         stderr=subprocess.PIPE,
     )
 
-    # Make a regex for `Local:   http://127.0.0.1:8000/\n` and 
+    # Make a regex for `Local:   http://127.0.0.1:8000/\n` and
     # `Local:   http://localhost:8000/\n`
     regex_1 = re.compile(r"http://" + "127.0.0.1" + r":(\d+)/\n")
     regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/\n")
-    
+
     # Need to check if it started successfully
     start_time = time.time()
     while process.poll() is None:
         out = process.stdout.readline().decode("utf-8")
-        print(out)
         match_1 = regex_1.search(out)
         match_2 = regex_2.search(out)
         if match_1 or match_2:
@@ -357,21 +356,17 @@ def run_frontend_prod(
             if "node_modules/" in output:
                 continue
             # Remove any symbols that would mess up the progress bar
-            rich.print(f"Building... {time.time() - start_time:.2f}s | {output}", end="\r")
+            rich.print(
+                f"Building... {time.time() - start_time:.2f}s | {output}", end="\r"
+            )
             if 'Wrote site to "build"' in output:
-                rich.print(f"Building... {time.time() - start_time:.2f}s | {output}", end="\r")
+                rich.print(
+                    f"Building... {time.time() - start_time:.2f}s | {output}", end="\r"
+                )
                 rich.print(f"Build completed in {time.time() - start_time:.2f}s")
                 break
-        
-        rich.print("")
 
-    # # Find + replace VITE_API_URL_PLACEHOLDER for production
-    # file_find_replace(
-    #     directory=buildpath,
-    #     find="meerkat-api-url?!?!?!?!",
-    #     replace=api_url,
-    #     pattern="*.js",
-    # )
+        rich.print("")
 
     # Run the statically built app with a simple python server
     env.update({"VITE_API_URL_PLACEHOLDER": api_url})
@@ -414,9 +409,20 @@ def run_frontend(
     apiurl: str = None,
     appdir: str = APP_DIR,
 ) -> FrontendInfo:
+    """Run the frontend server.
 
-    svelte_writer.write_all_component_wrappers()
+    Args:
+        package_manager (Literal["npm", "bun"], optional): The package manager to use. Defaults to "npm".
+        port (int, optional): The port to run the frontend server on. Defaults to FRONTEND_PORT.
+        dev (bool, optional): Whether to run the frontend in development mode. Defaults to True.
+        shareable (bool, optional): Whether to create a shareable link. Defaults to False.
+        subdomain (str, optional): The subdomain to use for the shareable link. Defaults to "app".
+        apiurl (str, optional): The URL of the API server. Defaults to None.
+        appdir (str, optional): The directory of the frontend app. Defaults to APP_DIR.
 
+    Returns:
+        FrontendInfo: A FrontendInfo object containing the port and process of the frontend server.
+    """
     currdir = os.getcwd()
 
     # Search for the first available port in the range
@@ -459,7 +465,7 @@ def start(
     api_port: int = API_PORT,
     frontend_port: int = FRONTEND_PORT,
     dev: bool = True,
-):
+) -> Tuple[APIInfo, FrontendInfo]:
     """Start a Meerkat interactive server.
 
     Args:
@@ -479,10 +485,13 @@ def start(
             `subdomain="myinterface"`, then the shareable link will have the domain
             `myinterface.meerkat.wiki`. Defaults to None, in which case a random
             subdomain will be generated.
-        api_port (int): the port to use for the Meerkat API server. Defaults to None,
-            in which case a random port will be used.
-        npm_port (int): the port to use for the Meerkat Vite server. Defaults to None,
-            in which case a random port will be used.
+        api_server_name (str): the name of the API server. Defaults to "localhost".
+        api_port (int): the port to use for the Meerkat API server. Defaults to 5000.
+        frontend_port (int): the port to use for the Meerkat Vite server. Defaults to 8000.
+        dev (bool): whether to run in development mode. Defaults to True.
+
+    Returns:
+        Tuple[APIInfo, FrontendInfo]: A tuple containing the APIInfo and FrontendInfo objects.
     """
     in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
     if in_mk_run_subprocess:
@@ -493,6 +502,8 @@ def start(
         return
 
     from meerkat.interactive.svelte import svelte_writer
+
+    svelte_writer.init_run()
 
     # Run the API server
     api_info = run_api_server(api_server_name, api_port, dev, shareable, subdomain)
@@ -536,9 +547,8 @@ def cleanup():
             state.api_info.process.terminate()
             state.api_info.process.wait()
 
-    # Delete SvelteKit routes for all interfaces
-    for _, interface in state.identifiables.interfaces.items():
-        interface._remove_svelte()
+    svelte_writer = SvelteWriter()
+    svelte_writer.cleanup_run()
 
 
 # Run this when the program exits

@@ -57,6 +57,52 @@ class SvelteWriter:
             return True
         return False
 
+    def cleanup_run(self):
+        """Cleanup the app directory at the end of a run."""
+        self.remove_all_component_wrappers()
+        self.remove_component_context()
+
+    def init_run(self):
+        """Write component wrappers and context at the start of a run.
+
+        Called by the `mk run` CLI, `Interface.__init__` constructor and
+        `mk.gui.start` function.
+        """
+        self.import_app_components()
+        self.write_all_component_wrappers()
+        self.write_component_context()
+
+    def create_app(self):
+        """Configure and setup the app for Meerkat."""
+        # These need to be done first, .mk allows Meerkat
+        # to recognize the app as a Meerkat app
+        svelte_writer.write_libdir()  # src/lib
+        svelte_writer.write_dot_mk()  # .mk file
+
+        # Write an ExampleComponent.svelte and __init__.py file
+        # and a script example.py that uses the component
+        svelte_writer.write_example_component()
+        svelte_writer.write_example_py()
+
+        svelte_writer.write_app_css()  # app.css
+        svelte_writer.write_constants_js()  # constants.js
+        svelte_writer.write_svelte_config()  # svelte.config.js
+        svelte_writer.write_tailwind_config()  # tailwind.config.cjs
+
+        svelte_writer.import_app_components()
+        svelte_writer.write_all_component_wrappers()  # src/lib/components/wrappers
+        svelte_writer.write_component_context()  # ComponentContext.svelte
+        svelte_writer.write_layout()  # +layout.svelte, layout.js
+        svelte_writer.write_slug_route()  # [slug]/+page.svelte
+
+        svelte_writer.write_gitignore()  # .gitignore
+        svelte_writer.write_setup_py()  # setup.py
+
+        svelte_writer.copy_banner_small()  # banner_small.png
+        svelte_writer.copy_favicon()  # favicon.png
+        
+        # TODO add example_ipynb
+
     def add_svelte(self):
         return subprocess.run(
             [self.package_manager, "add", "create-svelte@latest"],
@@ -201,6 +247,14 @@ class SvelteWriter:
         # omits libraries that are not installed
         installed_libraries = [p for p in libraries for o in output if p in o]
         return installed_libraries
+
+    def remove_all_component_wrappers(self):
+        """Remove all component wrappers from the app."""
+        shutil.rmtree(f"{self.appdir}/src/lib/wrappers")
+
+    def remove_component_context(self):
+        """Remove the ComponentContext.svelte file from the app."""
+        os.remove(f"{self.appdir}/src/lib/ComponentContext.svelte")
 
     def render_app_css(self):
         return jinja_env.get_template("app.css").render()

@@ -1,24 +1,13 @@
-import importlib
 import os
 import subprocess
-import sys
 
 import rich
 import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from meerkat.interactive.interface import Interface
 from meerkat.interactive.server import API_PORT, FRONTEND_PORT
-from meerkat.interactive.startup import (
-    get_subclasses_recursive,
-    output_startup_message,
-    run_frontend,
-    run_script,
-    to_py_module_name,
-    wrap_all_components,
-)
+from meerkat.interactive.startup import run_frontend, run_script
 from meerkat.interactive.svelte import SvelteWriter
-from meerkat.constants import APP_DIR
 from meerkat.state import APIInfo, state
 
 cli = typer.Typer()
@@ -51,6 +40,8 @@ def init(
         f":seedling: Creating [purple]Meerkat[/purple] app: [green]{name}[/green]"
     )
 
+    # Manually pass in _appdir to SvelteWriter, since we don't have an app yet
+    # (we're creating it)
     svelte_writer = SvelteWriter(appname=name, _appdir=os.path.join(os.getcwd(), "app"))
 
     with Progress(
@@ -104,35 +95,7 @@ def init(
             raise e
 
         # Configure and setup the app for Meerkat
-
-        # These need to be done first, .mk allows Meerkat
-        # to recognize the app as a Meerkat app
-        svelte_writer.write_libdir()  # src/lib
-        svelte_writer.write_dot_mk()  # .mk file
-
-        # Write an ExampleComponent.svelte and __init__.py file
-        # and a script example.py that uses the component
-        svelte_writer.write_example_component()
-        svelte_writer.write_example_py()
-
-        svelte_writer.write_app_css()  # app.css
-        svelte_writer.write_constants_js()  # constants.js
-        # TODO: add adapter static to svelte.config.js
-        svelte_writer.write_svelte_config()  # svelte.config.js
-        svelte_writer.write_tailwind_config()  # tailwind.config.cjs
-
-        svelte_writer.import_app_components()
-        svelte_writer.write_all_component_wrappers()  # src/lib/components/wrappers
-        svelte_writer.write_component_context()  # ComponentContext.svelte
-        svelte_writer.write_layout()  # +layout.svelte, layout.js
-        svelte_writer.write_slug_route()  # [slug]/+page.svelte
-
-        svelte_writer.write_gitignore()  # .gitignore
-        svelte_writer.write_setup_py()  # setup.py
-
-        svelte_writer.copy_banner_small()  # banner_small.png
-        svelte_writer.copy_favicon()  # favicon.png
-        # TODO add example_ipynb
+        svelte_writer.create_app()
 
     # Pretty print information to console
     rich.print(f":tada: Created [purple]{name}[/purple]!")
@@ -187,9 +150,7 @@ def run(
 
     # Dump wrapper Component subclasses, ComponentContext
     svelte_writer = SvelteWriter()
-    svelte_writer.import_app_components()
-    svelte_writer.write_all_component_wrappers()
-    svelte_writer.write_component_context()
+    svelte_writer.init_run()
 
     # Run the frontend
     # TODO: make the dummy API info take in the actual hostname
@@ -214,7 +175,7 @@ def run(
         apiurl=dummy_api_info.url,
     )
 
-    output_startup_message(frontend_info.url, api_info.docs_url)
+    # output_startup_message(frontend_info.url, api_info.docs_url)
 
     # Put it in the global state
     state.api_info = api_info
@@ -222,6 +183,7 @@ def run(
 
     while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
         pass
+
 
 @cli.command()
 def update():

@@ -1,17 +1,17 @@
-import rich
 import code
 import os
 from functools import partial, wraps
 from typing import Callable
 
+import rich
 from IPython.display import IFrame
 from pydantic import BaseModel
 
-from meerkat.constants import APP_DIR
 from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentFrontend,
 )
+from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -50,37 +50,16 @@ class Interface(IdentifiableMixin):
         self.height = height
         self.width = width
 
+        # Call `init_run`
+        svelte_writer = SvelteWriter()
+        svelte_writer.init_run()
+
     def __call__(self):
         """Return the FastAPI object, this allows Interface objects
         to be targeted by uvicorn when running a script."""
         from meerkat.interactive.api import MeerkatAPI
 
         return MeerkatAPI
-
-    def _remove_svelte(self):
-        # Remove all SvelteKit routes
-        try:
-            os.remove(f"{APP_DIR}/src/routes/{self.id}/+page.svelte")
-        except OSError:
-            pass
-        try:
-            os.rmdir(f"{APP_DIR}/src/routes/{self.id}")
-        except OSError:
-            pass
-
-        # Remove all component wrappers
-        for component_name in self.component.get_components():
-            try:
-                os.remove(
-                    f"{APP_DIR}/src/lib/wrappers/{self.id}/{component_name}.svelte"
-                )
-            except OSError:
-                pass
-
-        try:
-            os.rmdir(f"{APP_DIR}/src/lib/wrappers/{self.id}")
-        except OSError:
-            pass
 
     def launch(self, return_url: bool = False):
         from meerkat.interactive.startup import is_notebook, output_startup_message
