@@ -250,11 +250,17 @@ class SvelteWriter:
 
     def remove_all_component_wrappers(self):
         """Remove all component wrappers from the app."""
-        shutil.rmtree(f"{self.appdir}/src/lib/wrappers")
+        try:
+            shutil.rmtree(f"{self.appdir}/src/lib/wrappers")
+        except FileNotFoundError:
+            pass
 
     def remove_component_context(self):
         """Remove the ComponentContext.svelte file from the app."""
-        os.remove(f"{self.appdir}/src/lib/ComponentContext.svelte")
+        try:
+            os.remove(f"{self.appdir}/src/lib/ComponentContext.svelte")
+        except OSError:
+            pass
 
     def render_app_css(self):
         return jinja_env.get_template("app.css").render()

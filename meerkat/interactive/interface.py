@@ -81,7 +81,8 @@ class Interface(IdentifiableMixin):
         else:
 
             rich.print(
-                f":rocket: Interface [turqoise]{self.id}[/turqoise] "
+                ":scroll: "
+                f"Interface [turqoise]{self.id}[/turqoise] "
                 f"is at [turqoise]{url}[/turqoise]."
             )
 

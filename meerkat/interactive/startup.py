@@ -176,7 +176,6 @@ def run_script(
         ]
         + (["--reload"] if dev else []),
         env=env,
-        # stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
 
@@ -252,12 +251,14 @@ def run_frontend_dev(
             "info",
         ],
         env=env,
+        stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
 
-    # Make a regex for `Local:   http://127.0.0.1:8000/\n` and
-    # `Local:   http://localhost:8000/\n`
+    # Make a regex for
+    #   `Local:   http://127.0.0.1:8000/\n` and
+    #   `Local:   http://localhost:8000/\n`
     regex_1 = re.compile(r"http://" + "127.0.0.1" + r":(\d+)/\n")
     regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/\n")
 
@@ -274,7 +275,9 @@ def run_frontend_dev(
             raise TimeoutError(
                 """Could not start frontend dev server.
 
-Here are the stderr logs:
+Here are the stderr logs (if they are empty, this is likely an 
+issue with how we recognize if the server started successfully, please 
+file an issue on GitHub):
 """
                 + process.stderr.read().decode("utf-8")
             )
@@ -529,18 +532,15 @@ def start(
 def cleanup():
     # Shut down servers
     in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
+    if not in_mk_run_subprocess:
+        rich.print(":electric_plug: Cleaning up [violet]Meerkat[/violet].")
+        rich.print(":wave: Bye!")
     if state.frontend_info is not None and not in_mk_run_subprocess:
-        rich.print(
-            "[green][Log][/green] Cleaning up [bold violet]Meerkat frontend[/bold violet]."
-        )
         if state.frontend_info.process:
             state.frontend_info.process.terminate()
             state.frontend_info.process.wait()
 
     if state.api_info is not None and not in_mk_run_subprocess:
-        rich.print(
-            "[green][Log][/green] Cleaning up [bold violet]Meerkat API[/bold violet]."
-        )
         if state.api_info.server:
             state.api_info.server.close()
         if state.api_info.process:

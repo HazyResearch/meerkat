@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 import rich
 import typer
@@ -133,19 +134,20 @@ def run(
     """
     # Pretty print information to console
     rich.print(
-        f"[green][Log][/green] :rocket: Running [bold violet]{script_path}[/bold violet]"
+        f":rocket: Running [bold violet]{script_path}[/bold violet]"
     )
     if dev:
         rich.print(
-            "[green][Log][/green] :wrench: Dev mode is [bold violet]on[/bold violet]"
-        )
-        rich.print(
-            "[green][Log][/green] :hammer: Live reload is [bold violet]enabled[/bold violet]"
+            ":wrench: Dev mode is [bold violet]on[/bold violet]\n"
+            ":hammer: Live reload is [bold violet]enabled[/bold violet]"
         )
     else:
         rich.print(
-            "[green][Log][/green] :wrench: Production mode is [bold violet]on[/bold violet]"
+            ":wrench: Production mode is [bold violet]on[/bold violet]"
         )
+    rich.print(
+        f":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]"
+    )
     rich.print()
 
     # Dump wrapper Component subclasses, ComponentContext
@@ -182,7 +184,13 @@ def run(
     state.frontend_info = frontend_info
 
     while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
-        pass
+        # Exit on Ctrl+C
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            rich.print()
+            break
+
 
 
 @cli.command()
