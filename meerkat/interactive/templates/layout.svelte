@@ -1,6 +1,6 @@
 <script>
     import Meerkat from '@meerkat-ml/meerkat/Meerkat.svelte';
-    import "../app.css";
+    import "$lib/app.css";
 </script>
 
 <Meerkat>

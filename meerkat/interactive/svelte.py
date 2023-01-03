@@ -356,7 +356,7 @@ class SvelteWriter:
             self.write_component_wrapper(subclass)
 
     def write_app_css(self):
-        self.write_file(f"{self.appdir}/src/app.css", self.render_app_css())
+        self.write_file(f"{self.appdir}/src/lib/app.css", self.render_app_css())
 
     def write_component_context(self):
         self.write_file(

@@ -13,6 +13,13 @@
 //     store_trigger
 // } from './api/api.js';
 // This import causes an ssr error!
+
+// Need to export the styles, otherwise users of this Meerkat package don't see styling
+// We needed to move the app.css into src/lib, otherwise SvelteKit packaging
+// would not include it in the package/ build.
+// We manually compile the Tailwind CSS into package/app.css (
+// replacing the tailwind directives with the actual CSS), and then publish
+export { default as styles } from "./app.css";
 export { default as Button } from './component/button/Button.svelte';
 export { default as Choice } from './component/choice/Choice.svelte';
 export { default as CodeDisplay } from './component/codedisplay/CodeDisplay.svelte';
