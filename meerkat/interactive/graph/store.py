@@ -1,11 +1,11 @@
 import warnings
-from typing import Any, Generic, Union
+from typing import Any, Generic, Iterator, Union
 
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
 
-from meerkat.interactive.graph.reactivity import reactive
+from meerkat.interactive.graph.reactivity import is_reactive, reactive
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable, T
@@ -27,6 +27,13 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     _self_identifiable_group: str = "stores"
 
     def __init__(self, wrapped: T, backend_only: bool = False):
+        if isinstance(wrapped, Iterator):
+            warnings.warn(
+                "Wrapping an iterator in a Store is not recommended. "
+                "If the iterator is derived from an iterable, wrap the iterable:\n"
+                "    >>> store = mk.gui.Store(iterable)"
+                "    >>> iterator = iter(store)"
+            )
         super().__init__(wrapped=wrapped)
         # Set up these attributes so we can create the
         # schema and detail properties.
@@ -66,7 +73,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         mod.add_to_queue()
 
     def __repr__(self) -> str:
-        return f"Store({repr(self.__wrapped__)})"
+        return f"{type(self).__name__}({repr(self.__wrapped__)})"
 
     def __getattr__(self, name: str) -> Any:
         attr = getattr(self.__wrapped__, name)
@@ -426,13 +433,35 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     # def __exit__(self, *args, **kwargs):
     #     return self.__wrapped__.__exit__(*args, **kwargs)
 
+    # Overriding __next__ causes issues when using Stores with third-party libraries.
+    # @reactive
+    # def __next__(self):
+    #     return next(self.__wrapped__)
+
+    def __iter__(self):
+        # FIXME: Find efficient way of mocking the iterator.
+        # This is inefficient because it loads each element
+        # of the wrapped object into memory.
+        # This would be inefficient for iterables that should not
+        # be loaded into memory (e.g. torch DataLoaders) or for long iterables
+        # This is a temporary solution to make the Store iterable.
+        _is_reactive = is_reactive()
+        # return iter([Store(x) if _is_reactive else x for x in self.value])
+        _iterator = iter(self.__wrapped__)
+        return _IteratorStore(_iterator) if _is_reactive else _iterator
+
+
+class _IteratorStore(Store):
+    """A special store that wraps an iterator."""
+
+    def __init__(self, wrapped: T, backend_only: bool = False):
+        if not isinstance(wrapped, Iterator):
+            raise ValueError("wrapped object must be an Iterator.")
+        super().__init__(wrapped, backend_only)
+
     @reactive
     def __next__(self):
         return next(self.__wrapped__)
-
-    @reactive
-    def __iter__(self):
-        return iter(self.__wrapped__)
 
 
 def store_field(value: str) -> Field:

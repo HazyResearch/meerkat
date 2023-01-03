@@ -13,7 +13,7 @@ __all__ = ["react", "reactive", "is_reactive", "get_reactive_kwargs"]
 
 def reactive(
     fn: Callable = None,
-    nested_return: bool = False,
+    nested_return: bool = None,
 ) -> Callable:
     """Decorator that is used to mark a function as an interface operation.
 
@@ -22,6 +22,7 @@ def reactive(
 
     TODO: Remove nested_return argument. With the addition of __iter__ and __next__
     to mk.gui.Store, we no longer need to support nested return values.
+    This will require looking through current use of reactive and patching them.
 
     A basic example that adds two numbers:
 
@@ -286,7 +287,7 @@ class react:
         A decorated function that creates an operation node in the operation graph.
     """
 
-    def __init__(self, reactive: bool = True, *, nested_return: bool = False):
+    def __init__(self, reactive: bool = True, *, nested_return: bool = None):
         self._reactive = reactive
         self._nested_return = nested_return
 
@@ -316,7 +317,7 @@ class react:
 
 
 class no_react(react):
-    def __init__(self, nested_return: bool = False):
+    def __init__(self, nested_return: bool = None):
         super().__init__(reactive=False, nested_return=nested_return)
 
 

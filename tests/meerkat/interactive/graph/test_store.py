@@ -121,13 +121,17 @@ def test_tuple_unpack(react: bool):
     with mk.gui.react(react):
         a, b = store
 
-    assert isinstance(a, mk.gui.Store if react else int)
-    assert isinstance(b, mk.gui.Store if react else int)
+    if react:
+        assert isinstance(a, mk.gui.Store)
+        assert isinstance(b, mk.gui.Store)
+    else:
+        assert not isinstance(a, mk.gui.Store) and isinstance(a, int)
+        assert not isinstance(b, mk.gui.Store) and isinstance(b, int)
 
 
 @pytest.mark.parametrize("react", [False, True])
 def test_tuple_unpack_return_value(react: bool):
-    @mk.gui.react()
+    @mk.gui.react(nested_return=False)
     def add(seq: Tuple[int]):
         return tuple(x + 1 for x in seq)
 
@@ -135,8 +139,12 @@ def test_tuple_unpack_return_value(react: bool):
     # We need to use the `react` decorator here because tuple unpacking
     # happens outside of the function `add`. Without the decorator, the
     # tuple unpacking will not be reactive.
-    with mk.gui.react():
+    with mk.gui.react(react):
         a, b = add(store)
 
-    assert isinstance(a, mk.gui.Store if react else int)
-    assert isinstance(b, mk.gui.Store if react else int)
+    if react:
+        assert isinstance(a, mk.gui.Store)
+        assert isinstance(b, mk.gui.Store)
+    else:
+        assert not isinstance(a, mk.gui.Store) and isinstance(a, int)
+        assert not isinstance(b, mk.gui.Store) and isinstance(b, int)
