@@ -2,6 +2,7 @@ import warnings
 from functools import partial, wraps
 from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, Union, cast
 
+import rich
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.fields import ModelField
 from tqdm import tqdm
@@ -110,11 +111,13 @@ def trigger() -> List[Modification]:
     ]
     new_modifications = []
     if len(order) > 0:
-        print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
+        rich.print(
+            f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}",
+            flush=True,
+        )
         with tqdm(total=len(order)) as pbar:
             # Go through all the operations in order: run them and add
-            # their modifications
-            # to the new_modifications list
+            # their modifications to the new_modifications list
             for op in order:
                 pbar.set_postfix_str(f"Running {op.fn.__name__}")
                 mods = op()
@@ -122,7 +125,6 @@ def trigger() -> List[Modification]:
                 # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
                 new_modifications.extend(mods)
                 pbar.update(1)
-        print("done")
 
     # Clear out the modification queue
     state.modification_queue.clear()

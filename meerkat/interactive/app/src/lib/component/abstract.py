@@ -25,7 +25,8 @@ class ComponentFrontend(BaseModel):
 class WrappableMixin:
     @classproperty
     def wrapper_import_style(cls) -> Literal["default", "named"]:
-        from meerkat.interactive.svelte import svelte_writer
+        from meerkat.interactive.svelte import SvelteWriter
+        svelte_writer = SvelteWriter()
 
         if cls.library == "@meerkat-ml/meerkat" and cls.namespace == "meerkat":
             # Meerkat components

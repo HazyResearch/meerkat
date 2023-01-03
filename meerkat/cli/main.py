@@ -220,21 +220,8 @@ def run(
     state.api_info = api_info
     state.frontend_info = frontend_info
 
-    reload_index = 1
     while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
-        api_stdout = api_info.process.stdout.readline().decode("utf-8")
-        if "Reloading..." in api_stdout:
-            rich.print(
-                f"[purple][Reload #{reload_index}][/purple] {api_stdout.lstrip('WARNING:  ')}",
-                end="",
-            )
-            reload_index += 1
-        else:
-            if api_stdout:
-                rich.print(
-                    f"[medium_purple1][Script][/medium_purple1] {api_stdout}", end=""
-                )
-
+        pass
 
 @cli.command()
 def update():

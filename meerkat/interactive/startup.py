@@ -176,7 +176,7 @@ def run_script(
         ]
         + (["--reload"] if dev else []),
         env=env,
-        stdout=subprocess.PIPE,
+        # stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
 
@@ -546,17 +546,17 @@ def output_startup_message(url: str, docs_url: str = None):
 
     rich.print("")
     rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green][bold] Open interface at "
-        f"[/bold][turqoise]{url}[/turqoise]"
+        f"{meerkat_header} [bold green]➜[/bold green] Open interface at "
+        f"[turqoise]{url}[/turqoise]"
     )
     if docs_url:
         rich.print(
-            f"{meerkat_header} [bold green]➜[/bold green][bold] Open API docs at "
-            f"[/bold][turqoise]{docs_url}[/turqoise]"
+            f"{meerkat_header} [bold green]➜[/bold green] Open API docs at "
+            f"[turqoise]{docs_url}[/turqoise]"
         )
     rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green][bold] Interact with Meerkat "
+        f"{meerkat_header} [bold green]➜[/bold green] Interact with Meerkat "
         "programatically with the console below. Use [yellow]quit()[/yellow] to end "
-        "session.[/bold]"
+        "session."
     )
     rich.print("")
