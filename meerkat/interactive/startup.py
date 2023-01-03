@@ -537,9 +537,12 @@ def cleanup():
     if in_mk_run_subprocess:
         return
 
-    rich.print(
-        "\n:electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
-    )
+    if state.frontend_info or state.api_info:
+        # Keep message inside if statement to avoid printing when not needed
+        # e.g. when running `mk run --help`
+        rich.print(
+            "\n:electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
+        )
 
     if state.frontend_info is not None:
         if state.frontend_info.process:
