@@ -13,3 +13,4 @@ sphinx-toolbox
 sphinx-copybutton
 sphinx_design
 jinja2
+pydata-sphinx-theme==0.8.1
