@@ -82,12 +82,12 @@ class Interface(IdentifiableMixin):
 
             rich.print(
                 ":scroll: "
-                f"Interface [turqoise]{self.id}[/turqoise] "
-                f"is at [turqoise]{url}[/turqoise]."
+                f"Interface [violet]{self.id}[/violet] "
+                f"is at [violet]{url}[/violet]"
             )
             rich.print(
                 ":newspaper: "
-                f"API docs are at [turqoise]{state.api_info.docs_url}[/turqoise]."
+                f"API docs are at [violet]{state.api_info.docs_url}[/violet]"
             )
             rich.print()
 
