@@ -62,6 +62,6 @@ parts:
       - file: datasets/datasets
       - file: datasets/contributing
 
-  - caption: API Reference
-    chapters:
-      - file: apidocs/index
+  # - caption: API Reference
+  #   chapters:
+  #     - file: apidocs/index
