@@ -36,7 +36,7 @@ we simply pass filepaths to the :class:`~meerkat.ImageColumn` constructor.
     display_df(img_col, "simple_column")
 
 .. raw:: html
-   :file: ../html/display/simple_column.html
+   :file: ../../html/display/simple_column.html
 
 All Meerkat columns are subclasses of :class:`~meerkat.Column` and share a common 
 interface, which includes :meth:`~meerkat.Column.__len__`, :meth:`~meerkat.Column.__getitem__`, :meth:`~meerkat.Column.__setitem__`, :meth:`~meerkat.Column.filter`, :meth:`~meerkat.Column.map`, and :meth:`~meerkat.Column.concat`. Below we get the length of the column we just created. 
@@ -97,6 +97,6 @@ convert to a Meerkat column.
     display_df(df, "simple_df")
 
 .. raw:: html
-   :file: ../html/display/simple_df.html
+   :file: ../../html/display/simple_df.html
 
 Read on to learn how we access the data in Columns and DataFrames.
