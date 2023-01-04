@@ -6,3 +6,5 @@ API Reference
 
    dataframe.rst
    interactive.rst
+   columns.rst
+   ops.rst
