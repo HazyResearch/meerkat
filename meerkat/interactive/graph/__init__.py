@@ -56,6 +56,7 @@ def trigger() -> List[Modification]:
         for node in _topological_sort(root_nodes)
         if isinstance(node.obj, Operation)
     ]
+    
     new_modifications = []
     if len(order) > 0:
         print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
