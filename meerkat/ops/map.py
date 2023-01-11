@@ -1,11 +1,11 @@
-from inspect import getfullargspec, signature
+from inspect import signature
 from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Union
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView
 
 if TYPE_CHECKING:
-    from meerkat import Column, DataFrame
+    from meerkat.columns.abstract import Column
     from meerkat.columns.deferred.base import DeferredColumn
     from meerkat.dataframe import DataFrame
 
@@ -18,7 +18,7 @@ _SHARED_DOCS_ = {
         """
     ),
     "is_batched_fn": docs.Arg(
-        """ 
+        """
         is_batched_fn (bool, optional): Whether the function must be applied on a
             batch of rows. Defaults to False.
         """
@@ -29,40 +29,40 @@ _SHARED_DOCS_ = {
         """
     ),
     "inputs": docs.Arg(
-        """ 
+        """
         inputs (Dict[str, str], optional): Dictionary mapping column names in
-            ``${data}`` to keyword arguments of ``function``. Ignored if ``${data}`` is a
-            column. When calling ``function`` values from the columns will be fed to
+            ``${data}`` to keyword arguments of ``function``. Ignored if ``${data}`` is
+            a column. When calling ``function`` values from the columns will be fed to
             the corresponding keyword arguments. Defaults to None, in which case it
-            inspects the signature of the function. It then finds the columns with the 
-            same names in the DataFrame and passes the corresponding values to the 
-            function. If the function takes a non-default argument that is not a 
+            inspects the signature of the function. It then finds the columns with the
+            same names in the DataFrame and passes the corresponding values to the
+            function. If the function takes a non-default argument that is not a
             column in the DataFrame, the operation will raise a `ValueError`.
         """
     ),
     "outputs": docs.Arg(
         """
-        outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the output 
-            of ``function`` is mapped to the output of :func:`${name}`. 
+        outputs (Union[Dict[any, str], Tuple[str]], optional): Controls how the output
+            of ``function`` is mapped to the output of :func:`${name}`.
             Defaults to ``None``.
 
-            *   If ``None``: the output is inferred from the return type of the 
-                function. See explanation above. 
+            *   If ``None``: the output is inferred from the return type of the
+                function. See explanation above.
             *   If ``"single"``: a single :class:`DeferredColumn` is returned.
             *   If a ``Dict[any, str]``: then a :class:`DataFrame` containing
                 DeferredColumns is returned. This is useful when the output of
                 ``function`` is a ``Dict``. ``outputs`` maps the outputs of ``function``
                 to column names in the resulting :class:`DataFrame`.
-            *   If a ``Tuple[str]``: then a :class:`DataFrame` containing 
-                output :class:`DeferredColumn` is returned. This is useful when the 
+            *   If a ``Tuple[str]``: then a :class:`DataFrame` containing
+                output :class:`DeferredColumn` is returned. This is useful when the
                 of ``function`` is a ``Tuple``. ``outputs`` maps the outputs of
                 ``function`` to column names in the resulting :class:`DataFrame`.
         """
     ),
     "output_type": docs.Arg(
         """
-        output_type (Union[Dict[str, type], type], optional): Coerce the column. Defaults
-            to None.
+        output_type (Union[Dict[str, type], type], optional): Coerce the column.
+            Defaults to None.
         """
     ),
 }
@@ -116,11 +116,12 @@ def defer(
 
     *   If ``function`` returns a tuple, then ``defer`` will return a :class:`DataFrame`
         containing :class:`DeferredColumn` objects. The column names will be integers.
-        The column names can be overriden by passing a tuple to the ``outputs`` argument.
+        The column names can be overriden by passing a tuple to the ``outputs``
+        argument.
 
-    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"`` to the
-        ``outputs`` argument will cause ``defer`` to return a single :class:`DeferredColumn`
-        that materializes to a :class:`ObjectColumn`.
+    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"`` to
+        the ``outputs`` argument will cause ``defer`` to return a single
+        :class:`DeferredColumn` that materializes to a :class:`ObjectColumn`.
 
     *How do you execute the deferred map?*
 
@@ -349,8 +350,9 @@ def map(
         The column names will be integers. The column names can be overriden by passing
         a tuple to the ``outputs`` argument.
 
-    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"`` to the
-        ``outputs`` argument will cause ``map`` to return a single :class:`ObjectColumn`.
+    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"``
+        to the ``outputs`` argument will cause ``map`` to return a single
+        :class:`ObjectColumn`.
 
     .. note::
         This function is also available as a method of :class:`DataFrame` and

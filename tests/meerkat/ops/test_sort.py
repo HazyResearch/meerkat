@@ -176,3 +176,9 @@ def test_sort_tensor_and_pandas_descending():
         and (test["pandas"] == mk.ScalarColumn([9, 8, 7])).all()
         and (test["numpy"] == mk.TorchTensorColumn([6, 4, 4])).all()
     )
+
+
+def test_sort_with_store():
+    df = mk.DataFrame({"tensor": mk.TorchTensorColumn([3, 2, 4])})
+    test = df.sort(by=mk.gui.Store("tensor"), ascending=True)
+    assert (test["tensor"] == mk.TorchTensorColumn([2, 3, 4])).all()

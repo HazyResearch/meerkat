@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Callable, Mapping, Sequence, Union
 
 from pandas.util._decorators import doc
 
-from meerkat.block.abstract import BlockView
 from meerkat.ops.map import defer
 
 if TYPE_CHECKING:

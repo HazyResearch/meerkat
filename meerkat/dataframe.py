@@ -41,7 +41,6 @@ from meerkat.mixins.deferable import DeferrableMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
-from meerkat.mixins.mapping import MappableMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.row import Row
@@ -1244,10 +1243,18 @@ class DataFrame(
     def read(
         cls,
         path: str,
+        overwrite: bool = False,
         *args,
         **kwargs,
     ) -> DataFrame:
         """Load a DataFrame stored on disk."""
+        from meerkat.datasets.utils import download_df
+
+        # URL
+        if path.startswith("http://") or path.startswith("https://"):
+            return download_df(path, overwrite=overwrite)
+        elif not os.path.exists(path):
+            raise ValueError(f"Path does not exist: {path}")
 
         # Load the metadata
         metadata = dict(
@@ -1281,6 +1288,7 @@ class DataFrame(
     ) -> None:
         """Save a DataFrame to disk."""
         # Make all the directories to the path
+        path = os.path.abspath(os.path.expanduser(path))
         os.makedirs(path, exist_ok=True)
 
         # Get the DataFrame state

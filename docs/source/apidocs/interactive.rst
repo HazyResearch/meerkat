@@ -1,5 +1,5 @@
 Interactive
 ============
 
-.. automodule:: meerkat.interactive
+.. automodule:: meerkat.gui
    :members:

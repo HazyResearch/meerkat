@@ -53,7 +53,9 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_book_theme",
     "sphinx_external_toc",
-    "sphinx_design"
+    "sphinx_design",
+    "sphinx_toolbox.collapse",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,6 +74,7 @@ exclude_patterns = []
 html_theme = "sphinx_book_theme"
 html_logo = "../assets/meerkat_banner_padded.svg"
 html_favicon = "../assets/meerkat_logo.png"
+html_sidebars = {"**": ["sbt-sidebar-nav.html"]}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

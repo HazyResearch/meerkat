@@ -1,5 +1,5 @@
 Copy vs. View Behavior 
-=================
+=======================
 
 In Meerkat, as in other data structures (*e.g.* 
 `NumPy <https://numpy.org/doc/stable/user/basics.copies.html>`_, 

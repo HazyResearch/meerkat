@@ -45,6 +45,13 @@ parts:
               - file: guide/interactive/concepts/state
           - file: guide/interactive/details/why-reactive
           - file: guide/interactive/environments/running-interfaces
+          - file: guide/interactive/components/component
+            sections:
+              - file: guide/interactive/components/display
+              - file: guide/interactive/components/match
+          - file: guide/interactive/examples/examples
+            sections:
+              - file: guide/interactive/examples/image_search
 
   - caption: Use Cases
     chapters:

@@ -24,6 +24,7 @@ class Tab(FrontendMixin):
 
 class Tabs(Component):
 
+    # TODO: Add option for setting the default selected tab.
     tabs: Union[Mapping[str, Component], Sequence[Tab]]
 
     def __init__(self, **kwargs):

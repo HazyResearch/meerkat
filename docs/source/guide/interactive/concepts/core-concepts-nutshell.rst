@@ -1,5 +1,5 @@
 Core Concepts in a Nutshell
---------------------------
+----------------------------
 
 Data Structures
 

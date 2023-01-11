@@ -1,4 +1,8 @@
 import os
+import shutil
+import tarfile
+
+from meerkat.dataframe import DataFrame
 
 
 def download_url(url: str, dataset_dir: str, force: bool = False):
@@ -55,3 +59,45 @@ def download_google_drive(
         gdown.download_folder(url=url, id=id, output=dst)
     else:
         gdown.download(url=url, id=id, output=dst)
+
+
+def download_df(
+    url: str, overwrite: bool = False, download_dir: str = None
+) -> DataFrame:
+    """Download a dataframe from a url.
+
+    Args:
+        url: The url.
+        overwrite: Whether to download the dataframe from the path again.
+        download_dir: The directory to download the dataframe to.
+
+    Returns:
+        DataFrame: The downloaded dataframe.
+    """
+    if download_dir is None:
+        download_dir = os.path.abspath(os.path.expanduser("~/.meerkat/dataframes"))
+
+    # A hacky way of getting the name from the url.
+    # This won't always work, because we could have name conflicts.
+    # TODO: Find a better way to do this.
+    local_path = url.split("/")[-1]
+    local_path = local_path.split(".zip")[0].split(".tar")[0]
+    dir_path = os.path.join(download_dir, local_path)
+
+    mode = "r:gz" if url.endswith(".tar.gz") else "r"
+
+    if overwrite and os.path.exists(dir_path):
+        shutil.rmtree(dir_path)
+
+    if not os.path.exists(dir_path):
+        cached_tar_path = download_url(
+            url=url,
+            dataset_dir=download_dir,
+        )
+        print("Extracting tar archive, this may take a few minutes...")
+        tar = tarfile.open(cached_tar_path, mode=mode)
+        tar.extractall(download_dir)
+        tar.close()
+        os.remove(cached_tar_path)
+
+    return DataFrame.read(dir_path)

@@ -80,7 +80,7 @@ def get_first_available_port(initial: int, final: int) -> int:
             s = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )  # create a socket object
-            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port
+            result = s.bind((LOCALHOST_NAME, port))  # Bind to the port  # noqa: F841
             s.close()
             # rich.print(f"Found open port: {port}")
             return port

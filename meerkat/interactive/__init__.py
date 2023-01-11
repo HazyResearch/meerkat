@@ -2,7 +2,6 @@ import pathlib
 
 from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
-from meerkat.interactive.app.src.lib.component.text import Text
 from meerkat.interactive.app.src.lib.layouts import (
     ColumnLayout,
     Div,
@@ -13,6 +12,16 @@ from meerkat.interactive.app.src.lib.layouts import (
 # from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
 from meerkat.interactive.app.src.lib.shared.cell.image import Image
+from meerkat.interactive.graph import (
+    Store,
+    StoreFrontend,
+    is_reactive,
+    make_store,
+    no_react,
+    react,
+    reactive,
+    trigger,
+)
 
 from .app.src.lib.component.abstract import AutoComponent, Component
 from .app.src.lib.component.button import Button
@@ -35,16 +44,6 @@ from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.textbox import Textbox
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
-from .graph import (
-    Store,
-    StoreFrontend,
-    is_reactive,
-    make_store,
-    no_react,
-    react,
-    reactive,
-    trigger,
-)
 from .interface import Interface, interface
 from .modification import DataFrameModification, Modification
 from .startup import start

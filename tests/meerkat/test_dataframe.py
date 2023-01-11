@@ -13,7 +13,6 @@ import torch
 import ujson as json
 
 import meerkat
-from meerkat import TorchTensorColumn
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredColumn

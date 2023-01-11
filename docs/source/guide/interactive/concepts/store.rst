@@ -32,13 +32,17 @@ A :class:`Store` can be updated by either the backend and/or frontend.
 
 Faux Paus
 ^^^^^^^^^
-- Assigning a value to a store variable with Python assingment (i.e. `=`)
+- Setting a store equal to a value (i.e. ``store = 1``) will not update the value of the store. Use ``store.set()``.
 
 .. code-block:: python
     
-    counter = mk.gui.Store(0)
     # This does not set the value of the store to 1
+    counter = mk.gui.Store(0)
     counter = 1
+    
+    # Use .set to set the value of the store
+    counter = mk.gui.Store(0)
+    counter.set(1)
 
 - A list of Stores is not reactive, a Store of list is reactive
 
@@ -47,10 +51,49 @@ Faux Paus
     # my_list is a list of stores. It is not a Store.
     # Operations on my_list will not trigger reactions.
     my_list = [mk.gui.Store(0), mk.gui.Store(0)]
-    my_list.append(mk.gui.Store(2))  # this does nothing
+    my_list += [mk.gui.Store(2))]  # this does nothing
 
     # my_stores is a store containing list of integers.
     # appending will change the value of my_stores.
     # This will trigger reactions.
-    my_stores = mk.gui.Store([mk.gui.Store(0), mk.gui.Store(1)])
-    my_stores.append(mk.gui.Store(2))
+    my_stores = mk.gui.Store([0, 1])
+    my_stores += [2]
+
+- ``Store(None)`` is not ``None``, but is equal to ``None``
+
+.. code-block:: python
+
+    Store(None) is None  # False
+
+    Store(None) == None  # True
+
+- Using shortcut operators (``and``, ``or``, ``not``) with Stores will not return Stores, but using Meerkat's built-in overloads (``mk.cand``, ``mk.cor``, ``mk.cnot``) will
+
+.. code-block:: python
+
+    store = Store("")
+    with mk.gui.react():
+        # These will not return Stores
+        type(store or "default")  # str
+        type(store and "default")  # str
+        type(not store)  # bool
+
+        # These will return Stores
+        type(mk.cor(store, "default"))  # Store
+        type(mk.cand(store, "default"))  # Store
+        type(mk.cnot(store))  # Store
+
+- Unpacking store of tuples must be done in the ``mk.gui.react()`` to return stores
+
+.. code-block:: python
+
+    @mk.gui.react()
+    def add(seq: Tuple[int]):
+        return tuple(x + 1 for x in seq)
+
+    store = mk.gui.Store((1, 2))
+    # We need to use the `react` decorator here because tuple unpacking
+    # happens outside of the function `add`. Without the decorator, the
+    # tuple unpacking will not be reactive.
+    with mk.gui.react():
+        a, b = add(store)

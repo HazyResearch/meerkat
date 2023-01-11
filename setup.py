@@ -69,10 +69,13 @@ EXTRAS = {
         "pytest-cov>=2.10.1",
         "sphinx-rtd-theme>=0.5.1",
         "nbsphinx>=0.8.0",
+        "sphinx-toolbox",
         "recommonmark>=0.7.1",
         "parameterized",
         "pre-commit>=2.9.3",
         "sphinx-autobuild",
+        "sphinx-copybutton",
+        "sphinx_design",
         "twine",
     ],
     "embeddings-mac": [

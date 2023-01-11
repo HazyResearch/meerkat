@@ -95,14 +95,14 @@ def set_criterion(
     try:
         query_embedding = parse_query(query)
 
-        criterion.set(
-            MatchCriterion(
-                query=query,
-                against=against,
-                query_embedding=query_embedding,
-                name=f"match({against}, {query})",
-            )
+        match_criterion = MatchCriterion(
+            query=query,
+            against=against,
+            query_embedding=query_embedding,
+            name=f"match({against}, {query})",
         )
+        criterion.set(match_criterion)
+        return match_criterion
 
     except Exception as e:
         raise e
@@ -120,7 +120,7 @@ class MatchCriterion:
 @reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
-    if criterion == None or criterion.against is None:
+    if criterion == None or criterion.against is None:  # noqa: E711
         return df, None
 
     data_embedding = df[criterion.against]
@@ -152,8 +152,7 @@ class Match(Component):
         )
 
         self.criterion: MatchCriterion = Store(
-            MatchCriterion(against=None, query=None, name=None),
-            backend_only=True
+            MatchCriterion(against=None, query=None, name=None), backend_only=True
         )
 
         on_match = set_criterion.partial(

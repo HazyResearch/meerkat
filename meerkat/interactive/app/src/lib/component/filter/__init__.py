@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -10,9 +10,6 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import Component
-
-if TYPE_CHECKING:
-    from meerkat import DataFrame
 
 
 def _in(column: Column, value):

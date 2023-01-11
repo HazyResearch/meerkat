@@ -188,6 +188,7 @@ Interface
 And then finally, we can launch the interface!
 
 .. code-block:: python
+
     mk.gui.start()
     mk.gui.Interface(
         component=mk.gui.RowLayout(components=[choices, df_viz])

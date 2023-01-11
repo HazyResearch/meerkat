@@ -9,7 +9,8 @@ from meerkat.interactive.server import Server
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
-    from meerkat.interactive.graph import Modification
+    from meerkat.interactive.modification import Modification
+    from meerkat.interactive.server import Server
     from meerkat.mixins.identifiable import IdentifiableMixin
 
 
