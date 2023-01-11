@@ -14,6 +14,25 @@ class FlowbiteSvelteMixin:
         return "flowbite"
 
 
+class Accordion(Slottable, FlowbiteSvelteMixin, AutoComponent):
+    multiple: bool = False
+    flush: bool = False
+    activeClasses: str = "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800"
+    inactiveClasses: str = (
+        "text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:dark:bg-gray-800"
+    )
+    defaultClass: str = "text-gray-500 dark:text-gray-400"
+
+
+class AccordionItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+    open: bool = False
+    activeClasses: str = None
+    inactiveClasses: str = None
+    defaultClass: str = "flex items-center justify-between w-full font-medium text-left group-first:rounded-t-xl"
+    transitionType: Literal["slide", "fade"] = "slide"
+    transitionParams: dict = {}
+
+
 class Button(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
     pill: bool = False
