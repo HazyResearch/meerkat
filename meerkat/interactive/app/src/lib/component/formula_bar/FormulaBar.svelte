@@ -40,7 +40,7 @@
 	});
 
 </script>
-<div bind:this={divEl} class="h-64" />
+<div bind:this={divEl} class="h-32" />
 
 <!-- <input
 	type="text"

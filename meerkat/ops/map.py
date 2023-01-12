@@ -206,6 +206,7 @@ def defer(
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
         elif isinstance(inputs, Sequence):
+            # TODO: make this work with a list
             args = [data[col_name] for col_name in inputs]
             kwargs = {}
         elif inputs is None:
@@ -230,7 +231,7 @@ def defer(
         kwargs=kwargs,
         is_batched_fn=is_batched_fn,
         batch_size=batch_size,
-        return_format=type(outputs),
+        return_format=type(outputs) if outputs is not None else None,
     )
 
     block = DeferredBlock.from_block_data(data=op)
@@ -308,6 +309,7 @@ def map(
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
     output_type: Union[Mapping[str, type], type] = None,
     materialize: bool = True,
+    use_ray: bool = False,
     pbar: bool = False,
     **kwargs,
 ):
@@ -423,17 +425,29 @@ def map(
         output_type=output_type,
         materialize=materialize,
     )
-    return _materialize(deferred, batch_size=batch_size, pbar=pbar)
+    return _materialize(deferred, batch_size=batch_size, pbar=pbar, use_ray=use_ray)
 
 
-def _materialize(data: Union["DataFrame", "Column"], batch_size: int, pbar: bool):
+def _materialize(
+    data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool
+):
     from tqdm import tqdm
 
     from .concat import concat
 
-    result = []
-    for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
-        result.append(
-            data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True)
-        )
-    return concat(result)
+    if use_ray:
+        # TODO (dean): Implement this with ray for linear pipelines only, if there are
+        # branches raises a valueerror.
+        # Build the pipeline by following `data.args` and `data.kwargs`
+        # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).defer(lambda img: (img.mean(), img.std()))`
+        # `out["0"].data.args[0].data.kwargs["img"]`
+        raise NotImplementedError
+    else:
+        result = []
+        for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
+            result.append(
+                data._get(
+                    slice(batch_start, batch_start + batch_size, 1), materialize=True
+                )
+            )
+        return concat(result)
