@@ -76,30 +76,30 @@ class SvelteWriter:
         """Configure and setup the app for Meerkat."""
         # These need to be done first, .mk allows Meerkat
         # to recognize the app as a Meerkat app
-        svelte_writer.write_libdir()  # src/lib
-        svelte_writer.write_dot_mk()  # .mk file
+        self.write_libdir()  # src/lib
+        self.write_dot_mk()  # .mk file
 
         # Write an ExampleComponent.svelte and __init__.py file
         # and a script example.py that uses the component
-        svelte_writer.write_example_component()
-        svelte_writer.write_example_py()
+        self.write_example_component()
+        self.write_example_py()
 
-        svelte_writer.write_app_css()  # app.css
-        svelte_writer.write_constants_js()  # constants.js
-        svelte_writer.write_svelte_config()  # svelte.config.js
-        svelte_writer.write_tailwind_config()  # tailwind.config.cjs
+        self.write_app_css()  # app.css
+        self.write_constants_js()  # constants.js
+        self.write_svelte_config()  # svelte.config.js
+        self.write_tailwind_config()  # tailwind.config.cjs
 
-        svelte_writer.import_app_components()
-        svelte_writer.write_all_component_wrappers()  # src/lib/components/wrappers
-        svelte_writer.write_component_context()  # ComponentContext.svelte
-        svelte_writer.write_layout()  # +layout.svelte, layout.js
-        svelte_writer.write_slug_route()  # [slug]/+page.svelte
+        self.import_app_components()
+        self.write_all_component_wrappers()  # src/lib/components/wrappers
+        self.write_component_context()  # ComponentContext.svelte
+        self.write_layout()  # +layout.svelte, layout.js
+        self.write_slug_route()  # [slug]/+page.svelte
 
-        svelte_writer.write_gitignore()  # .gitignore
-        svelte_writer.write_setup_py()  # setup.py
+        self.write_gitignore()  # .gitignore
+        self.write_setup_py()  # setup.py
 
-        svelte_writer.copy_banner_small()  # banner_small.png
-        svelte_writer.copy_favicon()  # favicon.png
+        self.copy_banner_small()  # banner_small.png
+        self.copy_favicon()  # favicon.png
         
         # TODO add example_ipynb
 
