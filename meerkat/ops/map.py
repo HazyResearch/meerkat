@@ -428,22 +428,26 @@ def map(
     return _materialize(deferred, batch_size=batch_size, pbar=pbar, use_ray=use_ray)
 
 
-def _materialize(data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool):
+def _materialize(
+    data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool
+):
     from tqdm import tqdm
 
     from .concat import concat
 
     if use_ray:
-        # TODO (dean): Implement this with ray for linear pipelines only, if there are 
-        # branches raises a valueerror. 
+        # TODO (dean): Implement this with ray for linear pipelines only, if there are
+        # branches raises a valueerror.
         # Build the pipeline by following `data.args` and `data.kwargs`
         # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).defer(lambda img: (img.mean(), img.std()))`
         # `out["0"].data.args[0].data.kwargs["img"]`
         raise NotImplementedError
-    else:    
+    else:
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(
-                data._get(slice(batch_start, batch_start + batch_size, 1), materialize=True)
+                data._get(
+                    slice(batch_start, batch_start + batch_size, 1), materialize=True
+                )
             )
         return concat(result)
