@@ -24,3 +24,6 @@ class ConversionError(ValueError):
 
 class ExperimentalWarning(FutureWarning):
     pass
+
+class TriggerError(Exception):
+    pass

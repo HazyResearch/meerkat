@@ -25,11 +25,17 @@
 		if (endpoint_id === null) {
 			return;
 		}
-		let [result, modifications] = await post(`${API_URL}/endpoint/${endpoint_id}/dispatch`, {
+		let {result, modifications, error} = await post(`${API_URL}/endpoint/${endpoint_id}/dispatch`, {
 			fn_kwargs: kwargs,
 			payload: payload
 		});
+
+		if (error) {
+			throw error;
+		}
+
 		apply_modifications(modifications);
+		console.log(result);
 		return result;
 	};
 
