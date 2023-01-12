@@ -57,6 +57,7 @@ REQUIRED = [
     "wrapt",
     "typer",
     "jinja2",
+    "nbformat",
 ]
 
 # What packages are optional?

@@ -1,6 +1,7 @@
 import dataclasses
 import importlib
 import os
+import nbformat as nbf
 import subprocess
 import json
 import shutil
@@ -69,8 +70,8 @@ class SvelteWriter:
         `mk.gui.start` function.
         """
         self.import_app_components()
-        self.write_all_component_wrappers()
-        self.write_component_context()
+        self.write_all_component_wrappers()  # src/lib/components/wrappers
+        self.write_component_context()  # ComponentContext.svelte
 
     def create_app(self):
         """Configure and setup the app for Meerkat."""
@@ -83,6 +84,7 @@ class SvelteWriter:
         # and a script example.py that uses the component
         self.write_example_component()
         self.write_example_py()
+        self.write_example_ipynb()
 
         self.write_app_css()  # app.css
         self.write_constants_js()  # constants.js
@@ -100,7 +102,7 @@ class SvelteWriter:
 
         self.copy_banner_small()  # banner_small.png
         self.copy_favicon()  # favicon.png
-        
+
         # TODO add example_ipynb
 
     def add_svelte(self):
@@ -314,6 +316,33 @@ class SvelteWriter:
     def render_example_py(self):
         return jinja_env.get_template("example.py").render()
 
+    def render_example_ipynb(self) -> nbf.NotebookNode:
+        nb = nbf.v4.new_notebook()
+        text = """# Interactive Notebook Example"""
+
+        code_1 = """\
+import meerkat as mk
+from app.src.lib.components import ExampleComponent
+
+# Launch the Meerkat GUI servers
+mk.gui.start()"""
+
+        code_2 = """\
+# Import and use the ExampleComponent
+example_component = ExampleComponent(name="Meerkat")
+
+# Run the interface (startup may take a few seconds)
+interface = mk.gui.Interface(component=example_component, id="example", height="200px")
+interface.launch()"""
+
+        nb["cells"] = [
+            nbf.v4.new_markdown_cell(text),
+            nbf.v4.new_code_cell(code_1),
+            nbf.v4.new_code_cell(code_2),
+        ]
+
+        return nb
+
     def render_gitingore(self):
         return jinja_env.get_template("gitignore.jinja").render()
 
@@ -453,6 +482,10 @@ class SvelteWriter:
 
     def write_example_py(self):
         self.write_file("example.py", self.render_example_py())
+
+    def write_example_ipynb(self):
+        with open("example.ipynb", "w") as f:
+            nbf.write(self.render_example_ipynb(), f)
 
     def write_file(self, path: str, content: str):
         with open(path, "w") as f:
