@@ -6,5 +6,5 @@ example_component = ExampleComponent(name="Meerkat")
 
 # Launch the Meerkat GUI
 mk.gui.start()
-interface = mk.gui.Interface(component=example_component)
+interface = mk.gui.Interface(component=example_component, id="example")
 interface.launch()
