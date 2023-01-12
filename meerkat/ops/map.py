@@ -206,6 +206,7 @@ def defer(
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
         elif isinstance(inputs, Sequence):
+            # TODO: make this work with a list
             args = [data[col_name] for col_name in inputs]
             kwargs = {}
         elif inputs is None:
@@ -230,7 +231,7 @@ def defer(
         kwargs=kwargs,
         is_batched_fn=is_batched_fn,
         batch_size=batch_size,
-        return_format=type(outputs),
+        return_format=type(outputs) if outputs is not None else None,
     )
 
     block = DeferredBlock.from_block_data(data=op)
@@ -308,6 +309,7 @@ def map(
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
     output_type: Union[Mapping[str, type], type] = None,
     materialize: bool = True,
+    use_ray: bool = False,
     pbar: bool = False,
     **kwargs,
 ):

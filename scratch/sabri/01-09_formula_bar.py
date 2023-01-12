@@ -3,9 +3,8 @@ from meerkat.interactive.app.src.lib.component.formula_bar import FormulaBar
 
 df = mk.get("imagenette")
 
-with mk.gui.react():
-    formula_bar = FormulaBar()
-    df = formula_bar(df)
+formula_bar = FormulaBar()
+df = formula_bar(df)
 
 gallery = mk.gui.Gallery(
     df=df, 

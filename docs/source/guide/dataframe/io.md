@@ -4,7 +4,7 @@ kernelspec:
   name: python3
 ---
 
-(guide/dataframe/selection)=
+(guide/dataframe/io)=
 
 # I/O
 
