@@ -25,7 +25,7 @@
 			error = null;
 		} catch (err) {
 			error = err;
-			console.log(err);
+			console.log("THIS IS WRRR == " + err);
 		} 
 	};
 
