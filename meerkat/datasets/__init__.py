@@ -9,6 +9,7 @@ from .fer import fer
 from .imagenet import imagenet
 from .imagenette import imagenette
 from .lvis import lvis
+from .mimic_iii import mimic_iii
 from .mirflickr import mirflickr
 from .ngoa import ngoa
 from .pascal import pascal
@@ -22,6 +23,7 @@ __all__ = [
     "mirflickr",
     "pascal",
     "lvis",
+    "mimic_iii",
     "expw",
     "fer",
     "rfw",
