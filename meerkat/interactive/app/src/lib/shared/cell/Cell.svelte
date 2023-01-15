@@ -4,6 +4,7 @@
 	import Code from './code/Code.svelte';
 	import Image from './image/Image.svelte';
 	import BasicType from './basic/Basic.svelte';
+	import Page from './page/Page.svelte';
 
 	export let data: any;
 	export let column: string = null;
@@ -24,6 +25,8 @@
 	<Image {data} {...cell_props} />
 {:else if cell_component === 'code'}
 	<Code {data} {...cell_props} />
+{:else if cell_component === 'page'} 
+	<Page {data} {...cell_props} />
 {:else}
 	{#if editable}
 		<!-- TODO(Sabri): Make this work with the BasicType formatting -->

@@ -8,8 +8,8 @@
 <img 
 	class="rounded-md shadow-md" 
 	class:object-cover={layout === 'object-cover'}
-	style:height={height} 
-	style:width={width} 
+	style:height={`${height}vh`} 
+	style:width={`${width}vh`} 
 	src={data} 
 	alt="A cell." 
 />
