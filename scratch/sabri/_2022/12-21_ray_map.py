@@ -33,9 +33,9 @@ pipeline = ds.window(blocks_per_window=10).map(load).map(operation)
 
 # time the code pipeline.take_all() code below
 start = time.time()
-pipeline.take_all()
 end = time.time()
 print(f"Time taken: {end - start}")
+breakpoint()
 
 
 # Approach 2: use read_images instead of custom load function

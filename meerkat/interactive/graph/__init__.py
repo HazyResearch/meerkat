@@ -19,6 +19,7 @@ from meerkat.interactive.graph.store import (
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort
 from meerkat.state import state
+from meerkat.errors import TriggerError
 
 __all__ = [
     "react",
@@ -33,6 +34,7 @@ __all__ = [
     "Operation",
     "trigger",
 ]
+
 
 
 def trigger() -> List[Modification]:
@@ -56,7 +58,7 @@ def trigger() -> List[Modification]:
         for node in _topological_sort(root_nodes)
         if isinstance(node.obj, Operation)
     ]
-    
+
     new_modifications = []
     if len(order) > 0:
         print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
@@ -66,7 +68,13 @@ def trigger() -> List[Modification]:
             # to the new_modifications list
             for op in order:
                 pbar.set_postfix_str(f"Running {op.fn.__name__}")
-                mods = op()
+
+                try:
+                    mods = op()
+                except Exception as e:
+                    # TODO (sabri): Change this to a custom error type
+                    raise TriggerError("Exception in trigger. " + str(e))
+
                 # TODO: check this
                 # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
                 new_modifications.extend(mods)

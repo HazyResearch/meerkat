@@ -1,10 +1,10 @@
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.formula_bar import FormulaBar
+from meerkat.interactive.app.src.lib.component.code_cell import CodeCell
 
 df = mk.get("imagenette")
 
-formula_bar = FormulaBar()
-df = formula_bar(df)
+code_cell = CodeCell()
+df = code_cell(df)
 
 gallery = mk.gui.Gallery(
     df=df, 
@@ -14,5 +14,5 @@ gallery = mk.gui.Gallery(
 
 network = mk.gui.start(shareable=False, dev=True)
 mk.gui.Interface(
-    component=mk.gui.RowLayout(components=[formula_bar, gallery]),
+    component=mk.gui.RowLayout(components=[code_cell, gallery]),
 ).launch()
