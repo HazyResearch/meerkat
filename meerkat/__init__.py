@@ -46,6 +46,7 @@ from meerkat.ops.embed import embed
 from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
+from meerkat.ops.search import search
 from meerkat.ops.sliceby.clusterby import clusterby
 from meerkat.ops.sliceby.explainby import explainby
 from meerkat.ops.sliceby.groupby import groupby

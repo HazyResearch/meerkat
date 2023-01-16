@@ -154,8 +154,8 @@ class TensorFormatter(BasicFormatter):
         return format_array(np.array([cell]), formatter=None)[0]
 
 
-class PageURLFormatter(BasicFormatter):
-    cell_component = "page"
+class WebsiteFormatter(BasicFormatter):
+    cell_component = "website"
 
     def encode(self, cell: str):
         return cell
