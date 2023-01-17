@@ -106,6 +106,7 @@ class FileLoader:
 
             # need to convert Path objects to strings for Template to work
             base_dir = str(self.base_dir)
+            base_dir = os.path.expanduser(base_dir)
 
             try:
                 # we don't use os.expanvars because it raises an error
@@ -123,6 +124,7 @@ class FileLoader:
             if self.cache_dir is not None:
                 # need to convert Path objects to strings for Template to work
                 cache_dir = str(self.cache_dir)
+                cache_dir = os.path.expanduser(cache_dir)
 
                 try:
                     # we don't use os.expanvars because it raises an error
