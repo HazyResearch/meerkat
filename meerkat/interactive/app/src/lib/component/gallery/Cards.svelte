@@ -69,8 +69,8 @@
 					data: row[main_index],
 					cell_component: pivot_cell_component,
 					cell_props: {
-						height: layout === 'gimages' ? `${pivot_height}vh` : '',
-						width: layout_style === 'square' ? `${pivot_height}vh` : ''
+						height: layout === 'gimages' ? pivot_height : '',
+						width: layout_style === 'square' ? pivot_height : ''
 					}
 				}}
 				content={pivot_height >= 15 || num_columns <= 6

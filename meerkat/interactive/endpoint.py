@@ -226,6 +226,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         modifications = trigger()
 
+
         return result, modifications
 
     def partial(self, *args, **kwargs) -> Endpoint:

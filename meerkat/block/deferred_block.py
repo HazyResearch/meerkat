@@ -269,10 +269,16 @@ class DeferredOp:
                         output = output[self.return_index]
 
                     if single_on_batched:
-                        if (self.return_format is dict) and (self.return_index is None):
+                        if (
+                            (self.return_format is None or self.return_format is dict)
+                            and isinstance(output, Dict)
+                            and (self.return_index is None)
+                        ):
                             return {k: v[0] for k, v in output.items()}
-                        elif (self.return_format is tuple) and (
-                            self.return_index is None
+                        elif (
+                            (self.return_format is None or self.return_format is tuple)
+                            and isinstance(output, Tuple)
+                            and (self.return_index is None)
                         ):
                             return [v[0] for v in output]
                         else:

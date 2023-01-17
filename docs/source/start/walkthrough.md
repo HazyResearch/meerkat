@@ -6,7 +6,9 @@ kernelspec:
 
 # Introducing Meerkat 
 
-*What is `Meerkat`?*  `Meerkat` makes it easier for data scientists and ML practitioners to interact with high-dimensional, multi-modal data. It provides simple abstractions for data wrangling supported by efficient and robust IO under the hood.
+*What is `Meerkat`?*  `Meerkat` is a DataFrame library that enables data scientists and ML practitioners to interact with complex data types like images, video and free text.
+
+In this document, we'll walkthrough how a Meerkat can be used to analyze a small image dataset. It is targetted for newcomers, who would like a fast introduction to core concepts in Meerkat. 
 
 
 ```{code-cell}
@@ -40,6 +42,8 @@ Let's take a look at the CSV.
 Next, we'll load it into a Meerkat `DataFrame`.
 
 ## 📸 Creating an image `DataFrame`
+*For more information on creating DataFrames from various data sources, see the user guide section on {ref}`guide/dataframe/io`.*
+
 Meerkat's core contribution is the DataFrame, a simple columnar data abstraction. The Meerkat DataFrame can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs.
 
 We're going to build a `DataFrame` out of the `imagenette.csv` file from the download above.
@@ -60,21 +64,38 @@ df
 The call to `head` shows the first few rows in the `DataFrame`. You can see that there are a few metadata columns, as well as the "img" column we added in.
 
 ## 🗂 Selecting data
-When we create an `ImageColumn` we don't load the images into memory. Instead, `ImageColumn` keeps track of all those filepaths we passed in and only loads the images when they are accessed. 
+*For more information see the user guide section on {ref}`guide/dataframe/selection`.*
 
+When we create an `ImageColumn` we don't load the images into memory. Instead, `ImageColumn` keeps track of all those filepaths we passed in and only loads the images when they are needed. 
+
+When we select a row of the `ImageColumn`, we get an instance `FileCell` back. A `FileCell` is an object that holds everything we need to materialize the cell (e.g. the filepath to the image and the loading function), but stops just short of doing so. 
 ```{code-cell}
-img = df["img"][0]
-print(f"Indexing the `ImageColumn` returns an object of type: {type(img)}.")
-display(img)
+img_cell = df["img"][0]
+print(f"Indexing the `ImageColumn` returns an object of type: {type(img_cell)}.")
 ```
 
-We can load a **batch** of images by indexing a slice. Notice that the output is a `ListColumn` of PIL images. 
+To actually materialize the image, we simply call the cell. 
+```{code-cell}
+img = img_cell()
+img
+```
 
+We can subselect a **batch** of images by indexing with a slice.  Notice that this returns a smaller {class}`~meerkat.DataFrame`. 
 ```{code-cell}
 imgs = df["img"][1:4]
 print(f"Indexing a slice of the `ImageColumn` returns a: {type(imgs)}.")
-display(imgs)
+imgs
 ```
+
+The whole batch of images can be loaded together by calling the column. 
+```
+imgs();
+```
+
+One can load multiple rows using any one of following indexing schemes:
+- **Slice indexing**: _e.g._ `column[4:10]`
+- **Integer array indexing**: _e.g._ `column[[0, 4, 6, 11]]`
+- **Boolean array indexing**: _e.g._ `column[np.array([True, False, False ..., True, False])]`
 
 ### 📎 _Aside_: `ImageColumn` under the hood, `DeferredColumn`.
 
@@ -82,76 +103,44 @@ If you check out the implementation of `ImageColumn` (at [meerkat/columns/image_
 
 _What's a `DeferredColumn`?_
 In `meerkat`, high-dimensional data types like images and videos are typically stored in a `DeferredColumn`. A  `DeferredColumn` wraps around another column and lazily applies a function to it's content as it is indexed. Consider the following example, where we create a simple `meerkat` column...    
-```
-  >>> col = mk.NumpyArrayColumn([0,1,2])
-  >>> col[0]
-  0
+```{code-cell}
+  col = mk.column([0,1,2])
 ```  
-...and wrap it in a lambda column.
+...and wrap it in a deferred column.
 ```
-  >>> lambda_col = col.to_lambda(fn=lambda x: x + 10)
-  >>> lambda_col[0]  # the function is only called at this point!
-  10
+  dcol = col.defer(fn=lambda x: x + 10)
+  dcol[1]()  # the function is only called at this point!
 ```
-Critically, the function inside a lambda column is only called at the time the column is indexed! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a `DeferredColumn` that lazily loads images...
+Critically, the function inside a lambda column is only called at the time the column is called! This is very useful for columns with large data types that we don't want to load all into memory at once. For example, we could create a `DeferredColumn` that lazily loads images...
 ```
   >>> filepath_col = mk.PandasSeriesColumn(["path/to/image0.jpg", ...])
-  >>> img_col = filepath.to_lambda
+  >>> img_col = filepath.defer(lambda x: load_image(x))
 ```
 An `ImageColumn` is a just a `DeferredColumn` like this one, with a few more bells and whistles!
 
-
-### 🦥 Lazy indexing.
-What if we don't want to load the images? To access the underlying cell (without loading the image), use the lazy indexer, `lz`.
-
-```{code-cell}
-cell = df["img"][8000]
-print(f"Lazy indexing the `ImageColumn` returns an object of type: {type(cell)}.")
-display(cell)
-```
-
-Note: **cells can survive on their own.** Everything we need to materialize the cell (e.g. the filepath to the image and the loading function) lives inside the cell, so we can call `cell.get()` to load the image even after the cell has been isolated from its original column. 
-
-```{code-cell}
-cell()
-```
-
-Using the lazy indexer and one of the following indexing schemes, we can also access a **subset** of a `DeferredColumn`, returning a smaller `DeferredColumn`.
-- **Slice indexing**: _e.g._ `column[4:10]`
-- **Integer array indexing**: _e.g._ `column[[0, 4, 6, 11]]`
-- **Boolean array indexing**: _e.g._ `column[np.array([True, False, False ..., True, False])]`
-
-```{code-cell}
-images = df["img"][12:16]
-print(f"Lazy indexing a slice of the `ImageColumn` returns an object of type: {type(images)}.")
-display(images)
-```
-
 ## 🛠 Applying operations over the DataFrame.
 
-When training and evaluating our models, we often perform operations on each example in our dataset (e.g. compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them. The `DataFrame` makes it easy to perform these operations:  
+When analyzing data, we often perform operations on each example in our dataset (e.g. compute a model's prediction on each example, tokenize each sentence, compute a model's embedding for each example) and store them. The `DataFrame` makes it easy to perform these operations:  
 - Produce new columns (via `DataFrame.map`)
 - Produce new columns and store the columns alongside the original data (via `DataFrame.update`)
 - Extract an important subset of the datset (via `DataFrame.filter`).   
 
 Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottleneck our computation.
 
-Let's start by filtering the `DataFrame` down to the examples in the validation set. Note that we use the lazy indexer `lz` to avoid loading all of the images. 
-
+Let's start by filtering the `DataFrame` down to the examples in the validation set. 
 ```{code-cell}
-valid_df = df[df["split"].data == "valid"]
+valid_df = df.filter(lambda split: split == "valid")
 ```
 
 ### 🫐  Using `DataFrame.map` to compute average intensity of the blue color channel in the images.
 
-To demonstrate the utility `map` operation, we'll explore the relationship between the "blueness" of an image and the class of the image. 
+To demonstrate the utility of the `map` operation, we'll explore the relationship between the "blueness" of an image and the class of the image. 
 
 We'll quantify the "blueness" of each image by simply computing the mean intensity of the blue color channel. This can be accomplished with a simple `map` operation over the `DataFrame`:
 
 ```{code-cell}
 blue_col = valid_df.map(
-    lambda x: np.array(x["img"])[:, :, 2].mean(), 
-    pbar=True, 
+    lambda img: np.array(img)[:, :, 2].mean(), 
     num_workers=2
 )
 
@@ -195,8 +184,8 @@ import torchvision.transforms as transforms
 model = resnet18(pretrained=True)
 ```
 
-### 💈  Creating an `ImageColumn` with a transform.
-In order to do inference, we'll need to create a _new_ `ImageColumn`. The `ImageColumn` we defined above (_i.e._ `"img_path"`), does not apply any transforms after loading and simply returns a PIL image. Before passing the images through the model, we need to convert the PIL image to a `torch.Tensor` and normalize the color channels (along with a few other transformations). 
+### 💈  Applying a transform to the images.
+In order to do inference, we'll need to create a _new_ {class}`~meerkat.DeferredColumn`. The `ImageColumn` we defined above (_i.e._ `"img_path"`), does not apply any transforms after loading and simply returns a PIL image. Before passing the images through the model, we need to convert the PIL image to a `torch.Tensor` and normalize the color channels (along with a few other transformations). 
 
 Note: the transforms defined below are the same as the ones used by torchvision, see [here](https://github.com/pytorch/examples/blob/cbb760d5e50a03df667cdc32a61f75ac28e11cbf/imagenet/main.py#L225). 
 
@@ -214,24 +203,20 @@ transform = transforms.Compose([
 ])
 
 # Create new column with transform 
-valid_df["input"] = mk.ImageColumn.from_filepaths(
-    filepaths=valid_df["img_path"], 
-    transform=transform,
-    base_dir="imagenette2-160"
-)
+valid_df["input"] = valid_df["img"].defer(transform)
 ```
 
-Notice that indexing this new `ImageColumn` returns a `torch.Tensor`, not a PIL image...  
+Notice that indexing this new column returns a `torch.Tensor`, not a PIL image...  
 ```{code-cell}
-img = valid_df["input"][0]
+img = valid_df["input"][0]()
 print(f"Indexing the `ImageColumn` returns an object of type: {type(img)}.")
 ```
 
-... and that indexing a slice of this new `ImageColumn` returns a `TensorColumn`, not a `ListColumn` of PIL images.
+... and that indexing a slice of this new column returns a {class}`~meerkat.TensorColumn`.
 ```{code-cell}
-col = img = valid_df["input"][:3]
+col = img = valid_df["input"][:3]()
 print(f"Indexing a slice of the `ImageColumn` returns an object of type: {type(img)}.")
-display(col)
+col
 ```
 
 Let's see what the full `DataFrame` looks like now.  
@@ -264,9 +249,7 @@ extractor = ActivationExtractor()
 model.layer4.register_forward_hook(extractor.forward_hook);
 ```
 
-We want to apply a forward pass to each image in the `DataFrame` and store the outputs as new columns: `DataFrame.update` is perfectly suited for this task. 
-
-Like `map`, `update` accepts a function and applies it to batches of rows in the the `DataFrame`. Unlike `map`, `update` must return a dictionary. Each key in the dictionary corresponds to a new column that will be added to the updated `DataFrame`. 
+We want to apply a forward pass to each image in the `DataFrame` and store the outputs as new columns: `DataFrame.map` is perfectly suited for this task. 
 
 ```{code-cell}
 # 1. Move the model to GPU, if available
@@ -276,9 +259,8 @@ model.to(device).eval()
 
 # 2. Define a function that runs a forward pass over a batch 
 @torch.no_grad()
-def predict(batch: mk.DataFrame):
-    input_col: mk.TensorColumn = batch["input"] 
-    x: torch.Tensor = input_col.data.to(device)  # We get the underlying torch tensor with `data` and move to GPU 
+def predict(input: mk.TensorColumn):
+    x: torch.Tensor = input.data.to(device)  # We get the underlying torch tensor with `data` and move to GPU 
     out: torch.Tensor = model(x)  # Run forward pass
 
     # Return a dictionary with one key for each of the new columns. Each value in the
@@ -291,13 +273,8 @@ def predict(batch: mk.DataFrame):
 # 3. Apply the update. Note that the `predict` function operates on batches, so we set 
 # `batched=True`. Also, the `predict` function only accesses the "input" column, by 
 # specifying that here we instruct update to only load that one column and skip others 
-valid_df = valid_df.update(
-    function=predict,
-    is_batched_fn=True,
-    batch_size=32,
-    input_columns=["input"], 
-    pbar=True
-)
+pred_df = valid_df.map(function=predict, is_batched_fn=True, batch_size=32)
+valid_df = mk.concat([valid_df, pred_df], axis="columns")
 ```
 
 The predictions, output probabilities, and activations are now stored alongside the examples in the `DataFrame`. 

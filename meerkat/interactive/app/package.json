@@ -66,6 +66,7 @@
 		"daisyui": "^2.22.0",
 		"flowbite": "^1.5.2",
 		"layercake": "^7.0.0",
+		"monaco-editor": "^0.34.1",
 		"prismjs": "^1.28.0",
 		"svelte": "^3.54.0",
 		"svelte-forms": "^2.3.1",

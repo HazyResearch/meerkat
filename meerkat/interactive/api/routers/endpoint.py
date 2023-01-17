@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Tuple
 
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.errors import TriggerError
 
 if TYPE_CHECKING:
     from meerkat.interactive.modification import Modification
@@ -16,7 +17,11 @@ def dispatch(
     """Call an endpoint."""
     from meerkat.interactive.modification import StoreModification
 
-    result, modifications = endpoint.partial(**fn_kwargs).run()
+    try:
+        result, modifications = endpoint.partial(**fn_kwargs).run()
+    except TriggerError as e:
+        # TODO: handle case where result is not none
+        return {"result": None, "modifications": [], "error": str(e)}
 
     # only return store modifications that are not backend_only
     modifications = [
@@ -26,4 +31,4 @@ def dispatch(
     ]
 
     # Return the modifications and the result to the frontend
-    return result, modifications
+    return {"result": result, "modifications": modifications, "error": None}
