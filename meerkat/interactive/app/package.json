@@ -1,6 +1,6 @@
 {
     "name": "@meerkat-ml/meerkat",
-    "version": "0.0.2e",
+    "version": "0.0.2f",
     "description": "The Meerkat Svelte Library",
     "scripts": {
         "dev": "vite dev",
@@ -16,7 +16,6 @@
         "format": "prettier --write --plugin-search-dir=. ."
     },
     "devDependencies": {
-        "@playwright/test": "^1.22.2",
         "@sveltejs/adapter-auto": "next",
         "@sveltejs/adapter-static": "^1.0.0-next.48",
         "@sveltejs/kit": "next",
@@ -51,15 +50,12 @@
         "@svelteuidev/composables": "^0.7.7",
         "@types/underscore": "^1.11.4",
         "@zerodevx/svelte-toast": "^0.7.2",
-        "carbon-components-svelte": "^0.67.4",
         "carbon-icons-svelte": "^11.2.0",
-        "carbon-preprocess-svelte": "^0.9.1",
         "d3": "^7.6.1",
         "d3-brush": "^3.0.0",
         "d3-quadtree": "^3.0.1",
         "d3-scale-chromatic": "^3.0.0",
         "d3-selection": "^3.0.0",
-        "daisyui": "^2.22.0",
         "flowbite": "^1.5.2",
         "layercake": "^7.0.0",
         "marked": "^4.2.4",

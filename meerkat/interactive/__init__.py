@@ -1,5 +1,6 @@
 import pathlib
 
+from meerkat.interactive.app.src.lib.component import flowbite
 from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
 from meerkat.interactive.app.src.lib.layouts import (
@@ -9,6 +10,7 @@ from meerkat.interactive.app.src.lib.layouts import (
     Grid,
     RowLayout,
 )
+
 # from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
 from meerkat.interactive.app.src.lib.shared.cell.image import Image
@@ -49,14 +51,10 @@ from .modification import DataFrameModification, Modification
 from .startup import start
 from .state import State
 
-from meerkat.interactive.app.src.lib.component import carbon
-from meerkat.interactive.app.src.lib.component import svelteui
-
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
-    "carbon",
-    "svelteui",
+    "flowbite",
     "Endpoint",
     "State",
     "endpoint",

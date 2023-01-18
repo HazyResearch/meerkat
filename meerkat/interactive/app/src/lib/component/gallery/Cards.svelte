@@ -23,7 +23,7 @@
 	export let cell_size: number = 6;
 
 	// Selected columns 
-	export let selected: Writable<Array<number>> = writable([]);
+	export let selected: Array<number> = [];
 
 	let columns = column_infos.map((col: any) => col.name);
 	let column_components = column_infos.map((col: any) => col.cell_component);
@@ -95,40 +95,40 @@
 						card_flex_grow: false
 					}
 				}}
-				selected={$selected.includes(idx)}
+				selected={selected.includes(idx)}
 				on:click={(e) => {
 					if (e.detail.shiftKey) {
-						if ($selected.length === 0) {
-							$selected.push(idx);
+						if (selected.length === 0) {
+							selected.push(idx);
 						} else {
-							let last_idx = $selected[$selected.length - 1];
+							let last_idx = selected[selected.length - 1];
 							let last_i = idxs.indexOf(last_idx);
 							let i = idxs.indexOf(idx);
 							if (i > last_i) {
 								for (let j = last_i; j <= i; j++) {
-									if (!$selected.includes(idxs[j])) {
-										$selected.push(idxs[j]);
+									if (!selected.includes(idxs[j])) {
+										selected.push(idxs[j]);
 									}
 								}
 							} else {
 								for (let j = last_i; j >= i; j--) {
-									if (!$selected.includes(idxs[j])) {
-										$selected.push(idxs[j]);
+									if (!selected.includes(idxs[j])) {
+										selected.push(idxs[j]);
 									}
 								}
 							}
 						}
 					} else if (e.detail.altKey) {
-						$selected = [];
-						$selected.push(idx);
+						selected = [];
+						selected.push(idx);
 					} else {
-						if ($selected.includes(idx)) {
-							$selected = without($selected, idx);
-						} else if (!$selected.includes(idx)) {
-							$selected.push(idx);
+						if (selected.includes(idx)) {
+							selected = without(selected, idx);
+						} else if (!selected.includes(idx)) {
+							selected.push(idx);
 						}
 					}
-					$selected = $selected;
+					selected = selected;
 				}}
 			>
 				<div slot="pivot-tooltip">Double-click to see example</div>

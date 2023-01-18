@@ -3,28 +3,27 @@
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import Selected from './Selected.svelte';
 
-	const { get_schema, get_rows, edit } = getContext('Meerkat');
+	const { get_schema, get_rows } = getContext('Meerkat');
 
-	export let df: Writable;
-	export let main_column: Writable<string>;
+	export let df;
+	export let main_column: string;
 	export let tag_columns: Any; // Writable<Array<string>>;
 	export let primary_key: string;
-	export let selected: Writable<Array<string>>;
+	export let selected: Array<string>;
 
 	export let page: number = 0;
 	export let per_page: number = 20;
 
 	export let cell_size: number = 24;
 
-	$: schema_promise = get_schema($df.ref_id);
+	$: schema_promise = get_schema(df.ref_id);
 
 	// create an array with the main_column and the tag_columns
 	$: rows_promise = get_rows(
-		$df.ref_id,
+		df.ref_id,
 		page * per_page,
 		(page + 1) * per_page
 		// TODO (Sabri): we should limit the columns only to the main_column and the
@@ -55,9 +54,9 @@
 		<div class="h-full grid grid-rows-[auto_1fr] relative">
 			<div class="grid grid-cols-3 h-12 z-10 rounded-t-lg drop-shadow-xl bg-slate-100">
 				<div class="font-semibold self-center px-10 flex space-x-2">
-					{#if $selected.length > 0}
+					{#if selected.length > 0}
 						<Selected />
-						<div class="text-violet-600">{$selected.length}</div>
+						<div class="text-violet-600">{selected.length}</div>
 					{/if}
 				</div>
 				<span class="font-bold text-xl text-slate-600 self-center justify-self-center">
@@ -77,8 +76,8 @@
 						{schema}
 						{rows}
 						{primary_key}
-						main_column={$main_column}
-						tag_columns={$tag_columns}
+						main_column={main_column}
+						tag_columns={tag_columns}
 						bind:cell_size
 						bind:selected
 					/>

@@ -344,8 +344,8 @@ def run_frontend_prod(
                 package_manager,
                 "run",
                 "build",
-                "--",
-                "--watch",
+                # "--",
+                # "--watch",
             ],
             env=env,
             stdout=subprocess.PIPE,
@@ -356,6 +356,8 @@ def run_frontend_prod(
         start_time = time.time()
         while build_process.poll() is None:
             output = build_process.stdout.readline().decode("utf-8").strip()
+            # Pad output to 100 characters
+            output = output.ljust(100)
             if "node_modules/" in output:
                 continue
             # Remove any symbols that would mess up the progress bar
@@ -364,14 +366,13 @@ def run_frontend_prod(
             )
             if 'Wrote site to "build"' in output:
                 rich.print(
-                    f"Building... {time.time() - start_time:.2f}s | {output}", end="\r"
+                    f"Build completed in {time.time() - start_time:.2f}s." + " " * 120
                 )
-                rich.print(f"Build completed in {time.time() - start_time:.2f}s")
                 break
 
         rich.print("")
 
-    # Run the statically built app with a simple python server
+    # Run the statically built app with preview mode
     env.update({"VITE_API_URL_PLACEHOLDER": api_url})
     process = subprocess.Popen(
         [
@@ -386,6 +387,7 @@ def run_frontend_prod(
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
+    # Alternately run the statically built app with a simple python server
     # os.chdir(buildpath)
     # process = subprocess.Popen(
     #     [

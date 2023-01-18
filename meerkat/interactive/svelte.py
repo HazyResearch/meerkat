@@ -1,19 +1,18 @@
 import dataclasses
 import importlib
-import os
-import nbformat as nbf
-import subprocess
 import json
+import os
 import shutil
+import subprocess
 import sys
 from typing import TYPE_CHECKING, List, Literal, Set, Type
 
+import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader
 
 from meerkat.constants import APP_DIR, BASE_DIR
 from meerkat.interactive import Component
 from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
-
 
 if TYPE_CHECKING:
     from meerkat.interactive import Interface
@@ -279,9 +278,19 @@ class SvelteWriter:
         # Filter to only include components and frontend components
         # whose libraries are installed
         installed_libraries = self.filter_installed_libraries(libraries)
-        components = [c for c in components if c.library in installed_libraries]
+        components = [
+            c
+            for c in components
+            if c.library in installed_libraries
+            or c.library == "@meerkat-ml/meerkat"
+            and not self.is_user_appdir
+        ]
         frontend_components = [
-            c for c in frontend_components if c.library in installed_libraries
+            c
+            for c in frontend_components
+            if c.library in installed_libraries
+            or c.library == "@meerkat-ml/meerkat"
+            and not self.is_user_appdir
         ]
 
         return template.render(
@@ -356,6 +365,9 @@ interface.launch()"""
 
     def render_layout(self):
         return jinja_env.get_template("layout.svelte").render()
+
+    def render_layout_js(self):
+        return jinja_env.get_template("+layout.js").render()
 
     def get_import_prefix(self):
         if self.is_user_appdir:
@@ -506,7 +518,7 @@ interface.launch()"""
         )
         self.write_file(
             f"{self.appdir}/src/routes/+layout.js",
-            "export const prerender = true;",
+            self.render_layout_js(),
         )
 
     def write_libdir(self):
