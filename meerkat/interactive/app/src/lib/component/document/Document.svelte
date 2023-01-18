@@ -1,52 +1,57 @@
 <script lang="ts">
 	// Load in getContext from svelte (always)
-	import { getContext } from 'svelte';
-	// Load in the type Writable from svelte/store (always)
-	import { get, type Writable } from 'svelte/store';
+	import { createEventDispatcher, getContext } from 'svelte';
 
 	// Icons
 	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte';
 	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
 	import Help from 'carbon-icons-svelte/lib/Help.svelte';
 
-	import type { Endpoint } from '$lib/utils/types';
-
-	// Running getContext('Interface') returns an object which contains useful functions
+	// Running getContext('Meerkat') returns an object which contains useful functions
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
-	const { get_rows, dispatch } = getContext('Interface');
-	// the `$get_rows` function is used to fetch data from a dataframe in the Python backend
-	// the `$edit` function is used to send edits to a dataframe in the Python backend
+	const { get_rows } = getContext('Meerkat');
+	// the `get_rows` function is used to fetch data from a dataframe in the Python backend
+	// the `edit` function is used to send edits to a dataframe in the Python backend
 
 	// Below are props (attributes) for our component.
 	// These match what's in the Document class on the Python side.
 	// These are Writable store objects, which means that it can be read from and written to.
 	// *** To access the value of the store, use $store_name, so e.g. $data or get(store_name), so e.g. get(data)***
-	export let df: Writable;
+	export let df;
+
 	// More component props
-	export let text_column: Writable<string>;
-	export let paragraph_column: Writable<string>;
-	export let label_column: Writable<string>;
-	export let id_column: Writable<string>;
-	export let on_sentence_label: Endpoint;
+	export let text_column: string;
+	export let paragraph_column: string;
+	export let label_column: string;
+	export let id_column: string;
 
-	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $text_column
-	$: text_df_promise = $get_rows($df.ref_id, 0, null, null, [$text_column]);
+	let dispatch = createEventDispatcher();
 
-	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $paragraph_column if it's not null
-	let paragraph_df_promise: any;
-	$: if ($paragraph_column) {
-		paragraph_df_promise = $get_rows($df.ref_id, 0, null, null, [$paragraph_column]);
+	function dispatchLabel(id: string, label: number) {
+		dispatch('label', {
+			row_id: id,
+			value: label
+		});
 	}
 
 	// Fetch data for the `df` dataframe
-	// This fetches all the data from the $label_column and id_column
+	// This fetches all the data from the text_column
+	$: text_df_promise = get_rows(df.ref_id, 0, null, null, [text_column]);
+
+	// Fetch data for the `df` dataframe
+	// This fetches all the data from the paragraph_column if it's not null
+	let paragraph_df_promise: any;
+	$: if (paragraph_column) {
+		paragraph_df_promise = get_rows(df.ref_id, 0, null, null, [paragraph_column]);
+	}
+
+	// Fetch data for the `df` dataframe
+	// This fetches all the data from the label_column and id_column
 	let label_id_df_promise: any;
-	$: if ($label_column) {
+	$: if (label_column) {
 		// The name of the id_column was told to us by the edit_target
-		label_id_df_promise = $get_rows($df.ref_id, 0, null, null, [$label_column, $id_column]);
+		label_id_df_promise = get_rows(df.ref_id, 0, null, null, [label_column, id_column]);
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)
@@ -111,46 +116,30 @@
 										{sentence}
 										<div class="text_interactions">
 											<div class="selecting">
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-red-500 rounded-full hover:bg-slate-400"
 													class:bg-red-500={label === 0}
 													class:text-red-100={label === 0}
-													on:click={() => {
-														console.log(on_sentence_label.endpoint_id)
-														$dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 0
-														});
-														// $edit(get(edit_target.target).ref_id, 0, $label_column, id, id_column);
-													}}
+													on:click={() => dispatchLabel(id, 0)}
 												>
 													<CloseOutline size={32} />
 												</i>
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-emerald-500 rounded-full hover:bg-slate-400"
 													class:bg-emerald-400={label === 1}
 													class:text-emerald-100={label === 1}
-													on:click={() => {
-														$dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 1
-														});
-														// $edit(get(edit_target.target).ref_id, 1, $label_column, id, id_column);
-													}}
+													on:click={() => dispatchLabel(id, 1)}
 												>
 													<CheckmarkOutline size={32} />
 												</i>
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
 													class="text-orange-500 rounded-full hover:bg-slate-400"
 													class:bg-orange-400={label === 2}
 													class:text-orange-100={label === 2}
-													on:click={() => {
-														$dispatch(on_sentence_label.endpoint_id, {
-															row_id: id,
-															value: 2
-														});
-														// $edit(get(edit_target.target).ref_id, 2, $label_column, id, id_column);
-													}}
+													on:click={() => dispatchLabel(id, 2)}
 												>
 													<Help size={32} />
 												</i>

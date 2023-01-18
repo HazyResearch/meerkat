@@ -11,7 +11,7 @@
 	import Interval from '$lib/shared/cell/interval/Interval.svelte';
 	import { map } from 'underscore';
 
-	const { edit_target, get_rows } = getContext('Interface');
+	const { edit_target, get_rows } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let label_target: EditTarget;
@@ -36,7 +36,7 @@
 	$: {
 		$df; // needed to trigger on df change
 		console.log(col)
-		counts_promise = $get_rows(
+		counts_promise = get_rows(
 			label_target.target.ref_id,
 			undefined,
 			undefined,
@@ -70,7 +70,7 @@
 		let modifications_promise;
 
 		if (primary_key === undefined) {
-			modifications_promise = $edit_target(
+			modifications_promise = edit_target(
 				$df.ref_id,
 				label_target,
 				value,
@@ -81,7 +81,7 @@
 				metadata
 			);
 		} else {
-			modifications_promise = $edit_target(
+			modifications_promise = edit_target(
 				$df.ref_id,
 				label_target,
 				value,
@@ -107,7 +107,7 @@
 
 	function handle_phase_change(event: CustomEvent) {
 		let new_phase: string = event.detail;
-		$edit_target(
+		edit_target(
 			phase_target.target.ref_id,
 			phase_target,
 			new_phase,

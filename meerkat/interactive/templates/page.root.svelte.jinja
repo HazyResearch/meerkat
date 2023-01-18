@@ -1,0 +1,33 @@
+<script lang="ts">
+    import banner from '$lib/assets/banner_small.png';
+    import { API_URL } from '{{ import_prefix }}';
+    import { Interface } from '{{ import_prefix }}';
+    import { onMount, setContext } from 'svelte';
+    
+    {% for component in frontend_components -%}
+    import {{ component.frontend_alias }} from '$lib/wrappers/__{{ component.namespace }}/{{ component.component_name }}.svelte';
+    {% endfor %}
+    
+    setContext("Components", {
+        {% for component in components -%}
+        "{{ component.alias }}": {{ component.frontend_alias }},
+        {% endfor %}
+    })
+
+    let config: Interface | null = null;
+    onMount(async () => {
+        const id = new URLSearchParams(window.location.search).get('id');
+        config = await (await fetch(`${$API_URL}/interface/${id}/config`)).json();
+        document.title = "{{ title }}";
+    });
+</script>
+
+<div class="h-screen p-3">
+    {% raw %}{#if config}{% endraw %}
+        <Interface {config} />
+    {:else}
+        <div class="flex justify-center h-screen items-center">
+            <img src={banner} alt="Meerkat" class="h-12" />
+        </div>
+    {/if}
+</div>

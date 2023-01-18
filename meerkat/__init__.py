@@ -17,7 +17,6 @@ def _default(self, obj):
 _default.default = JSONEncoder().default
 JSONEncoder.default = _default
 
-
 from meerkat.logging.utils import initialize_logging
 
 initialize_logging()
@@ -39,6 +38,7 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
+from meerkat.mixins.identifiable import classproperty
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
 from meerkat.ops.cond import cand, cnot, cor
@@ -139,4 +139,6 @@ __all__ = [
     "files",
     "image",
     "audio",
+    # <<<< Utilities >>>>
+    "classproperty",
 ]

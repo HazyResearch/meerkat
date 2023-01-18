@@ -1,14 +1,13 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
 	import Select from 'svelte-select';
 
-	export let choices: Writable;
-	export let value: Writable<string>;
+	export let choices: Array<string>;
+	export let value: string;
 	export let gui_type: string;
 	export let title: string = '';
 
 	let handleSelect = (event) => {
-		$value = event.detail.value;
+		value = event.detail.value;
 	}
 </script>
 
@@ -21,8 +20,8 @@
 	<div class="themed flex-grow">
 		<Select
 			id="column"
-			value={$value}
-			items={$choices}
+			value={value}
+			items={choices}
 			on:change={handleSelect}
 		/>
 	</div>

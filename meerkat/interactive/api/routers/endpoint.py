@@ -10,20 +10,27 @@ if TYPE_CHECKING:
 @endpoint(prefix="/endpoint", route="/{endpoint}/dispatch/")
 def dispatch(
     endpoint: Endpoint,
-    fn_kwargs: dict,
-    payload: dict = None,
+    payload: dict,
 ) -> Tuple[Any, List["Modification"]]:
     # TODO: figure out how to use the payload
     """Call an endpoint."""
     from meerkat.interactive.modification import StoreModification
 
+    # `payload` is a dict with {detail: {key: value} | primitive}
+    # Unpack the payload to build the fn_kwargs
+    fn_kwargs = {}
+    kwargs = payload["detail"]
+    if isinstance(kwargs, dict):
+        fn_kwargs = kwargs
+
     try:
+        # Run the endpoint
         result, modifications = endpoint.partial(**fn_kwargs).run()
     except TriggerError as e:
         # TODO: handle case where result is not none
         return {"result": None, "modifications": [], "error": str(e)}
 
-    # only return store modifications that are not backend_only
+    # Only return store modifications that are not backend_only
     modifications = [
         m
         for m in modifications

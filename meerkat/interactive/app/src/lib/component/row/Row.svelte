@@ -6,7 +6,7 @@
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import BasicCell from '$lib/shared/cell/basic/Basic.svelte';
 
-	const { get_rows, get_schema, dispatch } = getContext('Interface');
+	const { get_rows, get_schema, dispatch } = getContext('Meerkat');
 
 	export let df: Writable<DataFrameBox>;
 	export let primary_key_column: Writable<string>;
@@ -16,13 +16,13 @@
 
 	export let on_change: Endpoint = null;
 
-	$: schema_promise = $get_schema($df.ref_id);
+	$: schema_promise = get_schema($df.ref_id);
 
 	let rows_promise: any = null;
 	$: {
 		console.log("selected key", $selected_key);
 		if ($selected_key !== null && $selected_key !== "") {
-			rows_promise = $get_rows($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
+			rows_promise = get_rows($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
 		} else {
 			rows_promise = null;
 		}
@@ -33,7 +33,7 @@
 			return;
 		}
 
-		const promise = $dispatch(
+		const promise = dispatch(
 			on_change.endpoint_id,
 			{
 				"key": $selected_key,

@@ -1,29 +1,26 @@
-from typing import Sequence
+from meerkat.interactive.app.src.lib.component.abstract import (
+    AutoComponent,
+    Slottable,
+)
 
-from meerkat.interactive.app.src.lib.component.abstract import Component
 
+class Flex(Slottable, AutoComponent):
 
-class Flex(Component):
-
-    components: Sequence[Component]
     classes: str = "flex-col"
 
 
-class Grid(Component):
+class Grid(Slottable, AutoComponent):
 
-    components: Sequence[Component]
     classes: str = "grid-cols-2"
 
 
-class Div(Component):
+class Div(Slottable, AutoComponent):
 
-    component: Component
     classes: str = ""
 
 
-class AutoLayout(Component):
+class AutoLayout(Slottable, AutoComponent):
 
-    components: Sequence[Component]
     classes: str = ""
 
 

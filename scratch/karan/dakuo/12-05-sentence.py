@@ -53,9 +53,6 @@ _get_sentences = lambda idx: np.where(_sentence_index[idx])[0]
 
 ##### Build the interface #####
 
-# Start the Meerkat GUI server
-gui_info = mk.gui.start(shareable=False)
-
 # Make a Choice component: this allows us to choose a document
 doc_id_choice = mk.gui.Choice(
     value=story_sentence_df["doc_id"][0],  # the default value is the first document id
@@ -69,7 +66,7 @@ doc_id_choice = mk.gui.Choice(
 # with the frontend.
 
 
-@mk.gui.reactive
+@mk.gui.react()
 def choose_sentences(sentence_df: mk.DataFrame, doc_id: str):
     """
     This is a reactive function (decorated with `@mk.gui.reactive`)
@@ -93,9 +90,8 @@ def choose_sentences(sentence_df: mk.DataFrame, doc_id: str):
     return sentence_df[sentence_indices]
 
 
-with mk.gui.react():
-    # Use the Choice component to choose a document and create a DataFrame for it
-    document_df = choose_sentences(story_sentence_df, doc_id_choice.value)
+# Use the Choice component to choose a document and create a DataFrame for it
+document_df = choose_sentences(story_sentence_df, doc_id_choice.value)
 
 """
 Code snippet that creates the Document labeling interface.
@@ -113,29 +109,28 @@ document = mk.gui.Document(
     paragraph_column="section",  # the column that contains the paragraph index
     label_column="label",  # the column that contains the label
     id_column="id",  # the column that contains the sentence id
-    on_sentence_label=edit.partial(
-        df=story_sentence_df, column="label", id_column="id"
+    on_label=edit.partial(
+        df=story_sentence_df, 
+        column="label", 
+        id_column="id",
     ),
 )
 
-
-@mk.gui.reactive
-def save_labels(df: mk.DataFrame):
-    """Save the labels to a file."""
-    df["id", "label"].to_jsonl("labels.jsonl")
-
-
 with mk.gui.react():
     # Autosave labels whenever the user updates `story_sentence_df` with a new label
-    save_labels(story_sentence_df)
+    story_sentence_df["id", "label"].to_json("labels.jsonl", lines=True)
 
 # This will not work as a reactive function anymore
 # save_labels(story_sentence_df)
+interface = mk.gui.Interface(
+    component=RowLayout(components=[doc_id_choice, document]),
+)
+
+# Start the Meerkat GUI server
+gui_info = mk.gui.start(shareable=False, dev=True)
 
 # Launch the interface
-mk.gui.Interface(
-    component=RowLayout(components=[doc_id_choice, document]),
-).launch()
+interface.launch()
 
 
 # Layouts are also Components: everything is a Component for GUI stuff

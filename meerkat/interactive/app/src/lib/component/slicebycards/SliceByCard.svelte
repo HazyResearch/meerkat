@@ -9,7 +9,7 @@
 	import LoadButton from '$lib/shared/common/LoadButton.svelte';
 	import Pill from '$lib/shared/common/Pill.svelte';
 
-	const { get_sliceby_rows } = getContext('Interface');
+	const { get_sliceby_rows } = getContext('Meerkat');
 
 	export let sliceby: Writable<SliceByBox>;
 	export let slice_key: SliceKey;
@@ -37,7 +37,7 @@
 	let load_status = 'waiting';
 	let load_rows = async () => {
 		load_status = 'loading';
-		let new_rows = await $get_sliceby_rows(
+		let new_rows = await get_sliceby_rows(
 			$sliceby.ref_id,
 			slice_key,
 			page * per_page,

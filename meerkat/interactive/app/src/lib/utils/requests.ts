@@ -1,5 +1,4 @@
-import { global_stores, store_lock } from "$lib/shared/blanks/stores";
-import { get as get_store } from "svelte/store";
+import { global_stores } from "$lib/shared/blanks/stores";
 
 
 export async function get_request(url: string): Promise<any> {
@@ -27,8 +26,6 @@ export async function post(url: string, data: any): Promise<any> {
     const json = await res.json();
     return json;
 }
-
-
 
 export async function modify(url: string, data: any): Promise<any> {
     const modifications = await post(url, data);

@@ -12,7 +12,7 @@ import meerkat as mk
 failed_indices = set()
 
 
-def load_doc_csv(row):
+def load_doc_csv(path, id):
     """
     Loader for a single document csv file. This function takes a row of the doc_df DataFrame
     and returns a DataFrame with the contents of the csv file.
@@ -20,9 +20,9 @@ def load_doc_csv(row):
     row: a row from the doc_df DataFrame
     """
     # Load the csv file from disk as a DataFrame
-    doc_data = mk.DataFrame.from_csv(row["path"])  # access the 'path'
+    doc_data = mk.DataFrame.from_csv(path)  # access the 'path'
     # Just add a doc_id column, so we know which document this CSV came from
-    doc_data["doc_id"] = [row["id"]] * len(doc_data)  # access the 'id'
+    doc_data["doc_id"] = [id] * len(doc_data)  # access the 'id'
     return doc_data
 
 
@@ -65,7 +65,7 @@ def load_fairytale_qa_doc(doc_path):
     except:
         # We can check which rows have different columns
         has_extra_column = np.where(
-            question_doc_df.map(lambda x: len(x["section_df"].columns)) == 16
+            question_doc_df.map(lambda section_df: len(section_df.columns)) == 16
         )[0]
         print(
             "These rows have an extra column, while all the others have 15 columns",
@@ -92,7 +92,7 @@ def load_fairytale_qa_doc(doc_path):
     )
 
 
-def load_sentence_csv(row):
+def load_sentence_csv(path, id):
     """
     Loader for a single sentence csv file. This function takes a row of the sentence_df DataFrame
     and returns a DataFrame with the contents of the csv file.
@@ -100,9 +100,9 @@ def load_sentence_csv(row):
     row: a row from the sentence_df DataFrame
     """
     # Load the csv file from disk as a DataFrame
-    sentence_data = mk.DataFrame.from_csv(row["path"])  # access the 'path'
+    sentence_data = mk.DataFrame.from_csv(path)  # access the 'path'
     # Just add a sentence_id column, so we know which document this CSV came from
-    sentence_data["sentence_id"] = [row["id"]] * len(sentence_data)  # access the 'id'
+    sentence_data["sentence_id"] = [id] * len(sentence_data)  # access the 'id'
     # Drop the `document_id` column, because we already have the `id` column
     sentence_data = sentence_data.drop("document_id")
     return sentence_data

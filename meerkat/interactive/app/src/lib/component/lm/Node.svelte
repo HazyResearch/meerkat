@@ -13,7 +13,7 @@
 	// Set of selected children of this node's parent
 	const selected_children = getContext('selected_children');
 
-	const { get_lm_categorization } = getContext('Interface');
+	const { get_lm_categorization } = getContext('Meerkat');
 
 	const flipDurationMs = 50;
 

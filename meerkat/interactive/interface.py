@@ -1,8 +1,9 @@
 import code
+import os
 from functools import partial, wraps
 from typing import Callable
 
-from fastapi import HTTPException
+import rich
 from IPython.display import IFrame
 from pydantic import BaseModel
 
@@ -10,6 +11,7 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentFrontend,
 )
+from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -17,7 +19,7 @@ from meerkat.state import state
 def interface(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        interface = Interface(layout=partial(fn, *args, **kwargs))
+        interface = Interface(component=partial(fn, *args, **kwargs))
         return interface.launch()
 
     return wrapper
@@ -35,8 +37,8 @@ class Interface(IdentifiableMixin):
     def __init__(
         self,
         component: Component,
+        id: str,
         name: str = "Interface",
-        id: str = None,
         height: str = "1000px",
         width: str = "100%",
     ):
@@ -48,46 +50,53 @@ class Interface(IdentifiableMixin):
         self.height = height
         self.width = width
 
-    def get(self, id: str):
-        try:
-            from meerkat.state import state
+        # Call `init_run`
+        svelte_writer = SvelteWriter()
+        svelte_writer.init_run()
 
-            interface = state.identifiables.get(id, "interfaces")
-        except KeyError:
-            raise HTTPException(
-                status_code=404, detail="No interface with id {}".format(id)
-            )
-        return interface
+    def __call__(self):
+        """Return the FastAPI object, this allows Interface objects
+        to be targeted by uvicorn when running a script."""
+        from meerkat.interactive.api import MeerkatAPI
+
+        return MeerkatAPI
 
     def launch(self, return_url: bool = False):
         from meerkat.interactive.startup import is_notebook, output_startup_message
 
-        if state.network_info is None:
-            raise ValueError(
-                "Interactive mode not initialized."
-                "Run `network = mk.gui.start()` first."
+        if state.frontend_info is None:
+            rich.print(
+                "Frontend is not initialized. "
+                "Run `mk.gui.start()` before calling launch."
             )
+            return
 
-        if state.network_info.shareable_npm_server_name is not None:
-            url = f"{state.network_info.shareable_npm_server_url}?id={self.id}"
-        else:
-            url = f"{state.network_info.npm_server_url}?id={self.id}"
+        url = f"{state.frontend_info.url}/{self.id}"
 
         if return_url:
             return url
+
         if is_notebook():
             return IFrame(url, width=self.width, height=self.height)
         else:
-            import webbrowser
 
-            webbrowser.open(url)
+            rich.print(
+                ":scroll: "
+                f"Interface [violet]{self.id}[/violet] "
+                f"is at [violet]{url}[/violet]"
+            )
+            rich.print(
+                ":newspaper: "
+                f"API docs are at [violet]{state.api_info.docs_url}[/violet]"
+            )
+            rich.print()
 
-            output_startup_message(url=url)
+            in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
+            if not in_mk_run_subprocess:
+                # get locals of the main module when running in script.
+                import __main__
 
-            # get locals of the main module when running in script.
-            import __main__
-
-            code.interact(local=__main__.__dict__)
+                code.interact(local=__main__.__dict__)
 
     @property
     def frontend(self):

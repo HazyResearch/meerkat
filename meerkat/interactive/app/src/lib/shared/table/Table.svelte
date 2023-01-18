@@ -9,6 +9,8 @@
 
 	export let rows: DataFrameRows | null;
 	export let schema: DataFrameSchema;
+	export let editable: boolean = false;
+	export let id_column: string = null;
 	let column_infos: Array<ColumnInfo> = schema.columns;
 
 	export let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 256);
@@ -109,6 +111,7 @@
 								data={value}
 								cell_component={column_info.cell_component}
 								cell_props={column_info.cell_props}
+								editable={editable && (column_info.name !== id_column)}
 								on:edit={(event) => handle_edit(event, index, column_info.name)}
 							/>
 						</div>

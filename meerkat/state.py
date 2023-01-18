@@ -1,9 +1,11 @@
+import os
 import subprocess
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional
 
 from fastapi import FastAPI, HTTPException
 
+from meerkat.interactive.server import Server
 from meerkat.tools.utils import WeakMapping
 
 if TYPE_CHECKING:
@@ -52,77 +54,52 @@ class LanguageModel:
 
 
 @dataclass
-class NetworkInfo:
+class APIInfo:
 
     api: FastAPI
-    api_server_port: int
-    api_server: "Server"
-    npm_server_port: int
-    npm_process: subprocess.Popen = None
-    api_server_name: str = "localhost"
-    npm_server_name: str = "localhost"
-    shareable_npm_server_name: str = None
-    shareable_api_server_name: str = None
-    npm_out_path: str = None
-    npm_err_path: str = None
-
-    def __post_init__(self):
-        # Hit the npm server _network endpoint with the api url
-        # requests.get(url=f"{self.npm_server_url}/network/register",
-        # params={"api": self.api_server_url})
-        pass
+    port: int
+    server: Optional[Server] = None
+    name: str = "localhost"
+    shared: bool = False
+    process: subprocess.Popen = None
+    _url: str = None
 
     @property
-    def shareable_npm_server_url(self):
-        if self.shareable_npm_server_name is None:
-            return None
-        return f"http://{self.shareable_npm_server_name}"
+    def url(self):
+        if self._url:
+            return self._url
+        if self.shared:
+            return f"http://{self.name}"
+        return f"http://{self.name}:{self.port}"
 
     @property
-    def shareable_api_server_url(self):
-        if self.shareable_api_server_name is None:
-            return None
-        return f"http://{self.shareable_api_server_name}"
+    def docs_url(self):
+        return f"{self.url}/docs"
 
     @property
-    def npm_server_url(self):
-        return f"http://{self.npm_server_name}:{self.npm_server_port}"
-
-    @property
-    def npm_network_url(self):
-        return f"{self.npm_server_url}/network"
-
-    @property
-    def npm_server_out(self) -> str:
-        if self.npm_out_path is None:
-            return ""
-        return open(self.npm_out_path, "r").read()
-
-    @property
-    def npm_server_err(self) -> str:
-        if self.npm_err_path is None:
-            return ""
-        return open(self.npm_err_path, "r").read()
-
-    @property
-    def npm_network(self):
+    def docs(self):
         from IPython.display import IFrame
 
-        return IFrame(self.npm_network_url, width=800, height=100)
+        return IFrame(self.docs_url, width=800, height=600)
+
+
+@dataclass
+class FrontendInfo:
+
+    package_manager: str
+    port: int
+    name: str = "localhost"
+    shared: bool = False
+    process: subprocess.Popen = None
+    _url: str = None
 
     @property
-    def api_server_url(self):
-        return f"http://{self.api_server_name}:{self.api_server_port}"
-
-    @property
-    def api_docs_url(self):
-        return f"{self.api_server_url}/docs"
-
-    @property
-    def api_docs(self):
-        from IPython.display import IFrame
-
-        return IFrame(self.api_docs_url, width=800, height=600)
+    def url(self):
+        if self._url:
+            return self._url
+        if self.shared:
+            return f"http://{self.name}"
+        return f"http://{self.name}:{self.port}"
 
 
 @dataclass
@@ -195,7 +172,8 @@ class ModificationQueue:
 @dataclass
 class GlobalState:
 
-    network_info: NetworkInfo = None
+    api_info: APIInfo = None
+    frontend_info: FrontendInfo = None
     identifiables: Identifiables = field(default_factory=Identifiables)
     secrets: Secrets = field(default_factory=Secrets)
     llm: LanguageModel = field(default_factory=LanguageModel)
@@ -209,3 +187,18 @@ state = GlobalState()
 def add_secret(api: str, api_key: str):
     """Add an API key to the global state."""
     state.secrets.add(api, api_key)
+
+
+def run_on_startup():
+    """
+    Run on startup
+    """
+    frontend_url = os.environ.get("MEERKAT_FRONTEND_URL", None)
+    if frontend_url:
+        state.frontend_info = FrontendInfo(None, None, _url=frontend_url)
+        
+    api_url = os.environ.get("MEERKAT_API_URL", None)
+    if api_url:
+        state.api_info = APIInfo(None, None, _url=api_url)
+
+run_on_startup()

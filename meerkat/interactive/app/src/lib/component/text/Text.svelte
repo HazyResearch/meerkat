@@ -1,14 +1,12 @@
 <script lang="ts">
-	import type { Writable } from "svelte/store";
-
-	export let data: Writable<any>;
+	export let data: any;
 	export let dtype: string | undefined = undefined;
 	export let precision: number = 3;
 	export let percentage: boolean = false;
 
 	if (dtype === undefined) {
-		if (typeof $data === 'number') {
-			if (Number.isInteger($data)) {
+		if (typeof data === 'number') {
+			if (Number.isInteger(data)) {
 				dtype = 'int';
 			} else {
 				dtype = 'float';
@@ -20,9 +18,9 @@
 
 	if (dtype === 'float') {
 		if (percentage) {
-			$data = ($data * 100).toPrecision(precision) + '%';
+			data = (data * 100).toPrecision(precision) + '%';
 		} else {
-			$data = $data.toPrecision(precision);
+			data = data.toPrecision(precision);
 		}
 	}
 </script>
@@ -30,5 +28,5 @@
 <div
 	class="space-x-2 bg-slate-100 py-1 rounded-lg px-2 drop-shadow-md z-20"
 >
-	{$data}
+	{data}
 </div>

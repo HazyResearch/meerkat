@@ -1,7 +1,5 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-
-	export let text: Writable<string>;
+	export let text: string;
 	export let title: string = '';
 
 	let timer: any;
@@ -9,7 +7,7 @@
 	const debounce = (v: string) => {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
-			$text = v;
+			text = v;
 		}, 300);
 	}
 </script>
