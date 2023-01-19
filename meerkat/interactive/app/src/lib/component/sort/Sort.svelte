@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
 	import type { SortCriterion, DataFrameSchema } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
@@ -40,14 +39,10 @@
 
 	const trigger_sort = () => {
 		// Need to reset the array to trigger.
-		console.log("trigger sort", criteria_frontend);
-		console.log("criteria", criteria);
 		criteria = criteria_frontend;
 	};
 
 	const onInputChange = (criterion: SortCriterion, input_id: string, value: any) => {
-		console.log("Input change", criterion);
-
 		const is_same_value = criterion[input_id] === value;
 		criterion[input_id] = value;
 		// Required for reactivity.
@@ -100,11 +95,9 @@
 
 	const flipDurationMs = 300;
 	function handleDndConsider(e) {
-		console.log('consider', e);
 		criteria_frontend = e.detail.items;
 	}
 	function handleDndFinalize(e) {
-		console.log('finalize', e);
 		criteria_frontend = e.detail.items;
 		trigger_sort();
 	}

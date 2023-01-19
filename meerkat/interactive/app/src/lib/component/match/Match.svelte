@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { get, writable, type Writable } from 'svelte/store';
-	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
+	import type { DataFrameSchema } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
 	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { get_schema, dispatch } = getContext('Meerkat');
+	const { dispatch } = getContext('Meerkat');
 
 	export let df: any;
 	export let against: string;
@@ -14,16 +13,13 @@
 	export let text: string;
 	export let title: string = '';
 	export let get_match_schema: Endpoint;
-	
-	let status: string = 'waiting';
 
-	console.log("get_match_schema", get_match_schema);
+	let status: string = 'waiting';
 
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = dispatch(get_match_schema.endpoint_id, {"detail": {}});
-		schema_promise.then(schema => console.log(schema))
+		schema_promise = dispatch(get_match_schema.endpoint_id, { detail: {} });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
@@ -35,29 +31,24 @@
 	};
 
 	let on_search = async () => {
-		console.log("against", against)
 		if (against === '') {
 			status = 'error';
 			return;
 		}
 		status = 'working';
 		let promise = dispatch(on_match.endpoint_id, {
-			"detail": {"against": against,
-			"query": text
-		}});
+			detail: { against: against, query: text }
+		});
 		promise
 			.then(() => {
 				status = 'success';
 			})
 			.catch((error: TypeError) => {
 				status = 'error';
-				console.log(error);
 			});
 	};
 
 	function handleSelect(event) {
-		console.log("here")
-		console.log(against)
 		against = event.detail.value;
 	}
 

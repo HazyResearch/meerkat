@@ -6,15 +6,13 @@ from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store, reactive, store_field
+from meerkat.interactive.graph import Store, reactive
 
 from ..abstract import AutoComponent
 
-# from meerkat.interactive.modification import Modification
-
 
 @endpoint
-def get_match_schema(df: DataFrame, encoder: str):
+def get_match_schema(df: DataFrame):
     import meerkat as mk
     from meerkat.interactive.api.routers.dataframe import (
         SchemaResponse,
@@ -150,10 +148,7 @@ class Match(AutoComponent):
         # if they are maintained on the backend, then a store update dispatch will
         # run on every key stroke
 
-        self.get_match_schema = get_match_schema.partial(
-            df=self.df,
-            encoder=self.encoder,
-        )
+        self.get_match_schema = get_match_schema.partial(df=self.df)
 
         self.criterion: MatchCriterion = Store(
             MatchCriterion(against=None, query=None, name=None), backend_only=True
