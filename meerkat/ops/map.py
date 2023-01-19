@@ -218,9 +218,9 @@ def defer(
                     kwargs[name] = data[name]
                 elif param.default is param.empty:
                     raise ValueError(
-                        f"Non-default argument {name} does not have a corresponding "
+                        f"Non-default argument '{name}' does not have a corresponding "
                         f"column in the DataFrame. Please provide an `inputs` mapping "
-                        f"pass a lambda function with a different signature."
+                        f"or pass a lambda function with a different signature."
                     )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
@@ -431,7 +431,11 @@ def map(
 def _materialize(
     data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool
 ):
+    import ray
     from tqdm import tqdm
+    import inspect
+    import pandas as pd
+    import numpy as np
 
     from .concat import concat
 
@@ -439,10 +443,92 @@ def _materialize(
         # TODO (dean): Implement this with ray for linear pipelines only, if there are
         # branches raises a valueerror.
         # Build the pipeline by following `data.args` and `data.kwargs`
-        # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).defer(lambda img: (img.mean(), img.std()))`
+        # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).map(lambda img: (img.mean(), img.std()))`
         # `out["0"].data.args[0].data.kwargs["img"]`
-        raise NotImplementedError
-    else:
+        
+        # print("Dean: hello world")
+        
+        # print("a")
+        # print(data.data)
+        # print("b")
+        # print(data.data.args)
+        # print("b2")
+        # print(inspect.signature(data.data.fn))
+        # print("b3")
+        # print(data.data.fn.__name__)
+        # print("c")
+        # print(data.data.args[0])
+        # print("d")
+        # print(data.data.args[0].data)
+        # print("e")
+        # print(data.data.args[0].data.kwargs)
+        # print("f")
+        # print(data.data.args[0].data.kwargs["img"])
+        
+        # return data
+        
+        ray.init(ignore_reinit_error=True)
+                
+        # Step 1: Convert the ImageColumn to ray dataset
+        img_col = data.data.args[0].data.kwargs["img"]
+        args = img_col.data.args
+        
+        # This approach is slower and also relies on Pandas
+        ds = ray.data.from_pandas(
+            pd.DataFrame({str(idx): arg.to_pandas() for idx, arg in enumerate(args)})
+        ).repartition(100)
+        
+        # This outputs a Ray Dataset of <class 'ray.data._internal.arrow_block.ArrowRow'>
+        # which doesn't support resize() like a numpy array does
+        # paths = list(DATASET_PATH + args[0])
+        # ds = ray.data.read_images(paths)
+        
+        # Step 2: Pull out the functions
+        DATASET_PATH = data.data.args[0].data.kwargs["img"].data.fn.base_dir
+        load_map = data.data.args[0].data.kwargs["img"].data.fn
+        resize_map = data.data.args[0].data.fn
+        mean_map = data.data.fn
+        
+        # Step 3: Build the pipeline
+        pipe: ray.DatasetPipeline = ds.window(blocks_per_window=10)
+        
+        pipe = pipe.map(lambda x: x["0"])
+        pipe = pipe.map(load_map)
+        pipe = pipe.map(resize_map)
+        pipe = pipe.map(mean_map)
+        
+        # Step 4: Iterate through the blocks? (there are 10 iterations)
+        result = np.array([])
+        partitions = iter(pipe.rewindow(blocks_per_window=100).iter_datasets()).__next__().to_numpy_refs()
+        for partition in partitions: # 100 partitions
+            result = np.append(result, ray.get(partition))
+            
+        # result = np.array([])
+        # out = iter(pipe.rewindow(blocks_per_window=100).iter_datasets()).__next__()
+        # print(f"hi: {out.count()}")
+        # print(f"hi: {len(out.to_numpy_refs())}") # This is also returning a list
+        # for elem in out.to_numpy_refs():
+        #     print("shape:", ray.get(elem).shape)
+        #     result = np.append(result, ray.get(elem))
+        #     print("result shape:", result.shape)
+        
+        # for out in pipe.rewindow(blocks_per_window=100).iter_datasets():
+            # print(f"hi: {out.count()}")
+            # print(f"hi: {len(out.to_numpy_refs())}") # This is also returning a list
+            # print(f"hi 2: {out.repartition(1).count()}")
+            # print(f"hi 3: {len(out.repartition(1).to_numpy_refs())}")
+            # for elem in out.to_numpy_refs():
+            #     print("shape:", ray.get(elem).shape)
+            #     result = np.append(result, ray.get(elem))
+            #     print("result shape:", result.shape)
+            # result.append(out.to_numpy_refs().get().repartition(1))
+            # result.append(out.to_arrow_refs().get().repartition(1))
+        return result
+        # return concat(result)
+        
+        # pipe.take_all() # This outputs a Python list, which is too slow
+        
+    else:    
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(
