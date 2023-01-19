@@ -3,7 +3,7 @@ from typing import Optional, Tuple, Union
 import sklearn.cluster as skcluster
 from sklearn.base import ClusterMixin
 
-from meerkat import Column, DataFrame, TorchTensorColumn, embed
+from meerkat import Column, DataFrame, ScalarColumn, TensorColumn
 
 
 def cluster(
@@ -13,7 +13,7 @@ def cluster(
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
-) -> Tuple[TorchTensorColumn, ClusterMixin]:
+) -> Tuple[ScalarColumn, ClusterMixin]:
     """Cluster the data in a column. If the column is an unstructured type,
     (e.g. image), the column is first embedded then clustered.
 
@@ -34,30 +34,21 @@ def cluster(
             clustered column is added to the DataFrame and it is returned.
     """
     if isinstance(data, DataFrame):
-        # TODO (sabri): Give the user the option to specify the output column.
-        cluster_column = f"{method}({input})"
-        embed_col = f"{encoder}({input})"
-
-        # TODO (sabri): Remove this guard once caching is supported.
-        if embed_col not in data:
-            data = embed(
-                data=data,
-                input=input,
-                encoder=encoder,
-                out_col=embed_col,
-                modality=modality,
-            )
-        data_embedding = data[embed_col]
+        col = data[input]
+        output_col = f"{method}({input})"
     else:
-        raise NotImplementedError
+        col = data
 
-    data_embedding = data[embed_col]
+    if not isinstance(col, TensorColumn) and len(col.shape) != 2:
+        raise ValueError("Must pass 2D TensorColumn.")
+
     if isinstance(method, str):
         method = getattr(skcluster, method)(**kwargs)
 
-    clusters = method.fit_predict(data_embedding.data)
+    clusters = method.fit_predict(col.data)
 
     if isinstance(data, DataFrame):
-        data[cluster_column] = clusters
+        data[output_col] = clusters
         return data, method
+
     return clusters, method

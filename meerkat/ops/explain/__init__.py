@@ -36,24 +36,11 @@ def explain(
     """
     if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
-        output_column = f"{method}({input},{target})"
+        output_col = f"{method}({input},{target})"
         # embed_col = f"{encoder}({input})"
-        embed_col = input
-
-        # TODO (sabri): Remove this guard once caching is supported.
-        if embed_col not in data:
-            data = embed(
-                data=data,
-                input=input,
-                encoder=encoder,
-                out_col=embed_col,
-                modality=modality,
-            )
-        data_embedding = data[embed_col]
+        col = data[input]
     else:
-        raise NotImplementedError
-
-    data_embedding = data[embed_col]
+        col = data
 
     if isinstance(method, str):
         import domino
@@ -67,14 +54,14 @@ def explain(
     elif isinstance(target, Mapping):
         target = {k: data[v] for k, v in target.items()}
 
-    method.fit(embeddings=data_embedding.data, **target)
+    method.fit(embeddings=col.data, **target)
     slices = method.predict(
-        embeddings=data_embedding.data,
+        embeddings=col.data,
         targets=None,
         pred_probs=None,
     )
 
     if isinstance(data, DataFrame):
-        data[output_column] = slices
+        data[output_col] = slices
         return data, method
     return slices, method

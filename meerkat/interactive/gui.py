@@ -30,6 +30,7 @@ class DataFrameGUI(GUI):
         ).launch()
 
     def gallery(self, main_column: str, tag_columns: List[str], **kwargs):
+        breakpoint()
         return Interface(
             component=mk.gui.Gallery(
                 df=self.df,
