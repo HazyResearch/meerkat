@@ -54,14 +54,10 @@ df
 ```
 The call to {func}`~meerkat.map` inspects the signature of the function and determines that it takes two arguments: `age` and `residence`. It then finds the columns with the same names in the DataFrame and passes the corresponding values to the function. If the function takes an non-default argument that is not a column in the DataFrame, the operation will raise a `ValueError`.
 
-We can also specify the correspondance between arguments and columns explicitly with the `inputs` argument to {func}`~meerkat.map`. While the inspection of function signature is convenient, it can be error-prone if used with a function that has a large number of arguments, some of which may spuriously match column names. The cell below is functionally equivalent to the one above, but is slightly more verbose.
+We can also specify the correspondence between arguments and columns explicitly with the `inputs` argument to {func}`~meerkat.map`. While the inspection of function signature is convenient, it can be error-prone if used with a function that has a large number of arguments, some of which may spuriously match column names. The cell below is functionally equivalent to the one above, but is slightly more verbose.
 
 ```{code-cell} ipython3
 :tags: [output_scroll]
-
-def eligibile(age, residence):
-    old_enough = age >= 18
-    return (residence == "MA") and old_enough, (residence == "LA") and old_enough
 
 df["ma_eligible"] = df.map(
     lambda x, y: (x == "MA") and (y >= 18),
@@ -149,7 +145,7 @@ If you're unfamiliar with DeferredColumns, you may want to read the guide on {do
 
 ### Simple deferred map
  
-In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature (*i.e.* all that was discussed in the previous section around multiple inputs and ouputs also applies to {func}`~meerkat.defer`), the difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
+In addition to {func}`~meerkat.map` described above, Meerkat provides {func}`~meerkat.defer`, which creates a {class}`~meerkat.DeferredColumn` representing a deferred map. The two functions share nearly the exact same signature (*i.e.* all that was discussed in the previous section around multiple inputs and ouputs also applies to {func}`~meerkat.defer`). The difference is that {func}`~meerkat.defer` returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.
 
 To demonstrate, let's repeat the example above, this time using a deferred map to create a 2-step chain of operations. 
 
@@ -207,7 +203,7 @@ class ParachuteClassifier:
 
 classifier = ParachuteClassifier()
 ```
-Because only one of the two methods is batched, chaining them correctly is a bit tricky (one approach might invovle a double for-loop). Fortunately, with deferred maps, we can chain together functions that use different batching strategies. First, we create a deferred column that applies `preprocess` to each image – by default `is_batched_fn=False`, so the `preprocess` method is applied to each image individually. Next, we map the `predict` method over the deferred column. Because `predict` is batched, we can use `is_batched_fn=True` an specify a `batch_size` to indicate that the `predict` method should be applied to batches of images.
+Because only one of the two methods is batched, chaining them correctly is a bit tricky (one approach might invovle a double for-loop). Fortunately, with deferred maps, we can chain together functions that use different batching strategies. First, we create a deferred column that applies `preprocess` to each image – by default `is_batched_fn=False`, so the `preprocess` method is applied to each image individually. Next, we map the `predict` method over the deferred column. Because `predict` is batched, we can use `is_batched_fn=True` and specify a `batch_size` to indicate that the `predict` method should be applied to batches of images.
 
 ```{code-cell} ipython3
 preprocessed = df["img"].defer(classifier.preprocess)
@@ -233,7 +229,7 @@ df["prediction"] = preprocessed.defer(
 accuracy = df.map(lambda prediction, label: prediction == (label == "parachute")).mean()
 ```
 
-Here's a trick question: *How long is the resulting chain?* At first glance, it seems like the chain is three maps long: `preprocess`, `predict`, then `accuracy`. However, recall from the guide on {doc}`../columns/deferred` that images and other complex data types are typically stored in {class}`~meerkat.DeferredColumn`s – that is, the `"img"` column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like `df["img"] = df["filepath"].defer(load_image)`. Because our first {func}`~meerkat.defer` call in the cell above was made on the `"img"` column, the resulting chain is actually four maps long: load, preprocess, predict, then accuracy. 
+Here's a trick question: *How long is the resulting chain?* At first glance, it seems like the chain is three maps long: `preprocess`, `predict`, then `accuracy`. However, recall from the guide on {doc}`../columns/deferred` that images and other complex data types are typically stored in {class}`~meerkat.DeferredColumn`s – that is, the `"img"` column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like `df["img"] = df["filepath"].defer(load_image)`. Because our first {func}`~meerkat.defer` call in the cell above was made on the `"img"` column, the resulting chain is actually four maps long: `load`, `preprocess`, `predict`, then `accuracy`. 
 
 ```{figure} _figures/map_chain.png
 ---
@@ -250,7 +246,7 @@ The chain of maps created by the code above. Although we only called {func}`~mee
 
 ## Pipelining and Parallelism 
 
-Because map applies the same function to each row, it is a [delightfully parallelizable](https://en.wikipedia.org/wiki/Embarrassingly_parallel) operation. In this section, we discuss how to parallelize maps and how to pipeline a chain of parrallel maps. 
+Because map applies the same function to each row, it is a [delightfully parallelizable](https://en.wikipedia.org/wiki/Embarrassingly_parallel) operation. In this section, we discuss how to parallelize maps and how to pipeline a chain of parallel maps. 
 
 ```{danger} WIP
 Pipelining is currently an experimental feature. It will be implemented using [Ray](https://docs.ray.io/en/latest/data/pipelining-compute.html). 
