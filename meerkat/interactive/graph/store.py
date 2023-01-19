@@ -68,6 +68,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
             # frontend
             new_value = new_value.__wrapped__
 
+        # TODO: Find operations that depend on this store and edit the cache.
+        # This should be done in the StoreModification
         mod = StoreModification(id=self.id, value=new_value)
         self.__wrapped__ = new_value
         mod.add_to_queue()

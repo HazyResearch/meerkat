@@ -9,7 +9,7 @@ df = mk.get("imagenette", version="160px")
 # To embed: df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN, encoder="clip").
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/arjundd/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
-    overwrite=True,
+    overwrite=False,
 )
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
@@ -29,4 +29,7 @@ gallery = mk.gui.Gallery(
 )
 
 mk.gui.start(shareable=False)
-mk.gui.Interface(component=mk.gui.RowLayout(components=[match, gallery])).launch()
+interface = mk.gui.Interface(
+    component=mk.gui.RowLayout(slots=[match, gallery]), id="match"
+)
+interface.launch()

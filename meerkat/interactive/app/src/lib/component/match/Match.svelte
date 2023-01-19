@@ -8,24 +8,26 @@
 
 	const { get_schema, dispatch } = getContext('Meerkat');
 
-	export let df: Writable;
-	export let against: Writable<string>;
+	export let df: any;
+	export let against: string;
 	export let on_match: Endpoint;
-	export let text: Writable<string>;
-	export let title: Writable<string> = '';
+	export let text: string;
+	export let title: string = '';
 	export let get_match_schema: Endpoint;
 	
 	let status: string = 'waiting';
 
+	console.log("get_match_schema", get_match_schema);
+
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = dispatch(get_match_schema.endpoint_id, {}, {});
+		schema_promise = dispatch(get_match_schema.endpoint_id, {"detail": {}});
+		schema_promise.then(schema => console.log(schema))
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
 	}
-	console.log(on_match)
 
 	const onKeyPress = (e) => {
 		if (e.charCode === 13) on_search();
@@ -33,15 +35,16 @@
 	};
 
 	let on_search = async () => {
-		if ($against === '') {
+		console.log("against", against)
+		if (against === '') {
 			status = 'error';
 			return;
 		}
 		status = 'working';
 		let promise = dispatch(on_match.endpoint_id, {
-			"against": $against,
-			"query": $text
-		}, {});
+			"detail": {"against": against,
+			"query": text
+		}});
 		promise
 			.then(() => {
 				status = 'success';
@@ -55,19 +58,19 @@
 	function handleSelect(event) {
 		console.log("here")
 		console.log(against)
-		$against = event.detail.value;
+		against = event.detail.value;
 	}
 
 	function handleClear() {
-		$against = '';
+		against = '';
 	}
-	$: against_item = { value: $against, label: $against };
+	$: against_item = { value: against, label: against };
 </script>
 
 <div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
-	{#if $title != ''}
+	{#if title != ''}
 		<div class="font-bold text-md text-slate-600 pl-2 text-center">
-			{$title}
+			{title}
 		</div>
 	{/if}
 	<div class="form-control">
@@ -77,7 +80,7 @@
 			</div>
 			<input
 				type="text"
-				bind:value={$text}
+				bind:value={text}
 				placeholder="Write some text to be matched..."
 				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
 				on:keypress={onKeyPress}

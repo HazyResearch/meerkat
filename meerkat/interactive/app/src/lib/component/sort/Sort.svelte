@@ -8,26 +8,21 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import SvelteTooltip from 'svelte-tooltip';
 	const { get_schema } = getContext('Meerkat');
-	export let df: Writable;
-	// TODO: Figure out if we should have a frontend_criteria
-	// to control the frontend display of criteria, which allows
-	// us to separate updating the backend store
-	// from updating the frontend display.
-	// This will allow us to selectively update the backend store
-	// if certain criteria on the frontend are met (e.g. no-op if filters
-	// are not valid.)
-	// the downside is now we have to maintain two different filter criteria
-	// and this can cause some lack of synchronization between the frontend and
-	// backend.
-	export let criteria: Writable<SortCriterion[]>;
-	export let title: Writable<string> = '';
+
+	export let df: any;
+	export let criteria: SortCriterion[];
+	export let title: string = '';
 
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
 	let criteria_frontend: SortCriterion[] = [];
-	criteria.subscribe((value) => {
-		criteria_frontend = $criteria;
-	});
+
+	// FIXME: Temporarily have to do this to update the frontend criteria
+	// when the backend criteria changes.
+	$: {criteria_frontend = criteria}
+	// criteria.subscribe((value) => {
+	// 	criteria_frontend = $criteria;
+	// });
 
 	let schema_promise;
 	let items_promise;
@@ -47,7 +42,7 @@
 		// Need to reset the array to trigger.
 		console.log("trigger sort", criteria_frontend);
 		console.log("criteria", criteria);
-		criteria.set(criteria_frontend);
+		criteria = criteria_frontend;
 	};
 
 	const onInputChange = (criterion: SortCriterion, input_id: string, value: any) => {
@@ -95,12 +90,12 @@
 		criteria_frontend = criteria_frontend.filter((_, i) => i !== index);
 
 		if (is_enabled) {
-			criteria.set(criteria_frontend);
+			criteria = criteria_frontend;
 		}
 	};
 
 	const handleClear = () => {
-		criteria.set([]);
+		criteria = [];
 	};
 
 	const flipDurationMs = 300;
@@ -117,9 +112,9 @@
 
 <div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30 flex flex-col">
 	<div class="flex space-x-6">
-		{#if $title != ''}
+		{#if title != ''}
 			<div class="font-bold text-xl text-slate-600 self-start pl-2">
-				{$title}
+				{title}
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">

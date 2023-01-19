@@ -14,6 +14,7 @@ __all__ = ["react", "reactive", "is_reactive", "get_reactive_kwargs"]
 def reactive(
     fn: Callable = None,
     nested_return: bool = None,
+    noop_fn: Callable = None,
 ) -> Callable:
     """Decorator that is used to mark a function as an interface operation.
 
@@ -60,6 +61,10 @@ def reactive(
             function returns two DataFrames in a tuple, then `nested_return` should be
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
+        noop_fn: A function that determines if the function should be run or the output
+            would be the same. This is useful for functions that are expensive to run.
+            The function should take in two dictionaries as arguments - kwargs corresponding
+            to the old parameters and kwargs corresponding to the new parameters.
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
@@ -68,10 +73,7 @@ def reactive(
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(
-            reactive,
-            nested_return=nested_return,
-        )
+        return partial(reactive, nested_return=nested_return, noop_fn=noop_fn)
 
     def _reactive(fn: Callable):
         @wraps(fn)

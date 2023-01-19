@@ -308,7 +308,7 @@ class SvelteWriter:
             path=component.path,
             prop_names=component.prop_names,
             event_names=component.event_names,
-            use_bindings=not issubclass(component, AutoComponent),
+            use_bindings=True,  # not issubclass(component, AutoComponent)
             prop_bindings=component.prop_bindings,
             slottable=component.slottable,
         )
