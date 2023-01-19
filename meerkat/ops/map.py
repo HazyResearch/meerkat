@@ -450,58 +450,102 @@ def _materialize(
 ):
     import ray
     from tqdm import tqdm
+    import inspect
     import pandas as pd
     import numpy as np
-    import meerkat as mk
 
     from .concat import concat
 
     if use_ray:
+        # TODO (dean): Implement this with ray for linear pipelines only, if there are
+        # branches raises a valueerror.
+        # Build the pipeline by following `data.args` and `data.kwargs`
+        # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).map(lambda img: (img.mean(), img.std()))`
+        # `out["0"].data.args[0].data.kwargs["img"]`
+        
+        # print("Dean: hello world")
+        
+        # print("a")
+        # print(data.data)
+        # print("b")
+        # print(data.data.args)
+        # print("b2")
+        # print(inspect.signature(data.data.fn))
+        # print("b3")
+        # print(data.data.fn.__name__)
+        # print("c")
+        # print(data.data.args[0])
+        # print("d")
+        # print(data.data.args[0].data)
+        # print("e")
+        # print(data.data.args[0].data.kwargs)
+        # print("f")
+        # print(data.data.args[0].data.kwargs["img"])
+        
+        # return data
+        
         ray.init(ignore_reinit_error=True)
-
-        # Step 1: Walk through the DeferredColumns and build a list of functions
-        curr = data
-        fns = []
-        while isinstance(curr, mk.DeferredColumn):
-            fns.append(curr.data.fn)
-
-            # For linear pipelines, there will be either one elem in args or one key in kwargs
-            if curr.data.args:
-                if len(curr.data.args) > 1:
-                    raise ValueError("Multiple args not supported.")
-                curr = curr.data.args[0]
-            elif curr.data.kwargs:
-                if len(curr.data.kwargs) > 1:
-                    raise ValueError("Multiple kwargs not supported.")
-                curr = curr.data.kwargs[next(iter(curr.data.kwargs))]
-            else:
-                raise ValueError("No args or kwargs.")
-
-        # Step 2: Create the ray dataset from the base column
-        if isinstance(curr, mk.ScalarColumn):
-            ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
-            fns.append(lambda x: x["0"])
-        else:
-            raise ValueError(f"Base column is of unsupported type {type(curr)}.")
-
-        # Step 3: Build the pipeline by walking backwards through fns
-        pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
-        for fn in reversed(fns):
-            pipe = pipe.map(fn)
-
-        # Step 4: Collect the results
-        # TODO (dean): support different output types
+                
+        # Step 1: Convert the ImageColumn to ray dataset
+        img_col = data.data.args[0].data.kwargs["img"]
+        args = img_col.data.args
+        
+        # This approach is slower and also relies on Pandas
+        ds = ray.data.from_pandas(
+            pd.DataFrame({str(idx): arg.to_pandas() for idx, arg in enumerate(args)})
+        ).repartition(100)
+        
+        # This outputs a Ray Dataset of <class 'ray.data._internal.arrow_block.ArrowRow'>
+        # which doesn't support resize() like a numpy array does
+        # paths = list(DATASET_PATH + args[0])
+        # ds = ray.data.read_images(paths)
+        
+        # Step 2: Pull out the functions
+        DATASET_PATH = data.data.args[0].data.kwargs["img"].data.fn.base_dir
+        load_map = data.data.args[0].data.kwargs["img"].data.fn
+        resize_map = data.data.args[0].data.fn
+        mean_map = data.data.fn
+        
+        # Step 3: Build the pipeline
+        pipe: ray.DatasetPipeline = ds.window(blocks_per_window=10)
+        
+        pipe = pipe.map(lambda x: x["0"])
+        pipe = pipe.map(load_map)
+        pipe = pipe.map(resize_map)
+        pipe = pipe.map(mean_map)
+        
+        # Step 4: Iterate through the blocks? (there are 10 iterations)
         result = np.array([])
-        partitions = (
-            iter(pipe.rewindow(blocks_per_window=num_blocks).iter_datasets())
-            .__next__()
-            .to_numpy_refs()
-        )
-        for partition in partitions:
+        partitions = iter(pipe.rewindow(blocks_per_window=100).iter_datasets()).__next__().to_numpy_refs()
+        for partition in partitions: # 100 partitions
             result = np.append(result, ray.get(partition))
+            
+        # result = np.array([])
+        # out = iter(pipe.rewindow(blocks_per_window=100).iter_datasets()).__next__()
+        # print(f"hi: {out.count()}")
+        # print(f"hi: {len(out.to_numpy_refs())}") # This is also returning a list
+        # for elem in out.to_numpy_refs():
+        #     print("shape:", ray.get(elem).shape)
+        #     result = np.append(result, ray.get(elem))
+        #     print("result shape:", result.shape)
+        
+        # for out in pipe.rewindow(blocks_per_window=100).iter_datasets():
+            # print(f"hi: {out.count()}")
+            # print(f"hi: {len(out.to_numpy_refs())}") # This is also returning a list
+            # print(f"hi 2: {out.repartition(1).count()}")
+            # print(f"hi 3: {len(out.repartition(1).to_numpy_refs())}")
+            # for elem in out.to_numpy_refs():
+            #     print("shape:", ray.get(elem).shape)
+            #     result = np.append(result, ray.get(elem))
+            #     print("result shape:", result.shape)
+            # result.append(out.to_numpy_refs().get().repartition(1))
+            # result.append(out.to_arrow_refs().get().repartition(1))
         return result
-
-    else:
+        # return concat(result)
+        
+        # pipe.take_all() # This outputs a Python list, which is too slow
+        
+    else:    
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(
