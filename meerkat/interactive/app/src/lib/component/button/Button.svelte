@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { type Writable } from 'svelte/store';
-	import { writable } from 'svelte/store';
-	import { getContext } from 'svelte';
-	import type { Endpoint } from '$lib/utils/types';
+	import { createEventDispatcher } from 'svelte';
 
-	let { dispatch } = getContext('Meerkat');
+	export let title: string = '';
 
-	export let title: Writable<string> = '';
-	export let on_click: Endpoint;
+	let dispatch = createEventDispatcher();
+
+	function dispatchClick() {
+		dispatch('click', {});
+	}
 </script>
 
-<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
+<div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col hover:bg-slate-200">
 	<button
 		on:click={(e) => {
-			dispatch(on_click.endpoint_id, {}, { type: e.type, detail: e.detail });
-		}}>{$title}</button
+			dispatchClick();
+		}}>{title}</button
 	>
 </div>

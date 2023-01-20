@@ -2,6 +2,7 @@ from typing import List
 
 from tqdm import tqdm
 
+from meerkat.errors import TriggerError
 from meerkat.interactive.graph.operation import Operation
 from meerkat.interactive.graph.reactivity import (
     get_reactive_kwargs,
@@ -19,7 +20,6 @@ from meerkat.interactive.graph.store import (
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort
 from meerkat.state import state
-from meerkat.errors import TriggerError
 
 __all__ = [
     "react",
@@ -34,7 +34,6 @@ __all__ = [
     "Operation",
     "trigger",
 ]
-
 
 
 def trigger() -> List[Modification]:
@@ -53,6 +52,8 @@ def trigger() -> List[Modification]:
     root_nodes = [mod.node for mod in modifications if mod.node is not None]
 
     # Sort the nodes in topological order, and keep the Operation nodes
+    # TODO: dynamically traverse and sort the graph instead of pre-sorting.
+    # We need to do this to skip operations where inputs are not changed.
     order = [
         node.obj
         for node in _topological_sort(root_nodes)
