@@ -190,15 +190,14 @@ def add_secret(api: str, api_key: str):
 
 
 def run_on_startup():
-    """
-    Run on startup
-    """
+    """Run on startup."""
     frontend_url = os.environ.get("MEERKAT_FRONTEND_URL", None)
     if frontend_url:
         state.frontend_info = FrontendInfo(None, None, _url=frontend_url)
-        
+
     api_url = os.environ.get("MEERKAT_API_URL", None)
     if api_url:
         state.api_info = APIInfo(None, None, _url=api_url)
+
 
 run_on_startup()

@@ -55,8 +55,8 @@ class Interface(IdentifiableMixin):
         svelte_writer.init_run()
 
     def __call__(self):
-        """Return the FastAPI object, this allows Interface objects
-        to be targeted by uvicorn when running a script."""
+        """Return the FastAPI object, this allows Interface objects to be
+        targeted by uvicorn when running a script."""
         from meerkat.interactive.api import MeerkatAPI
 
         return MeerkatAPI

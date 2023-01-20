@@ -157,29 +157,27 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         self.prefix = prefix
         self.route = route
-        
+
     @staticmethod
     def _has_var_positional(foo):
         # Check if `foo` has a `*args` parameter
         signature = inspect.signature(foo)
         return any(p.kind == p.VAR_POSITIONAL for p in signature.parameters.values())
-        
+
     def _validate_fn(self):
         """Validate the function `fn`."""
         if not callable(self.fn):
-            raise TypeError(
-                f"Endpoint function {self.fn} is not callable."
-            )
-            
+            raise TypeError(f"Endpoint function {self.fn} is not callable.")
+
         # Disallow *args
         if self._has_var_positional(self.fn):
             raise TypeError(
                 f"Endpoint function {self.fn} has a `*args` parameter."
                 " Please use keyword arguments instead."
             )
-        
+
         # Do we allow lambdas?
-        
+
     @property
     def frontend(self):
         return EndpointFrontend(
@@ -249,7 +247,6 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         modifications = trigger()
 
-
         return result, modifications
 
     def partial(self, *args, **kwargs) -> Endpoint:
@@ -278,6 +275,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         """Create a new Endpoint that applies `fn` to the return value of this
         Endpoint. Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
 
+        If the return value is None and `fn` doesn't take any inputs, then
+        `fn` will be called with no arguments.
+
         Args:
             fn (Endpoint, callable): An Endpoint or a callable function that accepts
                 a single argument of the same type as the return of this Endpoint
@@ -286,10 +286,15 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         Return:
             Endpoint: The new composed Endpoint.
         """
+        # `fn` may not take any inputs.
+        # FIXME: Should this logic be in ``compose``? or some other function?
+        sig = get_signature(fn)
+        pipe_return = len(sig.parameters) > 0
 
         @wraps(self.fn)
         def composed(*args, **kwargs):
-            return fn(self.fn(*args, **kwargs))
+            out = self.fn(*args, **kwargs)
+            return fn(out) if pipe_return else fn()
 
         return Endpoint(
             fn=composed,
@@ -429,6 +434,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         if not isinstance(v, cls):
             return make_endpoint(v)
         return v
+
+
+class EndpointProperty(Endpoint):
+    pass
 
 
 def make_endpoint(endpoint_or_fn: Union[Callable, Endpoint, None]) -> Endpoint:
@@ -644,3 +653,17 @@ def endpoints(cls=None, prefix=None):
         return EndpointClass
 
     return _endpoints(cls)
+
+
+def get_signature(fn: Union[Callable, Endpoint]) -> inspect.Signature:
+    """Get the signature of a function or endpoint.
+
+    Args:
+        fn: The function or endpoint to get the signature of.
+
+    Returns:
+        The signature of the function or endpoint.
+    """
+    if isinstance(fn, Endpoint):
+        fn = fn.fn
+    return inspect.signature(fn)

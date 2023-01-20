@@ -44,6 +44,7 @@ from .app.src.lib.component.stats_labeler import StatsLabeler
 from .app.src.lib.component.table import Table
 from .app.src.lib.component.tabs import Tabs
 from .app.src.lib.component.textbox import Textbox
+from .app.src.lib.component.toggle import Toggle
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from .interface import Interface, interface
@@ -104,5 +105,5 @@ __all__ = [
     "Text",
     "Code",
     "CodeDisplay",
-    "Text",
+    "Toggle",
 ]

@@ -13,7 +13,8 @@ export const dispatch = async (endpoint_id: string, payload: any = {}) => {
     if (endpoint_id === null) {
         return;
     }
-    const [result, modifications] = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
+    console.log("Dispatching")
+    const {result, modifications, error} = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
     apply_modifications(modifications);
     return result;
 };

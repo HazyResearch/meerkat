@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, reactive
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
 class SortCriterion(BaseModel):
@@ -46,7 +46,7 @@ def sort_by_criteria(
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
-class Sort(Component):
+class Sort(AutoComponent):
     """This component handles a sort_by list and a sort_order list.
 
     Sorting criteria are maintained in a Store. On change of these
@@ -61,7 +61,8 @@ class Sort(Component):
     criteria: Store[Union[List[SortCriterion], SortCriterion]] = Field(
         default_factory=lambda: Store([])
     )
-    title: Store[str] = Store("Sort")
+    # criteria: Union[List[SortCriterion], SortCriterion] = []
+    title: str = "Sort"
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

@@ -1,10 +1,9 @@
 from meerkat.interactive.endpoint import Endpoint
-from meerkat.interactive.graph import Store
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
-class Button(Component):
+class Button(AutoComponent):
 
-    title: Store[str]
+    title: str
     on_click: Endpoint = None

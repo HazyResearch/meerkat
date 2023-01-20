@@ -1,6 +1,4 @@
-from meerkat.interactive.app.src.lib.component.abstract import (
-    Component,
-)
+from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Image(Component):

@@ -5,7 +5,7 @@ from typing import Dict, List, Literal, Set
 from pydantic import BaseModel, Extra, root_validator, validator
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
@@ -26,6 +26,7 @@ class WrappableMixin:
     @classproperty
     def wrapper_import_style(cls) -> Literal["default", "named"]:
         from meerkat.interactive.svelte import SvelteWriter
+
         svelte_writer = SvelteWriter()
 
         if cls.library == "@meerkat-ml/meerkat" and cls.namespace == "meerkat":
@@ -106,8 +107,8 @@ class Component(
 
     @classproperty
     def alias(cls):
-        """Unique alias for this component that
-        uses the namespace and the name of the Component subclass.
+        """Unique alias for this component that uses the namespace and the name
+        of the Component subclass.
 
         This will give components with the same name from different
         libraries different names e.g. `MeerkatButton` and
@@ -127,22 +128,32 @@ class Component(
     @classproperty
     def event_names(cls) -> List[str]:
         """Returns a list of event names that this component emits."""
-        return [k[3:] for k in cls.__fields__ if k.startswith("on_")]
+        return [
+            k[3:]
+            for k in cls.__fields__
+            if k.startswith("on_")
+            and not issubclass(cls.__fields__[k].type_, EndpointProperty)
+        ]
 
     @classproperty
     def events(cls) -> List[str]:
         """Returns a list of events that this component emits."""
-        return [k for k in cls.__fields__ if k.startswith("on_")]
+        return [
+            k
+            for k in cls.__fields__
+            if k.startswith("on_")
+            and not issubclass(cls.__fields__[k].type_, EndpointProperty)
+        ]
 
     @classproperty
     def frontend_alias(cls):
         """Alias for this component that is used in the frontend.
 
-        This is not unique, and it is possible to have multiple components
-        with the same frontend alias. This is useful for components that
-        are just wrappers around other components, e.g. a layout Component
-        that subclasses a Grid Component will still have the same frontend
-        alias as the Grid Component.
+        This is not unique, and it is possible to have multiple
+        components with the same frontend alias. This is useful for
+        components that are just wrappers around other components, e.g.
+        a layout Component that subclasses a Grid Component will still
+        have the same frontend alias as the Grid Component.
         """
         return cls.namespace.title() + cls.component_name
 
@@ -196,15 +207,27 @@ class Component(
     def prop_names(cls):
         return [
             k for k in cls.__fields__ if not k.startswith("on_") and "_self_id" != k
+        ] + [
+            k
+            for k in cls.__fields__
+            if k.startswith("on_")
+            and issubclass(cls.__fields__[k].type_, EndpointProperty)
         ]
 
     @classproperty
     def prop_bindings(cls):
-        # These props need to be bound with `bind:` in Svelte
-        types_to_bind = {Store, DataFrame}
-        return {
-            prop: cls.__fields__[prop].type_ in types_to_bind for prop in cls.prop_names
-        }
+        if not issubclass(cls, AutoComponent):
+            # These props need to be bound with `bind:` in Svelte
+            types_to_bind = {Store, DataFrame}
+            return {
+                prop: cls.__fields__[prop].type_ in types_to_bind
+                for prop in cls.prop_names
+            }
+        else:
+            return {
+                prop: (cls.__fields__[prop].type_ != EndpointProperty)
+                for prop in cls.prop_names
+            }
 
     @property
     def frontend(self):
@@ -286,7 +309,10 @@ class AutoComponent(Component):
             # Wrap all the fields that are not NodeMixins in a Store
             # (i.e. this will exclude DataFrame, Endpoint etc. as well as
             # fields that are already Stores)
-            if cls.__fields__[name].type_ == Endpoint:
+            if (
+                cls.__fields__[name].type_ == Endpoint
+                or cls.__fields__[name].type_ == EndpointProperty
+            ):
                 # Separately skip Endpoint fields by looking at the field type,
                 # since they are assigned None by default and would be missed
                 # by the condition below

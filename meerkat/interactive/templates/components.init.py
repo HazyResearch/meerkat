@@ -10,8 +10,7 @@ class LibraryMixin:
 
 # AutoComponent should always be the last base class
 class ExampleComponent(LibraryMixin, AutoComponent):
-    """
-    Make custom components by extending the `AutoComponent` class.
+    """Make custom components by extending the `AutoComponent` class.
 
     Add the `namespace` and `library` class properties, so that
     it's easy to import and publish your components. Read our

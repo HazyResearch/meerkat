@@ -7,8 +7,9 @@ from pydantic import BaseModel, Field
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store, react
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Store, react
+
 from ..abstract import Component
 
 

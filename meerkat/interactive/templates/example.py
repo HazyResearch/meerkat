@@ -1,5 +1,6 @@
-import meerkat as mk
 from app.src.lib.components import ExampleComponent
+
+import meerkat as mk
 
 # Import and use the ExampleComponent
 example_component = ExampleComponent(name="Meerkat")

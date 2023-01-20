@@ -5,16 +5,14 @@ import numpy as np
 from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.graph import Store, reactive, store_field
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.graph import Store, reactive
 
-from ..abstract import Component
-
-# from meerkat.interactive.modification import Modification
+from ..abstract import AutoComponent
 
 
 @endpoint
-def get_match_schema(df: DataFrame, encoder: str):
+def get_match_schema(df: DataFrame):
     import meerkat as mk
     from meerkat.interactive.api.routers.dataframe import (
         SchemaResponse,
@@ -102,7 +100,9 @@ def set_criterion(
             name=f"match({against}, {query})",
         )
         criterion.set(match_criterion)
-        return match_criterion
+
+        # Do not return the criterion to the frontend because
+        # it is not json serializable.
 
     except Exception as e:
         raise e
@@ -129,14 +129,16 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     return df, criterion.name
 
 
-class Match(Component):
+class Match(AutoComponent):
 
     df: DataFrame
-    against: Store[str]
-    text: Store[str] = store_field("")
+    against: str
+    text: str = ""
     encoder: str = "clip"
-    on_match: Endpoint = None
-    title: Store[str] = store_field("Match")
+    title: str = "Match"
+
+    on_match: EndpointProperty = None
+    get_match_schema: EndpointProperty = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -146,10 +148,7 @@ class Match(Component):
         # if they are maintained on the backend, then a store update dispatch will
         # run on every key stroke
 
-        self.get_match_schema = get_match_schema.partial(
-            df=self.df,
-            encoder=self.encoder,
-        )
+        self.get_match_schema = get_match_schema.partial(df=self.df)
 
         self.criterion: MatchCriterion = Store(
             MatchCriterion(against=None, query=None, name=None), backend_only=True
@@ -162,13 +161,8 @@ class Match(Component):
         )
         if self.on_match is not None:
             on_match = on_match.compose(self.on_match)
-        self.on_match = on_match
 
-    @property
-    def props(self):
-        props = super().props
-        props["get_match_schema"] = self.get_match_schema
-        return props
+        self.on_match = on_match
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

@@ -8,4 +8,5 @@ gallery = mk.gui.Gallery(df=df, main_column="img")
 tabs = mk.gui.Tabs(tabs={"Table": table, "Gallery": gallery})
 
 mk.gui.start(shareable=False)
-mk.gui.Interface(component=mk.gui.RowLayout(components=[tabs])).launch()
+interface = mk.gui.Interface(component=mk.gui.RowLayout(slots=[tabs]), id="display")
+interface.launch()

@@ -44,9 +44,9 @@ def file_find_replace(directory, find, replace, pattern):
 def is_notebook() -> bool:
     """Check if the current environment is a notebook.
 
-    Taken from
-    https://stackoverflow.com/questions/15411967/how-can-i-check-if-code\
--is-executed-in-the-ipython-notebook.
+        Taken from
+        https://stackoverflow.com/questions/15411967/how-can-i-check-if-code\
+    -is-executed-in-the-ipython-notebook.
     """
     try:
         shell = get_ipython().__class__.__name__

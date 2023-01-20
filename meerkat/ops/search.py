@@ -3,7 +3,7 @@ from typing import List, Union
 import numpy as np
 import torch
 
-from meerkat import DataFrame, TensorColumn, TorchTensorColumn, NumPyTensorColumn
+from meerkat import DataFrame, NumPyTensorColumn, TensorColumn, TorchTensorColumn
 from meerkat.interactive.graph import reactive
 
 
@@ -40,7 +40,7 @@ def search(
 
         if not torch.is_tensor(query):
             query = torch.tensor(query)
-        
+
         fn = _torch_search
 
     elif isinstance(by, NumPyTensorColumn):
@@ -72,7 +72,5 @@ def _torch_search(
     return scores, indices
 
 
-def _numpy_search(
-    query: torch.Tensor, by: torch.Tensor, metric: str, k: int
-):
+def _numpy_search(query: torch.Tensor, by: torch.Tensor, metric: str, k: int):
     raise NotImplementedError()

@@ -26,9 +26,7 @@ jinja_env = Environment(
 
 @dataclasses.dataclass
 class SvelteWriter:
-    """
-    Class that handles writing Svelte components to the Meerkat app.
-    """
+    """Class that handles writing Svelte components to the Meerkat app."""
 
     appname: str = "meerkat_app"
     cwd: str = dataclasses.field(default_factory=os.getcwd)
@@ -52,7 +50,9 @@ class SvelteWriter:
     @property
     def is_user_appdir(self) -> bool:
         """Check if a Meerkat generated app can be used.
-        These apps are generated with the `mk init` command."""
+
+        These apps are generated with the `mk init` command.
+        """
         if os.path.exists(os.path.join(self.appdir, ".mk")):
             return True
         return False
@@ -228,8 +228,8 @@ class SvelteWriter:
         )
 
     def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
-        """Given a list of libraries, return the libraries that are
-        installed in the app directory.
+        """Given a list of libraries, return the libraries that are installed
+        in the app directory.
 
         Args:
             libraries (List[str]): List of libraries to check
@@ -308,7 +308,7 @@ class SvelteWriter:
             path=component.path,
             prop_names=component.prop_names,
             event_names=component.event_names,
-            use_bindings=not issubclass(component, AutoComponent),
+            use_bindings=True,  # not issubclass(component, AutoComponent)
             prop_bindings=component.prop_bindings,
             slottable=component.slottable,
         )
