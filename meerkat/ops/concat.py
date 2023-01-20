@@ -55,8 +55,8 @@ Try running `<objs>.filter(lambda x: len(x) > 0)` before calling mk.concat."""
     if isinstance(objs[0], DataFrame):
         if axis == 0 or axis == "rows":
             # append new rows
-            columns = set(objs[0].columns)
-            if not all([set(df.columns) == columns for df in objs]):
+            columns = objs[0].columns
+            if not all([set(df.columns) == set(columns) for df in objs]):
                 raise ConcatError(
                     "Can only concatenate DataFrames along axis 0 (rows) if they have "
                     " the same set of columns names."

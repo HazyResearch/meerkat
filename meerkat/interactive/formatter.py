@@ -6,6 +6,7 @@ import base64
 import math
 from abc import ABC, abstractmethod
 from io import BytesIO
+import textwrap
 from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
@@ -82,6 +83,8 @@ class BasicFormatter(Formatter):
 
     def html(self, cell: Any):
         cell = self.encode(cell)
+        if isinstance(cell, str):
+            cell = textwrap.shorten(cell, width=100, placeholder="...")
         return format_array(np.array([cell]), formatter=None)[0]
 
     @property

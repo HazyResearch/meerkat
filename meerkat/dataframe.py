@@ -1189,7 +1189,7 @@ class DataFrame(
                 # Copy old column into new column
                 new_df[new_name] = new_df[old_name]
                 new_df.remove_column(old_name)
-                names[i] = new_name
+                names[names.index(old_name)] = new_name
             new_df = new_df[names]
         elif isinstance(mapper, Callable):
             for old_name in new_df.columns:

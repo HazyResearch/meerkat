@@ -13,6 +13,7 @@ def explain(
     method: Union[str, "Slicer"] = "MixtureSlicer",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
+    output_col: str = None,
     **kwargs,
 ) -> Tuple[TorchTensorColumn, "Slicer"]:
     """Cluster the data in a column. If the column is an unstructured type,
@@ -36,7 +37,11 @@ def explain(
     """
     if isinstance(data, DataFrame):
         # TODO (sabri): Give the user the option to specify the output column.
-        output_col = f"{method}({input},{target})"
+        if output_col is None:
+            output_col = f"{method}({input},{target})"
+        else:
+            output_col = output_col
+
         # embed_col = f"{encoder}({input})"
         col = data[input]
     else:
