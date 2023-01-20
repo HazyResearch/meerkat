@@ -1,8 +1,8 @@
+from pydantic import validator
+
 from meerkat.dataframe import DataFrame
 
 from ..abstract import AutoComponent, Endpoint
-
-from pydantic import validator
 
 
 class Table(AutoComponent):
@@ -13,7 +13,7 @@ class Table(AutoComponent):
 
     on_edit: Endpoint = None
 
-    # Create a Pydantic validator to ensure that the id_column is in the df 
+    # Create a Pydantic validator to ensure that the id_column is in the df
     # when editable is True
     @validator("id_column")
     def id_column_in_df(cls, v, values):

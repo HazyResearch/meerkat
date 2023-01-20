@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Tuple
 
-from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.errors import TriggerError
+from meerkat.interactive.endpoint import Endpoint, endpoint
 
 if TYPE_CHECKING:
     from meerkat.interactive.modification import Modification

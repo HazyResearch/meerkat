@@ -1,7 +1,4 @@
-from meerkat.interactive.app.src.lib.component.abstract import (
-    AutoComponent,
-    Slottable,
-)
+from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
 
 
 class Flex(Slottable, AutoComponent):

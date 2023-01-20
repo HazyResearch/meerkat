@@ -107,8 +107,8 @@ class Component(
 
     @classproperty
     def alias(cls):
-        """Unique alias for this component that
-        uses the namespace and the name of the Component subclass.
+        """Unique alias for this component that uses the namespace and the name
+        of the Component subclass.
 
         This will give components with the same name from different
         libraries different names e.g. `MeerkatButton` and
@@ -149,11 +149,11 @@ class Component(
     def frontend_alias(cls):
         """Alias for this component that is used in the frontend.
 
-        This is not unique, and it is possible to have multiple components
-        with the same frontend alias. This is useful for components that
-        are just wrappers around other components, e.g. a layout Component
-        that subclasses a Grid Component will still have the same frontend
-        alias as the Grid Component.
+        This is not unique, and it is possible to have multiple
+        components with the same frontend alias. This is useful for
+        components that are just wrappers around other components, e.g.
+        a layout Component that subclasses a Grid Component will still
+        have the same frontend alias as the Grid Component.
         """
         return cls.namespace.title() + cls.component_name
 

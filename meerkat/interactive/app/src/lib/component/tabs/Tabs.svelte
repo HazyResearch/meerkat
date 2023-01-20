@@ -9,7 +9,6 @@
 	}
 
 	export let tabs: Array<Tab> = [];
-    console.log(tabs);
     
     let activeTabId = tabs[0].id;
 

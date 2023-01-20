@@ -16,7 +16,7 @@ MEERKAT_API_SERVER = "https://api.meerkat.app/v1/tunnel-request"
 
 class Server(uvicorn.Server):
     """Taken from https://stackoverflow.com/questions/61577643/python-how-to-\
-use-fastapi-and-uvicorn-run-without-blocking-the-thread and Gradio."""
+    use-fastapi-and-uvicorn-run-without-blocking-the-thread and Gradio."""
 
     def install_signal_handlers(self):
         pass

@@ -21,12 +21,11 @@ def init(
         help="Name of the app",
     ),
 ):
-    """
-    Create a new Meerkat app. This will create a new folder called `app` in
+    """Create a new Meerkat app. This will create a new folder called `app` in
     the current directory and install all the necessary packages.
 
-    Internally, Meerkat uses SvelteKit to create the app, and adds all the
-    setup required by Meerkat to the app.
+    Internally, Meerkat uses SvelteKit to create the app, and adds all
+    the setup required by Meerkat to the app.
     """
 
     # Check if app folder exists, and tell the user to delete it if it does
@@ -129,25 +128,17 @@ def run(
         "app", help="Subdomain to use for public sharing mode"
     ),
 ):
-    """
-    Launch a Meerkat app, given a path to a Python script.
-    """
+    """Launch a Meerkat app, given a path to a Python script."""
     # Pretty print information to console
-    rich.print(
-        f":rocket: Running [bold violet]{script_path}[/bold violet]"
-    )
+    rich.print(f":rocket: Running [bold violet]{script_path}[/bold violet]")
     if dev:
         rich.print(
             ":wrench: Dev mode is [bold violet]on[/bold violet]\n"
             ":hammer: Live reload is [bold violet]enabled[/bold violet]"
         )
     else:
-        rich.print(
-            ":wrench: Production mode is [bold violet]on[/bold violet]"
-        )
-    rich.print(
-        f":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]"
-    )
+        rich.print(":wrench: Production mode is [bold violet]on[/bold violet]")
+    rich.print(f":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]")
     rich.print()
 
     # Dump wrapper Component subclasses, ComponentContext
@@ -192,12 +183,9 @@ def run(
             break
 
 
-
 @cli.command()
 def update():
-    """
-    Update the Meerkat CLI to the latest version.
-    """
+    """Update the Meerkat CLI to the latest version."""
     # Check if there's an app/ folder in the current directory
     if os.path.exists("app"):
         # Run `npm i @meerkat-ml/meerkat` in the app/ folder
