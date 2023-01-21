@@ -7,19 +7,26 @@
 	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
 	import ArrowLeft from 'svelte-bootstrap-icons/lib/ArrowLeft.svelte';
 	import { chunk } from 'underscore';
+	import { schemeTableau10 } from 'd3-scale-chromatic';
 
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
 	export let posidx: number;
-	export let main_column = 'img';
+	export let main_column: string;
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
 	export let card_flex_grow: boolean = false;
 	export let as_modal: boolean = false;
-	export let wrap_content: boolean = false;
 
-	const { fetch_chunk } = getContext('Meerkat');
+	const { fetch_chunk, get_schema } = getContext('Meerkat');
+
+    $: schema_promise = get_schema(df.ref_id).then((schema) => {
+        if (main_column === undefined) {
+            main_column = schema.columns[0].name;
+        }
+        return schema;
+    });
 
 	$: chunk_promise = fetch_chunk({ df: df, indices: [posidx] });
 
@@ -63,28 +70,30 @@
 						<div class="text-center font-bold text-gray-600 text-xl">Columns</div>
 						<!-- Key-Value Pairs -->
 						<div class="flex-col flex space-y-1 ">
-							{#await chunk_promise then chunk}
-								{#each chunk.columns as column}
+							{#await schema_promise then schema}
+								{#each schema.columns as column}
 									<!-- Key-Value Pair -->
 									<button
 										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-3 py-1"
-										class:bg-slate-200={main_column === column}
+										class:bg-slate-200={main_column === column.name}
 										on:click={() => {
-											main_column = column;
+											main_column = column.name;
 										}}
 									>
 										<!-- Key -->
 										<span
 											class="text-bf text-slate-600 text-left font-mono"
-											class:font-bold={main_column === column}
+											class:font-bold={main_column === column.name}
 										>
-											{column}
+											{column.name}
 										</span>
 										<!-- Value -->
 										<span
 											class="text-gray-600 text-right whitespace-nowrap overflow-hidden text-ellipsis"
 										>
-											<Cell {...chunk.get_cell(0, column)} Cell />
+                                            {#await chunk_promise then chunk}
+											    <Cell {...chunk.get_cell(0, column.name)} Cell />
+                                            {/await}
 										</span>
 									</button>
 								{/each}
@@ -119,13 +128,13 @@
 									</button>
 								</li>
 								<li>
-									{#await chunk_promise}
+									{#await schema_promise}
 										<button class="w-18 px-1 h-8 text-slate-800">
 											{posidx} / ?
 										</button>
-									{:then chunk}
+									{:then schema}
 										<button class="w-18 px-1 h-8 text-slate-800">
-											{posidx} / {chunk.full_length}
+											{posidx} / {schema.nrows}
 										</button>
 									{/await}
 								</li>
