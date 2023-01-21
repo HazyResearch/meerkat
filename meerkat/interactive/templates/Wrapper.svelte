@@ -1,6 +1,7 @@
 <script>
     {% if import_style == 'named' -%}
     import {{ component_name }} from '{{ path }}';
+    {% elif import_style == 'none' -%}
     {% else -%}
     import { {{ component_name }} } from '{{ path }}';
     {% endif %}
@@ -19,14 +20,16 @@
 
 <{{ component_name }} 
     {% for prop in prop_names -%}
-    {% if use_bindings %}
     {% if prop_bindings[prop] -%}
-    bind:{{ prop }}={${{ prop }}}
+    {% if prop == 'classes' and import_style == 'none' -%}
+    class={${{ prop }}}
+    {% elif import_style == 'none' -%}
+    {{ prop }}={${{ prop }}}
     {% else -%}
-    {{ prop }}={ {{prop}} }
+    bind:{{ prop }}={${{ prop }}}
     {% endif -%}
     {% else -%}
-    bind:{{ prop }}={${{ prop }}}
+    {{ prop }}={ {{prop}} }
     {% endif -%}
     {% endfor -%}
     {% for event in event_names -%}

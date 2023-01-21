@@ -1,6 +1,6 @@
 {
     "name": "@meerkat-ml/meerkat",
-    "version": "0.0.2f",
+    "version": "0.0.2i",
     "description": "The Meerkat Svelte Library",
     "scripts": {
         "dev": "vite dev",
@@ -33,7 +33,6 @@
         "eslint": "^8.16.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-svelte3": "^4.0.0",
-        "flowbite-svelte": "^0.24.4",
         "postcss": "latest",
         "prettier": "^2.6.2",
         "prettier-plugin-svelte": "^2.7.0",
@@ -57,6 +56,7 @@
         "d3-scale-chromatic": "^3.0.0",
         "d3-selection": "^3.0.0",
         "flowbite": "^1.5.2",
+        "flowbite-svelte": "^0.29.7",
         "layercake": "^7.0.0",
         "marked": "^4.2.4",
         "prismjs": "^1.28.0",

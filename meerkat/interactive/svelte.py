@@ -277,7 +277,7 @@ class SvelteWriter:
 
         # Filter to only include components and frontend components
         # whose libraries are installed
-        installed_libraries = self.filter_installed_libraries(libraries)
+        installed_libraries = self.filter_installed_libraries(libraries) + ["html"]
         components = [
             c
             for c in components
