@@ -1,3 +1,4 @@
+import collections
 import inspect
 import os
 from typing import Dict, List, Literal, Set
@@ -24,7 +25,7 @@ class ComponentFrontend(BaseModel):
 
 class WrappableMixin:
     @classproperty
-    def wrapper_import_style(cls) -> Literal["default", "named"]:
+    def wrapper_import_style(cls) -> Literal["default", "named", "none"]:
         from meerkat.interactive.svelte import SvelteWriter
 
         svelte_writer = SvelteWriter()
@@ -51,6 +52,9 @@ class WrappableMixin:
                     f"Cannot use custom component {cls.component_name}, "
                     "please initialize a Meerkat app using `mk init` first."
                 )
+        elif cls.library == "html":
+            # No need to import HTML tags
+            return "none"
         else:
             return "default"
 
@@ -75,14 +79,31 @@ class Slottable:
         return True
 
 
+def iterable(arg):
+    return isinstance(arg, collections.Iterable) and not isinstance(arg, str)
+
+
 class SlotsMixin:
     def __init__(self, slots: List["Component"] = [], *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if not iterable(slots):
+            slots = [slots]
+
         self._slots = slots
 
     @property
     def slots(self) -> List["Component"]:
-        return self._slots
+        from meerkat.interactive.app.src.lib.layouts import Brace
+
+        _slots = []
+        for slot in self._slots:
+            if not isinstance(slot, Component):
+                # Wrap it in a Brace component
+                _slots.append(Brace(data=slot))
+            else:
+                _slots.append(slot)
+        return _slots
 
     @classproperty
     def slottable(cls) -> bool:
