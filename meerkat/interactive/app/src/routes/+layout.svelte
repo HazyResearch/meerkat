@@ -6,5 +6,5 @@
 
 <Meerkat>
 	<slot />
+	<Modals />
 </Meerkat>
-<Modals />

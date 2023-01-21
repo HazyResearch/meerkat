@@ -44,6 +44,7 @@ export { default as Text } from './component/text/Text.svelte';
 export { default as Textbox } from './component/textbox/Textbox.svelte';
 export { API_URL } from './constants.js';
 export { default as AutoLayout } from './layouts/AutoLayout.svelte';
+export { default as Brace } from './layouts/Brace.svelte';
 export { default as Div } from './layouts/Div.svelte';
 export { default as Flex } from './layouts/Flex.svelte';
 export { default as Grid } from './layouts/Grid.svelte';

@@ -29,6 +29,7 @@ class SchemaResponse(BaseModel):
     id: str
     columns: List[ColumnInfo]
     nrows: int = None
+    primary_key: str = None
 
 
 @endpoint(prefix="/df", route="/{df}/schema/")
@@ -38,6 +39,7 @@ def schema(df: DataFrame, request: SchemaRequest) -> SchemaResponse:
         id=df.id,
         columns=_get_column_infos(df, columns),
         nrows=len(df),
+        primary_key=df.primary_key_name,
     )
 
 
@@ -103,12 +105,15 @@ def rows(
         indices = list(range(start, end))
     elif keys is not None:
         if key_column is None:
-            # TODO(sabri): when we add support for primary keys this should defualt to
-            # the primary key
-            raise ValueError("Must provide key_column if keys are provided")
-
-        # FIXME(sabri): this will only work if key_column is a pandas column
-        df = df[df[key_column].isin(keys)]
+            if df.primary_key is None:
+                raise ValueError(
+                    "Must provide key_column if keys are provided and no "
+                    "primary_key on dataframe."
+                )
+            df = df.loc[keys]
+        else:
+            # FIXME(sabri): this will only work if key_column is a pandas column
+            df = df[df[key_column].isin(keys)]
     else:
         raise ValueError()
 

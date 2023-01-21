@@ -1,3 +1,5 @@
+from typing import Any
+
 from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
 
 
@@ -29,3 +31,8 @@ class RowLayout(Grid):
 class ColumnLayout(Flex):
 
     classes: str = "flex-row"
+
+
+class Brace(AutoComponent):
+
+    data: Any

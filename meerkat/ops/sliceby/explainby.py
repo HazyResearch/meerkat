@@ -33,6 +33,7 @@ def explainby(
     modality: str = None,
     scores: bool = False,
     use_cache: bool = True,
+    output_col: str = None,
     **kwargs,
 ) -> ExplainBy:
     """Perform a clusterby operation on a DataFrame.
@@ -49,14 +50,15 @@ def explainby(
     Returns:
         ExplainBy: A ExplainBy object.
     """
-    out_col = f"{method}({by},{target})"
+    if output_col is None:
+        output_col = f"{method}({by},{target})"
     # TODO (sabri): Give the user the option to specify the output and remove this guard
     # once caching is supported
 
     if not isinstance(by, str):
         raise NotImplementedError
 
-    if out_col not in data or not use_cache:
+    if output_col not in data or not use_cache:
         data, _ = explain(
             data=data,
             input=by,
@@ -64,18 +66,18 @@ def explainby(
             method=method,
             encoder=encoder,
             modality=modality,
+            output_col=output_col,
             **kwargs,
         )
 
     if scores:
-
-        slice_scores = data[out_col]
+        slice_scores = data[output_col]
         slice_scores = {
             key: slice_scores[:, key] for key in range(slice_scores.shape[1])
         }
         return ExplainBy(data=data, scores=slice_scores, by=by)
     else:
-        slice_sets = data[out_col]
+        slice_sets = data[output_col]
         slice_sets = {
             key: np.where(slice_sets[:, key] == 1)[0]
             for key in range(slice_sets.shape[1])

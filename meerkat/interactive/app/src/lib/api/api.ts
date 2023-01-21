@@ -1,6 +1,7 @@
 import type { SliceKey } from '$lib/api/sliceby';
 import { apply_modifications, get_request, modify, post } from '$lib/utils/requests';
 import type { EditTarget } from '$lib/utils/types';
+import { DataFrameChunk, type DataFrameRef } from '$lib/api/dataframe';
 import { get, type Writable } from 'svelte/store';
 import { API_URL } from "../constants.js";
 
@@ -13,8 +14,7 @@ export const dispatch = async (endpoint_id: string, payload: any = {}) => {
     if (endpoint_id === null) {
         return;
     }
-    console.log("Dispatching")
-    const {result, modifications, error} = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
+    const { result, modifications, error } = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
     apply_modifications(modifications);
     return result;
 };
@@ -22,6 +22,42 @@ export const dispatch = async (endpoint_id: string, payload: any = {}) => {
 export const get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
     return await post(`${get(API_URL)}/df/${ref_id}/schema`, { columns: columns });
 };
+
+
+export interface DataFrameChunkRequest {
+    df: DataFrameRef
+    start?: number | null
+    end?: number | null
+    indices?: Array<number> | null
+    columns?: Array<string> | null
+    key_column?: string | null
+    keys?: Array<string | number> | null
+}
+
+export const fetch_chunk = async ({
+    df,
+    start = null,
+    end = null,
+    indices = null,
+    columns = null,
+    key_column = null,
+    keys = null }: DataFrameChunkRequest) => {
+    const result = await post(`${get(API_URL)}/df/${df.ref_id}/rows`, {
+        start: start,
+        end: end,
+        indices: indices,
+        key_column: key_column,
+        keys: keys,
+        columns: columns
+    });
+
+    return new DataFrameChunk(
+        result.column_infos,
+        result.indices,
+        result.rows,
+        result.full_length
+    );
+}
 
 export const get_rows = async (
     ref_id: string,
@@ -40,8 +76,15 @@ export const get_rows = async (
         keys: keys,
         columns: columns
     });
-    return result;
+
+    return new DataFrameChunk(
+        result.column_infos,
+        result.indices,
+        result.rows,
+        result.full_length
+    );
 };
+
 
 export const add = async (ref_id: string, column_name: string) => {
     const modifications = await modify(`${get(API_URL)}/df/${ref_id}/add`, { column: column_name });

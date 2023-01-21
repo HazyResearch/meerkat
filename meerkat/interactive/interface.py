@@ -66,10 +66,10 @@ class Interface(IdentifiableMixin):
 
         if state.frontend_info is None:
             rich.print(
-                "Frontend is not initialized. "
-                "Run `mk.gui.start()` before calling launch."
+                "Frontend is not initialized. Running `mk.gui.start()`."
             )
-            return
+            from .startup import start
+            start()
 
         url = f"{state.frontend_info.url}/{self.id}"
 

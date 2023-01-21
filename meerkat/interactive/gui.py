@@ -26,7 +26,8 @@ class DataFrameGUI(GUI):
             component=mk.gui.Table(
                 df=self.df,
                 **kwargs,
-            )
+            ),
+            id="table"
         ).launch()
 
     def gallery(self, main_column: str, tag_columns: List[str], **kwargs):
