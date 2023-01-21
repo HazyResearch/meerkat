@@ -42,7 +42,7 @@
 
 	// eventually everything will have to be done based on primary key, but placeholder 
 	// for now
-	const get_idx = (row: Array<any>, i: number) => {
+	const get_keyidx = (row: Array<any>, i: number) => {
 		if (schema.primary_key === undefined) {
 			return i;
 		} else {
@@ -50,7 +50,7 @@
 		}
 	};
 
-	$: idxs = rows.rows.map(get_idx)
+	$: keyidxs = rows.rows.map(get_keyidx)
 
 </script>
 
@@ -61,9 +61,10 @@
 		class:panel-gimages={layout === 'gimages'}
 		style:columns={layout === 'gimages' ? null : num_columns}
 	>
-		{#each rows.rows.map((row, i) => [row, idxs[i]]) as [row, idx]}
+		{#each rows.rows.map((row, i) => [row, keyidxs[i], i]) as [row, keyidx, i]}
 			<Card
-				id={idx}
+				keyidx={keyidx}
+				posidx={rows.indices[i]}
 				pivot={{
 					data: row[main_index],
 					cell_component: pivot_cell_component,
@@ -94,37 +95,37 @@
 						card_flex_grow: false
 					}
 				}}
-				selected={selected.includes(idx)}
+				selected={selected.includes(keyidx)}
 				on:click={(e) => {
 					if (e.detail.shiftKey) {
 						if (selected.length === 0) {
-							selected.push(idx);
+							selected.push(keyidx);
 						} else {
 							let last_idx = selected[selected.length - 1];
-							let last_i = idxs.indexOf(last_idx);
-							let i = idxs.indexOf(idx);
+							let last_i = keyidxs.indexOf(last_idx);
+							let i = keyidxs.indexOf(keyidx);
 							if (i > last_i) {
 								for (let j = last_i; j <= i; j++) {
-									if (!selected.includes(idxs[j])) {
-										selected.push(idxs[j]);
+									if (!selected.includes(keyidxs[j])) {
+										selected.push(keyidxs[j]);
 									}
 								}
 							} else {
 								for (let j = last_i; j >= i; j--) {
-									if (!selected.includes(idxs[j])) {
-										selected.push(idxs[j]);
+									if (!selected.includes(keyidxs[j])) {
+										selected.push(keyidxs[j]);
 									}
 								}
 							}
 						}
 					} else if (e.detail.altKey) {
 						selected = [];
-						selected.push(idx);
+						selected.push(keyidx);
 					} else {
-						if (selected.includes(idx)) {
-							selected = without(selected, idx);
-						} else if (!selected.includes(idx)) {
-							selected.push(idx);
+						if (selected.includes(keyidx)) {
+							selected = without(selected, keyidx);
+						} else if (!selected.includes(keyidx)) {
+							selected.push(keyidx);
 						}
 					}
 					selected = selected;

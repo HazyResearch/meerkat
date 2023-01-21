@@ -10,8 +10,9 @@
 	import Selected from './Selected.svelte';
 	import { getContext } from 'svelte';
 
-	// ID for this component
-	export let id: string;
+	// idxs for this component
+	export let keyidx: string;
+	export let posidx: number;
 
 	// Pivot cell
 	export let pivot: CellInterface;
@@ -88,9 +89,9 @@
 		<div
 			class="pivot"
 			class:selected-pivot={selected}
-			on:dblclick={(e) => {open_row_modal(id);}}
+			on:dblclick={(e) => {open_row_modal(posidx);}}
 			use:pivot_tippy={pivot_tooltip
-				? { content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }
+				? { content: document.getElementById(`${keyidx}-pivot-tooltip`)?.innerHTML }
 				: null}
 			on:click={(e) => {
 				dispatch('click', e);
@@ -101,7 +102,7 @@
 
 		<!-- Pivot tooltip -->
 		{#if pivot_tooltip}
-			<div id="{id}-pivot-tooltip" class="hidden">
+			<div id="{keyidx}-pivot-tooltip" class="hidden">
 				<slot name="pivot-tooltip">
 					<Cell {...pivot} />
 				</slot>
@@ -115,13 +116,13 @@
 			<div
 				class="mx-1 my-1 px-2 py-0.5 rounded-full text-center text-slate-800 text-xs font-mono bg-violet-200 hover:bg-violet-600 hover:text-slate-200"
 				use:content_tippy={{
-					content: document.getElementById(`${id}-content-tooltip-${j}`)?.innerHTML
+					content: document.getElementById(`${keyidx}-content-tooltip-${j}`)?.innerHTML
 				}}
 			>
 				{subcontent.column}
 				<Cell {...subcontent} />
 				{#if content_tooltip}
-					<div id="{id}-content-tooltip-{j}" class="hidden">
+					<div id="{keyidx}-content-tooltip-{j}" class="hidden">
 						<Cell {...subcontent} />
 					</div>
 				{/if}
