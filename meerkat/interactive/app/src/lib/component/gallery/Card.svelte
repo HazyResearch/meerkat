@@ -8,6 +8,7 @@
 	import { openModal } from 'svelte-modals';
 	import { createEventDispatcher } from 'svelte';
 	import Selected from './Selected.svelte';
+	import { getContext } from 'svelte';
 
 	// ID for this component
 	export let id: string;
@@ -57,6 +58,8 @@
 	}
 
 	// Modal setup
+
+	const open_row_modal: Function = getContext('open_row_modal');
 	export let pivot_modal: boolean = true;
 	export let pivot_modal_component: SvelteComponent;
 	export let pivot_modal_component_props: Object;
@@ -85,9 +88,7 @@
 		<div
 			class="pivot"
 			class:selected-pivot={selected}
-			on:dblclick={pivot_modal
-				? () => openModal(pivot_modal_component, { is_open: true, ...pivot_modal_component_props })
-				: null}
+			on:dblclick={(e) => {open_row_modal(id);}}
 			use:pivot_tippy={pivot_tooltip
 				? { content: document.getElementById(`${id}-pivot-tooltip`)?.innerHTML }
 				: null}
@@ -150,8 +151,6 @@
 	.pivot {
 		@apply self-center;
 	}
-
-
 
 	.content {
 		/* Row format for tags */

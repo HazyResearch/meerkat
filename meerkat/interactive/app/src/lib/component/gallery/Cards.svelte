@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DataFrameRows, ColumnInfo, DataFrameSchema } from '$lib/api/dataframe';
+	import type { DataFrameChunk, ColumnInfo, DataFrameSchema } from '$lib/api/dataframe';
 	import { writable, type Writable } from 'svelte/store';
 	import { get, map, without } from 'underscore';
 	import Card from './Card.svelte';
@@ -7,8 +7,7 @@
 
 	export let schema: DataFrameSchema;
 	let column_infos: Array<ColumnInfo> = schema.columns;
-	export let rows: DataFrameRows | null;
-	export let primary_key: string;
+	export let rows: DataFrameChunk | null;
 
 	export let layout = 'gimages'; // 'gimages' or 'masonry'
 	export let layout_style = 'natural'; // 'natural' or 'square'
@@ -34,8 +33,8 @@
 	
 	// need to get the row index of the primary key 
 	let primary_key_index: number;
-	if (primary_key !== undefined) {
-		primary_key_index = columns.findIndex((c) => c === primary_key);
+	if (schema.primary_key !== undefined) {
+		primary_key_index = columns.findIndex((c) => c === schema.primary_key);
 	} 
 
 	$: pivot_height = layout === 'gimages' ? cell_size : undefined;
@@ -44,7 +43,7 @@
 	// eventually everything will have to be done based on primary key, but placeholder 
 	// for now
 	const get_idx = (row: Array<any>, i: number) => {
-		if (primary_key === undefined) {
+		if (schema.primary_key === undefined) {
 			return i;
 		} else {
 			return row[primary_key_index];

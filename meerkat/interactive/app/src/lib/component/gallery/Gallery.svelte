@@ -2,16 +2,19 @@
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import Selected from './Selected.svelte';
 
+	import { openModal } from 'svelte-modals';
+	import RowModal from '$lib/shared/modals/RowModal.svelte';
+	import type { DataFrameRef } from '$lib/api/dataframe';
+
 	const { get_schema, get_rows } = getContext('Meerkat');
 
-	export let df;
+	export let df: DataFrameRef;
 	export let main_column: string;
 	export let tag_columns: Any; // Writable<Array<string>>;
-	export let primary_key: string;
 	export let selected: Array<string>;
 
 	export let page: number = 0;
@@ -21,8 +24,15 @@
 
 	$: schema_promise = get_schema(df.ref_id);
 
+	setContext('open_row_modal', (posidx: number) => {
+		openModal(RowModal, {
+			df: df,
+			posidx: posidx
+		});
+	});
+
 	// create an array with the main_column and the tag_columns
-	$: rows_promise = get_rows(
+	$: df_slice_promise = get_rows(
 		df.ref_id,
 		page * per_page,
 		(page + 1) * per_page
@@ -67,17 +77,16 @@
 				</span>
 			</div>
 			<div class="h-full overflow-y-scroll">
-				{#await rows_promise}
+				{#await df_slice_promise}
 					<div class="h-full flex items-center justify-center">
 						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 					</div>
-				{:then rows}
+				{:then df_slice}
 					<Cards
 						{schema}
-						{rows}
-						{primary_key}
-						main_column={main_column}
-						tag_columns={tag_columns}
+						rows={df_slice}
+						{main_column}
+						{tag_columns}
 						bind:cell_size
 						bind:selected
 					/>

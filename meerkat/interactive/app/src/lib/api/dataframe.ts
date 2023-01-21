@@ -1,5 +1,22 @@
 import { post } from '$lib/utils/requests';
+/**
+ * An object that holds a reference to a DataFrame on the backend, but does not
+ * actually hold any of its data. 
+ */
+export interface DataFrameRef {
+    ref_id: string;
+}
 
+export interface DataFrameSchema {
+    columns: Array<ColumnInfo>;
+    primary_key: string;
+    nrows: number;
+    id: string;
+}
+
+/**
+ * Important metadata about a column in a DataFrame.
+ */
 export interface ColumnInfo {
     name: string;
     type: string;
@@ -7,15 +24,46 @@ export interface ColumnInfo {
     cell_props: any
 }
 
-export interface DataFrameSchema {
-    columns: Array<ColumnInfo>;
-    id: string;
-}
-export interface DataFrameRows {
-    column_infos?: Array<ColumnInfo>
-    indices?: Array<number>
-    rows?: Array<Array<any>>
-    full_length?: number
+/**
+ * A chunk of a DataFrame holds the data for a subset of the rows and columns in a full
+ * DataFrame that lives on the backend. 
+ */
+export class DataFrameChunk {
+
+    column_infos: Array<ColumnInfo>
+    columns: Array<string>
+    indices: Array<number>
+    rows: Array<Array<any>>
+    full_length: number
+
+    constructor(
+        column_infos: Array<ColumnInfo>,
+        indices: Array<number>,
+        rows: Array<Array<any>>,
+        full_length: number
+    ) {
+        this.column_infos = column_infos;
+        this.columns = this.column_infos.map((col: any) => col.name);
+        this.indices = indices;
+        this.rows = rows;
+        this.full_length = full_length;
+    }
+
+    get_cell(row: number, column: string) {
+        let column_idx = this.columns.indexOf(column);
+        let column_info = this.column_infos[column_idx];
+        return {
+            data: this.rows[row][this.columns.indexOf(column)],
+            cell_component: column_info.cell_component,
+            cell_props: column_info.cell_props
+        }
+
+    }
+
+    length() {
+        return this.rows.length;
+    }
+
 }
 
 export interface FilterCriterion {
