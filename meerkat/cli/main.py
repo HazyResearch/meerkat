@@ -20,6 +20,9 @@ def init(
         "meerkat_app",
         help="Name of the app",
     ),
+    package_manager: str = typer.Option(
+        "npm", show_choices=["npm", "bun"], help="Package manager to use"
+    ),
 ):
     """Create a new Meerkat app. This will create a new folder called `app` in
     the current directory and install all the necessary packages.
@@ -42,7 +45,11 @@ def init(
 
     # Manually pass in _appdir to SvelteWriter, since we don't have an app yet
     # (we're creating it)
-    svelte_writer = SvelteWriter(appname=name, _appdir=os.path.join(os.getcwd(), "app"))
+    svelte_writer = SvelteWriter(
+        appname=name,
+        _appdir=os.path.join(os.getcwd(), "app"),
+        package_manager=package_manager,
+    )
 
     with Progress(
         SpinnerColumn(spinner_name="material"),
