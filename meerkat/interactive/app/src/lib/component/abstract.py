@@ -285,24 +285,38 @@ class Component(
         vprop_names = [k for k in self.__fields__ if "_self_id" != k]
         return {k: self.__getattribute__(k) for k in vprop_names}
 
-    @validator("*", pre=False)
-    def _check_inode(cls, value):
-        if isinstance(value, NodeMixin) and not isinstance(value, Store):
-            # Now value is a NodeMixin object
-            # We need to make sure that value points to a Node in the graph
-            # If it doesn't, we need to add it to the graph
-            if not value.has_inode():
-                value.attach_to_inode(value.create_inode())
+    @root_validator(pre=True)
+    def _init_cache(cls, values):
+        # This is a workaround because Pydantic automatically converts
+        # all Store objects to their underlying values when validating
+        # the class. We need to keep the Store objects around.
+        cls._cache = values.copy()
+        return values
 
-            # Now value is a NodeMixin object that points to a Node in the graph
+    @root_validator(pre=False)
+    def _check_inode(cls, values):
+        """Unwrap NodeMixin objects to their underlying Node (except Stores)."""
+        values.update(cls._cache)
+        for name, value in values.items():
+            if isinstance(value, NodeMixin) and not isinstance(value, Store):
+                # Now value is a NodeMixin object
+                # We need to make sure that value points to a Node in the graph
+                # If it doesn't, we need to add it to the graph
+                if not value.has_inode():
+                    value.attach_to_inode(value.create_inode())
 
-            # We replace `value` with `value.inode`, and will send
-            # this to the frontend
-            # Effectively, NodeMixin objects (except Store) are "by reference"
-            # and not "by value" (this is also why we explicitly exclude
-            # Store from this check, which is "by value")
-            return value.inode
-        return value
+                # Now value is a NodeMixin object that points to a Node in the graph
+
+                # We replace `value` with `value.inode`, and will send
+                # this to the frontend
+                # Effectively, NodeMixin objects (except Store) are "by reference"
+                # and not "by value" (this is also why we explicitly exclude
+                # Store from this check, which is "by value")
+                values[name] = value.inode
+            else:
+                values[name] = value
+        cls._cache = values
+        return values
 
     class Config:
         arbitrary_types_allowed = True
@@ -324,8 +338,22 @@ class AutoComponent(Component):
 
         return cls.__name__
 
+    @root_validator(pre=True)
+    def _init_cache(cls, values):
+        # This is a workaround because Pydantic automatically converts
+        # all Store objects to their underlying values when validating
+        # the class. We need to keep the Store objects around.
+        cls._cache = values.copy()
+        for name, value in values.items():
+            if isinstance(value, Store):
+                values[name] = value.__wrapped__
+
+        return values
+
     @root_validator(pre=False)
     def _convert_fields(cls, values):
+        values = cls._cache
+        cls._cache = None
         for name, value in values.items():
             # Wrap all the fields that are not NodeMixins in a Store
             # (i.e. this will exclude DataFrame, Endpoint etc. as well as
