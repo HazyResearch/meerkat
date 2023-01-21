@@ -1,10 +1,11 @@
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.graph import Store
 
 from ..abstract import AutoComponent
 
 
 @endpoint
-def _toggle(value: bool) -> bool:
+def _toggle(value: bool, store: Store[bool]) -> bool:
     """
     A wrapper to convert the value to positional arguments.
     This allows the user to write an endpoint without having
@@ -14,15 +15,19 @@ def _toggle(value: bool) -> bool:
 
     TODO: Figure out if we can pass positional args to pydantic.
     """
+    store.set(value)
     return value
 
 
 class Toggle(AutoComponent):
     title: str = ""
+    value: bool = False
 
-    on_toggle: Endpoint
+    on_toggle: Endpoint = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.on_toggle = _toggle.compose(self.on_toggle)
+        on_toggle = _toggle.partial(store=self.value)
+        if self.on_toggle is not None:
+            on_toggle = on_toggle.compose(self.on_toggle)
+        self.on_toggle = on_toggle
