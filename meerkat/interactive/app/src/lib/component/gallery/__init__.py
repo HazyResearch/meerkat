@@ -6,7 +6,7 @@ from pydantic import Field
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
 @dataclass
@@ -24,9 +24,9 @@ class EditTarget:
         }
 
 
-class Gallery(Component):
+class Gallery(AutoComponent):
 
     df: DataFrame
-    main_column: Store[str]
-    tag_columns: Store[List[str]] = Field(default_factory=lambda: Store(list()))
-    selected: Store[List[int]] = Field(default_factory=lambda: Store(list()))
+    main_column: str
+    tag_columns: List[str] = []
+    selected: List[int] = []
