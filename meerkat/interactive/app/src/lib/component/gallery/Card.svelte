@@ -1,80 +1,26 @@
 <script lang="ts">
-	import { createTippy } from 'svelte-tippy';
-	import { followCursor } from 'tippy.js';
+	import { tippy } from 'svelte-tippy';
 
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import type { CellInterface } from '$lib/utils/types';
-	import type { SvelteComponent } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import { createEventDispatcher } from 'svelte';
 	import Selected from './Selected.svelte';
 	import { getContext } from 'svelte';
 
-	// idxs for this component
 	export let keyidx: string;
 	export let posidx: number;
-
-	// Pivot cell
 	export let pivot: CellInterface;
-
-	// Content cells
 	export let content: Array<CellInterface>;
-
-	// Layout
 	export let layout: string;
-
-	// Give the card the `flex-grow` Tailwind class to horizontally
-	// fill out space in the (containing) flex container.
-	export let card_flex_grow: boolean = false;
-
 	export let selected: boolean = false;
 
-	// Tooltip setup
-	export let pivot_tooltip: boolean = false;
-	export let content_tooltip: boolean = true;
-	let pivot_tippy = (node: HTMLElement, parameters: any = null) => {};
-	let content_tippy = (node: HTMLElement, parameters: any = null) => {};
-
-	if (pivot_tooltip) {
-		pivot_tippy = createTippy({
-			placement: 'auto',
-			allowHTML: true,
-			theme: 'pivot-tooltip',
-			followCursor: true,
-			plugins: [followCursor],
-			duration: [0, 0],
-			maxWidth: '95vw'
-			// interactive: true
-		});
-	}
-	if (content_tooltip) {
-		content_tippy = createTippy({
-			allowHTML: true,
-			theme: 'content-tooltip',
-			followCursor: true,
-			plugins: [followCursor],
-			duration: [0, 0],
-			maxWidth: '95vw'
-		});
-	}
-
-	// Modal setup
-
 	const open_row_modal: Function = getContext('open_row_modal');
-	export let pivot_modal: boolean = true;
-	export let pivot_modal_component: SvelteComponent;
-	export let pivot_modal_component_props: Object;
-
-	// Additional styling props
-	export let blur = false;
-
 	const dispatch = createEventDispatcher();
 </script>
 
 <div
 	class="mx-2 my-4"
-	class:blur-sm={blur}
-	class:flex-grow={card_flex_grow}
 	class:card-masonry={layout === 'masonry'}
 	class:card-gimages={layout === 'gimages'}
 >
@@ -89,43 +35,29 @@
 		<div
 			class="pivot"
 			class:selected-pivot={selected}
-			on:dblclick={(e) => {open_row_modal(posidx);}}
-			use:pivot_tippy={pivot_tooltip
-				? { content: document.getElementById(`${keyidx}-pivot-tooltip`)?.innerHTML }
-				: null}
+			on:dblclick={(e) => {
+				open_row_modal(posidx);
+			}}
 			on:click={(e) => {
 				dispatch('click', e);
 			}}
 		>
 			<Cell {...pivot} />
 		</div>
-
-		<!-- Pivot tooltip -->
-		{#if pivot_tooltip}
-			<div id="{keyidx}-pivot-tooltip" class="hidden">
-				<slot name="pivot-tooltip">
-					<Cell {...pivot} />
-				</slot>
-			</div>
-		{/if}
 	</div>
 
 	<!-- Content -->
 	<div class="content">
 		{#each content as subcontent, j}
 			<div
-				class="mx-1 my-1 px-2 py-0.5 rounded-full text-center text-slate-800 text-xs font-mono bg-violet-200 hover:bg-violet-600 hover:text-slate-200"
-				use:content_tippy={{
-					content: document.getElementById(`${keyidx}-content-tooltip-${j}`)?.innerHTML
-				}}
+				class="subcontent mx-1 my-1 px-2 py-0.5 rounded-md text-left text-slate-800 text-xs bg-slate-200"
 			>
-				{subcontent.column}
-				<Cell {...subcontent} />
-				{#if content_tooltip}
-					<div id="{keyidx}-content-tooltip-{j}" class="hidden">
-						<Cell {...subcontent} />
-					</div>
-				{/if}
+				<div class="font-bold font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+					{subcontent.column}
+				</div>
+				<div class="font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+					<Cell {...subcontent} />
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -158,32 +90,11 @@
 		@apply flex flex-wrap items-start;
 	}
 
-	.subcontent {
-		@apply flex-grow w-0 p-1 m-1 rounded-sm;
-		@apply text-center overflow-hidden text-xs text-ellipsis whitespace-nowrap select-none font-mono;
-		@apply text-slate-200 bg-slate-800;
-	}
-
-	.subcontent:hover {
-		@apply bg-slate-600;
-	}
-
 	.selected-pivot {
 		@apply opacity-50;
 	}
 
 	.pivot:hover {
 		@apply opacity-50;
-	}
-
-	/* CSS for the tooltips */
-	:global(.tippy-box[data-theme='pivot-tooltip']) {
-		@apply py-1 px-1 text-xs font-mono rounded-lg shadow-sm;
-		@apply text-white bg-violet-500;
-	}
-
-	:global(.tippy-box[data-theme='content-tooltip']) {
-		@apply py-4 px-4 text-base font-mono rounded-lg shadow-sm;
-		@apply text-white bg-violet-900;
 	}
 </style>

@@ -21,12 +21,12 @@
 
 	const { fetch_chunk, get_schema } = getContext('Meerkat');
 
-    $: schema_promise = get_schema(df.ref_id).then((schema) => {
-        if (main_column === undefined) {
-            main_column = schema.columns[0].name;
-        }
-        return schema;
-    });
+	$: schema_promise = get_schema(df.ref_id).then((schema) => {
+		if (main_column === undefined) {
+			main_column = schema.columns[0].name;
+		}
+		return schema;
+	});
 
 	$: chunk_promise = fetch_chunk({ df: df, indices: [posidx] });
 
@@ -91,9 +91,9 @@
 										<span
 											class="text-gray-600 text-right whitespace-nowrap overflow-hidden text-ellipsis"
 										>
-                                            {#await chunk_promise then chunk}
-											    <Cell {...chunk.get_cell(0, column.name)} Cell />
-                                            {/await}
+											{#await chunk_promise then chunk}
+												<Cell {...chunk.get_cell(0, column.name)} Cell />
+											{/await}
 										</span>
 									</button>
 								{/each}
@@ -128,13 +128,10 @@
 									</button>
 								</li>
 								<li>
-									{#await schema_promise}
+									{#await schema_promise then schema}
 										<button class="w-18 px-1 h-8 text-slate-800">
-											{posidx} / ?
-										</button>
-									{:then schema}
-										<button class="w-18 px-1 h-8 text-slate-800">
-											{posidx} / {schema.nrows}
+											Row <span class="font-bold">{posidx}</span> of
+											<span class="font-bold">{schema.nrows}</span>
 										</button>
 									{/await}
 								</li>

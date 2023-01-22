@@ -7,7 +7,7 @@
 
 	export let schema: DataFrameSchema;
 	let column_infos: Array<ColumnInfo> = schema.columns;
-	export let rows: DataFrameChunk | null;
+	export let chunk: DataFrameChunk;
 
 	export let layout = 'gimages'; // 'gimages' or 'masonry'
 	export let layout_style = 'natural'; // 'natural' or 'square'
@@ -21,8 +21,8 @@
 	// Columns size to display
 	export let cell_size: number = 6;
 
-	// Selected columns 
-	export let selected: Array<number> = [];
+	// Selected columns
+	export let selected: Array<string> = [];
 
 	let columns = column_infos.map((col: any) => col.name);
 	let column_components = column_infos.map((col: any) => col.cell_component);
@@ -30,17 +30,17 @@
 	let tag_indices: Array<number> = tag_columns.map((tag) => columns.indexOf(tag));
 	let main_index: number = columns.indexOf(main_column);
 	let pivot_cell_component = column_components[main_index];
-	
-	// need to get the row index of the primary key 
+
+	// need to get the row index of the primary key
 	let primary_key_index: number;
 	if (schema.primary_key !== undefined) {
 		primary_key_index = columns.findIndex((c) => c === schema.primary_key);
-	} 
+	}
 
 	$: pivot_height = layout === 'gimages' ? cell_size : undefined;
 	$: num_columns = layout === 'masonry' ? cell_size : undefined;
 
-	// eventually everything will have to be done based on primary key, but placeholder 
+	// eventually everything will have to be done based on primary key, but placeholder
 	// for now
 	const get_keyidx = (row: Array<any>, i: number) => {
 		if (schema.primary_key === undefined) {
@@ -50,8 +50,7 @@
 		}
 	};
 
-	$: keyidxs = rows.rows.map(get_keyidx)
-
+	$: keyidxs = chunk.rows.map(get_keyidx);
 </script>
 
 <div class="h-full">
@@ -61,10 +60,10 @@
 		class:panel-gimages={layout === 'gimages'}
 		style:columns={layout === 'gimages' ? null : num_columns}
 	>
-		{#each rows.rows.map((row, i) => [row, keyidxs[i], i]) as [row, keyidx, i]}
+		{#each chunk.rows.map((row, i) => [row, keyidxs[i], i]) as [row, keyidx, i]}
 			<Card
-				keyidx={keyidx}
-				posidx={rows.indices[i]}
+				{keyidx}
+				posidx={chunk.indices[i]}
 				pivot={{
 					data: row[main_index],
 					cell_component: pivot_cell_component,
@@ -77,24 +76,7 @@
 					? tag_indices.map((z) => ({ data: row[z], column: columns[z] }))
 					: []}
 				{layout}
-				pivot_tooltip={true}
-				content_tooltip={true}
 				card_flex_grow={false}
-				--card-width=""
-				pivot_modal_component={InfoModal}
-				pivot_modal_component_props={{
-					props: {
-						pivot: {
-							data: row[main_index],
-							cell_component: pivot_cell_component,
-							cell_props: { height: '100%' }
-						},
-						pivot_header: main_column,
-						content: row.filter((z, i) => i !== main_index),
-						content_headers: columns.filter((z, i) => i !== main_index),
-						card_flex_grow: false
-					}
-				}}
 				selected={selected.includes(keyidx)}
 				on:click={(e) => {
 					if (e.detail.shiftKey) {
@@ -131,7 +113,7 @@
 					selected = selected;
 				}}
 			>
-				<div slot="pivot-tooltip">Double-click to see example</div>
+				<div slot="pivot-tooltip">Double-click to see row</div>
 			</Card>
 		{/each}
 	</div>
