@@ -27,7 +27,8 @@
 	setContext('open_row_modal', (posidx: number) => {
 		openModal(RowModal, {
 			df: df,
-			posidx: posidx
+			posidx: posidx,
+			main_column: main_column,
 		});
 	});
 
