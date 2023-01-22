@@ -50,8 +50,8 @@ class Choice(AutoComponent):
             choice = mk.gui.Choice(choices=["a", "b"], on_select=on_select)
     """
 
-    choices: Store[List]
-    value: Store[str]
+    choices: list
+    value: str
     gui_type: Literal["dropdown", "radio"] = "dropdown"
     title: str = None
 

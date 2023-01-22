@@ -559,7 +559,7 @@ def cleanup():
             state.api_info.process.wait()
 
     svelte_writer = SvelteWriter()
-    svelte_writer.cleanup_run()
+    # svelte_writer.cleanup_run()
 
 
 def output_startup_message(url: str, docs_url: str = None):

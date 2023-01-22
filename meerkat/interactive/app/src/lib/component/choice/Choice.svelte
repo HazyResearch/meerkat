@@ -37,7 +37,7 @@
 		</div>
 	{:else if gui_type == 'radio'}
 		{#each choices as choice, i}
-			<div class="flex items-center mb-4">
+			<div class="themed flex items-center justify-center">
 				<input
 					id="default-radio-{i}"
 					type="radio"
