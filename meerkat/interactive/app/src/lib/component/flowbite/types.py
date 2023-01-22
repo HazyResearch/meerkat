@@ -229,7 +229,7 @@ class NavbarType:
     name: str
     href: str
     rel: str = ""
-    child: List[NavbarType] = None
+    child: List["NavbarType"] = None
 
 
 @dataclass

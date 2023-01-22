@@ -536,7 +536,7 @@ class NavUl(Slottable, FlowbiteSvelteMixin, AutoComponent):
     divClass: str = "w-full md:block md:w-auto"
     ulClass: str = "flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium"
     hidden: bool = True
-    slideParams: SlideParams = {delay: 250, duration: 500, easing: quintOut}
+    # slideParams: SlideParams = {delay: 250, duration: 500, easing: quintOut}
 
 
 class Pagination(Slottable, FlowbiteSvelteMixin, AutoComponent):
