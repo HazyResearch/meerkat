@@ -24,6 +24,22 @@ jinja_env = Environment(
 )
 
 
+def get_subclasses_recursive(cls: type) -> List[type]:
+    """Recursively find all subclasses of a class.
+
+    Args:
+        cls (type): the class to find subclasses of.
+
+    Returns:
+        List[type]: a list of all subclasses of cls.
+    """
+    subclasses = []
+    for subclass in cls.__subclasses__():
+        subclasses.append(subclass)
+        subclasses.extend(get_subclasses_recursive(subclass))
+    return subclasses
+
+
 @dataclasses.dataclass
 class SvelteWriter:
     """Class that handles writing Svelte components to the Meerkat app."""
@@ -69,6 +85,7 @@ class SvelteWriter:
         `mk.gui.start` function.
         """
         self.import_app_components()
+        self.cleanup_run()
         self.write_all_component_wrappers()  # src/lib/components/wrappers
         self.write_component_context()  # ComponentContext.svelte
 
@@ -165,7 +182,7 @@ class SvelteWriter:
         Returns:
             List[Type["Component"]]: List of subclasses of Component.
         """
-        from meerkat.interactive.startup import get_subclasses_recursive
+        # from meerkat.interactive.startup import get_subclasses_recursive
 
         # Import user components
         self.import_app_components()
@@ -441,7 +458,7 @@ interface.launch()"""
         self,
         exclude_classes: Set[str] = {"AutoComponent", "Component"},
     ):
-        from meerkat.interactive.startup import get_subclasses_recursive
+        # from meerkat.interactive.startup import get_subclasses_recursive
 
         # Recursively find all subclasses of Component
         subclasses = get_subclasses_recursive(Component)
@@ -546,3 +563,4 @@ interface.launch()"""
 
 # Create an instance that can be used by other modules
 svelte_writer = SvelteWriter()
+svelte_writer.init_run()

@@ -19,13 +19,13 @@ def on_select_radio():
     )
 
 
-choices = ["a", "b", "c"]
+choices = mk.gui.Store(["a", "b", "c", "d"])
 value = ""
 choice_dropdown = mk.gui.Choice(
     choices=choices, value=value, title="Choose a letter", on_select=on_select_dropdown
 )
 
-choices = [1, 2, 3]
+choices = [1, 2, 3, 4, 5, 6]
 value = 0
 choice_radio = mk.gui.Choice(
     choices=choices,
