@@ -155,10 +155,90 @@ alert = fb.Alert(
     color="blue",
 )
 
+avatar = html.div(
+    slots=[
+        html.div(
+            slots=[
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(stacked=True),
+            ],
+            classes="flex mb-5",
+        ),
+        html.div(
+            slots=[
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(
+                    src="http://placekitten.com/200/200",
+                    stacked=True,
+                    classes="mr-2",
+                ),
+                fb.Avatar(
+                    stacked=True,
+                    href="/",
+                    classes="bg-gray-700 text-white hover:bg-gray-600 text-sm",
+                    slots="+99",
+                ),
+            ],
+            classes="flex",
+        ),
+    ],
+    classes="flex flex-col",
+)
+
+
+carousel = html.div(
+    slots=[
+        fb.Carousel(
+            images=[
+                {
+                    "id": "1",
+                    "imgurl": "http://placeimg.com/640/480/nature",
+                    "name": "Image 1",
+                },
+                {
+                    "id": "2",
+                    "imgurl": "http://placeimg.com/640/480/animals",
+                    "name": "Image 2",
+                },
+                {
+                    "id": "3",
+                    "imgurl": "http://placeimg.com/640/480/tech",
+                    "name": "Image 3",
+                },
+            ],
+        )
+    ],
+    classes="max-w-4xl",
+)
+
+
 heading = html.h1(slots="Flowbite Demo", classes="text-4xl")
 
 interface = mk.gui.Interface(
-    component=mk.gui.RowLayout(slots=[heading, card, accordion, alert]),
+    component=mk.gui.RowLayout(slots=[heading, card, accordion, alert, avatar, carousel]),
     id="flowbite",
 )
 interface.launch()

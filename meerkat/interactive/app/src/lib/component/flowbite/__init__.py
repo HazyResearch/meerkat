@@ -92,7 +92,7 @@ class Alert(Slottable, FlowbiteSvelteMixin, AutoComponent):
         "blue", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
     ] = "blue"
 
-class Avatar(FlowbiteSvelteMixin, AutoComponent):
+class Avatar(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
     src: str = ""
     href: str = None
@@ -102,6 +102,8 @@ class Avatar(FlowbiteSvelteMixin, AutoComponent):
     dot: dict = None
     alt: str = ""
     size: SizeType = "md"
+
+    classes: str = None
 
 
 class Badge(Slottable, FlowbiteSvelteMixin, AutoComponent):
