@@ -105,6 +105,14 @@ class SlotsMixin:
                 _slots.append(slot)
         return _slots
 
+    def append(self, other):
+        # Allow users to append to slots
+        from meerkat.interactive.app.src.lib.layouts import Brace
+        if isinstance(other, Component):
+            self._slots.append(other)
+        else:
+            self._slots.append(Brace(data=other))
+
     @classproperty
     def slottable(cls) -> bool:
         return False
@@ -200,19 +208,19 @@ class Component(
     def path(cls):
         from meerkat.interactive.svelte import svelte_writer
 
-        if not cls.library == "@meerkat-ml/meerkat" or (
-            cls.library == "@meerkat-ml/meerkat"
-            and cls.namespace == "meerkat"
-            and svelte_writer.is_user_appdir
-        ):
-            return cls.library
-
         path = os.path.join(
             os.path.dirname(inspect.getfile(cls)),
             f"{cls.component_name}.svelte",
         )
         if os.path.exists(path):
             return path
+
+        if not cls.library == "@meerkat-ml/meerkat" or (
+            cls.library == "@meerkat-ml/meerkat"
+            and cls.namespace == "meerkat"
+            and svelte_writer.is_user_appdir
+        ):
+            return cls.library
 
         # Raise an error if the file doesn't exist
         raise FileNotFoundError(

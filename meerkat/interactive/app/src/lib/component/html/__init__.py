@@ -35,6 +35,16 @@ class span(Slottable, HtmlMixin, AutoComponent):
     classes: str = None
     style: str = None
 
+# FIXME: remove closing tags in the Wrapper.svelte transipler
+# class input(HtmlMixin, AutoComponent):
+#     classes: str = None
+#     style: str = None
+
+#     type: str = "text"
+#     value: str = ""
+#     placeholder: str = ""
+#     name: str = ""
+
 
 # class img(Slottable, HtmlMixin, AutoComponent):
 #     src: str = ""
@@ -73,6 +83,10 @@ class svg(Slottable, HtmlMixin, AutoComponent):
 
     fill: str = None
     viewBox: str = None
+    stroke: str = None
+    stroke_width: str = None
+    stroke_linecap: str = None
+    stroke_linejoin: str = None
     # Keeping this attribute in makes the svg component not render
     # xmlns: str = "http://www.w3.org/2000/svg"
     aria_hidden: str = None
@@ -85,6 +99,10 @@ class path(Slottable, HtmlMixin, AutoComponent):
     fill: str = None
     clip_rule: str = None
     fill_rule: str = None
+    stroke: str = None
+    stroke_linecap: str = None
+    stroke_linejoin: str = None
+    stroke_width: str = None
 
 class ul(Slottable, HtmlMixin, AutoComponent):
     classes: str = None

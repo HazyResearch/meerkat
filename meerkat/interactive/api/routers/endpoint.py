@@ -11,8 +11,7 @@ if TYPE_CHECKING:
 def dispatch(
     endpoint: Endpoint,
     payload: dict,
-) -> Tuple[Any, List["Modification"]]:
-    # TODO: figure out how to use the payload
+) -> dict:
     """Call an endpoint."""
     from meerkat.interactive.modification import StoreModification
 
