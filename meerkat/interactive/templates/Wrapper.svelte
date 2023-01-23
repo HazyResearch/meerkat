@@ -24,6 +24,9 @@
     {% if prop == 'classes' and import_style == 'none' -%}
     {# For HTML tags, convert the classes attribute to the class property #}
     class={${{ prop }}}
+    {% elif prop == 'classes' and path == 'flowbite-svelte' -%}
+    {# For Flowbite-Svelte, convert the classes attribute to the class property #}
+    class={${{ prop }}}
     {% elif import_style == 'none' -%}
     {# For HTML tags, do not use bind, and convert _ to -, e.g. aria_hidden to aria-hidden #}
     {{ prop.replace("_", "-") }}={${{ prop }}}

@@ -1056,6 +1056,10 @@ class Select(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
 class Textarea(FlowbiteSvelteMixin, AutoComponent):
     value: str = ""
+    rows: int = 3
+    placeholder: str = ""
+
+    classes: str = None
 
     on_blur: Endpoint = None
     on_change: Endpoint = None
