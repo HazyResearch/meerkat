@@ -4,10 +4,10 @@
 	import Interface from '$lib/shared/Interface.svelte';
 	import type { InterfaceType } from '$lib/utils/types';
 	import { onMount } from 'svelte';
-    import { API_URL } from '$lib/constants';
-    import { page } from '$app/stores';
+	import { API_URL } from '$lib/constants';
+	import { page } from '$app/stores';
 
-    let config: InterfaceType | null = null;
+	let config: InterfaceType | null = null;
 	onMount(async () => {
 		config = await (await fetch(`${$API_URL}/interface/${$page.params.slug}/config`)).json();
 		document.title = config?.name ? config.name : 'Meerkat';

@@ -1,6 +1,7 @@
 import pathlib
 
 from meerkat.interactive.app.src.lib.component import flowbite
+from meerkat.interactive.app.src.lib.component import html
 from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
 from meerkat.interactive.app.src.lib.layouts import (
@@ -56,6 +57,7 @@ INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
     "flowbite",
+    "html",
     "Endpoint",
     "State",
     "endpoint",

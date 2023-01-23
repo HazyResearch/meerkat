@@ -18,7 +18,6 @@ from .types import (
     DotType,
     DrawerTransitionTypes,
     DropdownType,
-    F,
     FormColorType,
     FormSizeType,
     Gradientduotones,
@@ -85,6 +84,13 @@ class AccordionItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     transitionType: Literal["slide", "fade"] = "slide"
     transitionParams: dict = {}
 
+class Alert(Slottable, FlowbiteSvelteMixin, AutoComponent):
+
+    dismissable: bool = False
+    accent: bool = False
+    color: Literal[
+        "blue", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
+    ] = "blue"
 
 class Avatar(FlowbiteSvelteMixin, AutoComponent):
 
@@ -128,6 +134,8 @@ class BreadcrumbItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
 
 class Button(Slottable, FlowbiteSvelteMixin, AutoComponent):
+
+    classes: str = None
 
     pill: bool = False
     outline: bool = False
@@ -285,7 +293,7 @@ class Drawer(Slottable, FlowbiteSvelteMixin, AutoComponent):
     bgColor: str = "bg-gray-900"
     bgOpacity: str = "bg-opacity-75"
     placement: Literal["left", "right", "top", "bottom"] = "left"
-    id: str = "drawer-example"
+    # id: str = "drawer-example"
     divClass: str = "overflow-y-auto z-50 p-4 bg-white dark:bg-gray-800"
     transitionParams: dict = {}  # DrawerTransitionParamTypes
     transitionType: DrawerTransitionTypes = "fly"
@@ -437,33 +445,33 @@ class ArrowKeyUp(Slottable, FlowbiteSvelteMixin, AutoComponent):
     svgClass: str = "w-4 h-4"
 
 
-class ListGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class ListGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
-    items: List[ListGroupItemType] = []
-    active: bool = False
-    classes: str = ""
+#     items: List[ListGroupItemType] = []
+#     active: bool = False
+#     classes: str = ""
 
 
-class ListGroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class ListGroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
-    classes: str = ""
+#     classes: str = ""
 
-    # Events
-    on_blur: Endpoint = None
-    on_change: Endpoint = None
-    on_click: Endpoint = None
-    on_focus: Endpoint = None
-    on_keydown: Endpoint = None
-    on_keypress: Endpoint = None
-    on_keyup: Endpoint = None
-    on_mouseenter: Endpoint = None
-    on_mouseleave: Endpoint = None
-    on_mouseover: Endpoint = None
+#     # Events
+#     on_blur: Endpoint = None
+#     on_change: Endpoint = None
+#     on_click: Endpoint = None
+#     on_focus: Endpoint = None
+#     on_keydown: Endpoint = None
+#     on_keypress: Endpoint = None
+#     on_keyup: Endpoint = None
+#     on_mouseenter: Endpoint = None
+#     on_mouseleave: Endpoint = None
+#     on_mouseover: Endpoint = None
 
 
 class MegaMenu(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
-    classes: str = ""
+    classes: str = None
     items: List[LinkType] = []
     open: bool = False
     full: bool = False
@@ -562,48 +570,48 @@ class Popover(Slottable, FlowbiteSvelteMixin, AutoComponent):
     defaultClass: str = "py-2 px-3"
 
 
-class Popper(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class Popper(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
-    activeContent: bool = False
-    arrow: bool = True
-    offset: number = 8
-    placement: Placement = "top"
-    trigger: Literal["hover", "click"] = "hover"
-    triggeredBy: str = None
-    strategy: Literal["absolute", "fixed"] = "absolute"
-    open: bool = False
-    yOnly: bool = False
+#     activeContent: bool = False
+#     arrow: bool = True
+#     offset: number = 8
+#     placement: Placement = "top"
+#     trigger: Literal["hover", "click"] = "hover"
+#     triggeredBy: str = None
+#     strategy: Literal["absolute", "fixed"] = "absolute"
+#     open: bool = False
+#     yOnly: bool = False
 
 
-class Frame(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class Frame(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
-    tag: str = "div"
-    color: Literal[
-        "gray",
-        "red",
-        "yellow",
-        "green",
-        "indigo",
-        "default",
-        "purple",
-        "pink",
-        "blue",
-        "light",
-        "dark",
-        "dropdown",
-        "navbar",
-        "navbarUl",
-        "form",
-        "none",
-    ] = "default"
-    rounded: bool = False
-    border: bool = False
-    shadow: bool = False
-    # transition: TransitionFunc = None
-    params: object = {}
-    # node: HTMLElement = None
-    # use: Action = noop
-    options: object = {}
+#     tag: str = "div"
+#     color: Literal[
+#         "gray",
+#         "red",
+#         "yellow",
+#         "green",
+#         "indigo",
+#         "default",
+#         "purple",
+#         "pink",
+#         "blue",
+#         "light",
+#         "dark",
+#         "dropdown",
+#         "navbar",
+#         "navbarUl",
+#         "form",
+#         "none",
+#     ] = "default"
+#     rounded: bool = False
+#     border: bool = False
+#     shadow: bool = False
+#     # transition: TransitionFunc = None
+#     params: object = {}
+#     # node: HTMLElement = None
+#     # use: Action = noop
+#     options: object = {}
 
 
 class Progressbar(Slottable, FlowbiteSvelteMixin, AutoComponent):
@@ -754,7 +762,7 @@ class SpeedDial(Slottable, FlowbiteSvelteMixin, AutoComponent):
     tooltip: Union[Placement, Literal["none"]] = "left"
     trigger: Literal["hover", "click"] = "hover"
     textOutside: bool = False
-    id: str = str(uuid.uuid4())
+    # id: str = str(uuid.uuid4())
 
     # Events
     on_click: Endpoint = None
@@ -956,7 +964,7 @@ class GroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
 class FloatingLabelInput(FlowbiteSvelteMixin, AutoComponent):
 
-    id: str = ""  #  determine if this should be uuid
+    # id: str = ""  #  determine if this should be uuid
     style: Literal["filled", "outlined", "standard"] = "standard"
     type: Literal["text"] = "text"  # TODO: add more input types
     size: Literal["small", "default"] = "default"
