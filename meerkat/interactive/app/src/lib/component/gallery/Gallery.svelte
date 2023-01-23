@@ -21,7 +21,7 @@
 	export let per_page: number = 20;
 	export let cell_size: number = 24;
 
-	$: schema_promise = get_schema(df.ref_id);
+	$: schema_promise = get_schema(df.ref_id, [main_column, ...tag_columns]);
 
 	setContext('open_row_modal', (posidx: number) => {
 		openModal(RowModal, {
@@ -34,7 +34,8 @@
 	$: chunk_promise = fetch_chunk({
 		df: df,
 		start: page * per_page,
-		end: (page + 1) * per_page
+		end: (page + 1) * per_page,
+		columns: [main_column, ...tag_columns]
 	});
 
 </script>

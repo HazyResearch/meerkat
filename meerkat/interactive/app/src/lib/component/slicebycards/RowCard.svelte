@@ -64,8 +64,6 @@
 
 	// Modal setup
 	export let main_modal: boolean = false;
-	let main_modal_component: SvelteComponent = main.cell_component;
-	let main_modal_component_props: Object = main.cell_props;
 </script>
 
 <div class="h-full">

@@ -10,3 +10,5 @@ gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["path"])
 
 interface = mk.gui.Interface(component=gallery, id="simple")
 interface.launch()
+
+
