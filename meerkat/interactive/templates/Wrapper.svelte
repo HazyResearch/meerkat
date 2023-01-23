@@ -22,9 +22,11 @@
     {% for prop in prop_names -%}
     {% if prop_bindings[prop] -%}
     {% if prop == 'classes' and import_style == 'none' -%}
+    {# For HTML tags, convert the classes attribute to the class property #}
     class={${{ prop }}}
     {% elif import_style == 'none' -%}
-    {{ prop }}={${{ prop }}}
+    {# For HTML tags, do not use bind, and convert _ to -, e.g. aria_hidden to aria-hidden #}
+    {{ prop.replace("_", "-") }}={${{ prop }}}
     {% else -%}
     bind:{{ prop }}={${{ prop }}}
     {% endif -%}

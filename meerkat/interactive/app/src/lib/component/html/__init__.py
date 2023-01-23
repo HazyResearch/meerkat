@@ -13,19 +13,27 @@ class HtmlMixin:
 
 
 class p(Slottable, HtmlMixin, AutoComponent):
-    pass
+    classes: str = None
+    style: str = None
 
 
 class a(Slottable, HtmlMixin, AutoComponent):
+    classes: str = None
+    style: str = None
+
     href: str = ""
+    target: str = ""
+    rel: str = ""
 
 
 class div(Slottable, HtmlMixin, AutoComponent):
-    pass
+    classes: str = None
+    style: str = None
 
 
 class span(Slottable, HtmlMixin, AutoComponent):
-    pass
+    classes: str = None
+    style: str = None
 
 
 # class img(Slottable, HtmlMixin, AutoComponent):
@@ -36,8 +44,8 @@ class span(Slottable, HtmlMixin, AutoComponent):
 
 
 class h1(Slottable, HtmlMixin, AutoComponent):
-    classes: str = ""
-    style: str = ""
+    classes: str = None
+    style: str = None
 
 
 class h2(Slottable, HtmlMixin, AutoComponent):
@@ -59,9 +67,28 @@ class h5(Slottable, HtmlMixin, AutoComponent):
 class h6(Slottable, HtmlMixin, AutoComponent):
     pass
 
+class svg(Slottable, HtmlMixin, AutoComponent):
+    classes: str = None
+    style: str = None
+
+    fill: str = None
+    viewBox: str = None
+    # Keeping this attribute in makes the svg component not render
+    # xmlns: str = "http://www.w3.org/2000/svg"
+    aria_hidden: str = None
+
+class path(Slottable, HtmlMixin, AutoComponent):
+    classes: str = None
+    style: str = None
+
+    d: str = None
+    fill: str = None
+    clip_rule: str = None
+    fill_rule: str = None
 
 class ul(Slottable, HtmlMixin, AutoComponent):
-    pass
+    classes: str = None
+    style: str = None
 
 
 class ol(Slottable, HtmlMixin, AutoComponent):
