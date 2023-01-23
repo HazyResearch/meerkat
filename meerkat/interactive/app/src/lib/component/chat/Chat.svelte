@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Avatar, Textarea, Button } from 'flowbite-svelte';
-	import Message from './Message.svelte';
-	import { createEventDispatcher } from 'svelte';
 	import { get_rows } from '$lib/api/api';
 	import type { DataFrameRef } from '$lib/api/dataframe';
+	import { Avatar, Button, Textarea } from 'flowbite-svelte';
+	import { createEventDispatcher } from 'svelte';
+	import Message from './Message.svelte';
 	const eventDispatcher = createEventDispatcher();
 
 	export let df: DataFrameRef;
@@ -30,7 +30,9 @@
 				>
 					<svelte:fragment slot="avatar">
 						<Avatar
-							src={messages.get_cell(messages.full_length - i - 1, 'sender').data === 'chatbot' ? imgChatbot : imgUser}
+							src={messages.get_cell(messages.full_length - i - 1, 'sender').data === 'chatbot'
+								? imgChatbot
+								: imgUser}
 							stacked={true}
 							class="mr-2"
 						/>
