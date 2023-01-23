@@ -85,7 +85,11 @@ class path(Slottable, HtmlMixin, AutoComponent):
     fill: str = None
     clip_rule: str = None
     fill_rule: str = None
-
+    stroke: str = None
+    stroke_linecap: str = None
+    stroke_linejoin: str = None
+    stroke_width: str = None
+    
 class ul(Slottable, HtmlMixin, AutoComponent):
     classes: str = None
     style: str = None

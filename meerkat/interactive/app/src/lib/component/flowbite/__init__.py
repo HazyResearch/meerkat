@@ -921,6 +921,8 @@ class Toast(Slottable, FlowbiteSvelteMixin, AutoComponent):
     open: bool = True
     divClass: str = "w-full max-w-xs p-4"
 
+    classes: str = None
+
 
 class Tooltip(Slottable, FlowbiteSvelteMixin, AutoComponent):
 
