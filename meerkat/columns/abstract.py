@@ -286,6 +286,12 @@ class Column(
     def formatter(self, formatter: "Formatter"):
         self._formatter = formatter
 
+        
+    def format(self, formatter: type):
+        new_col = self.view()
+        new_col.formatter = formatter
+        return new_col
+
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -631,7 +637,6 @@ class Column(
     @property
     def is_mmap(self):
         return False
-
 
 def column(data: Sequence) -> Column:
     """Create a Meerkat column from data.

@@ -7,7 +7,7 @@ import math
 from abc import ABC, abstractmethod
 from io import BytesIO
 import textwrap
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Callable, Union
 
 import numpy as np
 import pandas as pd
@@ -17,6 +17,18 @@ from PIL.Image import Image
 
 if TYPE_CHECKING:
     from meerkat.columns.deferred.file import FileCell
+
+
+
+
+
+class NewFormatter:
+
+    def __init__(self, encode: Callable, component_class: type, component_kwargs: dict):
+        self.encode = encode
+        self.component = component_class
+        self.component_kwargs = component_kwargs
+
 
 
 class Formatter(ABC):

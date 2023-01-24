@@ -63,8 +63,8 @@ def _get_column_infos(df: DataFrame, columns: List[str] = None):
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cell_component=df[col].formatter.cell_component,
-            cell_props=df[col].formatter.cell_props,
+            cell_component="image",
+            cell_props=df[col].formatter.component_kwargs,
         )
         for col in columns
     ]
