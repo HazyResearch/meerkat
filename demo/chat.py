@@ -6,7 +6,7 @@ from meerkat.interactive.app.src.lib.component.chat import Chat
 
 df = mk.DataFrame(
     {
-        "message": ["hello"],
+        "message": ["Lorem ipsum"],
         "sender": ["chatbot"],
         "name": ["ChatBot"],
         "time": ["2 hours ago"],

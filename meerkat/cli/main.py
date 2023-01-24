@@ -134,6 +134,7 @@ def run(
     subdomain: str = typer.Option(
         "app", help="Subdomain to use for public sharing mode"
     ),
+    debug: bool = typer.Option(False, help="Enable debug logging mode"),
 ):
     """Launch a Meerkat app, given a path to a Python script."""
     # Pretty print information to console
@@ -166,6 +167,7 @@ def run(
     )
 
     # Run the uvicorn server
+    # Set the logging level to debug if debug is enabled
     api_info = run_script(
         script_path,
         port=api_port,
@@ -173,6 +175,7 @@ def run(
         target=target,
         frontend_url=frontend_info.url,
         apiurl=dummy_api_info.url,
+        debug=debug,
     )
 
     # output_startup_message(frontend_info.url, api_info.docs_url)

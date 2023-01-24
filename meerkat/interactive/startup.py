@@ -136,6 +136,7 @@ def run_script(
     subdomain: str = "app",
     frontend_url: str = None,
     apiurl: str = None,
+    debug: bool = False,
 ) -> APIInfo:
     """Run a script with uvicorn.
 
@@ -160,6 +161,8 @@ def run_script(
         env["MEERKAT_FRONTEND_URL"] = frontend_url
     if apiurl is not None:
         env["MEERKAT_API_URL"] = apiurl
+    if debug:
+        env["MEERKAT_LOGGING_LEVEL"] = "DEBUG"
     env["MEERKAT_RUN"] = str(1)
 
     process = subprocess.Popen(

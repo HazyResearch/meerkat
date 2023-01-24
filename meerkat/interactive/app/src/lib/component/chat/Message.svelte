@@ -2,8 +2,6 @@
 	export let message: string;
 	export let name: string;
 	export let time: string;
-
-	console.log(message);
 </script>
 
 <div class="flex ml-2 pl-4 pr-4 mb-4">
@@ -17,7 +15,7 @@
 				<span class="text-gray-500">{time}</span>
 			</slot>
 		</p>
-		<p class="text-gray-700 whitespace-pre-line">
+		<p class="text-gray-800 whitespace-pre-line">
 			{message}
 		</p>
 	</div>
