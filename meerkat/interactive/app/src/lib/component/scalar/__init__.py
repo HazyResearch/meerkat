@@ -7,11 +7,11 @@ import numpy as np
 from pandas.io.formats.format import format_array
 
 
-from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
 from meerkat.interactive.formatter import Formatter
 
 
-class Scalar(Component):
+class Scalar(AutoComponent):
 
     data: Any
     dtype: str = None

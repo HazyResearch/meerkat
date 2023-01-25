@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { tippy } from 'svelte-tippy';
-
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import type { CellInterface } from '$lib/utils/types';
-	import { openModal } from 'svelte-modals';
 	import { createEventDispatcher } from 'svelte';
 	import Selected from './Selected.svelte';
 	import { getContext } from 'svelte';
@@ -14,7 +11,8 @@
 	export let content: Array<CellInterface>;
 	export let layout: string;
 	export let selected: boolean = false;
-	console.log(pivot);
+
+	console.log(pivot)
 
 	const open_row_modal: Function = getContext('open_row_modal');
 	const dispatch = createEventDispatcher();
@@ -68,7 +66,7 @@
 	.card {
 		min-width: var(--card-width, '');
 		@apply m-2 border-2 border-solid rounded-lg shadow-md;
-		@apply dark:bg-gray-700 dark:border-gray-600;
+		@apply dark:border-gray-600;
 	}
 
 	.card-masonry {

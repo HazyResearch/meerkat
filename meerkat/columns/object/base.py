@@ -9,7 +9,6 @@ import pandas as pd
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
-from meerkat.interactive.formatter import ObjectFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
@@ -63,8 +62,9 @@ class ObjectColumn(Column):
         return self[index]
 
     @staticmethod
-    def _get_default_formatter() -> ObjectFormatter:
-        return ObjectFormatter()
+    def _get_default_formatter():
+        from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
+        return ScalarFormatter()
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         return pd.Series([self[int(idx)] for idx in range(len(self))])

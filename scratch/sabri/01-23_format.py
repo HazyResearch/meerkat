@@ -4,28 +4,38 @@ import meerkat as mk
 from meerkat.interactive.app.src.lib.component.image_url import ImageUrl
 
 
-col = mk.column([
-    "http://commons.wikimedia.org/wiki/Special:FilePath/Mary%2C%20Untier%20of%20Knots%20by%20Schmidtner.png?width=100&thumb=true",
-    "http://commons.wikimedia.org/wiki/Special:FilePath/Amor%20als%20Sieger%20-%20Gem%C3%A4ldegalerie%20Berlin%20-%205139072.jpg?width=100&thumb=true"
-])
+# col = mk.column([
+#     "http://commons.wikimedia.org/wiki/Special:FilePath/Mary%2C%20Untier%20of%20Knots%20by%20Schmidtner.png?width=100&thumb=true",
+#     "http://commons.wikimedia.org/wiki/Special:FilePath/Amor%20als%20Sieger%20-%20Gem%C3%A4ldegalerie%20Berlin%20-%205139072.jpg?width=100&thumb=true"
+# ])
+
+# df = mk.DataFrame(
+#     {
+#         "img_url": col,
+#     }
+# )
+# image = ImageUrl(
+#     url="https://placeimg.com/200/200/animals"
+# )
+
+
+
+# grayscale = mk.gui.Store(False)
+# button = mk.gui.Toggle(value=grayscale)
+# df["img_url"] = df["img_url"].format(ImageUrl.to_formatter(grayscale=grayscale))
+
+# gallery = mk.gui.Gallery(df=df, main_column="img_url")
 
 df = mk.DataFrame(
     {
-        "img_url": col,
+        "a": [1, 2, 3],
+        "b": [4, 5, 6],
+        "c": ["1", "2", "3"],
     }
 )
-image = ImageUrl(
-    url="https://placeimg.com/200/200/animals"
-)
 
-
-grayscale = mk.gui.Store(False)
-button = mk.gui.Toggle(value=grayscale)
-df["img_url"] = df["img_url"].format(ImageUrl.to_formatter(grayscale=grayscale))
-
-breakpoint()
-gallery = mk.gui.Gallery(df=df, main_column="img_url")
-interface = mk.gui.Interface(component=mk.gui.RowLayout(slots=[button, gallery]), id="image")
+table = mk.gui.Table(df=df)
+interface = mk.gui.Interface(component=mk.gui.RowLayout(slots=[table]), id="image")
 interface.launch() 
 
 

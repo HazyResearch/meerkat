@@ -7,7 +7,7 @@ import math
 from abc import ABC, abstractmethod
 from io import BytesIO
 import textwrap
-from typing import TYPE_CHECKING, Any, Callable, Union
+from typing import TYPE_CHECKING, Any, Callable, Union, Type
 
 import numpy as np
 import pandas as pd
@@ -15,31 +15,35 @@ import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
 
+
+
 if TYPE_CHECKING:
     from meerkat.columns.deferred.file import FileCell
-
-
-
-
-
-class NewFormatter:
-
-    def __init__(self, encode: Callable, component_class: type, component_kwargs: dict):
-        self.encode = encode
-        self.component = component_class
-        self.component_kwargs = component_kwargs
-
+    from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Formatter(ABC):
 
-    # one of the front end cell components implemented here:
-    # meerkat/interactive/app/src/lib/shared/item
-    # (e.g. "image", "code")
-    cell_component: str
+    # def __init__(self, encode: Callable=, component_class: type = None, component_kwargs: dict=None):
+    #     self.encode = encode
+    #     self.component_class = component_class
+    #     self.component_kwargs = component_kwargs
+    component_class: Type["Component"]
+    data_prop: str = "data"
 
-    @abstractmethod
-    def encode(self, cell: Any):
+    def __init__(self, encode: str = None, **kwargs):
+        self._encode = encode
+
+        default_props, required_props = self._get_props()
+        if not all(k in kwargs for k in required_props):
+            raise ValueError(
+                f"Missing required properties {required_props} for {self.__class__.__name__}"
+            )
+
+        default_props.update(kwargs)
+        self._props = default_props
+
+    def encode(self, cell: Any, **kwargs):
         """Encode the cell on the backend side before sending it to the
         frontend.
 
@@ -48,18 +52,34 @@ class Formatter(ABC):
         displays that don't actually need to apply the lambda in order
         to display the value.
         """
+        if self._encode is not None:
+            return self._encode(cell, **kwargs)
+        return cell
+    
+    @property
+    def props(self):
+        return self._props
 
-    @abstractmethod
+    @classmethod
+    def _get_props(cls):
+        default_props = {}
+        required_props = []
+        for k, v in cls.component_class.__fields__.items():
+            if k == cls.data_prop:
+                continue
+            if v.required:
+                required_props.append(k)
+            else:
+                default_props[k] = v.default
+        return default_props, required_props
+
     def html(self, cell: Any):
         """When not in interactive mode, objects are visualized using static
         html.
 
         This method should produce that static html for the cell.
         """
-
-    @property
-    def cell_props(self):
-        return {}
+        return str(cell)
 
 
 class BasicFormatter(Formatter):
@@ -109,14 +129,7 @@ class BasicFormatter(Formatter):
         }
 
 
-class ObjectFormatter(Formatter):
-    cell_component = "object"
 
-    def encode(self, cell: Any):
-        return str(cell)
-
-    def html(self, cell: Any):
-        return str(cell)
 
 
 class NumpyArrayFormatter(BasicFormatter):

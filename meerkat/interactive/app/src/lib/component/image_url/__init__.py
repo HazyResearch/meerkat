@@ -1,22 +1,10 @@
 from typing import Callable
 from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
 from functools import partial
-from meerkat.interactive.formatter import NewFormatter
-
-class FormatterMixin:
-
-    @classmethod
-    def to_formatter(cls, data: any) -> NewFormatter:
-        raise NotImplementedError()
-
-    
-    @staticmethod
-    def encode(data: any, **kwargs) -> any:
-        return data
 
 
 """Someone wrote this Image component. We want to use this as a formatter."""
-class ImageUrl(AutoComponent, FormatterMixin):
+class ImageUrl(AutoComponent):
     url: str
     grayscale: bool = False
 

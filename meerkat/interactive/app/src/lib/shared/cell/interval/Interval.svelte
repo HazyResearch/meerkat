@@ -1,5 +1,5 @@
-<script lang="ts">
-	import BasicCell from '../basic/Basic.svelte';
+<!-- <script lang="ts">
+	import BasicCell from '../../../component/scalar/Scalar.svelte';
 
 	export let data: Array<number>;
 	export let dtype: string | undefined = undefined;
@@ -17,4 +17,4 @@
 		- 
         <BasicCell data={data[2]} {dtype} {precision} {percentage} />
     </div>
-</div>
+</div> -->
