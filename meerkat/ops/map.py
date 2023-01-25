@@ -310,6 +310,8 @@ def map(
     output_type: Union[Mapping[str, type], type] = None,
     materialize: bool = True,
     use_ray: bool = False,
+    num_blocks: int = 100,
+    blocks_per_window: int = 10,
     pbar: bool = False,
     **kwargs,
 ):
@@ -370,6 +372,9 @@ def map(
         ${inputs}
         ${outputs}
         ${output_type}
+        ${use_ray}
+        ${num_blocks}
+        ${blocks_per_window}
         pbar (bool): Show a progress bar. Defaults to False.
 
     Returns:
@@ -425,11 +430,23 @@ def map(
         output_type=output_type,
         materialize=materialize,
     )
-    return _materialize(deferred, batch_size=batch_size, pbar=pbar, use_ray=use_ray)
+    return _materialize(
+        deferred,
+        batch_size=batch_size,
+        pbar=pbar,
+        use_ray=use_ray,
+        num_blocks=num_blocks,
+        blocks_per_window=blocks_per_window
+    )
 
 
 def _materialize(
-    data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool
+    data: Union["DataFrame", "Column"],
+    batch_size: int,
+    pbar: bool,
+    use_ray: bool,
+    num_blocks: int,
+    blocks_per_window: int,
 ):
     import ray
     from tqdm import tqdm
@@ -445,56 +462,39 @@ def _materialize(
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
         fns = []
-        while isinstance(curr, mk.DeferredColumn): # and not isinstance(curr, mk.ImageColumn):
-            if isinstance(curr, mk.ImageColumn) and False:
-                # Method 0 is to continue with appending curr.data.fn
-        
-                # Method 1 (wrap the fn with a lambda function to extract x["0"])
-                fns.append(lambda x: curr.data.fn(x["0"]))
-                curr = curr.data.args[0]
-                break
-                
-                # Method 2
-                # TODO: We will need to wrap in a lambda function that converts to PIL and
-                #       accesses the "image" col
-                paths = list(curr.data.fn.base_dir + curr.data.args[0])
-                ds = ray.data.read_images(paths)
-                break
-            
+        while isinstance(curr, mk.DeferredColumn):
             fns.append(curr.data.fn)
             
-            # For linear pipelines, there will be one elem in args or one key in kwargs
+            # For linear pipelines, there will be either one elem in args or one key in kwargs
             if curr.data.args:
                 if len(curr.data.args) > 1:
-                    raise ValueError("Cannot handle multiple args")
-                curr = curr.data.args[0] # Get first element in args
+                    raise ValueError("Multiple args not supported.")
+                curr = curr.data.args[0]
             elif curr.data.kwargs:
                 if len(curr.data.kwargs) > 1:
-                    raise ValueError("Cannot handle multiple args")
-                curr = curr.data.kwargs[next(iter(curr.data.kwargs))] # Get first value in args
+                    raise ValueError("Multiple kwargs not supported.")
+                curr = curr.data.kwargs[next(iter(curr.data.kwargs))]
             else:
-                print("ERROR: no args or kwargs")
+                raise ValueError("No args or kwargs.")
 
         # Step 2: Create the ray dataset from the base column
-        print("Base type is ", type(curr))
         if isinstance(curr, mk.ScalarColumn):
-            ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(100)
+            ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
             fns.append(lambda x: x["0"])
         else:
-            print("ERROR: unclear base type")
+            raise ValueError(f"Base column is of unsupported type {type(curr)}.")
 
         # Step 3: Build the pipeline by walking backwards through fns
-        pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=10)
+        pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
         for fn in reversed(fns):
             pipe = pipe.map(fn)
         
-        # Step 4: Iterate through the blocks? (there are 10 iterations)
-        # TODO: support different output types
+        # Step 4: Collect the results
+        # TODO (dean): support different output types
         result = np.array([])
-        partitions = iter(pipe.rewindow(blocks_per_window=100).iter_datasets()).__next__().to_numpy_refs()
-        for partition in partitions: # 100 partitions
+        partitions = iter(pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()).__next__().to_numpy_refs()
+        for partition in partitions:
             result = np.append(result, ray.get(partition))
-        
         return result
         
     else:    
