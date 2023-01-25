@@ -13,8 +13,11 @@
 	export let cell_props: object = {};
 	export let editable: boolean = false;
 
+	// FIXME
 	cell_props.url = data;
+
 	console.log(cell_component);
+
 
 	const dispatch = createEventDispatcher();
 
@@ -25,7 +28,6 @@
 	}
 </script>
 
-hello
 <DynamicComponent name={cell_component} props={cell_props} />
 
 <!-- {#if cell_component === 'image'}

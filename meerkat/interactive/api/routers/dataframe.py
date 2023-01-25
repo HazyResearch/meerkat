@@ -58,12 +58,13 @@ def _get_column_infos(df: DataFrame, columns: List[str] = None):
             )
 
     columns = [column for column in columns if not column.startswith("_")]
-
+    for col in columns:
+        print(df[col].formatter.component_kwargs)
     return [
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cell_component="image",
+            cell_component=df[col].formatter.component.alias,
             cell_props=df[col].formatter.component_kwargs,
         )
         for col in columns

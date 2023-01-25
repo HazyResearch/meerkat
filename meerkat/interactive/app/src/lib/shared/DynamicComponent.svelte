@@ -21,8 +21,8 @@
 			console.log(`Component ${name} was not imported and added to the Components context.`);
 		}
 	});
-	console.log(components);
 </script>
+
 
 {#if component}
 	<!-- Pass the props to the component being rendered -->
@@ -31,4 +31,6 @@
 			<svelte:self {...slot} />
 		{/each}
 	</svelte:component>
+{:else}
+	else
 {/if}

@@ -14,6 +14,7 @@
 	export let content: Array<CellInterface>;
 	export let layout: string;
 	export let selected: boolean = false;
+	console.log(pivot);
 
 	const open_row_modal: Function = getContext('open_row_modal');
 	const dispatch = createEventDispatcher();

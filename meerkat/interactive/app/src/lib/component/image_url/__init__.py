@@ -30,6 +30,5 @@ class ImageUrl(AutoComponent, FormatterMixin):
     
     @staticmethod
     def encode(data: str, grayscale: bool = False):
-        print(grayscale)
         return data
 

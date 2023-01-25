@@ -29,8 +29,7 @@
 
 	let tag_indices: Array<number> = tag_columns.map((tag) => columns.indexOf(tag));
 	let main_index: number = columns.indexOf(main_column);
-	let pivot_cell_component = column_components[main_index];
-
+	
 	// need to get the row index of the primary key
 	let primary_key_index: number;
 	if (schema.primary_key !== undefined) {
@@ -64,19 +63,11 @@
 			<Card
 				{keyidx}
 				posidx={chunk.indices[i]}
-				pivot={{
-					data: row[main_index],
-					cell_component: pivot_cell_component,
-					cell_props: {
-						height: layout === 'gimages' ? pivot_height : '',
-						width: layout_style === 'square' ? pivot_height : ''
-					}
-				}}
+				pivot={chunk.get_cell(i, main_column)}
 				content={pivot_height >= 15 || num_columns <= 6
 					? tag_indices.map((z) => ({ data: row[z], column: columns[z] }))
 					: []}
 				{layout}
-				card_flex_grow={false}
 				selected={selected.includes(keyidx)}
 				on:click={(e) => {
 					if (e.detail.shiftKey) {

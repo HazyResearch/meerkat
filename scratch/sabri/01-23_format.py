@@ -23,6 +23,7 @@ grayscale = mk.gui.Store(False)
 button = mk.gui.Toggle(value=grayscale)
 df["img_url"] = df["img_url"].format(ImageUrl.to_formatter(grayscale=grayscale))
 
+breakpoint()
 gallery = mk.gui.Gallery(df=df, main_column="img_url")
 interface = mk.gui.Interface(component=mk.gui.RowLayout(slots=[button, gallery]), id="image")
 interface.launch() 
