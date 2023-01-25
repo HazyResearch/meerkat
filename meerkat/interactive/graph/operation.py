@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
 from meerkat.dataframe import DataFrame
@@ -12,6 +13,8 @@ from meerkat.interactive.types import Primitive
 
 if TYPE_CHECKING:
     from meerkat.interactive.graph.store import Store
+
+logger = logging.getLogger(__name__)
 
 
 class Operation(NodeMixin):
@@ -41,6 +44,8 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the
         result Reference, and are used to update the state of the GUI.
         """
+        logger.debug(f"Running {repr(self)}")
+
         # Dereference the nodes.
         args = _replace_nodes_with_nodeables(self.args)
         kwargs = _replace_nodes_with_nodeables(self.kwargs)

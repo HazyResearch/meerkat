@@ -1,3 +1,4 @@
+import logging
 import warnings
 from typing import Any, Generic, Iterator, Union
 
@@ -12,6 +13,7 @@ from meerkat.interactive.types import Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 
 __all__ = ["Store", "StoreFrontend", "make_store", "store_field"]
+logger = logging.getLogger(__name__)
 
 
 class StoreFrontend(BaseModel):
@@ -67,6 +69,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
             # if the value is a store, then we need to unpack so it can be sent to the
             # frontend
             new_value = new_value.__wrapped__
+
+        logging.debug(f"Setting store {self.id}: {self.value} -> {new_value}.")
 
         # TODO: Find operations that depend on this store and edit the cache.
         # This should be done in the StoreModification

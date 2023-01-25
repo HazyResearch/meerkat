@@ -1,9 +1,12 @@
+import logging
 from typing import Any, List, Literal
 
 from meerkat.interactive.endpoint import Endpoint, endpoint, get_signature
 from meerkat.interactive.graph import Store
 
 from ..abstract import AutoComponent
+
+logger = logging.getLogger(__name__)
 
 
 @endpoint
@@ -17,6 +20,7 @@ def _select_value(
     all inputs to strings.
     """
     value = choices[index]
+    logger.debug(f"Choice: Setting value of {value_store} to {value}")
     value_store.set(value)
     if return_value:
         return value
