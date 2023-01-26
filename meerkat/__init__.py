@@ -28,7 +28,7 @@ from meerkat.columns.abstract import Column, column
 from meerkat.columns.deferred.audio import AudioColumn
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
-from meerkat.columns.deferred.image import ImageColumn
+from meerkat.columns.deferred.image import image, ImageColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
@@ -65,7 +65,6 @@ tensor = TensorColumn
 deferred = DeferredColumn
 objects = ObjectColumn
 files = FileColumn
-image = ImageColumn
 audio = AudioColumn
 
 # aliases for io

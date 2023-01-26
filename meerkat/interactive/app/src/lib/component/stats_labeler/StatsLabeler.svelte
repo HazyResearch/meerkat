@@ -11,7 +11,7 @@
 	import Interval from '$lib/shared/cell/interval/Interval.svelte';
 	import { map } from 'underscore';
 
-	const { edit_target, get_rows } = getContext('Meerkat');
+	const { edit_target, fetch_chunk } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let label_target: EditTarget;
@@ -36,7 +36,7 @@
 	$: {
 		$df; // needed to trigger on df change
 		console.log(col)
-		counts_promise = get_rows(
+		counts_promise = fetch_chunk(
 			label_target.target.ref_id,
 			undefined,
 			undefined,

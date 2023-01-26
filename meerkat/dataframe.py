@@ -88,7 +88,7 @@ class DataFrame(
     def __init__(
         self,
         data: Union[dict, list] = None,
-        primary_key: str = None,
+        primary_key: Union[str, bool] = True,
         *args,
         **kwargs,
     ):
@@ -96,10 +96,11 @@ class DataFrame(
             *args,
             **kwargs,
         )
-        logger.debug("Creating DataFrame.")
-        self._primary_key = primary_key
-
+        self._primary_key = None
         self.data = data
+
+        if primary_key is True:
+            primary_key = self._infer_primary_key(create=True)
 
     @property
     def gui(self):
@@ -234,7 +235,18 @@ class DataFrame(
             column (str): The name of the column to create.
         """
         self[column] = np.arange(self.nrows)
-        self.set_primary_key(column)
+        self.set_primary_key(column, inplace=True)
+    
+    def _infer_primary_key(self, create: bool = False) -> str:
+        """Infer the primary key from the data."""
+        for column in self.columns:
+            if self[column]._is_valid_primary_key():
+                self.set_primary_key(column, inplace=True)
+                return column
+        if create:
+            self.create_primary_key("pkey")
+            return "pkey"
+        return None
 
     @property
     def nrows(self):

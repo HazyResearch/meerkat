@@ -5,7 +5,7 @@
 	
 	const dispatch = createEventDispatcher();
 
-	const { get_schema, get_rows } = getContext('Meerkat');
+	const { get_schema, fetch_chunk } = getContext('Meerkat');
 
 	export let df;
 
@@ -17,7 +17,7 @@
 	export let column_widths: Array<number>;
 
 	$: schema_promise = get_schema(df.ref_id);
-	$: rows_promise = get_rows(df.ref_id, page * per_page, (page + 1) * per_page);
+	$: rows_promise = fetch_chunk({df :df, start: page * per_page, end: (page + 1) * per_page});
 
 	$: schema_promise.then((s: any) => {
 		if (column_widths == null) {

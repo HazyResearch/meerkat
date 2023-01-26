@@ -149,12 +149,12 @@ class DeferredColumn(Column):
             )
 
     def _get_default_formatter(self) -> Callable:
-        from meerkat.interactive.formatter import BasicFormatter, PILImageFormatter
+        # materialize a sample into a column
+        from meerkat.interactive.formatter.base import DeferredFormatter
 
-        if self._output_type == Image.Image:
-            return PILImageFormatter()
+        col = self._get(index=slice(0,1,1), materialize=True)
+        return DeferredFormatter(col.formatter)
 
-        return BasicFormatter()
 
     def _repr_cell(self, idx):
         return self[idx]

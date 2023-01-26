@@ -19,7 +19,6 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumPyBlock
 from meerkat.columns.abstract import Column
-from meerkat.interactive.formatter import Formatter, NumpyArrayFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.writers.concat_writer import ConcatWriter
 
@@ -203,7 +202,8 @@ class NumPyTensorColumn(
         else:
             return self[index]
 
-    def _get_default_formatter(self) -> Formatter:
+    def _get_default_formatter(self):
+        from meerkat.interactive.formatter import NumpyArrayFormatter
 
         if len(self) == 0:
             return NumpyArrayFormatter()

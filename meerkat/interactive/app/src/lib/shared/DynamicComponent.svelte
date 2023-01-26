@@ -1,14 +1,12 @@
 <script lang="ts">
+	import { LogicalPartition } from 'carbon-icons-svelte';
 	import { getContext, onMount, type ComponentType } from 'svelte';
 
 	const components: { [key: string]: ComponentType } = getContext('Components');
 
-	export let component_id: string;
 	export let name: string;
-	export let path: string;
 	export let props: any;
-	export let slots: any;
-	export let library: string;
+	export let slots: any = [];
 
 	let component: ComponentType;
 	onMount(async () => {
@@ -21,7 +19,12 @@
 			console.log(`Component ${name} was not imported and added to the Components context.`);
 		}
 	});
+	$:{
+		component = components[name];
+	}
+
 </script>
+
 
 {#if component}
 	<!-- Pass the props to the component being rendered -->

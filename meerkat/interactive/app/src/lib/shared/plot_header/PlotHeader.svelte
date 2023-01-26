@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { api_url } from '$lib/../routes/network/stores';
+	import { fetch_chunk } from '$lib/api/api';
 	import type { RefreshCallback } from '$lib/api/callbacks';
 	import {
-		get_rows,
 		MatchCriterion,
 		type DataFrameRows,
 		type DataFrameSchema
@@ -41,7 +41,7 @@
 
 		console.log(imputed_xcolumn, imputed_ycolumn);
 
-		let rows = await get_rows($api_url, dataframe_id, 0, undefined, undefined, [
+		let rows = await fetch_chunk($api_url, dataframe_id, 0, undefined, undefined, [
 			imputed_xcolumn,
 			imputed_ycolumn
 		]);

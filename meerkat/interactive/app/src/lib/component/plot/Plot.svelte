@@ -9,7 +9,7 @@
 	import type { Point2D } from '$lib/shared/plot/types';
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { get_rows, get_schema, dispatch } = getContext('Meerkat');
+	const { fetch_chunk, get_schema, dispatch } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let x: Writable<string>;
@@ -41,7 +41,7 @@
 		per_page: number
 	): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await get_rows(ref_id, page * per_page, (page + 1) * per_page, undefined, [
+		let rows = await fetch_chunk(ref_id, page * per_page, (page + 1) * per_page, undefined, [
 			$x,
 			$y,
 			$primary_key,

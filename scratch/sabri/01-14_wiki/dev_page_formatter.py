@@ -2,7 +2,7 @@ import requests
 import pywikibot as pwb
 import os
 import meerkat as mk
-from meerkat.interactive.formatter import WebsiteFormatter
+from meerkat.interactive.formatter.base import WebsiteFormatter
 
 
 url = "https://query.wikidata.org/sparql"
