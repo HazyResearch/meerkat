@@ -374,7 +374,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # Pydantic model, and a return annotation that matches `fn`
             def _fn(
                 kwargs: FnPydanticModel = Endpoint.EmbeddedBody(),
-            ) -> signature.return_annotation:
+            ):# -> signature.return_annotation:
                 return self.fn(**kwargs.dict())
 
             # from inspect import Parameter, Signature

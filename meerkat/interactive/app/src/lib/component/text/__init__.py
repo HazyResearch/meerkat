@@ -1,12 +1,9 @@
-
-from meerkat.interactive.graph import Store
-
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
-class Text(Component):
+class Text(AutoComponent):
 
-    data: Store[str]
+    data: str
     dtype: str = None
     precision: int = 3
     percentage: bool = False

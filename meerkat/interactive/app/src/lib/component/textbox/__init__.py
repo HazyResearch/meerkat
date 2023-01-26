@@ -1,9 +1,9 @@
-from meerkat.interactive.graph import Store, store_field
+from typing import Optional
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
-class Textbox(Component):
+class Textbox(AutoComponent):
 
-    text: Store[str] = store_field("")
+    text: Optional[str] = ""
     title: str = ""
