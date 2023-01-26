@@ -91,6 +91,8 @@ jobs:
 
             -   name: Install Interactive Dependencies
                 run: |
+                    ls
+                    cd ..
                     pip install -e '.[interactive]'
             
             -   name: Test interactive install
