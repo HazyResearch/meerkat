@@ -1,26 +1,33 @@
 import os
 
+import rich
 from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.fileupload import FileUpload
 
-dir = mk.gui.Store(None)
-query = mk.gui.Store("")
+
+@mk.gui.react()
+def rprint(*args):
+    """Helper function that reactively prints its arguments to the console."""
+    rich.print(*args)
+
+
+# Start off with a default directory
+dir = mk.gui.Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
 savefilename = "gpt_index"
 
 
 @mk.gui.react()
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
-    print(
-        f"Executing load_index with dir={type(dir)} and savefilename={type(savefilename)}"
-    )
-    if not dir:
+    if not dir or not os.path.exists(dir):
         return None
 
     if os.path.exists(os.path.join(dir, f"{savefilename}.json")):
         # load the index after savaing (maybe)
-        return GPTSimpleVectorIndex.load_from_disk(f"{savefilename}.json")
+        return GPTSimpleVectorIndex.load_from_disk(
+            os.path.join(dir, f"{savefilename}.json")
+        )
 
     # reader for docs
     documents = SimpleDirectoryReader(dir).load_data()
@@ -31,35 +38,72 @@ def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
     # save the index somewhere (maybe)
     index.save_to_disk(os.path.join(dir, f"{savefilename}.json"))
 
-    print("Index created.")
-
     return index
+
+
+# Create the index, and assign it to a variable.
+index = load_index(dir=dir, savefilename=savefilename)
+
+# Create a variable that will be used to store the response from the index
+# for the last query. We will display this in the UI.
+last_response = mk.gui.Store("The response will appear here.")
 
 
 @mk.gui.endpoint
 def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
-    if index:
-        return "Index not created. Please use the picker to choose a folder."
-    return index.query(query)
+    """
+    A function that given an index and query, will return the response from the index.
+    """
+    if not index:
+        last_response.set("Index not created. Please use the picker to choose a folder.")
+        return
+
+    response = index.query(query)
+
+    # Stores can only be set inside endpoints in order to trigger the reactive
+    # functions that depend on them! The special `set` method helps with this.
+    last_response.set(response.response)
+    rich.print(response)
+    return response
 
 
-index = load_index(dir=dir, savefilename=savefilename)
+# FileUpload component, which can be used to upload files.
+# fileupload_component = FileUpload()
 
-# Make a FileUpload component to select a directory
-fileupload_component = FileUpload(value=dir)
-query_component = mk.gui.Textbox(text=query)
+# Create a Store that will hold the query.
+query = mk.gui.Store("")
+# Pass this to a Textbox component, which will allow the user to modify the query.
+query_component = mk.gui.Textbox(text=query, title="Question")
 
+# Pass the directory to a Textbox component, which will allow the user to modify the directory.
+dir_component = mk.gui.Textbox(text=dir, title="Directory")
+
+# Create a button that will call the query_gpt_index endpoint when clicked.
 button = mk.gui.Button(
     title="Query GPT-Index",
     on_click=query_gpt_index.partial(index=index, query=query),
 )
 
+# Write some HTML to display the response from the index nicely.
+text = mk.gui.html.div(
+    slots=[mk.gui.html.p(slots=last_response, classes="font-mono whitespace-pre-wrap")],
+    classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200",
+)
+
+# Print the values of the variables to the console, so we can see them.
+# This will reprint them whenever any of the variables change.
+rprint("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
+
+
 interface = mk.gui.Interface(
+    # Layout the Interface components one row each, and launch the interface.
     component=mk.gui.RowLayout(
         slots=[
-            fileupload_component,
+            # fileupload_component,
+            dir_component,
             query_component,
             button,
+            text,
         ]
     ),
     id="gpt-index",
