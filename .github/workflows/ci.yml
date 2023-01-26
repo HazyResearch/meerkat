@@ -89,11 +89,13 @@ jobs:
                 run: |
                     which brew
 
-            -   name: Install Interactive Dependencies
+            -   name: List
                 run: |
                     ls
-                    cd ..
-                    pip install -e '.[interactive]'
+
+            -   name: Install Interactive Dependencies
+                run: |
+                    pip install -e ".[interactive]"
             
             -   name: Test interactive install
                 run: |
