@@ -39,7 +39,7 @@ from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
-    from meerkat.interactive.formatter import Formatter
+    from meerkat.interactive.formatter.base import Formatter
 
 
 logger = logging.getLogger(__name__)

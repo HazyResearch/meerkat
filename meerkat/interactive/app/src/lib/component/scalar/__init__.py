@@ -8,7 +8,7 @@ from pandas.io.formats.format import format_array
 
 
 from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
-from meerkat.interactive.formatter import Formatter
+from meerkat.interactive.formatter.base import Formatter
 
 
 class Scalar(AutoComponent):

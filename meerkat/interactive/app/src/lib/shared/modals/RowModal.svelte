@@ -17,16 +17,16 @@
 	export let card_flex_grow: boolean = false;
 	export let as_modal: boolean = false;
 
-	const { fetch_chunk, get_schema } = getContext('Meerkat');
+	const { fetch_chunk, fetch_schema } = getContext('Meerkat');
 
-	$: schema_promise = get_schema(df.ref_id).then((schema) => {
+	$: schema_promise = fetch_schema({df: df}).then((schema) => {
 		if (main_column === undefined) {
 			main_column = schema.columns[0].name;
 		}
 		return schema;
 	});
 
-	$: chunk_promise = fetch_chunk({ df: df, indices: [posidx] });
+	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx] });
 
 	const increment = async () => {
 		let chunk = await chunk_promise;

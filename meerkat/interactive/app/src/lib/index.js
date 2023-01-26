@@ -4,7 +4,6 @@
 //     dispatch,
 //     edit,
 //     edit_target,
-//     get_rows,
 //     get_schema,
 //     get_sliceby_info,
 //     get_sliceby_rows,

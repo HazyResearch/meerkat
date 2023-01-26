@@ -40,14 +40,14 @@ export class DataFrameChunk {
 
     constructor(
         column_infos: Array<ColumnInfo>,
-        indices: Array<number>,
+        posidxs: Array<number>,
         rows: Array<Array<any>>,
         full_length: number,
         primary_key: string
     ) {
         this.column_infos = column_infos;
         this.columns = this.column_infos.map((col: any) => col.name);
-        this.posidxs = indices;
+        this.posidxs = posidxs;
         this.rows = rows;
         this.full_length = full_length;
         this.primary_key = primary_key

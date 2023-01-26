@@ -1,20 +1,27 @@
 import base64
 from io import BytesIO
-from typing import Union
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
-from meerkat.interactive.formatter import Formatter
+from meerkat.interactive.formatter.base import Formatter, Variant
 
 class Image(AutoComponent):
 
     data: str
     classes: str = ""
+    thumbnail: bool = False
 
 
 class ImageFormatter(Formatter):
 
     component_class: type = Image
     data_prop: str = "data"
+
+    variants: dict = {
+        "small": Variant(
+            props={"thumbnail": True},
+            encode_kwargs={"thumbnail": True},
+        )
+    }
 
     def __init__(self, classes: str = ""):
         super().__init__(classes=classes)

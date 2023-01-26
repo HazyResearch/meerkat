@@ -33,7 +33,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import Column
-from meerkat.interactive.formatter import Formatter
+from meerkat.interactive.formatter.base import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
 from .abstract import ScalarColumn

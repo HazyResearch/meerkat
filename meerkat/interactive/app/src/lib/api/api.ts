@@ -23,37 +23,56 @@ export const get_schema = async (ref_id: string, columns: Array<string> | null =
     return await post(`${get(API_URL)}/df/${ref_id}/schema`, { columns: columns });
 };
 
+export interface DataFrameChunkRequest {
+    df: DataFrameRef
+    columns?: Array<string> | null
+    variants?: Array<string> | null
+}
+
+export const fetch_schema = async ({
+    df,
+    columns = null,
+    variants = null
+}: DataFrameChunkRequest) => {
+    return await post(`${get(API_URL)}/df/${df.ref_id}/schema`, {
+        columns: columns, variants: variants
+    });
+}
 
 export interface DataFrameChunkRequest {
     df: DataFrameRef
+    columns?: Array<string> | null
     start?: number | null
     end?: number | null
-    indices?: Array<number> | null
-    columns?: Array<string> | null
+    posidxs?: Array<number> | null
+    keyidxs?: Array<string | number> | null
     key_column?: string | null
-    keys?: Array<string | number> | null
+    variants?: Array<string> | null
 }
 
 export const fetch_chunk = async ({
     df,
+    columns = null,
     start = null,
     end = null,
-    indices = null,
-    columns = null,
+    posidxs = null,
+    keyidxs = null,
     key_column = null,
-    keys = null }: DataFrameChunkRequest) => {
+    variants = null
+}: DataFrameChunkRequest) => {
     const result = await post(`${get(API_URL)}/df/${df.ref_id}/rows`, {
         start: start,
         end: end,
-        indices: indices,
+        posidxs: posidxs,
         key_column: key_column,
-        keys: keys,
-        columns: columns
+        keyidxs: keyidxs,
+        columns: columns,
+        variants: variants
     });
 
     return new DataFrameChunk(
         result.column_infos,
-        result.indices,
+        result.posidxs,
         result.rows,
         result.full_length,
         result.primary_key

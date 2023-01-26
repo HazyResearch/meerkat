@@ -3,7 +3,7 @@ import argparse
 import os
 import time
 
-from meerkat.interactive.formatter import ImageURLFormatter
+from meerkat.interactive.formatter.base import ImageURLFormatter
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_dir", type=str, default="/data/datasets/opendata/")

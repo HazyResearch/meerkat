@@ -14,7 +14,6 @@ from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.torch_block import TorchBlock
-from meerkat.interactive.formatter import TensorFormatter
 from meerkat.mixins.cloneable import CloneableMixin
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
@@ -170,6 +169,7 @@ class TorchTensorColumn(
 
     @staticmethod
     def _get_default_formatter() -> Callable:
+        from meerkat.interactive.formatter import TensorFormatter
         return TensorFormatter()
 
     @classmethod

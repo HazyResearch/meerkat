@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get_rows } from '$lib/api/api';
+	import { fetch_chunk } from '$lib/api/api';
 	import type { DataFrameRef } from '$lib/api/dataframe';
 	import { Avatar, Button, Textarea } from 'flowbite-svelte';
 	import { createEventDispatcher } from 'svelte';
@@ -10,7 +10,7 @@
 	export let imgChatbot: string;
 	export let imgUser: string;
 
-	$: messages_promise = get_rows(df.ref_id, 0, 100000);
+	$: messages_promise = fetch_chunk({df:df, start:0, end: 100000});
 
 	let value: string = '';
 	let send = () => {

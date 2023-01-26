@@ -150,8 +150,8 @@ class DeferredColumn(Column):
 
     def _get_default_formatter(self) -> Callable:
         # materialize a sample into a column
-        from meerkat.interactive.formatter import DeferredFormatter
-        
+        from meerkat.interactive.formatter.base import DeferredFormatter
+
         col = self._get(index=slice(0,1,1), materialize=True)
         return DeferredFormatter(col.formatter)
 
