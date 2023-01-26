@@ -2,7 +2,6 @@ import dataclasses
 import importlib
 import json
 import os
-import platform
 import shutil
 import subprocess
 import sys
@@ -258,19 +257,34 @@ class SvelteWriter:
         if subprocess.run(["which", "node"]).returncode == 0:
             return
 
-        processor = platform.processor()
-        if processor.startswith("arm"):  # M1 Mac
+        platform = sys.platform
+        if platform == "darwin":  # M1 Mac or Intel Mac
             if not self.has_brew:
                 raise RuntimeError(
                     "Homebrew is required to install Meerkat on M1 Macs. "
                     "See these instructions: https://docs.brew.sh/Installation"
                 )
-            run_args = ["brew", "install", "node"]
-        elif sys.platform == "darwin":  # Intel Mac
-            if self.has_brew:
-                run_args = ["brew", "install", "node"]
-
-        subprocess.run(run_args, check=True)
+            return subprocess.run(["brew install node"], check=True, shell=True)
+        elif platform == "linux":  # linux
+            if subprocess.run(["which npm"], shell=True).returncode == 0:
+                # Has npm, so has node
+                subprocess.run("npm install -g n", shell=True, check=True)
+                subprocess.run("n latest", shell=True, check=True)
+                subprocess.run("npm install -g npm", shell=True, check=True)
+                subprocess.run("hash -d npm", shell=True, check=True)
+                subprocess.run("nvm install node", shell=True, check=True)
+            else:
+                subprocess.run(
+                    "curl -fsSL https://deb.nodesource.com/setup_16.x | bash -",
+                    shell=True,
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                )
+                subprocess.run("apt-get install gcc g++ make", shell=True, check=True)
+                subprocess.run("apt-get install -y nodejs", shell=True, check=True)
+        else:
+            raise RuntimeError(f"Unsupported platform '{platform}'")
 
     def install_mk_app(self):
         """Run `npm i` on the Meerkat interactive/app directory."""
