@@ -10,9 +10,8 @@
 	export let pivot: CellInterface;
 	export let content: Array<CellInterface>;
 	export let layout: string;
+	export let height: number = 12;
 	export let selected: boolean = false;
-
-	console.log(pivot)
 
 	const open_row_modal: Function = getContext('open_row_modal');
 	const dispatch = createEventDispatcher();
@@ -31,9 +30,10 @@
 			</div>
 		{/if}
 		<!-- Pivot item -->
-		<div
-			class="pivot"
-			class:selected-pivot={selected}
+		<button
+			class="self-center rounded-sm overflow-hidden hover:opacity-75"
+			style:height={`${height}vh`}
+			class:opacity-50={selected}
 			on:dblclick={(e) => {
 				open_row_modal(posidx);
 			}}
@@ -42,33 +42,29 @@
 			}}
 		>
 			<Cell {...pivot} />
-		</div>
+		</button>
 	</div>
 
 	<!-- Content -->
-	<div class="content">
-		{#each content as subcontent, j}
-			<div
-				class="subcontent mx-1 my-1 px-2 py-0.5 rounded-md text-left text-slate-800 text-xs bg-slate-200"
-			>
-				<div class="font-bold font-mono whitespace-nowrap overflow-hidden text-ellipsis">
-					{subcontent.column}
+	{#if height >= 15}
+		<div class="flex flex-wrap items-start w-full">
+			{#each content as subcontent}
+				<div
+					class="subcontent mx-1 my-1 px-2 py-0.5 rounded-md text-left text-slate-800 text-xs bg-slate-200"
+				>
+					<div class="font-bold font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+						{subcontent.column}
+					</div>
+					<div class="font-mono whitespace-nowrap overflow-hidden text-ellipsis rounded-md">
+						<Cell {...subcontent} />
+					</div>
 				</div>
-				<div class="font-mono whitespace-nowrap overflow-hidden text-ellipsis">
-					<Cell {...subcontent} />
-				</div>
-			</div>
-		{/each}
-	</div>
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
-	.card {
-		min-width: var(--card-width, '');
-		@apply m-2 border-2 border-solid rounded-lg shadow-md;
-		@apply dark:border-gray-600;
-	}
-
 	.card-masonry {
 		/* Solution 1: multiple columns in a masonry layout */
 		@apply break-inside-avoid h-auto;
@@ -78,22 +74,5 @@
 		/* Solution 2: flex containers in the Google Images style */
 		/* Make the card a flex-col so the pivot element can be centered horizontally */
 		@apply flex flex-col;
-	}
-
-	.pivot {
-		@apply self-center;
-	}
-
-	.content {
-		/* Row format for tags */
-		@apply flex flex-wrap items-start;
-	}
-
-	.selected-pivot {
-		@apply opacity-50;
-	}
-
-	.pivot:hover {
-		@apply opacity-50;
 	}
 </style>

@@ -32,21 +32,28 @@ export class DataFrameChunk {
 
     column_infos: Array<ColumnInfo>
     columns: Array<string>
-    indices: Array<number>
+    posidxs: Array<number>
+    keyidxs: Array<string>
     rows: Array<Array<any>>
     full_length: number
+    primary_key: string
 
     constructor(
         column_infos: Array<ColumnInfo>,
         indices: Array<number>,
         rows: Array<Array<any>>,
-        full_length: number
+        full_length: number,
+        primary_key: string
     ) {
         this.column_infos = column_infos;
         this.columns = this.column_infos.map((col: any) => col.name);
-        this.indices = indices;
+        this.posidxs = indices;
         this.rows = rows;
         this.full_length = full_length;
+        this.primary_key = primary_key
+
+        let primary_key_index = this.columns.findIndex((c) => c === primary_key);
+        this.keyidxs = this.rows.map((row) => row[primary_key_index])
     }
 
     get_cell(row: number, column: string) {
@@ -55,7 +62,8 @@ export class DataFrameChunk {
         return {
             data: this.rows[row][this.columns.indexOf(column)],
             cell_component: column_info.cell_component,
-            cell_props: column_info.cell_props
+            cell_props: column_info.cell_props,
+            column: column
         }
 
     }

@@ -15,6 +15,8 @@ import torch
 from pandas.io.formats.format import format_array
 from PIL.Image import Image
 
+from meerkat.columns.abstract import Column
+from meerkat.columns.deferred.base import DeferredCell
 
 
 if TYPE_CHECKING:
@@ -24,15 +26,12 @@ if TYPE_CHECKING:
 
 class Formatter(ABC):
 
-    # def __init__(self, encode: Callable=, component_class: type = None, component_kwargs: dict=None):
-    #     self.encode = encode
-    #     self.component_class = component_class
-    #     self.component_kwargs = component_kwargs
     component_class: Type["Component"]
     data_prop: str = "data"
 
-    def __init__(self, encode: str = None, **kwargs):
-        self._encode = encode
+    def __init__(self, encode: str = None,  **kwargs):
+        if encode is not None:
+            self._encode = encode
 
         default_props, required_props = self._get_props()
         if not all(k in kwargs for k in required_props):
@@ -44,7 +43,7 @@ class Formatter(ABC):
         self._props = default_props
 
     def encode(self, cell: Any, **kwargs):
-        """Encode the cell on the backend side before sending it to the
+        """Encode the cell on the backend before sending it to the
         frontend.
 
         The cell is lazily loaded, so when used on a LambdaColumn,
@@ -55,7 +54,7 @@ class Formatter(ABC):
         if self._encode is not None:
             return self._encode(cell, **kwargs)
         return cell
-    
+
     @property
     def props(self):
         return self._props
@@ -80,6 +79,29 @@ class Formatter(ABC):
         This method should produce that static html for the cell.
         """
         return str(cell)
+
+class DeferredFormatter(Formatter):
+
+    def __init__(self, formatter: Formatter):
+        self.wrapped = formatter
+    
+    def encode(self, cell: DeferredCell):
+        return self.wrapped.encode(cell())
+    
+    @property
+    def component_class(self):
+        return self.wrapped.component_class
+    
+    @property
+    def data_prop(self):
+        return self.wrapped.data_prop
+    
+    @property
+    def props(self):
+        return self.wrapped.props
+    
+    def html(self, cell: DeferredCell):
+        return self.wrapped.html(cell())
 
 
 class BasicFormatter(Formatter):
@@ -127,9 +149,6 @@ class BasicFormatter(Formatter):
             if hasattr(self, "dtype")
             else "str",
         }
-
-
-
 
 
 class NumpyArrayFormatter(BasicFormatter):

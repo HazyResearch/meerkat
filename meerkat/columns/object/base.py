@@ -61,9 +61,16 @@ class ObjectColumn(Column):
     def _repr_cell(self, index) -> object:
         return self[index]
 
-    @staticmethod
-    def _get_default_formatter():
+    def _get_default_formatter(self):
         from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.image import ImageFormatter
+
+        from PIL.Image import Image
+        
+        sample = self[0]
+        if isinstance(sample, Image):
+            return ImageFormatter()
+
         return ScalarFormatter()
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:

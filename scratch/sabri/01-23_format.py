@@ -1,7 +1,6 @@
 
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.image_url import ImageUrl
 
 
 # col = mk.column([
@@ -24,20 +23,11 @@ from meerkat.interactive.app.src.lib.component.image_url import ImageUrl
 # button = mk.gui.Toggle(value=grayscale)
 # df["img_url"] = df["img_url"].format(ImageUrl.to_formatter(grayscale=grayscale))
 
-# gallery = mk.gui.Gallery(df=df, main_column="img_url")
+df = mk.get("imagenette")
+gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["path"])
 
-df = mk.DataFrame(
-    {
-        "a": [1, 2, 3],
-        "b": [4, 5, 6],
-        "c": ["1", "2", "3"],
-    }
-)
-
-table = mk.gui.Table(df=df)
-interface = mk.gui.Interface(component=mk.gui.RowLayout(slots=[table]), id="image")
+interface = mk.gui.Interface(component=gallery, id="image")
 interface.launch() 
-
 
 # import meerkat as mk
 # from meerkat.interactive.app.src.lib.component.image import Image

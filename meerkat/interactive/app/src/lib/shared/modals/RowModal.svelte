@@ -6,8 +6,6 @@
 	import ChevronLeft from 'svelte-bootstrap-icons/lib/ChevronLeft.svelte';
 	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
 	import ArrowLeft from 'svelte-bootstrap-icons/lib/ArrowLeft.svelte';
-	import { chunk } from 'underscore';
-	import { schemeTableau10 } from 'd3-scale-chromatic';
 
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
@@ -44,7 +42,6 @@
 	};
 
 	const onKeyPress = async (e) => {
-		console.log(e.charCode);
 		if (e.charCode === 113) {
 			closeModal();
 		} else if (e.charCode === 97) {
@@ -102,7 +99,7 @@
 					</div>
 				</div>
 
-				<div class="grid grid-rows-[auto_1fr]">
+				<div class="grid grid-rows-[auto_1fr] items-center">
 					<!-- Header section -->
 					<div class="grid grid-cols-3 px-3 py-1 items-center">
 						<!-- Close button -->
@@ -147,9 +144,9 @@
 						</div>
 					</div>
 					<!-- Main section -->
-					<div class="flex p-10 items-center justify-center justify-self-center">
+					<div class="flex p-10 items-center h-fit justify-center justify-self-center">
 						{#await chunk_promise then chunk}
-							<Cell {...chunk.get_cell(0, main_column)} Cell />
+							<Cell {...chunk.get_cell(0, main_column)} />
 						{/await}
 					</div>
 				</div>

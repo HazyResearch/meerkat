@@ -55,7 +55,8 @@ export const fetch_chunk = async ({
         result.column_infos,
         result.indices,
         result.rows,
-        result.full_length
+        result.full_length,
+        result.primary_key
     );
 }
 
@@ -81,7 +82,8 @@ export const get_rows = async (
         result.column_infos,
         result.indices,
         result.rows,
-        result.full_length
+        result.full_length,
+        result.primary_key
     );
 };
 

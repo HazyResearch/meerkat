@@ -14,7 +14,6 @@ from meerkat.interactive.app.src.lib.layouts import (
 
 # from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
-from meerkat.interactive.app.src.lib.shared.cell.image import Image
 from meerkat.interactive.graph import (
     Store,
     StoreFrontend,

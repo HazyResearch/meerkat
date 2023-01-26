@@ -45,6 +45,7 @@ def schema(df: DataFrame, request: SchemaRequest) -> SchemaResponse:
 
 
 def _get_column_infos(df: DataFrame, columns: List[str] = None):
+
     if columns is None:
         columns = df.columns
     else:
@@ -57,8 +58,12 @@ def _get_column_infos(df: DataFrame, columns: List[str] = None):
                     f" with id {df.id}"
                 ),
             )
+        
+    
 
     columns = [column for column in columns if not column.startswith("_")]
+    if df.primary_key_name is not None and df.primary_key_name not in columns:
+        columns += [df.primary_key_name]
     return [
         ColumnInfo(
             name=col,
@@ -76,6 +81,7 @@ class RowsResponse(BaseModel):
     indices: List[int] = None
     rows: List[List[Any]]
     full_length: int
+    primary_key: str
 
 
 @endpoint(prefix="/df", route="/{df}/rows/")
@@ -89,6 +95,7 @@ def rows(
     columns: List[str] = Endpoint.EmbeddedBody(None),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
+
     full_length = len(df)
     column_infos = _get_column_infos(df, columns)
 
@@ -128,6 +135,7 @@ def rows(
         rows=rows,
         full_length=full_length,
         indices=indices,
+        primary_key=df.primary_key_name,
     )
 
 

@@ -1,10 +1,10 @@
 <script lang="ts">
 	export let data: any;
-	export let dtype: string | undefined = undefined;
+	export let dtype: string = "auto";
     export let precision: number = 3
     export let percentage: boolean = false
 
-    if(dtype === undefined){
+    if(dtype === "auto"){
         if(typeof data === "number") {
             
             if(Number.isInteger(data)) {

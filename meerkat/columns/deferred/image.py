@@ -8,7 +8,7 @@ from typing import Callable, Union
 from PIL import Image
 
 from meerkat.columns.deferred.file import FileColumn
-from meerkat.interactive.formatter import PILImageFormatter
+from meerkat.interactive.app.src.lib.component.image import DeferredImageFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +46,6 @@ class ImageColumn(FileColumn):
         base_dir (str): A base directory that the paths in ``data`` are relative to. If
             ``None``, the paths are assumed to be absolute.
     """
-
-    @staticmethod
-    def _get_default_formatter() -> Callable:
-        return PILImageFormatter()
 
     @classmethod
     def default_loader(cls, *args, **kwargs):

@@ -9,18 +9,20 @@
 	export let cell_props: object = {};
 	export let cell_data_prop: string = 'data';
 	export let editable: boolean = false;
+	export let column: string = '';
 
-	// need to actually create a new object, since we don't want to modify the 
-	// cell_props that were passed in 
-	cell_props = {
-		...cell_props
-	}
-	cell_props[cell_data_prop] = data;
+	// need to actually create a new object, since we don't want to modify the
+	// cell_props that were passed in
 
-	// iterate over cell_props and turn them into stores if they aren't already
-	for (const [key, value] of Object.entries(cell_props)) {
-		if (value.subscribe === undefined) {
-			cell_props[key] = writable(value);
+	$: {
+		cell_props = {...cell_props};
+		cell_props[cell_data_prop] = data;
+
+		// iterate over cell_props and turn them into stores if they aren't already
+		for (const [key, value] of Object.entries(cell_props)) {
+			if (value === null || value.subscribe === undefined) {
+				cell_props[key] = writable(value);
+			}
 		}
 	}
 
@@ -31,6 +33,8 @@
 			value: data
 		});
 	}
+
+
 </script>
 
 <DynamicComponent name={cell_component} props={cell_props} />
