@@ -55,8 +55,13 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
     A function that given an index and query, will return the response from the index.
     """
     if not index:
-        return "Index not created. Please use the picker to choose a folder."
+        last_response.set("Index not created. Please use the picker to choose a folder.")
+        return
+
     response = index.query(query)
+
+    # Stores can only be set inside endpoints in order to trigger the reactive
+    # functions that depend on them! The special `set` method helps with this.
     last_response.set(response.response)
     rich.print(response)
     return response
@@ -67,9 +72,10 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
 
 # Create a Store that will hold the query.
 query = mk.gui.Store("")
+# Pass this to a Textbox component, which will allow the user to modify the query.
 query_component = mk.gui.Textbox(text=query, title="Question")
 
-# Create a Store that will hold the dir.
+# Pass the directory to a Textbox component, which will allow the user to modify the directory.
 dir_component = mk.gui.Textbox(text=dir, title="Directory")
 
 # Create a button that will call the query_gpt_index endpoint when clicked.
@@ -78,6 +84,7 @@ button = mk.gui.Button(
     on_click=query_gpt_index.partial(index=index, query=query),
 )
 
+# Write some HTML to display the response from the index nicely.
 text = mk.gui.html.div(
     slots=[mk.gui.html.p(slots=last_response, classes="font-mono whitespace-pre-wrap")],
     classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200",
@@ -89,6 +96,7 @@ rprint("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 
 interface = mk.gui.Interface(
+    # Layout the Interface components one row each, and launch the interface.
     component=mk.gui.RowLayout(
         slots=[
             # fileupload_component,
