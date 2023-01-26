@@ -67,7 +67,7 @@ jobs:
                     make docs
 
     Interactive-Setup:
-        needs: Documentation
+        # needs: Documentation
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:

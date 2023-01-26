@@ -503,7 +503,8 @@ interface.launch()"""
         subclasses = get_subclasses_recursive(Component)
         for subclass in subclasses:
             # Use subclass.__name__ as the component name, instead of
-            # subclass.component_name, because the latter is not guaranteed to be unique.
+            # subclass.component_name, because the latter is not guaranteed to be
+            # unique.
             component_name = subclass.__name__
             if component_name in exclude_classes:
                 continue
