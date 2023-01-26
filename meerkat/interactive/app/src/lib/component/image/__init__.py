@@ -8,8 +8,6 @@ class Image(AutoComponent):
 
     data: str
     classes: str = ""
-    thumbnail: bool = False
-
 
 class ImageFormatter(Formatter):
 
@@ -18,7 +16,7 @@ class ImageFormatter(Formatter):
 
     variants: dict = {
         "small": Variant(
-            props={"thumbnail": True},
+            props={},
             encode_kwargs={"thumbnail": True},
         )
     }
