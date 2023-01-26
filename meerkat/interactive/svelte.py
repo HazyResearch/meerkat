@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from meerkat.interactive import Interface
 
 NPM_PACKAGE = "@meerkat-ml/meerkat"
+_MK_REPO_APP_DIR = os.path.join(os.path.dirname(__file__), "app")
 
 jinja_env = Environment(
     loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates"))
@@ -48,6 +49,7 @@ class SvelteWriter:
     cwd: str = dataclasses.field(default_factory=os.getcwd)
     package_manager: Literal["bun", "npm"] = "npm"
     _appdir: str = None
+    _has_brew: bool = None
 
     def __post_init__(self):
         if self._appdir:
@@ -72,6 +74,13 @@ class SvelteWriter:
         if os.path.exists(os.path.join(self.appdir, ".mk")):
             return True
         return False
+
+    @property
+    def has_brew(self) -> bool:
+        """Check if the user has homebrew installed."""
+        if self._has_brew is None:
+            self._has_brew = subprocess.run(["which", "brew"]).returncode == 0
+        return self._has_brew
 
     def cleanup_run(self):
         """Cleanup the app directory at the end of a run."""
@@ -242,6 +251,50 @@ class SvelteWriter:
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+        )
+
+    def install_node(self):
+        if subprocess.run(["which", "node"]).returncode == 0:
+            return
+
+        platform = sys.platform
+        if platform == "darwin":  # M1 Mac or Intel Mac
+            if not self.has_brew:
+                raise RuntimeError(
+                    "Homebrew is required to install Meerkat on M1 Macs. "
+                    "See these instructions: https://docs.brew.sh/Installation"
+                )
+            return subprocess.run(["brew install node"], check=True, shell=True)
+        elif platform == "linux":  # linux
+            if subprocess.run(["which npm"], shell=True).returncode == 0:
+                # Has npm, so has node
+                subprocess.run("npm install -g n", shell=True, check=True)
+                subprocess.run("n latest", shell=True, check=True)
+                subprocess.run("npm install -g npm", shell=True, check=True)
+                subprocess.run("hash -d npm", shell=True, check=True)
+                subprocess.run("nvm install node", shell=True, check=True)
+            else:
+                subprocess.run(
+                    "curl -fsSL https://deb.nodesource.com/setup_16.x | bash -",
+                    shell=True,
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                )
+                subprocess.run("apt-get install gcc g++ make", shell=True, check=True)
+                subprocess.run("apt-get install -y nodejs", shell=True, check=True)
+        else:
+            raise RuntimeError(f"Unsupported platform '{platform}'")
+
+    def install_mk_app(self):
+        """Run `npm i` on the Meerkat interactive/app directory."""
+        return subprocess.run(
+            [f"cd {_MK_REPO_APP_DIR} && npm i"], shell=True, check=True
+        )
+
+    def npm_run_dev(self):
+        return subprocess.run(
+            [f"cd {_MK_REPO_APP_DIR} && npm run dev"], shell=True, check=True
         )
 
     def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
@@ -464,7 +517,8 @@ interface.launch()"""
         subclasses = get_subclasses_recursive(Component)
         for subclass in subclasses:
             # Use subclass.__name__ as the component name, instead of
-            # subclass.component_name, because the latter is not guaranteed to be unique.
+            # subclass.component_name, because the latter is not guaranteed to be
+            # unique.
             component_name = subclass.__name__
             if component_name in exclude_classes:
                 continue

@@ -66,6 +66,36 @@ jobs:
                 run: |
                     make docs
 
+    Interactive-Setup:
+        # needs: Documentation
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                # macOS automatically imports homebrew. So this will be used for setup.
+                os: [macos-latest, ubuntu-latest]
+                python-version: ['3.10']
+        
+        steps:
+            -   uses: actions/checkout@v2
+    
+            -   name: Set up Python ${{ matrix.python-version }}
+                uses: actions/setup-python@v2
+                with:
+                    python-version: ${{ matrix.python-version }}
+
+            -   uses: actions/cache@v2
+                with:
+                    path: ~/.cache/pip
+                    key: ${{ runner.os }}-pip
+
+            -   name: Install Interactive Dependencies
+                run: |
+                    pip install -e ".[interactive]"
+            
+            -   name: Test interactive install
+                run: |
+                    make test-interactive-install
+
     Build-Basic:
         needs: Documentation
         runs-on: ${{ matrix.os }}

@@ -207,5 +207,22 @@ def update():
         )
 
 
+@cli.command()
+def install(
+    package_manager: str = typer.Option(
+        "npm", show_choices=["npm", "bun"], help="Package manager to use"
+    ),
+    run_dev: bool = typer.Option(True, help="Run `npm run dev` after installation"),
+):
+    """Install npm and other dependencies for interactive Meerkat."""
+    svelte_writer = SvelteWriter(
+        package_manager=package_manager,
+    )
+    svelte_writer.install_node()
+    svelte_writer.install_mk_app()
+    if run_dev:
+        svelte_writer.npm_run_dev()
+
+
 if __name__ == "__main__":
     cli()
