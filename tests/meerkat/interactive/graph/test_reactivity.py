@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Mapping
 
 import numpy as np
 import pandas as pd
@@ -6,6 +6,7 @@ import pytest
 
 import meerkat as mk
 from meerkat.interactive.graph import is_reactive, reactive, trigger
+from meerkat.interactive.graph.reactivity import _unpack_stores
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
@@ -117,3 +118,124 @@ def test_default_nested_return():
     with mk.gui.react():
         out = _return_list()
     assert isinstance(out, list)
+
+
+def test_nested_reactive_fns():
+    """
+    When reactive functions are executed, only the outer function should
+    be added as a child to the input stores.
+
+    In simpler language, a reactive function run inside another reactive function
+    will not add things to the graph.
+    """
+
+    @mk.gui.react()
+    def _inner(x):
+        return ["a", "b", x]
+
+    @mk.gui.react()
+    def _outer(x):
+        return ["example"] + _inner(x)
+
+    x = mk.gui.Store("c")
+    _outer(x)
+
+    assert x.inode.has_trigger_children()
+    assert len(x.inode.trigger_children) == 1
+    # Compare the names because the memory addresses will be different
+    # when the function is wrapped in reactive.
+    assert x.inode.trigger_children[0].obj.fn.__name__ == "_outer"
+
+
+@pytest.mark.parametrize(
+    "x",
+    [
+        # Primitives.
+        1,
+        "foo",
+        [1, 2],
+        (1, 4),
+        {"a": 1, "b": 2},
+        # Basic types.
+        mk.gui.Store(1),
+        mk.gui.Store("foo"),
+        mk.gui.Store([1, 2]),
+        mk.gui.Store((1, 4)),
+        mk.gui.Store({"a": 1, "b": 2}),
+        # Stores in non-reactive containers.
+        {"a": 1, "b": mk.gui.Store(2)},
+        [1, mk.gui.Store(2)],
+        (mk.gui.Store(1), 2),
+        {"a": {"b": mk.gui.Store(1)}},
+        # Nested stores.
+        mk.gui.Store([mk.gui.Store(1), 2]),
+    ],
+)
+@pytest.mark.parametrize("use_kwargs", [False, True])
+def test_unpacking(x, use_kwargs):
+    """
+    Test that all stores are unpacked correctly.
+    """
+
+    def _are_equal(x, y):
+        if isinstance(x, Mapping):
+            return _are_equal(x.keys(), y.keys()) and all(
+                _are_equal(x[k], y[k]) for k in x.keys()
+            )
+        else:
+            return x == y
+
+    if use_kwargs:
+        inputs = {"wrapped": x}
+        unpacked_args, unpacked_kwargs, stores = _unpack_stores(**inputs)
+        assert len(unpacked_args) == 0
+        assert len(unpacked_kwargs) == 1
+        outputs = unpacked_kwargs
+    else:
+        inputs = [x]
+        unpacked_args, unpacked_kwargs, stores = _unpack_stores(*inputs)
+        assert len(unpacked_args) == 1
+        assert len(unpacked_kwargs) == 0
+        outputs = unpacked_args
+
+    # Recursively check for equality.
+    assert _are_equal(inputs, outputs)
+
+
+def test_instance_methods():
+    """Test that instance methods get reactified correctly."""
+
+    class Foo:
+        def __init__(self, x):
+            self.x = x
+
+        @reactive
+        def add(self, y):
+            return self.x + y
+
+        @reactive
+        def __eq__(self, __o: int) -> bool:
+            return self.x == __o
+
+    foo = Foo(1)
+    val = mk.gui.Store(2)
+    with mk.gui.react():
+        out_add = foo.add(val)
+        out_eq = foo == val
+    assert isinstance(out_add, mk.gui.Store)
+    assert isinstance(out_eq, mk.gui.Store)
+
+    assert len(val.inode.trigger_children) == 2
+    assert val.inode.trigger_children[0].obj.fn.__name__ == "add"
+    assert val.inode.trigger_children[0].trigger_children[0] is out_add.inode
+    assert val.inode.trigger_children[1].obj.fn.__name__ == "__eq__"
+    assert val.inode.trigger_children[1].trigger_children[0] is out_eq.inode
+
+    # Trigger the functions.
+    @mk.gui.endpoint
+    def set_val(val):
+        val.set(0)
+
+    set_val(val)
+    assert out_add == 1
+    assert not out_eq

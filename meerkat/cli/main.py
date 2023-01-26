@@ -224,5 +224,19 @@ def install(
         svelte_writer.npm_run_dev()
 
 
+_DEMO_DIR = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "demo"
+    )
+def _get_demo_scripts():
+    """Get a list of demo scripts."""
+    # Get the path to the demo scripts
+    return [x.split(".py")[0] for x in os.listdir(_DEMO_DIR) if x.endswith(".py")]
+
+@cli.command()
+def demo(
+    script = typer.Option(choices=_get_demo_scripts(), help="Demo script to run"),
+):
+    
+
 if __name__ == "__main__":
     cli()

@@ -1,7 +1,10 @@
 from functools import partial, wraps
 from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
 
-from meerkat.interactive.graph.operation import Operation, _check_fn_has_leading_self_arg
+from meerkat.interactive.graph.operation import (
+    Operation,
+    _check_fn_has_leading_self_arg,
+)
 from meerkat.interactive.graph.utils import (
     _get_nodeables,
     _replace_nodeables_with_nodes,
@@ -12,6 +15,14 @@ __all__ = ["react", "reactive", "is_reactive", "get_reactive_kwargs"]
 
 
 def _unpack_stores(*args, **kwargs):
+    """Unpack stores from arguments and keyword arguments.
+
+    Only the first-level stores are unpacked. In other words,
+    if a store is nested inside another store, it is not unpacked.
+    This is important for speed reasons.
+
+    TODO: Clean up args/kwargs separation
+    """
     from meerkat.interactive.graph.store import Store
 
     stores = []
@@ -20,7 +31,7 @@ def _unpack_stores(*args, **kwargs):
         if isinstance(arg, Store):
             stores.append(arg)
             unpacked_args.append(arg.value)
-        elif isinstance(arg, list) or isinstance(arg, tuple):
+        elif isinstance(arg, (list, tuple)):
             unpacked_args_i, _, stores_i = _unpack_stores(*arg)
             unpacked_args_i = type(arg)(unpacked_args_i)
             unpacked_args.append(unpacked_args_i)
@@ -38,7 +49,7 @@ def _unpack_stores(*args, **kwargs):
         if isinstance(v, Store):
             stores.append(v)
             unpacked_kwargs[k] = v.value
-        elif isinstance(v, list) or isinstance(v, tuple):
+        elif isinstance(v, (list, tuple)):
             unpacked_args_i, _, stores_i = _unpack_stores(*v)
             unpacked_args_i = type(v)(unpacked_args_i)
             unpacked_kwargs[k] = unpacked_args_i
