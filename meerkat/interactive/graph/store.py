@@ -89,7 +89,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
             return reactive(attr)
         else:
             # Attribute
-            return reactive(lambda store: getattr(store.__wrapped__, name))(self)
+            return reactive(lambda wrapped: getattr(wrapped, name))(self)
+            # return reactive(lambda store: getattr(store.__wrapped__, name))(self)
 
     @classmethod
     def __get_validators__(cls):

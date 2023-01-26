@@ -14,9 +14,14 @@ def _replace_nodeables_with_nodes(obj):
     return obj
 
 
-def _replace_nodes_with_nodeables(obj):
+def _replace_nodes_with_nodeables(obj, unwrap_stores=True):
+    from meerkat.interactive.graph.store import Store
     if isinstance(obj, Node):
         obj = obj.obj
+        if unwrap_stores:
+            # Replace `Store` objects with their wrapped values
+            if isinstance(obj, Store):
+                obj = obj.__wrapped__
     elif isinstance(obj, list) or isinstance(obj, tuple):
         obj = type(obj)(_replace_nodes_with_nodeables(x) for x in obj)
     elif isinstance(obj, dict):

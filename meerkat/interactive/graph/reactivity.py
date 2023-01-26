@@ -1,7 +1,7 @@
 from functools import partial, wraps
 from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
 
-from meerkat.interactive.graph.operation import Operation
+from meerkat.interactive.graph.operation import Operation, _check_fn_has_leading_self_arg
 from meerkat.interactive.graph.utils import (
     _get_nodeables,
     _replace_nodeables_with_nodes,
@@ -9,6 +9,49 @@ from meerkat.interactive.graph.utils import (
 from meerkat.interactive.node import NodeMixin
 
 __all__ = ["react", "reactive", "is_reactive", "get_reactive_kwargs"]
+
+
+def _unpack_stores(*args, **kwargs):
+    from meerkat.interactive.graph.store import Store
+
+    stores = []
+    unpacked_args = []
+    for arg in args:
+        if isinstance(arg, Store):
+            stores.append(arg)
+            unpacked_args.append(arg.value)
+        elif isinstance(arg, list) or isinstance(arg, tuple):
+            unpacked_args_i, _, stores_i = _unpack_stores(*arg)
+            unpacked_args_i = type(arg)(unpacked_args_i)
+            unpacked_args.append(unpacked_args_i)
+            stores.extend(stores_i)
+        elif isinstance(arg, dict):
+            _, unpacked_kwargs_i, stores_i = _unpack_stores(**arg)
+            unpacked_kwargs_i = type(arg)(unpacked_kwargs_i)
+            unpacked_args.append(unpacked_kwargs_i)
+            stores.extend(stores_i)
+        else:
+            unpacked_args.append(arg)
+
+    unpacked_kwargs = {}
+    for k, v in kwargs.items():
+        if isinstance(v, Store):
+            stores.append(v)
+            unpacked_kwargs[k] = v.value
+        elif isinstance(v, list) or isinstance(v, tuple):
+            unpacked_args_i, _, stores_i = _unpack_stores(*v)
+            unpacked_args_i = type(v)(unpacked_args_i)
+            unpacked_kwargs[k] = unpacked_args_i
+            stores.extend(stores_i)
+        elif isinstance(v, dict):
+            _, unpacked_kwargs_i, stores_i = _unpack_stores(**v)
+            unpacked_kwargs_i = type(v)(unpacked_kwargs_i)
+            unpacked_kwargs[k] = unpacked_kwargs_i
+            stores.extend(stores_i)
+        else:
+            unpacked_kwargs[k] = v
+
+    return unpacked_args, unpacked_kwargs, stores
 
 
 def reactive(
@@ -108,15 +151,37 @@ def reactive(
 
                 return _fn_wrapper
 
+            # Unpack the stores from the args and kwargs
+            unpacked_args, unpacked_kwargs, _ = _unpack_stores(*args, **kwargs)
+
             if hasattr(fn, "__self__") and fn.__self__ is not None:
                 args = (fn.__self__, *args)
+
+                # Unpack the stores from the args and kwargs because
+                # args has changed!
+                # TODO: make this all nicer
+                unpacked_args, unpacked_kwargs, _ = _unpack_stores(*args, **kwargs)
+
                 # The method bound to the class.
                 fn_class = getattr(fn.__self__.__class__, fn.__name__)
                 fn = _fn_outer_wrapper(fn_class)
 
+                # If `fn` is an instance method, then the first argument in `args`
+                # is the instance. We should **not** unpack the `self` argument
+                # if it is a Store.
+                if isinstance(args[0], Store):
+                    unpacked_args[0] = args[0]
+            elif _check_fn_has_leading_self_arg(fn):
+                # If `fn` is an instance method, then the first argument in `args`
+                # is the instance. We should **not** unpack the `self` argument
+                # if it is a Store.
+                if isinstance(args[0], Store):
+                    unpacked_args[0] = args[0]
+
             # Call the function on the args and kwargs
             with no_react():
-                result = fn(*args, **kwargs)
+                result = fn(*unpacked_args, **unpacked_kwargs)
+                # result = fn(*args, **kwargs)
 
             if not is_reactive():
                 # If we are not in a reactive context, then we don't need to create

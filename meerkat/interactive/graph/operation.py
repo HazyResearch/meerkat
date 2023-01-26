@@ -17,6 +17,21 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _check_fn_has_leading_self_arg(fn: Callable):
+    """
+    # FIXME: super hacky
+    # We need to figure out why Store.__eq__ (and potentially other dunder methods)
+    # are passed into `reactive` as the class method instead of the instance method.
+    # In the meantime, we can check if the first argument is `self` and if so,
+    # we can assume that the function is an instance method.
+    """
+    import inspect
+
+    parameters = list(inspect.signature(fn).parameters)
+    if len(parameters) > 0:
+        return "self" == parameters[0]
+    return False
+
 class Operation(NodeMixin):
     def __init__(
         self,
@@ -47,8 +62,14 @@ class Operation(NodeMixin):
         logger.debug(f"Running {repr(self)}")
 
         # Dereference the nodes.
-        args = _replace_nodes_with_nodeables(self.args)
-        kwargs = _replace_nodes_with_nodeables(self.kwargs)
+        args = _replace_nodes_with_nodeables(self.args, unwrap_stores=True)
+        kwargs = _replace_nodes_with_nodeables(self.kwargs, unwrap_stores=True)
+
+        # Special logic to make sure we unwrap all Store objects, except those
+        # that correspond to `self`.
+        if _check_fn_has_leading_self_arg(self.fn):
+            args = list(args)
+            args[0] = _replace_nodes_with_nodeables(self.args[0], unwrap_stores=False)
 
         update = self.fn(*args, **kwargs)
 

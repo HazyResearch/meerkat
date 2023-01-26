@@ -1,7 +1,14 @@
 import meerkat as mk
+import rich
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
+
+rich.print(
+    "[bold red]This script uses CLIP to embed images. "
+    "This will take some time to download the model. "
+    "Please be patient.[/bold red]"
+)
 
 df = mk.get("imagenette", version="160px")
 # Download the precomupted CLIP embeddings for imagenette.

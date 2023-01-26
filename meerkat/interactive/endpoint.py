@@ -212,7 +212,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         signature = inspect.signature(partial_fn)
         # Check if any parameters are unfilled args
         no_unfilled_args = all(
-            [param.default != param.empty for param in signature.parameters.values()]
+            [param.default is not param.empty for param in signature.parameters.values()]
         )
 
         if not (no_args and no_kwonlyargs and no_unfilled_args):
@@ -421,9 +421,15 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         app.include_router(self.router)
 
-    def __call__(self, *args, **kwargs):
-        """Calling the endpoint will just call the raw underlying function."""
-        return self.fn(*args, **kwargs)
+    def __call__(self, *args, __fn_only=False, **kwargs):
+        """
+        Calling the endpoint will just call .run(...) by default. 
+        If `__fn_only=True` is specified, it will call the raw 
+        function underlying this endpoint.
+        """
+        if __fn_only:
+            return self.fn(*args, **kwargs)
+        return self.run(*args, **kwargs)
 
     @classmethod
     def __get_validators__(cls):
