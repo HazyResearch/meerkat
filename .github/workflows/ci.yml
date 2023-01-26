@@ -66,6 +66,27 @@ jobs:
                 run: |
                     make docs
 
+    Interactive-Setup:
+        needs: Documentation
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-latest]
+                python-version: ['3.10']
+        
+        steps:
+            -   name: Check if homebrew is installed
+                run: |
+                    which brew
+
+            -   name: Install Interactive Dependencies
+                run: |
+                    pip install -e '.[interactive]'
+            
+            -   name: Test interactive install
+                run: |
+                    make test-interactive-install
+
     Build-Basic:
         needs: Documentation
         runs-on: ${{ matrix.os }}

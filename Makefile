@@ -19,6 +19,10 @@ test-basic:
 test-cov:
 	pytest --cov=./ --cov-report=xml
 
+test-interactive-install:
+	set -e
+	mk install --no-run-dev
+
 docs:
 	sphinx-build -b html docs/source/ docs/build/html/
 

@@ -2,6 +2,7 @@ import dataclasses
 import importlib
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
     from meerkat.interactive import Interface
 
 NPM_PACKAGE = "@meerkat-ml/meerkat"
+_MK_REPO_APP_DIR = os.path.join(os.path.dirname(__file__), "app")
 
 jinja_env = Environment(
     loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates"))
@@ -48,6 +50,7 @@ class SvelteWriter:
     cwd: str = dataclasses.field(default_factory=os.getcwd)
     package_manager: Literal["bun", "npm"] = "npm"
     _appdir: str = None
+    _has_brew: bool = None
 
     def __post_init__(self):
         if self._appdir:
@@ -72,6 +75,13 @@ class SvelteWriter:
         if os.path.exists(os.path.join(self.appdir, ".mk")):
             return True
         return False
+
+    @property
+    def has_brew(self) -> bool:
+        """Check if the user has homebrew installed."""
+        if self._has_brew is None:
+            self._has_brew = subprocess.run(["which", "brew"]).returncode == 0
+        return self._has_brew
 
     def cleanup_run(self):
         """Cleanup the app directory at the end of a run."""
@@ -242,6 +252,35 @@ class SvelteWriter:
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
+        )
+
+    def install_node(self):
+        if subprocess.run(["which", "node"]).returncode == 0:
+            return
+
+        processor = platform.processor()
+        if processor.startswith("arm"):  # M1 Mac
+            if not self.has_brew:
+                raise RuntimeError(
+                    "Homebrew is required to install Meerkat on M1 Macs. "
+                    "See these instructions: https://docs.brew.sh/Installation"
+                )
+            run_args = ["brew", "install", "node"]
+        elif sys.platform == "darwin":  # Intel Mac
+            if self.has_brew:
+                run_args = ["brew", "install", "node"]
+
+        subprocess.run(run_args, check=True)
+
+    def install_mk_app(self):
+        """Run `npm i` on the Meerkat interactive/app directory."""
+        return subprocess.run(
+            [f"cd {_MK_REPO_APP_DIR} && npm i"], shell=True, check=True
+        )
+
+    def npm_run_dev(self):
+        return subprocess.run(
+            [f"cd {_MK_REPO_APP_DIR} && npm run dev"], shell=True, check=True
         )
 
     def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
