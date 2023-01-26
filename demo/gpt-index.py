@@ -20,9 +20,6 @@ savefilename = "gpt_index"
 
 @mk.gui.react()
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
-    print(
-        f"Executing load_index with dir={type(dir)} and savefilename={type(savefilename)}"
-    )
     if not dir or not os.path.exists(dir):
         return None
 
