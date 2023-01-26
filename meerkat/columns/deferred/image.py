@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import os
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable, Sequence, Union
 
 from PIL import Image
 
-from meerkat.columns.deferred.file import FileColumn
+import meerkat.tools.docs as docs
+from meerkat.columns.deferred.file import FileColumn, FILE_SHARED_DOCS
 from meerkat.interactive.app.src.lib.component.image import DeferredImageFormatter
 
 logger = logging.getLogger(__name__)
@@ -17,9 +19,41 @@ def load_image(f: Union[str, BytesIO, Path]):
     img = Image.open(f)
     return img.convert("RGB")
 
+@docs.doc(source=FILE_SHARED_DOCS)
+def image(
+    filepaths: Sequence[str],
+    base_dir: str = None,
+    downloader: Union[callable, str] = None,
+    loader: callable = load_image,
+    cache_dir: str = None,
+):
+    """Create a :class:`FileColumn` where each cell represents an image stored on disk. The
+    underlying data is a :class:`ScalarColumn` of strings, where each string is
+    the path to an image.
+
+    Args:
+        filepaths (Sequence[str]): A list of filepaths to images.
+        ${loader}
+        ${base_dir}
+        ${downloader}
+        ${fallback_downloader}
+        ${cache_dir}
+    """
+    return FileColumn(
+        filepaths,
+        base_dir=base_dir,
+        loader=loader,
+        downloader=downloader,
+        cache_dir=cache_dir,
+        formatter=DeferredImageFormatter()
+    )
+
+    
 
 class ImageColumn(FileColumn):
-    """A column where each cell represents an image stored on disk. The
+    """
+    DEPRECATED
+    A column where each cell represents an image stored on disk. The
     underlying data is a `PandasSeriesColumn` of strings, where each string is
     the path to an image. The column materializes the images into memory when
     indexed. If the column is lazy indexed with the ``lz`` indexer, the images

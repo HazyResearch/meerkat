@@ -38,6 +38,9 @@ class DeferredImageFormatter(ImageFormatter):
     component_class: type = Image
     data_prop: str = "data"
 
-    def _encode(image: DeferredCell, thumbnail: bool = False) -> str:
-        image = image()
-        return super()._encode(image, thumbnail=thumbnail)
+    def _encode(self, image: DeferredCell, thumbnail: bool = False) -> str:
+        if image.absolute_path.startswith("http"):
+            return image.absolute_path
+        else:
+            image = image()
+            return super()._encode(image, thumbnail=thumbnail)
