@@ -1,6 +1,8 @@
 import os
+import shutil
 import subprocess
 import time
+from enum import Enum
 
 import rich
 import typer
@@ -14,14 +16,19 @@ from meerkat.state import APIInfo, state
 cli = typer.Typer()
 
 
+class PackageManager(str, Enum):
+    npm = "npm"
+    bun = "bun"
+
+
 @cli.command()
 def init(
     name: str = typer.Option(
         "meerkat_app",
         help="Name of the app",
     ),
-    package_manager: str = typer.Option(
-        "npm", show_choices=["npm", "bun"], help="Package manager to use"
+    package_manager: PackageManager = typer.Option(
+        "npm", show_choices=True, help="Package manager to use"
     ),
 ):
     """Create a new Meerkat app. This will create a new folder called `app` in
@@ -30,6 +37,12 @@ def init(
     Internally, Meerkat uses SvelteKit to create the app, and adds all
     the setup required by Meerkat to the app.
     """
+    # Unwrap the Enum
+    package_manager = (
+        package_manager.value
+        if isinstance(package_manager, PackageManager)
+        else package_manager
+    )
 
     # Check if app folder exists, and tell the user to delete it if it does
     if os.path.exists("app"):
@@ -128,8 +141,8 @@ def run(
     api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
     frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
     target: str = typer.Option("interface", help="Target to run in script"),
-    package_manager: str = typer.Option(
-        "npm", show_choices=["npm", "bun"], help="Package manager to use"
+    package_manager: PackageManager = typer.Option(
+        "npm", show_choices=True, help="Package manager to use"
     ),
     subdomain: str = typer.Option(
         "app", help="Subdomain to use for public sharing mode"
@@ -137,6 +150,35 @@ def run(
     debug: bool = typer.Option(False, help="Enable debug logging mode"),
 ):
     """Launch a Meerkat app, given a path to a Python script."""
+    package_manager = (
+        package_manager.value
+        if isinstance(package_manager, PackageManager)
+        else package_manager
+    )
+    _run(
+        script_path=script_path,
+        dev=dev,
+        shareable=shareable,
+        api_port=api_port,
+        frontend_port=frontend_port,
+        target=target,
+        package_manager=package_manager,
+        subdomain=subdomain,
+        debug=debug,
+    )
+
+
+def _run(
+    script_path: str,
+    dev: bool = True,
+    shareable: bool = False,
+    api_port: int = 8000,
+    frontend_port: int = 3000,
+    target: str = "interface",
+    package_manager: str = "npm",
+    subdomain: str = "app",
+    debug: bool = False,
+):
     # Pretty print information to console
     rich.print(f":rocket: Running [bold violet]{script_path}[/bold violet]")
     if dev:
@@ -224,19 +266,44 @@ def install(
         svelte_writer.npm_run_dev()
 
 
-_DEMO_DIR = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", "..", "demo"
-    )
-def _get_demo_scripts():
-    """Get a list of demo scripts."""
-    # Get the path to the demo scripts
-    return [x.split(".py")[0] for x in os.listdir(_DEMO_DIR) if x.endswith(".py")]
+_DEMO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "demo")
+
+DemoScript = Enum(
+    "DemoScript",
+    {
+        k: k
+        for k in [x.split(".py")[0] for x in os.listdir(_DEMO_DIR) if x.endswith(".py")]
+    },
+)
+
 
 @cli.command()
 def demo(
-    script = typer.Option(choices=_get_demo_scripts(), help="Demo script to run"),
+    script: DemoScript = typer.Argument(
+        ..., show_choices=True, help="Demo script to run"
+    ),
+    run: bool = typer.Option(True, help="Run the demo script"),
+    api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
+    frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
+    copy: bool = typer.Option(
+        False, help="Copy the demo script to the current directory"
+    ),
 ):
-    
+    """Run a demo script."""
+    # Get the path to the demo script
+    script = script.value
+    script_path = os.path.join(_DEMO_DIR, f"{script}.py")
+
+    # Optional: Copy the demo script to the current directory.
+    if copy:
+        shutil.copy(script_path, f"./{script}.py")
+        rich.print(f"Copied [purple]{script}.py[/purple] to the current directory.")
+        script_path = f"{script}.py"
+
+    # Optional: Run the demo script.
+    if run:
+        _run(script_path=script_path, api_port=api_port, frontend_port=frontend_port)
+
 
 if __name__ == "__main__":
     cli()

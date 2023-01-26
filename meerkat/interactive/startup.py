@@ -152,7 +152,7 @@ def run_script(
             "interface".
     """
     # Make sure script is in module format.
-    script = to_py_module_name(script)
+    script = os.path.abspath(script)  # to_py_module_name(script)
 
     # Run the script with uvicorn. This will start the FastAPI server and serve the
     # backend.
@@ -168,7 +168,7 @@ def run_script(
     process = subprocess.Popen(
         [
             "uvicorn",
-            f"{script}:{target}",
+            f"{os.path.basename(script).rsplit('.')[0]}:{target}",
             "--port",
             str(port),
             "--host",
@@ -177,7 +177,8 @@ def run_script(
             "warning",
             "--factory",
         ]
-        + (["--reload"] if dev else []),
+        + (["--reload"] if dev else [])
+        + (["--app-dir", os.path.dirname(script)]),
         env=env,
         stderr=subprocess.STDOUT,
     )
