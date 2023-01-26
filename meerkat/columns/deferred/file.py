@@ -14,6 +14,7 @@ from urllib.parse import urlparse
 import dill
 import yaml
 
+import meerkat.tools.docs as docs
 from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
@@ -25,7 +26,62 @@ folder = LazyLoader("torchvision.datasets.folder")
 logger = logging.getLogger(__name__)
 
 
+FILE_SHARED_DOCS = {
+    "loader": docs.Arg(
+        """
+        loader (Union[str, Callable[[Union[str, IO]], Any]]): a callable that 
+            accepts a filepath or an I/O stream and returns data.
+        """
+    ), 
+    "cache_dir": docs.Arg(
+        """
+        cache_dir (str, optional): the directory on disk where downloaded
+                files are to be cached. Defaults to None, in which case files will be
+                re-downloaded on every access of the data. The ``cache_dir`` can also
+                include environment variables (e.g. ``$DATA_DIR/images``) which will
+                be expanded prior to loading. This is useful when sharing DataFrames
+                between machines.
+        """
+    ),
+    "base_dir": docs.Arg(
+        """
+        base_dir (str, optional): an absolute path to a directory containing the
+            files. If provided, the ``filepath`` to be loaded will be joined with
+            the ``base_dir``. As such, this argument should only be used if the
+            loader will be applied to relative paths. T
+
+            The ``base_dir`` can also
+            include environment variables (e.g. ``$DATA_DIR/images``) which will
+            be expanded prior to loading. This is useful when sharing DataFrames
+            between machines.
+        """
+    ),
+    "downloader": docs.Arg(
+        """
+        downloader (Union[str, callable], optional):  a callable that accepts at
+            least two  positional arguments - a URI and a destination (which could
+            be either a string or file object).
+
+            Meerkat includes a small set of built-in downloaders ["url", "gcs"]
+            which can be specified via string.
+        """
+    ),
+    "fallback_downloader": docs.Arg(
+        """
+        fallback_downloader (callable, optional): a callable that will be run each
+            time the the downloader fails (for any reason). This is useful, for
+            example, if you expect some of the URIs in a dataset to be broken
+            ``fallback_downloader`` could write an empty file in place of the
+            original. If ``fallback_downloader`` is not supplied, the original
+            exception is re-raised.
+        """
+    ),
+}
+
+
 class FileLoader:
+    
+    @docs.doc(source=FILE_SHARED_DOCS)
     def __init__(
         self,
         loader: Union[str, Callable[[Union[str, IO]], Any]],
@@ -33,7 +89,6 @@ class FileLoader:
         downloader: Union[str, Callable] = None,
         fallback_downloader: Callable[[Union[str, IO]], None] = None,
         cache_dir: str = None,
-        transform: Callable[[Any], Any] = None,
     ):
         """A simple file loader with support for both local paths and remote
         URIs.
@@ -43,45 +98,12 @@ class FileLoader:
             callables passed to the constructor must be pickleable.
 
         Args:
-            loader (callable): a callable that accepts a filepath or an I/O
-                stream and returns data.
-
-            base_dir (str, optional): an absolute path to a directory containing the
-                files. If provided, the ``filepath`` to be loaded will be joined with
-                the ``base_dir``. As such, this argument should only be used if the
-                loader will be applied to relative paths. T
-
-                The ``base_dir`` can also
-                include environment variables (e.g. ``$DATA_DIR/images``) which will
-                be expanded prior to loading. This is useful when sharing DataFrames
-                between machines.
-
-            downloader (Union[str, callable], optional): a callable that accepts at
-                least two  positional arguments - a URI and a destination (which could
-                be either a string or file object).
-
-                Meerkat includes a small set of built-in downloaders ["url", "gcs"]
-                which can be specified via string.
-
-            fallback_downloader (callable, optional): a callable that will be run each
-                time the the downloader fails (for any reason). This is useful, for
-                example, if you expect some of the URIs in a dataset to be broken
-                ``fallback_downloader`` could write an empty file in place of the
-                original. If ``fallback_downloader`` is not supplied, the original
-                exception is re-raised.
-
-            cache_dir (str, optional): the directory on disk where downloaded
-                files are to be cached. Defaults to None, in which case files will be
-                re-downloaded on every access of the data. The ``cache_dir`` can also
-                include environment variables (e.g. ``$DATA_DIR/images``) which will
-                be expanded prior to loading. This is useful when sharing DataFrames
-                between machines.
-
-            transform (callable, optional): an optional callable which will be applied
-                to the data after loading. This is useful, for example, in machine
-                learning workflows where raw data requires conversion to Tensors.
+            ${loader}
+            ${base_dir}
+            ${downloader}
+            ${fallback_downloader}
+            ${cache_dir}
         """
-        self.transform = transform
         self.loader = loader
         self.base_dir = base_dir
         if downloader == "url":
@@ -160,21 +182,18 @@ class FileLoader:
 
         data = self.loader(filepath)
 
-        if self.transform is not None:
-            data = self.transform(data)
         return data
 
     def __eq__(self, other: FileLoader) -> bool:
         return (
             (other.__class__ == self.__class__)
             and (self.loader == other.loader)
-            and (self.transform == other.transform)
             and (self.base_dir == other.base_dir)
         )
 
     def __hash__(self) -> int:
         # needs to be hasable for block signature
-        return hash((self.loader, self.transform, self.base_dir))
+        return hash((self.loader, self.base_dir))
 
     def __setstate__(self, state):
         # need to add downloader if it is missing from state,
@@ -187,36 +206,16 @@ class FileLoader:
 
 
 class FileCell(DeferredCell):
-    def from_filepath(
-        self,
-        transform: callable = None,
-        loader: callable = None,
-        path: str = None,
-        base_dir: str = None,
-    ):
-        self.loader = self.default_loader if loader is None else loader
-        self.transform = transform
-
-        self.base_dir = base_dir
-
-        data = DeferredCellOp(
-            fn=self.fn,
-            args=[
-                path,
-            ],
-            kwargs={},
-            is_batched_fn=False,
-            return_index=None,
-        )
-
-        super().__init__(data=data)
+    @property
+    def base_dir(self):
+        return self.data.fn.base_dir
 
     @property
     def absolute_path(self):
         return (
-            os.path.join(self.base_dir, self.data)
+            os.path.join(self.base_dir, self.data.args[0])
             if self.base_dir is not None
-            else self.data
+            else self.data.args[0]
         )
 
     def __eq__(self, other):
@@ -234,44 +233,43 @@ class FileColumn(DeferredColumn):
     Args:
         data (Sequence[str]): A list of filepaths to images.
 
-        loader (callable): A callable with signature ``def loader(filepath: str) ->
-            PIL.Image:``. Defaults to ``torchvision.datasets.folder.default_loader``.
-
-            .. warning::
-                In order for the column to be serializable with ``write()``, the loader
-                function must be pickleable.
-
-        transform (callable): A function that transforms the loaded data (e.g.
-            ``torchvision.transforms.functional.center_crop``).
-
-            .. warning::
-                In order for the column to be serializable, the transform function must
-                be pickleable.
-
-
-        base_dir (str): an absolute path to a directory containing the
-            files. If provided, the ``filepath`` to be loaded will be joined with
-            the ``base_dir``. As such, this argument should only be used if the
-            loader will be applied to relative paths. The ``base_dir`` can also
-            include environment variables (e.g. ``$DATA_DIR/images``) which will
-            be expanded prior to loading. This is useful when sharing DataFrames
-            between machines.
+        ${loader}
+        ${base_dir}
+        ${downloader}
+        ${cache_dir}
     """
 
     def __init__(
         self,
         data: Sequence[str] = None,
         loader: callable = None,
-        transform: callable = None,
         downloader: Union[callable | str] = None,
         base_dir: str = None,
+        cache_dir: str = None,
         *args,
         **kwargs,
     ):
+
+        if not isinstance(data, ScalarColumn):
+            data = ScalarColumn(data)
+
+        # if base_dir is not provided and all paths are absolute, then
+        # we can infer the base_dir
+        if base_dir is None and data.str.startswith("/").all():
+            base_dir = os.path.commonpath(data)
+            data = data.str.replace(base_dir, "")
+
+        # if downloader is not provided then we can try to infer from the filepaths
+        if downloader is None:
+            if data.str.startswith("http").all():
+                downloader = download_url
+            elif data.str.startswith("gs://").all():
+                downloader = download_gcs
+
         if isinstance(loader, FileLoader):
-            if transform is not None or base_dir is not None or downloader is not None:
+            if base_dir is not None or downloader is not None:
                 raise ValueError(
-                    "Cannot pass `transform`, `base_dir`, `downloader`, when loader is "
+                    "Cannot pass, `base_dir`, `downloader`, when loader is "
                     "a `FileLoader`."
                 )
 
@@ -280,14 +278,11 @@ class FileColumn(DeferredColumn):
                 fn.loader = self.default_loader
         else:
             fn = FileLoader(
-                transform=transform,
                 loader=self.default_loader if loader is None else loader,
                 base_dir=base_dir,
                 downloader=downloader,
+                cache_dir=cache_dir,
             )
-
-        if not isinstance(data, ScalarColumn):
-            data = ScalarColumn(data)
 
         data = DeferredOp(
             args=[data],
@@ -308,14 +303,6 @@ class FileColumn(DeferredColumn):
         self.data.fn.loader = loader
 
     @property
-    def transform(self):
-        return self.data.fn.transform
-
-    @transform.setter
-    def transform(self, transform: callable):
-        self.data.fn.transform = transform
-
-    @property
     def base_dir(self):
         return self.data.fn.base_dir
 
@@ -331,13 +318,11 @@ class FileColumn(DeferredColumn):
         cls,
         filepaths: Sequence[str],
         loader: callable = None,
-        transform: callable = None,
         base_dir: str = None,
     ):
         return cls(
             data=filepaths,
             loader=loader,
-            transform=transform,
             base_dir=base_dir,
         )
 
@@ -345,7 +330,6 @@ class FileColumn(DeferredColumn):
     def from_urls(
         cls,
         urls: Sequence[str],
-        transform: callable = None,
     ):
         from PIL import Image
 
@@ -355,7 +339,6 @@ class FileColumn(DeferredColumn):
                 loader=lambda bytes_io: Image.open(bytes_io).convert("RGB"),
                 downloader="url",
             ),
-            transform=transform,
         )
 
     @classmethod
@@ -389,7 +372,6 @@ class FileColumn(DeferredColumn):
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
 
             fn = FileLoader(
-                transform=state["transform"],
                 loader=state["loader"],
                 base_dir=state["base_dir"],
             )

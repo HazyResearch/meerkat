@@ -19,10 +19,7 @@ class ColumnInfo(BaseModel):
     type: str
     cell_component: str
     cell_props: Dict[str, Any]
-
-
-class SchemaRequest(BaseModel):
-    columns: List[str] = None
+    cell_data_prop: str
 
 
 class SchemaResponse(BaseModel):
@@ -33,17 +30,22 @@ class SchemaResponse(BaseModel):
 
 
 @endpoint(prefix="/df", route="/{df}/schema/")
-def schema(df: DataFrame, request: SchemaRequest) -> SchemaResponse:
-    columns = df.columns if request is None else request.columns
+def schema(
+    df: DataFrame, columns: List[str]=None, variants: List[str]=None
+) -> SchemaResponse:
+    columns = df.columns if columns is None else columns
     return SchemaResponse(
         id=df.id,
-        columns=_get_column_infos(df, columns),
+        columns=_get_column_infos(df, columns, variants=variants),
         nrows=len(df),
         primary_key=df.primary_key_name,
     )
 
 
-def _get_column_infos(df: DataFrame, columns: List[str] = None):
+def _get_column_infos(
+    df: DataFrame, columns: List[str] = None, variants: List[str] = None
+):
+
     if columns is None:
         columns = df.columns
     else:
@@ -58,13 +60,15 @@ def _get_column_infos(df: DataFrame, columns: List[str] = None):
             )
 
     columns = [column for column in columns if not column.startswith("_")]
-
+    if df.primary_key_name is not None and df.primary_key_name not in columns:
+        columns += [df.primary_key_name]
     return [
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cell_component=df[col].formatter.cell_component,
-            cell_props=df[col].formatter.cell_props,
+            cell_component=df[col].formatter.component_class.alias,
+            cell_props=df[col].formatter.get_props(variants=variants),
+            cell_data_prop=df[col].formatter.data_prop,
         )
         for col in columns
     ]
@@ -72,9 +76,10 @@ def _get_column_infos(df: DataFrame, columns: List[str] = None):
 
 class RowsResponse(BaseModel):
     column_infos: List[ColumnInfo]
-    indices: List[int] = None
+    posidxs: List[int] = None
     rows: List[List[Any]]
     full_length: int
+    primary_key: str
 
 
 @endpoint(prefix="/df", route="/{df}/rows/")
@@ -82,27 +87,29 @@ def rows(
     df: DataFrame,
     start: int = Endpoint.EmbeddedBody(None),
     end: int = Endpoint.EmbeddedBody(None),
-    indices: List[int] = Endpoint.EmbeddedBody(None),
+    posidxs: List[int] = Endpoint.EmbeddedBody(None),
     key_column: str = Endpoint.EmbeddedBody(None),
     keys: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
+    variants: List[str] = Endpoint.EmbeddedBody(None),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
+
     full_length = len(df)
-    column_infos = _get_column_infos(df, columns)
+    column_infos = _get_column_infos(df, columns, variants=variants)
 
     df = df[[info.name for info in column_infos]]
 
-    if indices is not None:
-        df = df[indices]
-        indices = indices
+    if posidxs is not None:
+        df = df[posidxs]
+        posidxs = posidxs
     elif start is not None:
         if end is None:
             end = len(df)
         else:
             end = min(end, len(df))
         df = df[start:end]
-        indices = list(range(start, end))
+        posidxs = list(range(start, end))
     elif keys is not None:
         if key_column is None:
             if df.primary_key is None:
@@ -120,13 +127,17 @@ def rows(
     rows = []
     for row in df:
         rows.append(
-            [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
+            [
+                df[info.name].formatter.encode(row[info.name], variants=variants)
+                for info in column_infos
+            ]
         )
     return RowsResponse(
         column_infos=column_infos,
         rows=rows,
         full_length=full_length,
-        indices=indices,
+        posidxs=posidxs,
+        primary_key=df.primary_key_name,
     )
 
 

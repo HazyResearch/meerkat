@@ -10,7 +10,7 @@
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import type { DataFrameRef } from '$lib/api/dataframe';
 
-	const { get_schema, fetch_chunk } = getContext('Meerkat');
+	const { fetch_schema, fetch_chunk } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let main_column: string;
@@ -21,7 +21,7 @@
 	export let per_page: number = 20;
 	export let cell_size: number = 24;
 
-	$: schema_promise = get_schema(df.ref_id, [main_column, ...tag_columns]);
+	$: schema_promise = fetch_schema({df: df, columns: [main_column, ...tag_columns]});
 
 	setContext('open_row_modal', (posidx: number) => {
 		openModal(RowModal, {
@@ -35,7 +35,8 @@
 		df: df,
 		start: page * per_page,
 		end: (page + 1) * per_page,
-		columns: [main_column, ...tag_columns]
+		columns: [main_column, ...tag_columns],
+		variants: ['small']
 	});
 
 </script>

@@ -4,9 +4,9 @@
 	import type { DataFrameBox, EditTarget, Endpoint } from '$lib/utils/types';
 	import { get } from 'svelte/store';
 	import Cell from '$lib/shared/cell/Cell.svelte';
-	import BasicCell from '$lib/shared/cell/basic/Basic.svelte';
+	import BasicCell from '$lib/component/scalar/Scalar.svelte';
 
-	const { get_rows, get_schema, dispatch } = getContext('Meerkat');
+	const { fetch_chunk, get_schema, dispatch } = getContext('Meerkat');
 
 	export let df: Writable<DataFrameBox>;
 	export let primary_key_column: Writable<string>;
@@ -20,9 +20,8 @@
 
 	let rows_promise: any = null;
 	$: {
-		console.log("selected key", $selected_key);
 		if ($selected_key !== null && $selected_key !== "") {
-			rows_promise = get_rows($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
+			rows_promise = fetch_chunk($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
 		} else {
 			rows_promise = null;
 		}
@@ -46,11 +45,6 @@
 			console.log(error);
 		});
 	};
-
-	console.log("cell_specs", cell_specs);
-	console.log("cell_specs", $cell_specs["name"].type);
-	console.log("selected_key", $selected_key);
-
 </script>
 
 <div class="bg-slate-100 py-3 px-2 rounded-lg drop-shadow-md flex flex-col space-y-1">

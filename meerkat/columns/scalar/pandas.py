@@ -33,7 +33,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import Column
-from meerkat.interactive.formatter import Formatter
+from meerkat.interactive.formatter.base import Formatter
 from meerkat.mixins.aggregate import AggregationError
 
 from .abstract import ScalarColumn
@@ -257,22 +257,22 @@ class PandasScalarColumn(
     def _get_default_formatter(self) -> Formatter:
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
-        from meerkat.interactive.formatter import BasicFormatter
+        from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
 
         if len(self) == 0:
-            return BasicFormatter()
+            return ScalarFormatter()
 
         if self.dtype == object:
-            return BasicFormatter(dtype="str")
+            return ScalarFormatter(dtype="str")
 
         if self.dtype == pd.StringDtype:
-            return BasicFormatter(dtype="str")
+            return ScalarFormatter(dtype="str")
 
         cell = self[0]
         if isinstance(cell, np.generic):
-            return BasicFormatter(dtype=type(cell.item()).__name__)
+            return ScalarFormatter(dtype=type(cell.item()).__name__)
 
-        return BasicFormatter()
+        return ScalarFormatter()
 
     def _is_valid_primary_key(self):
         return self.data.is_unique

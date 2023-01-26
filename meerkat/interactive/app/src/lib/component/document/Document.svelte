@@ -10,7 +10,7 @@
 	// Running getContext('Meerkat') returns an object which contains useful functions
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
-	const { get_rows } = getContext('Meerkat');
+	const { fetch_chunk } = getContext('Meerkat');
 	// the `get_rows` function is used to fetch data from a dataframe in the Python backend
 	// the `edit` function is used to send edits to a dataframe in the Python backend
 
@@ -37,13 +37,13 @@
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the text_column
-	$: text_df_promise = get_rows(df.ref_id, 0, null, null, [text_column]);
+	$: text_df_promise = fetch_chunk(df, 0, null, null, [text_column]);
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the paragraph_column if it's not null
 	let paragraph_df_promise: any;
 	$: if (paragraph_column) {
-		paragraph_df_promise = get_rows(df.ref_id, 0, null, null, [paragraph_column]);
+		paragraph_df_promise = fetch_chunk(df, 0, null, null, [paragraph_column]);
 	}
 
 	// Fetch data for the `df` dataframe
@@ -51,7 +51,7 @@
 	let label_id_df_promise: any;
 	$: if (label_column) {
 		// The name of the id_column was told to us by the edit_target
-		label_id_df_promise = get_rows(df.ref_id, 0, null, null, [label_column, id_column]);
+		label_id_df_promise = fetch_chunk(df, 0, null, null, [label_column, id_column]);
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)

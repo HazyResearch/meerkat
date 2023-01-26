@@ -7,14 +7,14 @@ import numpy as np
 from pandas.io.formats.format import format_array
 
 
-from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
 from meerkat.interactive.formatter.base import Formatter
 
 
-class Scalar(Component):
+class Scalar(AutoComponent):
 
     data: Any
-    dtype: str = None
+    dtype: str = "auto"
     precision: int = 3
     percentage: bool = False
 
@@ -24,10 +24,10 @@ class ScalarFormatter(Formatter):
     component_class: type = Scalar
     data_prop: str = "data"
 
-    def __init__(self, dtype: str = None, precision: int = 3, percentage: bool = False):
+    def __init__(self, dtype: str = "auto", precision: int = 3, percentage: bool = False):
         super().__init__(dtype=dtype, precision=precision, percentage=percentage)
 
-    def encode(self, cell: Any):
+    def _encode(self, cell: Any):
         # check for native python nan
         if isinstance(cell, float) and math.isnan(cell):
             return "NaN"

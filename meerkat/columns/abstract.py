@@ -39,7 +39,7 @@ from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
-    from meerkat.interactive.formatter import Formatter
+    from meerkat.interactive.formatter.base import Formatter
 
 
 logger = logging.getLogger(__name__)
@@ -274,9 +274,9 @@ class Column(
     def _get_default_formatter(self) -> "Formatter":
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
-        from meerkat.interactive.formatter import BasicFormatter
+        from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
 
-        return BasicFormatter()
+        return ScalarFormatter()
 
     @property
     def formatter(self) -> "Formatter":
@@ -285,6 +285,12 @@ class Column(
     @formatter.setter
     def formatter(self, formatter: "Formatter"):
         self._formatter = formatter
+
+        
+    def format(self, formatter: type):
+        new_col = self.view()
+        new_col.formatter = formatter
+        return new_col
 
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
@@ -631,7 +637,6 @@ class Column(
     @property
     def is_mmap(self):
         return False
-
 
 def column(data: Sequence) -> Column:
     """Create a Meerkat column from data.
