@@ -85,9 +85,9 @@ jobs:
                     path: ~/.cache/pip
                     key: ${{ runner.os }}-pip
 
-            -   name: Check if homebrew is installed
-                run: |
-                    which brew
+            # -   name: Check if homebrew is installed
+            #     run: |
+            #         which brew
 
             -   name: List
                 run: |
