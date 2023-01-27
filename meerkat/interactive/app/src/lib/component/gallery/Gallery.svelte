@@ -5,7 +5,6 @@
 	import { getContext, setContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import Selected from './Selected.svelte';
-	import DropdownMenu from '$lib/shared/menu/DropdownMenu.svelte';
 	import { openModal } from 'svelte-modals';
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import type { DataFrameRef } from '$lib/api/dataframe';
@@ -21,7 +20,9 @@
 	export let per_page: number = 20;
 	export let cell_size: number = 24;
 
-	$: schema_promise = fetch_schema({df: df, columns: [main_column, ...tag_columns]});
+	$: schema_promise = fetch_schema({ 
+		df: df, columns: [main_column, ...tag_columns], variants: ['small']
+	});
 
 	setContext('open_row_modal', (posidx: number) => {
 		openModal(RowModal, {
@@ -38,7 +39,6 @@
 		columns: [main_column, ...tag_columns],
 		variants: ['small']
 	});
-
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50 h-full">
@@ -69,11 +69,7 @@
 
 				<!-- Right header section -->
 				<div class="flex self-center justify-self-end items-center">
-					<Pagination
-						bind:page
-						bind:per_page
-						total_items={schema.nrows}
-					/>
+					<Pagination bind:page bind:per_page total_items={schema.nrows} />
 				</div>
 			</div>
 			<div class="h-full overflow-y-scroll">

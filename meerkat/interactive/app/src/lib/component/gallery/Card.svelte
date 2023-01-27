@@ -15,6 +15,7 @@
 
 	const open_row_modal: Function = getContext('open_row_modal');
 	const dispatch = createEventDispatcher();
+
 </script>
 
 <div
@@ -31,7 +32,7 @@
 		{/if}
 		<!-- Pivot item -->
 		<button
-			class="self-center rounded-sm overflow-hidden hover:opacity-75"
+			class="self-center rounded-sm hover:opacity-75"
 			style:height={`${height}vh`}
 			class:opacity-50={selected}
 			on:dblclick={(e) => {

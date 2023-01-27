@@ -21,7 +21,8 @@ export interface ColumnInfo {
     name: string;
     type: string;
     cell_component: string;
-    cell_props: any
+    cell_props: any,
+    cell_data_prop: string,
 }
 
 /**
@@ -63,6 +64,7 @@ export class DataFrameChunk {
             data: this.rows[row][this.columns.indexOf(column)],
             cell_component: column_info.cell_component,
             cell_props: column_info.cell_props,
+            cell_data_prop: column_info.cell_data_prop,
             column: column
         }
 

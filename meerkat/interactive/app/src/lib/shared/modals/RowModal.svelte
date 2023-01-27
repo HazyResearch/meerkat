@@ -19,14 +19,15 @@
 
 	const { fetch_chunk, fetch_schema } = getContext('Meerkat');
 
-	$: schema_promise = fetch_schema({df: df}).then((schema) => {
+	$: schema_promise = fetch_schema({df: df, variants: ["small"]}).then((schema) => {
 		if (main_column === undefined) {
 			main_column = schema.columns[0].name;
 		}
 		return schema;
 	});
 
-	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx] });
+	$: main_chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], columns: [main_column]});
+	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], variants: ["tiny"]});
 
 	const increment = async () => {
 		let chunk = await chunk_promise;
@@ -102,19 +103,8 @@
 				<div class="grid grid-rows-[auto_1fr] items-center">
 					<!-- Header section -->
 					<div class="grid grid-cols-3 px-3 py-1 items-center">
-						<!-- Close button -->
-						<button
-							class="flex items-center gap-1 text-slate-800 hover:bg-slate-100 w-fit h-fit rounded-md px-1"
-							on:click={() => closeModal()}
-						>
-							<ArrowLeft /> Close
-						</button>
-						<!-- Main column header -->
-						<div class="justify-self-center text-xl font-bold font-mono text-slate-600 ">
-							{main_column}
-						</div>
 						<!-- Navigation buttons -->
-						<div class="justify-self-end">
+						<div class="justify-self-start">
 							<ul class="inline-flex self-center items-center">
 								<li>
 									<button
@@ -142,10 +132,22 @@
 								</li>
 							</ul>
 						</div>
+					
+						<!-- Main column header -->
+						<div class="justify-self-center text-xl font-bold font-mono text-slate-600 ">
+							{main_column}
+						</div>
+						<!-- Close button -->
+						<button
+							class="flex justify-self-end items-center gap-1 text-slate-800 hover:bg-slate-100 w-fit h-fit rounded-md px-1"
+							on:click={() => closeModal()}
+						>
+							<ArrowLeft /> Close
+						</button>
 					</div>
 					<!-- Main section -->
-					<div class="flex p-10 items-center h-fit justify-center justify-self-center">
-						{#await chunk_promise then chunk}
+					<div class="flex p-10 items-center h-full w-full justify-center justify-self-center">
+						{#await main_chunk_promise then chunk}
 							<Cell {...chunk.get_cell(0, main_column)} />
 						{/await}
 					</div>

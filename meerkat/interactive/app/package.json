@@ -59,6 +59,7 @@
         "layercake": "^7.0.0",
         "marked": "^4.2.4",
         "prismjs": "^1.28.0",
+        "sanitize-html": "^2.8.1",
         "svelte": "^3.54.0",
         "svelte-bootstrap-icons": "^2.2.0",
         "svelte-check": "^2.7.1",
