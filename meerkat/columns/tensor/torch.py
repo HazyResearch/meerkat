@@ -169,8 +169,8 @@ class TorchTensorColumn(
 
     @staticmethod
     def _get_default_formatter() -> Callable:
-        from meerkat.interactive.formatter import TensorFormatter
-        return TensorFormatter()
+        from meerkat.interactive.formatter import ScalarFormatter
+        return ScalarFormatter()
 
     @classmethod
     def from_data(cls, data: Union[Columnable, Column]):

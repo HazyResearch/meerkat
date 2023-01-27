@@ -69,9 +69,13 @@ class ColumnIOMixin:
         col._set_state(state)
         col._set_data(data)
 
-        if "_formatter" not in col.__dict__:
-            # PATCH: backwards  compatability patch for dataframes saved before v0.2.4
-            col._formatter = col._get_default_formatter()
+        from meerkat.interactive.formatter import DeprecatedFormatter
+
+        if "_formatter" not in col.__dict__ or isinstance(
+            col.formatter, DeprecatedFormatter
+        ):
+            # PATCH: backwards compatability patch for old dataframes saved before v0.2.4
+            col.formatter = col._get_default_formatter()
 
         return col
 

@@ -203,19 +203,19 @@ class NumPyTensorColumn(
             return self[index]
 
     def _get_default_formatter(self):
-        from meerkat.interactive.formatter import NumpyArrayFormatter
+        from meerkat.interactive.formatter import ScalarFormatter
 
         if len(self) == 0:
-            return NumpyArrayFormatter()
+            return ScalarFormatter()
 
         if self.dtype.type is np.str_:
-            return NumpyArrayFormatter(dtype="str")
+            return ScalarFormatter(dtype="str")
 
         cell = self.data[0]
         if isinstance(cell, np.generic):
-            return NumpyArrayFormatter(dtype=type(cell.item()).__name__)
+            return ScalarFormatter(dtype=type(cell.item()).__name__)
 
-        return NumpyArrayFormatter()
+        return ScalarFormatter()
 
     def _is_valid_primary_key(self):
         if self.dtype.kind == "f":
