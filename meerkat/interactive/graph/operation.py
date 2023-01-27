@@ -1,3 +1,4 @@
+import inspect
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
@@ -32,6 +33,7 @@ def _check_fn_has_leading_self_arg(fn: Callable):
         return "self" == parameters[0]
     return False
 
+
 class Operation(NodeMixin):
     def __init__(
         self,
@@ -39,6 +41,7 @@ class Operation(NodeMixin):
         args: List[Any],
         kwargs: Dict[str, Any],
         result: Any,
+        skip_fn: Callable[..., bool] = None,
     ):
         super().__init__()
         self.fn = fn
@@ -46,10 +49,61 @@ class Operation(NodeMixin):
         self.kwargs = kwargs
         self.result = result
 
+        self.skip_fn = skip_fn
+        self.cache = None
+        if self.skip_fn is None:
+            self._skip_parameters = None
+        else:
+            # The fn parameters we need to extract for skip_fn.
+            self._skip_parameters = _validate_and_extract_skip_fn(
+                skip_fn=self.skip_fn, fn=self.fn
+            )
+            self._reset_cache()
+
     def __repr__(self):
         return (
             f"Operation({self.fn.__name__}, {self.args}, {self.kwargs}, {self.result})"
         )
+
+    def _reset_cache(self):
+        """Set the cache to the new arguments and keyword arguments."""
+        args, kwargs = self._dereference_nodes()
+        cache = inspect.getcallargs(self.fn, *args, **kwargs)
+        self.cache = {param: cache[param] for param in self._skip_parameters}
+
+    def _run_skip_fn(self, *args, **kwargs):
+        """Run the skip_fn to determine if the operation should be skipped.
+
+        Args:
+            *args: The new arguments to the function.
+            **kwargs: The new keyword arguments to the function.
+        """
+        # Process cache.
+        skip_kwargs = {f"old_{k}": v for k, v in self.cache.items()}
+        self.cache = {}
+
+        # Process new arguments.
+        new_kwargs = inspect.getcallargs(self.fn, *args, **kwargs)
+        new_kwargs = {
+            f"new_{param}": new_kwargs[param] for param in self._skip_parameters
+        }
+        skip_kwargs.update(new_kwargs)
+
+        skip = self.skip_fn(**skip_kwargs)
+        logger.debug(f"Operation({self.fn.__name__}): skip_fn -> {skip}")
+        return skip
+
+    def _dereference_nodes(self):
+        # Dereference the nodes.
+        args = _replace_nodes_with_nodeables(self.args, unwrap_stores=True)
+        kwargs = _replace_nodes_with_nodeables(self.kwargs, unwrap_stores=True)
+
+        # Special logic to make sure we unwrap all Store objects, except those
+        # that correspond to `self`.
+        if _check_fn_has_leading_self_arg(self.fn):
+            args = list(args)
+            args[0] = _replace_nodes_with_nodeables(self.args[0], unwrap_stores=False)
+        return args, kwargs
 
     def __call__(self) -> List[Modification]:
         """Execute the operation. Unpack the arguments and keyword arguments
@@ -62,14 +116,17 @@ class Operation(NodeMixin):
         logger.debug(f"Running {repr(self)}")
 
         # Dereference the nodes.
-        args = _replace_nodes_with_nodeables(self.args, unwrap_stores=True)
-        kwargs = _replace_nodes_with_nodeables(self.kwargs, unwrap_stores=True)
+        args, kwargs = self._dereference_nodes()
 
-        # Special logic to make sure we unwrap all Store objects, except those
-        # that correspond to `self`.
-        if _check_fn_has_leading_self_arg(self.fn):
-            args = list(args)
-            args[0] = _replace_nodes_with_nodeables(self.args[0], unwrap_stores=False)
+        # If we are skipping the function, then we can
+        # return an empty list of modifications.
+        if self.skip_fn is not None:
+            skip = self._run_skip_fn(*args, **kwargs)
+            # Reset the cache to the new arguments and keyword arguments.
+            # FIXME: We are deferencing the nodes again, which we dont need to do.
+            self._reset_cache()
+            if skip:
+                return []
 
         update = self.fn(*args, **kwargs)
 
@@ -148,3 +205,34 @@ def _update_result(
         # If the result is not a Reference or Store, then it is a primitive type
         # and we can just return the update
         return update
+
+
+def _validate_and_extract_skip_fn(*, skip_fn, fn) -> set:
+    # Skip functions should have arguments that start with `old_` and `new_`
+    # followed by the same keyword argument name.
+    # e.g. def skip(old_x, new_x):
+    fn_parameters = inspect.signature(fn).parameters.keys()
+    skip_parameters = inspect.signature(skip_fn).parameters.keys()
+
+    if not all(
+        param.startswith("old_") or param.startswith("new_")
+        for param in skip_parameters
+    ):
+        raise ValueError(
+            f"Expected skip_fn to have parameters that start with "
+            f"`old_` or `new_`, but got parameters: {skip_parameters}"
+        )
+
+    # Remove the `old_` and `new_` prefixes from the skip parameters.
+    skip_parameters_no_prefix = {param[4:] for param in skip_parameters}
+    if not skip_parameters_no_prefix.issubset(fn_parameters):
+        unknown_parameters = skip_parameters_no_prefix - fn_parameters
+        unknown_parameters = [x for x in skip_parameters if x[4:] in unknown_parameters]
+        unknown_parameters = ", ".join(unknown_parameters)
+        raise ValueError(
+            "Expected skip_fn to have parameters that match the "
+            "parameters of the function, but got parameters: "
+            f"{skip_parameters_no_prefix}"
+        )
+
+    return skip_parameters_no_prefix

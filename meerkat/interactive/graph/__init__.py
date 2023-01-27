@@ -74,7 +74,7 @@ def trigger() -> List[Modification]:
                     mods = op()
                 except Exception as e:
                     # TODO (sabri): Change this to a custom error type
-                    raise TriggerError("Exception in trigger. " + str(e))
+                    raise TriggerError("Exception in trigger. " + str(e)) from e
 
                 # TODO: check this
                 # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]

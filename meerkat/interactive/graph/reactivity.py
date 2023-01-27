@@ -68,7 +68,7 @@ def _unpack_stores(*args, **kwargs):
 def reactive(
     fn: Callable = None,
     nested_return: bool = None,
-    noop_fn: Callable = None,
+    skip_fn: Callable[..., bool] = None,
 ) -> Callable:
     """Decorator that is used to mark a function as an interface operation.
 
@@ -107,27 +107,18 @@ def reactive(
         df3 = concat(df1, df2)
 
     Args:
-        fn: The function to decorate.
-        nested_return: Whether the function returns an object (e.g. List, Dict) with
-            a nested structure. If True, a `Store` or `Reference` will be created for
-            every element in the nested structure. If False, a single `Store` or
-            `Reference` wrapping the entire object will be created. For example, if the
-            function returns two DataFrames in a tuple, then `nested_return` should be
-            `True`. However, if the functions returns a variable length list of ints,
-            then `nested_return` should likely be `False`.
-        noop_fn: A function that determines if the function should be run or the output
-            would be the same. This is useful for functions that are expensive to run.
-            The function should take in two dictionaries as arguments - kwargs corresponding
-            to the old parameters and kwargs corresponding to the new parameters.
+        fn: See :func:`react`.
+        nested_return: See :func:`react`.
+        skip_fn: See :func:`react`.
 
     Returns:
-        A decorated function that creates an operation node in the operation graph.
+        See :func:`react`.
     """
 
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(reactive, nested_return=nested_return, noop_fn=noop_fn)
+        return partial(reactive, nested_return=nested_return, skip_fn=skip_fn)
 
     def _reactive(fn: Callable):
         @wraps(fn)
@@ -229,7 +220,9 @@ def reactive(
             kwargs = _replace_nodeables_with_nodes(kwargs)
 
             # Create the Operation node
-            op = Operation(fn=fn, args=args, kwargs=kwargs, result=result)
+            op = Operation(
+                fn=fn, args=args, kwargs=kwargs, result=result, skip_fn=skip_fn
+            )
 
             # For normal functions
             # Make a node for the operation if it doesn't have one
@@ -264,9 +257,15 @@ def reactive(
 # The stack is reveresed so that the top of the stack is
 # the last index in the list.
 class _ReactiveState:
-    def __init__(self, *, reactive: bool, nested_return: Optional[bool]) -> None:
+    def __init__(
+        self,
+        *,
+        reactive: bool,
+        nested_return: Optional[bool],
+        skip_fn: Optional[Callable],
+    ) -> None:
         self.reactive = reactive
-        self.kwargs = dict(nested_return=nested_return)
+        self.kwargs = dict(nested_return=nested_return, skip_fn=skip_fn)
 
     def __bool__(self):
         return self.reactive
@@ -275,7 +274,8 @@ class _ReactiveState:
         return (
             f"{self.__class__.__name__}("
             f"reactive={self.reactive}, "
-            f"nested_return={self.kwargs['nested_return']}"
+            f"nested_return={self.kwargs['nested_return']}, "
+            f"skip_fn={self.kwargs['skip_fn']}"
             ")"
         )
 
@@ -360,28 +360,55 @@ class react:
             function returns two DataFrames in a tuple, then `nested_return` should be
             `True`. However, if the functions returns a variable length list of ints,
             then `nested_return` should likely be `False`.
+        skip_fn: A function that returns True if the operation should be skipped.
+            This is useful for functions that are expensive to run.
+            The function should take in parameters starting with "old_" and "new_" and
+            ending with the name of the parameter. Instance methods cannot be used as
+            skip functions.
+
+            .. code-block:: python
+
+                def skip_fn(old_a: int, new_a: int, old_b: int, new_b: int) -> bool:
+                    # Addition is commutative, so we can skip the operation
+                    # if the values of a and b are the switched.
+                    return old_a == new_b and old_b == new_a
+
+                @react(skip_fn=skip_fn)
+                def add(a: int, b: int) -> int:
+                    return a + b
 
     Returns:
         A decorated function that creates an operation node in the operation graph.
     """
 
-    def __init__(self, reactive: bool = True, *, nested_return: bool = None):
+    def __init__(
+        self,
+        reactive: bool = True,
+        *,
+        nested_return: bool = None,
+        skip_fn: Callable = None,
+    ):
         self._reactive = reactive
         self._nested_return = nested_return
+        self._skip_fn = skip_fn
 
     def __call__(self, func):
         @wraps(func)
         def decorate_context(*args, **kwargs):
             with self.clone():
-                return reactive(func, nested_return=self._nested_return)(
-                    *args, **kwargs
-                )
+                return reactive(
+                    func, nested_return=self._nested_return, skip_fn=self._skip_fn
+                )(*args, **kwargs)
 
         return cast(F, decorate_context)
 
     def __enter__(self):
         _IS_REACTIVE.append(
-            _ReactiveState(reactive=self._reactive, nested_return=self._nested_return)
+            _ReactiveState(
+                reactive=self._reactive,
+                nested_return=self._nested_return,
+                skip_fn=self._skip_fn,
+            )
         )
         return self
 
@@ -390,7 +417,9 @@ class react:
 
     def clone(self):
         return self.__class__(
-            reactive=self._reactive, nested_return=self._nested_return
+            reactive=self._reactive,
+            nested_return=self._nested_return,
+            skip_fn=self._skip_fn,
         )
 
 
