@@ -258,15 +258,17 @@ class PandasScalarColumn(
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.text import TextFormatter
+
 
         if len(self) == 0:
             return ScalarFormatter()
 
         if self.dtype == object:
-            return ScalarFormatter(dtype="str")
+            return TextFormatter()
 
         if self.dtype == pd.StringDtype:
-            return ScalarFormatter(dtype="str")
+            return TextFormatter()
 
         cell = self[0]
         if isinstance(cell, np.generic):

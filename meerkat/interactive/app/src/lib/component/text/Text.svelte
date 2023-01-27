@@ -3,8 +3,7 @@
 </script>
 
 <div
-	class="thumbnail h-full aspect-square rounded-md shadow-md border-black"
+	class="bg-white flex h-full w-full aspect-video content-center items-center rounded-md shadow-md border-black text-center"
 >
-	hello
 	{data}
 </div>

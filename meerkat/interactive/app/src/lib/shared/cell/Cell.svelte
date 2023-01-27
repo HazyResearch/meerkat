@@ -13,8 +13,6 @@
 
 	// need to actually create a new object, since we don't want to modify the
 	// cell_props that were passed in
-	console.log(cell_props)
-
 	$: {
 		cell_props = {...cell_props};
 		cell_props[cell_data_prop] = data;
