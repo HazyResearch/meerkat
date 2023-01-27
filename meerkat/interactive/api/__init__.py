@@ -7,4 +7,5 @@ from .routers import (  # noqa: F401
     ops,
     sliceby,
     store,
+    subscribe,
 )

@@ -170,6 +170,22 @@ class ModificationQueue:
 
 
 @dataclass
+class ProgressQueue:
+    """A queue of progress messages to be displayed to the user."""
+
+    queue: list = field(default_factory=list)
+
+    def add(self, message: str):
+        self.queue.append(message)
+
+    def clear(self) -> list:
+        """Clear the progress queue, and return the old queue."""
+        current_queue = self.queue
+        self.queue = []
+        return current_queue
+
+
+@dataclass
 class GlobalState:
 
     api_info: APIInfo = None
@@ -178,6 +194,7 @@ class GlobalState:
     secrets: Secrets = field(default_factory=Secrets)
     llm: LanguageModel = field(default_factory=LanguageModel)
     modification_queue: ModificationQueue = field(default_factory=ModificationQueue)
+    progress_queue: ProgressQueue = field(default_factory=ProgressQueue)
 
 
 global state
