@@ -18,12 +18,13 @@ export async function post(url: string, data: any): Promise<any> {
         },
         body: JSON.stringify(data)
     });
+    const json = await res.json();
     if (!res.ok) {
-        throw new Error(
+        console.log(
             "HTTP status " + res.status + ": " + res.statusText + "\n url: " + url + "\n data: " + JSON.stringify(data)
         );
+        throw new Error("HTTP status " + res.status + ": " + json.detail)
     }
-    const json = await res.json();
     return json;
 }
 
