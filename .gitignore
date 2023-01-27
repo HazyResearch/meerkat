@@ -17,6 +17,11 @@ scratch/sabri/data
 # Note files
 notes.md
 
+*.lwp
+*.ctrl
+**/apicache-py3
+
+
 # Mac
 .DS_STORE
 
