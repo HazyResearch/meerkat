@@ -465,7 +465,8 @@ def _materialize(
         while isinstance(curr, mk.DeferredColumn):
             fns.append(curr.data.fn)
 
-            # For linear pipelines, there will be either one elem in args or one key in kwargs
+            # For linear pipelines, there will be either one elem in args or one key in 
+            # kwargs
             if curr.data.args:
                 if len(curr.data.args) > 1:
                     raise ValueError("Multiple args not supported.")
@@ -497,6 +498,7 @@ def _materialize(
             .__next__()
             .to_numpy_refs()
         )
+        breakpoint()
         for partition in partitions:
             result = np.append(result, ray.get(partition))
         return result
