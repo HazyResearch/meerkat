@@ -7,6 +7,7 @@
 	import Selected from './Selected.svelte';
 	import { openModal } from 'svelte-modals';
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
+	import { Dropdown, DropdownItem } from 'flowbite-svelte';
 	import type { DataFrameRef } from '$lib/api/dataframe';
 
 	const { fetch_schema, fetch_chunk } = getContext('Meerkat');
@@ -20,8 +21,9 @@
 	export let per_page: number = 20;
 	export let cell_size: number = 24;
 
-	$: schema_promise = fetch_schema({ 
-		df: df, columns: [main_column, ...tag_columns], variants: ['small']
+	$: schema_promise = fetch_schema({
+		df: df,
+		variants: ['small']
 	});
 
 	setContext('open_row_modal', (posidx: number) => {
@@ -39,6 +41,8 @@
 		columns: [main_column, ...tag_columns],
 		variants: ['small']
 	});
+
+	let dropdown_open: boolean = false;
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50 h-full">
@@ -62,10 +66,31 @@
 					</div>
 				</div>
 
-				<!-- Left header section -->
-				<span class="font-bold font-mono text-xl text-slate-600 self-center justify-self-center">
-					{main_column}
-				</span>
+				<!-- Middle header section -->
+				<div class="self-center justify-self-center">
+					<button
+						class="font-bold font-mono text-xl text-slate-600 self-center justify-self-center"
+						on:click={() => {
+							dropdown_open = !dropdown_open;
+						}}
+					>
+						{main_column}
+					</button>
+					<Dropdown open={dropdown_open} class="w-fit">
+						{#each schema.columns as col}
+							<DropdownItem
+								on:click={() => {
+									main_column = col.name;
+									dropdown_open = false;
+								}}
+							>
+								<div class="text-slate-600 font-mono">
+									<span class="font-bold">{col.name}</span>
+								</div>
+							</DropdownItem>
+						{/each}
+					</Dropdown>
+				</div>
 
 				<!-- Right header section -->
 				<div class="flex self-center justify-self-end items-center">
