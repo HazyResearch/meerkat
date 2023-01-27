@@ -48,7 +48,6 @@
         "@magidoc/plugin-svelte-marked": "^2.14.5",
         "@svelteuidev/composables": "^0.7.7",
         "@types/underscore": "^1.11.4",
-        "@zerodevx/svelte-toast": "^0.7.2",
         "carbon-icons-svelte": "^11.2.0",
         "d3": "^7.6.1",
         "d3-brush": "^3.0.0",
