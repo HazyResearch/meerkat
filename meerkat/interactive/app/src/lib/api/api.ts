@@ -4,6 +4,7 @@ import type { EditTarget } from '$lib/utils/types';
 import { DataFrameChunk, type DataFrameRef } from '$lib/api/dataframe';
 import { get, type Writable } from 'svelte/store';
 import { API_URL } from "../constants.js";
+import toast from 'svelte-french-toast';
 
 export const store_trigger = async (store_id: string, value: any) => {
     const modifications = await modify(`${get(API_URL)}/store/${store_id}/trigger`, { value: value });
@@ -11,12 +12,21 @@ export const store_trigger = async (store_id: string, value: any) => {
 };
 
 export const dispatch = async (endpoint_id: string, payload: any = {}) => {
-    if (endpoint_id === null) {
-        return;
-    }
-    const { result, modifications, error } = await post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload);
-    apply_modifications(modifications);
-    return result;
+	if (endpoint_id === null) {
+		return;
+	}
+	const promise = post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload).catch(
+		(error) => {
+            console.log(error);
+			toast.error(error.message);
+            // Pass the error along.
+			throw error;
+		}
+	);
+	const { result, modifications, error } = await promise;
+	// Code below is executed only if the promise is successful.
+	apply_modifications(modifications);
+	return result;
 };
 
 export const get_schema = async (ref_id: string, columns: Array<string> | null = null) => {

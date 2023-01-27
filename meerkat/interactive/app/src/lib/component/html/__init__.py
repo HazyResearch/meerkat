@@ -148,9 +148,26 @@ class td(Slottable, HtmlMixin, AutoComponent):
 # class hr(HtmlMixin, AutoComponent):
 #     pass
 
+class form(Slottable, HtmlMixin, AutoComponent):
+    classes: str = None
+    style: str = None
+
+    action: str = None
+    method: str = "get"
+    enctype: str = "application/x-www-form-urlencoded"
+    target: str = None
 
 class button(Slottable, HtmlMixin, AutoComponent):
-    pass
+    
+    classes: str = None
+    style: str = None
+
+    type: str = "button"
+    value: str = None
+    name: str = None
+    disabled: bool = False
+
+    formaction: str = None
 
 
 # class input(Slottable, HtmlMixin, AutoComponent):

@@ -65,6 +65,7 @@
         "svelte-check": "^2.7.1",
         "svelte-dnd-action": "^0.9.19",
         "svelte-forms": "^2.3.1",
+        "svelte-french-toast": "^1.0.3",
         "svelte-grid": "^5.1.1",
         "svelte-heros": "^2.3.3",
         "svelte-highlight": "^6.2.0",

@@ -24,6 +24,7 @@ from meerkat.interactive.graph import (
     reactive,
     trigger,
 )
+from meerkat.interactive.utils import print
 
 from .app.src.lib.component.abstract import AutoComponent, Component
 from .app.src.lib.component.button import Button
@@ -107,4 +108,6 @@ __all__ = [
     "Code",
     "CodeDisplay",
     "Toggle",
+    # Utilities
+    "print",
 ]

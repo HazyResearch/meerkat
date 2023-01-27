@@ -4,17 +4,14 @@ import rich
 from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
 import meerkat as mk
+from meerkat.interactive import Store
 from meerkat.interactive.app.src.lib.component.fileupload import FileUpload
 
-
-@mk.gui.react()
-def rprint(*args):
-    """Helper function that reactively prints its arguments to the console."""
-    rich.print(*args)
-
+# Makes prints reactive!
+print = mk.gui.react()(rich.print)
 
 # Start off with a default directory
-dir = mk.gui.Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
+dir = Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
 savefilename = "gpt_index"
 
 
@@ -46,7 +43,7 @@ index = load_index(dir=dir, savefilename=savefilename)
 
 # Create a variable that will be used to store the response from the index
 # for the last query. We will display this in the UI.
-last_response = mk.gui.Store("The response will appear here.")
+last_response = Store("The response will appear here.")
 
 
 @mk.gui.endpoint
@@ -63,7 +60,7 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
     # Stores can only be set inside endpoints in order to trigger the reactive
     # functions that depend on them! The special `set` method helps with this.
     last_response.set(response.response)
-    rich.print(response)
+    print(response)
     return response
 
 
@@ -71,7 +68,7 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
 # fileupload_component = FileUpload()
 
 # Create a Store that will hold the query.
-query = mk.gui.Store("")
+query = Store("")
 # Pass this to a Textbox component, which will allow the user to modify the query.
 query_component = mk.gui.Textbox(text=query, title="Question")
 
@@ -92,7 +89,7 @@ text = mk.gui.html.div(
 
 # Print the values of the variables to the console, so we can see them.
 # This will reprint them whenever any of the variables change.
-rprint("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
+print("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 
 interface = mk.gui.Interface(

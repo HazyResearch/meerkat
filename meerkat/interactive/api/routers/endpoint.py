@@ -1,10 +1,7 @@
-from typing import TYPE_CHECKING, Any, List, Tuple
+from fastapi import HTTPException
 
 from meerkat.errors import TriggerError
 from meerkat.interactive.endpoint import Endpoint, endpoint
-
-if TYPE_CHECKING:
-    from meerkat.interactive.modification import Modification
 
 
 @endpoint(prefix="/endpoint", route="/{endpoint}/dispatch/")
@@ -28,6 +25,10 @@ def dispatch(
     except TriggerError as e:
         # TODO: handle case where result is not none
         return {"result": None, "modifications": [], "error": str(e)}
+    except Exception as e:
+        # General exception should be converted to a HTTPException
+        # that fastapi can handle.
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Only return store modifications that are not backend_only
     modifications = [
