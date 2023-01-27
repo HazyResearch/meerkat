@@ -74,6 +74,7 @@ def set_logging_level_for_imports(level: int = logging.WARNING) -> None:
     logging.getLogger("matplotlib").setLevel(level)
     logging.getLogger("textattack").setLevel(level)
     logging.getLogger("filelock").setLevel(level)
+    logging.getLogger("sse_starlette").setLevel(level)
 
 
 def set_logging_level(level: Union[int, str] = logging.INFO):

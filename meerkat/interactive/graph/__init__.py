@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from tqdm import tqdm
@@ -36,6 +37,9 @@ __all__ = [
 ]
 
 
+logger = logging.getLogger(__name__)
+
+
 def trigger() -> List[Modification]:
     """Trigger the computation graph of an interface based on a list of
     modifications.
@@ -47,6 +51,7 @@ def trigger() -> List[Modification]:
             computation graph.
     """
     modifications = state.modification_queue.queue
+    progress = state.progress_queue
 
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications if mod.node is not None]
@@ -62,26 +67,41 @@ def trigger() -> List[Modification]:
 
     new_modifications = []
     if len(order) > 0:
-        print(f"triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}")
-        with tqdm(total=len(order)) as pbar:
-            # Go through all the operations in order: run them and add
-            # their modifications
-            # to the new_modifications list
-            for op in order:
-                pbar.set_postfix_str(f"Running {op.fn.__name__}")
+        logger.debug(
+            f"Triggered pipeline: {'->'.join([node.fn.__name__ for node in order])}"
+        )
 
-                try:
-                    mods = op()
-                except Exception as e:
-                    # TODO (sabri): Change this to a custom error type
-                    raise TriggerError("Exception in trigger. " + str(e)) from e
+        # Add the number of operations to the progress queue
+        # TODO: this should be an object that contains other information
+        # for the start of the progress bar
+        progress.add([op.fn.__name__ for op in order])
+        # with tqdm(total=len(order)) as pbar:
+        # Go through all the operations in order: run them and add
+        # their modifications to the new_modifications list
+        for i, op in enumerate(order):
+            # pbar.set_postfix_str(f"Running {op.fn.__name__}")
 
-                # TODO: check this
-                # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
-                new_modifications.extend(mods)
-                pbar.update(1)
-        print("done")
+            # Add the operation name to the progress queue
+            # TODO: this should be an object that contains other information
+            # for the progress bar
+            progress.add(
+                {"op": op.fn.__name__, "progress": int((i + 1) / len(order) * 100)}
+            )
+
+            try:
+                mods = op()
+            except Exception as e:
+                # TODO (sabri): Change this to a custom error type
+                raise TriggerError("Exception in trigger. " + str(e)) from e
+
+            # TODO: check this
+            # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
+            new_modifications.extend(mods)
+            # pbar.update(1)
+            progress.add(None)
+        logger.debug("Done running trigger pipeline.")
 
     # Clear out the modification queue
     state.modification_queue.clear()
     return modifications + new_modifications
+# 
