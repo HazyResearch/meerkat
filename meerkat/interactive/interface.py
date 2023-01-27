@@ -7,10 +7,12 @@ import rich
 from IPython.display import IFrame
 from pydantic import BaseModel
 
+from meerkat.interactive import html
 from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     ComponentFrontend,
 )
+from meerkat.interactive.app.src.lib.component.progress import Progress
 from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
@@ -45,7 +47,12 @@ class Interface(IdentifiableMixin):
 
         super().__init__(id=id)
 
-        self.component = component
+        self.component = html.div(
+            slots=[
+                Progress(),
+                component,
+            ],
+        )
         self.name = name
         self.height = height
         self.width = width

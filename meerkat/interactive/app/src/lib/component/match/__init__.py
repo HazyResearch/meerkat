@@ -69,7 +69,10 @@ def _parse_query(
             pbar=False,
         )
     else:
-        raise ValueError(f"Unsupported query node {node}")
+        node_repr = node.id if hasattr(node, "id") else node
+        if isinstance(node_repr, str):
+            node_repr = f"'{node_repr}'"
+        raise ValueError(f"Unsupported query {node_repr}")
 
 
 @endpoint

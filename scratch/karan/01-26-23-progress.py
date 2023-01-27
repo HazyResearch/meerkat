@@ -1,11 +1,7 @@
 import time
 import meerkat as mk
 from meerkat.interactive import Store
-from meerkat.interactive.app.src.lib.component.progress import Progress
 from meerkat.interactive.interface import Interface
-
-progressbar = Progress()
-
 
 a = Store(1)
 b = Store(2)
@@ -43,7 +39,6 @@ e = cub(c)
 
 layout = mk.gui.html.div(
     slots=[
-        progressbar,
         mk.gui.flowbite.Button(
             on_click=set_a.partial(new_a=3),
             slots=["Set A"],
