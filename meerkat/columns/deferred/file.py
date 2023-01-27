@@ -21,8 +21,6 @@ from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
-folder = LazyLoader("torchvision.datasets.folder")
-
 logger = logging.getLogger(__name__)
 
 
@@ -257,7 +255,7 @@ class FileColumn(DeferredColumn):
         # we can infer the base_dir
         if base_dir is None and data.str.startswith("/").all():
             base_dir = os.path.commonpath(data)
-            data = data.str.replace(base_dir, "")
+            data = data.str.replace(base_dir + "/", "")
 
         # if downloader is not provided then we can try to infer from the filepaths
         if downloader is None:
@@ -342,8 +340,9 @@ class FileColumn(DeferredColumn):
         )
 
     @classmethod
-    def default_loader(cls, *args, **kwargs):
-        return folder.default_loader(*args, **kwargs)
+    def default_loader(cls, path, *args, **kwargs):
+        with open(path, "r") as f:
+            return f.read()
 
     @staticmethod
     def _read_data(path: str):
