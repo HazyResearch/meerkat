@@ -3,6 +3,8 @@
 	import { create_stores_from_component, global_stores } from './blanks/stores';
 	import DynamicComponent from './DynamicComponent.svelte';
 	import StoreComponent from './StoreComponent.svelte';
+	import {Toaster} from 'svelte-french-toast';
+
 
 	export let config: InterfaceType;
     
@@ -27,3 +29,5 @@
 {:else}
 	<slot />
 {/if}
+
+<Toaster />
