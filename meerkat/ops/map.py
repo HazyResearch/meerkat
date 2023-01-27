@@ -436,7 +436,7 @@ def map(
         pbar=pbar,
         use_ray=use_ray,
         num_blocks=num_blocks,
-        blocks_per_window=blocks_per_window
+        blocks_per_window=blocks_per_window,
     )
 
 
@@ -464,7 +464,7 @@ def _materialize(
         fns = []
         while isinstance(curr, mk.DeferredColumn):
             fns.append(curr.data.fn)
-            
+
             # For linear pipelines, there will be either one elem in args or one key in kwargs
             if curr.data.args:
                 if len(curr.data.args) > 1:
@@ -488,16 +488,20 @@ def _materialize(
         pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
         for fn in reversed(fns):
             pipe = pipe.map(fn)
-        
+
         # Step 4: Collect the results
         # TODO (dean): support different output types
         result = np.array([])
-        partitions = iter(pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()).__next__().to_numpy_refs()
+        partitions = (
+            iter(pipe.rewindow(blocks_per_window=num_blocks).iter_datasets())
+            .__next__()
+            .to_numpy_refs()
+        )
         for partition in partitions:
             result = np.append(result, ray.get(partition))
         return result
-        
-    else:    
+
+    else:
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(
