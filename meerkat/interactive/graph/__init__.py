@@ -51,6 +51,7 @@ def trigger() -> List[Modification]:
             computation graph.
     """
     modifications = state.modification_queue.clear()
+    logger.debug(f"Triggering on {modifications}")
     progress = state.progress_queue
 
     # build a graph rooted at the stores and refs in the modifications list

@@ -10,16 +10,27 @@
 	// Fetch data from this streaming endpoint
 	const eventSource = new EventSource(`${get(API_URL)}/subscribe/progress/`);
 
-	let start_payload;
+    
+    eventSource.addEventListener('endpoint', async (event) => {
+        let endpoint = JSON.parse(event.data);
+		running = true;
+        progress = 0;
+        info = `Running endpoint ${endpoint}...`;
+        console.log("Endpoint");
+	});
+    
+    let start_payload;
 	eventSource.addEventListener('start', (event) => {
 		start_payload = JSON.parse(event.data);
 		running = true;
+        console.log("Start");
 	});
 
 	eventSource.addEventListener('progress', (event) => {
 		let op;
 		({ op, progress } = JSON.parse(event.data));
 		info = `Running ${op}...`;
+        console.log("Progress");
 	});
 
 	eventSource.addEventListener('end', async (event) => {
@@ -27,8 +38,14 @@
 		progress = 100;
 		await new Promise((r) => setTimeout(r, 500));
 		running = false;
+        // Removing this `progress=0` causes events
+        // to not be triggered correctly!
+        // FIXME: debug this
+        progress = 0; 
 		info = 'Server Ready.';
 	});
+
+
 </script>
 
 <div class="h-12 mb-1">

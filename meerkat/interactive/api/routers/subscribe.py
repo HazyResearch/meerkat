@@ -34,6 +34,13 @@ async def progress_generator():
                         "retry": RETRY_TIMEOUT,
                         "data": "",
                     }
+                elif isinstance(item, str):
+                    yield {
+                        "event": "endpoint",
+                        "id": "message_id",
+                        "retry": RETRY_TIMEOUT,
+                        "data": json.dumps(item),
+                    }
                 else:
                     # Progress events send the current progress
                     # and the operation name
