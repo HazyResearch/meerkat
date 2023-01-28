@@ -29,13 +29,13 @@
 	eventSource.addEventListener('progress', (event) => {
 		let op;
 		({ op, progress } = JSON.parse(event.data));
-		info = `Running ${op}...`;
+		info = op !== "Done!" ? `Running ${op}...` : op;
         console.log("Progress");
 	});
 
 	eventSource.addEventListener('end', async (event) => {
-		info = 'Done!';
-		progress = 100;
+		// info = 'Done!';
+		// progress = 100;
 		await new Promise((r) => setTimeout(r, 500));
 		running = false;
         // Removing this `progress=0` causes events

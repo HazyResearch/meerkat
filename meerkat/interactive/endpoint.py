@@ -243,6 +243,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         state.modification_queue.ready()
         state.progress_queue.add(self.fn.func.__name__)
         result = partial_fn()
+        state.progress_queue.add(None)
         # Don't track modifications outside of the endpoint
         state.modification_queue.unready()
 

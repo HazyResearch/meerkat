@@ -28,6 +28,8 @@ def dispatch(
     except Exception as e:
         # General exception should be converted to a HTTPException
         # that fastapi can handle.
+        from meerkat.state import state
+        state.progress_queue.add(None)
         raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Only return store modifications that are not backend_only

@@ -96,6 +96,7 @@ def trigger() -> List[Modification]:
             # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
         
+        progress.add({"op": "Done!", "progress": 100})
         progress.add(None)
         logger.debug("Done running trigger pipeline.")
 
