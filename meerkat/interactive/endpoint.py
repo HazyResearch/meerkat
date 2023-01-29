@@ -162,9 +162,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         self.route = route
 
     def __repr__(self) -> str:
-        if hasattr(self.fn, '__name__'):
+        if hasattr(self.fn, "__name__"):
             name = self.fn.__name__
-        elif hasattr(self.fn, 'func'):
+        elif hasattr(self.fn, "func"):
             name = self.fn.func.__name__
         else:
             name = None
@@ -225,7 +225,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         signature = inspect.signature(partial_fn)
         # Check if any parameters are unfilled args
         no_unfilled_args = all(
-            [param.default is not param.empty for param in signature.parameters.values()]
+            [
+                param.default is not param.empty
+                for param in signature.parameters.values()
+            ]
         )
 
         if not (no_args and no_kwonlyargs and no_unfilled_args):
@@ -262,7 +265,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # Unready the modification queue
             state.modification_queue.unready()
             raise e
-        
+
         modifications = trigger()
 
         # End the progress bar
@@ -395,7 +398,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             # Pydantic model, and a return annotation that matches `fn`
             def _fn(
                 kwargs: FnPydanticModel = Endpoint.EmbeddedBody(),
-            ):# -> signature.return_annotation:
+            ):  # -> signature.return_annotation:
                 return self.fn(**kwargs.dict())
 
             # from inspect import Parameter, Signature
@@ -444,8 +447,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
     def __call__(self, *args, __fn_only=False, **kwargs):
         """
-        Calling the endpoint will just call .run(...) by default. 
-        If `__fn_only=True` is specified, it will call the raw 
+        Calling the endpoint will just call .run(...) by default.
+        If `__fn_only=True` is specified, it will call the raw
         function underlying this endpoint.
         """
         if __fn_only:
