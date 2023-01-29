@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { LogicalPartition } from 'carbon-icons-svelte';
 	import { getContext, onMount, type ComponentType } from 'svelte';
 
 	const components: { [key: string]: ComponentType } = getContext('Components');
