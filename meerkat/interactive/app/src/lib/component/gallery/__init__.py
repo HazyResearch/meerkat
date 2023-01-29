@@ -4,7 +4,6 @@ from typing import List
 from pydantic import Field
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph import Store
 
 from ..abstract import AutoComponent
 

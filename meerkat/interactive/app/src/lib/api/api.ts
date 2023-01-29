@@ -29,10 +29,6 @@ export const dispatch = async (endpoint_id: string, payload: any = {}) => {
 	return result;
 };
 
-export const get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
-    return await post(`${get(API_URL)}/df/${ref_id}/schema`, { columns: columns });
-};
-
 export interface DataFrameChunkRequest {
     df: DataFrameRef
     columns?: Array<string> | null
@@ -98,6 +94,7 @@ export const get_rows = async (
     key_column?: string,
     keys?: Array<string | number>
 ) => {
+    console.log("get_schema is deprecated. Use fetch_schema instead.")
     const result = await post(`${get(API_URL)}/df/${ref_id}/rows`, {
         start: start,
         end: end,
@@ -116,6 +113,11 @@ export const get_rows = async (
     );
 };
 
+
+export const get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
+    console.log("get_schema is deprecated. Use fetch_schema instead.")
+    return await post(`${get(API_URL)}/df/${ref_id}/schema`, { columns: columns });
+};
 
 export const add = async (ref_id: string, column_name: string) => {
     const modifications = await modify(`${get(API_URL)}/df/${ref_id}/add`, { column: column_name });

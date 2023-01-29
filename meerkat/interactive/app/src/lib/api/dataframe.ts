@@ -67,7 +67,17 @@ export class DataFrameChunk {
             cell_data_prop: column_info.cell_data_prop,
             column: column
         }
-
+    }
+    get_column(column: string) {
+        let column_idx = this.columns.indexOf(column);
+        let column_info = this.column_infos[column_idx];
+        return {
+            data: this.rows.map((row) => row[column_idx]),
+            cell_component: column_info.cell_component,
+            cell_props: column_info.cell_props,
+            cell_data_prop: column_info.cell_data_prop,
+            column: column
+        }
     }
 
     length() {
