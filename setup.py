@@ -78,6 +78,7 @@ EXTRAS = {
         "sphinx-copybutton",
         "sphinx_design",
         "twine",
+        "httpx",
     ],
     "embeddings-mac": [
         "faiss-cpu",
