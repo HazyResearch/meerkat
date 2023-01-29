@@ -10,7 +10,7 @@
 	export let imgChatbot: string;
 	export let imgUser: string;
 
-	$: messages_promise = fetch_chunk({df:df, start:0, end: 100000});
+	$: messages_promise = fetch_chunk({ df: df, start: 0, end: 100000 });
 
 	let value: string = '';
 	let send = () => {

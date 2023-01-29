@@ -20,6 +20,16 @@ const config = {
 	test: {
 		globals: true,
 		environment: 'jsdom',
+
+		// Add @testing-library/jest-dom matchers & mocks of SvelteKit modules
+		setupFiles: ['./src/mocks/setup.ts'],
+		// Exclude files in c8
+		coverage: {
+			exclude: ['./src/mocks']
+		},
+		deps: {
+			inline: [/msw/]
+		}
 	},
 
 	// build: {
