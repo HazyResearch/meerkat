@@ -280,9 +280,11 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                     arg.attach_to_inode(node)
 
                 arg.inode.add_child(self.inode, triggers=False)
-
+        
+        fn = partial(self.fn, *args, **kwargs)
+        fn.__name__ = self.fn.__name__
         return Endpoint(
-            fn=partial(self.fn, *args, **kwargs),
+            fn=fn,
             prefix=None,
             route=None,
         )
@@ -302,6 +304,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         Return:
             Endpoint: The new composed Endpoint.
         """
+        if not isinstance(fn, Endpoint):
+            fn = Endpoint(fn=fn)
+
         # `fn` may not take any inputs.
         # FIXME: Should this logic be in ``compose``? or some other function?
         sig = get_signature(fn)
@@ -310,7 +315,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         @wraps(self.fn)
         def composed(*args, **kwargs):
             out = self.fn(*args, **kwargs)
-            return fn(out) if pipe_return else fn()
+            return fn.fn(out) if pipe_return else fn.fn()
+        
+        composed.__name__ = f"composed({str(self)} | {str(fn)})"
 
         return Endpoint(
             fn=composed,
@@ -444,6 +451,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         function underlying this endpoint.
         """
         if __fn_only:
+            # FIXME(Sabri): This isn't working for some reason. The '__fn_only' arg
+            # is for some reason being put in the kwargs dict. Workaround is to just 
+            # use self.fn directly.
             return self.fn(*args, **kwargs)
         return self.run(*args, **kwargs)
 

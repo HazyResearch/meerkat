@@ -170,11 +170,18 @@ class ModificationQueue:
 
     def ready(self):
         """Ready the queue for accepting new modifications."""
+        count = 0
         while self._ready:
             # Modification queue is already in use
             # Wait for it to be unready
             logger.debug("Modification queue is already in use. Waiting...")
             time.sleep(0.1)
+            count += 1
+            if count == 1e-3:
+                logger.warn(
+                    "Modification queue is taking a long time to unready."
+                    "Check for deadlocks."
+                )
             
         self._ready = True
         logger.debug("Modification queue is now ready.")

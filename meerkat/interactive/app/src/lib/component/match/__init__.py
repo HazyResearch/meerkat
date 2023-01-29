@@ -103,12 +103,12 @@ def set_criterion(
         )
         criterion.set(match_criterion)
 
-        # Do not return the criterion to the frontend because
-        # it is not json serializable.
-
     except Exception as e:
         raise e
         raise HTTPException(status_code=500, detail=str(e))
+    
+    return criterion
+
 
 
 @dataclass

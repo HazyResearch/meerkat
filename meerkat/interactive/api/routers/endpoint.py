@@ -1,8 +1,12 @@
+import json
 import logging
 from fastapi import HTTPException
+from fastapi.responses import Response
+
 
 from meerkat.errors import TriggerError
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.utils import MeerkatJSONEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +37,7 @@ def dispatch(
         # General exception should be converted to a HTTPException
         # that fastapi can handle.
         from meerkat.state import state
+
         logger.debug("Exception in dispatch", exc_info=True)
         state.progress_queue.add(None)
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -45,4 +50,5 @@ def dispatch(
     ]
 
     # Return the modifications and the result to the frontend
+
     return {"result": result, "modifications": modifications, "error": None}
