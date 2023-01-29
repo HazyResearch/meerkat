@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { store_trigger } from '../api/api';
+	import { update_store } from '../api/api';
 
 	export let store_id: string;
 	export let store: any;
@@ -16,12 +16,17 @@
 	// this assumes that all the stores are created with meerkat_writable
 	let trigger_store = store.trigger_store;
 
+	let _mounted = false;
 	// Callback that runs when the store changes
 	export let callback = () => {
+		if (!_mounted) {
+			_mounted = true;
+			return;
+		}
 		if (!is_backend_store) {
 			return;
 		}
-		store_trigger(store_id, $store);
+		update_store(store_id, $store);
 	};
 
 	// only respond to trigger_store
