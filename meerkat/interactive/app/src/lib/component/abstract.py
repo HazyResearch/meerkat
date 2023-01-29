@@ -30,6 +30,9 @@ class WrappableMixin:
 
         svelte_writer = SvelteWriter()
 
+        # TODO: this will create issues if users want to use plotly components
+        # in mk init apps. In general, we need to make the library / namespace
+        # distinction more explicit and this system more robust.
         if cls.library == "@meerkat-ml/meerkat" and (
             cls.namespace == "meerkat" or cls.namespace == "plotly"
         ):
