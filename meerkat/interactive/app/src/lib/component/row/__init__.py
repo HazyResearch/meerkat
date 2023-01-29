@@ -4,18 +4,18 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
-class Row(Component):
+class Row(AutoComponent):
 
     df: "DataFrame"
     # The primary key column.a
-    primary_key_column: Store[str]
+    primary_key_column: str
     # The Cell specs
-    cell_specs: Store[Dict[str, Dict[str, Any]]]
+    cell_specs: Dict[str, Dict[str, Any]]
     # The selected key. This should be an element in primary_key_col.
-    selected_key: Store[str] = None
+    selected_key: str = None
     title: str = ""
 
     # On change should take in 3 arguments:

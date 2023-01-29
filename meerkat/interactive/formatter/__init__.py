@@ -13,3 +13,4 @@ NumpyArrayFormatter = DeprecatedFormatter
 TensorFormatter = DeprecatedFormatter
 WebsiteFormatter = DeprecatedFormatter
 CodeFormatter = DeprecatedFormatter
+PILImageFormatter = DeprecatedFormatter

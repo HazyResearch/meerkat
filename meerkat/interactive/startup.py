@@ -303,32 +303,33 @@ def get_subclasses_recursive(cls: type) -> List[type]:
         subclasses.extend(get_subclasses_recursive(subclass))
     return subclasses
 
+# TODO(Karan): Do we still need this? Seems like it's not used anywhere.
+# def wrap_all_components(exclude_meerkat: bool = False):
+#     from meerkat.interactive import Component
 
-def wrap_all_components(exclude_meerkat: bool = False):
-    from meerkat.interactive import Component
+#     # Recursively find all subclasses of Component
+#     subclasses = get_subclasses_recursive(Component)
+#     exclude = set(["AutoComponent", "Component"])
+#     for subclass in subclasses:
+#         if subclass.__name__ in exclude:
+#             continue
 
-    # Recursively find all subclasses of Component
-    subclasses = get_subclasses_recursive(Component)
-    exclude = set(["AutoComponent", "Component"])
-    for subclass in subclasses:
-        if subclass.__name__ in exclude:
-            continue
+#         if subclass.namespace == "@meerkat-ml/meerkat" and exclude_meerkat:
+#             continue
 
-        if subclass.namespace == "@meerkat-ml/meerkat" and exclude_meerkat:
-            continue
+#         # Use subclass.__name__ as the component name, instead of
+#         # subclass.component_name, because the latter is not guaranteed to be unique.
+#         component_name = subclass.__name__
 
-        # Use subclass.__name__ as the component name, instead of
-        # subclass.component_name, because the latter is not guaranteed to be unique.
-        component_name = subclass.__name__
-
-        # Make a file for the component, inside a subdirectory for the namespace
-        # e.g. src/lib/wrappers/__meerkat/Component.svelte
-        os.makedirs(f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}", exist_ok=True)
-        with open(
-            f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}/{component_name}.svelte",
-            "w",
-        ) as f:
-            f.write(subclass._to_svelte_wrapper())
+#         # Make a file for the component, inside a subdirectory for the namespace
+#         # e.g. src/lib/wrappers/__meerkat/Component.svelte
+#         breakpoint()
+#         os.makedirs(f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}", exist_ok=True)
+#         with open(
+#             f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}/{component_name}.svelte",
+#             "w",
+#         ) as f:
+#             f.write(subclass._to_svelte_wrapper())
 
 
 def run_frontend_prod(

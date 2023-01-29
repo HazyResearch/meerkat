@@ -1,8 +1,8 @@
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import Component
+from ..abstract import AutoComponent
 
 
 @endpoint
@@ -38,22 +38,14 @@ def discover(df: DataFrame, by: str, target: str, pred: str):
     return eb
 
 
-class Discover(Component):
+class Discover(AutoComponent):
 
     df: DataFrame
-    by: Store[str]
+    by: str
     target: str = None
     pred: str = None
-    on_discover: Endpoint = None
-
-    @property
-    def props(self):
-        return {
-            "df": self.df,
-            "by": self.by,
-            "on_discover": self.on_discover,
-            "get_discover_schema": self.get_discover_schema,
-        }
+    on_discover: EndpointProperty = None
+    get_discover_schema: EndpointProperty = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

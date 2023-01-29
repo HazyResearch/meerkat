@@ -51,7 +51,7 @@ from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from .interface import Interface, interface
 from .modification import DataFrameModification, Modification
 from .startup import start
-from .state import State
+from .state import State 
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 

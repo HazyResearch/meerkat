@@ -96,11 +96,11 @@ class DataFrame(
             *args,
             **kwargs,
         )
-        self._primary_key = None
+        self._primary_key = None if primary_key is False else primary_key
         self.data = data
 
         if primary_key is True:
-            primary_key = self._infer_primary_key(create=True)
+            self._infer_primary_key(create=True)
 
     @property
     def gui(self):

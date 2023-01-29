@@ -1,27 +1,26 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
-	import type { DataFrameBox, EditTarget, Endpoint } from '$lib/utils/types';
+	import type { DataFrameRef, EditTarget, Endpoint } from '$lib/utils/types';
 	import { get } from 'svelte/store';
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import BasicCell from '$lib/component/scalar/Scalar.svelte';
 
-	const { fetch_chunk, get_schema, dispatch } = getContext('Meerkat');
+	const { fetch_chunk, fetch_schema, dispatch } = getContext('Meerkat');
 
-	export let df: Writable<DataFrameBox>;
-	export let primary_key_column: Writable<string>;
-	export let selected_key: Writable<string>;
+	export let df: DataFrameRef;
+	export let selected_key: string;
 	export let cell_specs: any;
 	export let title: string = "";
 
 	export let on_change: Endpoint = null;
 
-	$: schema_promise = get_schema($df.ref_id);
+	$: schema_promise = fetch_schema({df: df});
 
 	let rows_promise: any = null;
 	$: {
-		if ($selected_key !== null && $selected_key !== "") {
-			rows_promise = fetch_chunk($df.ref_id, null, null, null, null, $primary_key_column, [$selected_key]);
+		if (selected_key !== null && selected_key !== "") {
+			rows_promise = fetch_chunk({df: df,  keyidxs: [selected_key]});
 		} else {
 			rows_promise = null;
 		}
@@ -35,7 +34,7 @@
 		const promise = dispatch(
 			on_change.endpoint_id,
 			{
-				"key": $selected_key,
+				"key": selected_key,
 				"column": column,
 				"value": event.detail.value
 			}
@@ -58,7 +57,7 @@
 	{:then schema}
 		{#each schema.columns as column, column_idx}
         
-			{#if $cell_specs[column.name] && $cell_specs[column.name]["type"] !== 'stat'}
+			{#if cell_specs[column.name] && cell_specs[column.name]["type"] !== 'stat'}
 				<div class="">
 					<div class="text-gray-600 font-mono">
 						{column.name}
@@ -74,7 +73,7 @@
 									data={rows.rows[0][column_idx]}
 									cell_component={column.cell_component}
 									cell_props={column.cell_props}
-									editable={$cell_specs[column.name].type === 'editable'}
+									editable={cell_specs[column.name].type === 'editable'}
 									on:edit={(event) => on_edit(event, column.name)}
 								/>
 							{/if}
@@ -85,11 +84,11 @@
 		{/each}
 		<div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2 pt-2">
 			{#each schema.columns as column, column_idx}
-				{#if $cell_specs[column.name] && $cell_specs[column.name].type === 'stat'}
+				{#if cell_specs[column.name] && cell_specs[column.name].type === 'stat'}
 					<div class="bg-white rounded-md flex flex-col shadow-lg">
 						<div class="text-slate-400 px-3 py-1 self-center">
-							{#if $cell_specs[column.name].name}
-								{$cell_specs[column.name].name}
+							{#if cell_specs[column.name].name}
+								{cell_specs[column.name].name}
 							{:else}
 								{column.name}
 							{/if}

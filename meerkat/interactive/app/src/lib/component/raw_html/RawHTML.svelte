@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Globe } from 'carbon-icons-svelte';
-import sanitizeHtml from 'sanitize-html';
+	import sanitizeHtml from 'sanitize-html';
 	import Globe2 from 'svelte-bootstrap-icons/lib/Globe2.svelte';
 
 	export let html: string;

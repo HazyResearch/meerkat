@@ -11,7 +11,7 @@
 	// for interacting with the Python backend.
 	// Each of these functions can be accessed by running $function_name
 	const { fetch_chunk } = getContext('Meerkat');
-	// the `get_rows` function is used to fetch data from a dataframe in the Python backend
+	// the `fetch_chunk` function is used to fetch data from a dataframe in the Python backend
 	// the `edit` function is used to send edits to a dataframe in the Python backend
 
 	// Below are props (attributes) for our component.

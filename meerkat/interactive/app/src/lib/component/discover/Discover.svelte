@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import type { DataFrameSchema } from '$lib/api/dataframe';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
 	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
@@ -8,8 +8,8 @@
 
 	const { dispatch } = getContext('Meerkat');
 
-	export let df: Writable;
-	export let by: Writable<string>;
+	export let df: DataFrameRef;
+	export let by: string;
 	export let on_discover: Endpoint;
 	export let get_discover_schema: Endpoint;
 
@@ -18,25 +18,23 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = dispatch(get_discover_schema.endpoint_id, {}, {});
+		schema_promise = dispatch(get_discover_schema.endpoint_id, { detail: {} });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
 	}
 
 	const on_submit = async () => {
-		if ($by === '') {
+		if (by === '') {
 			status = 'error';
 			return;
 		}
 		status = 'working';
-		let promise = dispatch(
-			on_discover.endpoint_id,
-			{
-				by: $by
-			},
-			{}
-		);
+		let promise = dispatch(on_discover.endpoint_id, {
+			detail: {
+				by: by
+			}
+		});
 		promise
 			.then(() => {
 				status = 'success';
@@ -48,13 +46,13 @@
 	};
 
 	function handleSelect(event) {
-		$by = event.detail.value;
+		by = event.detail.value;
 	}
 
 	function handleClear() {
-		$by = '';
+		by = '';
 	}
-	$: by_item = { value: $by, label: $by };
+	$: by_item = { value: by, label: by };
 </script>
 
 <div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">

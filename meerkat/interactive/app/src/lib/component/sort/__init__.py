@@ -58,9 +58,7 @@ class Sort(AutoComponent):
     """
 
     df: DataFrame
-    criteria: Store[Union[List[SortCriterion], SortCriterion]] = Field(
-        default_factory=lambda: Store([])
-    )
+    criteria: Union[List[SortCriterion], SortCriterion] = Field(default_factory=lambda: [])
     # criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"
 

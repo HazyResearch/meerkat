@@ -18,7 +18,9 @@
 
 	// FIXME: Temporarily have to do this to update the frontend criteria
 	// when the backend criteria changes.
-	$: {criteria_frontend = criteria}
+	$: {
+		criteria_frontend = criteria
+	}
 	// criteria.subscribe((value) => {
 	// 	criteria_frontend = $criteria;
 	// });

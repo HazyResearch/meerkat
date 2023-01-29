@@ -27,7 +27,7 @@ class ImageFormatter(Formatter):
     def _encode(self, image: Image, thumbnail: bool = False) -> str:
         with BytesIO() as buffer:
             if thumbnail:
-                image.thumbnail((64, 64))
+                image.thumbnail((256, 256))
             image.save(buffer, "jpeg")
             return "data:image/jpeg;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()

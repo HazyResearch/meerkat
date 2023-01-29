@@ -1,24 +1,20 @@
 <script lang="ts">
-	import type { Component } from '$lib/utils/types';
-	import Plot from '$lib/component/plot/Plot.svelte';
-	import Gallery from '$lib/component/gallery/Gallery.svelte';
-	import Stats from '$lib/component/stats/Stats.svelte';
-	import Match from '$lib/component/match/Match.svelte';
-	import Filter from '$lib/component/filter/Filter.svelte';
-	import Row from '$lib/component/row/Row.svelte';
-	import Sort from '$lib/component/sort/Sort.svelte';
-	import Discover from '$lib/component/discover/Discover.svelte';
+	import type { ComponentType } from '$lib/utils/types';
+	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
 
-	export let gallery: Component;
-	export let gallery_match: Component;
-	export let gallery_filter: Component;
-	export let gallery_sort: Component;
-	export let discover: Component;
-	export let plot: Component;
-	export let active_slice: Component;
-	export let slice_sort: Component;
-	export let slice_match: Component;
-	export let global_stats: Component;
+
+	export let gallery: ComponentType;
+	export let gallery_match: ComponentType;
+	export let gallery_filter: ComponentType;
+	export let gallery_sort: ComponentType;
+	export let discover: ComponentType;
+	// export let plot: ComponentType;
+	export let active_slice: ComponentType;
+	export let slice_sort: ComponentType;
+	export let slice_match: ComponentType;
+	export let global_stats: ComponentType;
+	
+	console.log(gallery)
 </script>
 
 <div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
@@ -28,11 +24,12 @@
 				<span color="transparent" text-shadow="0 0 0 white">♨️</span> Mocha ChangeList
 			</div>
 		</div>
-		<Match {...slice_match.props} />
-		<Sort {...slice_sort.props} />
-		<Discover {...discover.props} />
-		<Stats {...global_stats.props} />
-		<Plot {...plot.props} />
+		<DynamicComponent {...slice_match} />
+		<DynamicComponent {...slice_sort} />
+		<DynamicComponent {...discover} />
+		<DynamicComponent {...global_stats} />
+		<div></div>
+		<!-- <Plot {...plot} / -->
 	</div>
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
@@ -42,17 +39,17 @@
 		</div>
 		<div class="grid grid-rows-auto grid-flow-col gap-3">
 			<div class="flex flex-col space-y-3">
-				<Row {...active_slice.props} />
-				<!-- <StatsLabeler {...gallery_editor.props} /> -->
+				<DynamicComponent {...active_slice} />
+				<!-- <StatsLabeler {...gallery_editor} /> -->
 			</div>
 			<div class="flex flex-col space-y-3">
-				<Match {...gallery_match.props} />
+				<DynamicComponent {...gallery_match} />
 
-				<Filter {...gallery_filter.props} />
-				<Sort {...gallery_sort.props} />
+				<DynamicComponent {...gallery_filter} />
+				<DynamicComponent {...gallery_sort} />
 			</div>
 		</div>
-		<Gallery {...gallery.props} />
+		<DynamicComponent {...gallery} />
 	</div>
 </div>
 
