@@ -8,8 +8,8 @@ from meerkat.state import state
 
 logger = logging.getLogger(__name__)
 
-@endpoint(prefix="/store", route="/{store}/trigger/")
-def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
+@endpoint(prefix="/store", route="/{store}/update/")
+def update(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
     """Triggers the computational graph when a store on the frontend changes."""
 
     logger.debug(f"Updating store {store} with value {value}.")

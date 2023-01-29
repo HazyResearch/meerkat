@@ -9,7 +9,7 @@
 //     get_sliceby_rows,
 //     match,
 //     remove_row_by_index,
-//     store_trigger
+//     update_store
 // } from './api/api.js';
 // This import causes an ssr error!
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { store_trigger } from '../api/api';
+	import { update_store } from '../api/api';
 
 	export let store_id: string;
 	export let store: any;
@@ -26,7 +26,7 @@
 		if (!is_backend_store) {
 			return;
 		}
-		store_trigger(store_id, $store);
+		update_store(store_id, $store);
 	};
 
 	// only respond to trigger_store
