@@ -46,7 +46,7 @@ class SingletonRouter(type):
 
 
 class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter):
-    # TODO: using the SingletonRouter metaclass causes a bug.
+    # KG: using the SingletonRouter metaclass causes a bug.
     # app.include_router() inside Endpoint is called multiple times
     # for the same router. This causes an error because some
     # endpoints are registered multiple times because the FastAPI
@@ -56,25 +56,17 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
     # that's not a problem).
     """A very simple FastAPI router.
 
-    Only one instance of this router will be created *for a given prefix*, so
-    you can call this router multiple times in your code and it will always
-    return the same instance.
-
     This router allows you to pass in arbitrary keyword arguments that are
     passed to the FastAPI router, and sets sensible defaults for the
     prefix, tags, and responses.
+
+    Note that if you create two routers with the same prefix, they will
+    not be the same object.
 
     Attributes:
         prefix (str): The prefix for this router.
         **kwargs: Arbitrary keyword arguments that are passed to the FastAPI
             router.
-
-    Example:
-        >>> from meerkat.interactive.api.routers import SimpleRouter
-        >>> router = SimpleRouter(prefix="/endpoint")
-        >>> router = SimpleRouter(prefix="/endpoint")
-        >>> router is SimpleRouter(prefix="/endpoint")
-        True
     """
 
     _self_identifiable_group: str = "routers"

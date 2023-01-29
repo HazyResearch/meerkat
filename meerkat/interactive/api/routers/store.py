@@ -35,7 +35,7 @@ def store_trigger(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modificat
     # Trigger on the store modification: leads to modifications on the graph
     modifications = trigger()
 
-    # only return modifications that are not backend_only
+    # Only return modifications that are not backend_only
     modifications = [
         m
         for m in modifications

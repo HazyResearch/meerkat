@@ -16,8 +16,13 @@
 	// this assumes that all the stores are created with meerkat_writable
 	let trigger_store = store.trigger_store;
 
+	let _mounted = false;
 	// Callback that runs when the store changes
 	export let callback = () => {
+		if (!_mounted) {
+			_mounted = true;
+			return;
+		}
 		if (!is_backend_store) {
 			return;
 		}
