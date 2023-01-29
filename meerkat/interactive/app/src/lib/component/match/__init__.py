@@ -87,7 +87,6 @@ def set_criterion(
 
     The `dataframe_id` remains the same as the original request.
     """
-
     if not isinstance(df, DataFrame):
         raise HTTPException(
             status_code=400, detail="`match` expects a ref containing a dataframe"

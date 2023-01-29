@@ -8,18 +8,19 @@
 	import { BarLoader } from 'svelte-loading-spinners';
 	import type { Point2D } from '$lib/shared/plot/types';
 	import type { Endpoint } from '$lib/utils/types';
+	import type { DataFrameRef } from '$lib/api/dataframe';
 
-	const { fetch_chunk, get_schema, dispatch } = getContext('Meerkat');
+	const { fetch_chunk, fetch_schema, dispatch } = getContext('Meerkat');
 
-	export let df: Writable;
-	export let x: Writable<string>;
-	export let y: Writable<string>;
-	export let primary_key: Writable<string>;
-	export let x_label: Writable<string>;
-	export let y_label: Writable<string>;
-	export let type: Writable<string>;
+	export let df: DataFrameRef;
+	export let x: string;
+	export let y: string;
+	export let primary_key: string;
+	export let x_label: string;
+	export let y_label: string;
+	export let type: string;
 	export let padding: number = 10;
-	export let keys_to_remove: Writable;
+	export let keys_to_remove: Array<string>;
 	export let can_remove: boolean = true;
 	export let on_select: Endpoint = null;
 
@@ -33,20 +34,20 @@
 	let page: number = 0;
 	let per_page: number = 30;
 
-	$: schema_promise = get_schema($df.ref_id);
+	$: schema_promise = fetch_schema({ df: df });
 
 	let get_datum = async (
-		ref_id: string,
+		df: DataFrameRef,
 		page: number,
 		per_page: number
 	): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await fetch_chunk(ref_id, page * per_page, (page + 1) * per_page, undefined, [
-			$x,
-			$y,
-			$primary_key,
-			...metadata_columns
-		]);
+		let rows = await fetch_chunk({
+			df: df,
+			start: page * per_page,
+			end: (page + 1) * per_page,
+			columns: [x, y, ...metadata_columns]
+		});
 		let datum: Array<Point2D> = [];
 		rows.rows?.forEach((row: any, index: number) => {
 			datum.push({
@@ -75,7 +76,7 @@
 
 		return datum;
 	};
-	$: datum_promise = get_datum($df.ref_id, page, per_page);
+	$: datum_promise = get_datum(df, page, per_page);
 
 	let on_select_run = async (slice_ids: Array<any>) => {
 		if (on_select === null) {
@@ -113,8 +114,8 @@
 		<FancyHorizontalBarPlot
 			data={datum}
 			{metadata}
-			bind:xlabel={$x_label}
-			bind:ylabel={$y_label}
+			bind:xlabel={x_label}
+			bind:ylabel={y_label}
 			ywidth={196}
 			{padding}
 			{can_remove}
@@ -122,8 +123,8 @@
 				on_select_run(Array.from(e.detail.selected_points));
 			}}
 			on:remove={async (e) => {
-				$keys_to_remove.push(datum[e.detail].key);
-				$keys_to_remove = $keys_to_remove;
+				keys_to_remove.push(datum[e.detail].key);
+				keys_to_remove = keys_to_remove;
 			}}
 		/>
 	{/await}

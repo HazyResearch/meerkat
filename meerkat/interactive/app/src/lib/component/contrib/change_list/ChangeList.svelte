@@ -8,13 +8,12 @@
 	export let gallery_filter: ComponentType;
 	export let gallery_sort: ComponentType;
 	export let discover: ComponentType;
-	// export let plot: ComponentType;
+	export let plot: ComponentType;
 	export let active_slice: ComponentType;
 	export let slice_sort: ComponentType;
 	export let slice_match: ComponentType;
 	export let global_stats: ComponentType;
 	
-	console.log(gallery)
 </script>
 
 <div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
@@ -28,8 +27,7 @@
 		<DynamicComponent {...slice_sort} />
 		<DynamicComponent {...discover} />
 		<DynamicComponent {...global_stats} />
-		<div></div>
-		<!-- <Plot {...plot} / -->
+		<DynamicComponent {...plot} />
 	</div>
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
 		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
