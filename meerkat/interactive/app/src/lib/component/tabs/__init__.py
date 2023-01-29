@@ -4,13 +4,13 @@ from typing import Mapping, Sequence, Union
 
 from meerkat.interactive.frontend import FrontendMixin
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
 @dataclass
 class Tab(FrontendMixin):
     label: str
-    component: Component
+    component: BaseComponent
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     @property
@@ -22,10 +22,10 @@ class Tab(FrontendMixin):
         }
 
 
-class Tabs(Component):
+class Tabs(BaseComponent):
 
     # TODO: Add option for setting the default selected tab.
-    tabs: Union[Mapping[str, Component], Sequence[Tab]]
+    tabs: Union[Mapping[str, BaseComponent], Sequence[Tab]]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,9 +1,9 @@
 from meerkat.interactive.graph import Store
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
-class CodeDisplay(Component):
+class CodeDisplay(BaseComponent):
 
     data: Store[str]
     language: str = "python"

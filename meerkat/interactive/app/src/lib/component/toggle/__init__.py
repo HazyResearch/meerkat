@@ -1,7 +1,7 @@
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 @endpoint
@@ -19,7 +19,7 @@ def _toggle(value: bool, store: Store[bool]) -> bool:
     return value
 
 
-class Toggle(AutoComponent):
+class Toggle(Component):
     title: str = ""
     value: bool = False
 

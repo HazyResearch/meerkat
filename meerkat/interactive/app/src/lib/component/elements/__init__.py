@@ -1,8 +1,8 @@
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
 
 
-class button(Slottable, AutoComponent):
+class button(Slottable, Component):
 
     classes: str = ""
 

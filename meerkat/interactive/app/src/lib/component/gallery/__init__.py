@@ -5,7 +5,7 @@ from pydantic import Field
 
 from meerkat.dataframe import DataFrame
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 @dataclass
@@ -23,7 +23,7 @@ class EditTarget:
         }
 
 
-class Gallery(AutoComponent):
+class Gallery(Component):
 
     df: DataFrame
     main_column: str

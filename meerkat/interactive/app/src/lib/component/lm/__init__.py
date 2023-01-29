@@ -1,9 +1,9 @@
 from meerkat.dataframe import DataFrame
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
-class SchemaTree(Component):
+class SchemaTree(BaseComponent):
 
     name = "SchemaTree"
 

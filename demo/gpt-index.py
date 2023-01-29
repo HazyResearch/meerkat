@@ -92,8 +92,8 @@ text = mk.gui.html.div(
 print("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 
-interface = mk.gui.Interface(
-    # Layout the Interface components one row each, and launch the interface.
+page = mk.gui.Page(
+    # Layout the Interface components one row each, and launch the page.
     component=mk.gui.RowLayout(
         slots=[
             # fileupload_component,
@@ -105,4 +105,4 @@ interface = mk.gui.Interface(
     ),
     id="gpt-index",
 )
-interface.launch()
+page.launch()

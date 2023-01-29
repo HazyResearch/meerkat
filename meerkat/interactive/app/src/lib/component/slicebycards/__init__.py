@@ -5,7 +5,7 @@ from meerkat.interactive.graph import make_store
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
 class Aggregation(IdentifiableMixin):
@@ -26,7 +26,7 @@ class Aggregation(IdentifiableMixin):
         }
 
 
-class SliceByCards(Component):  # FIXME: update this component
+class SliceByCards(BaseComponent):  # FIXME: update this component
     def __init__(
         self,
         sliceby: SliceBy,

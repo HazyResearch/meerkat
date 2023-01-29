@@ -9,7 +9,7 @@ from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, reactive
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 def _in(column: Column, value):
@@ -154,7 +154,7 @@ def filter(
     return data[mask]
 
 
-class Filter(AutoComponent):
+class Filter(Component):
     """This component handles filtering of a dataframe.
 
     Filtering criteria are maintained in a Store. On change of values

@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class Secrets:
 
@@ -59,13 +60,13 @@ class LanguageModel:
 @dataclass
 class APIInfo:
 
-    api: FastAPI
-    port: int
+    api: Optional[FastAPI]
+    port: Optional[int]
     server: Optional[Server] = None
     name: str = "localhost"
     shared: bool = False
-    process: subprocess.Popen = None
-    _url: str = None
+    process: Optional[subprocess.Popen] = None
+    _url: Optional[str] = None
 
     @property
     def url(self):
@@ -89,12 +90,12 @@ class APIInfo:
 @dataclass
 class FrontendInfo:
 
-    package_manager: str
-    port: int
+    package_manager: Optional[str]
+    port: Optional[int]
     name: str = "localhost"
     shared: bool = False
-    process: subprocess.Popen = None
-    _url: str = None
+    process: Optional[subprocess.Popen] = None
+    _url: Optional[str] = None
 
     @property
     def url(self):
@@ -114,7 +115,7 @@ class Identifiables:
 
     columns: WeakMapping = field(default_factory=WeakMapping)
     dataframes: WeakMapping = field(default_factory=WeakMapping)
-    interfaces: Mapping = field(default_factory=dict)
+    pages: Mapping = field(default_factory=dict)
     slicebys: WeakMapping = field(default_factory=WeakMapping)
     aggregations: WeakMapping = field(default_factory=WeakMapping)
     box_operations: WeakMapping = field(default_factory=WeakMapping)
@@ -211,8 +212,8 @@ class ProgressQueue:
 @dataclass
 class GlobalState:
 
-    api_info: APIInfo = None
-    frontend_info: FrontendInfo = None
+    api_info: Optional[APIInfo] = None
+    frontend_info: Optional[FrontendInfo] = None
     identifiables: Identifiables = field(default_factory=Identifiables)
     secrets: Secrets = field(default_factory=Secrets)
     llm: LanguageModel = field(default_factory=LanguageModel)

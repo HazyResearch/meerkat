@@ -1,15 +1,15 @@
-from ...abstract import Component
+from ...abstract import BaseComponent
 
 
-class ChangeList(Component):
+class ChangeList(BaseComponent):
 
-    gallery: Component
-    gallery_match: Component
-    gallery_filter: Component
-    gallery_sort: Component
-    discover: Component
-    plot: Component
-    active_slice: Component
-    slice_sort: Component
-    slice_match: Component
-    global_stats: Component
+    gallery: BaseComponent
+    gallery_match: BaseComponent
+    gallery_filter: BaseComponent
+    gallery_sort: BaseComponent
+    discover: BaseComponent
+    plot: BaseComponent
+    active_slice: BaseComponent
+    slice_sort: BaseComponent
+    slice_match: BaseComponent
+    global_stats: BaseComponent

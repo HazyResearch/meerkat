@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import time
 from enum import Enum
+from typing import Literal
 
 import rich
 import typer
@@ -140,7 +141,7 @@ def run(
     shareable: bool = typer.Option(False, help="Run in public sharing mode"),
     api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
     frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
-    target: str = typer.Option("interface", help="Target to run in script"),
+    target: str = typer.Option("page", help="Target to run in script"),
     package_manager: PackageManager = typer.Option(
         "npm", show_choices=True, help="Package manager to use"
     ),
@@ -174,8 +175,8 @@ def _run(
     shareable: bool = False,
     api_port: int = 8000,
     frontend_port: int = 3000,
-    target: str = "interface",
-    package_manager: str = "npm",
+    target: str = "page",
+    package_manager: Literal["npm", "bun"] = "npm",
     subdomain: str = "app",
     debug: bool = False,
 ):
@@ -191,7 +192,7 @@ def _run(
     rich.print(f":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]")
     rich.print()
 
-    # Dump wrapper Component subclasses, ComponentContext
+    # Dump wrapper BaseComponent subclasses, ComponentContext
     svelte_writer = SvelteWriter()
     svelte_writer.init_run()
 
@@ -219,8 +220,6 @@ def _run(
         apiurl=dummy_api_info.url,
         debug=debug,
     )
-
-    # output_startup_message(frontend_info.url, api_info.docs_url)
 
     # Put it in the global state
     state.api_info = api_info

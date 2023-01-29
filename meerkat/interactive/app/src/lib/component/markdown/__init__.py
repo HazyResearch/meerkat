@@ -1,6 +1,6 @@
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
-class Markdown(Component):
+class Markdown(BaseComponent):
 
     data: str

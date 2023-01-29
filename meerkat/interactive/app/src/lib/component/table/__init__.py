@@ -2,10 +2,10 @@ from pydantic import validator
 
 from meerkat.dataframe import DataFrame
 
-from ..abstract import AutoComponent, Endpoint
+from ..abstract import Component, Endpoint
 
 
-class Table(AutoComponent):
+class Table(Component):
     df: DataFrame
     per_page: int = 100
     editable: bool = False

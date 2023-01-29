@@ -1,6 +1,6 @@
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
+from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
-class Progress(AutoComponent):
+class Progress(Component):
 
     progress: float = 0.0

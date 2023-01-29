@@ -4,10 +4,10 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
-class Row(AutoComponent):
+class Row(Component):
 
     df: "DataFrame"
     # The primary key column.a

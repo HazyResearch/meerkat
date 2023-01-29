@@ -27,11 +27,11 @@ def test_index_js():
         [line.split("default as ")[-1].split(" }")[0] for line in export_statements]
     )
 
-    # Remove the `Interface` and `Meerkat` components
+    # Remove the `Page` and `Meerkat` components
     exported_components = [
         component
         for component in exported_components
-        if component not in ["Interface", "Meerkat"]
+        if component not in ["Page", "Meerkat"]
     ]
 
     # Get the list of all components defined in Python for Meerkat

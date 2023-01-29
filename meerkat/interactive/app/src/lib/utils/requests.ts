@@ -1,4 +1,4 @@
-import { global_stores } from "$lib/shared/blanks/stores";
+import { global_stores } from "$lib/utils/stores";
 
 
 export async function get_request(url: string): Promise<any> {

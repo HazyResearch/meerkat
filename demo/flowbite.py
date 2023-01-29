@@ -273,10 +273,10 @@ toast = fb.Toast(
 
 heading = html.h1(slots="Flowbite Demo", classes="text-4xl")
 
-interface = mk.gui.Interface(
+page = mk.gui.Page(
     component=mk.gui.RowLayout(
         slots=[heading, card, accordion, alert, avatar, carousel, toast]
     ),
     id="flowbite",
 )
-interface.launch()
+page.launch()

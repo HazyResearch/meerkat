@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
-
 	import type { Endpoint } from '$lib/utils/types';
 
-	const { dispatch } = getContext('Interface');
+	const { dispatch } = getContext('Meerkat');
 
 	export let on_run: Endpoint;
 
@@ -26,10 +25,8 @@
 		} catch (err) {
 			error = err;
 			console.log(err);
-		} 
+		}
 	};
-
-
 
 	let divEl: HTMLDivElement = null;
 	let editor;

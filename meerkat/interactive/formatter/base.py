@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Type
 from meerkat.columns.deferred.base import DeferredCell
 
 if TYPE_CHECKING:
-    from meerkat.interactive.app.src.lib.component.abstract import Component
+    from meerkat.interactive.app.src.lib.component.abstract import BaseComponent
 
 
 @dataclass
@@ -20,7 +20,7 @@ class Variant:
 
 class Formatter(ABC):
 
-    component_class: Type["Component"]
+    component_class: Type["BaseComponent"]
     data_prop: str = "data"
     variants: Dict[str, Variant] = {}
 

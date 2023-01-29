@@ -10,7 +10,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store, react
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
 @react()
@@ -29,7 +29,7 @@ def on_run(code: Store[str], new_code: str):
     return code
 
 
-class FormulaBar(Component):
+class FormulaBar(BaseComponent):
     on_run: Endpoint = None
 
     def __init__(self, **kwargs):

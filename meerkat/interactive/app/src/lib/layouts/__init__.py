@@ -1,24 +1,24 @@
 from typing import Any
 
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 
 
-class Flex(Slottable, AutoComponent):
+class Flex(Slottable, Component):
 
     classes: str = "flex-col"
 
 
-class Grid(Slottable, AutoComponent):
+class Grid(Slottable, Component):
 
     classes: str = "grid-cols-2"
 
 
-class Div(Slottable, AutoComponent):
+class Div(Slottable, Component):
 
     classes: str = ""
 
 
-class AutoLayout(Slottable, AutoComponent):
+class AutoLayout(Slottable, Component):
 
     classes: str = ""
 
@@ -33,6 +33,6 @@ class ColumnLayout(Flex):
     classes: str = "flex-row"
 
 
-class Brace(AutoComponent):
+class Brace(Component):
 
     data: Any

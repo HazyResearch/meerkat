@@ -4,7 +4,7 @@ from typing import Any, List, Literal
 from meerkat.interactive.endpoint import Endpoint, endpoint, get_signature
 from meerkat.interactive.graph import Store
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def _select_value(
         return value
 
 
-class Choice(AutoComponent):
+class Choice(Component):
     """Component to select a value from a list of choices.
 
     The ``value`` store will be set to the selected value.

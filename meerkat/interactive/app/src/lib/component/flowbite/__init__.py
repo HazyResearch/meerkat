@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.mixins.identifiable import classproperty
 
@@ -66,7 +66,7 @@ class FlowbiteSvelteMixin:
         return "flowbite"
 
 
-class Accordion(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Accordion(Slottable, FlowbiteSvelteMixin, Component):
     multiple: bool = False
     flush: bool = False
     activeClasses: str = "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800"
@@ -76,7 +76,7 @@ class Accordion(Slottable, FlowbiteSvelteMixin, AutoComponent):
     defaultClass: str = "text-gray-500 dark:text-gray-400"
 
 
-class AccordionItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class AccordionItem(Slottable, FlowbiteSvelteMixin, Component):
     open: bool = False
     activeClasses: str = None
     inactiveClasses: str = None
@@ -84,7 +84,7 @@ class AccordionItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     transitionType: Literal["slide", "fade"] = "slide"
     transitionParams: dict = {}
 
-class Alert(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Alert(Slottable, FlowbiteSvelteMixin, Component):
 
     dismissable: bool = False
     accent: bool = False
@@ -92,7 +92,7 @@ class Alert(Slottable, FlowbiteSvelteMixin, AutoComponent):
         "blue", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
     ] = "blue"
 
-class Avatar(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Avatar(Slottable, FlowbiteSvelteMixin, Component):
 
     src: str = ""
     href: str = None
@@ -106,7 +106,7 @@ class Avatar(Slottable, FlowbiteSvelteMixin, AutoComponent):
     classes: str = None
 
 
-class Badge(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Badge(Slottable, FlowbiteSvelteMixin, Component):
 
     color: Literal[
         "blue", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
@@ -119,14 +119,14 @@ class Badge(Slottable, FlowbiteSvelteMixin, AutoComponent):
     dismissable: bool = False
 
 
-class Breadcrumb(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Breadcrumb(Slottable, FlowbiteSvelteMixin, Component):
     solid: bool = False
     navClass: str = "flex"
     solidClass: str = "flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700"
     olClass: str = "inline-flex items-center space-x-1 md:space-x-3"
 
 
-class BreadcrumbItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class BreadcrumbItem(Slottable, FlowbiteSvelteMixin, Component):
 
     home: bool = False
     href: str = None
@@ -135,7 +135,7 @@ class BreadcrumbItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     homeClass: str = "inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
 
 
-class Button(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Button(Slottable, FlowbiteSvelteMixin, Component):
 
     classes: str = None
 
@@ -178,7 +178,7 @@ class Button(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_mouseleave: Endpoint = None
 
 
-class ButtonGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ButtonGroup(Slottable, FlowbiteSvelteMixin, Component):
 
     size: SizeType = "md"
     divClass: str = "inline-flex rounded-lg shadow-sm"
@@ -193,7 +193,7 @@ class ButtonGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_mouseleave: Endpoint = None
 
 
-class Card(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Card(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = None
     horizontal: bool = False
@@ -227,7 +227,7 @@ class Card(Slottable, FlowbiteSvelteMixin, AutoComponent):
     shadow: bool = False
 
 
-class Carousel(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Carousel(Slottable, FlowbiteSvelteMixin, Component):
 
     showIndicators: bool = True
     showCaptions: bool = True
@@ -249,7 +249,7 @@ class Carousel(Slottable, FlowbiteSvelteMixin, AutoComponent):
     slideClass: str = ""
 
 
-class CarouselTransition(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class CarouselTransition(Slottable, FlowbiteSvelteMixin, Component):
 
     showIndicators: bool = True
     showCaptions: bool = True
@@ -272,7 +272,7 @@ class CarouselTransition(Slottable, FlowbiteSvelteMixin, AutoComponent):
     )
 
 
-class DarkMode(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class DarkMode(Slottable, FlowbiteSvelteMixin, Component):
 
     btnClass: str = (
         "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 "
@@ -281,7 +281,7 @@ class DarkMode(Slottable, FlowbiteSvelteMixin, AutoComponent):
     )
 
 
-class Drawer(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Drawer(Slottable, FlowbiteSvelteMixin, Component):
 
     activateClickOutside: bool = True
     hidden: bool = True
@@ -301,7 +301,7 @@ class Drawer(Slottable, FlowbiteSvelteMixin, AutoComponent):
     transitionType: DrawerTransitionTypes = "fly"
 
 
-class Dropdown(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Dropdown(Slottable, FlowbiteSvelteMixin, Component):
 
     open: bool = False
     frameClass: str = ""
@@ -309,7 +309,7 @@ class Dropdown(Slottable, FlowbiteSvelteMixin, AutoComponent):
     # Configure slots for header and footer
 
 
-class DropdownItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class DropdownItem(Slottable, FlowbiteSvelteMixin, Component):
 
     defaultClass: str = (
         "font-medium py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -327,18 +327,18 @@ class DropdownItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_mouseleave: Endpoint = None
 
 
-class DropdownDivider(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class DropdownDivider(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "my-1 h-px bg-gray-100 dark:bg-gray-600"
 
 
-class DropdownHeader(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class DropdownHeader(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "py-2 px-4 text-gray-700 dark:text-white"
     divider: bool = True
 
 
-class Footer(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Footer(Slottable, FlowbiteSvelteMixin, Component):
 
     customClass: str = ""
     footerType: Literal[
@@ -346,7 +346,7 @@ class Footer(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "default"
 
 
-class FooterBrand(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class FooterBrand(Slottable, FlowbiteSvelteMixin, Component):
 
     aClass: str = "flex items-center"
     spanClass: str = (
@@ -360,7 +360,7 @@ class FooterBrand(Slottable, FlowbiteSvelteMixin, AutoComponent):
     target: str = None
 
 
-class FooterCopyright(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class FooterCopyright(Slottable, FlowbiteSvelteMixin, Component):
 
     spanClass: str = "block text-sm text-gray-500 sm:text-center dark:text-gray-400"
     aClass: str = "hover:underline"
@@ -370,7 +370,7 @@ class FooterCopyright(Slottable, FlowbiteSvelteMixin, AutoComponent):
     target: str = None
 
 
-class FooterIcon(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class FooterIcon(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = ""
     ariaLabel: str = ""
@@ -378,7 +378,7 @@ class FooterIcon(Slottable, FlowbiteSvelteMixin, AutoComponent):
     target: str = None
 
 
-class FooterLink(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class FooterLink(Slottable, FlowbiteSvelteMixin, Component):
 
     liClass: str = "mr-4 last:mr-0 md:mr-6"
     aClass: str = "hover:underline"
@@ -386,12 +386,12 @@ class FooterLink(Slottable, FlowbiteSvelteMixin, AutoComponent):
     target: str = None
 
 
-class FooterLinkGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class FooterLinkGroup(Slottable, FlowbiteSvelteMixin, Component):
 
     ulClass: str = "text-gray-600 dark:text-gray-400"
 
 
-class Indicator(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Indicator(Slottable, FlowbiteSvelteMixin, Component):
 
     color: Literal[
         "gray",
@@ -422,39 +422,39 @@ class Indicator(Slottable, FlowbiteSvelteMixin, AutoComponent):
     offset: bool = True
 
 
-class Kbd(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Kbd(Slottable, FlowbiteSvelteMixin, Component):
 
     kbdClass: str = "text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"
 
 
-class ArrowKeyDown(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ArrowKeyDown(Slottable, FlowbiteSvelteMixin, Component):
 
     svgClass: str = "w-4 h-4"
 
 
-class ArrowKeyLeft(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ArrowKeyLeft(Slottable, FlowbiteSvelteMixin, Component):
 
     svgClass: str = "w-4 h-4"
 
 
-class ArrowKeyRight(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ArrowKeyRight(Slottable, FlowbiteSvelteMixin, Component):
 
     svgClass: str = "w-4 h-4"
 
 
-class ArrowKeyUp(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ArrowKeyUp(Slottable, FlowbiteSvelteMixin, Component):
 
     svgClass: str = "w-4 h-4"
 
 
-# class ListGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class ListGroup(Slottable, FlowbiteSvelteMixin, Component):
 
 #     items: List[ListGroupItemType] = []
 #     active: bool = False
 #     classes: str = ""
 
 
-# class ListGroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class ListGroupItem(Slottable, FlowbiteSvelteMixin, Component):
 
 #     classes: str = ""
 
@@ -471,7 +471,7 @@ class ArrowKeyUp(Slottable, FlowbiteSvelteMixin, AutoComponent):
 #     on_mouseover: Endpoint = None
 
 
-class MegaMenu(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class MegaMenu(Slottable, FlowbiteSvelteMixin, Component):
 
     classes: str = None
     items: List[LinkType] = []
@@ -479,7 +479,7 @@ class MegaMenu(Slottable, FlowbiteSvelteMixin, AutoComponent):
     full: bool = False
 
 
-class Modal(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Modal(Slottable, FlowbiteSvelteMixin, Component):
 
     open: bool = False
     title: str = ""
@@ -503,7 +503,7 @@ class Modal(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_open: Endpoint = None
 
 
-class Navbar(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Navbar(Slottable, FlowbiteSvelteMixin, Component):
 
     navClass: str = "px-2 sm:px-4 py-2.5 w-full"
     navDivClass: str = "mx-auto flex flex-wrap justify-between items-center "
@@ -528,12 +528,12 @@ class Navbar(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "navbar"
 
 
-class NavBrand(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class NavBrand(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = ""
 
 
-class NavLi(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class NavLi(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = ""
     active: bool = False
@@ -541,7 +541,7 @@ class NavLi(Slottable, FlowbiteSvelteMixin, AutoComponent):
     nonActiveClass: str = "text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 
 
-class NavUl(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class NavUl(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "w-full md:block md:w-auto"
     ulClass: str = "flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium"
@@ -549,7 +549,7 @@ class NavUl(Slottable, FlowbiteSvelteMixin, AutoComponent):
     # slideParams: SlideParams = {delay: 250, duration: 500, easing: quintOut}
 
 
-class Pagination(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Pagination(Slottable, FlowbiteSvelteMixin, Component):
 
     pages: List[LinkType] = []
     activeClass: str = "text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
@@ -558,7 +558,7 @@ class Pagination(Slottable, FlowbiteSvelteMixin, AutoComponent):
     table: bool = False
 
 
-class PaginationItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class PaginationItem(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = None
     active: bool = False
@@ -566,13 +566,13 @@ class PaginationItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     normalClass: str = "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 
 
-class Popover(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Popover(Slottable, FlowbiteSvelteMixin, Component):
 
     title: str = ""
     defaultClass: str = "py-2 px-3"
 
 
-# class Popper(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class Popper(Slottable, FlowbiteSvelteMixin, Component):
 
 #     activeContent: bool = False
 #     arrow: bool = True
@@ -585,7 +585,7 @@ class Popover(Slottable, FlowbiteSvelteMixin, AutoComponent):
 #     yOnly: bool = False
 
 
-# class Frame(Slottable, FlowbiteSvelteMixin, AutoComponent):
+# class Frame(Slottable, FlowbiteSvelteMixin, Component):
 
 #     tag: str = "div"
 #     color: Literal[
@@ -616,7 +616,7 @@ class Popover(Slottable, FlowbiteSvelteMixin, AutoComponent):
 #     options: object = {}
 
 
-class Progressbar(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Progressbar(Slottable, FlowbiteSvelteMixin, Component):
 
     progress: number = 45
     size: Literal["h-2.5", "h-3", "h-4", "h-5"] = "h-2.5"
@@ -630,7 +630,7 @@ class Progressbar(Slottable, FlowbiteSvelteMixin, AutoComponent):
     )
 
 
-class Rating(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Rating(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "flex items-center"
     size: str = "24"
@@ -640,7 +640,7 @@ class Rating(Slottable, FlowbiteSvelteMixin, AutoComponent):
     count: bool = False
 
 
-class AdvancedRating(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class AdvancedRating(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "flex items-center mt-4"
     labelClass: str = "text-sm font-medium text-blue-600 dark:text-blue-500"
@@ -650,7 +650,7 @@ class AdvancedRating(Slottable, FlowbiteSvelteMixin, AutoComponent):
     unit: str = "%"
 
 
-class ScoreRating(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ScoreRating(Slottable, FlowbiteSvelteMixin, Component):
 
     desc1Class: str = "bg-blue-100 w-8 text-blue-800 text-sm font-semibold inline-flex items-center p-1.5 rounded dark:bg-blue-200 dark:text-blue-800"
     desc2Class: str = "ml-2 w-24 font-medium text-gray-900 dark:text-white"
@@ -658,14 +658,14 @@ class ScoreRating(Slottable, FlowbiteSvelteMixin, AutoComponent):
     desc3pClass: str = "text-sm w-24 font-medium text-gray-500 dark:text-gray-400"
 
 
-class RatingComment(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class RatingComment(Slottable, FlowbiteSvelteMixin, Component):
 
     ceil: bool = False
     helpfullink: str = ""
     abuselink: str = ""
 
 
-class Review(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Review(Slottable, FlowbiteSvelteMixin, Component):
 
     review: ReviewType = None
     articleClass: str = "md:gap-8 md:grid md:grid-cols-3"
@@ -675,17 +675,17 @@ class Review(Slottable, FlowbiteSvelteMixin, AutoComponent):
     liClass: str = "flex items-center"
 
 
-class Sidebar(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Sidebar(Slottable, FlowbiteSvelteMixin, Component):
 
     asideClass: str = "w-64"
 
 
-class SidebarBrand(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarBrand(Slottable, FlowbiteSvelteMixin, Component):
 
     site: SiteType = None
 
 
-class SidebarCta(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarCta(Slottable, FlowbiteSvelteMixin, Component):
 
     divWrapperClass: str = "p-4 mt-6 bg-blue-50 rounded-lg dark:bg-blue-900"
     divClass: str = "flex items-center mb-3"
@@ -693,7 +693,7 @@ class SidebarCta(Slottable, FlowbiteSvelteMixin, AutoComponent):
     label: str = ""
 
 
-class SidebarDropdownItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarDropdownItem(Slottable, FlowbiteSvelteMixin, Component):
 
     aClass: str = "flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
     href: str = ""
@@ -713,7 +713,7 @@ class SidebarDropdownItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_mouseover: Endpoint = None
 
 
-class SidebarDropdownWrapper(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarDropdownWrapper(Slottable, FlowbiteSvelteMixin, Component):
 
     btnClass: str = "flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
     label: str = ""
@@ -722,14 +722,14 @@ class SidebarDropdownWrapper(Slottable, FlowbiteSvelteMixin, AutoComponent):
     isOpen: bool = False
 
 
-class SidebarGroup(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarGroup(Slottable, FlowbiteSvelteMixin, Component):
 
     ulClass: str = "space-y-2"
     borderClass: str = "pt-4 mt-4 border-t border-gray-200 dark:border-gray-700"
     border: bool = False
 
 
-class SidebarItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarItem(Slottable, FlowbiteSvelteMixin, Component):
 
     aClass: str = "flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
     href: str = ""
@@ -750,13 +750,13 @@ class SidebarItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_mouseover: Endpoint = None
 
 
-class SidebarWrapper(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SidebarWrapper(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800"
     asideClass: str = "w-64"
 
 
-class SpeedDial(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SpeedDial(Slottable, FlowbiteSvelteMixin, Component):
 
     defaultClass: str = "fixed right-6 bottom-6"
     placement: Placement = "top"
@@ -770,12 +770,12 @@ class SpeedDial(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_click: Endpoint = None
 
 
-class SpeedDialButton(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class SpeedDialButton(Slottable, FlowbiteSvelteMixin, Component):
 
     pass
 
 
-class Spinner(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Spinner(Slottable, FlowbiteSvelteMixin, Component):
 
     color: Literal[
         "blue", "gray", "green", "red", "yellow", "pink", "purple", "white"
@@ -786,7 +786,7 @@ class Spinner(Slottable, FlowbiteSvelteMixin, AutoComponent):
     currentColor: str = "currentColor"
 
 
-class Tabs(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Tabs(Slottable, FlowbiteSvelteMixin, Component):
 
     style: Literal["full", "pill", "underline", "none"] = "none"
     defaultClass: str = "flex flex-wrap space-x-2"
@@ -798,7 +798,7 @@ class Tabs(Slottable, FlowbiteSvelteMixin, AutoComponent):
     inactiveClasses: str = "p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
 
 
-class TabItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TabItem(Slottable, FlowbiteSvelteMixin, Component):
 
     open: bool = False
     title: str = "Tab title"
@@ -809,7 +809,7 @@ class TabItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     )
 
 
-class Table(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Table(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "relative overflow-x-auto"
     striped: bool = False
@@ -829,12 +829,12 @@ class Table(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "default"
 
 
-class TableBodyCell(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TableBodyCell(Slottable, FlowbiteSvelteMixin, Component):
 
     tdClass: str = "px-6 py-4 whitespace-nowrap font-medium "
 
 
-class TableBodyRow(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TableBodyRow(Slottable, FlowbiteSvelteMixin, Component):
 
     # TODO: figure out how to get context
     color: Literal[
@@ -842,7 +842,7 @@ class TableBodyRow(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "purple"  # getContext("color")
 
 
-class TableSearch(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TableSearch(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "relative overflow-x-auto shadow-md sm:rounded-lg"
     inputValue: str = ""
@@ -854,13 +854,13 @@ class TableSearch(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "default"
 
 
-class TableHead(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TableHead(Slottable, FlowbiteSvelteMixin, Component):
 
     theadClass: str = "text-xs uppercase"
     defaultRow: bool = True
 
 
-class Timeline(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Timeline(Slottable, FlowbiteSvelteMixin, Component):
 
     customClass: str = ""
     order: Literal[
@@ -868,7 +868,7 @@ class Timeline(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "default"
 
 
-class TimelineItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TimelineItem(Slottable, FlowbiteSvelteMixin, Component):
 
     title: str = ""
     date: str = ""
@@ -876,25 +876,25 @@ class TimelineItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     customTimeClass: str = ""
 
 
-class Checkbox(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Checkbox(Slottable, FlowbiteSvelteMixin, Component):
 
     color: FormColorType = "blue"
     title: str = ""
     date: str = ""
 
 
-class TimelineHorizontal(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TimelineHorizontal(Slottable, FlowbiteSvelteMixin, Component):
 
     olClass: str = "items-center sm:flex"
 
 
-class TimelineItemHorizontal(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class TimelineItemHorizontal(Slottable, FlowbiteSvelteMixin, Component):
 
     title: str = ""
     date: str = ""
 
 
-class Toast(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Toast(Slottable, FlowbiteSvelteMixin, Component):
 
     color: Literal[
         "gray",
@@ -924,30 +924,30 @@ class Toast(Slottable, FlowbiteSvelteMixin, AutoComponent):
     classes: str = None
 
 
-class Tooltip(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Tooltip(Slottable, FlowbiteSvelteMixin, Component):
 
     style: Literal["dark", "light", "auto", "custom"] = "dark"
     defaultClass: str = "py-2 px-3 text-sm font-medium"
 
 
-class Activity(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Activity(Slottable, FlowbiteSvelteMixin, Component):
 
     olClass: str = "relative border-l border-gray-200 dark:border-gray-700"
 
 
-class ActivityItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class ActivityItem(Slottable, FlowbiteSvelteMixin, Component):
 
     activities: List[ActivityType] = []
 
 
-class Group(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Group(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "p-5 mb-4 bg-gray-50 rounded-lg border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
     timeClass: str = "text-lg font-semibold text-gray-900 dark:text-white"
     date: str = ""  # date: Union[Date, str] = ""
 
 
-class GroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class GroupItem(Slottable, FlowbiteSvelteMixin, Component):
 
     timelines: List[GroupTimelineType] = []
     #     "blue", "red", "green", "yellow", "indigo", "purple", "pink"
@@ -966,7 +966,7 @@ class GroupItem(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_paste: Endpoint = None
 
 
-class FloatingLabelInput(FlowbiteSvelteMixin, AutoComponent):
+class FloatingLabelInput(FlowbiteSvelteMixin, Component):
 
     # id: str = ""  #  determine if this should be uuid
     style: Literal["filled", "outlined", "standard"] = "standard"
@@ -989,7 +989,7 @@ class FloatingLabelInput(FlowbiteSvelteMixin, AutoComponent):
     on_paste: Endpoint = None
 
 
-class Radio(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Radio(Slottable, FlowbiteSvelteMixin, Component):
     color: Literal[
         "blue", "red", "green", "yellow", "indigo", "purple", "pink"
     ] = "blue"
@@ -1011,7 +1011,7 @@ class Radio(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_paste: Endpoint = None
 
 
-class Range(FlowbiteSvelteMixin, AutoComponent):
+class Range(FlowbiteSvelteMixin, Component):
     value: number
     size: Literal["sm", "md", "lg"] = "md"
     min: number = None
@@ -1025,7 +1025,7 @@ class Range(FlowbiteSvelteMixin, AutoComponent):
     on_keyup: Endpoint = None
 
 
-class Search(FlowbiteSvelteMixin, AutoComponent):
+class Search(FlowbiteSvelteMixin, Component):
     size: Literal["sm", "md", "lg"] = "lg"
     placeholder: str = "Search"
     value: Union[str, number] = ""
@@ -1043,7 +1043,7 @@ class Search(FlowbiteSvelteMixin, AutoComponent):
     on_paste: Endpoint = None
 
 
-class Select(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Select(Slottable, FlowbiteSvelteMixin, Component):
     items: list
     value: Union[str, number]
     placeholder: str = "Choose option ..."
@@ -1054,7 +1054,7 @@ class Select(Slottable, FlowbiteSvelteMixin, AutoComponent):
     on_input: Endpoint = None
 
 
-class Textarea(FlowbiteSvelteMixin, AutoComponent):
+class Textarea(FlowbiteSvelteMixin, Component):
     value: str = ""
     rows: int = 3
     placeholder: str = ""
@@ -1075,7 +1075,7 @@ class Textarea(FlowbiteSvelteMixin, AutoComponent):
     on_paste: Endpoint = None
 
 
-class Toggle(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Toggle(Slottable, FlowbiteSvelteMixin, Component):
     size: Literal["small", "default", "large"] = "default"
     group: List[Union[str, number]] = ()
     value: Union[str, number] = ""
@@ -1088,14 +1088,14 @@ class Toggle(Slottable, FlowbiteSvelteMixin, AutoComponent):
 """Typography."""
 
 
-class A(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class A(Slottable, FlowbiteSvelteMixin, Component):
 
     href: str = "#"
     color: str = "text-blue-600 dark:text-blue-500"
     aClass: str = "inline-flex items-center hover:underline"
 
 
-class Blockquote(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Blockquote(Slottable, FlowbiteSvelteMixin, Component):
 
     border: bool = False
     italic: bool = True
@@ -1121,21 +1121,21 @@ class Blockquote(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "lg"
 
 
-class DescriptionList(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class DescriptionList(Slottable, FlowbiteSvelteMixin, Component):
 
     tag: Literal["dt", "dd"] = ""
     dtClass: str = "text-gray-500 md:text-lg dark:text-gray-400"
     ddClass: str = "text-lg font-semibold"
 
 
-class Heading(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Heading(Slottable, FlowbiteSvelteMixin, Component):
 
     tag: Literal["h1", "h2", "h3", "h4", "h5", "h6"] = "h1"
     color: str = "text-gray-900 dark:text-white"
     customSize: str = ""
 
 
-class Hr(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Hr(Slottable, FlowbiteSvelteMixin, Component):
 
     icon: bool = False
     width: str = "w-full"
@@ -1147,20 +1147,20 @@ class Hr(Slottable, FlowbiteSvelteMixin, AutoComponent):
     middleBgColor: str = "dark:bg-gray-900"
 
 
-class Layout(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Layout(Slottable, FlowbiteSvelteMixin, Component):
 
     divClass: str = "grid"
     cols: str = "grid-cols-1 sm:grid-cols-2"
     gap: number = 4
 
 
-class Li(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Li(Slottable, FlowbiteSvelteMixin, Component):
 
     icon: bool = False
     liClass: str = ""
 
 
-class List(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class List(Slottable, FlowbiteSvelteMixin, Component):
 
     tag: Literal["ul", "ol", "dl"] = "ul"
     list: Literal["disc", "none", "decimal"] = "disc"
@@ -1171,14 +1171,14 @@ class List(Slottable, FlowbiteSvelteMixin, AutoComponent):
     dlClass: str = "max-w-md divide-y divide-gray-200 dark:divide-gray-700"
 
 
-class Mark(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Mark(Slottable, FlowbiteSvelteMixin, Component):
 
     color: str = "text-white dark:bg-blue-500"
     bgColor: str = "bg-blue-600"
     markClass: str = "px-2 rounded"
 
 
-class P(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class P(Slottable, FlowbiteSvelteMixin, Component):
 
     color: str = "text-gray-900 dark:text-white"
     height: Literal["normal", "relaxed", "loose"] = "normal"
@@ -1218,13 +1218,13 @@ class P(Slottable, FlowbiteSvelteMixin, AutoComponent):
     ] = "normal"
 
 
-class Secondary(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Secondary(Slottable, FlowbiteSvelteMixin, Component):
 
     color: str = "text-gray-500 dark:text-gray-400"
     secondaryClass: str = "font-semibold"
 
 
-class Span(Slottable, FlowbiteSvelteMixin, AutoComponent):
+class Span(Slottable, FlowbiteSvelteMixin, Component):
 
     italic: bool = False
     underline: bool = False

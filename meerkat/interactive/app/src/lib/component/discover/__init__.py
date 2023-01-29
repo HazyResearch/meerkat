@@ -2,7 +2,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 @endpoint
@@ -38,7 +38,7 @@ def discover(df: DataFrame, by: str, target: str, pred: str):
     return eb
 
 
-class Discover(AutoComponent):
+class Discover(Component):
 
     df: DataFrame
     by: str

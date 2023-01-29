@@ -1,5 +1,5 @@
 from meerkat import classproperty
-from meerkat.interactive import AutoComponent
+from meerkat.interactive import Component
 
 
 class LibraryMixin:
@@ -8,9 +8,9 @@ class LibraryMixin:
         return "custom"
 
 
-# AutoComponent should always be the last base class
-class ExampleComponent(LibraryMixin, AutoComponent):
-    """Make custom components by extending the `AutoComponent` class.
+# Component should always be the last base class
+class ExampleComponent(LibraryMixin, Component):
+    """Make custom components by extending the `Component` class.
 
     Add the `namespace` and `library` class properties, so that
     it's easy to import and publish your components. Read our
@@ -31,7 +31,7 @@ class ExampleComponent(LibraryMixin, AutoComponent):
 
     For fine-grained control of which fields are synchronized
     with the frontend, you can directly extend the `Component` class instead
-    of the `AutoComponent` class. See our documentation for details.
+    of the `Component` class. See our documentation for details.
     """
 
     name: str = "World"

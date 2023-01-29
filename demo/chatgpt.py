@@ -1,5 +1,5 @@
 """
-Run ChatGPT with Meerkat's Chat interface.
+Run ChatGPT with Meerkat's Chat page.
 
 Requirements:
     - Download manifest: `pip install manifest-ml[chatgpt]`
@@ -55,8 +55,8 @@ chat = Chat(
     on_send=on_send.partial(df=df),
 )
 
-interface = mk.gui.Interface(
+page = mk.gui.Page(
     component=chat,
     id="chat",
 )
-interface.launch()
+page.launch()

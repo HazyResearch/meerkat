@@ -1,6 +1,7 @@
 import dataclasses
 import importlib
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -11,11 +12,13 @@ import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader
 
 from meerkat.constants import APP_DIR, BASE_DIR
-from meerkat.interactive import Component
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
+from meerkat.interactive import BaseComponent
+from meerkat.interactive.app.src.lib.component.abstract import Component
 
 if TYPE_CHECKING:
-    from meerkat.interactive import Interface
+    from meerkat.interactive import Page
+
+logger = logging.getLogger(__name__)
 
 NPM_PACKAGE = "@meerkat-ml/meerkat"
 _MK_REPO_APP_DIR = os.path.join(os.path.dirname(__file__), "app")
@@ -86,11 +89,12 @@ class SvelteWriter:
         """Cleanup the app directory at the end of a run."""
         self.remove_all_component_wrappers()
         self.remove_component_context()
+        logger.debug("Removed all component wrappers and ComponentContext.svelte.")
 
     def init_run(self):
         """Write component wrappers and context at the start of a run.
 
-        Called by the `mk run` CLI, `Interface.__init__` constructor and
+        Called by the `mk run` CLI, `Page.__init__` constructor and
         `mk.gui.start` function.
         """
         self.import_app_components()
@@ -179,17 +183,17 @@ class SvelteWriter:
 
     def get_all_components(
         self,
-        exclude_classes: Set[str] = {"AutoComponent", "Component"},
-    ) -> List[Type["Component"]]:
-        """Get all subclasses of Component, excluding the ones in
+        exclude_classes: Set[str] = {"Component", "BaseComponent"},
+    ) -> List[Type["BaseComponent"]]:
+        """Get all subclasses of BaseComponent, excluding the ones in
         `exclude_classes`.
 
         Args:
             exclude_classes (Set[str], optional): Set of classes
-                to exclude. Defaults to {"AutoComponent", "Component"}.
+                to exclude. Defaults to {"Component", "BaseComponent"}.
 
         Returns:
-            List[Type["Component"]]: List of subclasses of Component.
+            List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
         """
         # from meerkat.interactive.startup import get_subclasses_recursive
 
@@ -197,15 +201,17 @@ class SvelteWriter:
         self.import_app_components()
 
         # Recursively find all subclasses of Component
-        subclasses = get_subclasses_recursive(Component)
+        subclasses = get_subclasses_recursive(BaseComponent)
 
         # Filter out the classes we don't want and sort
         subclasses = [c for c in subclasses if c.__name__ not in exclude_classes]
         subclasses = sorted(subclasses, key=lambda c: c.alias)
 
+        logger.debug(f"Found {len(subclasses)} components: {subclasses}")
+
         return subclasses
 
-    def get_all_frontend_components(self) -> List[Type["Component"]]:
+    def get_all_frontend_components(self) -> List[Type["BaseComponent"]]:
         # Create a `frontend_components` list that contains the
         # components that have unique component.frontend_alias
         components = self.get_all_components()
@@ -223,8 +229,10 @@ class SvelteWriter:
             # Import all components inside the app/src/lib/components
             # directory to register user components from the app
             # Otherwise do nothing
+            logger.debug("In user appdir. Importing app components from app/src/lib/components.")
             sys.path.append(self.cwd)
             importlib.import_module("app.src.lib.components")
+            return
 
     def install_bun(self):
         return subprocess.run(
@@ -368,7 +376,7 @@ class SvelteWriter:
             frontend_components=frontend_components,
         )
 
-    def render_component_wrapper(self, component: Type[Component]):
+    def render_component_wrapper(self, component: Type[BaseComponent]):
         # TODO: fix line breaks in Wrapper.svelte
         template = jinja_env.get_template("Wrapper.svelte")
 
@@ -378,7 +386,7 @@ class SvelteWriter:
             path=component.path,
             prop_names=component.prop_names,
             event_names=component.event_names,
-            use_bindings=True,  # not issubclass(component, AutoComponent)
+            use_bindings=True,  # not issubclass(component, Component)
             prop_bindings=component.prop_bindings,
             slottable=component.slottable,
         )
@@ -410,9 +418,9 @@ mk.gui.start()"""
 # Import and use the ExampleComponent
 example_component = ExampleComponent(name="Meerkat")
 
-# Run the interface (startup may take a few seconds)
-interface = mk.gui.Interface(component=example_component, id="example", height="200px")
-interface.launch()"""
+# Run the page (startup may take a few seconds)
+page = mk.gui.Page(component=example_component, id="example", height="200px")
+page.launch()"""
 
         nb["cells"] = [
             nbf.v4.new_markdown_cell(text),
@@ -446,16 +454,16 @@ interface.launch()"""
             return NPM_PACKAGE
         return "$lib"
 
-    def render_route(self, interface: "Interface"):
+    def render_route(self, page: "Page"):
         template = jinja_env.get_template("page.svelte.jinja")
 
         # TODO: make this similar to render_root_route
         #       and use component.frontend_alias and component.alias
         return template.render(
-            route=interface.id,
-            title=interface.name,
+            route=page.id,
+            title=page.name,
             import_prefix=self.get_import_prefix(),
-            components=list(sorted(interface.component.get_components())),
+            components=list(sorted(page.component.get_components())),
             queryparam=False,
         )
 
@@ -509,12 +517,12 @@ interface.launch()"""
 
     def write_all_component_wrappers(
         self,
-        exclude_classes: Set[str] = {"AutoComponent", "Component"},
+        exclude_classes: Set[str] = {"Component", "BaseComponent"},
     ):
         # from meerkat.interactive.startup import get_subclasses_recursive
 
-        # Recursively find all subclasses of Component
-        subclasses = get_subclasses_recursive(Component)
+        # Recursively find all subclasses of BaseComponent
+        subclasses = get_subclasses_recursive(BaseComponent)
         for subclass in subclasses:
             # Use subclass.__name__ as the component name, instead of
             # subclass.component_name, because the latter is not guaranteed to be
@@ -536,7 +544,7 @@ interface.launch()"""
             self.render_component_context(),
         )
 
-    def write_component_wrapper(self, component: Type[Component]):
+    def write_component_wrapper(self, component: Type[BaseComponent]):
         cwd = f"{self.appdir}/src/lib/wrappers/__{component.namespace}"
         os.makedirs(cwd, exist_ok=True)
         self.write_file(

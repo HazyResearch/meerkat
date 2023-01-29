@@ -1,4 +1,4 @@
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.mixins.identifiable import classproperty
 
 
@@ -17,12 +17,12 @@ class SvelteMixin:
 #         super().__init__(*args, **kwargs)
 #         self.let = let
 
-# class fragment(Slottable, SvelteMixin, AutoComponent):
+# class fragment(Slottable, SvelteMixin, Component):
 
 #     slot: str = None
 
 
-# class options(Slottable, SvelteMixin, AutoComponent):
+# class options(Slottable, SvelteMixin, Component):
 
 #     immutable: bool = False
 #     accessors: bool = False
@@ -30,22 +30,22 @@ class SvelteMixin:
 #     tag: str = None
 
 
-# class head(Slottable, SvelteMixin, AutoComponent):
+# class head(Slottable, SvelteMixin, Component):
 
 #     pass
 
 
-# class component(Slottable, SvelteMixin, AutoComponent):
+# class component(Slottable, SvelteMixin, Component):
 
 #     this: str = None
 #     props: dict = None
 
 
-# class self(Slottable, SvelteMixin, AutoComponent):
+# class self(Slottable, SvelteMixin, Component):
 
 #     props: dict = None
 
 
-# class each(Slottable, AutoComponent):
+# class each(Slottable, Component):
 
 #     items: list = None

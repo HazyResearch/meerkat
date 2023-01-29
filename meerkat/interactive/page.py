@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from meerkat.interactive import html
 from meerkat.interactive.app.src.lib.component.abstract import (
-    Component,
+    BaseComponent,
     ComponentFrontend,
 )
 from meerkat.interactive.app.src.lib.component.progress import Progress
@@ -18,29 +18,32 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
 
-def interface(fn: Callable):
+def page(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        interface = Interface(component=partial(fn, *args, **kwargs))
-        return interface.launch()
+        page = Page(
+            component=partial(fn, *args, **kwargs),
+            id=fn.__name__,
+        )
+        return page.launch()
 
     return wrapper
 
 
-class InterfaceFrontend(BaseModel):
+class PageFrontend(BaseModel):
     component: ComponentFrontend
     name: str
 
 
-class Interface(IdentifiableMixin):
+class Page(IdentifiableMixin):
 
-    _self_identifiable_group: str = "interfaces"
+    _self_identifiable_group: str = "pages"
 
     def __init__(
         self,
-        component: Component,
+        component: BaseComponent,
         id: str,
-        name: str = "Interface",
+        name: str = "Page",
         height: str = "1000px",
         width: str = "100%",
     ):
@@ -58,24 +61,24 @@ class Interface(IdentifiableMixin):
         self.width = width
 
         # Call `init_run`
+        # KG: TODO: figure out if we need this here.
         svelte_writer = SvelteWriter()
         svelte_writer.init_run()
 
     def __call__(self):
-        """Return the FastAPI object, this allows Interface objects to be
+        """Return the FastAPI object, this allows Page objects to be
         targeted by uvicorn when running a script."""
         from meerkat.interactive.api import MeerkatAPI
 
         return MeerkatAPI
 
     def launch(self, return_url: bool = False):
-        from meerkat.interactive.startup import is_notebook, output_startup_message
+        from meerkat.interactive.startup import is_notebook
 
         if state.frontend_info is None:
-            rich.print(
-                "Frontend is not initialized. Running `mk.gui.start()`."
-            )
+            rich.print("Frontend is not initialized. Running `mk.gui.start()`.")
             from .startup import start
+
             start()
 
         url = f"{state.frontend_info.url}/{self.id}"
@@ -89,7 +92,7 @@ class Interface(IdentifiableMixin):
 
             rich.print(
                 ":scroll: "
-                f"Interface [violet]{self.id}[/violet] "
+                f"Frontend [violet]{self.id}[/violet] "
                 f"is at [violet]{url}[/violet]"
             )
             rich.print(
@@ -107,4 +110,4 @@ class Interface(IdentifiableMixin):
 
     @property
     def frontend(self):
-        return InterfaceFrontend(name=self.name, component=self.component.frontend)
+        return PageFrontend(name=self.name, component=self.component.frontend)

@@ -13,4 +13,4 @@ gallery = mk.gui.Gallery(
 )
 
 mk.gui.start(shareable=False)
-mk.gui.Interface(component=mk.gui.RowLayout(components=[filter, gallery])).launch()
+mk.gui.Page(component=mk.gui.RowLayout(components=[filter, gallery])).launch()

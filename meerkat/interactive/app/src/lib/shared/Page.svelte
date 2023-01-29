@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { InterfaceType } from '$lib/utils/types';
+	import type { PageType } from '$lib/utils/types';
 	import { Toaster } from 'svelte-french-toast';
-	import { create_stores_from_component, global_stores } from './blanks/stores';
+	import { create_stores_from_component, global_stores } from '../utils/stores';
 	import DynamicComponent from './DynamicComponent.svelte';
 	import StoreComponent from './StoreComponent.svelte';
 
 
-	export let config: InterfaceType;
+	export let config: PageType;
     
 	$: {
 		if (config.component) {

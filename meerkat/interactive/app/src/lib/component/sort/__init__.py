@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph import Store, reactive
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 class SortCriterion(BaseModel):
@@ -46,7 +46,7 @@ def sort_by_criteria(
     return mk.sort(data, by=sort_by, ascending=ascending)
 
 
-class Sort(AutoComponent):
+class Sort(Component):
     """This component handles a sort_by list and a sort_order list.
 
     Sorting criteria are maintained in a Store. On change of these

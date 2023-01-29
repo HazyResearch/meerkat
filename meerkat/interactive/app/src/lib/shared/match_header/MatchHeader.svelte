@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
 	import type { RefreshCallback } from '$lib/api/callbacks';
-	import { api_url } from '$lib/../routes/network/stores';
+	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
 	import Status from '$lib/shared/common/Status.svelte';
-	import Select from 'svelte-select';
 	import { createEventDispatcher } from 'svelte';
+	import Select from 'svelte-select';
 
 	const dispatch = createEventDispatcher();
 
@@ -13,8 +12,7 @@
 			search_text: search_text,
 			column: column
 		});
-	};
-
+	}
 
 	export let schema_promise: Promise<DataFrameSchema>;
 	export let refresh_callback: RefreshCallback;
@@ -38,7 +36,6 @@
 			// Dispatch the match event
 			dispatch_match(search_box_text, column);
 		});
-		
 	};
 
 	const onKeyPress = (e) => {

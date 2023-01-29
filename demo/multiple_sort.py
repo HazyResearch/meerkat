@@ -16,7 +16,7 @@ with mk.gui.react():
     )
 
 mk.gui.start(shareable=False)
-interface = mk.gui.Interface(
+page = mk.gui.Page(
     component=mk.gui.RowLayout(slots=[sort1, sort2, galleries]), id="multiple_sort"
 )
-interface.launch()
+page.launch()

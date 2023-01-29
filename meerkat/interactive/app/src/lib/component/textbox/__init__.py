@@ -1,9 +1,9 @@
 from typing import Optional
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
-class Textbox(AutoComponent):
+class Textbox(Component):
 
     text: Optional[str] = ""
     title: str = ""

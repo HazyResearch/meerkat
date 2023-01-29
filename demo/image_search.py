@@ -55,7 +55,7 @@ with mk.gui.react():
     gallery = mk.gui.Gallery(df=df, main_column="img")
 
 mk.gui.start(shareable=False)
-mk.gui.Interface(
+mk.gui.Page(
     component=mk.gui.RowLayout(
         components=[
             match,

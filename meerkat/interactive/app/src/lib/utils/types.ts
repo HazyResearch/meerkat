@@ -46,7 +46,7 @@ export interface Layout {
     props: any;
 }
 
-export interface InterfaceType {
+export interface PageType {
     name: string;
     component: ComponentType
 }

@@ -8,7 +8,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.graph import Store, reactive
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 @endpoint
@@ -131,7 +131,7 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     return df, criterion.name
 
 
-class Match(AutoComponent):
+class Match(Component):
 
     df: DataFrame
     against: str

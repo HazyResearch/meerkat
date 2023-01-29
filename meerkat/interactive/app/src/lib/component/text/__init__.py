@@ -4,11 +4,11 @@ import textwrap
 import numpy as np
 from pandas.io.formats.format import format_array
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 from meerkat.interactive.formatter.base import Formatter
 
 
-class Text(AutoComponent):
+class Text(Component):
 
     data: str
 

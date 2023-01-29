@@ -7,7 +7,7 @@ from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
-from . import Interface
+from . import Page
 
 
 class GUI:
@@ -22,7 +22,7 @@ class DataFrameGUI(GUI):
         self,
         **kwargs,
     ) -> IFrame:
-        return Interface(
+        return Page(
             component=mk.gui.Table(
                 df=self.df,
                 **kwargs,
@@ -36,7 +36,7 @@ class DataFrameGUI(GUI):
         if main_column is None:
             main_column = self.df.columns[0]
             
-        return Interface(
+        return Page(
             component=mk.gui.Gallery(
                 df=self.df,
                 main_column=main_column,
@@ -78,7 +78,7 @@ class SliceByGUI(GUI):
             tag_columns=tag_columns,
             aggregations=aggregations,
         )
-        return mk.gui.Interface(component=component).launch()
+        return mk.gui.Page(component=component).launch()
 
 
 class Aggregation(IdentifiableMixin):

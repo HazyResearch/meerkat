@@ -1,7 +1,7 @@
-from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.app.src.lib.component.abstract import BaseComponent
 
 
-class Code(Component):
+class Code(BaseComponent):
 
     data: str
     language: str = "python"

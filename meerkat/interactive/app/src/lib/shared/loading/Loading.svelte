@@ -8,4 +8,3 @@
 	<img src={banner} alt="Meerkat" class="h-12"/>
     <BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 </div>
- 

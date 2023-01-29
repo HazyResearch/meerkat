@@ -1,5 +1,10 @@
-from ...abstract import AutoComponent
+from meerkat.mixins.identifiable import classproperty
+from ...abstract import Component
 
 
-class Plot(AutoComponent):
+class Plot(Component):
     title: str
+
+    @classproperty
+    def namespace(cls):
+        return "plotly"

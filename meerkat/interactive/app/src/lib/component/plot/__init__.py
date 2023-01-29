@@ -4,14 +4,14 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.graph import Store
 
-from ..abstract import AutoComponent
+from ..abstract import Component
 
 
 def is_none(x):
     return (isinstance(x, Store) and x.__wrapped__ is None) or x is None
 
 
-class Plot(AutoComponent):
+class Plot(Component):
     # name: str = "Plot"
 
     df: "DataFrame"

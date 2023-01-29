@@ -131,7 +131,7 @@ def run_script(
     server_name: str = LOCALHOST_NAME,
     port: int = API_PORT,
     dev: bool = True,
-    target: str = "interface",
+    target: str = "page",
     shareable: bool = False,
     subdomain: str = "app",
     frontend_url: str = None,
@@ -148,8 +148,8 @@ def run_script(
             port in Meerkat, which is 5000.
         dev (bool, optional): whether to run the script in development mode. Defaults to
             True.
-        target (str, optional): the target `Interface` instance to run. Defaults to
-            "interface".
+        target (str, optional): the target `Page` instance to run. Defaults to
+            "page".
     """
     # Make sure script is in module format.
     script = os.path.abspath(script)  # to_py_module_name(script)
@@ -305,11 +305,11 @@ def get_subclasses_recursive(cls: type) -> List[type]:
 
 # TODO(Karan): Do we still need this? Seems like it's not used anywhere.
 # def wrap_all_components(exclude_meerkat: bool = False):
-#     from meerkat.interactive import Component
+#     from meerkat.interactive import BaseComponent
 
-#     # Recursively find all subclasses of Component
-#     subclasses = get_subclasses_recursive(Component)
-#     exclude = set(["AutoComponent", "Component"])
+#     # Recursively find all subclasses of BaseComponent
+#     subclasses = get_subclasses_recursive(BaseComponent)
+#     exclude = set(["Component", "BaseComponent"])
 #     for subclass in subclasses:
 #         if subclass.__name__ in exclude:
 #             continue
@@ -322,7 +322,7 @@ def get_subclasses_recursive(cls: type) -> List[type]:
 #         component_name = subclass.__name__
 
 #         # Make a file for the component, inside a subdirectory for the namespace
-#         # e.g. src/lib/wrappers/__meerkat/Component.svelte
+#         # e.g. src/lib/wrappers/__meerkat/BaseComponent.svelte
 #         breakpoint()
 #         os.makedirs(f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}", exist_ok=True)
 #         with open(

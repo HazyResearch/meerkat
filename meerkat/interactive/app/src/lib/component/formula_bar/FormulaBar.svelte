@@ -3,7 +3,7 @@
 
     import type { Endpoint } from '$lib/utils/types';
 
-    const { dispatch } = getContext('Interface');
+    const { dispatch } = getContext('Meerkat');
 
 	export let on_run: Endpoint;
 

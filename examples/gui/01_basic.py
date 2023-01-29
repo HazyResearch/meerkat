@@ -5,7 +5,7 @@ df = df.sample(n=1000, replace=False)
 # df = mk.embed(df, input="img")
 
 
-def match(df: mk.DataFrame, against: str, id_column: str) -> mk.gui.Interface:
+def match(df: mk.DataFrame, against: str, id_column: str) -> mk.gui.Page:
 
     # Setup pivots
     df_pivot = mk.gui.Reference(df)
@@ -21,7 +21,7 @@ def match(df: mk.DataFrame, against: str, id_column: str) -> mk.gui.Interface:
         tag_columns=["label"],
         edit_target=mk.gui.EditTarget(df_pivot, id_column, id_column),
     )
-    return mk.gui.Interface(components=[match, gallery])
+    return mk.gui.Page(components=[match, gallery])
 
 
 mk.gui.start()

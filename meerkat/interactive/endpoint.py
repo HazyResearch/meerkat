@@ -550,7 +550,7 @@ def endpoint(
         # Gather up all the arguments that are hinted as Stores
         stores = set()
         # Also gather up the hinted arguments that subclass IdentifiableMixin
-        # e.g. Store, Endpoint, Interface, etc.
+        # e.g. Store, Endpoint, Page, etc.
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):

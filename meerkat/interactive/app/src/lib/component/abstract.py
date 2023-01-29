@@ -30,7 +30,9 @@ class WrappableMixin:
 
         svelte_writer = SvelteWriter()
 
-        if cls.library == "@meerkat-ml/meerkat" and cls.namespace == "meerkat":
+        if cls.library == "@meerkat-ml/meerkat" and (
+            cls.namespace == "meerkat" or cls.namespace == "plotly"
+        ):
             # Meerkat components
             if not svelte_writer.is_user_appdir:
                 # In Meerkat package
@@ -84,7 +86,7 @@ def iterable(arg):
 
 
 class SlotsMixin:
-    def __init__(self, slots: List["Component"] = [], *args, **kwargs):
+    def __init__(self, slots: List["BaseComponent"] = [], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if not iterable(slots):
@@ -93,12 +95,12 @@ class SlotsMixin:
         self._slots = slots
 
     @property
-    def slots(self) -> List["Component"]:
+    def slots(self) -> List["BaseComponent"]:
         from meerkat.interactive.app.src.lib.layouts import Brace
 
         _slots = []
         for slot in self._slots:
-            if not isinstance(slot, Component):
+            if not isinstance(slot, BaseComponent):
                 # Wrap it in a Brace component
                 _slots.append(Brace(data=slot))
             else:
@@ -108,7 +110,8 @@ class SlotsMixin:
     def append(self, other):
         # Allow users to append to slots
         from meerkat.interactive.app.src.lib.layouts import Brace
-        if isinstance(other, Component):
+
+        if isinstance(other, BaseComponent):
             self._slots.append(other)
         else:
             self._slots.append(Brace(data=other))
@@ -118,7 +121,7 @@ class SlotsMixin:
         return False
 
 
-class Component(
+class BaseComponent(
     IdentifiableMixin,
     FrontendMixin,
     SlotsMixin,
@@ -137,7 +140,7 @@ class Component(
     @classproperty
     def alias(cls):
         """Unique alias for this component that uses the namespace and the name
-        of the Component subclass.
+        of the BaseComponent subclass.
 
         This will give components with the same name from different
         libraries different names e.g. `MeerkatButton` and
@@ -147,9 +150,9 @@ class Component(
 
     @classproperty
     def component_name(cls):
-        # Inheriting an existing Component and modifying it on the Python side
+        # Inheriting an existing BaseComponent and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != Component and issubclass(cls.__bases__[0], Component):
+        if cls.__bases__[0] != BaseComponent and issubclass(cls.__bases__[0], BaseComponent):
             return cls.__bases__[0].__name__
 
         return cls.__name__
@@ -181,8 +184,8 @@ class Component(
         This is not unique, and it is possible to have multiple
         components with the same frontend alias. This is useful for
         components that are just wrappers around other components, e.g.
-        a layout Component that subclasses a Grid Component will still
-        have the same frontend alias as the Grid Component.
+        a layout BaseComponent that subclasses a Grid BaseComponent will still
+        have the same frontend alias as the Grid BaseComponent.
         """
         return cls.namespace.title() + cls.component_name
 
@@ -225,11 +228,11 @@ class Component(
         # Raise an error if the file doesn't exist
         raise FileNotFoundError(
             f"Could not find {path}. "
-            f"Check that the definition of this Component {cls} "
+            f"Check that the definition of this BaseComponent {cls} "
             "is in the same folder as the Svelte file. "
             "You might also be using a "
             "component from a library, in which case set the `library` "
-            "property of the Component correctly."
+            "property of the BaseComponent correctly."
         )
 
     @classproperty
@@ -245,7 +248,7 @@ class Component(
 
     @classproperty
     def prop_bindings(cls):
-        if not issubclass(cls, AutoComponent):
+        if not issubclass(cls, Component):
             # These props need to be bound with `bind:` in Svelte
             types_to_bind = {Store, DataFrame}
             return {
@@ -332,15 +335,15 @@ class Component(
         copy_on_model_validation = False
 
 
-class AutoComponent(Component):
+class Component(BaseComponent):
     """Component with simple defaults."""
 
     @classproperty
     def component_name(cls):
-        # Inheriting an existing AutoComponent and modifying it on the Python side
+        # Inheriting an existing Component and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != AutoComponent and issubclass(
-            cls.__bases__[0], AutoComponent
+        if cls.__bases__[0] != Component and issubclass(
+            cls.__bases__[0], Component
         ):
             return cls.__bases__[0].__name__
 
@@ -359,7 +362,7 @@ class AutoComponent(Component):
         return values
 
     @root_validator(pre=False)
-    def _convert_fields(cls, values):
+    def _convert_fields(cls, values: dict):
         values = cls._cache
         cls._cache = None
         for name, value in values.items():

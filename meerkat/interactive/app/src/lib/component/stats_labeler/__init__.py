@@ -4,10 +4,10 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.edit import EditTarget
 from meerkat.interactive.graph import Store, make_store
 
-from ..abstract import Component
+from ..abstract import BaseComponent
 
 
-class StatsLabeler(Component):
+class StatsLabeler(BaseComponent):
 
     name = "StatsLabeler"
 

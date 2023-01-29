@@ -1,4 +1,4 @@
-from meerkat.interactive import Interface, endpoint
+from meerkat.interactive import Page, endpoint
 from meerkat.interactive.app.src.lib.component.button import Button
 
 
@@ -13,5 +13,5 @@ button = Button(
     on_click=on_click,
 )
 
-interface = Interface(component=button, id="button")
-interface.launch()
+page = Page(component=button, id="button")
+page.launch()

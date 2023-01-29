@@ -17,7 +17,7 @@ class EndpointMixin:
         # Access all the user-defined attributes of the instance to create endpoints
         # Here, we keep only methods that:
         # - are defined in this subclass, but not in any of its superclasses
-        #   (e.g. Component, IdentifiableMixin, EndpointMixin etc.)
+        #   (e.g. BaseComponent, IdentifiableMixin, EndpointMixin etc.)
         # - don't begin with "_"
         # - are callables
         names = set(dir(self.__class__)) - set(

@@ -1,9 +1,9 @@
 from typing import Optional
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
+from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
 
 
-class FileUpload(AutoComponent):
+class FileUpload(Component):
 
     files: list = []
     filenames: list = []

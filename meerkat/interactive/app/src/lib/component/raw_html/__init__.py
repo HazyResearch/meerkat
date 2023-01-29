@@ -1,10 +1,10 @@
 import base64
 from io import BytesIO
 from meerkat.columns.deferred.base import DeferredCell
-from meerkat.interactive.app.src.lib.component.abstract import AutoComponent
+from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.formatter.base import Formatter, Variant
 
-class RawHTML(AutoComponent):
+class RawHTML(Component):
     html: str
     view: str = "full"
 
