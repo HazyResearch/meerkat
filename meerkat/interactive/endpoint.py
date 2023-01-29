@@ -255,7 +255,13 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         # modifications made by the endpoint
         state.modification_queue.ready()
         state.progress_queue.add(self.fn.func.__name__)
-        result = partial_fn()
+
+        try:
+            result = partial_fn()
+        except Exception as e:
+            # Unready the modification queue
+            state.modification_queue.unready()
+            raise e
         
         modifications = trigger()
 
