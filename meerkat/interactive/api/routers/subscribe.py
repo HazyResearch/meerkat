@@ -1,10 +1,12 @@
 import asyncio
 import json
-from sse_starlette.sse import EventSourceResponse
+import logging
 
+from sse_starlette.sse import EventSourceResponse
 
 from meerkat.interactive.endpoint import endpoint
 
+logger = logging.getLogger(__name__)
 
 STREAM_DELAY = 0.150  # second
 RETRY_TIMEOUT = 15000  # milisecond
@@ -21,6 +23,7 @@ async def progress_generator():
                 if isinstance(item, list):
                     # Start events just send the total length
                     # of the progressbar
+                    logger.debug(f"Sending start event with {item}.")
                     yield {
                         "event": "start",
                         "id": "message_id",
@@ -28,6 +31,7 @@ async def progress_generator():
                         "data": json.dumps(item),
                     }
                 elif item is None:
+                    logger.debug("Sending end event.")
                     yield {
                         "event": "end",
                         "id": "message_id",
@@ -35,6 +39,7 @@ async def progress_generator():
                         "data": "",
                     }
                 elif isinstance(item, str):
+                    logger.debug(f"Sending endpoint event with {item}.")
                     yield {
                         "event": "endpoint",
                         "id": "message_id",
@@ -44,6 +49,7 @@ async def progress_generator():
                 else:
                     # Progress events send the current progress
                     # and the operation name
+                    logger.debug(f"Sending progress event with {item}.")
                     yield {
                         "event": "progress",
                         "id": "message_id",

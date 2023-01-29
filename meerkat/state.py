@@ -1,3 +1,5 @@
+import time
+import logging
 import os
 import subprocess
 from dataclasses import dataclass, field
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
     from meerkat.interactive.server import Server
     from meerkat.mixins.identifiable import IdentifiableMixin
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Secrets:
@@ -152,21 +155,34 @@ class ModificationQueue:
 
     def add(self, modification: "Modification"):
         if self._ready:
+            logger.debug(f"Adding modification {modification} to queue.")
             self.queue.append(modification)
+            return
         # Do nothing if not ready
+        logger.debug(f"Modification queue not ready. Ignoring {modification}.")
 
     def clear(self) -> List["Modification"]:
         """Clear the modification queue, and return the old queue."""
+        logger.debug("Clearing modification queue.")
         current_queue = self.queue
         self.queue = []
         return current_queue
 
     def ready(self):
         """Ready the queue for accepting new modifications."""
+        while self._ready:
+            # Modification queue is already in use
+            # Wait for it to be unready
+            logger.debug("Modification queue is already in use. Waiting...")
+            time.sleep(0.1)
+            
         self._ready = True
+        logger.debug("Modification queue is now ready.")
 
     def unready(self):
+        """Unready the queue for accepting new modifications."""
         self._ready = False
+        logger.debug("Modification queue is now unready.")
 
 
 @dataclass

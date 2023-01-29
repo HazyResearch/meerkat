@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
@@ -12,6 +13,8 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
+
+logger = logging.getLogger(__name__)
 
 # KG: must declare this dynamically defined model here,
 # otherwise I was getting an error due to FastAPI
@@ -158,6 +161,15 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         self.prefix = prefix
         self.route = route
 
+    def __repr__(self) -> str:
+        if hasattr(self.fn, '__name__'):
+            name = self.fn.__name__
+        elif hasattr(self.fn, 'func'):
+            name = self.fn.func.__name__
+        else:
+            name = None
+        return f"Endpoint(id={self.id}, name={name}, prefix={self.prefix}, route={self.route})"
+
     @staticmethod
     def _has_var_positional(foo):
         # Check if `foo` has a `*args` parameter
@@ -194,6 +206,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         Returns:
             The return value of `fn`.
         """
+        logger.debug(f"Running endpoint {self}.")
 
         # Apply a partial function to ingest the additional arguments
         # that are passed in
@@ -243,11 +256,11 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         state.modification_queue.ready()
         state.progress_queue.add(self.fn.func.__name__)
         result = partial_fn()
-        state.progress_queue.add(None)
-        # Don't track modifications outside of the endpoint
-        state.modification_queue.unready()
-
+        
         modifications = trigger()
+
+        # End the progress bar
+        state.progress_queue.add(None)
 
         return result, modifications
 

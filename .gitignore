@@ -1,4 +1,6 @@
-scratch/sabri/**.ipynb
+# Scratch folder
+scratch/
+
 # Meerkat written
 *.mk
 

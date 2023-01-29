@@ -16,32 +16,31 @@
 		running = true;
         progress = 0;
         info = `Running endpoint ${endpoint}...`;
-        console.log("Endpoint");
+        console.log("Endpoint", endpoint);
 	});
     
     let start_payload;
 	eventSource.addEventListener('start', (event) => {
 		start_payload = JSON.parse(event.data);
 		running = true;
-        console.log("Start");
+        console.log("Start", start_payload);
 	});
 
 	eventSource.addEventListener('progress', (event) => {
 		let op;
 		({ op, progress } = JSON.parse(event.data));
 		info = op !== "Done!" ? `Running ${op}...` : op;
-        console.log("Progress");
+        console.log("Progress", op, progress);
 	});
 
 	eventSource.addEventListener('end', async (event) => {
-		// info = 'Done!';
-		// progress = 100;
+        console.log("End");
 		await new Promise((r) => setTimeout(r, 500));
 		running = false;
         // Removing this `progress=0` causes events
         // to not be triggered correctly!
         // FIXME: debug this
-        progress = 0; 
+        // progress = 0; 
 		info = 'Server Ready.';
 	});
 

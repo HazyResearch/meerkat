@@ -50,9 +50,14 @@ def trigger() -> List[Modification]:
         List[Modification]: The list of modifications that resulted from running the
             computation graph.
     """
+    # Get all the modifications collected so far
+    # This clears the modification queue
     modifications = state.modification_queue.clear()
+
+    # Stop tracking modifications since we're triggering with what we have
+    state.modification_queue.unready()
+
     logger.debug(f"Triggering on {modifications}")
-    progress = state.progress_queue
 
     # build a graph rooted at the stores and refs in the modifications list
     root_nodes = [mod.node for mod in modifications if mod.node is not None]
@@ -75,14 +80,14 @@ def trigger() -> List[Modification]:
         # Add the number of operations to the progress queue
         # TODO: this should be an object that contains other information
         # for the start of the progress bar
-        progress.add([op.fn.__name__ for op in order])
+        state.progress_queue.add([op.fn.__name__ for op in order])
         # Go through all the operations in order: run them and add
         # their modifications to the new_modifications list
         for i, op in enumerate(order):
             # Add the operation name to the progress queue
             # TODO: this should be an object that contains other information
             # for the progress bar
-            progress.add(
+            state.progress_queue.add(
                 {"op": op.fn.__name__, "progress": int(i / len(order) * 100)}
             )
 
@@ -96,8 +101,7 @@ def trigger() -> List[Modification]:
             # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
         
-        progress.add({"op": "Done!", "progress": 100})
-        progress.add(None)
+        state.progress_queue.add({"op": "Done!", "progress": 100})
         logger.debug("Done running trigger pipeline.")
 
     return modifications + new_modifications
