@@ -33,6 +33,7 @@ from .app.src.lib.component.filter import Filter
 from .app.src.lib.component.gallery import Gallery
 from .app.src.lib.component.markdown import Markdown
 from .app.src.lib.component.match import Match
+from .app.src.lib.component.formula_bar import FormulaBar
 from .app.src.lib.component.plot import Plot
 from .app.src.lib.component.row import Row
 from .app.src.lib.component.slicebycards import SliceByCards
@@ -73,6 +74,7 @@ __all__ = [
     "Gallery",
     "Markdown",
     "Match",
+    "FormulaBar",
     "Row",
     "Plot",
     "SliceByCards",
