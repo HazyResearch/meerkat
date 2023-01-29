@@ -1,6 +1,5 @@
+from meerkat.interactive import AutoComponent
 from meerkat.interactive.endpoint import Endpoint
-
-from ..abstract import AutoComponent
 
 
 class Button(AutoComponent):

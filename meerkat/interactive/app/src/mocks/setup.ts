@@ -1,8 +1,9 @@
-// src/mocks/setup.ts
+import '@testing-library/jest-dom';
 import { API_URL } from '$lib/constants';
 import { server } from './server';
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { fetch } from 'cross-fetch';
+
 
 // Add `fetch` polyfill.
 global.fetch = fetch;
