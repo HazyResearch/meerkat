@@ -133,8 +133,6 @@ class SvelteWriter:
         self.copy_banner_small()  # banner_small.png
         self.copy_favicon()  # favicon.png
 
-        # TODO add example_ipynb
-
     def add_svelte(self):
         return subprocess.run(
             [self.package_manager, "add", "create-svelte@latest"],
