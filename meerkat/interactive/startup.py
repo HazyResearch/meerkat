@@ -324,7 +324,7 @@ def run_frontend_prod(
     env: dict = {},
     skip_build: bool = False,
 ) -> subprocess.Popen:
-    
+
     if not skip_build:
         env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
         build_process = subprocess.Popen(
@@ -369,14 +369,24 @@ def run_frontend_prod(
     # File find replacement for the VITE_API_URL_PLACEHOLDER
     # Replace VITE_API_URL||"http://some.url.here:port" with VITE_API_URL||"http://localhost:8000"
     # using a regex
-    file_find_replace(libpath / "build", r"(VITE_API_URL\|\|\".*?\")", f"VITE_API_URL||\"{api_url}\"", "*.js")
-    file_find_replace(libpath / ".svelte-kit/output/client/_app/", r"(VITE_API_URL\|\|\".*?\")", f"VITE_API_URL||\"{api_url}\"", "*.js")
+    file_find_replace(
+        libpath / "build",
+        r"(VITE_API_URL\|\|\".*?\")",
+        f'VITE_API_URL||"{api_url}"',
+        "*.js",
+    )
+    file_find_replace(
+        libpath / ".svelte-kit/output/client/_app/",
+        r"(VITE_API_URL\|\|\".*?\")",
+        f'VITE_API_URL||"{api_url}"',
+        "*.js",
+    )
 
     # Run the statically built app with preview mode
-    # This doesn't serve the build directory, but instead serves the 
+    # This doesn't serve the build directory, but instead serves the
     # .svelte-kit/output/client/_app directory.
     # This works with [slug] routes, but it requires a Cmd + Shift + R to
-    # hard refresh the page when the API server port changes. We need to 
+    # hard refresh the page when the API server port changes. We need to
     # investigate this further, so we can use this to serve the [slug] routes.
     # process = subprocess.Popen(
     #     [
@@ -393,8 +403,8 @@ def run_frontend_prod(
     # )
 
     # Alternately we run the statically built app with a simple python server
-    # Note: this does not seem to work with [slug] routes, so we should use the preview 
-    # mode instead. We can use this if we explicitly write routes for each
+    # Note: this does not seem to work with [slug] routes, so we should use the preview
+    # mode instead (gives a 404 error). We can use this if we explicitly write routes for each
     # page. We are using this to serve pages using /?id=page_id for now.
     os.chdir(libpath / "build")
     process = subprocess.Popen(
