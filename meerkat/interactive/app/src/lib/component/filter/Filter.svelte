@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-	import type { FilterCriterion, DataFrameSchema } from '$lib/api/dataframe';
+	import type { DataFrameRef, DataFrameSchema, FilterCriterion } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
-	const { get_schema } = getContext('Meerkat');
+	
+	const { fetch_schema } = getContext('Meerkat');
 
-	export let df;
+	export let df: DataFrameRef;
 	export let criteria: FilterCriterion[];
 	export let operations: string[];
 	export let title: string = '';
@@ -15,7 +15,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = get_schema(df.ref_id);
+		schema_promise = fetch_schema(df);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {

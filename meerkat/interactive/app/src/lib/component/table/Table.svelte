@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { DataFrameChunk } from '$lib/api/dataframe';
+	import type { DataFrameChunk, DataFrameRef } from '$lib/api/dataframe';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Table from '$lib/shared/table/Table.svelte';
 	import { createEventDispatcher, getContext } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
-	const { get_schema, fetch_chunk } = getContext('Meerkat');
+	const { fetch_schema, fetch_chunk } = getContext('Meerkat');
 
-	export let df;
+	export let df: DataFrameRef;
 
 	export let page: number = 0;
 	export let per_page: number = 100;
@@ -17,7 +17,7 @@
 
 	export let column_widths: Array<number>;
 
-	$: schema_promise = get_schema(df.ref_id);
+	$: schema_promise = fetch_schema(df);
 	$: rows_promise = fetch_chunk({ df: df, start: page * per_page, end: (page + 1) * per_page });
 
 	$: schema_promise.then((s: any) => {

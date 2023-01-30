@@ -85,82 +85,48 @@ export const fetch_chunk = async ({
     );
 }
 
-export const get_rows = async (
-    ref_id: string,
-    start?: number,
-    end?: number,
-    indices?: Array<number>,
-    columns?: Array<string>,
-    key_column?: string,
-    keys?: Array<string | number>
-) => {
-    console.log("get_schema is deprecated. Use fetch_schema instead.")
-    const result = await post(`${get(API_URL)}/df/${ref_id}/rows`, {
-        start: start,
-        end: end,
-        indices: indices,
-        key_column: key_column,
-        keys: keys,
-        columns: columns
-    });
-
-    return new DataFrameChunk(
-        result.column_infos,
-        result.indices,
-        result.rows,
-        result.full_length,
-        result.primary_key
-    );
-};
-
-
-export const get_schema = async (ref_id: string, columns: Array<string> | null = null) => {
-    console.log("get_schema is deprecated. Use fetch_schema instead.")
-    return await post(`${get(API_URL)}/df/${ref_id}/schema`, { columns: columns });
-};
-
 export const add = async (ref_id: string, column_name: string) => {
     const modifications = await modify(`${get(API_URL)}/df/${ref_id}/add`, { column: column_name });
     return modifications;
 };
 
-export const edit = async (
-    ref_id: string,
-    value: string | number,
-    column: string,
-    row_id: string | number,
-    id_column: string
-) => {
-    const modifications = await modify(`${get(API_URL)}/df/${ref_id}/edit`, {
-        value: value,
-        column: column,
-        row_id: row_id,
-        id_column: id_column
-    });
-    return modifications;
-};
+// export const edit = async (
+//     ref_id: string,
+//     value: string | number,
+//     column: string,
+//     row_id: string | number,
+//     id_column: string
+// ) => {
+//     const modifications = await modify(`${get(API_URL)}/df/${ref_id}/edit`, {
+//         value: value,
+//         column: column,
+//         row_id: row_id,
+//         id_column: id_column
+//     });
+//     return modifications;
+// };
 
-export const edit_target = async (
-    ref_id: string,
-    target: EditTarget,
-    value: any,
-    column: string,
-    row_indices: Array<number>,
-    row_keys: Array<string>,
-    primary_key: string,
-    metadata: any
-) => {
-    const modifications = await modify(`${get(API_URL)}/df/${ref_id}/edit_target`, {
-        target: target,
-        value: value,
-        column: column,
-        row_indices: row_indices,
-        row_keys: row_keys,
-        primary_key: primary_key,
-        metadata: metadata
-    });
-    return modifications;
-};
+// export const edit_target = async (
+//     ref_id: string,
+//     target: EditTarget,
+//     value: any,
+//     column: string,
+//     row_indices: Array<number>,
+//     row_keys: Array<string>,
+//     primary_key: string,
+//     metadata: any
+// ) => {
+//     const modifications = await modify(`${get(API_URL)}/df/${ref_id}/edit_target`, {
+//         target: target,
+//         value: value,
+//         column: column,
+//         row_indices: row_indices,
+//         row_keys: row_keys,
+//         primary_key: primary_key,
+//         metadata: metadata
+//     });
+//     return modifications;
+// };
 
 export const match = async (ref_id: string, input: string, query: string, col_out: Writable<string>) => {
     const modifications = await modify(`${get(API_URL)}/ops/${ref_id}/match`, {

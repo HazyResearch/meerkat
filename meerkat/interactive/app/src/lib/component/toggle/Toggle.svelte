@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
+	let dispatch = createEventDispatcher();
+
 	export let title: string = '';
 	export let value: boolean;
-
-	let dispatch = createEventDispatcher();
 
 	function dispatchToggle(value: boolean) {
 		dispatch('toggle', { value: value });

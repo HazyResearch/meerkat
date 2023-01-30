@@ -5,7 +5,7 @@
 	import type { Writable } from 'svelte/store';
 	import SliceByCard from './SliceByCard.svelte';
 
-	const { get_schema, get_sliceby_info, aggregate_sliceby } = getContext('Meerkat');
+	const { fetch_schema, get_sliceby_info, aggregate_sliceby } = getContext('Meerkat');
 
 	export let sliceby: Writable<SliceByBox>;
 	export let df: Writable<DataFrameBox>;
@@ -13,7 +13,7 @@
 	export let tag_columns: Writable<Array<string>>;
 	export let aggregations: any;
 
-	$: schema_promise = get_schema($df.ref_id);
+	$: schema_promise = fetch_schema($df);
 	$: info_promise = get_sliceby_info($sliceby.ref_id);
 	let aggregations_promise = aggregate_sliceby($sliceby.ref_id, (aggregations = aggregations));
 </script>

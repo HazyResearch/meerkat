@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { SortCriterion, DataFrameSchema } from '$lib/api/dataframe';
+	import type { DataFrameSchema, SortCriterion } from '$lib/api/dataframe';
 	import { getContext } from 'svelte';
-	import Select from 'svelte-select';
-	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
-	import { v4 as uuidv4 } from 'uuid';
+	import Select from 'svelte-select';
 	import SvelteTooltip from 'svelte-tooltip';
-	const { get_schema } = getContext('Meerkat');
+	import { flip } from 'svelte/animate';
+	import { v4 as uuidv4 } from 'uuid';
+	const { fetch_schema } = getContext('Meerkat');
 
 	export let df: any;
 	export let criteria: SortCriterion[];
@@ -19,7 +19,7 @@
 	// FIXME: Temporarily have to do this to update the frontend criteria
 	// when the backend criteria changes.
 	$: {
-		criteria_frontend = criteria
+		criteria_frontend = criteria;
 	}
 	// criteria.subscribe((value) => {
 	// 	criteria_frontend = $criteria;
@@ -28,7 +28,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = get_schema(df.ref_id);
+		schema_promise = fetch_schema(df);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
@@ -113,9 +113,17 @@
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">
-			<button on:click={addCriterion} class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md">+ Add Sort</button>
-			<button on:click={handleClear} class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"> Clear </button>
-
+			<button
+				on:click={addCriterion}
+				class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md"
+				>+ Add Sort</button
+			>
+			<button
+				on:click={handleClear}
+				class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"
+			>
+				Clear
+			</button>
 		</div>
 	</div>
 	<div class="form-control w-full">
@@ -143,12 +151,7 @@
 					<!-- Column selector -->
 					<div class="themed px-1 grow">
 						{#await items_promise}
-							<Select
-								id="column"
-								placeholder="...a column."
-								loading={true}
-								showChevron={true}
-							/>
+							<Select id="column" placeholder="...a column." loading={true} showChevron={true} />
 						{:then items}
 							<Select
 								id="column"
@@ -229,7 +232,6 @@
 				</div>
 			{/each}
 		</section>
-
 	</div>
 </div>
 

@@ -4,7 +4,6 @@
 //     dispatch,
 //     edit,
 //     edit_target,
-//     get_schema,
 //     get_sliceby_info,
 //     get_sliceby_rows,
 //     match,
@@ -42,11 +41,7 @@ export { default as Tabs } from './component/tabs/Tabs.svelte';
 export { default as Text } from './component/text/Text.svelte';
 export { default as Textbox } from './component/textbox/Textbox.svelte';
 export { API_URL } from './constants.js';
-export { default as AutoLayout } from './layouts/AutoLayout.svelte';
 export { default as Brace } from './layouts/Brace.svelte';
-export { default as Div } from './layouts/Div.svelte';
-export { default as Flex } from './layouts/Flex.svelte';
-export { default as Grid } from './layouts/Grid.svelte';
 export { meerkat_writable } from './utils/stores.js';
 export { default as Code } from './shared/cell/code/Code.svelte';
 export { default as Image } from './shared/cell/image/Image.svelte';

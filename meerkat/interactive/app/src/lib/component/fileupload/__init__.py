@@ -8,7 +8,7 @@ class FileUpload(Component):
     files: list = []
     filenames: list = []
     contents: list = []
-    classes: str = None
+    classes: Optional[str] = None
 
     webkitdirectory: bool = False
     directory: bool = False

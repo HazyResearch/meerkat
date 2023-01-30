@@ -1,13 +1,15 @@
 <script lang="ts">
+	// FIXME
 	import { getContext } from 'svelte';
 	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/api/dataframe';
 
-	const { get_schema, edit_target } = getContext('Meerkat');
+	const { fetch_schema, edit_target } = getContext('Meerkat');
 
-	export let df: Writable;
+	export let df: DataFrameRef;
 	export let target: EditTarget;
 	export let primary_key: string;
 	export let selected: Writable<Array<number>>;
@@ -23,7 +25,7 @@
 	$: target.target = get(target.target);
 
 	$: {
-		schema_promise = get_schema(target.target.ref_id);
+		schema_promise = fetch_schema(target.target);
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
