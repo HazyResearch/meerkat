@@ -263,15 +263,22 @@ def run_frontend_dev(
     # Make a regex for
     #   `Local:   http://127.0.0.1:8000/\n` and
     #   `Local:   http://localhost:8000/\n`
-    regex_1 = re.compile(r"http://" + "127.0.0.1" + r":(\d+)/\n")
-    regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/\n")
+    regex_1 = re.compile(r"http://" + "127.0.0.1" + r":(\d+)/")
+    regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/")
+
+    def escape_ansi(line):
+        ansi_escape =re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
+        return ansi_escape.sub('', line)
 
     # Need to check if it started successfully
     start_time = time.time()
     while process.poll() is None:
         out = process.stdout.readline().decode("utf-8")
+        out = escape_ansi(out)
+
         match_1 = regex_1.search(out)
         match_2 = regex_2.search(out)
+        
         if match_1 or match_2:
             break
 

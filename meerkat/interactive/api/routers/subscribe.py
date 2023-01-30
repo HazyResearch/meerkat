@@ -56,7 +56,7 @@ async def progress_generator():
                         "retry": RETRY_TIMEOUT,
                         "data": json.dumps(item),
                     }
-            
+
         await asyncio.sleep(STREAM_DELAY)
 
 @endpoint(prefix='/subscribe', route='/progress/', method='GET')
