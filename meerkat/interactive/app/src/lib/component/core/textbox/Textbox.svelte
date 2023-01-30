@@ -1,18 +1,17 @@
 <script lang="ts">
 	/** Text in the textbox. */
 	export let text: string;
-	
+
 	/** Title the textbox to help the user. */
 	export let title: string = '';
 
 	let timer: any;
-
 	const debounce = (v: string) => {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
 			text = v;
 		}, 300);
-	}
+	};
 </script>
 
 <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">

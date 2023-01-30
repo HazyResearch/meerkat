@@ -15,7 +15,7 @@ button = fb.Button(
 
 card = fb.Card(
     slots=[
-        mk.gui.Flex(
+        mk.gui.html.flex(
             slots=[button, "My Custom Card"],
             classes="flex-row items-center justify-between",
         )
@@ -274,7 +274,7 @@ toast = fb.Toast(
 heading = html.h1(slots="Flowbite Demo", classes="text-4xl")
 
 page = mk.gui.Page(
-    component=mk.gui.RowLayout(
+    component=mk.gui.html.flexcol(
         slots=[heading, card, accordion, alert, avatar, carousel, toast]
     ),
     id="flowbite",

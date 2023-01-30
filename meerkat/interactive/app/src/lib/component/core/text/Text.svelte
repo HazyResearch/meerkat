@@ -14,7 +14,7 @@
 {:else}
 	<div class="h-full w-full rounded-md shadow-md border-black">
 		<iframe
-			srcdoc={sanitized_html}
+			srcdoc={data}
 			title={'title'}
 			class="rounded-md"
 			frameborder="0"
@@ -23,7 +23,7 @@
 	</div>
 {/if}
 
-{#if false}
+<!-- {#if false}
 	<div
 		class="bg-white flex h-full w-full aspect-video content-center items-center rounded-md shadow-md border-black text-center"
 	>
@@ -31,4 +31,4 @@
 	</div>
 {:else}
 	{data}
-{/if}
+{/if} -->
