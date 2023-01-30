@@ -14,6 +14,7 @@ gallery = mk.gui.Gallery(
 
 mk.gui.start(shareable=False)
 interface = mk.gui.Page(
-    component=mk.gui.RowLayout(slots=[filter, gallery]), id="filter"
+    component=mk.gui.html.flexcol(slots=[filter, gallery]),
+    id="filter",
 )
 interface.launch()

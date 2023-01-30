@@ -5,7 +5,6 @@ from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
 import meerkat as mk
 from meerkat.interactive import Store
-from meerkat.interactive.app.src.lib.component.fileupload import FileUpload
 
 # Makes prints reactive!
 print = mk.gui.react()(rich.print)
@@ -92,9 +91,10 @@ text = mk.gui.html.div(
 print("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 
+mk.gui.start(shareable=False)
 page = mk.gui.Page(
     # Layout the Interface components one row each, and launch the page.
-    component=mk.gui.RowLayout(
+    component=mk.gui.html.flexcol(
         slots=[
             # fileupload_component,
             dir_component,

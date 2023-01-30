@@ -17,6 +17,7 @@ with mk.gui.react():
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.RowLayout(slots=[sort1, sort2, galleries]), id="multiple_sort"
+    component=mk.gui.html.flexcol(slots=[sort1, sort2, galleries]), 
+    id="multiple-sort",
 )
 page.launch()
