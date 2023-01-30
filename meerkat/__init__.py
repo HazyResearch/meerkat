@@ -9,6 +9,7 @@ def _default(self, obj):
     # Monkey patch json module at import time so
     # JSONEncoder.default() checks for a "to_json()"
     # method and uses it to encode objects if it exists
+    # Note: this may not have been for FastAPI, but another library
     if isinstance(obj, gui.Store):
         return getattr(obj, "to_json", _default.default)()
     return getattr(obj.__class__, "to_json", _default.default)(obj)

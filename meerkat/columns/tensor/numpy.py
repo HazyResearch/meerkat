@@ -315,6 +315,9 @@ class NumPyTensorColumn(
 
     def to_numpy(self) -> np.ndarray:
         return self.data
+    
+    def to_json(self) -> List[Any]:
+        return self.data.tolist()
 
     @classmethod
     def from_npy(

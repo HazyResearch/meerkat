@@ -1,12 +1,14 @@
-import json
 import logging
 from fastapi import HTTPException
-from fastapi.responses import Response
+from fastapi.encoders import jsonable_encoder
 
+import torch
+import numpy as np
+import pandas as pd 
 
 from meerkat.errors import TriggerError
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.utils import MeerkatJSONEncoder
+from meerkat.columns.abstract import Column
 
 logger = logging.getLogger(__name__)
 
@@ -50,5 +52,13 @@ def dispatch(
     ]
 
     # Return the modifications and the result to the frontend
-
-    return {"result": result, "modifications": modifications, "error": None}
+    # Need to support sending back numpy arrays, torch tensors, and pandas series
+    return jsonable_encoder(
+        {"result": result, "modifications": modifications, "error": None},
+        custom_encoder={
+            np.ndarray: lambda v: v.tolist(),
+            torch.Tensor: lambda v: v.tolist(),
+            pd.Series: lambda v: v.tolist(),
+            Column: lambda v: v.to_json(),
+        },
+    )
