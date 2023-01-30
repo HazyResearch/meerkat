@@ -13,6 +13,7 @@ from meerkat.interactive.server import API_PORT, FRONTEND_PORT
 from meerkat.interactive.startup import run_frontend, run_script
 from meerkat.interactive.svelte import SvelteWriter
 from meerkat.state import APIInfo, state
+from meerkat.tools.collect_env import collect_env_info
 
 cli = typer.Typer()
 
@@ -302,6 +303,11 @@ def demo(
     # Optional: Run the demo script.
     if run:
         _run(script_path=script_path, api_port=api_port, frontend_port=frontend_port)
+
+
+@cli.command()
+def collect_env():
+    print(collect_env_info())
 
 
 if __name__ == "__main__":

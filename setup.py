@@ -58,6 +58,7 @@ REQUIRED = [
     "typer",
     "jinja2",
     "nbformat",
+    "sse_starlette",
 ]
 
 # What packages are optional?
