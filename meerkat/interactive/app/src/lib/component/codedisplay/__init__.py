@@ -1,9 +1,8 @@
-from meerkat.interactive.graph import Store
+from enum import Enum
 
-from ..abstract import BaseComponent
+from ..abstract import Component
 
+class CodeDisplay(Component):
 
-class CodeDisplay(BaseComponent):
-
-    data: Store[str]
+    data: str
     language: str = "python"

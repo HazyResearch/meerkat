@@ -1,5 +1,5 @@
 <script>
-	import { closeModal, Modals } from 'svelte-modals';
+	import { Modals } from 'svelte-modals';
 </script>
 
 <Modals>

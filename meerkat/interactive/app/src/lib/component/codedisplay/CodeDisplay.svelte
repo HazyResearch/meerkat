@@ -1,13 +1,21 @@
 <script lang="ts">
 	import Prism from 'prismjs';
-	// import 'prismjs/components/prism-python.js';
-	import type { Writable } from 'svelte/store';
 
-	export let data: Writable<string>;
+	// TODO: Add all themes here
+	type PrismTheme =
+		| 'coy'
+		| 'dark'
+		| 'funky'
+		| 'okaidia'
+		| 'solarizedlight'
+		| 'tomorrow'
+		| 'twilight';
+
+	export let data: string;
 	export let language: string = 'python';
-	export let theme: string = 'okaidia';
+	export let theme: PrismTheme = 'okaidia';
 
-	let html_code = Prism.highlight($data, Prism.languages.js, language);
+	let html_code = Prism.highlight(data, Prism.languages.js, language);
 </script>
 
 <svelte:head>

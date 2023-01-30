@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import validator
 
 from meerkat.dataframe import DataFrame
@@ -9,7 +10,7 @@ class Table(Component):
     df: DataFrame
     per_page: int = 100
     editable: bool = False
-    id_column: str = None
+    id_column: Optional[str] = None
 
     on_edit: Endpoint = None
 

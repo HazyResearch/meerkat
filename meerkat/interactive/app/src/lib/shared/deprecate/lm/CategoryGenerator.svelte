@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Pill from "../common/Pill.svelte";
+    import Pill from "../../common/Pill.svelte";
     import { form, field } from 'svelte-forms';
     import { required } from 'svelte-forms/validators';
     import { get_categories, get_categorization } from "$lib/api/llm";

@@ -1,13 +1,13 @@
 <script lang="ts">
 	// import Description from './Description.svelte';
-	import type { DataFrameRows, ColumnInfo, DataFrameSchema } from '$lib/api/dataframe';
-	import type { Writable } from 'svelte/store';
-	import { getContext } from 'svelte';
+	import type { DataFrameRows, DataFrameSchema } from '$lib/api/dataframe';
 	import type { SliceKey } from '$lib/api/sliceby';
-	import type { SliceByBox } from '$lib/utils/types';
-	import RowCard from './RowCard.svelte';
 	import LoadButton from '$lib/shared/common/LoadButton.svelte';
 	import Pill from '$lib/shared/common/Pill.svelte';
+	import type { SliceByBox } from '$lib/utils/types';
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import RowCard from './RowCard.svelte';
 
 	const { get_sliceby_rows } = getContext('Meerkat');
 
@@ -23,7 +23,6 @@
 	let main_index: number = columns.indexOf(main_column);
 	let main_component = schema.columns[main_index].cell_component;
 	let main_props = schema.columns[main_index].cell_props;
-
 
 	let page: number = 0;
 	const per_page: number = 25;
@@ -50,8 +49,7 @@
 	};
 	load_rows();
 
-	let get_type
-
+	let get_type;
 </script>
 
 <div class="pt-2 pl-6 pb-2 h-fit mx-auto bg-white rounded-xl shadow-lg overflow-x-hidden ml-4">
@@ -73,18 +71,14 @@
 				Loading aggregations...
 			{:then aggregations}
 				{#each Object.entries(aggregations) as [name, aggregation]}
-					<Pill 
-						layout="wide-content" 
-						header={name} 
-						content={aggregation.df[slice_key]} 
-					/>
+					<Pill layout="wide-content" header={name} content={aggregation.df[slice_key]} />
 				{/each}
 			{:catch error}
 				{error}
 			{/await}
 		</div>
 
-		<div class="flex overflow-x-scroll mx-2 items-center space-x-4"> 
+		<div class="flex overflow-x-scroll mx-2 items-center space-x-4">
 			{#if rows.rows.length < 1}
 				<LoadButton status="loading" on:load={load_rows} />
 			{:else}
@@ -108,7 +102,7 @@
 						layout="gimages"
 					/>
 				{/each}
-				<LoadButton status={"waiting"} on:load={load_rows} />
+				<LoadButton status={'waiting'} on:load={load_rows} />
 			{/if}
 		</div>
 	</div>

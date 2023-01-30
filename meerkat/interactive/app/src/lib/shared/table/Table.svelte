@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ColumnInfo, DataFrameRows, DataFrameSchema } from '$lib/api/dataframe';
+	import type { ColumnInfo, DataFrameChunk, DataFrameSchema } from '$lib/api/dataframe';
 	import Cell from '$lib/shared/cell/Cell.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
@@ -7,7 +7,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	export let rows: DataFrameRows | null;
+	export let rows: DataFrameChunk | null;
 	export let schema: DataFrameSchema;
 	export let editable: boolean = false;
 	export let id_column: string = null;
@@ -112,7 +112,7 @@
 								cell_component={column_info.cell_component}
 								cell_props={column_info.cell_props}
 								cell_data_prop={column_info.cell_data_prop}
-								editable={editable && (column_info.name !== id_column)}
+								editable={editable && column_info.name !== id_column}
 								on:edit={(event) => handle_edit(event, index, column_info.name)}
 							/>
 						</div>

@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { DataFrameChunk } from '$lib/api/dataframe';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Table from '$lib/shared/table/Table.svelte';
 	import { createEventDispatcher, getContext } from 'svelte';
-	
+
 	const dispatch = createEventDispatcher();
 
 	const { get_schema, fetch_chunk } = getContext('Meerkat');
@@ -17,7 +18,7 @@
 	export let column_widths: Array<number>;
 
 	$: schema_promise = get_schema(df.ref_id);
-	$: rows_promise = fetch_chunk({df :df, start: page * per_page, end: (page + 1) * per_page});
+	$: rows_promise = fetch_chunk({ df: df, start: page * per_page, end: (page + 1) * per_page });
 
 	$: schema_promise.then((s: any) => {
 		if (column_widths == null) {
@@ -26,14 +27,13 @@
 	});
 
 	async function handle_edit(event: any) {
-		let rows = await rows_promise;
+		let rows: DataFrameChunk = await rows_promise;
 
 		let { row, column, value } = event.detail;
 		let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
 		let row_index = rows.indices.indexOf(row);
 		let row_id = rows.rows[row_index][row_id_column_index];
 
-		// edit(pivot.ref_id, value, column, row_id, pivot_id_column);
 		dispatch('edit', {
 			row: row,
 			row_id: row_id,
@@ -41,7 +41,6 @@
 			value: event.detail.value
 		});
 	}
-	
 </script>
 
 <div class="h-full flex-1 rounded-lg overflow-hidden bg-slate-50">
