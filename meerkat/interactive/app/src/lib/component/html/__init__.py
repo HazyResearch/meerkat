@@ -1,4 +1,7 @@
 from typing import Optional
+
+from pydantic import validator
+
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.mixins.identifiable import classproperty
 
@@ -11,11 +14,6 @@ class HtmlMixin:
     @classproperty
     def namespace(cls):
         return "html"
-
-
-class p(Slottable, HtmlMixin, Component):
-    classes: Optional[str] = None
-    style: Optional[str] = None
 
 
 class a(Slottable, HtmlMixin, Component):
@@ -32,51 +30,78 @@ class div(Slottable, HtmlMixin, Component):
     style: Optional[str] = None
 
 
+class flex(div):
+
+    @validator("classes", pre=True, always=True)
+    def make_flex(cls, v):
+        return "flex flex-row " + v if v is not None else "flex flex-row"
+
+class flexcol(div):
+    
+    @validator("classes", pre=True, always=True)
+    def make_flexcol(cls, v):
+        return "flex flex-col " + v if v is not None else "flex flex-col"
+
+class grid(div):
+    
+    @validator("classes", pre=True, always=True)
+    def make_grid(cls, v):
+        return "grid " + v if v is not None else "grid"
+
+class gridcols2(div):
+    @validator("classes", pre=True, always=True)
+    def make_gridcols2(cls, v):
+        return "grid grid-cols-2 " + v if v is not None else "grid grid-cols-2"
+    
+class gridcols3(div):
+    @validator("classes", pre=True, always=True)
+    def make_gridcols3(cls, v):
+        return "grid grid-cols-3 " + v if v is not None else "grid grid-cols-3"
+
+class gridcols4(div):
+    @validator("classes", pre=True, always=True)
+    def make_gridcols4(cls, v):
+        return "grid grid-cols-4 " + v if v is not None else "grid grid-cols-4"
+
+
+class p(Slottable, HtmlMixin, Component):
+    classes: Optional[str] = None
+    style: Optional[str] = None
+
+
 class span(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
 
-# FIXME: remove closing tags in the Wrapper.svelte transipler
-# class input(HtmlMixin, Component):
-#     classes: Optional[str] = None
-#     style: Optional[str] = None
-
-#     type: str = "text"
-#     value: str = ""
-#     placeholder: str = ""
-#     name: str = ""
-
-
-# class img(Slottable, HtmlMixin, Component):
-#     src: str = ""
-#     alt: str = ""
-#     width: str = ""
-#     height: str = ""
-
 
 class h1(Slottable, HtmlMixin, Component):
-    classes: Optional[str] = None
+    classes: Optional[str] = "text-4xl"
     style: Optional[str] = None
 
 
 class h2(Slottable, HtmlMixin, Component):
-    pass
+    classes: Optional[str] = "text-3xl"
+    style: Optional[str] = None
 
 
 class h3(Slottable, HtmlMixin, Component):
-    pass
+    classes: Optional[str] = "text-2xl"
+    style: Optional[str] = None
 
 
 class h4(Slottable, HtmlMixin, Component):
-    pass
+    classes: Optional[str] = "text-xl"
+    style: Optional[str] = None
 
 
 class h5(Slottable, HtmlMixin, Component):
-    pass
+    classes: Optional[str] = "text-lg"
+    style: Optional[str] = None
 
 
 class h6(Slottable, HtmlMixin, Component):
-    pass
+    classes: Optional[str] = "text-md"
+    style: Optional[str] = None
 
 class svg(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
@@ -174,6 +199,25 @@ class button(Slottable, HtmlMixin, Component):
 # class input(Slottable, HtmlMixin, Component):
 #     pass
 
+
+
+
+# FIXME: remove closing tags in the Wrapper.svelte transipler
+# class input(HtmlMixin, Component):
+#     classes: Optional[str] = None
+#     style: Optional[str] = None
+
+#     type: str = "text"
+#     value: str = ""
+#     placeholder: str = ""
+#     name: str = ""
+
+
+# class img(Slottable, HtmlMixin, Component):
+#     src: str = ""
+#     alt: str = ""
+#     width: str = ""
+#     height: str = ""
 
 class textarea(Slottable, HtmlMixin, Component):
     pass

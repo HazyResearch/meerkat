@@ -8,11 +8,11 @@ from IPython.display import IFrame
 from pydantic import BaseModel
 
 from meerkat.interactive import html
+from meerkat.interactive.app.src.lib.component._internal.progress import Progress
 from meerkat.interactive.app.src.lib.component.abstract import (
     BaseComponent,
     ComponentFrontend,
 )
-from meerkat.interactive.app.src.lib.component.progress import Progress
 from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
@@ -81,7 +81,11 @@ class Page(IdentifiableMixin):
 
             start()
 
-        url = f"{state.frontend_info.url}/{self.id}"
+        # TODO: restore the original route
+        # We had issues using the original route when serving [slug] pages
+        # in production mode, see `run_frontend_prod` in `startup.py`.
+        # url = f"{state.frontend_info.url}/{self.id}"
+        url = f"{state.frontend_info.url}/?id={self.id}"
 
         if return_url:
             return url

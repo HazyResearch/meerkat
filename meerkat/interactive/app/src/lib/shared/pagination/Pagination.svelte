@@ -2,7 +2,6 @@
 	import ChevronLeft from 'svelte-bootstrap-icons/lib/ChevronLeft.svelte';
 	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
 	import { Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { tippy } from 'svelte-tippy';
 
 	export let page: number = 0;
 	export let per_page: number = 10;

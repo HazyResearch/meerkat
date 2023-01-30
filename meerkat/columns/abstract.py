@@ -627,6 +627,20 @@ class Column(
         raise ConversionError(
             f"Cannot convert column of type {type(self)} to Numpy array."
         )
+    
+    def to_json(self) -> dict:
+        """Convert the column to a JSON object.
+
+        If the column cannot be converted to a JSON object, this method will raise a
+        `~meerkat.errors.ConversionError`.
+
+        Returns:
+            dict: The column as a JSON object.
+        """
+        raise ConversionError(
+            f"Cannot convert column of type {type(self)} to JSON object."
+        )
+
 
     def _copy_data(self) -> object:
         return copy(self._data)

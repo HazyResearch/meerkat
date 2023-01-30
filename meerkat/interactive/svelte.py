@@ -124,6 +124,7 @@ class SvelteWriter:
         self.write_all_component_wrappers()  # src/lib/components/wrappers
         self.write_component_context()  # ComponentContext.svelte
         self.write_layout()  # +layout.svelte, layout.js
+        self.write_root_route_alternate()  # +page.svelte
         self.write_slug_route()  # [slug]/+page.svelte
 
         self.write_gitignore()  # .gitignore
@@ -131,8 +132,6 @@ class SvelteWriter:
 
         self.copy_banner_small()  # banner_small.png
         self.copy_favicon()  # favicon.png
-
-        # TODO add example_ipynb
 
     def add_svelte(self):
         return subprocess.run(
@@ -232,7 +231,6 @@ class SvelteWriter:
             logger.debug("In user appdir. Importing app components from app/src/lib/components.")
             sys.path.append(self.cwd)
             importlib.import_module("app.src.lib.components")
-            return
 
     def install_bun(self):
         return subprocess.run(
@@ -479,6 +477,9 @@ page.launch()"""
             frontend_components=frontend_components,
         )
 
+    def render_root_route_alternate(self):
+        return jinja_env.get_template("page.root.alternate.svelte").render()
+
     def render_setup_py(self):
         return jinja_env.get_template("setup.py").render()
 
@@ -603,6 +604,12 @@ page.launch()"""
     def write_libdir(self):
         os.makedirs(f"{self.appdir}/src/lib", exist_ok=True)
 
+    def write_root_route_alternate(self):
+        self.write_file(
+            f"{self.appdir}/src/routes/+page.svelte",
+            self.render_root_route_alternate(),
+        )
+
     def write_setup_py(self):
         self.write_file("setup.py", self.render_setup_py())
 
@@ -625,4 +632,4 @@ page.launch()"""
 
 # Create an instance that can be used by other modules
 svelte_writer = SvelteWriter()
-svelte_writer.init_run()
+# svelte_writer.init_run() # FIXME

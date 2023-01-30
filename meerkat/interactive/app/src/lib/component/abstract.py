@@ -3,7 +3,7 @@ import inspect
 import os
 from typing import Dict, List, Literal, Set
 
-from pydantic import BaseModel, Extra, root_validator, validator
+from pydantic import BaseModel, Extra, root_validator
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
@@ -30,6 +30,9 @@ class WrappableMixin:
 
         svelte_writer = SvelteWriter()
 
+        # TODO: this will create issues if users want to use plotly components
+        # in mk init apps. In general, we need to make the library / namespace
+        # distinction more explicit and this system more robust.
         if cls.library == "@meerkat-ml/meerkat" and (
             cls.namespace == "meerkat" or cls.namespace == "plotly"
         ):
@@ -96,25 +99,25 @@ class SlotsMixin:
 
     @property
     def slots(self) -> List["BaseComponent"]:
-        from meerkat.interactive.app.src.lib.layouts import Brace
+        from meerkat.interactive.app.src.lib.component.core.put import Put
 
         _slots = []
         for slot in self._slots:
             if not isinstance(slot, BaseComponent):
-                # Wrap it in a Brace component
-                _slots.append(Brace(data=slot))
+                # Wrap it in a Put component
+                _slots.append(Put(data=slot))
             else:
                 _slots.append(slot)
         return _slots
 
     def append(self, other):
         # Allow users to append to slots
-        from meerkat.interactive.app.src.lib.layouts import Brace
+        from meerkat.interactive.app.src.lib.component.core.put import Put
 
         if isinstance(other, BaseComponent):
             self._slots.append(other)
         else:
-            self._slots.append(Brace(data=other))
+            self._slots.append(Put(data=other))
 
     @classproperty
     def slottable(cls) -> bool:
@@ -152,7 +155,9 @@ class BaseComponent(
     def component_name(cls):
         # Inheriting an existing BaseComponent and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != BaseComponent and issubclass(cls.__bases__[0], BaseComponent):
+        if cls.__bases__[0] != BaseComponent and issubclass(
+            cls.__bases__[0], BaseComponent
+        ):
             return cls.__bases__[0].__name__
 
         return cls.__name__
@@ -211,19 +216,21 @@ class BaseComponent(
     def path(cls):
         from meerkat.interactive.svelte import svelte_writer
 
+        if not cls.library == "@meerkat-ml/meerkat" or (
+            cls.library == "@meerkat-ml/meerkat"
+            # KG: TODO: Temporary hack to be able to use multiple namespaces
+            # for components provided natively in the Meerkat library.
+            and (cls.namespace == "meerkat" or cls.namespace == "plotly")
+            and svelte_writer.is_user_appdir
+        ):
+            return cls.library
+
         path = os.path.join(
             os.path.dirname(inspect.getfile(cls)),
             f"{cls.component_name}.svelte",
         )
         if os.path.exists(path):
             return path
-
-        if not cls.library == "@meerkat-ml/meerkat" or (
-            cls.library == "@meerkat-ml/meerkat"
-            and cls.namespace == "meerkat"
-            and svelte_writer.is_user_appdir
-        ):
-            return cls.library
 
         # Raise an error if the file doesn't exist
         raise FileNotFoundError(
@@ -342,9 +349,7 @@ class Component(BaseComponent):
     def component_name(cls):
         # Inheriting an existing Component and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != Component and issubclass(
-            cls.__bases__[0], Component
-        ):
+        if cls.__bases__[0] != Component and issubclass(cls.__bases__[0], Component):
             return cls.__bases__[0].__name__
 
         return cls.__name__

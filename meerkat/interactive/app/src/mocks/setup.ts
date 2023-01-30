@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom';
 import { API_URL } from '$lib/constants';
-import { server } from './server';
-import { afterAll, afterEach, beforeAll } from 'vitest'
+import '@testing-library/jest-dom';
 import { fetch } from 'cross-fetch';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from './server';
 
 
 // Add `fetch` polyfill.

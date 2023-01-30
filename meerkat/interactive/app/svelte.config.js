@@ -1,7 +1,5 @@
-// import adapter from '@sveltejs/adapter-auto';
 import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
-// import { optimizeImports } from "carbon-preprocess-svelte";
 
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -12,13 +10,30 @@ const config = {
 		preprocess({
 			postcss: true,
 		}),
-		// optimizeImports()
 	],
 
 	kit: {
 		adapter: adapter(),
-        prerender: {
+		prerender: {
 			entries: ['*', '/[slug]'],
+		}
+	},
+
+	package: {
+		files: (filename) => {
+			// Exclude the `wrappers` and `ComponentContext` from the build
+			// Exclude everything inside `deprecate` folders
+			// Exclude any __pycache__ folders in any subdirectory
+			// Exclude all .py files
+			if (filename.match(/wrappers\/.*/)
+				|| filename.match(/ComponentContext.*/)
+				|| filename.match(/deprecate\/.*/)
+				|| filename.match(/__pycache__\/.*/)
+				|| filename.match(/.*\.py/)
+			) {
+				return false;
+			}
+			return true;
 		}
 	}
 };

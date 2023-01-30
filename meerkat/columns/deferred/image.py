@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import os
 import logging
 from io import BytesIO
 from pathlib import Path
-from typing import Callable, Sequence, Union
+from typing import Optional, Sequence, Union
 
 from PIL import Image
 
 import meerkat.tools.docs as docs
-from meerkat.columns.deferred.file import FileColumn, FILE_SHARED_DOCS
-from meerkat.interactive.app.src.lib.component.image import DeferredImageFormatter
+from meerkat.columns.deferred.file import FILE_SHARED_DOCS, FileColumn
+from meerkat.interactive.app.src.lib.component.core.image import DeferredImageFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +18,11 @@ def load_image(f: Union[str, BytesIO, Path]):
     img = Image.open(f)
     return img.convert("RGB")
 
+
 @docs.doc(source=FILE_SHARED_DOCS)
 def image(
     filepaths: Sequence[str],
-    base_dir: str = None,
+    base_dir: Optional[str] = None,
     downloader: Union[callable, str] = None,
     loader: callable = load_image,
     cache_dir: str = None,
@@ -45,10 +45,9 @@ def image(
         loader=loader,
         downloader=downloader,
         cache_dir=cache_dir,
-        formatter=DeferredImageFormatter()
+        formatter=DeferredImageFormatter(),
     )
 
-    
 
 class ImageColumn(FileColumn):
     """

@@ -1,55 +1,51 @@
-// export {
-//     add,
-//     aggregate_sliceby,
-//     dispatch,
-//     edit,
-//     edit_target,
-//     get_schema,
-//     get_sliceby_info,
-//     get_sliceby_rows,
-//     match,
-//     remove_row_by_index,
-//     update_store
-// } from './api/api.js';
-// This import causes an ssr error!
-
-// Need to export the styles, otherwise users of this Meerkat package don't see styling
-// We needed to move the app.css into src/lib, otherwise SvelteKit packaging
-// would not include it in the package/ build.
-// We manually compile the Tailwind CSS into package/app.css (
-// replacing the tailwind directives with the actual CSS), and then publish
-export { default as styles } from "./app.css";
-export { default as Button } from './component/button/Button.svelte';
-export { default as Choice } from './component/choice/Choice.svelte';
-export { default as CodeDisplay } from './component/codedisplay/CodeDisplay.svelte';
-export { default as Discover } from './component/discover/Discover.svelte';
-export { default as Document } from './component/document/Document.svelte';
-export { default as Editor } from './component/editor/Editor.svelte';
-export { default as Filter } from './component/filter/Filter.svelte';
-export { default as Gallery } from './component/gallery/Gallery.svelte';
-export { default as Markdown } from './component/markdown/Markdown.svelte';
-export { default as Match } from './component/match/Match.svelte';
-export { default as MultiSelect } from './component/multiselect/MultiSelect.svelte';
-export { default as Plot } from './component/plot/Plot.svelte';
-export { default as Row } from './component/row/Row.svelte';
-export { default as SliceByCard } from './component/slicebycards/SliceByCard.svelte';
-export { default as SliceByCards } from './component/slicebycards/SliceByCards.svelte';
-export { default as Sort } from './component/sort/Sort.svelte';
-export { default as Stats } from './component/stats/Stats.svelte';
-export { default as StatsLabeler } from './component/stats_labeler/StatsLabeler.svelte';
-export { default as Table } from './component/table/Table.svelte';
-export { default as Tabs } from './component/tabs/Tabs.svelte';
-export { default as Text } from './component/text/Text.svelte';
-export { default as Textbox } from './component/textbox/Textbox.svelte';
-export { API_URL } from './constants.js';
-export { default as AutoLayout } from './layouts/AutoLayout.svelte';
-export { default as Brace } from './layouts/Brace.svelte';
-export { default as Div } from './layouts/Div.svelte';
-export { default as Flex } from './layouts/Flex.svelte';
-export { default as Grid } from './layouts/Grid.svelte';
-export { meerkat_writable } from './utils/stores.js';
-export { default as Code } from './shared/cell/code/Code.svelte';
-export { default as Image } from './shared/cell/image/Image.svelte';
-export { default as Page } from './shared/Page.svelte';
-export { nestedMap } from './utils/tools.js';
+/** Meerkat Component */
 export { default as Meerkat } from './Meerkat.svelte';
+/**
+ * CSS
+ * Need to export the styles, otherwise users of this Meerkat package don't see styling
+ * We needed to move the app.css into src/lib, otherwise SvelteKit packaging
+ * would not include it in the package/ build.
+ * We manually compile the Tailwind CSS into package/app.css (
+ * replacing the tailwind directives with the actual CSS), and then publish
+*/
+export { default as styles } from "./app.css";
+/** Internal Components */
+export { default as Progress } from './component/_internal/progress/Progress.svelte';
+/** Contrib Components */
+// export { default as Discover } from './component/contrib/discover/Discover.svelte';
+/** Core Components */
+export { default as Button } from './component/core/button/Button.svelte';
+export { default as Chat } from './component/core/chat/Chat.svelte';
+export { default as Choice } from './component/core/choice/Choice.svelte';
+export { default as CodeDisplay } from './component/core/codedisplay/CodeDisplay.svelte';
+export { default as Document } from './component/core/document/Document.svelte';
+export { default as Editor } from './component/core/editor/Editor.svelte';
+export { default as FileUpload } from './component/core/fileupload/FileUpload.svelte';
+export { default as Filter } from './component/core/filter/Filter.svelte';
+export { default as Gallery } from './component/core/gallery/Gallery.svelte';
+export { default as Image } from './component/core/image/Image.svelte';
+export { default as Markdown } from './component/core/markdown/Markdown.svelte';
+export { default as Match } from './component/core/match/Match.svelte';
+export { default as MultiSelect } from './component/core/multiselect/MultiSelect.svelte';
+export { default as Put } from './component/core/put/Put.svelte';
+export { default as Scalar } from './component/core/scalar/Scalar.svelte';
+export { default as SliceByCards } from './component/core/slicebycards/SliceByCards.svelte';
+export { default as Sort } from './component/core/sort/Sort.svelte';
+export { default as Stats } from './component/core/stats/Stats.svelte';
+export { default as Table } from './component/core/table/Table.svelte';
+export { default as Tabs } from './component/core/tabs/Tabs.svelte';
+export { default as Text } from './component/core/text/Text.svelte';
+export { default as Textbox } from './component/core/textbox/Textbox.svelte';
+export { default as Toggle } from './component/core/toggle/Toggle.svelte';
+export { default as RawHTML } from './component/core/raw_html/RawHTML.svelte';
+/** Plotly Components */
+export { default as BarPlot } from './component/plotly/bar/BarPlot.svelte';
+export { default as Plot } from './component/plotly/plot/Plot.svelte';
+/** Utils */
+export { API_URL } from './constants.js';
+/** Shared Components */
+export { default as Page } from './shared/Page.svelte';
+export { default as Code } from './shared/cell/code/Code.svelte';
+export { default } from './utils/api';
+export { meerkat_writable } from './utils/stores.js';
+export { nestedMap } from './utils/tools.js';

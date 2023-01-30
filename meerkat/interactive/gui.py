@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Union
 from IPython.display import IFrame
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.slicebycards import SliceByCards
+from meerkat.interactive.app.src.lib.component.core.slicebycards import SliceByCards
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.ops.sliceby.sliceby import SliceBy
 
@@ -78,7 +78,7 @@ class SliceByGUI(GUI):
             tag_columns=tag_columns,
             aggregations=aggregations,
         )
-        return mk.gui.Page(component=component).launch()
+        return mk.gui.Page(component=component, id="sliceby").launch()
 
 
 class Aggregation(IdentifiableMixin):

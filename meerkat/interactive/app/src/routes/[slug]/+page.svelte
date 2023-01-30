@@ -1,10 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import banner from '$lib/assets/banner_small.png';
+	import { API_URL } from '$lib/constants';
 	import Page from '$lib/shared/Page.svelte';
 	import type { PageType } from '$lib/utils/types';
 	import { onMount } from 'svelte';
-	import { API_URL } from '$lib/constants';
-	import { page } from '$app/stores';
 
 	let config: PageType | null = null;
 	onMount(async () => {
