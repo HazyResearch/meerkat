@@ -1,16 +1,15 @@
 <script lang="ts">
+	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
+	import { fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import type { DataFrameRef } from '$lib/utils/dataframe';
+	import { Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { setContext } from 'svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
+	import { openModal } from 'svelte-modals';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
-	import { getContext, setContext } from 'svelte';
-	import { BarLoader } from 'svelte-loading-spinners';
 	import Selected from './Selected.svelte';
-	import { openModal } from 'svelte-modals';
-	import RowModal from '$lib/shared/modals/RowModal.svelte';
-	import { Dropdown, DropdownItem } from 'flowbite-svelte';
-	import type { DataFrameRef } from '$lib/api/dataframe';
-
-	const { fetch_schema, fetch_chunk } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let main_column: string;

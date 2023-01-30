@@ -1,11 +1,8 @@
 <script lang="ts">
-	import type { DataFrameBox, SliceByBox } from '$lib/utils/types';
+	import { fetch_schema } from '$lib/utils/api';
 
-	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import SliceByCard from './SliceByCard.svelte';
-
-	const { fetch_schema, get_sliceby_info, aggregate_sliceby } = getContext('Meerkat');
 
 	export let sliceby: Writable<SliceByBox>;
 	export let df: Writable<DataFrameBox>;

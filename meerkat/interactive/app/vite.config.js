@@ -25,9 +25,6 @@ const config = {
 		rollupOptions: {
 			// Externalize deps
 			external: [
-				// Exclude the `wrappers` and `ComponentContext` from the build
-				new RegExp('./src/lib/wrappers/.*'),
-				new RegExp('./src/lib/ComponentContext.*'),
 				// Exclude everything inside `deprecate` folders
 				new RegExp('./src/lib/component/deprecate/.*'),
 				new RegExp('./src/lib/shared/deprecate/.*'),

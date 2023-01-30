@@ -1,10 +1,8 @@
 <script lang="ts">
-	import type { DataFrameRef, DataFrameSchema } from '$lib/api/dataframe';
-	import { getContext } from 'svelte';
+	import { fetch_schema } from '$lib/utils/api';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
 	import Select from 'svelte-select';
 	import type { FilterCriterion } from './types';
-	
-	const { fetch_schema } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let criteria: FilterCriterion[];
@@ -16,7 +14,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = fetch_schema(df);
+		schema_promise = fetch_schema({ df: df });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { dispatch } from '$lib/utils/api';
 	import type { Endpoint } from '$lib/utils/types';
-
-	const { dispatch } = getContext('Meerkat');
+	import { onMount } from 'svelte';
 
 	export let on_run: Endpoint;
 
@@ -14,7 +13,7 @@
 
 	let run_search = async (text) => {
 		try {
-			await $dispatch(
+			await dispatch(
 				on_run.endpoint_id,
 				{
 					new_code: text

@@ -1,10 +1,12 @@
 """Startup script for interactive Meerkat.
 
-Code is heavily borrowed from Gradio.
+Some code and design patters are borrowed from 
+Gradio and Pynecone.
 """
 
 import atexit
 import fnmatch
+import logging
 import os
 import pathlib
 import re
@@ -29,6 +31,8 @@ from meerkat.interactive.svelte import SvelteWriter
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import APIInfo, FrontendInfo, state
 
+logger = logging.getLogger(__name__)
+
 
 def file_find_replace(directory, find, replace, pattern):
     for path, _, files in os.walk(os.path.abspath(directory)):
@@ -36,7 +40,8 @@ def file_find_replace(directory, find, replace, pattern):
             filepath = os.path.join(path, filename)
             with open(filepath) as f:
                 s = f.read()
-            s = s.replace(find, replace)
+            # s = s.replace(find, replace)
+            s = re.sub(find, replace, s)
             with open(filepath, "w") as f:
                 f.write(s)
 
@@ -267,8 +272,8 @@ def run_frontend_dev(
     regex_2 = re.compile(r"http://" + "localhost" + r":(\d+)/")
 
     def escape_ansi(line):
-        ansi_escape =re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
-        return ansi_escape.sub('', line)
+        ansi_escape = re.compile(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]")
+        return ansi_escape.sub("", line)
 
     # Need to check if it started successfully
     start_time = time.time()
@@ -278,7 +283,7 @@ def run_frontend_dev(
 
         match_1 = regex_1.search(out)
         match_2 = regex_2.search(out)
-        
+
         if match_1 or match_2:
             break
 
@@ -310,34 +315,6 @@ def get_subclasses_recursive(cls: type) -> List[type]:
         subclasses.extend(get_subclasses_recursive(subclass))
     return subclasses
 
-# TODO(Karan): Do we still need this? Seems like it's not used anywhere.
-# def wrap_all_components(exclude_meerkat: bool = False):
-#     from meerkat.interactive import BaseComponent
-
-#     # Recursively find all subclasses of BaseComponent
-#     subclasses = get_subclasses_recursive(BaseComponent)
-#     exclude = set(["Component", "BaseComponent"])
-#     for subclass in subclasses:
-#         if subclass.__name__ in exclude:
-#             continue
-
-#         if subclass.namespace == "@meerkat-ml/meerkat" and exclude_meerkat:
-#             continue
-
-#         # Use subclass.__name__ as the component name, instead of
-#         # subclass.component_name, because the latter is not guaranteed to be unique.
-#         component_name = subclass.__name__
-
-#         # Make a file for the component, inside a subdirectory for the namespace
-#         # e.g. src/lib/wrappers/__meerkat/BaseComponent.svelte
-#         breakpoint()
-#         os.makedirs(f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}", exist_ok=True)
-#         with open(
-#             f"{APP_DIR}/src/lib/wrappers/__{subclass.namespace}/{component_name}.svelte",
-#             "w",
-#         ) as f:
-#             f.write(subclass._to_svelte_wrapper())
-
 
 def run_frontend_prod(
     port: int,
@@ -347,17 +324,14 @@ def run_frontend_prod(
     env: dict = {},
     skip_build: bool = False,
 ) -> subprocess.Popen:
-    # # Location of the build folder
-    # buildpath = libpath / "build"
-
+    
     if not skip_build:
+        env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
         build_process = subprocess.Popen(
             [
                 package_manager,
                 "run",
                 "build",
-                # "--",
-                # "--watch",
             ],
             env=env,
             stdout=subprocess.PIPE,
@@ -370,49 +344,71 @@ def run_frontend_prod(
             output = build_process.stdout.readline().decode("utf-8").strip()
             # Pad output to 100 characters
             output = output.ljust(100)
-            if "node_modules/" in output:
+            if "node_modules/" in output or "unused" in output:
                 continue
             # Remove any symbols that would mess up the progress bar
-            rich.print(
-                f"Building... {time.time() - start_time:.2f}s | {output}", end="\r"
+            stmt = (
+                f"Building (may take upto a minute)... {time.time() - start_time:.2f}s"
             )
+            if is_notebook():
+                print(stmt, end="\r", flush=True)
+            else:
+                rich.print(stmt, end="\r", flush=True)
+
+            # Put a sleep to make the progress smoother
+            time.sleep(0.1)
+
             if 'Wrote site to "build"' in output:
                 rich.print(
-                    f"Build completed in {time.time() - start_time:.2f}s." + " " * 120
+                    f"Build completed in {time.time() - start_time:.2f}s." + " " * 140
                 )
                 break
+    else:
+        logger.debug("Skipping build step.")
 
-        rich.print("")
+    # File find replacement for the VITE_API_URL_PLACEHOLDER
+    # Replace VITE_API_URL||"http://some.url.here:port" with VITE_API_URL||"http://localhost:8000"
+    # using a regex
+    file_find_replace(libpath / "build", r"(VITE_API_URL\|\|\".*?\")", f"VITE_API_URL||\"{api_url}\"", "*.js")
+    file_find_replace(libpath / ".svelte-kit/output/client/_app/", r"(VITE_API_URL\|\|\".*?\")", f"VITE_API_URL||\"{api_url}\"", "*.js")
 
     # Run the statically built app with preview mode
-    env.update({"VITE_API_URL_PLACEHOLDER": api_url})
-    process = subprocess.Popen(
-        [
-            package_manager,
-            "run",
-            "preview",
-            "--",
-            "--port",
-            str(port),
-        ],
-        env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    # Alternately run the statically built app with a simple python server
-    # os.chdir(buildpath)
+    # This doesn't serve the build directory, but instead serves the 
+    # .svelte-kit/output/client/_app directory.
+    # This works with [slug] routes, but it requires a Cmd + Shift + R to
+    # hard refresh the page when the API server port changes. We need to 
+    # investigate this further, so we can use this to serve the [slug] routes.
     # process = subprocess.Popen(
     #     [
-    #         "python",
-    #         "-m",
-    #         "http.server",
+    #         package_manager,
+    #         "run",
+    #         "preview",
+    #         "--",
+    #         "--port",
     #         str(port),
     #     ],
     #     env=env,
     #     stdout=subprocess.PIPE,
     #     stderr=subprocess.STDOUT,
     # )
-    # os.chdir(libpath)
+
+    # Alternately we run the statically built app with a simple python server
+    # Note: this does not seem to work with [slug] routes, so we should use the preview 
+    # mode instead. We can use this if we explicitly write routes for each
+    # page. We are using this to serve pages using /?id=page_id for now.
+    os.chdir(libpath / "build")
+    process = subprocess.Popen(
+        [
+            "python",
+            "-m",
+            "http.server",
+            str(port),
+        ],
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    os.chdir(libpath)
 
     return process
 
@@ -425,6 +421,7 @@ def run_frontend(
     subdomain: str = "app",
     apiurl: str = None,
     appdir: str = APP_DIR,
+    skip_build: bool = False,
 ) -> FrontendInfo:
     """Run the frontend server.
 
@@ -436,6 +433,7 @@ def run_frontend(
         subdomain (str, optional): The subdomain to use for the shareable link. Defaults to "app".
         apiurl (str, optional): The URL of the API server. Defaults to None.
         appdir (str, optional): The directory of the frontend app. Defaults to APP_DIR.
+        skip_build (bool, optional): Whether to skip the build step in production. Defaults to False.
 
     Returns:
         FrontendInfo: A FrontendInfo object containing the port and process of the frontend server.
@@ -450,15 +448,50 @@ def run_frontend(
     libpath = pathlib.Path(appdir)
     os.chdir(libpath)
 
-    # Update the VITE_API_URL environment variable
     env = os.environ.copy()
-    env.update({"VITE_API_URL": apiurl})
 
     # Start the frontend server
     if dev:
+        # Update the VITE_API_URL environment variable
+        env.update({"VITE_API_URL": apiurl})
         process = run_frontend_dev(port, package_manager, env)
     else:
-        process = run_frontend_prod(port, apiurl, libpath, package_manager, env)
+        # Read the timestamp of the most recent file change, for the last build
+        if os.path.exists(".buildprint"):
+            with open(".buildprint", "r") as f:
+                last_buildprint = int(f.read())
+        else:
+            last_buildprint = 0
+
+        # Get the timestamp of the most recent file change
+        most_recent_file = max(
+            (
+                # Exclude the build and package folders
+                os.path.join(root, f)
+                for root, _, files in os.walk(os.getcwd())
+                for f in files
+                if ("build" not in root)
+                and ("/package/" not in root)
+                and ("node_modules" not in root)
+                and (".svelte-kit" not in root)
+                and ("src/lib/wrappers" not in root)
+                and (f != "ComponentContext.svelte")
+                and (f != ".buildprint")
+            ),
+            key=os.path.getctime,
+        )
+        buildprint = int(os.path.getctime(most_recent_file))
+        logger.debug("Most recent file change:", most_recent_file, buildprint)
+
+        # Record the timestamp of the most recent file change, for the current build
+        with open(".buildprint", "w") as f:
+            f.write(str(buildprint))
+
+        # If the most recent file change is the same as the last build, skip the build step
+        skip_build = skip_build or (last_buildprint == buildprint)
+        process = run_frontend_prod(
+            port, apiurl, libpath, package_manager, env, skip_build
+        )
 
     if shareable:
         domain = setup_tunnel(port, subdomain=subdomain)
@@ -513,8 +546,8 @@ def start(
     in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
     if in_mk_run_subprocess:
         rich.print(
-            "Cannot call `start` from a script run with `mk run`. "
-            "Ignoring and continuing..."
+            "Calling `start` from a script run with `mk run` has no effect. "
+            "Continuing..."
         )
         return
 

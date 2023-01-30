@@ -28,7 +28,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = fetch_schema(df);
+		schema_promise = fetch_schema({ df: df });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {

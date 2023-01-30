@@ -1,11 +1,8 @@
 <script lang="ts">
-	import type { DataFrameRef } from '$lib/api/dataframe';
-	import BasicCell from '$lib/component/scalar/Scalar.svelte';
 	import Cell from '$lib/shared/cell/Cell.svelte';
+	import { dispatch, fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-	import { getContext } from 'svelte';
-
-	const { fetch_chunk, fetch_schema, dispatch } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let selected_key: string;

@@ -1,11 +1,9 @@
 <script lang="ts">
-	import type { DataFrameRef, DataFrameSchema } from '$lib/api/dataframe';
 	import Status from '$lib/shared/common/Status.svelte';
+	import { dispatch } from '$lib/utils/api';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-	import { getContext } from 'svelte';
 	import Select from 'svelte-select';
-
-	const { dispatch } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let by: string;
