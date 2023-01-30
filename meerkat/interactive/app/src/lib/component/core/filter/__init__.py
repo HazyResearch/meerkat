@@ -94,7 +94,17 @@ def _format_criteria(
     ]
 
 
-def _skip_filter(new_criteria, old_criteria):
+def _skip_filter(new_criteria, old_criteria) -> bool:
+    """Returns whether the filter operation should be skipped.
+
+    The filter operation should be skipped when the active (i.e. enabled)
+    criteria are the same. Note, order of the criteria does not matter in
+    filtering.
+
+    Returns:
+        bool: Whether the filter operation should be skipped.
+    """
+
     def _to_set(criteria: List[FilterCriterion]):
         return {
             (criterion.column, criterion.op, criterion.value) for criterion in criteria
@@ -140,8 +150,6 @@ def filter(
         mk.DataFrame: A view of ``data`` with a new column containing the embeddings.
         This column will be named according to the ``out_col`` parameter.
     """
-    import meerkat as mk
-
     # since the criteria can either be a list of dictionary or of FilterCriterion
     # we need to convert them to FilterCriterion
     criteria = _format_criteria(criteria)
@@ -153,11 +161,6 @@ def filter(
         # we view so that the result is a different dataframe than the input
         return data.view()
 
-    # if not all(
-    #     isinstance(data[column], supported_column_types) for column in input_columns
-    # ):
-    #     raise ValueError(f"All columns must be one of {supported_column_types}")
-
     # Filter pandas series columns.
     # TODO (arjundd): Make this more efficient to perform filtering sequentially.
     all_masks = []
@@ -167,12 +170,17 @@ def filter(
         # values should be split by "," when using in/not-in operators.
         if "in" in criterion.op:
             value = [x.strip() for x in criterion.value.split(",")]
-            if isinstance(col, mk.ScalarColumn):
-                value = np.asarray(value, dtype=col.dtype).tolist()
         else:
             value = col.dtype.type(criterion.value)
-            if isinstance(col, mk.ScalarColumn):
-                value = np.asarray(value, dtype=col.dtype)
+
+        # TODO: this logic will fail when the column is a boolean column
+        # beacuse all values will be rendered as strings. If the string
+        # is not empty, col.dtype will cast the string to True.
+        # e.g. np.asarray("False", dtype=np.bool) --> True
+        if isinstance(col, ScalarColumn):
+            value = np.asarray(value, dtype=col.dtype)
+        if "in" in criterion.op:
+            value = value.tolist()
 
         # FIXME: Figure out why we cannot pass col for PandasSeriesColumn.
         # the .data accessor is an interim solution.

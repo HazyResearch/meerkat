@@ -16,7 +16,52 @@ class SortCriterion(BaseModel):
     source: str = ""
 
 
-@reactive
+def _format_criteria(
+    criteria: List[Union[SortCriterion, Dict[str, Any]]]
+) -> List[SortCriterion]:
+    # since the criteria can either be a list of dictionary or of SortCriterion
+    # we need to convert them to SortCriterion
+    return [
+        criterion
+        if isinstance(criterion, SortCriterion)
+        else SortCriterion(**criterion)
+        for criterion in criteria
+    ]
+
+
+def _skip_sort(
+    new_criteria: List[Union[SortCriterion, Dict[str, Any]]],
+    old_criteria: List[Union[SortCriterion, Dict[str, Any]]],
+) -> bool:
+    """Returns whether the sort operation should be skipped.
+
+    The sort operation should be skipped when the active (i.e. enabled)
+    sorting criteria are the same and in the same order.
+
+    Returns:
+        bool: Whether the sort operation should be skipped.
+    """
+
+    def _to_list(criteria: List[SortCriterion]):
+        return [
+            (criterion.column, criterion.ascending, criterion.source)
+            for criterion in criteria
+        ]
+
+    old_criteria = _format_criteria(old_criteria)
+    new_criteria = _format_criteria(new_criteria)
+
+    # Remove disabled sorting criteria.
+    old_criteria = [criterion for criterion in old_criteria if criterion.is_enabled]
+    new_criteria = [criterion for criterion in new_criteria if criterion.is_enabled]
+
+    if len(new_criteria) != len(old_criteria):
+        return False
+
+    return _to_list(old_criteria) == _to_list(new_criteria)
+
+
+@reactive(skip_fn=_skip_sort)
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],
@@ -24,14 +69,9 @@ def sort_by_criteria(
     """Wrapper around mk.sort that adds unpacking of store to the DAG."""
     import meerkat as mk
 
-    # since the criteria can either be a list of dictionary or of FilterCriterion
-    # we need to convert them to FilterCriterion
-    criteria = [
-        criterion
-        if isinstance(criterion, SortCriterion)
-        else SortCriterion(**criterion)
-        for criterion in criteria
-    ]
+    # since the criteria can either be a list of dictionary or of SortCriterion
+    # we need to convert them to SortCriterion
+    criteria = _format_criteria(criteria)
 
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
@@ -57,7 +97,9 @@ class Sort(Component):
     """
 
     df: DataFrame
-    criteria: Union[List[SortCriterion], SortCriterion] = Field(default_factory=lambda: [])
+    criteria: Union[List[SortCriterion], SortCriterion] = Field(
+        default_factory=lambda: []
+    )
     # criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"
 
