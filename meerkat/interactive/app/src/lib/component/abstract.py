@@ -3,7 +3,7 @@ import inspect
 import os
 from typing import Dict, List, Literal, Set
 
-from pydantic import BaseModel, Extra, root_validator, validator
+from pydantic import BaseModel, Extra, root_validator
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
@@ -155,7 +155,9 @@ class BaseComponent(
     def component_name(cls):
         # Inheriting an existing BaseComponent and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != BaseComponent and issubclass(cls.__bases__[0], BaseComponent):
+        if cls.__bases__[0] != BaseComponent and issubclass(
+            cls.__bases__[0], BaseComponent
+        ):
             return cls.__bases__[0].__name__
 
         return cls.__name__
@@ -345,9 +347,7 @@ class Component(BaseComponent):
     def component_name(cls):
         # Inheriting an existing Component and modifying it on the Python side
         # should not change the name of the component used on the frontend
-        if cls.__bases__[0] != Component and issubclass(
-            cls.__bases__[0], Component
-        ):
+        if cls.__bases__[0] != Component and issubclass(cls.__bases__[0], Component):
             return cls.__bases__[0].__name__
 
         return cls.__name__

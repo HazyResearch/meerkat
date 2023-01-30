@@ -8,11 +8,11 @@ from IPython.display import IFrame
 from pydantic import BaseModel
 
 from meerkat.interactive import html
+from meerkat.interactive.app.src.lib.component._internal.progress import Progress
 from meerkat.interactive.app.src.lib.component.abstract import (
     BaseComponent,
     ComponentFrontend,
 )
-from meerkat.interactive.app.src.lib.component.progress import Progress
 from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state

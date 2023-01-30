@@ -1,5 +1,6 @@
+from meerkat.interactive.app.src.lib.component.core.scalar import ScalarFormatter
+
 from .base import Formatter
-from ..app.src.lib.component.scalar import ScalarFormatter
 
 
 # # backwards compatibility

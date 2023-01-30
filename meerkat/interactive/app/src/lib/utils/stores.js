@@ -1,5 +1,5 @@
-import { nestedMap } from "./tools";
 import { writable } from "svelte/store";
+import { nestedMap } from "./tools";
 
 export function meerkat_writable(value) {
     const { subscribe, set, update } = writable(value);

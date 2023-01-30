@@ -1,9 +1,14 @@
 <script lang="ts">
-	import type { RefreshCallback } from '$lib/api/callbacks';
-	import { MatchCriterion, type DataFrameSchema } from '$lib/api/dataframe';
+	import type { RefreshCallback } from '$lib/shared/deprecate/callbacks';
+	import type { DataFrameSchema } from '$lib/api/dataframe';
 	import Status from '$lib/shared/common/Status.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import Select from 'svelte-select';
+
+	export class MatchCriterion {
+		constructor(readonly column: string, readonly query: string) { }
+	}
+
 
 	const dispatch = createEventDispatcher();
 

@@ -1,13 +1,31 @@
 import pathlib
 
-from meerkat.interactive.app.src.lib.component import flowbite, html, plotly
-from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
-from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
-from meerkat.interactive.app.src.lib.layouts import Brace
-
-# from meerkat.interactive.app.src.lib.shared.cell.basic import Text
-from meerkat.interactive.app.src.lib.shared.cell.code import Code
-from meerkat.interactive.graph import (
+from .app.src.lib.component import contrib, core, flowbite, html, plotly
+from .app.src.lib.component.abstract import BaseComponent, Component
+from .app.src.lib.component.core.button import Button
+from .app.src.lib.component.core.choice import Choice
+from .app.src.lib.component.core.codedisplay import CodeDisplay
+from .app.src.lib.component.core.document import Document
+from .app.src.lib.component.core.editor import Editor
+from .app.src.lib.component.core.filter import Filter
+from .app.src.lib.component.core.gallery import Gallery
+from .app.src.lib.component.core.image import Image
+from .app.src.lib.component.core.markdown import Markdown
+from .app.src.lib.component.core.match import Match
+from .app.src.lib.component.core.multiselect import MultiSelect
+from .app.src.lib.component.core.put import put
+from .app.src.lib.component.core.slicebycards import SliceByCards
+from .app.src.lib.component.core.sort import Sort
+from .app.src.lib.component.core.stats import Stats
+from .app.src.lib.component.core.table import Table
+from .app.src.lib.component.core.tabs import Tabs
+from .app.src.lib.component.core.text import Text
+from .app.src.lib.component.core.textbox import Textbox
+from .app.src.lib.component.core.toggle import Toggle
+from .app.src.lib.shared.cell.code import Code
+from .edit import EditTarget
+from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
+from .graph import (
     Store,
     StoreFrontend,
     is_reactive,
@@ -17,90 +35,73 @@ from meerkat.interactive.graph import (
     reactive,
     trigger,
 )
-from meerkat.interactive.utils import print
-
-from .app.src.lib.component.abstract import BaseComponent, Component
-from .app.src.lib.component.button import Button
-from .app.src.lib.component.choice import Choice
-from .app.src.lib.component.discover import Discover
-from .app.src.lib.component.document import Document
-from .app.src.lib.component.editor import Editor
-from .app.src.lib.component.filter import Filter
-from .app.src.lib.component.gallery import Gallery
-from .app.src.lib.component.image import Image
-from .app.src.lib.component.markdown import Markdown
-from .app.src.lib.component.match import Match
-from .app.src.lib.component.plot import Plot
-from .app.src.lib.component.row import Row
-from .app.src.lib.component.slicebycards import SliceByCards
-from .app.src.lib.component.sort import Sort
-from .app.src.lib.component.stats import Stats
-from .app.src.lib.component.stats_labeler import StatsLabeler
-from .app.src.lib.component.table import Table
-from .app.src.lib.component.tabs import Tabs
-from .app.src.lib.component.text import Text
-from .app.src.lib.component.textbox import Textbox
-from .app.src.lib.component.toggle import Toggle
-from .edit import EditTarget
-from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from .modification import DataFrameModification, Modification
 from .page import Page, page
 from .startup import start
 from .state import State
+from .utils import print
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
 __all__ = [
-    "flowbite",
-    "html",
-    "plotly",
-    "Endpoint",
-    "State",
-    "endpoint",
-    "endpoints",
-    "react",
-    "no_react",
-    "is_reactive",
-    "make_endpoint",
-    "Modification",
-    "DataFrameModification",
-    "Document",
+    # <<<< Startup >>>>
+    "start",
+    # <<<< Core Library >>>>
+    ## Component
+    "BaseComponent",
+    "Component",
+    ## Page
+    "Page",
+    "page",
+    ## Store
     "Store",
     "StoreFrontend",
     "make_store",
-    "trigger",
-    "Component",
-    "BaseComponent",
-    "Discover",
-    "Gallery",
-    "Markdown",
-    "Match",
-    "Row",
-    "Plot",
-    "SliceByCards",
-    "Stats",
-    "EditTarget",
-    "Table",
-    "Tabs",
-    "Filter",
-    "Page",
-    "page",
+    ## Endpoint
+    "Endpoint",
+    "endpoint",
+    "endpoints",
+    "make_endpoint",
+    ## Reactivity
+    "is_reactive",
+    "no_react",
+    "react",
     "reactive",
-    "start",
-    "Editor",
-    "Sort",
-    "StatsLabeler",
-    "Choice",
-    "Textbox",
+    "trigger",
+    ## Modification Types
+    "DataFrameModification",
+    "Modification",
+    ## Add-ons
+    "State",
+    # <<<< Component Namespaces >>>>
+    "contrib",
+    "core",
+    "flowbite",
+    "html",
+    "plotly",
+    # <<<< Core Components >>>>
     "Button",
-    "MultiSelect",
-    "Image",
-    "Text",
+    "Choice",
     "Code",
     "CodeDisplay",
+    "Document",
+    "EditTarget",
+    "Editor",
+    "Filter",
+    "Gallery",
+    "Image",
+    "Markdown",
+    "Match",
+    "MultiSelect",
+    "SliceByCards",
+    "Sort",
+    "Stats",
+    "Table",
+    "Tabs",
+    "Text",
+    "Textbox",
     "Toggle",
-    # Layouts
-    "Brace",
-    # Utilities
+    "put",
+    # <<<< Utilities >>>>
     "print",
 ]

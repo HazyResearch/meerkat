@@ -62,11 +62,13 @@ class ObjectColumn(Column):
         return self[index]
 
     def _get_default_formatter(self):
-        from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
-        from meerkat.interactive.app.src.lib.component.image import ImageFormatter
-
         from PIL.Image import Image
-        
+
+        from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
+        from meerkat.interactive.app.src.lib.component.core.scalar import (
+            ScalarFormatter,
+        )
+
         sample = self[0]
         if isinstance(sample, Image):
             return ImageFormatter()

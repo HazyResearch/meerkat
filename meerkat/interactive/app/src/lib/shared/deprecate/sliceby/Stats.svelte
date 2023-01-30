@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { StatsType } from '$lib/utils/types';
+	import type { StatsType } from "./types";
 	export let stats: StatsType;
 </script>
 

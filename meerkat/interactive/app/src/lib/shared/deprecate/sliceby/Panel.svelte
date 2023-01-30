@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Instance from './Instance.svelte';
-	import type { InstanceType } from '$lib/utils/types';
+
 	import Description from './Description.svelte';
 	import Matrix, { type MatrixType } from './matrix/Matrix.svelte';
 	import Stats from './Stats.svelte';
-	import type { StatsType } from '$lib/utils/types';
+	import type { StatsType, InstanceType } from './types';
 
 	export let name: string;
 	export let descriptions: Array<{ score: number; description: string; }>;

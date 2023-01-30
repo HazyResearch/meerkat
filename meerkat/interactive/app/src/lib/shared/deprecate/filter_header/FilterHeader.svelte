@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { DataFrameSchema, FilterCriterion } from '$lib/api/dataframe';
-	import type { RefreshCallback } from '$lib/api/callbacks';
-	import { api_url } from '$lib/../routes/network/stores';
+	import type { DataFrameSchema, FilterCriterapi/dataframe';
+	import Statusimport { FilterCriterion } from "$lib/api/FilterCriterion";
+ from '$lib/shared/common/Status.svelte';
+	import type { RefreshCallback } from '$lib/shared/deprecate/callbacks';
 	import Select from 'svelte-select';
-	import Status from '$lib/shared/common/Status.svelte';
 
 	export let schema_promise: Promise<DataFrameSchema>;
 	export let refresh_callback: RefreshCallback;

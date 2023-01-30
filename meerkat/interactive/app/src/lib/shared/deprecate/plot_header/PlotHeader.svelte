@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { api_url } from '$lib/../routes/network/stores';
 	import { fetch_chunk } from '$lib/api/api';
-	import type { RefreshCallback } from '$lib/api/callbacks';
 	import {
 		MatchCriterion,
 		type DataFrameRows,
 		type DataFrameSchema
 	} from '$lib/api/dataframe';
+	import type { RefreshCallback } from '$lib/shared/deprecate/callbacks';
 	import MatchHeader from '$lib/shared/deprecate/match_header/MatchHeader.svelte';
 	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
+	import type { Point2D } from '../../plot/types';
 	import ColumnSelect from '../column_select/ColumnSelect.svelte';
 	import Toggle from '../common/Toggle.svelte';
-	import type { Point2D } from '../../plot/types';
 
 	export let dataframe_id: string;
 	export let rows_promise = Promise<DataFrameRows>;

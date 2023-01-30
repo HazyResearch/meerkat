@@ -1,5 +1,3 @@
-
-
 function isObject(elem) {
     return elem === Object(elem);
 }

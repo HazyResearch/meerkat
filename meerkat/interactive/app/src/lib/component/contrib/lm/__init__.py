@@ -1,21 +1,21 @@
-from meerkat.dataframe import DataFrame
+# from meerkat.dataframe import DataFrame
 
-from ..abstract import BaseComponent
+# from ..abstract import BaseComponent
 
 
-class SchemaTree(BaseComponent):
+# class SchemaTree(BaseComponent):
 
-    name = "SchemaTree"
+#     name = "SchemaTree"
 
-    def __init__(
-        self,
-        df: DataFrame,
-    ) -> None:
-        super().__init__()
-        self.df = df
+#     def __init__(
+#         self,
+#         df: DataFrame,
+#     ) -> None:
+#         super().__init__()
+#         self.df = df
 
-    @property
-    def props(self):
-        return {
-            "df": self.df.config,  # FIXME
-        }
+#     @property
+#     def props(self):
+#         return {
+#             "df": self.df.config,  # FIXME
+#         }
