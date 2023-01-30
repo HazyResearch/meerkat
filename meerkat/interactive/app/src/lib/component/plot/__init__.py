@@ -1,7 +1,7 @@
 from pydantic import Field
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.endpoint import EndpointProperty
 from meerkat.interactive.graph import Store
 
 from ..abstract import Component
@@ -24,5 +24,5 @@ class Plot(Component):
     keys_to_remove: list =  Field(default_factory=list)
     metadata_columns: list = Field(default_factory=list)
 
-    on_select: Endpoint = None
+    on_select: EndpointProperty = None
 

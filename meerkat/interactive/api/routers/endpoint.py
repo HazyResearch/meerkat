@@ -32,9 +32,6 @@ def dispatch(
     try:
         # Run the endpoint
         result, modifications = endpoint.partial(**fn_kwargs).run()
-    except TriggerError as e:
-        # TODO: handle case where result is not none
-        return {"result": None, "modifications": [], "error": str(e)}
     except Exception as e:
         # General exception should be converted to a HTTPException
         # that fastapi can handle.

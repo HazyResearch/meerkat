@@ -150,7 +150,6 @@ def filter(
         mask = _operator_str_to_func[criterion.op](col.data, value)
         all_masks.append(np.asarray(mask))
     mask = np.stack(all_masks, axis=1).all(axis=1)
-
     return data[mask]
 
 

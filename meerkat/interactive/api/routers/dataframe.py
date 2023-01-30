@@ -89,7 +89,7 @@ def rows(
     end: int = Endpoint.EmbeddedBody(None),
     posidxs: List[int] = Endpoint.EmbeddedBody(None),
     key_column: str = Endpoint.EmbeddedBody(None),
-    keys: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
+    keyidxs: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
     variants: List[str] = Endpoint.EmbeddedBody(None),
 ) -> RowsResponse:
@@ -110,17 +110,17 @@ def rows(
             end = min(end, len(df))
         df = df[start:end]
         posidxs = list(range(start, end))
-    elif keys is not None:
+    elif keyidxs is not None:
         if key_column is None:
             if df.primary_key is None:
                 raise ValueError(
-                    "Must provide key_column if keys are provided and no "
+                    "Must provide key_column if keyidxs are provided and no "
                     "primary_key on dataframe."
                 )
-            df = df.loc[keys]
+            df = df.loc[keyidxs]
         else:
             # FIXME(sabri): this will only work if key_column is a pandas column
-            df = df[df[key_column].isin(keys)]
+            df = df[df[key_column].isin(keyidxs)]
     else:
         raise ValueError()
 

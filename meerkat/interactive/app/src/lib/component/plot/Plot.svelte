@@ -8,14 +8,13 @@
 	import { BarLoader } from 'svelte-loading-spinners';
 	import type { Point2D } from '$lib/shared/plot/types';
 	import type { Endpoint } from '$lib/utils/types';
-	import type { DataFrameRef } from '$lib/api/dataframe';
+	import type { DataFrameChunk, DataFrameRef } from '$lib/api/dataframe';
 
 	const { fetch_chunk, fetch_schema, dispatch } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let x: string;
 	export let y: string;
-	export let primary_key: string;
 	export let x_label: string;
 	export let y_label: string;
 	export let type: string;
@@ -42,25 +41,26 @@
 		per_page: number
 	): Promise<Array<Point2D>> => {
 		// Fetch all the data from the dataframe for the columns to be plotted
-		let rows = await fetch_chunk({
+		let chunk: DataFrameChunk = await fetch_chunk({
 			df: df,
 			start: page * per_page,
 			end: (page + 1) * per_page,
 			columns: [x, y, ...metadata_columns]
 		});
+		// iterate over the rows
 		let datum: Array<Point2D> = [];
-		rows.rows?.forEach((row: any, index: number) => {
+		for (let i = 0; i < chunk.length(); i++) {
 			datum.push({
-				x: parseFloat(row[0]),
-				y: row[1],
-				id: row[2]
+				x: parseFloat(chunk.get_cell(i, x).data),
+				y: chunk.get_cell(i, y).data,
+				id: chunk.get_cell(i, chunk.primary_key).data
 			});
-		});
+		}
 
 		// Update the metadata array.
 		if (metadata_columns.length > 0) {
 			metadata = [];
-			rows.rows?.forEach((row: any) => {
+			chunk.rows?.forEach((row: any) => {
 				const metadata_obj = metadata_columns.reduce(
 					(accumulator: any, column: string, index: number) => {
 						accumulator[index] = row[index + 3];
@@ -83,22 +83,15 @@
 			return;
 		}
 
-		status = 'working';
-		const promise = dispatch(
-			on_select.endpoint_id,
-			{
+		const promise = dispatch(on_select.endpoint_id, {
+			detail: {
 				// FIXME: Should we support multiple selections?
 				// If there is nothing in the array we should return an empty string
 				slice_id: slice_ids.length > 0 ? slice_ids[0] : ''
-			},
-			{}
-		);
+			}
+		});
 		promise
-			.then(() => {
-				status = 'success';
-			})
 			.catch((error: TypeError) => {
-				status = 'error';
 				console.log(error);
 			});
 	};
