@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 import numpy as np
 from fastapi import HTTPException
@@ -79,7 +79,8 @@ class RowsResponse(BaseModel):
     posidxs: List[int] = None
     rows: List[List[Any]]
     full_length: int
-    primary_key: str
+    # primary key
+    primary_key: Optional[str] = None
 
 
 @endpoint(prefix="/df", route="/{df}/rows/")
