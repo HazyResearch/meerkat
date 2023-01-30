@@ -1,8 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint
-from meerkat.interactive.graph import Store
 
 from ..abstract import Component
 
@@ -15,7 +14,7 @@ class Row(Component):
     # The Cell specs
     cell_specs: Dict[str, Dict[str, Any]]
     # The selected key. This should be an element in primary_key_col.
-    selected_key: str = None
+    selected_key: Optional[str] = None
     title: str = ""
 
     # On change should take in 3 arguments:

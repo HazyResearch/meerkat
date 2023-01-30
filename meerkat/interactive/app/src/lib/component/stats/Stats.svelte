@@ -1,15 +1,15 @@
 <script lang="ts">
-	import RadialProgress from './RadialProgress.svelte';
-
-	export let data: any;
-	export let specs: any;
- 
+	export let data: { [key: string]: number } = {};
 
 	const format_number = (number: number) => {
 		if (Number.isInteger(number) && number < 1000) {
 			return number.toString();
 		}
-		const symbol_to_divisor = [["B", 9], ["M", 6], ["K", 3]];
+		const symbol_to_divisor = [
+			['B', 9],
+			['M', 6],
+			['K', 3]
+		];
 		let number_str = number.toFixed(2);
 		for (let i = 0; i < symbol_to_divisor.length; i++) {
 			const symbol: string = symbol_to_divisor[i][0];
@@ -19,10 +19,10 @@
 				break;
 			}
 		}
-		return number_str
+		return number_str;
 	};
-
 </script>
+
 <div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2">
 	{#each Object.entries(data) as [k, v]}
 		<div class="bg-slate-100 rounded-md flex flex-col shadow-sm">

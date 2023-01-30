@@ -10,7 +10,7 @@
 	import MatchHeader from '$lib/shared/deprecate/match_header/MatchHeader.svelte';
 	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import ColumnSelect from '../column_select/ColumnSelect.svelte';
-	import Toggle from '../../common/Toggle.svelte';
+	import Toggle from '../common/Toggle.svelte';
 	import type { Point2D } from '../../plot/types';
 
 	export let dataframe_id: string;

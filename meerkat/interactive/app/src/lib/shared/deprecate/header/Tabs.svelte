@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
-    import Toggle from '$lib/shared/common/Toggle.svelte';
+    import Toggle from '$lib/shared/deprecate/common/Toggle.svelte';
     import banner from "$lib/assets/banner_small.png"
 	import { activeTabId } from './stores';
 
