@@ -448,16 +448,19 @@ def _materialize(
     num_blocks: int,
     blocks_per_window: int,
 ):
-    import ray
-    from tqdm import tqdm
-    import pandas as pd
     import numpy as np
+    import pandas as pd
+    import ray
+    import torch
+    from tqdm import tqdm
+    
     import meerkat as mk
 
     from .concat import concat
 
     if use_ray:
         ray.init(ignore_reinit_error=True)
+        ray.data.set_progress_bars(enabled=not pbar) # 0 is enabled, 1 is disabled
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
@@ -465,7 +468,7 @@ def _materialize(
         while isinstance(curr, mk.DeferredColumn):
             fns.append(curr.data.fn)
 
-            # For linear pipelines, there will be either one elem in args or one key in 
+            # For linear pipelines, there will be either one elem in args or one key in
             # kwargs
             if curr.data.args:
                 if len(curr.data.args) > 1:
@@ -488,20 +491,37 @@ def _materialize(
         # Step 3: Build the pipeline by walking backwards through fns
         pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
         for fn in reversed(fns):
+            # TODO (dean): if batch_size > 1, then use map_batches
             pipe = pipe.map(fn)
 
         # Step 4: Collect the results
         # TODO (dean): support different output types
-        result = np.array([])
-        partitions = (
-            iter(pipe.rewindow(blocks_per_window=num_blocks).iter_datasets())
-            .__next__()
-            .to_numpy_refs()
-        )
-        breakpoint()
-        for partition in partitions:
-            result = np.append(result, ray.get(partition))
-        return result
+        result_ds = iter(
+            pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()
+        ).__next__()
+        if data.output_type is mk.NumPyTensorColumn:
+            result = []
+            for partition in result_ds.to_numpy_refs():
+                result.append(ray.get(partition))
+            return np.stack(result)
+        elif data.output_type is mk.TorchTensorColumn:
+            result = []
+            for partition in result_ds.to_torch():
+                result.append(ray.get(partition))
+            return torch.stack(result)
+        elif data.output_type is mk.ObjectColumn:
+            result = []
+            # TODO
+            for partition in result_ds.to_numpy_refs():
+                result.append(ray.get(partition))
+            return np.stack(result)
+        elif data.data.return_format is mk.ScalarColumn:
+            result = []
+            for partition in result_ds.to_pandas_refs():
+                result.extend(ray.get(partition))
+            return result
+        else:
+            raise ValueError(f"Unsupported output type {data.output_type}.")
 
     else:
         result = []
