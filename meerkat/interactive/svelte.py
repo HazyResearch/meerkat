@@ -232,7 +232,6 @@ class SvelteWriter:
             logger.debug("In user appdir. Importing app components from app/src/lib/components.")
             sys.path.append(self.cwd)
             importlib.import_module("app.src.lib.components")
-            return
 
     def install_bun(self):
         return subprocess.run(
@@ -625,4 +624,4 @@ page.launch()"""
 
 # Create an instance that can be used by other modules
 svelte_writer = SvelteWriter()
-svelte_writer.init_run()
+# svelte_writer.init_run() # FIXME

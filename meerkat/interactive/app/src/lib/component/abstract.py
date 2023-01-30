@@ -99,25 +99,25 @@ class SlotsMixin:
 
     @property
     def slots(self) -> List["BaseComponent"]:
-        from meerkat.interactive.app.src.lib.layouts import Brace
+        from meerkat.interactive.app.src.lib.component.core.put import Put
 
         _slots = []
         for slot in self._slots:
             if not isinstance(slot, BaseComponent):
-                # Wrap it in a Brace component
-                _slots.append(Brace(data=slot))
+                # Wrap it in a Put component
+                _slots.append(Put(data=slot))
             else:
                 _slots.append(slot)
         return _slots
 
     def append(self, other):
         # Allow users to append to slots
-        from meerkat.interactive.app.src.lib.layouts import Brace
+        from meerkat.interactive.app.src.lib.component.core.put import Put
 
         if isinstance(other, BaseComponent):
             self._slots.append(other)
         else:
-            self._slots.append(Brace(data=other))
+            self._slots.append(Put(data=other))
 
     @classproperty
     def slottable(cls) -> bool:
@@ -216,19 +216,21 @@ class BaseComponent(
     def path(cls):
         from meerkat.interactive.svelte import svelte_writer
 
+        if not cls.library == "@meerkat-ml/meerkat" or (
+            cls.library == "@meerkat-ml/meerkat"
+            # KG: TODO: Temporary hack to be able to use multiple namespaces
+            # for components provided natively in the Meerkat library.
+            and (cls.namespace == "meerkat" or cls.namespace == "plotly")
+            and svelte_writer.is_user_appdir
+        ):
+            return cls.library
+
         path = os.path.join(
             os.path.dirname(inspect.getfile(cls)),
             f"{cls.component_name}.svelte",
         )
         if os.path.exists(path):
             return path
-
-        if not cls.library == "@meerkat-ml/meerkat" or (
-            cls.library == "@meerkat-ml/meerkat"
-            and cls.namespace == "meerkat"
-            and svelte_writer.is_user_appdir
-        ):
-            return cls.library
 
         # Raise an error if the file doesn't exist
         raise FileNotFoundError(

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { DataFrameSchema, FilterCriterapi/dataframe';
-	import Statusimport { FilterCriterion } from "$lib/api/FilterCriterion";
- from '$lib/shared/common/Status.svelte';
+	import type { FilterCriterion } from '$lib/component/core/filter/types';
+	import Status from '$lib/shared/common/Status.svelte';
 	import type { RefreshCallback } from '$lib/shared/deprecate/callbacks';
+	import type { DataFrameSchema } from '$lib/utils/dataframe';
 	import Select from 'svelte-select';
 
 	export let schema_promise: Promise<DataFrameSchema>;

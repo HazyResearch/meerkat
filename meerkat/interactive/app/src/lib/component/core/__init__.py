@@ -11,7 +11,7 @@ from .image import Image
 from .markdown import Markdown
 from .match import Match
 from .multiselect import MultiSelect
-from .put import put
+from .put import Put
 from .raw_html import RawHTML
 from .scalar import Scalar
 from .slicebycards import SliceByCards
@@ -37,7 +37,7 @@ __all__ = [
     "Markdown",
     "Match",
     "MultiSelect",
-    "put",
+    "Put",
     "RawHTML",
     "Scalar",
     "SliceByCards",

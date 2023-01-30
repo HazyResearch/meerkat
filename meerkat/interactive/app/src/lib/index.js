@@ -27,7 +27,7 @@ export { default as Image } from './component/core/image/Image.svelte';
 export { default as Markdown } from './component/core/markdown/Markdown.svelte';
 export { default as Match } from './component/core/match/Match.svelte';
 export { default as MultiSelect } from './component/core/multiselect/MultiSelect.svelte';
-export { default as put } from './component/core/put/put.svelte';
+export { default as Put } from './component/core/put/Put.svelte';
 export { default as Scalar } from './component/core/scalar/Scalar.svelte';
 export { default as SliceByCards } from './component/core/slicebycards/SliceByCards.svelte';
 export { default as Sort } from './component/core/sort/Sort.svelte';

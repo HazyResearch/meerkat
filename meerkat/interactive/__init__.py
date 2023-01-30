@@ -13,7 +13,7 @@ from .app.src.lib.component.core.image import Image
 from .app.src.lib.component.core.markdown import Markdown
 from .app.src.lib.component.core.match import Match
 from .app.src.lib.component.core.multiselect import MultiSelect
-from .app.src.lib.component.core.put import put
+from .app.src.lib.component.core.put import Put
 from .app.src.lib.component.core.slicebycards import SliceByCards
 from .app.src.lib.component.core.sort import Sort
 from .app.src.lib.component.core.stats import Stats
@@ -101,7 +101,7 @@ __all__ = [
     "Text",
     "Textbox",
     "Toggle",
-    "put",
+    "Put",
     # <<<< Utilities >>>>
     "print",
 ]

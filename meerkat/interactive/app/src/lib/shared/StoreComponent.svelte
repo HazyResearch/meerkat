@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { update_store } from '../api/api';
+	import { update_store } from '$lib/utils/api';
 
 	export let store_id: string;
 	export let store: any;

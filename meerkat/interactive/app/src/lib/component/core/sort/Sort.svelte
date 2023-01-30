@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { fetch_schema } from '$lib/api/api';
-	import type { DataFrameSchema } from '$lib/api/dataframe';
+	import { fetch_schema } from '$lib/utils/api';
+	import type { DataFrameSchema } from '$lib/utils/dataframe';
 	import { dndzone } from 'svelte-dnd-action';
 	import Select from 'svelte-select';
 	import SvelteTooltip from 'svelte-tooltip';

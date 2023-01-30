@@ -37,6 +37,6 @@ gallery = mk.gui.Gallery(
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.RowLayout(slots=[match, gallery]), id="match"
+    component=mk.gui.html.flexcol(slots=[match, gallery]), id="match"
 )
 page.launch()

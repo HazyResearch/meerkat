@@ -1,7 +1,7 @@
 <script lang="ts">
     import banner from '$lib/assets/banner_small.png';
     import { API_URL } from '{{ import_prefix }}';
-    import { Interface } from '{{ import_prefix }}';
+    import { Page } from '{{ import_prefix }}';
     import { onMount, setContext } from 'svelte';
     
     {% for component in components -%}
@@ -14,16 +14,16 @@
         {% endfor %}
     })
 
-    let config: Interface | null = null;
+    let config: Page | null = null;
     onMount(async () => {
-        config = await (await fetch(`${$API_URL}/interface/{{ route }}/config`)).json();
+        config = await (await fetch(`${$API_URL}/page/{{ route }}/config`)).json();
         document.title = "{{ title }}";
     });
 </script>
 
 <div class="h-screen p-3">
     {% raw %}{#if config}{% endraw %}
-        <Interface {config} />
+        <Page {config} />
     {:else}
         <div class="flex justify-center h-screen items-center">
             <img src={banner} alt="Meerkat" class="h-12" />
