@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from fastapi import HTTPException
@@ -31,7 +31,7 @@ class SchemaResponse(BaseModel):
 
 @endpoint(prefix="/df", route="/{df}/schema/")
 def schema(
-    df: DataFrame, columns: List[str]=None, variants: List[str]=None
+    df: DataFrame, columns: List[str] = None, variants: List[str] = None
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
     return SchemaResponse(
