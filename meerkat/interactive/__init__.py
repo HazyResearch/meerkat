@@ -25,8 +25,9 @@ from meerkat.interactive.graph import (
 )
 from meerkat.interactive.utils import print
 
-from .app.src.lib.component.abstract import Component, BaseComponent
+from .app.src.lib.component.abstract import BaseComponent, Component
 from .app.src.lib.component.button import Button
+from .app.src.lib.component.chat import Chat
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.discover import Discover
 from .app.src.lib.component.document import Document
@@ -110,6 +111,7 @@ __all__ = [
     "Code",
     "CodeDisplay",
     "Toggle",
+    "Chat",
     # Utilities
     "print",
 ]

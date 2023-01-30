@@ -249,7 +249,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         # Ready the ModificationQueue so that it can be used to track
         # modifications made by the endpoint
         state.modification_queue.ready()
-        state.progress_queue.add(self.fn.func.__name__)
+        state.progress_queue.add(
+            self.fn.func.__name__ if isinstance(self.fn, partial) else self.fn.__name__
+        )
 
         try:
             result = partial_fn()
@@ -280,7 +282,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                     arg.attach_to_inode(node)
 
                 arg.inode.add_child(self.inode, triggers=False)
-        
+
         fn = partial(self.fn, *args, **kwargs)
         fn.__name__ = self.fn.__name__
         return Endpoint(
@@ -316,7 +318,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         def composed(*args, **kwargs):
             out = self.fn(*args, **kwargs)
             return fn.fn(out) if pipe_return else fn.fn()
-        
+
         composed.__name__ = f"composed({str(self)} | {str(fn)})"
 
         return Endpoint(
@@ -452,7 +454,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         """
         if __fn_only:
             # FIXME(Sabri): This isn't working for some reason. The '__fn_only' arg
-            # is for some reason being put in the kwargs dict. Workaround is to just 
+            # is for some reason being put in the kwargs dict. Workaround is to just
             # use self.fn directly.
             return self.fn(*args, **kwargs)
         return self.run(*args, **kwargs)

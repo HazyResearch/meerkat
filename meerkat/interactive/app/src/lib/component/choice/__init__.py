@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Literal
+from typing import Any, List, Literal, Optional, Union
 
 from meerkat.interactive.endpoint import Endpoint, endpoint, get_signature
 from meerkat.interactive.graph import Store
@@ -55,7 +55,7 @@ class Choice(Component):
     """
 
     choices: list
-    value: str
+    value: Optional[Union[str, int, float, bool]]
     gui_type: Literal["dropdown", "radio"] = "dropdown"
     title: str = None
 

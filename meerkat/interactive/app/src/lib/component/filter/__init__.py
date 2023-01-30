@@ -15,10 +15,13 @@ from ..abstract import Component
 def _in(column: Column, value):
     if not isinstance(value, (tuple, list)):
         value = [value]
-    if not isinstance(column, ScalarColumn):
+    if isinstance(column, Column):
+        column = column.data
+
+    if not isinstance(column, pd.Series):
         data = pd.Series(column.data)
     else:
-        data = column.data
+        data = column
     return data.isin(value)
 
 
@@ -79,7 +82,39 @@ def parse_filter_criterion(criterion: str) -> Dict[str, Any]:
     # raise ValueError(f"Could not find any operation in the string {criterion}")
 
 
-@reactive
+def _format_criteria(
+    criteria: List[Union[FilterCriterion, Dict[str, Any]]]
+) -> List[FilterCriterion]:
+    # since the criteria can either be a list of dictionary or of FilterCriterion
+    # we need to convert them to FilterCriterion
+    return [
+        criterion
+        if isinstance(criterion, FilterCriterion)
+        else FilterCriterion(**criterion)
+        for criterion in criteria
+    ]
+
+
+def _skip_filter(new_criteria, old_criteria):
+    def _to_set(criteria: List[FilterCriterion]):
+        return {
+            (criterion.column, criterion.op, criterion.value) for criterion in criteria
+        }
+
+    old_criteria = _format_criteria(old_criteria)
+    new_criteria = _format_criteria(new_criteria)
+
+    # Filter out criteria that are disabled.
+    old_criteria = _to_set(
+        [criterion for criterion in old_criteria if criterion.is_enabled]
+    )
+    new_criteria = _to_set(
+        [criterion for criterion in new_criteria if criterion.is_enabled]
+    )
+    return old_criteria == new_criteria
+
+
+@reactive(skip_fn=_skip_filter)
 def filter(
     data: Union["DataFrame", "Column"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
@@ -110,12 +145,7 @@ def filter(
 
     # since the criteria can either be a list of dictionary or of FilterCriterion
     # we need to convert them to FilterCriterion
-    criteria = [
-        criterion
-        if isinstance(criterion, FilterCriterion)
-        else FilterCriterion(**criterion)
-        for criterion in criteria
-    ]
+    criteria = _format_criteria(criteria)
 
     # Filter out criteria that are disabled.
     criteria = [criterion for criterion in criteria if criterion.is_enabled]
@@ -138,11 +168,11 @@ def filter(
         # values should be split by "," when using in/not-in operators.
         if "in" in criterion.op:
             value = [x.strip() for x in criterion.value.split(",")]
-            if isinstance(col, mk.TorchTensorColumn):
+            if isinstance(col, mk.ScalarColumn):
                 value = np.asarray(value, dtype=col.dtype).tolist()
         else:
             value = col.dtype.type(criterion.value)
-            if isinstance(col, mk.TorchTensorColumn):
+            if isinstance(col, mk.ScalarColumn):
                 value = np.asarray(value, dtype=col.dtype)
 
         # FIXME: Figure out why we cannot pass col for PandasSeriesColumn.
@@ -163,7 +193,7 @@ class Filter(Component):
     This component will return a Reference object, which can be used downstream.
     """
 
-    df: DataFrame
+    df: DataFrame = None
     criteria: Store[List[FilterCriterion]] = Field(
         default_factory=lambda: Store(list())
     )
