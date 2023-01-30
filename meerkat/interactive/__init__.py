@@ -3,13 +3,7 @@ import pathlib
 from meerkat.interactive.app.src.lib.component import flowbite, html, plotly
 from meerkat.interactive.app.src.lib.component.codedisplay import CodeDisplay
 from meerkat.interactive.app.src.lib.component.multiselect import MultiSelect
-from meerkat.interactive.app.src.lib.layouts import (
-    ColumnLayout,
-    Div,
-    Flex,
-    Grid,
-    RowLayout,
-)
+from meerkat.interactive.app.src.lib.layouts import Brace
 
 # from meerkat.interactive.app.src.lib.shared.cell.basic import Text
 from meerkat.interactive.app.src.lib.shared.cell.code import Code
@@ -25,7 +19,7 @@ from meerkat.interactive.graph import (
 )
 from meerkat.interactive.utils import print
 
-from .app.src.lib.component.abstract import Component, BaseComponent
+from .app.src.lib.component.abstract import BaseComponent, Component
 from .app.src.lib.component.button import Button
 from .app.src.lib.component.choice import Choice
 from .app.src.lib.component.discover import Discover
@@ -99,17 +93,14 @@ __all__ = [
     "Choice",
     "Textbox",
     "Button",
-    "ColumnLayout",
-    "RowLayout",
-    "Div",
-    "Flex",
-    "Grid",
     "MultiSelect",
     "Image",
     "Text",
     "Code",
     "CodeDisplay",
     "Toggle",
+    # Layouts
+    "Brace",
     # Utilities
     "print",
 ]

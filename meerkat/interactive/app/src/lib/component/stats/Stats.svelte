@@ -27,7 +27,7 @@
 	{#each Object.entries(data) as [k, v]}
 		<div class="bg-slate-100 rounded-md flex flex-col shadow-sm">
 			<div class="text-slate-400 px-3 py-1 self-center">{k}</div>
-			<div class="font-bold text-2xl self-center ">
+			<div class="font-bold text-2xl self-center">
 				{format_number(v)}
 			</div>
 		</div>

@@ -1,11 +1,12 @@
-from typing import Any
 import textwrap
+from typing import Any
 
 import numpy as np
 from pandas.io.formats.format import format_array
 
-from ..abstract import Component
 from meerkat.interactive.formatter.base import Formatter
+
+from ..abstract import Component
 
 
 class Text(Component):
