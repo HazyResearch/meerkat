@@ -2,7 +2,7 @@
 	export let data: any;
 	export let view: string = 'full';
 </script>
-
+<!-- 
 {#if view === 'logo'}
 	<span><Globe2 /></span>
 {:else if view === 'thumbnail'}
@@ -21,9 +21,9 @@
 			style="height: 100%; width: 100%;"
 		/>
 	</div>
-{/if}
+{/if} -->
 
-<!-- {#if false}
+{#if false}
 	<div
 		class="bg-white flex h-full w-full aspect-video content-center items-center rounded-md shadow-md border-black text-center"
 	>
@@ -31,4 +31,4 @@
 	</div>
 {:else}
 	{data}
-{/if} -->
+{/if}
