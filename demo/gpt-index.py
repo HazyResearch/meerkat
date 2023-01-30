@@ -91,6 +91,7 @@ text = mk.gui.html.div(
 print("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 
+mk.gui.start(shareable=False)
 page = mk.gui.Page(
     # Layout the Interface components one row each, and launch the page.
     component=mk.gui.html.flexcol(

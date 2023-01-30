@@ -15,6 +15,7 @@ gallery = mk.gui.Gallery(
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.RowLayout(slots=[sort, gallery]), id="sort"
+    component=mk.gui.html.flexcol(slots=[sort, gallery]), 
+    id="sort",
 )
 page.launch()

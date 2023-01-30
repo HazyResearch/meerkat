@@ -27,7 +27,7 @@ df = mk.get("imagenette", version="160px")
 # To embed: df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN, encoder="clip").
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/arjundd/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
-    overwrite=True,
+    overwrite=False, # set overwrite=True to download the embeddings again.
 )
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
@@ -55,13 +55,15 @@ with mk.gui.react():
     gallery = mk.gui.Gallery(df=df, main_column="img")
 
 mk.gui.start(shareable=False)
-mk.gui.Page(
-    component=mk.gui.RowLayout(
-        components=[
+page = mk.gui.Page(
+    component=mk.gui.html.flexcol(
+        slots=[
             match,
-            mk.gui.RowLayout(components=[filter, sort], classes="grid-cols-2 gap-2"),
+            mk.gui.html.flexcol(slots=[filter, sort], classes="grid-cols-2 gap-2"),
             gallery,
         ],
         classes="grid-cols-1 gap-2",
-    )
-).launch()
+    ),
+    id="image-search"
+)
+page.launch()

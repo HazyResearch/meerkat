@@ -9,4 +9,5 @@ gallery = mk.gui.Gallery(
 )
 
 mk.gui.start(shareable=False)
-mk.gui.Page(component=mk.gui.RowLayout(components=[gallery])).launch()
+page = mk.gui.Page(component=mk.gui.html.flexcol(slots=[gallery]), id="gallery")
+page.launch()
