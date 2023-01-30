@@ -14,7 +14,7 @@ import os
 from manifest import Manifest
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.chat import Chat
+from meerkat.interactive.app.src.lib.component.core.chat import Chat
 
 manifest = Manifest(
     client_name="chatgpt",

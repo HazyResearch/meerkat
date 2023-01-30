@@ -4,7 +4,7 @@
 	import Status from '$lib/shared/common/Status.svelte';
 	import Select from 'svelte-select';
 	import type { Endpoint } from '$lib/utils/types';
-
+	import Textbox from '../textbox/Textbox.svelte';
 	const { dispatch } = getContext('Meerkat');
 
 	export let df: any;
@@ -56,6 +56,14 @@
 		against = '';
 	}
 	$: against_item = { value: against, label: against };
+
+	// <!-- <input
+	// 			type="text"
+	// 			bind:value={text}
+	// 			placeholder="Write some text to be matched..."
+	// 			class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
+	// 			on:keypress={onKeyPress}
+	// 		/> -->
 </script>
 
 <div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
@@ -69,13 +77,8 @@
 			<div class="px-3">
 				<Status {status} />
 			</div>
-			<input
-				type="text"
-				bind:value={text}
-				placeholder="Write some text to be matched..."
-				class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-				on:keypress={onKeyPress}
-			/>
+			<Textbox bind:text={text} on:keypress={onKeyPress}/>
+
 			<div class="text-slate-400 px-2">against</div>
 
 			<div class="themed pr-2 w-48">

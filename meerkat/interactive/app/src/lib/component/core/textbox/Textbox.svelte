@@ -10,7 +10,7 @@
 		clearTimeout(timer);
 		timer = setTimeout(() => {
 			text = v;
-		}, 300);
+		}, 150);
 	};
 </script>
 
@@ -26,6 +26,7 @@
 			placeholder="Write some text..."
 			class="grow h-10 px-3 rounded-md shadow-md"
 			on:keyup={({ target: { value } }) => debounce(value)}
+			on:keypress
 		/>
 	</div>
 </div>
