@@ -4,16 +4,15 @@ https://github.com/facebookresearch/detectron2
 """
 import importlib
 import os
+import platform
 import re
 import subprocess
 import sys
-import platform
 from collections import defaultdict
 
 import numpy as np
 import PIL
 import torch
-import torchvision
 from tabulate import tabulate
 
 __all__ = ["collect_env_info"]
@@ -58,8 +57,22 @@ def collect_env_info():
     data = []
     data.append(("sys.platform", sys.platform))
     data.append(("platform.platform", platform.platform()))
-    data.append(("node", subprocess.run(["node", "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")))
-    data.append(("npm", subprocess.run(["npm", "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")))
+    data.append(
+        (
+            "node",
+            subprocess.run(["node", "--version"], stdout=subprocess.PIPE).stdout.decode(
+                "utf-8"
+            ),
+        )
+    )
+    data.append(
+        (
+            "npm",
+            subprocess.run(["npm", "--version"], stdout=subprocess.PIPE).stdout.decode(
+                "utf-8"
+            ),
+        )
+    )
     data.append(("Python", sys.version.replace("\n", "")))
     data.append(("numpy", np.__version__))
 
@@ -97,6 +110,8 @@ def collect_env_info():
     data.append(("Pillow", PIL.__version__))
 
     try:
+        import torchvision
+
         data.append(
             (
                 "torchvision",
@@ -112,7 +127,7 @@ def collect_env_info():
                 data.append(("torchvision arch flags", msg))
             except ImportError:
                 data.append(("torchvision._C", "failed to find"))
-    except AttributeError:
+    except (AttributeError, ModuleNotFoundError):
         data.append(("torchvision", "unknown"))
 
     # Slurm info

@@ -59,6 +59,7 @@ REQUIRED = [
     "jinja2",
     "nbformat",
     "sse_starlette",
+    "tabulate",
 ]
 
 # What packages are optional?
@@ -181,7 +182,7 @@ setup(
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
     entry_points={
-        'console_scripts': ['mk=meerkat.cli.main:cli'],
+        "console_scripts": ["mk=meerkat.cli.main:cli"],
     },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
