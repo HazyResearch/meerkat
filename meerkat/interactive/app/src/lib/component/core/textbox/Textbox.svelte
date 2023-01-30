@@ -1,5 +1,8 @@
 <script lang="ts">
+	/** Text in the textbox. */
 	export let text: string;
+	
+	/** Title the textbox to help the user. */
 	export let title: string = '';
 
 	let timer: any;

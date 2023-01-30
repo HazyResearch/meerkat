@@ -1,4 +1,5 @@
 import { global_stores } from "$lib/utils/stores";
+import { get } from "svelte/store";
 
 
 export async function get_request(url: string): Promise<any> {
@@ -63,7 +64,10 @@ export function apply_modifications(modifications: Array<any>) {
             if (!("trigger_store" in store)) {
                 throw "Must use `meerkat_writable` for backend stores."
             }
-            store.set(modification.value, false);
+            // only update the store if the value has changed
+            if (modification.value !== get(store)) {
+                store.set(modification.value, false);
+            }
         }
     }
 }
