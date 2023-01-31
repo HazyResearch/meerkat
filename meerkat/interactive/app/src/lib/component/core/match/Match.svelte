@@ -13,6 +13,7 @@
 	export let text: string;
 	export let title: string = '';
 	export let get_match_schema: Endpoint;
+	export let show_against: boolean = false;
 
 	let status: string = 'waiting';
 
@@ -73,30 +74,32 @@
 		</div>
 	{/if}
 	<div class="form-control">
-		<div class="input-group w-100% flex items-center">
-			<div class="px-3">
+		<div class="input-group w-100% flex items-center px-3 space-x-2">
+			<div class="">
 				<Status {status} />
 			</div>
-			<Textbox bind:text={text} on:keypress={onKeyPress}/>
+			<Textbox bind:text on:keypress={onKeyPress} />
 
-			<div class="text-slate-400 px-2">against</div>
+			{#if show_against}
+				<div class="text-slate-400 px-2">against</div>
 
-			<div class="themed pr-2 w-48">
-				{#await items_promise}
-					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
-				{:then items}
-					<Select
-						id="column"
-						placeholder="...a column."
-						value={against_item}
-						{items}
-						showIndicator={true}
-						listPlacement="auto"
-						on:select={handleSelect}
-						on:clear={handleClear}
-					/>
-				{/await}
-			</div>
+				<div class="themed pr-2 w-48">
+					{#await items_promise}
+						<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
+					{:then items}
+						<Select
+							id="column"
+							placeholder="...a column."
+							value={against_item}
+							{items}
+							showIndicator={true}
+							listPlacement="auto"
+							on:select={handleSelect}
+							on:clear={handleClear}
+						/>
+					{/await}
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

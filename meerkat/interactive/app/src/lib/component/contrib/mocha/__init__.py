@@ -1,4 +1,5 @@
 import os
+from typing import List
 from meerkat.dataframe import DataFrame
 import meerkat as mk
 from meerkat.ops.sliceby.sliceby import SliceBy
@@ -37,7 +38,10 @@ class ChangeList(BaseComponent):
         main_column: str,
         embed_column: str,
         repo_path: str,
+        tag_columns: List[str] = None,
     ):
+        if tag_columns is None:
+            tag_columns = []
         if df.primary_key is None:
             raise ValueError("The DataFrame must have a primary key set.")
 
@@ -225,20 +229,20 @@ class ChangeList(BaseComponent):
             @mk.gui.reactive
             def subselect_columns(df):
                 return df[
-                        [
+                        list(set([
                             main_column,
                             DELTA_COLUMN,
                             label_column,
                             v1_column,
                             v2_column,
                             current_examples.primary_key_name,
-                        ]
+                        ] + tag_columns))
                 ]
 
             gallery = mk.gui.Gallery(
                 df=subselect_columns(current_examples),
                 main_column=main_column,
-                tag_columns=[DELTA_COLUMN, label_column, v1_column, v2_column],
+                tag_columns=tag_columns,
             )
 
         @mk.gui.endpoint
