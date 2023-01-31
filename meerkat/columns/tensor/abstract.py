@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union
 
 import numpy as np
 
@@ -9,13 +9,16 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
 
-TensorColumnTypes = Union[np.ndarray, torch.TensorType]
-
 torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    from torch import TensorType
+
+    TensorColumnTypes = Union[np.ndarray, TensorType]
 
 
 class TensorColumn(Column):
-    def __new__(cls, data: TensorColumnTypes = None, backend: str = None):
+    def __new__(cls, data: "TensorColumnTypes" = None, backend: str = None):
         from .numpy import NumPyTensorColumn
         from .torch import TorchTensorColumn
 
