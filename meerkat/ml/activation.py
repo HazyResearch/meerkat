@@ -1,9 +1,10 @@
 from functools import reduce
+from importlib.util import LazyLoader
 from typing import Union
 
-import torch
-
 from meerkat.ml.model import Model
+
+torch = LazyLoader("torch")
 
 
 class ActivationExtractor:

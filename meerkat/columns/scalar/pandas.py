@@ -10,7 +10,6 @@ from typing import Any, Callable, List, Sequence, Union
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 from pandas.core.accessor import CachedAccessor
 from pandas.core.arrays.categorical import CategoricalAccessor
 from pandas.core.dtypes.common import (
@@ -35,8 +34,11 @@ from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import Column
 from meerkat.interactive.formatter.base import Formatter
 from meerkat.mixins.aggregate import AggregationError
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .abstract import ScalarColumn
+
+torch = LazyLoader("torch")
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 

@@ -1,13 +1,12 @@
 from typing import Callable
 
-import torch
+from meerkat.display import audio_file_formatter
+from meerkat.tools.lazy_loader import LazyLoader
 
-from ...display import audio_file_formatter
-from ...tools.lazy_loader import LazyLoader
 from .file import FileColumn
 
 torchaudio = LazyLoader("torchaudio")
-
+torch = LazyLoader("torch")
 
 class AudioColumn(FileColumn):
     """A lambda column where each cell represents an audio file on disk. The

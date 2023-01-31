@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-import torch
-
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.instances_column import InstancesColumn
 from meerkat.ml.model import Model
 from meerkat.ml.segmentation_column import SegmentationOutputColumn
+from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 
 class TensorModel(Model):
     def __init__(

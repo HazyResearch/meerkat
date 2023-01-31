@@ -1,15 +1,17 @@
 import logging
 import traceback
 
+import numpy as np
+import pandas as pd
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
-import torch
-import numpy as np
-import pandas as pd 
 
+from meerkat.columns.abstract import Column
 from meerkat.errors import TriggerError
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.columns.abstract import Column
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 logger = logging.getLogger(__name__)
 

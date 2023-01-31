@@ -1,8 +1,10 @@
 from typing import Dict, List, Union
 
-import torch
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .encoder import Encoder
+
+torch = LazyLoader("torch")
 
 
 def transformers(

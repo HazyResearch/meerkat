@@ -3,10 +3,10 @@ import statistics
 from typing import Callable, Sequence, Union
 
 import numpy as np
-import torch
 
 from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 nltk = LazyLoader("nltk")
 rouge_score = LazyLoader("rouge_score")
 torchmetrics = LazyLoader("torchmetrics")

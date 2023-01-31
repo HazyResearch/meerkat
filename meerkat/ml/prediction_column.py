@@ -5,11 +5,13 @@ from typing import Sequence, Union
 
 import numpy as np
 import pandas as pd
-import torch
-import torch.nn.functional as F
-from torch.distributions.categorical import Categorical
 
 from meerkat.columns.tensor.torch import TorchTensorColumn
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
+F = LazyLoader("torch.nn.functional")
+categorical = LazyLoader("torch.distributions.categorical")
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
 
@@ -246,7 +248,7 @@ class ClassificationOutputColumn(TorchTensorColumn):
         elif probs.ndim > 2:
             # make channels last
             probs = probs.transpose((0,) + tuple(range(2, probs.ndim)) + (1,))
-        return TorchTensorColumn(Categorical(probs=probs).entropy())
+        return TorchTensorColumn(categorical.Categorical(probs=probs).entropy())
 
     @classmethod
     def _state_keys(cls) -> set:

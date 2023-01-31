@@ -5,7 +5,6 @@ from typing import List, Sequence, Union
 
 import numpy as np
 import pandas as pd
-import torch
 from tqdm import tqdm
 
 from meerkat.columns.tensor.torch import TorchTensorColumn
@@ -16,6 +15,7 @@ from meerkat.ml.prediction_column import (
 )
 from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 cv2 = LazyLoader("cv2")
 
 Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]

@@ -1,8 +1,10 @@
 import pandas as pd
-import torch
-import torchaudio
 
 import meerkat as mk
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
+torchaudio = LazyLoader("torchaudio")
 
 
 def get_yesno(dataset_dir: str, download: bool = True):

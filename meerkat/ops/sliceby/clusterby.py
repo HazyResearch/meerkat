@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import Dict, List, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Sequence, Tuple, Union
 
 import numpy as np
-from sklearn.base import ClusterMixin
 
 from meerkat.dataframe import DataFrame
 from meerkat.ops.cluster import cluster
 
 from .sliceby import SliceBy
+
+if TYPE_CHECKING:
+    from sklearn.base import ClusterMixin
 
 
 class ClusterBy(SliceBy):
@@ -24,7 +26,7 @@ class ClusterBy(SliceBy):
 def clusterby(
     data: DataFrame,
     by: Union[str, Sequence[str]],
-    method: Union[str, ClusterMixin] = "KMeans",
+    method: Union[str, "ClusterMixin"] = "KMeans",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
@@ -35,7 +37,7 @@ def clusterby(
         data (DataFrame): The dataframe to cluster.
         by (Union[str, Sequence[str]]): The column(s) to cluster by. These columns will
             be embedded using the ``encoder`` and the resulting embedding will be used.
-        method (Union[str, ClusterMixin]): The clustering method to use.
+        method (Union[str, "ClusterMixin"]): The clustering method to use.
         encoder (str): The encoder to use for the embedding. Defaults to ``clip``.
         modality (Union[str, Sequence[str])): The modality to of the
         **kwargs: Additional keyword arguments to pass to the clustering method.

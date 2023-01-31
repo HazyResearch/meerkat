@@ -20,7 +20,6 @@ from typing import (
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 
 import meerkat.config
 from meerkat.errors import ConversionError
@@ -36,11 +35,13 @@ from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.io import ColumnIOMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
     from meerkat.interactive.formatter.base import Formatter
 
+torch = LazyLoader("torch")
 
 logger = logging.getLogger(__name__)
 
@@ -286,7 +287,6 @@ class Column(
     def formatter(self, formatter: "Formatter"):
         self._formatter = formatter
 
-        
     def format(self, formatter: type):
         new_col = self.view()
         new_col.formatter = formatter
@@ -627,7 +627,7 @@ class Column(
         raise ConversionError(
             f"Cannot convert column of type {type(self)} to Numpy array."
         )
-    
+
     def to_json(self) -> dict:
         """Convert the column to a JSON object.
 
@@ -641,7 +641,6 @@ class Column(
             f"Cannot convert column of type {type(self)} to JSON object."
         )
 
-
     def _copy_data(self) -> object:
         return copy(self._data)
 
@@ -651,6 +650,7 @@ class Column(
     @property
     def is_mmap(self):
         return False
+
 
 def column(data: Sequence) -> Column:
     """Create a Meerkat column from data.

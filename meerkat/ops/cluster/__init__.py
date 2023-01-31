@@ -1,19 +1,23 @@
-from typing import Optional, Tuple, Union
-
-import sklearn.cluster as skcluster
-from sklearn.base import ClusterMixin
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 from meerkat import Column, DataFrame, ScalarColumn, TensorColumn
+from meerkat.tools.lazy_loader import LazyLoader
+
+if TYPE_CHECKING:
+    from sklearn.base import ClusterMixin
+
+
+skcluster = LazyLoader("sklearn.cluster")
 
 
 def cluster(
     data: Union[Column, DataFrame],
     input: Optional[str] = None,
-    method: Union[str, ClusterMixin] = "KMeans",
+    method: Union[str, "ClusterMixin"] = "KMeans",
     encoder: str = "clip",  # add support for auto selection of encoder
     modality: str = None,
     **kwargs,
-) -> Tuple[ScalarColumn, ClusterMixin]:
+) -> Tuple[ScalarColumn, "ClusterMixin"]:
     """Cluster the data in a column. If the column is an unstructured type,
     (e.g. image), the column is first embedded then clustered.
 

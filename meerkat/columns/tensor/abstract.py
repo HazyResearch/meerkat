@@ -1,15 +1,17 @@
 from typing import List, Union
 
 import numpy as np
-import torch
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumPyBlock
 from meerkat.block.torch_block import TorchBlock
+from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
 
 TensorColumnTypes = Union[np.ndarray, torch.TensorType]
+
+torch = LazyLoader("torch")
 
 
 class TensorColumn(Column):

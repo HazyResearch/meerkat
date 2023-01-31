@@ -1,12 +1,12 @@
 from typing import Dict, List
 
-import torch
-
 from meerkat.dataframe import DataFrame
 from meerkat.ml.embedding_column import EmbeddingColumn
 from meerkat.ml.metrics import compute_metric
 from meerkat.ml.prediction_column import ClassificationOutputColumn
+from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 
 # TODO(Priya): Move some general functions here
 class Model(torch.nn.Module):
