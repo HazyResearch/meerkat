@@ -15,6 +15,7 @@ import PIL
 from tabulate import tabulate
 
 from meerkat.tools.lazy_loader import LazyLoader
+from meerkat.version import __version__
 
 torch = LazyLoader("torch")
 torchvision = LazyLoader("torchvision")
@@ -83,7 +84,8 @@ def collect_torchvision_env():
     return data
 
 
-def _get_version(module_name, raise_error=False):
+def _get_version(module_name: str, raise_error: bool = False) -> str:
+    """Get version of a module from subprocess."""
     try:
         return subprocess.run(
             [module_name, "--version"], stdout=subprocess.PIPE
@@ -101,10 +103,10 @@ def collect_env_info():
     data.append(("sys.platform", sys.platform))
     data.append(("platform.platform", platform.platform()))
     data.append(("node", _get_version("node")))
-    data.append(("node", _get_version("npm")))
+    data.append(("npm", _get_version("npm")))
     data.append(("Python", sys.version.replace("\n", "")))
+    data.append(("meerkat", __version__))
     data.append(("numpy", np.__version__))
-
     data.append(("PyTorch", torch.__version__ + " @" + os.path.dirname(torch.__file__)))
     data.append(("PyTorch debug build", torch.version.debug))
 
