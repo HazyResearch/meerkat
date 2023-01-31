@@ -1,10 +1,11 @@
 from typing import List, Union
 
 import numpy as np
-import torch
 
 from meerkat import DataFrame, NumPyTensorColumn, TensorColumn, TorchTensorColumn
-from meerkat.interactive.graph import reactive
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 def search(

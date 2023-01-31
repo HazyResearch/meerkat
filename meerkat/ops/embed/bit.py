@@ -5,15 +5,18 @@ from typing import Dict, Union
 import numpy as np
 import PIL
 import requests
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import nested_getattr
 
 from .encoder import Encoder
 from .registry import encoders
 from .utils import ActivationExtractor, _get_reduction_fn
+
+torch = LazyLoader("torch")
+nn = LazyLoader("torch.nn")
+F = LazyLoader("torch.nn.functional")
+
 
 # this implementation is primarily an adaptation of this colab
 # https://colab.research.google.com/github/google-research/big_transfer/blob/master/colabs/big_transfer_pytorch.ipynb

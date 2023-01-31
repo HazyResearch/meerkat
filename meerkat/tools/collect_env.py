@@ -12,8 +12,12 @@ from collections import defaultdict
 
 import numpy as np
 import PIL
-import torch
 from tabulate import tabulate
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader('torch')
+torchvision = LazyLoader('torchvision')
 
 __all__ = ["collect_env_info"]
 

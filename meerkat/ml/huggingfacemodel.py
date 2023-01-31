@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 import cytoolz as tz
-import torch
 
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.dataframe import DataFrame
 from meerkat.ml.model import Model
 from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 AutoTokenizer = LazyLoader("transformers.AutoTokenizer")
 
 

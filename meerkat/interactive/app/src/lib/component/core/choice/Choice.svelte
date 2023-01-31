@@ -2,12 +2,16 @@
 	import Select from 'svelte-select';
 	import { createEventDispatcher } from 'svelte';
 
-	export let choices: Array<any>;
-	export let value: any;
-	export let gui_type: string;
-	export let title: string = '';
-
 	let dispatch = createEventDispatcher();
+
+	/** Array of choices to display in the dropdown. */
+	export let choices: Array<any>;
+	/** The current value of the dropdown. */
+	export let value: any;
+	/** The type of GUI to use. Either `dropdown` or `radio`. */
+	export let gui_type: 'dropdown' | 'radio' = 'dropdown';
+	/** The title to display above the dropdown. */
+	export let title: string = '';
 
 	let dispatchSelect = (index: number) => {
 		dispatch('select', { index: index });

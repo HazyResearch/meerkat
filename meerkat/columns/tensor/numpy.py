@@ -12,7 +12,6 @@ from typing import Any, Callable, List, Sequence, Union
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
 
@@ -20,9 +19,12 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumPyBlock
 from meerkat.columns.abstract import Column
 from meerkat.mixins.aggregate import AggregationError
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.writers.concat_writer import ConcatWriter
 
 from .abstract import TensorColumn
+
+torch = LazyLoader("torch")
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -315,7 +317,7 @@ class NumPyTensorColumn(
 
     def to_numpy(self) -> np.ndarray:
         return self.data
-    
+
     def to_json(self) -> List[Any]:
         return self.data.tolist()
 

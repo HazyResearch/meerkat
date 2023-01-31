@@ -7,11 +7,11 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-import torch
 
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 faiss = LazyLoader("faiss")
 umap = LazyLoader("umap")
 umap_plot = LazyLoader("umap.plot")
