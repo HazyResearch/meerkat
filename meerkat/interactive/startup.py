@@ -328,7 +328,7 @@ def run_frontend_prod(
                 continue
             # Remove any symbols that would mess up the progress bar
             stmt = (
-                f"Building (may take upto a minute)... {time.time() - start_time:.2f}s"
+                f"Building (may take up to a minute)... {time.time() - start_time:.2f}s"
             )
             if is_notebook():
                 print(stmt, end="\r", flush=True)

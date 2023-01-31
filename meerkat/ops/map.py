@@ -453,14 +453,14 @@ def _materialize(
     import ray
     import torch
     from tqdm import tqdm
-    
+
     import meerkat as mk
 
     from .concat import concat
 
     if use_ray:
         ray.init(ignore_reinit_error=True)
-        ray.data.set_progress_bars(enabled=not pbar) # 0 is enabled, 1 is disabled
+        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
@@ -485,6 +485,10 @@ def _materialize(
         if isinstance(curr, mk.ScalarColumn):
             ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
             fns.append(lambda x: x["0"])
+        elif isinstance(curr, mk.TensorColumn):
+            ds = ray.data.from_torch(curr).repartition(num_blocks)
+        elif isinstance(curr, mk.ObjectColumn):
+            ds = ray.data.from_items(curr).repartition(num_blocks)
         else:
             raise ValueError(f"Base column is of unsupported type {type(curr)}.")
 
@@ -499,29 +503,32 @@ def _materialize(
         result_ds = iter(
             pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()
         ).__next__()
-        if data.output_type is mk.NumPyTensorColumn:
+        if data._output_type in [np.int64, np.float32, np.float64, np.ndarray]:
+            print("Using to_numpy_refs()")
             result = []
             for partition in result_ds.to_numpy_refs():
                 result.append(ray.get(partition))
             return np.stack(result)
-        elif data.output_type is mk.TorchTensorColumn:
+        elif data._output_type in [torch.Tensor]:
+            print("Using to_torch()")
             result = []
             for partition in result_ds.to_torch():
-                result.append(ray.get(partition))
+                result.append(partition[0])
             return torch.stack(result)
-        elif data.output_type is mk.ObjectColumn:
-            result = []
-            # TODO
-            for partition in result_ds.to_numpy_refs():
-                result.append(ray.get(partition))
-            return np.stack(result)
-        elif data.data.return_format is mk.ScalarColumn:
+        elif data._output_type in [str, int, float, bool, pd.Series, pd.DataFrame]:
+            print("Using to_pandas_refs()")
             result = []
             for partition in result_ds.to_pandas_refs():
                 result.extend(ray.get(partition))
             return result
+        elif isinstance(data._output_type, object):
+            print("Using iter_batches()")
+            result = []
+            for partition in result_ds.iter_batches():
+                result.extend(partition)
+            return result
         else:
-            raise ValueError(f"Unsupported output type {data.output_type}.")
+            raise ValueError(f"Unsupported output type {data._output_type}.")
 
     else:
         result = []
