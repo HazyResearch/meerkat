@@ -1,7 +1,11 @@
+import os
 from meerkat.dataframe import DataFrame
 import meerkat as mk
 from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.interactive.app.src.lib.component.filter import FilterCriterion
+from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
+from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
+from meerkat.interactive.app.src.lib.component.contrib.row import Row
+from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
 
 import numpy as np
 from ...abstract import BaseComponent
@@ -12,32 +16,37 @@ DELTA_COLUMN = "delta"
 
 
 class ChangeList(BaseComponent):
-    
+
+    gallery: BaseComponent
+    gallery_match: BaseComponent
+    gallery_filter: BaseComponent
+    gallery_sort: BaseComponent
+    discover: BaseComponent
+    plot: BaseComponent
+    active_slice: BaseComponent
+    slice_sort: BaseComponent
+    slice_match: BaseComponent
+    global_stats: BaseComponent
+
     def __init__(
         self,
         df: DataFrame,
         v1_column: str,
         v2_column: str,
+        label_column: str,
         main_column: str,
-        repo_path: str = None,
+        embed_column: str,
+        repo_path: str,
     ):
         if df.primary_key is None:
             raise ValueError("The DataFrame must have a primary key set.")
 
         df[DELTA_COLUMN] = df[v2_column] - df[v1_column]
 
-        slice_repo = SliceRepo(df, repo_path)
-        for i in range(3):
-            slice_repo.add(
-                f"slice_{i}",
-                mk.DataFrame(
-                    {
-                        df.primary_key_name: df[df.primary_key_name],
-                        "slice": np.random.rand(len(df)) > 0.9,
-                    },
-                    primary_key=df.primary_key_name,
-                ),
-            )
+        if os.path.exists(os.path.join(repo_path, "membership.mk")):
+            slice_repo = SliceRepo.read(repo_path)
+        else:
+            slice_repo = SliceRepo(df, repo_path)
 
         membership_df = slice_repo.membership
         slices_df = slice_repo.slices
@@ -57,9 +66,7 @@ class ChangeList(BaseComponent):
                 result = sb[DELTA_COLUMN].mean()
 
                 # compute prototype image embeddings
-                image_prototypes_df = sb[["clip_1", "clip_2", "clip_concat"]].mean(
-                    axis=0
-                )
+                image_prototypes_df = sb[[embed_column]].mean(axis=0)
                 image_prototypes_df["slice_id"] = image_prototypes_df["slice"].map(
                     slice_repo._slice_id
                 )
@@ -81,9 +88,7 @@ class ChangeList(BaseComponent):
                         "name",
                         "description",
                         "slice",
-                        "clip_1",
-                        "clip_2",
-                        "clip_concat",
+                        embed_column,
                     ]
                     .merge(result, on="slice")
                     .drop("slice")
@@ -105,7 +110,7 @@ class ChangeList(BaseComponent):
             sort_criteria = mk.gui.Store([])
             match = mk.gui.Match(
                 df=base_examples,
-                against="clip_1",
+                against=embed_column,
                 title="Search Examples",
                 on_match=append_to_sort.partial(criteria=sort_criteria),
             )
@@ -129,7 +134,7 @@ class ChangeList(BaseComponent):
 
             sb_match = mk.gui.Match(
                 df=stats_df,
-                against="clip_1",
+                against=embed_column,
                 title="Search Slices",
                 on_match=append_to_sort.partial(criteria=slice_sort.criteria),
             )
@@ -172,82 +177,107 @@ class ChangeList(BaseComponent):
                             source=source,
                         )
                     )
+
                 criteria.set(wrapped)
                 # set to empty string if None
                 # TODO: Need mk.None
                 selected.set(slice_id or "")
 
-                plot = mk.gui.Plot(
-                    df=stats_df,
-                    x=DELTA_COLUMN,
-                    y="name",
-                    x_label="Accuracy Shift (μ)",
-                    y_label="slice",
-                    metadata_columns=["count"],
-                    keys_to_remove=[],
-                    on_select=on_select_slice.partial(
-                        criteria=filter.criteria, selected=selected_slice_id
+            plot = Plot(
+                df=stats_df,
+                x=DELTA_COLUMN,
+                y="name",
+                x_label="Accuracy Shift (μ)",
+                y_label="slice",
+                metadata_columns=["count"],
+                keys_to_remove=[],
+                on_select=on_select_slice.partial(
+                    criteria=filter.criteria, selected=selected_slice_id
+                ),
+            )
+
+            @mk.gui.endpoint
+            def on_write_row(key: str, column: str, value: str, df: mk.DataFrame):
+                """Change the value of a column in the slice_df."""
+                if not key:
+                    return
+                df[column][df.primary_key._keyidx_to_posidx(key)] = value
+                # We have to force add the dataframe modification to trigger downstream updates
+                mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
+                mod.add_to_queue()
+
+            active_slice_view = Row(
+                df=stats_df,
+                primary_key_column=slices_df.primary_key_name,
+                cell_specs={
+                    "name": {"type": "editable"},
+                    "description": {"type": "editable"},
+                    DELTA_COLUMN: {"type": "stat", "name": "Accuracy Change"},
+                    # "key": {"type": "stat"},
+                    "count": {"type": "stat"},
+                },
+                selected_key=selected_slice_id,
+                title="Active Slice",
+                # The edits should be written on the slices_df
+                on_change=on_write_row.partial(df=slices_df),
+            )
+
+            @mk.gui.reactive
+            def subselect_columns(df):
+                return df[
+                        [
+                            main_column,
+                            DELTA_COLUMN,
+                            label_column,
+                            v1_column,
+                            v2_column,
+                            current_examples.primary_key_name,
+                        ]
+                ]
+
+            gallery = mk.gui.Gallery(
+                df=subselect_columns(current_examples),
+                main_column=main_column,
+                tag_columns=[DELTA_COLUMN, label_column, v1_column, v2_column],
+            )
+
+        @mk.gui.endpoint
+        def add_discovered_slices(eb: SliceBy):
+            for key, slice in eb.slices.items():
+                col = np.zeros(len(slice_repo.membership))
+                col[slice] = 1
+                # FIXME: make this interface less awful
+                slice_repo.add(
+                    name=f"discovered_{key}",
+                    membership=mk.DataFrame(
+                        {
+                            eb.data.primary_key_name: eb.data.primary_key,
+                            "slice": col,
+                        },
+                        primary_key=eb.data.primary_key_name,
                     ),
                 )
 
-                @mk.gui.endpoint
-                def on_write_row(key: str, column: str, value: str, df: mk.DataFrame):
-                    """Change the value of a column in the slice_df."""
-                    if not key:
-                        return
-                    df[column][df.primary_key._keyidx_to_posidx(key)] = value
-                    # We have to force add the dataframe modification to trigger downstream updates
-                    mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
-                    mod.add_to_queue()
+            # add a sort by created time
 
-                active_slice_view = mk.gui.Row(
-                    df=stats_df,
-                    primary_key_column=slices_df.primary_key_name,
-                    cell_specs={
-                        "name": {"type": "editable"},
-                        "description": {"type": "editable"},
-                        DELTA_COLUMN: {"type": "stat", "name": "Accuracy Change"},
-                        # "key": {"type": "stat"},
-                        "count": {"type": "stat"},
-                    },
-                    selected_key=selected_slice_id,
-                    title="Active Slice",
-                    # The edits should be written on the slices_df
-                    on_change=on_write_row.partial(df=slices_df),
-                )
+        discover = Discover(
+            df=current_examples,
+            by=embed_column,
+            target=v1_column,
+            pred=v2_column,
+            on_discover=add_discovered_slices,
+        )
 
-                gallery = mk.gui.Gallery(
-                    df=current_examples,
-                    main_column="image",
-                    tag_columns=[DELTA_COLUMN, "target", "pred_a", "pred_b"],
-                    # edit_target=edit_target,
-                )
-
-                @mk.gui.endpoint
-                def add_discovered_slices(eb: SliceBy):
-                    for key, slice in eb.slices.items():
-                        col = np.zeros(len(slice_repo.membership))
-                        col[slice] = 1
-                        # FIXME: make this interface less awful
-                        slice_repo.add(
-                            name=f"discovered_{key}",
-                            membership=mk.DataFrame(
-                                {
-                                    eb.data.primary_key_name: eb.data.primary_key,
-                                    "slice": col,
-                                },
-                                primary_key=eb.data.primary_key_name,
-                            ),
-                        )
-
-                    # add a sort by created time
-
-                discover = mk.gui.Discover(
-                    df=current_examples,
-                    by="clip_1",
-                    target="pred_a",
-                    pred="pred_b",
-                    on_discover=add_discovered_slices,
-                )
-
-                stats = mk.gui.Stats(data={"count": len(current_examples)})
+        stats = mk.gui.Stats(data={"count": len(current_examples)})
+        super().__init__(
+            gallery_match=match,
+            gallery_filter=filter,
+            gallery_sort=sort,
+            gallery=gallery,
+            discover=discover,
+            global_stats=stats,
+            active_slice=active_slice_view,
+            plot=plot,
+            slice_sort=slice_sort,
+            slice_match=sb_match,
+        )

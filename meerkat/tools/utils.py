@@ -69,7 +69,9 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
     ("meerkat.columns.arrow_column", "meerkat.columns.scalar.arrow"),
     ("meerkat.columns.image_column", "meerkat.columns.deferred.image"),
     ("meerkat.columns.file_column", "meerkat.columns.deferred.file"),
+    ("meerkat.columns.list_column", "meerkat.columns.object.base"),
     ("meerkat.block.lambda_block", "meerkat.block.deferred_block"),
+    ("ListColumn", "ObjectColumn"),
     ("LambdaBlock", "DeferredBlock"),
     ("NumpyBlock", "NumPyBlock"),
 ]
