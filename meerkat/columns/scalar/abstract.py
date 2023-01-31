@@ -3,13 +3,15 @@ from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.pandas_block import PandasBlock
+from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
+
+torch = LazyLoader("torch")
 
 ScalarColumnTypes = Union[np.ndarray, torch.TensorType, pd.Series, List]
 

@@ -412,7 +412,7 @@ import meerkat as mk
 from app.src.lib.components import ExampleComponent
 
 # Launch the Meerkat GUI servers
-mk.gui.start()"""
+mk.gui.start(api_port=5000, frontend_port=8000)"""
 
         code_2 = """\
 # Import and use the ExampleComponent

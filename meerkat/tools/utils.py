@@ -7,9 +7,12 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 import dill
 import numpy as np
 import pandas as pd
-import torch
 import yaml
 from yaml.constructor import ConstructorError
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 class WeakMapping(Mapping):

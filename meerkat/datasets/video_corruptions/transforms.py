@@ -1,7 +1,9 @@
 import random
 from typing import Optional, Tuple
 
-import torch
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 class TemporalDownsampling(object):

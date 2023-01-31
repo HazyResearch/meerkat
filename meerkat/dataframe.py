@@ -25,7 +25,6 @@ import dill
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 import yaml
 from pandas._libs import lib
 
@@ -44,7 +43,10 @@ from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.row import Row
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
+
+torch = LazyLoader("torch")
 
 try:
     from typing import Literal
@@ -236,7 +238,7 @@ class DataFrame(
         """
         self[column] = np.arange(self.nrows)
         self.set_primary_key(column, inplace=True)
-    
+
     def _infer_primary_key(self, create: bool = False) -> str:
         """Infer the primary key from the data."""
         for column in self.columns:

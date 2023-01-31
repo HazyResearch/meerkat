@@ -4,15 +4,17 @@ import os
 from typing import Sequence, Set
 
 import pyarrow as pa
-import torch
 from pyarrow.compute import equal
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
+from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
 from .abstract import ScalarColumn
+
+torch = LazyLoader("torch")
 
 
 class ArrowScalarColumn(ScalarColumn):

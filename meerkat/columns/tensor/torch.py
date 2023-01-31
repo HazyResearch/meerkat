@@ -9,17 +9,19 @@ from typing import Callable, List, Mapping, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.torch_block import TorchBlock
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
 from ..abstract import Column
 from .abstract import TensorColumn
+
+torch = LazyLoader("torch")
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -170,6 +172,7 @@ class TorchTensorColumn(
     @staticmethod
     def _get_default_formatter() -> Callable:
         from meerkat.interactive.formatter import ScalarFormatter
+
         return ScalarFormatter()
 
     @classmethod
