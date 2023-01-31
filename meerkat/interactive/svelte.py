@@ -228,7 +228,9 @@ class SvelteWriter:
             # Import all components inside the app/src/lib/components
             # directory to register user components from the app
             # Otherwise do nothing
-            logger.debug("In user appdir. Importing app components from app/src/lib/components.")
+            logger.debug(
+                "In user appdir. Importing app components from app/src/lib/components."
+            )
             sys.path.append(self.cwd)
             importlib.import_module("app.src.lib.components")
 
@@ -295,12 +297,12 @@ class SvelteWriter:
     def install_mk_app(self):
         """Run `npm i` on the Meerkat interactive/app directory."""
         return subprocess.run(
-            [f"cd {_MK_REPO_APP_DIR} && npm i"], shell=True, check=True
+            [f"cd '{_MK_REPO_APP_DIR}' && npm i"], shell=True, check=True
         )
 
     def npm_run_dev(self):
         return subprocess.run(
-            [f"cd {_MK_REPO_APP_DIR} && npm run dev"], shell=True, check=True
+            [f"cd '{_MK_REPO_APP_DIR}' && npm run dev"], shell=True, check=True
         )
 
     def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
