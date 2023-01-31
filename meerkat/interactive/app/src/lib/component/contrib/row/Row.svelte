@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { DataFrameRef } from '$lib/api/dataframe';
 	import Cell from '$lib/shared/cell/Cell.svelte';
-	import { dispatch, fetch_chunk, fetch_schema } from '$lib/utils/api';
-	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
+	import { getContext } from 'svelte';
+	import { fetch_chunk, fetch_schema, dispatch } from '$lib/utils/api';
 
 	export let df: DataFrameRef;
 	export let selected_key: string;
@@ -92,9 +93,8 @@
 								{#if rows == null}
 									No selection
 								{:else}
-									<BasicCell
-										data={rows.rows[0][column_idx]}
-										{...column.cell_props}
+									<Cell
+										{...rows.get_cell(0, column.name)}
 										percentage={false}
 									/>
 								{/if}

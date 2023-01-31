@@ -126,6 +126,7 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     data_embedding = df[criterion.against]
     scores = (data_embedding @ criterion.query_embedding.T).squeeze()
     df[criterion.name] = scores
+
     return df, criterion.name
 
 

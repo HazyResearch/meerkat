@@ -1,7 +1,8 @@
 import logging
+import traceback
+
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
-
 import torch
 import numpy as np
 import pandas as pd 
@@ -39,6 +40,7 @@ def dispatch(
 
         logger.debug("Exception in dispatch", exc_info=True)
         state.progress_queue.add(None)
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Only return store modifications that are not backend_only

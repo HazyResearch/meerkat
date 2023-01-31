@@ -94,36 +94,7 @@ def _format_criteria(
     ]
 
 
-def _skip_filter(new_criteria, old_criteria) -> bool:
-    """Returns whether the filter operation should be skipped.
-
-    The filter operation should be skipped when the active (i.e. enabled)
-    criteria are the same. Note, order of the criteria does not matter in
-    filtering.
-
-    Returns:
-        bool: Whether the filter operation should be skipped.
-    """
-
-    def _to_set(criteria: List[FilterCriterion]):
-        return {
-            (criterion.column, criterion.op, criterion.value) for criterion in criteria
-        }
-
-    old_criteria = _format_criteria(old_criteria)
-    new_criteria = _format_criteria(new_criteria)
-
-    # Filter out criteria that are disabled.
-    old_criteria = _to_set(
-        [criterion for criterion in old_criteria if criterion.is_enabled]
-    )
-    new_criteria = _to_set(
-        [criterion for criterion in new_criteria if criterion.is_enabled]
-    )
-    return old_criteria == new_criteria
-
-
-@reactive(skip_fn=_skip_filter)
+@reactive
 def filter(
     data: Union["DataFrame", "Column"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
@@ -161,7 +132,7 @@ def filter(
         # we view so that the result is a different dataframe than the input
         return data.view()
 
-    # Filter pandas series columns.
+    # Filter pandas series columns.c
     # TODO (arjundd): Make this more efficient to perform filtering sequentially.
     all_masks = []
     for criterion in criteria:
