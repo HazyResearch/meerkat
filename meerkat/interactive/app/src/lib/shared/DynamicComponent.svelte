@@ -27,9 +27,9 @@
 
 {#if component}
 	<!-- Pass the props to the component being rendered -->
-	<svelte:component this={component} {...props}>
+	<svelte:component this={component} {...props} on:edit>
 		{#each slots as slot}
-			<svelte:self {...slot} />
+			<svelte:self {...slot}/>
 		{/each}
 	</svelte:component>
 {/if}

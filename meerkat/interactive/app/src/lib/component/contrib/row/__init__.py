@@ -1,7 +1,7 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.endpoint import EndpointProperty
 
 from ...abstract import Component
 
@@ -9,10 +9,9 @@ from ...abstract import Component
 class Row(Component):
 
     df: "DataFrame"
-    # The primary key column.a
-    primary_key_column: str
-    # The Cell specs
-    cell_specs: Dict[str, Dict[str, Any]]
+    columns: List[str] 
+    stat_columns: List[str] = {}
+    rename: Dict[str, str] = {}
     # The selected key. This should be an element in primary_key_col.
     selected_key: Optional[str] = None
     title: str = ""
@@ -21,4 +20,4 @@ class Row(Component):
     # - key: the primary key (key)
     # - column: the column name (column)
     # - value: the new value (value)
-    on_change: Endpoint = None
+    on_change: EndpointProperty = None

@@ -1,7 +1,6 @@
 import os
-from typing import List
-from meerkat.dataframe import DataFrame
-import meerkat as mk
+from typing import List, TYPE_CHECKING
+
 from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
 from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
@@ -11,7 +10,9 @@ from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
 import numpy as np
 from ...abstract import BaseComponent
 
-from mocha.repo import SliceRepo
+if TYPE_CHECKING:
+    from meerkat.dataframe import DataFrame
+
 
 DELTA_COLUMN = "delta"
 
@@ -31,7 +32,7 @@ class ChangeList(BaseComponent):
 
     def __init__(
         self,
-        df: DataFrame,
+        df: "DataFrame",
         v1_column: str,
         v2_column: str,
         label_column: str,
@@ -40,6 +41,9 @@ class ChangeList(BaseComponent):
         repo_path: str,
         tag_columns: List[str] = None,
     ):
+        from mocha.repo import SliceRepo
+        import meerkat as mk
+
         if tag_columns is None:
             tag_columns = []
         if df.primary_key is None:
@@ -212,18 +216,12 @@ class ChangeList(BaseComponent):
 
             active_slice_view = Row(
                 df=stats_df,
-                primary_key_column=slices_df.primary_key_name,
-                cell_specs={
-                    "name": {"type": "editable"},
-                    "description": {"type": "editable"},
-                    DELTA_COLUMN: {"type": "stat", "name": "Accuracy Change"},
-                    # "key": {"type": "stat"},
-                    "count": {"type": "stat"},
-                },
                 selected_key=selected_slice_id,
+                columns=["name", "description"],
+                stat_columns=["count", DELTA_COLUMN],
+                # rename={""}
                 title="Active Slice",
-                # The edits should be written on the slices_df
-                on_change=on_write_row.partial(df=slices_df),
+                on_change=on_write_row.partial(df=slices_df) # the edits should be written on the slices_df
             )
 
             @mk.gui.reactive

@@ -1,20 +1,18 @@
 <script lang="ts">
-	import {createEventDispatcher} from 'svelte';
+	import {getContext} from 'svelte/internal';
 
 	export let data: any;
 	export let view: string = 'line';
 	export let editable: boolean = true;
 
-	const dispatch = createEventDispatcher();
-	const edit = () => {dispatch('edit', {value: data})}
-
+	const cellEdit: CallableFunction = getContext('cellEdit');
 </script>
 
 {#if view === 'line'}
 	{#if editable}
 		<input 				
 			class="input input-bordered grow h-7 px-3 rounded-md shadow-md"
-			on:change={edit} 
+			on:change={() => {cellEdit(data)}} 
 			bind:value={data} 
 		/>
 	{:else}
