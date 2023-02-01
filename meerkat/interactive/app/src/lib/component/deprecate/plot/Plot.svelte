@@ -59,16 +59,8 @@
 
 		// Update the metadata array.
 		if (metadata_columns.length > 0) {
-			metadata = [];
-			chunk.rows?.forEach((row: any) => {
-				const metadata_obj = metadata_columns.reduce(
-					(accumulator: any, column: string, index: number) => {
-						accumulator[index] = row[index + 3];
-						return accumulator;
-					},
-					{}
-				);
-				metadata.push(metadata_obj);
+			metadata = chunk.rows?.map((row: any, i: number) => {
+				return metadata_columns.map((column: string) => chunk.get_cell(i, column).data);
 			});
 		} else {
 			metadata = new Array(datum.length).fill([]);
@@ -90,10 +82,9 @@
 				slice_id: slice_ids.length > 0 ? slice_ids[0] : ''
 			}
 		});
-		promise
-			.catch((error: TypeError) => {
-				console.log(error);
-			});
+		promise.catch((error: TypeError) => {
+			console.log(error);
+		});
 	};
 </script>
 
