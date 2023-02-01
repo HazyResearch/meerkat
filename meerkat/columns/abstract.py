@@ -654,12 +654,9 @@ class Column(
         return False
 
 def infer_column_type(data: Sequence) -> Type[Column]:
-    from .scalar import ScalarColumn
-    from .tensor import TensorColumn
 
     if isinstance(data, Column):
-        # TODO: Need ton make this view but should decide where to do it exactly
-        return data  # .view()
+        return type(data)
 
     if isinstance(data, pd.Series):
         from .scalar.pandas import PandasScalarColumn
@@ -682,7 +679,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
             from .scalar.pandas import PandasScalarColumn
             return PandasScalarColumn
         from .tensor.numpy import NumPyTensorColumn
-        
+
         return NumPyTensorColumn
 
     if isinstance(data, Sequence):
@@ -713,4 +710,8 @@ def column(data: Sequence) -> Column:
     The Meerkat column type is inferred from the type and structure of
     the data passed in.
     """
+    if isinstance(data, Column):
+        # TODO: Need ton make this view but should decide where to do it exactly
+        return data  # .view()
+
     return infer_column_type(data)(data)
