@@ -7,7 +7,9 @@
 
 	export let df: DataFrameRef;
 	export let selected_key: string;
-	export let cell_specs: any;
+	export let columns: string[] = [];
+	export let stat_columns: string[] = [];
+	export let cell_props: any;
 	export let title: string = '';
 
 	export let on_change: Endpoint = null;
@@ -34,7 +36,6 @@
 			value: event.detail.value
 		});
 		promise.catch((error: TypeError) => {
-			status = 'error';
 			console.log(error);
 		});
 	};
@@ -65,8 +66,7 @@
 								<Cell
 									data={rows.rows[0][column_idx]}
 									cell_component={column.cell_component}
-									cell_props={column.cell_props}
-									editable={cell_specs[column.name].type === 'editable'}
+									cell_props={...column.cell_props, ...cell_props[column.name]}
 									on:edit={(event) => on_edit(event, column.name)}
 								/>
 							{/if}
