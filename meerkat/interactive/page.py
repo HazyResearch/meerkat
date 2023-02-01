@@ -1,11 +1,11 @@
 import code
-import os
 from functools import partial, wraps
 from typing import Callable
 
 import rich
 from IPython.display import IFrame
 from pydantic import BaseModel
+from meerkat.constants import MEERKAT_RUN_SUBPROCESS, is_notebook
 
 from meerkat.interactive import html
 from meerkat.interactive.app.src.lib.component._internal.progress import Progress
@@ -13,7 +13,6 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     BaseComponent,
     ComponentFrontend,
 )
-from meerkat.interactive.svelte import SvelteWriter
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
@@ -60,10 +59,10 @@ class Page(IdentifiableMixin):
         self.height = height
         self.width = width
 
-        # Call `init_run`
-        # KG: TODO: figure out if we need this here.
-        svelte_writer = SvelteWriter()
-        svelte_writer.init_run()
+        # # Call `init_run`
+        # # KG: TODO: figure out if we need this here.
+        # svelte_writer = SvelteWriter()
+        # svelte_writer.init_run()
 
     def __call__(self):
         """Return the FastAPI object, this allows Page objects to be
@@ -73,7 +72,6 @@ class Page(IdentifiableMixin):
         return MeerkatAPI
 
     def launch(self, return_url: bool = False):
-        from meerkat.interactive.startup import is_notebook
 
         if state.frontend_info is None:
             rich.print("Frontend is not initialized. Running `mk.gui.start()`.")
@@ -105,8 +103,8 @@ class Page(IdentifiableMixin):
             )
             rich.print()
 
-            in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
-            if not in_mk_run_subprocess:
+            # in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
+            if not MEERKAT_RUN_SUBPROCESS:
                 # get locals of the main module when running in script.
                 import __main__
 

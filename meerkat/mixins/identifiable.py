@@ -1,17 +1,6 @@
 from uuid import uuid4
 
-
-class classproperty(property):
-    """Taken from https://stackoverflow.com/a/13624858.
-
-    The behavior of class properties using the @classmethod and
-    @property decorators has changed across Python versions. This class
-    (should) provide consistent behavior across Python versions. See
-    https://stackoverflow.com/a/1800999 for more information.
-    """
-
-    def __get__(self, owner_self, owner_cls):
-        return self.fget(owner_cls)
+from meerkat.tools.utils import classproperty
 
 
 class IdentifiableMixin:

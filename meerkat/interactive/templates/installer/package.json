@@ -2,6 +2,6 @@
     "name": "meerkat-installer",
     "main": "installer.js",
     "type": "module",
-    "scripts": {"install": "node installer.js"},
+    "scripts": {"create": "node installer.js"},
     "dependencies": {"create-svelte": "latest"}
 }

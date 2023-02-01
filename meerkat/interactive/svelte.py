@@ -1,31 +1,31 @@
-import dataclasses
-import importlib
-import json
+import importlib.util
 import logging
 import os
 import shutil
-import subprocess
 import sys
-from typing import TYPE_CHECKING, List, Literal, Set, Type
+from typing import TYPE_CHECKING, List, Set, Type
 
-import nbformat as nbf
-from jinja2 import Environment, FileSystemLoader
+from tabulate import tabulate
 
-from meerkat.constants import APP_DIR, BASE_DIR
+from meerkat.constants import (
+    JINJA_ENV,
+    MEERKAT_INIT_PROCESS,
+    MEERKAT_NPM_PACKAGE,
+    MEERKAT_RUN_ID,
+    MEERKAT_RUN_PROCESS,
+    MEERKAT_RUN_RELOAD_COUNT,
+    MEERKAT_RUN_SUBPROCESS,
+    App,
+    PathHelper,
+    write_file,
+)
 from meerkat.interactive import BaseComponent
-from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.tools.singleton import Singleton
 
 if TYPE_CHECKING:
     from meerkat.interactive import Page
 
 logger = logging.getLogger(__name__)
-
-NPM_PACKAGE = "@meerkat-ml/meerkat"
-_MK_REPO_APP_DIR = os.path.join(os.path.dirname(__file__), "app")
-
-jinja_env = Environment(
-    loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates"))
-)
 
 
 def get_subclasses_recursive(cls: type) -> List[type]:
@@ -44,147 +44,43 @@ def get_subclasses_recursive(cls: type) -> List[type]:
     return subclasses
 
 
-@dataclasses.dataclass
-class SvelteWriter:
+class SvelteWriter(metaclass=Singleton):
     """Class that handles writing Svelte components to the Meerkat app."""
 
-    appname: str = "meerkat_app"
-    cwd: str = dataclasses.field(default_factory=os.getcwd)
-    package_manager: Literal["bun", "npm"] = "npm"
-    _appdir: str = None
-    _has_brew: bool = None
+    def __init__(self):
+        self.app = App(appdir=PathHelper().appdir)
 
-    def __post_init__(self):
-        if self._appdir:
-            # User defined appdir
-            return
-        if os.path.exists(os.path.join(self.cwd, "app")):
-            # Otherwise, check if we're in a Meerkat generated app
-            self._appdir = os.path.join(self.cwd, "app")
-        else:
-            self._appdir = APP_DIR
+        self._ran_import_app_components = False
+        self._components = None
+        self._frontend_components = None
 
     @property
     def appdir(self):
-        return self._appdir
+        return self.app.appdir
 
-    @property
-    def is_user_appdir(self) -> bool:
-        """Check if a Meerkat generated app can be used.
-
-        These apps are generated with the `mk init` command.
-        """
-        if os.path.exists(os.path.join(self.appdir, ".mk")):
-            return True
-        return False
-
-    @property
-    def has_brew(self) -> bool:
-        """Check if the user has homebrew installed."""
-        if self._has_brew is None:
-            self._has_brew = subprocess.run(["which", "brew"]).returncode == 0
-        return self._has_brew
-
-    def cleanup_run(self):
-        """Cleanup the app directory at the end of a run."""
-        self.remove_all_component_wrappers()
-        self.remove_component_context()
-        logger.debug("Removed all component wrappers and ComponentContext.svelte.")
-
-    def init_run(self):
+    def run(self):
         """Write component wrappers and context at the start of a run.
 
         Called by the `mk run` CLI, `Page.__init__` constructor and
         `mk.gui.start` function.
         """
         self.import_app_components()
-        self.cleanup_run()
-        self.write_all_component_wrappers()  # src/lib/components/wrappers
+        self.cleanup()
+        self.write_all_component_wrappers()  # src/lib/wrappers/
         self.write_component_context()  # ComponentContext.svelte
 
-    def create_app(self):
-        """Configure and setup the app for Meerkat."""
-        # These need to be done first, .mk allows Meerkat
-        # to recognize the app as a Meerkat app
-        self.write_libdir()  # src/lib
-        self.write_dot_mk()  # .mk file
-
-        # Write an ExampleComponent.svelte and __init__.py file
-        # and a script example.py that uses the component
-        self.write_example_component()
-        self.write_example_py()
-        self.write_example_ipynb()
-
-        self.write_app_css()  # app.css
-        self.write_constants_js()  # constants.js
-        self.write_svelte_config()  # svelte.config.js
-        self.write_tailwind_config()  # tailwind.config.cjs
-
-        self.import_app_components()
-        self.write_all_component_wrappers()  # src/lib/components/wrappers
-        self.write_component_context()  # ComponentContext.svelte
-        self.write_layout()  # +layout.svelte, layout.js
-        self.write_root_route_alternate()  # +page.svelte
-        self.write_slug_route()  # [slug]/+page.svelte
-
-        self.write_gitignore()  # .gitignore
-        self.write_setup_py()  # setup.py
-
-        self.copy_banner_small()  # banner_small.png
-        self.copy_favicon()  # favicon.png
-
-    def add_svelte(self):
-        return subprocess.run(
-            [self.package_manager, "add", "create-svelte@latest"],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-
-    def copy_banner_small(self):
-        """Copy the Meerkat banner to the new app."""
-        # Get path to banner at
-        # "meerkat/interactive/app/src/lib/assets/banner_small.png"
-        banner_path = os.path.join(
-            BASE_DIR,
-            "meerkat",
-            "interactive",
-            "app",
-            "src",
-            "lib",
-            "assets",
-            "banner_small.png",
-        )
-
-        # Copy banner to the new app
-        dir = f"{self.appdir}/src/lib/assets"
-        os.makedirs(dir, exist_ok=True)
-        shutil.copy(banner_path, f"{dir}/banner_small.png")
-
-    def copy_favicon(self):
-        """Copy the Meerkat favicon to the new app."""
-        # Get path to favicon.png, at "meerkat/interactive/app/static/favicon.png"
-        favicon_path = os.path.join(
-            BASE_DIR,
-            "meerkat",
-            "interactive",
-            "app",
-            "static",
-            "favicon.png",
-        )
-
-        # Copy favicon.png to the new app
-        shutil.copy(favicon_path, f"{self.appdir}/static/favicon.png")
-
-    def delete_installer(self):
-        """Delete the Meerkat app installer directory."""
-        return subprocess.run(["rm", "-rf", "installer"])
+    def cleanup(self):
+        """Cleanup the app."""
+        self.remove_all_component_wrappers()
+        self.remove_component_context()
+        logger.debug("Removed all component wrappers and ComponentContext.svelte.")
 
     def get_all_components(
         self,
         exclude_classes: Set[str] = {"Component", "BaseComponent"},
     ) -> List[Type["BaseComponent"]]:
-        """Get all subclasses of BaseComponent, excluding the ones in
+        """
+        Get all subclasses of BaseComponent, excluding the ones in
         `exclude_classes`.
 
         Args:
@@ -195,9 +91,8 @@ class SvelteWriter:
             List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
         """
         # from meerkat.interactive.startup import get_subclasses_recursive
-
-        # Import user components
-        self.import_app_components()
+        if self._components:
+            return self._components
 
         # Recursively find all subclasses of Component
         subclasses = get_subclasses_recursive(BaseComponent)
@@ -206,11 +101,24 @@ class SvelteWriter:
         subclasses = [c for c in subclasses if c.__name__ not in exclude_classes]
         subclasses = sorted(subclasses, key=lambda c: c.alias)
 
-        logger.debug(f"Found {len(subclasses)} components: {subclasses}")
+        logger.debug(
+            f"Found {len(subclasses)} components.\n"
+            f"{tabulate([[subclass.__module__, subclass.__name__] for subclass in subclasses])}"
+        )
 
+        self._components = subclasses
         return subclasses
 
     def get_all_frontend_components(self) -> List[Type["BaseComponent"]]:
+        """
+        Get all subclasses of BaseComponent that have a unique frontend_alias.
+
+        Returns:
+            List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
+        """
+        if self._frontend_components:
+            return self._frontend_components
+
         # Create a `frontend_components` list that contains the
         # components that have unique component.frontend_alias
         components = self.get_all_components()
@@ -221,111 +129,42 @@ class SvelteWriter:
                 frontend_components.append(component)
                 aliases.add(component.frontend_alias)
 
+        self._frontend_components = frontend_components
         return frontend_components
 
     def import_app_components(self):
-        if self.is_user_appdir:
+        """
+        Import all components inside the app/src/lib/components directory
+        to register custom user components from their app.
+        """
+        if self._ran_import_app_components:
+            # Only run this once in a process
+            return
+
+        if self.app.is_user_app:
             # Import all components inside the app/src/lib/components
             # directory to register user components from the app
             # Otherwise do nothing
             logger.debug(
-                "In user appdir. Importing app components from app/src/lib/components."
+                "The app being run is as a user app. "
+                f"Adding {self.appdir} to sys.path. "
+                "Importing app components from app/src/lib/components."
             )
-            sys.path.append(self.cwd)
-            importlib.import_module("app.src.lib.components")
 
-    def install_bun(self):
-        return subprocess.run(
-            ["curl https://bun.sh/install | sh"],
-            check=True,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
+            # StackOverflow:
+            # How can I import a module dynamically given the full path?
+            # https://stackoverflow.com/a/67692
+            # This module name can be anything
+            module_name = "user.app.src.lib.components"
+            spec = importlib.util.spec_from_file_location(
+                module_name,
+                f"{self.appdir}/src/lib/components/__init__.py",
+            )
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
 
-    def install_tailwind(self):
-        return subprocess.run(
-            ["npx", "tailwindcss", "init", "tailwind.config.cjs", "-p"],
-            cwd=self.appdir,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-
-    def install_packages(self, cwd=None):
-        return subprocess.run(
-            [self.package_manager, "install"],
-            cwd=self.appdir if not cwd else cwd,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-
-    def install_node(self):
-        if subprocess.run(["which", "node"]).returncode == 0:
-            return
-
-        platform = sys.platform
-        if platform == "darwin":  # M1 Mac or Intel Mac
-            if not self.has_brew:
-                raise RuntimeError(
-                    "Homebrew is required to install Meerkat on M1 Macs. "
-                    "See these instructions: https://docs.brew.sh/Installation"
-                )
-            return subprocess.run(["brew install node"], check=True, shell=True)
-        elif platform == "linux":  # linux
-            if subprocess.run(["which npm"], shell=True).returncode == 0:
-                # Has npm, so has node
-                subprocess.run("npm install -g n", shell=True, check=True)
-                subprocess.run("n latest", shell=True, check=True)
-                subprocess.run("npm install -g npm", shell=True, check=True)
-                subprocess.run("hash -d npm", shell=True, check=True)
-                subprocess.run("nvm install node", shell=True, check=True)
-            else:
-                subprocess.run(
-                    "curl -fsSL https://deb.nodesource.com/setup_16.x | bash -",
-                    shell=True,
-                    check=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                )
-                subprocess.run("apt-get install gcc g++ make", shell=True, check=True)
-                subprocess.run("apt-get install -y nodejs", shell=True, check=True)
-        else:
-            raise RuntimeError(f"Unsupported platform '{platform}'")
-
-    def install_mk_app(self):
-        """Run `npm i` on the Meerkat interactive/app directory."""
-        return subprocess.run(
-            [f"cd '{_MK_REPO_APP_DIR}' && npm i"], shell=True, check=True
-        )
-
-    def npm_run_dev(self):
-        return subprocess.run(
-            [f"cd '{_MK_REPO_APP_DIR}' && npm run dev"], shell=True, check=True
-        )
-
-    def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
-        """Given a list of libraries, return the libraries that are installed
-        in the app directory.
-
-        Args:
-            libraries (List[str]): List of libraries to check
-
-        Returns:
-            List[str]: List of libraries that are installed
-        """
-        p = subprocess.run(
-            ["npm", "list"] + list(libraries) + ["--parseable", "--silent"],
-            cwd=self.appdir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-        output = p.stdout.decode("utf-8").splitlines()
-        # output consists of a list of paths to the installed package and
-        # omits libraries that are not installed
-        installed_libraries = [p for p in libraries for o in output if p in o]
-        return installed_libraries
+        self._ran_import_app_components = True
 
     def remove_all_component_wrappers(self):
         """Remove all component wrappers from the app."""
@@ -341,11 +180,9 @@ class SvelteWriter:
         except OSError:
             pass
 
-    def render_app_css(self):
-        return jinja_env.get_template("app.css").render()
-
     def render_component_context(self):
-        template = jinja_env.get_template("ComponentContext.svelte")
+        """Render the ComponentContext.svelte file for the app."""
+        template = JINJA_ENV.get_template("ComponentContext.svelte")
         components = self.get_all_components()
         frontend_components = self.get_all_frontend_components()
 
@@ -355,20 +192,20 @@ class SvelteWriter:
 
         # Filter to only include components and frontend components
         # whose libraries are installed
-        installed_libraries = self.filter_installed_libraries(libraries) + ["html"]
+        installed_libraries = self.app.filter_installed_libraries(libraries) + ["html"]
         components = [
             c
             for c in components
             if c.library in installed_libraries
-            or c.library == "@meerkat-ml/meerkat"
-            and not self.is_user_appdir
+            or c.library == MEERKAT_NPM_PACKAGE
+            and not self.app.is_user_app
         ]
         frontend_components = [
             c
             for c in frontend_components
             if c.library in installed_libraries
-            or c.library == "@meerkat-ml/meerkat"
-            and not self.is_user_appdir
+            or c.library == MEERKAT_NPM_PACKAGE
+            and not self.app.is_user_app
         ]
 
         return template.render(
@@ -378,7 +215,7 @@ class SvelteWriter:
 
     def render_component_wrapper(self, component: Type[BaseComponent]):
         # TODO: fix line breaks in Wrapper.svelte
-        template = jinja_env.get_template("Wrapper.svelte")
+        template = JINJA_ENV.get_template("Wrapper.svelte")
 
         return template.render(
             import_style=component.wrapper_import_style,
@@ -391,71 +228,15 @@ class SvelteWriter:
             slottable=component.slottable,
         )
 
-    def render_components_init_py(self):
-        return jinja_env.get_template("components.init.py").render()
-
-    def render_constants_js(self):
-        return jinja_env.get_template("constants.js").render()
-
-    def render_example_component(self):
-        return jinja_env.get_template("ExampleComponent.svelte").render()
-
-    def render_example_py(self):
-        return jinja_env.get_template("example.py").render()
-
-    def render_example_ipynb(self) -> nbf.NotebookNode:
-        nb = nbf.v4.new_notebook()
-        text = """# Interactive Notebook Example"""
-
-        code_1 = """\
-import meerkat as mk
-from app.src.lib.components import ExampleComponent
-
-# Launch the Meerkat GUI servers
-mk.gui.start(api_port=5000, frontend_port=8000)"""
-
-        code_2 = """\
-# Import and use the ExampleComponent
-example_component = ExampleComponent(name="Meerkat")
-
-# Run the page (startup may take a few seconds)
-page = mk.gui.Page(component=example_component, id="example", height="200px")
-page.launch()"""
-
-        nb["cells"] = [
-            nbf.v4.new_markdown_cell(text),
-            nbf.v4.new_code_cell(code_1),
-            nbf.v4.new_code_cell(code_2),
-        ]
-
-        return nb
-
-    def render_gitingore(self):
-        return jinja_env.get_template("gitignore.jinja").render()
-
-    def render_installer_js(self):
-        return jinja_env.get_template("installer/installer.js").render(
-            name=self.appname,
-        )
-
-    def render_installer_package_json(self):
-        return jinja_env.get_template("installer/package.json").render()
-
-    def render_layout(self):
-        return jinja_env.get_template("layout.svelte").render()
-
-    def render_layout_js(self):
-        return jinja_env.get_template("+layout.js").render()
-
     def get_import_prefix(self):
-        if self.is_user_appdir:
-            # Use the @meerkat-ml/meerkat package instead of $lib
+        if self.app.is_user_app:
+            # Use the MEERKAT_NPM_PACKAGE package instead of $lib
             # in a Meerkat generated app
-            return NPM_PACKAGE
+            return MEERKAT_NPM_PACKAGE
         return "$lib"
 
     def render_route(self, page: "Page"):
-        template = jinja_env.get_template("page.svelte.jinja")
+        template = JINJA_ENV.get_template("page.svelte.jinja")
 
         # TODO: make this similar to render_root_route
         #       and use component.frontend_alias and component.alias
@@ -468,7 +249,7 @@ page.launch()"""
         )
 
     def render_root_route(self):
-        template = jinja_env.get_template("page.root.svelte.jinja")
+        template = JINJA_ENV.get_template("page.root.svelte.jinja")
         components = self.get_all_components()
         frontend_components = self.get_all_frontend_components()
 
@@ -479,44 +260,13 @@ page.launch()"""
             frontend_components=frontend_components,
         )
 
-    def render_root_route_alternate(self):
-        return jinja_env.get_template("page.root.alternate.svelte").render()
-
-    def render_setup_py(self):
-        return jinja_env.get_template("setup.py").render()
-
-    def render_slug_route(self):
-        return jinja_env.get_template("page.slug.svelte.jinja").render()
-
-    def render_svelte_config(self):
-        return jinja_env.get_template("svelte.config.js").render()
-
-    def render_tailwind_config(self):
-        return jinja_env.get_template("tailwind.config.cjs").render()
-
-    def update_package_json(self):
-        # Update the package.json
-        #   Add "@meerkat-ml/meerkat" to dependencies
-        #   Add "tailwindcss" "postcss" "autoprefixer" to devDependencies
-        with open(f"{self.appdir}/package.json") as f:
-            package = json.load(f)
-
-        if "dependencies" not in package:
-            package["dependencies"] = {}
-        package["dependencies"][NPM_PACKAGE] = "latest"
-        package["dependencies"]["@sveltejs/adapter-static"] = "latest"
-
-        package["devDependencies"] = {
-            **package["devDependencies"],
-            **{
-                "tailwindcss": "latest",
-                "postcss": "latest",
-                "autoprefixer": "latest",
-            },
-        }
-
-        with open(f"{self.appdir}/package.json", "w") as f:
-            json.dump(package, f)
+    def write_component_wrapper(self, component: Type[BaseComponent]):
+        cwd = f"{self.appdir}/src/lib/wrappers/__{component.namespace}"
+        os.makedirs(cwd, exist_ok=True)
+        write_file(
+            f"{cwd}/{component.__name__}.svelte",
+            self.render_component_wrapper(component),
+        )
 
     def write_all_component_wrappers(
         self,
@@ -538,100 +288,36 @@ page.launch()"""
             # e.g. src/lib/wrappers/__meerkat/Component.svelte
             self.write_component_wrapper(subclass)
 
-    def write_app_css(self):
-        self.write_file(f"{self.appdir}/src/lib/app.css", self.render_app_css())
-
     def write_component_context(self):
-        self.write_file(
+        write_file(
             f"{self.appdir}/src/lib/ComponentContext.svelte",
             self.render_component_context(),
         )
 
-    def write_component_wrapper(self, component: Type[BaseComponent]):
-        cwd = f"{self.appdir}/src/lib/wrappers/__{component.namespace}"
-        os.makedirs(cwd, exist_ok=True)
-        self.write_file(
-            f"{cwd}/{component.__name__}.svelte",
-            self.render_component_wrapper(component),
-        )
 
-    def write_constants_js(self):
-        self.write_file(
-            f"{self.appdir}/src/lib/constants.js",
-            self.render_constants_js(),
-        )
+"""
+Convert all Python component classes to Svelte component wrappers.
 
-    def write_dot_mk(self):
-        self.write_file(f"{self.appdir}/.mk", "")
+We only run the following code if
+  - a script importing `meerkat` is run directly with Python e.g. `python myscript.py`
+  - a notebook importing `meerkat` is run directly with Jupyter
+  - a script was run with `mk run` and we are in the `mk run` process
+  - a script was run with `mk run`, we are in the `mk run` subprocess
+    and this is a live reload run (i.e. not the first run of the subprocess)
+"""
+if (
+    (not MEERKAT_RUN_PROCESS and not MEERKAT_RUN_SUBPROCESS)
+    or MEERKAT_RUN_PROCESS
+    or (MEERKAT_RUN_SUBPROCESS and MEERKAT_RUN_RELOAD_COUNT > 1)
+) and not MEERKAT_INIT_PROCESS:
+    logger.debug("Running SvelteWriter().run().")
+    SvelteWriter().run()
 
-    def write_example_component(self):
-        cwd = f"{self.appdir}/src/lib/components"
-        os.makedirs(cwd, exist_ok=True)
-
-        self.write_file(
-            f"{cwd}/ExampleComponent.svelte",
-            self.render_example_component(),
-        )
-        self.write_file(f"{cwd}/__init__.py", self.render_components_init_py())
-
-    def write_example_py(self):
-        self.write_file("example.py", self.render_example_py())
-
-    def write_example_ipynb(self):
-        with open("example.ipynb", "w") as f:
-            nbf.write(self.render_example_ipynb(), f)
-
-    def write_file(self, path: str, content: str):
-        with open(path, "w") as f:
-            f.write(content)
-
-    def write_installer(self):
-        os.makedirs("installer", exist_ok=True)
-        self.write_file("installer/package.json", self.render_installer_package_json())
-        self.write_file("installer/installer.js", self.render_installer_js())
-
-    def write_gitignore(self):
-        self.write_file(f"{self.appdir}/.gitignore", self.render_gitingore())
-
-    def write_layout(self):
-        self.write_file(
-            f"{self.appdir}/src/routes/+layout.svelte",
-            self.render_layout(),
-        )
-        self.write_file(
-            f"{self.appdir}/src/routes/+layout.js",
-            self.render_layout_js(),
-        )
-
-    def write_libdir(self):
-        os.makedirs(f"{self.appdir}/src/lib", exist_ok=True)
-
-    def write_root_route_alternate(self):
-        self.write_file(
-            f"{self.appdir}/src/routes/+page.svelte",
-            self.render_root_route_alternate(),
-        )
-
-    def write_setup_py(self):
-        self.write_file("setup.py", self.render_setup_py())
-
-    def write_slug_route(self):
-        os.makedirs(f"{self.appdir}/src/routes/[slug]", exist_ok=True)
-        self.write_file(
-            f"{self.appdir}/src/routes/[slug]/+page.svelte",
-            self.render_slug_route(),
-        )
-
-    def write_svelte_config(self):
-        self.write_file(f"{self.appdir}/svelte.config.js", self.render_svelte_config())
-
-    def write_tailwind_config(self):
-        self.write_file(
-            f"{self.appdir}/tailwind.config.cjs",
-            self.render_tailwind_config(),
-        )
-
-
-# Create an instance that can be used by other modules
-svelte_writer = SvelteWriter()
-# svelte_writer.init_run() # FIXME
+if MEERKAT_RUN_SUBPROCESS:
+    # Increment the MEERKAT_RUN_RELOAD_COUNT
+    # so that the subprocess knows that it has been reloaded
+    # on a subsequent live reload run
+    write_file(
+        f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload",
+        str(MEERKAT_RUN_RELOAD_COUNT + 1),
+    )

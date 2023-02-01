@@ -39,7 +39,7 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
-from meerkat.mixins.identifiable import classproperty
+from meerkat.tools.utils import classproperty
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
 from meerkat.ops.cond import cand, cnot, cor
@@ -54,6 +54,9 @@ from meerkat.ops.sliceby.groupby import groupby
 from meerkat.ops.sort import sort
 from meerkat.provenance import provenance
 from meerkat.row import Row
+
+# This statement needs to be after the imports above.
+import meerkat.interactive.svelte
 
 from .config import config
 
