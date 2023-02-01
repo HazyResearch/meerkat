@@ -1,4 +1,4 @@
-from meerkat.interactive.graph import Store, reactive
+from meerkat.interactive.graph import reactive
 
 
 @reactive
@@ -13,9 +13,8 @@ def cand(*args):
     Returns:
         The result of the and operation.
     """
-    inputs = [x.value if isinstance(x, Store) else x for x in args]
-    x = inputs[0]
-    for y in inputs[1:]:
+    x = args[0]
+    for y in args[1:]:
         x = x and y
     return x
 
@@ -32,11 +31,25 @@ def cor(*args):
     Returns:
         The result of the ``or`` operation.
     """
-    inputs = [x.value if isinstance(x, Store) else x for x in args]
-    x = inputs[0]
-    for y in inputs[1:]:
+    x = args[0]
+    for y in args[1:]:
         x = x or y
     return x
+
+
+@reactive
+def to_bool(x):
+    """Overloaded ``bool`` operator.
+
+    Use this when you want to use the ``bool`` operator on reactive values (e.g. Store).
+
+    Args:
+        x: The argument to convert to a bool.
+
+    Returns:
+        Store[bool] | bool: The result of the bool operation.
+    """
+    return bool(x)
 
 
 @reactive
@@ -51,6 +64,4 @@ def cnot(x):
     Returns:
         The result of the and operation.
     """
-    if isinstance(x, Store):
-        x = x.value
     return not x

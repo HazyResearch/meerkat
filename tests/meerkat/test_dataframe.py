@@ -1,6 +1,7 @@
 """Unittests for Datasets."""
 import os
 import tempfile
+import warnings
 from functools import wraps
 from itertools import product
 from typing import Dict, Sequence, Set
@@ -1339,11 +1340,27 @@ def test_reactivity_attributes_and_properties(name):
     assert not isinstance(out, mk.gui.Store)
 
 
+def test_reactivity_len():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        with pytest.warns(UserWarning):
+            length = len(df)
+    assert length == 10
+
+    # Warnings should not be raised if we are not in a reactive context.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        length = len(df)
+    assert length == 10
+
+
 def test_reactivity_contains():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
     store = mk.gui.Store("a")
     with mk.gui.react():
-        a_contains = df.__contains__(store)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            a_contains = df.contains(store)
     inode = a_contains.inode
 
     assert a_contains
@@ -1353,7 +1370,7 @@ def test_reactivity_contains():
     assert len(df.inode.trigger_children) == 1
     op = df.inode.trigger_children[0].obj
     assert isinstance(op, Operation)
-    assert op.fn.__name__ == "__contains__"
+    assert op.fn.__name__ == "contains"
     assert len(op.inode.trigger_children) == 1
     assert id(op.inode.trigger_children[0]) == id(a_contains.inode)
 
@@ -1365,7 +1382,8 @@ def test_reactivity_contains():
     # Store.__bool__ cannot return a bool due to cpython limitations.
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
     with mk.gui.react():
-        a_in = "a" in df
+        with pytest.warns(UserWarning):
+            a_in = "a" in df
     assert not isinstance(a_in, mk.gui.Store)
 
 
@@ -1422,7 +1440,7 @@ def test_reactivity_append(axis: str):
         assert inode.obj.columns == ["alpha", "beta", "c", "d"]
 
 
-def test_reactivity_getitem_column():
+def test_reactivity_getitem_multiple_columns():
     df = DataFrame(
         {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
     )
@@ -1450,14 +1468,21 @@ def test_reactivity_getitem_column():
     _set_store_or_df(df, DataFrame({"c": np.arange(5)}))
     assert np.all(inode.obj["c"] == np.arange(5))
 
+
+def test_reactivity_getitem_single_column():
     # TODO: We need to add support for column modifications in _update_result
     # in operation.
     df = DataFrame(
         {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
     )
+    store = mk.gui.Store("b")
+    with mk.gui.react():
+        df_col = df[store]
+    inode = df_col.inode
+
     _set_store_or_df(df, DataFrame({"c": np.arange(5)}))
-    store.set("a")
-    # assert np.all(inode.obj["a"] == np.arange(5))
+    store.set("c")
+    assert np.all(inode.obj["a"] == np.arange(5))
 
 
 def test_reactivity_getitem_slicing():

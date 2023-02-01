@@ -34,6 +34,7 @@ from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
 from meerkat.interactive.graph.reactivity import is_reactive, reactive
+from meerkat.interactive.graph.store import Store
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -139,21 +140,30 @@ class DataFrame(
         # __len__ is required to return an int. It cannot return a Store[int].
         # As such, it cannot be wrapped in `@reactive` decorator.
         # To get the length of a DataFrame in a reactive way, use `df.nrows`.
+        _len = self.nrows
         if is_reactive():
             warnings.warn(
                 "DataFrame.__len__ is not a reactive function. Use `df.nrows` to get"
                 "a reactive variable representing the number of rows in a DataFrame."
             )
-        return self.nrows
+        return _len.value if isinstance(_len, Store) else _len
 
-    @reactive
     def __contains__(self, item):
         # __contains__ is called when using the `in` keyword.
         # `in` casts the output to a boolean (i.e. `bool(output)`).
         # Store.__bool__ is not reactive because __bool__ has to return
         # a bool (not a Store). Thus, we cannot wrap __contains__ in
         # `@reactive` decorator.
+        if is_reactive():
+            warnings.warn(
+                "The `in` operator is not reactive. Use `df.contains(...)`:\n"
+                "\t >>> df.contains(item)"
+            )
         return item in self.columns
+
+    @reactive
+    def contains(self, item):
+        return self.__contains__(item)
 
     @property
     def data(self) -> BlockManager:

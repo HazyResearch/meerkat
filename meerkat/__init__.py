@@ -23,13 +23,16 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 import meerkat.interactive as gui
+
+# This statement needs to be after the imports above.
+import meerkat.interactive.svelte
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
 from meerkat.columns.deferred.audio import AudioColumn
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
-from meerkat.columns.deferred.image import image, ImageColumn
+from meerkat.columns.deferred.image import ImageColumn, image
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
@@ -39,10 +42,9 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
-from meerkat.tools.utils import classproperty
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
-from meerkat.ops.cond import cand, cnot, cor
+from meerkat.ops.cond import cand, cnot, cor, to_bool
 from meerkat.ops.embed import embed
 from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
@@ -54,9 +56,7 @@ from meerkat.ops.sliceby.groupby import groupby
 from meerkat.ops.sort import sort
 from meerkat.provenance import provenance
 from meerkat.row import Row
-
-# This statement needs to be after the imports above.
-import meerkat.interactive.svelte
+from meerkat.tools.utils import classproperty
 
 from .config import config
 
@@ -117,6 +117,7 @@ __all__ = [
     "cand",
     "cor",
     "cnot",
+    "to_bool",
     # <<<< I/O >>>>
     "from_csv",
     "from_json",

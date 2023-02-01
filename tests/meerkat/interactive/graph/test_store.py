@@ -148,3 +148,21 @@ def test_tuple_unpack_return_value(react: bool):
     else:
         assert not isinstance(a, mk.gui.Store) and isinstance(a, int)
         assert not isinstance(b, mk.gui.Store) and isinstance(b, int)
+
+
+@pytest.mark.parametrize("react", [False, True])
+def test_bool(react: bool):
+    store = mk.gui.Store(0)
+    with mk.gui.react(react):
+        if react:
+            with pytest.warns(UserWarning):
+                out_bool = bool(store)
+            with pytest.warns(UserWarning):
+                out_not = not store
+        else:
+            out_bool = bool(store)
+            out_not = not store
+
+    # Store.__bool__ is not reactive.
+    assert not isinstance(out_bool, mk.gui.Store)
+    assert not isinstance(out_not, mk.gui.Store)

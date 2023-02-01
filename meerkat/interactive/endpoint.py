@@ -8,7 +8,7 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.graph import Store, no_react, trigger
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -160,7 +160,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             name = self.fn.func.__name__
         else:
             name = None
-        return f"Endpoint(id={self.id}, name={name}, prefix={self.prefix}, route={self.route})"
+        return (
+            f"Endpoint(id={self.id}, name={name}, prefix={self.prefix}, "
+            f"route={self.route})"
+        )
 
     @staticmethod
     def _has_var_positional(foo):
@@ -254,7 +257,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
         try:
-            result = partial_fn()
+            # The function should not add any operations to the graph.
+            with no_react():
+                result = partial_fn()
         except Exception as e:
             # Unready the modification queue
             state.modification_queue.unready()
