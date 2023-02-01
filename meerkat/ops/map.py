@@ -441,31 +441,6 @@ def map(
     )
 
 
-from ray.data import Datasource
-from typing import List, Any
-from ray.data.block import BlockMetadata, Block
-from ray.data.datasource import WriteResult
-from ray.types import ObjectRef
-
-
-class NumPyDatasource(Datasource):
-    def __init__(self):
-        self._data = []
-
-    def do_write(
-        self,
-        blocks: List[ObjectRef[Block]],
-        metadata: List[BlockMetadata],
-        ray_remote_args: Dict[str, Any],
-        **write_args,
-    ) -> List[ObjectRef[WriteResult]]:
-        self._data.append(blocks)
-        return blocks
-    
-    def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
-        return 0
-
-
 def _materialize(
     data: Union["DataFrame", "Column"],
     batch_size: int,
@@ -523,10 +498,6 @@ def _materialize(
         for fn in reversed(fns):
             # TODO (dean): if batch_size > 1, then use map_batches
             pipe = pipe.map(fn)
-
-        datasource = NumPyDatasource()
-        pipe = pipe.write_datasource(datasource)
-        breakpoint()
 
         # Step 4: Collect the results
         # TODO (dean): support different output types
