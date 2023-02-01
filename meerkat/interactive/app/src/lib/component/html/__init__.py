@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import validator
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
-from meerkat.mixins.identifiable import classproperty
+from meerkat.tools.utils import classproperty
 
 
 class HtmlMixin:

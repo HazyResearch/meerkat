@@ -14,6 +14,9 @@ scratch/sabri/data
 
 *.mjs
 
+# .reload files
+*.reload
+
 # Note files
 notes.md
 

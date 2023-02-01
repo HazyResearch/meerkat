@@ -1,4 +1,4 @@
-from meerkat.mixins.identifiable import classproperty
+from meerkat.tools.utils import classproperty
 from ...abstract import Component
 
 

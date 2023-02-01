@@ -5,6 +5,7 @@ from typing import Dict, List, Literal, Set
 
 from pydantic import BaseModel, Extra, root_validator
 
+from meerkat.constants import MEERKAT_NPM_PACKAGE, PathHelper
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.interactive.frontend import FrontendMixin
@@ -26,27 +27,23 @@ class ComponentFrontend(BaseModel):
 class WrappableMixin:
     @classproperty
     def wrapper_import_style(cls) -> Literal["default", "named", "none"]:
-        from meerkat.interactive.svelte import SvelteWriter
-
-        svelte_writer = SvelteWriter()
-
         # TODO: this will create issues if users want to use plotly components
         # in mk init apps. In general, we need to make the library / namespace
         # distinction more explicit and this system more robust.
-        if cls.library == "@meerkat-ml/meerkat" and (
+        if cls.library == MEERKAT_NPM_PACKAGE and (
             cls.namespace == "meerkat" or cls.namespace == "plotly"
         ):
             # Meerkat components
-            if not svelte_writer.is_user_appdir:
+            if not PathHelper().is_user_app:
                 # In Meerkat package
                 # Use named import: import Something from "path/to/component";
                 return "named"
             else:
-                # Use default import: import { Something } from "@meerkat-ml/meerkat";
+                # Use default import: import { Something } from MEERKAT_NPM_PACKAGE;
                 return "default"
-        elif cls.library == "@meerkat-ml/meerkat":
+        elif cls.library == MEERKAT_NPM_PACKAGE:
             # Custom user components
-            if svelte_writer.is_user_appdir:
+            if PathHelper().is_user_app:
                 # Use named import: import Something from "path/to/component";
                 return "named"
             else:
@@ -206,7 +203,7 @@ class BaseComponent(
 
     @classproperty
     def library(cls):
-        return "@meerkat-ml/meerkat"
+        return MEERKAT_NPM_PACKAGE
 
     @classproperty
     def namespace(cls):
@@ -214,14 +211,12 @@ class BaseComponent(
 
     @classproperty
     def path(cls):
-        from meerkat.interactive.svelte import svelte_writer
-
-        if not cls.library == "@meerkat-ml/meerkat" or (
-            cls.library == "@meerkat-ml/meerkat"
+        if not cls.library == MEERKAT_NPM_PACKAGE or (
+            cls.library == MEERKAT_NPM_PACKAGE
             # KG: TODO: Temporary hack to be able to use multiple namespaces
             # for components provided natively in the Meerkat library.
             and (cls.namespace == "meerkat" or cls.namespace == "plotly")
-            and svelte_writer.is_user_appdir
+            and PathHelper().is_user_app
         ):
             return cls.library
 

@@ -13,12 +13,21 @@ import re
 import socket
 import subprocess
 import time
-from typing import List, Literal, Tuple
+from typing import Literal, Tuple
 
 import rich
 from uvicorn import Config
 
-from meerkat.constants import APP_DIR, BASE_DIR
+from meerkat.constants import (
+    MEERKAT_APP_DIR,
+    MEERKAT_BASE_DIR,
+    MEERKAT_RUN_ID,
+    MEERKAT_RUN_PROCESS,
+    MEERKAT_RUN_SUBPROCESS,
+    PathHelper,
+    is_notebook,
+    write_file,
+)
 from meerkat.interactive.api import MeerkatAPI
 from meerkat.interactive.server import (
     API_PORT,
@@ -27,7 +36,6 @@ from meerkat.interactive.server import (
     TRY_NUM_PORTS,
     Server,
 )
-from meerkat.interactive.svelte import SvelteWriter
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import APIInfo, FrontendInfo, state
 
@@ -44,25 +52,6 @@ def file_find_replace(directory, find, replace, pattern):
             s = re.sub(find, replace, s)
             with open(filepath, "w") as f:
                 f.write(s)
-
-
-def is_notebook() -> bool:
-    """Check if the current environment is a notebook.
-
-        Taken from
-        https://stackoverflow.com/questions/15411967/how-can-i-check-if-code\
-    -is-executed-in-the-ipython-notebook.
-    """
-    try:
-        shell = get_ipython().__class__.__name__
-        if shell == "ZMQInteractiveShell":
-            return True  # Jupyter notebook or qtconsole
-        elif shell == "TerminalInteractiveShell":
-            return False  # Terminal running IPython
-        else:
-            return False  # Other type (?)
-    except NameError:
-        return False  # Probably standard Python interpreter
 
 
 def get_first_available_port(initial: int, final: int) -> int:
@@ -168,8 +157,14 @@ def run_script(
         env["MEERKAT_API_URL"] = apiurl
     if debug:
         env["MEERKAT_LOGGING_LEVEL"] = "DEBUG"
-    env["MEERKAT_RUN"] = str(1)
+    env["MEERKAT_RUN_SUBPROCESS"] = str(1)
+    env["MEERKAT_RUN_SCRIPT_PATH"] = script
+    env["MEERKAT_RUN_ID"] = MEERKAT_RUN_ID
 
+    # Create a file that will be used to count the number of times the script has been
+    # reloaded. This is used by `SvelteWriter` to decide when to write the Svelte
+    # wrappers (see that class for more details).
+    write_file(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload", str(1))
     process = subprocess.Popen(
         [
             "uvicorn",
@@ -183,6 +178,7 @@ def run_script(
             "--factory",
         ]
         + (["--reload"] if dev else [])
+        + (["--reload-dir", os.path.dirname(script)] if dev else [])
         + (["--app-dir", os.path.dirname(script)]),
         env=env,
         stderr=subprocess.STDOUT,
@@ -210,7 +206,7 @@ def run_api_server(
 ) -> APIInfo:
     # Move to the base directory at meerkat/
     currdir = os.getcwd()
-    os.chdir(BASE_DIR)
+    os.chdir(MEERKAT_BASE_DIR)
 
     # Start the FastAPI server
     # Note: it isn't possible to support live reloading
@@ -298,22 +294,6 @@ file an issue on GitHub):
                 + process.stderr.read().decode("utf-8")
             )
     return process
-
-
-def get_subclasses_recursive(cls: type) -> List[type]:
-    """Recursively find all subclasses of a class.
-
-    Args:
-        cls (type): the class to find subclasses of.
-
-    Returns:
-        List[type]: a list of all subclasses of cls.
-    """
-    subclasses = []
-    for subclass in cls.__subclasses__():
-        subclasses.append(subclass)
-        subclasses.extend(get_subclasses_recursive(subclass))
-    return subclasses
 
 
 def run_frontend_prod(
@@ -430,7 +410,7 @@ def run_frontend(
     shareable: bool = False,
     subdomain: str = "app",
     apiurl: str = None,
-    appdir: str = APP_DIR,
+    appdir: str = MEERKAT_APP_DIR,
     skip_build: bool = False,
 ) -> FrontendInfo:
     """Run the frontend server.
@@ -553,17 +533,12 @@ def start(
     Returns:
         Tuple[APIInfo, FrontendInfo]: A tuple containing the APIInfo and FrontendInfo objects.
     """
-    in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
-    if in_mk_run_subprocess:
+    if MEERKAT_RUN_SUBPROCESS:
         rich.print(
             "Calling `start` from a script run with `mk run` has no effect. "
             "Continuing..."
         )
         return
-
-    from meerkat.interactive.svelte import svelte_writer
-
-    svelte_writer.init_run()
 
     # Run the API server
     api_info = run_api_server(api_server_name, api_port, dev, shareable, subdomain)
@@ -576,7 +551,7 @@ def start(
         shareable,
         subdomain,
         api_info.url,
-        svelte_writer.appdir,
+        PathHelper().appdir,
     )
 
     # Store in global state
@@ -586,13 +561,18 @@ def start(
     return api_info, frontend_info
 
 
+# TODO: @atexist.register doesn't work for notebooks, find a way to make it work
+# there.
 @atexit.register
 def cleanup():
     """Clean up Meerkat processes and files when exiting."""
-    # Shut down servers
-    in_mk_run_subprocess = int(os.environ.get("MEERKAT_RUN", 0))
-    if in_mk_run_subprocess:
+    if MEERKAT_RUN_SUBPROCESS:
+        # Don't clean up anything if running from the `mk run` subprocess.
         return
+
+    if MEERKAT_RUN_PROCESS:
+        # Remove the reload counter file if running from the `mk run` process.
+        os.remove(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload")
 
     if state.frontend_info or state.api_info:
         # Keep message inside if statement to avoid printing when not needed
@@ -601,6 +581,7 @@ def cleanup():
             "\n:electric_plug: Cleaning up [violet]Meerkat[/violet].\n" ":wave: Bye!",
         )
 
+    # Shut down servers
     if state.frontend_info is not None:
         if state.frontend_info.process:
             state.frontend_info.process.terminate()
@@ -613,26 +594,7 @@ def cleanup():
             state.api_info.process.terminate()
             state.api_info.process.wait()
 
-    svelte_writer = SvelteWriter()
-    # svelte_writer.cleanup_run()
-
-
-def output_startup_message(url: str, docs_url: str = None):
-    meerkat_header = "[bold violet]\[Meerkat][/bold violet]"  # noqa: W605
-
-    rich.print("")
-    rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green] Open interface at "
-        f"[turqoise]{url}[/turqoise]"
-    )
-    if docs_url:
-        rich.print(
-            f"{meerkat_header} [bold green]➜[/bold green] Open API docs at "
-            f"[turqoise]{docs_url}[/turqoise]"
-        )
-    rich.print(
-        f"{meerkat_header} [bold green]➜[/bold green] Interact with Meerkat "
-        "programatically with the console below. Use [yellow]quit()[/yellow] to end "
-        "session."
-    )
-    rich.print("")
+    # from meerkat.interactive.svelte import SvelteWriter
+    # TODO: this was causing issues earlier, but it seems to be working now.
+    # Investigate further and we can remove this comment.
+    # SvelteWriter().cleanup()
