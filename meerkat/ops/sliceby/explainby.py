@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Dict, List, Mapping, Sequence, Tuple, Union
 import numpy as np
 
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph.reactivity import reactive
 from meerkat.ops.explain import explain
 
 from .sliceby import SliceBy
@@ -24,6 +25,7 @@ class ExplainBy(SliceBy):
         super().__init__(data=data, by=by, sets=sets, scores=scores)
 
 
+@reactive
 def explainby(
     data: DataFrame,
     by: Union[str, Sequence[str]],

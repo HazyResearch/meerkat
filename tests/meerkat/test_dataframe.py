@@ -1488,3 +1488,15 @@ def test_reactivity_getitem_slicing():
     assert len(inode.obj) == 0
     _set_store_or_df(store, slice(0, 5))
     assert np.all(inode.obj["a"] == np.arange(5))
+
+
+def test_reactivity_keys():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    with mk.gui.react():
+        keys = df.keys()
+    inode = keys.inode
+
+    assert list(keys) == ["a", "b"]
+
+    _set_store_or_df(df, DataFrame({"c": np.arange(10)}))
+    assert list(inode.obj) == ["c"]
