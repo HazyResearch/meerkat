@@ -2,7 +2,6 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
-from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph.utils import _replace_nodes_with_nodeables
 from meerkat.interactive.modification import (
     DataFrameModification,
@@ -154,6 +153,7 @@ def _update_result(
     Returns:
         The updated result object.
     """
+    from meerkat.dataframe import DataFrame
     from meerkat.interactive.graph.store import Store
 
     if isinstance(result, DataFrame):
