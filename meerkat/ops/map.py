@@ -1,5 +1,5 @@
 from inspect import signature
-from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Type, Union
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView
@@ -76,7 +76,7 @@ def defer(
     batch_size: int = 1,
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
-    output_type: Union[Mapping[str, type], type] = None,
+    output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
     materialize: bool = True,
 ) -> Union["DataFrame", "DeferredColumn"]:
     """Create one or more DeferredColumns that lazily applies a function to
@@ -237,6 +237,7 @@ def defer(
     block = DeferredBlock.from_block_data(data=op)
 
     first_row = op._get(0) if len(op) > 0 else None
+    _infer_column_type([first_row])
 
     if outputs is None and isinstance(first_row, Dict):
         # support for splitting a dict into multiple columns without specifying outputs
@@ -440,6 +441,31 @@ def map(
     )
 
 
+from ray.data import Datasource
+from typing import List, Any
+from ray.data.block import BlockMetadata, Block
+from ray.data.datasource import WriteResult
+from ray.types import ObjectRef
+
+
+class NumPyDatasource(Datasource):
+    def __init__(self):
+        self._data = []
+
+    def do_write(
+        self,
+        blocks: List[ObjectRef[Block]],
+        metadata: List[BlockMetadata],
+        ray_remote_args: Dict[str, Any],
+        **write_args,
+    ) -> List[ObjectRef[WriteResult]]:
+        self._data.append(blocks)
+        return blocks
+    
+    def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
+        return 0
+
+
 def _materialize(
     data: Union["DataFrame", "Column"],
     batch_size: int,
@@ -497,6 +523,10 @@ def _materialize(
         for fn in reversed(fns):
             # TODO (dean): if batch_size > 1, then use map_batches
             pipe = pipe.map(fn)
+
+        datasource = NumPyDatasource()
+        pipe = pipe.write_datasource(datasource)
+        breakpoint()
 
         # Step 4: Collect the results
         # TODO (dean): support different output types
