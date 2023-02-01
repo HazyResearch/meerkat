@@ -1311,6 +1311,7 @@ def _set_store_or_df(store, value):
         "primary_key_name",
         "nrows",
         "ncols",
+        "shape",
     ],
 )
 def test_reactivity_attributes_and_properties(name):
@@ -1387,10 +1388,10 @@ def test_reactivity_contains():
     assert not isinstance(a_in, mk.gui.Store)
 
 
-def test_reactivity_shape():
+def test_reactivity_size():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
     with mk.gui.react():
-        shape = df.shape()
+        shape = df.size()
     inode = shape.inode
 
     assert shape == (10, 2)
@@ -1400,7 +1401,7 @@ def test_reactivity_shape():
     assert len(df.inode.trigger_children) == 1
     op = df.inode.trigger_children[0].obj
     assert isinstance(op, Operation)
-    assert op.fn.__name__ == "shape"
+    assert op.fn.__name__ == "size"
     assert len(op.inode.trigger_children) == 1
     assert id(op.inode.trigger_children[0]) == id(shape.inode)
 
@@ -1438,6 +1439,20 @@ def test_reactivity_append(axis: str):
             df, DataFrame({"alpha": np.arange(10), "beta": torch.arange(10)})
         )
         assert inode.obj.columns == ["alpha", "beta", "c", "d"]
+
+
+@pytest.mark.parametrize("op_name", ["head", "tail"])
+def test_reactivity_head_tail(op_name: str):
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        df_slice = getattr(df, op_name)()
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == op_name
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(df_slice.inode)
 
 
 def test_reactivity_getitem_multiple_columns():
@@ -1513,6 +1528,88 @@ def test_reactivity_getitem_slicing():
     assert len(inode.obj) == 0
     _set_store_or_df(store, slice(0, 5))
     assert np.all(inode.obj["a"] == np.arange(5))
+
+
+def test_reactivity_merge():
+    df1 = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    df2 = DataFrame({"a": np.arange(10), "d": torch.arange(20, 30)})
+    on = mk.gui.Store("a")
+    with mk.gui.react():
+        df_merge = df1.merge(df2, on=on)
+    inode = df_merge.inode
+
+    assert np.all(df_merge.to_pandas() == df1.merge(df2, on="a").to_pandas())
+    assert len(df1.inode.trigger_children) == 1
+    assert len(df2.inode.trigger_children) == 1
+    assert df1.inode.trigger_children[0].obj.fn.__name__ == "merge"
+    assert df2.inode.trigger_children[0].obj.fn.__name__ == "merge"
+
+    new_df = df1.copy()
+    new_df["a"][-1] = 20
+    _set_store_or_df(df1, new_df)
+    assert len(inode.obj) == 9
+
+
+def test_reactivity_sort():
+    a, b = np.arange(10), np.arange(20, 30)
+    np.random.shuffle(a)
+    np.random.shuffle(b)
+
+    df = DataFrame({"a": a, "b": b})
+    store = mk.gui.Store("a")
+    with mk.gui.react():
+        df_sort = df.sort(by=store)
+    inode = df_sort.inode
+
+    assert np.all(inode.obj["a"] == np.arange(10))
+
+    _set_store_or_df(store, "b")
+    assert np.all(inode.obj["b"] == np.arange(20, 30))
+
+
+def test_reactivity_sample():
+    df = DataFrame({"a": np.arange(100)})
+    frac = mk.gui.Store(0.1)
+    with mk.gui.react():
+        df_sample = df.sample(frac=frac)
+    inode = df_sample.inode
+
+    assert len(inode.obj) == 10
+
+    _set_store_or_df(frac, 0.2)
+    assert len(inode.obj) == 20
+
+
+def test_reactivity_rename():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    store = mk.gui.Store({"a": "c"})
+    with mk.gui.react():
+        df_rename = df.rename(mapper=store)
+    inode = df_rename.inode
+
+    assert list(inode.obj.keys()) == ["c", "b"]
+
+    # rename is an out-of-place method.
+    # renaming occurs on the source dataframe, which has columns "a" and "b".
+    # Calling `rename` with "b" -> "d" will operate on the source dataframe.
+    # Thus column "a" should still exist.
+    _set_store_or_df(store, {"b": "d"})
+    assert list(inode.obj.keys()) == ["a", "d"]
+
+
+def test_reactivity_drop():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    store = mk.gui.Store(["a"])
+    with mk.gui.react():
+        df_drop = df.drop(columns=store)
+    inode = df_drop.inode
+
+    assert list(inode.obj.keys()) == ["b"]
+
+    # drop is an out-of-place method.
+    # Thus, column "a" will still exist when `drop` is rerun with argument "b".
+    _set_store_or_df(store, ["b"])
+    assert list(inode.obj.keys()) == ["a"]
 
 
 def test_reactivity_keys():

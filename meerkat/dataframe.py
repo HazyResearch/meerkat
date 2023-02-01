@@ -143,7 +143,7 @@ class DataFrame(
         _len = self.nrows
         if is_reactive():
             warnings.warn(
-                "DataFrame.__len__ is not a reactive function. Use `df.nrows` to get"
+                "Calling len(dataframe) is not reactive. Use `df.nrows` to get"
                 "a reactive variable representing the number of rows in a DataFrame."
             )
         return _len.value if isinstance(_len, Store) else _len
@@ -157,7 +157,7 @@ class DataFrame(
         if is_reactive():
             warnings.warn(
                 "The `in` operator is not reactive. Use `df.contains(...)`:\n"
-                "\t >>> df.contains(item)"
+                "\t>>> df.contains(item)"
             )
         return item in self.columns
 
@@ -287,10 +287,15 @@ class DataFrame(
         """Number of rows in the DataFrame."""
         return self.data.ncols
 
-    @reactive(nested_return=False)
+    @property
     def shape(self):
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
+
+    @reactive(nested_return=False)
+    def size(self):
+        """Shape of the DataFrame (num_rows, num_columns)."""
+        return self.shape
 
     def add_column(self, name: str, data: Column.Columnable, overwrite=False) -> None:
         """Add a column to the DataFrame."""

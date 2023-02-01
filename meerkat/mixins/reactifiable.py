@@ -39,7 +39,7 @@ class ReactifiableMixin:
                 return super().__getattribute__(name)
 
             _fn.__name__ = name
-            _fn = reactive(_fn)
+            _fn = reactive(_fn, nested_return=False)
 
             return _fn(self)
         else:
