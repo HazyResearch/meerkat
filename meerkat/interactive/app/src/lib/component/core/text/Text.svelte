@@ -1,12 +1,16 @@
 <script lang="ts">
 	import {getContext} from 'svelte/internal';
+	import Markdown from '@magidoc/plugin-svelte-marked';
+
 
 	export let data: any;
 	export let view: string = 'line';
-	export let editable: boolean = true;
+	export let editable: boolean = false;
+	export let markdown: boolean = true;
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 </script>
+
 
 {#if view === 'line'}
 	{#if editable}
@@ -16,10 +20,14 @@
 			bind:value={data} 
 		/>
 	{:else}
+	<div class="text-ellipsis whitespace-nowrap overflow-hidden">
 		{data}
+	</div>
 	{/if}
-{:else}
-else
+{:else if view === 'wrapped'}
+	<div class="whitespace-pre-line">
+		<Markdown source={data} />
+	</div>
 {/if}
 <!-- 
 {#if view === 'logo'}

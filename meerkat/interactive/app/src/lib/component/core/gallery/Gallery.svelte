@@ -38,7 +38,7 @@
 		start: page * per_page,
 		end: (page + 1) * per_page,
 		columns: [main_column, ...tag_columns],
-		variants: ['small']
+		variants: ['gallery']
 	});
 
 	let dropdown_open: boolean = false;

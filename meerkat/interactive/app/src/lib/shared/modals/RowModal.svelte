@@ -19,15 +19,20 @@
 
 	const { fetch_chunk, fetch_schema } = getContext('Meerkat');
 
-	$: schema_promise = fetch_schema({df: df, variants: ["small"]}).then((schema) => {
+	$: schema_promise = fetch_schema({ df: df, variants: ['small'] }).then((schema) => {
 		if (main_column === undefined) {
 			main_column = schema.columns[0].name;
 		}
 		return schema;
 	});
 
-	$: main_chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], columns: [main_column]});
-	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], variants: ["tiny"]});
+	$: main_chunk_promise = fetch_chunk({
+		df: df,
+		posidxs: [posidx],
+		columns: [main_column],
+		variants: ['full_screen']
+	});
+	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
 
 	const increment = async () => {
 		let chunk = await chunk_promise;
@@ -132,7 +137,7 @@
 								</li>
 							</ul>
 						</div>
-					
+
 						<!-- Main column header -->
 						<div class="justify-self-center text-xl font-bold font-mono text-slate-600 ">
 							{main_column}

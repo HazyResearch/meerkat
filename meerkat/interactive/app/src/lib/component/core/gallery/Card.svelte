@@ -24,7 +24,7 @@
 	class:card-gimages={layout === 'gimages'}
 >
 	<!-- Pivot (main) element -->
-	<div class="relative">
+	<div class="relative  overflow-hidden">
 		{#if selected}
 			<div class="absolute top-2 left-2 z-10">
 				<Selected />
@@ -32,7 +32,7 @@
 		{/if}
 		<!-- Pivot item -->
 		<button
-			class="self-center rounded-sm hover:opacity-75"
+			class="self-center rounded-sm hover:opacity-75 aspect-video bg-white shadow-sm px-2"
 			style:height={`${height}vh`}
 			class:opacity-50={selected}
 			on:dblclick={(e) => {
