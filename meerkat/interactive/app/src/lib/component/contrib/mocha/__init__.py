@@ -5,6 +5,7 @@ from meerkat.ops.sliceby.sliceby import SliceBy
 from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
 from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
 from meerkat.interactive.app.src.lib.component.contrib.row import Row
+from meerkat.interactive.app.src.lib.component.contrib.global_stats import GlobalStats
 from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
 
 import numpy as np
@@ -29,6 +30,9 @@ class ChangeList(BaseComponent):
     slice_sort: BaseComponent
     slice_match: BaseComponent
     global_stats: BaseComponent
+    metric: str = "Accuracy", 
+    v1_name: str = None, 
+    v2_name: str = None,
 
     def __init__(
         self,
@@ -40,9 +44,15 @@ class ChangeList(BaseComponent):
         embed_column: str,
         repo_path: str,
         tag_columns: List[str] = None,
+        metric: str = "Accuracy", 
+        v1_name: str = None, 
+        v2_name: str = None,
     ):
         from mocha.repo import SliceRepo
         import meerkat as mk
+
+        v1_name = v1_name or v1_column
+        v2_name = v2_name or v2_column
 
         if tag_columns is None:
             tag_columns = []
@@ -204,7 +214,7 @@ class ChangeList(BaseComponent):
                 df=stats_df,
                 x=DELTA_COLUMN,
                 y="name",
-                x_label="Accuracy Shift (μ)",
+                x_label="Accuracy Shift",
                 y_label="slice",
                 metadata_columns=["count", "description"],
                 on_select=on_select_slice.partial(
@@ -219,9 +229,9 @@ class ChangeList(BaseComponent):
                 if not key:
                     return
                 df[column][df.primary_key._keyidx_to_posidx(key)] = value
-                # We have to force add the dataframe modification to trigger downstream updates
-                mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
-                mod.add_to_queue()
+                # # We have to force add the dataframe modification to trigger downstream updates
+                # mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
+                # mod.add_to_queue()
                 slice_repo.write()
 
             active_slice_view = Row(
@@ -287,7 +297,16 @@ class ChangeList(BaseComponent):
             on_discover=add_discovered_slices,
         )
 
-        stats = mk.gui.Stats(data={"count": len(current_examples)})
+        
+        stats = GlobalStats(
+            v1_name=v1_name,
+            v2_name=v2_name,
+            v1_mean=examples_df[v1_column].mean(),
+            v2_mean=examples_df[v2_column].mean(),
+            shift=examples_df[DELTA_COLUMN].mean(),
+            inconsistency=examples_df[DELTA_COLUMN].std(),
+            metric=metric
+        )
         super().__init__(
             gallery_match=match,
             gallery_filter=filter,
@@ -299,4 +318,7 @@ class ChangeList(BaseComponent):
             plot=plot,
             slice_sort=slice_sort,
             slice_match=sb_match,
+            v1_name=v1_name,
+            v2_name=v2_name,
+            metric=metric,
         )

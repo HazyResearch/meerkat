@@ -40,7 +40,7 @@
 		{/if}
 	</div>
 
-	<div id="fancy-tick-{id}" class="hidden">
+	<div id="fancy-tick-{id}" class="hidden  overflow-hidden">
 		<div class="grid grid-cols-[1fr_auto] items-center">
 			{name}
 			
@@ -49,7 +49,7 @@
 			<div class="font-bold">Count</div>
 			<div>{size}</div>
 			<div class="font-bold">ID</div>
-			<div>{id}</div>
+			<div class="whitespace-nowrap overflow-hidden text-ellipsis">{id}</div>
 		</div>
 	</div>
 </div>

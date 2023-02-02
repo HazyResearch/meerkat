@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ComponentType } from '$lib/utils/types';
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
+	import { InfoCircle } from 'svelte-bootstrap-icons';
 
 
 	export let gallery: ComponentType;
@@ -16,21 +17,28 @@
 	
 </script>
 
-<div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-5 max-width-100%">
-	<div class="grid grid-rows-[auto_auto_auto_auto_1fr] h-screen gap-5">
-		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
-			<div class="font-bold text-xl text-slate-800 self-center justify-self-center">
-				<span color="transparent" text-shadow="0 0 0 white">♨️</span> Mocha ChangeList
+<div class="grid grid-cols-[1fr_2fr] p-5 h-screen gap-12 max-width-100%">
+	<div class="grid grid-rows-[auto_auto_auto_auto_auto_1fr] h-screen gap-2">
+		<div class=" py-1 rounded-lg  z-40 flex flex-col">
+			<div class="font-bold font-mono text-xl text-slate-800 self-center justify-self-center">
+				ChangeList
 			</div>
 		</div>
+		<DynamicComponent {...global_stats} />
 		<DynamicComponent {...slice_match} />
 		<DynamicComponent {...slice_sort} />
-		<DynamicComponent {...discover} />
-		<!-- <DynamicComponent {...global_stats} /> -->
+		<!-- <DynamicComponent {...discover} /> -->
+		<div class=" px-2 py-1 bg-slate-100 rounded-md flex gap-1 align-center">
+			<InfoCircle/>
+			<div class="text-slate-800 text-left text-sm">
+				The plot below shows changes in performance across different data slices.
+				Click on a slice of data to bring it into focus on the right.
+			</div>
+		</div>
 		<DynamicComponent {...plot} />
 	</div>
 	<div class="grid grid-rows-[auto_auto_1fr] h-screen gap-5">
-		<div class="bg-violet-200 py-1 rounded-lg drop-shadow-md z-40 flex flex-col">
+		<div class=" py-1 rounded-lg  z-40 flex flex-col">
 			<div class="font-bold text-xl text-slate-800 self-center justify-self-center">
 				Slice Focus View
 			</div>

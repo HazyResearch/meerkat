@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fetch_schema } from '$lib/utils/api';
 	import type { DataFrameSchema } from '$lib/utils/dataframe';
+	import { ClipboardPlus, Trash } from 'svelte-bootstrap-icons';
 	import { dndzone } from 'svelte-dnd-action';
 	import Select from 'svelte-select';
 	import SvelteTooltip from 'svelte-tooltip';
@@ -105,23 +106,26 @@
 	}
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30 flex flex-col">
+<div class="bg-slate-100 py-2 rounded-lg  z-30 flex flex-col">
 	<div class="flex space-x-6">
 		{#if title != ''}
-			<div class="font-bold text-xl text-slate-600 self-start pl-2">
+			<div class="font-bold text-md text-slate-600 self-start pl-2">
 				{title}
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">
+
 			<button
 				on:click={addCriterion}
-				class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md"
-				>+ Add Sort</button
+				class="px-3 bg-slate-200 flex items-center gap-1.5 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<ClipboardPlus/> Add Sort
+			</button>
 			<button
 				on:click={handleClear}
-				class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"
+				class="px-2 flex items-center gap-1.5 bg-slate-200 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<Trash />
 				Clear
 			</button>
 		</div>

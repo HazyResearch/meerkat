@@ -25,9 +25,9 @@
 
 <div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2">
 	{#each Object.entries(data) as [k, v]}
-		<div class="bg-slate-100 rounded-md flex flex-col shadow-sm">
-			<div class="text-slate-400 px-3 py-1 self-center">{k}</div>
-			<div class="font-bold text-2xl self-center">
+		<div class="bg-slate-100 rounded-md flex flex-col shadow-sm py-0.5">
+			<div class="text-slate-400 text-md px-2 self-center">{k}</div>
+			<div class="font-bold text-xl self-center">
 				{format_number(v)}
 			</div>
 		</div>

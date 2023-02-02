@@ -55,6 +55,7 @@
     "type": "module",
     "dependencies": {
         "@datastructures-js/priority-queue": "^6.1.2",
+        "@magidoc/plugin-svelte-marked": "^3.2.1",
         "@svelteuidev/composables": "^0.7.7",
         "@types/underscore": "^1.11.4",
         "@zerodevx/svelte-json-view": "^1.0.1",

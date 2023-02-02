@@ -52,7 +52,7 @@
 	$: by_item = { value: by, label: by };
 </script>
 
-<div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
+<div class="bg-slate-100 py-1 rounded-lg z-50 flex flex-col">
 	<div class="form-control">
 		<div class="input-group w-100% flex items-center space-x-3">
 			<div class="px-3">
@@ -64,7 +64,7 @@
 			>
 				Discover
 			</button>
-			<div class="themed pr-2 w-48">
+			<!-- <div class="themed pr-2 w-48">
 				{#await items_promise}
 					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 				{:then items}
@@ -79,7 +79,7 @@
 						on:clear={handleClear}
 					/>
 				{/await}
-			</div>
+			</div> -->
 		</div>
 	</div>
 </div>

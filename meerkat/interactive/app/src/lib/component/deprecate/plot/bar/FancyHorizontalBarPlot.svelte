@@ -38,7 +38,7 @@
 		let min = Math.min(...data.map((d) => d.x));
 		let max = Math.max(...data.map((d) => d.x));
 		// return [0, max]
-		return [min - 0.05, max + 0.05];
+		return [Math.min(min, -max) - 0.05, Math.max(max, -min) + 0.05];
 		// return [floor(min, 1), ceil(max, 1)];
 	}
 
