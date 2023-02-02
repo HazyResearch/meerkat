@@ -1,7 +1,7 @@
 from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
-class CodeDisplay(Component):
+class Code(Component):
 
-    data: str
+    body: str
     language: str = "python"

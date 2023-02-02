@@ -1,5 +1,5 @@
 import meerkat as mk
-from meerkat.interactive.svelte import svelte_writer
+from meerkat.interactive.svelte import SvelteWriter
 
 
 def test_index_js():
@@ -35,7 +35,7 @@ def test_index_js():
     ]
 
     # Get the list of all components defined in Python for Meerkat
-    py_components = svelte_writer.get_all_components()
+    py_components = SvelteWriter().get_all_components()
 
     # Keep only the components that have library @meerkat-ml/meerkat
     py_components = sorted(

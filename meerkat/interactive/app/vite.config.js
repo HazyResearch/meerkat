@@ -17,7 +17,7 @@ const config = {
 		},
 
 		deps: {
-			inline: [/msw/]
+			inline: [/msw/, "vega-embed", "vega-loader", "vega-schema-url-parser"]
 		}
 	},
 

@@ -471,6 +471,7 @@ class MeerkatApp(App):
                 "tailwindcss": "latest",
                 "postcss": "latest",
                 "autoprefixer": "latest",
+                "@tailwindcss/typography": "latest",
                 "@sveltejs/adapter-static": "latest",
             },
             dev=True,
