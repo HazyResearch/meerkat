@@ -37,7 +37,7 @@
 	};
 </script>
 
-<div class="bg-slate-100 py-3 px-2 rounded-lg drop-shadow-md flex flex-col space-y-1">
+<div class="bg-slate-100 py-3 px-2 rounded-lg flex flex-col space-y-1">
 	{#if title != ''}
 		<div class="font-bold text-xl text-slate-600 self-start pl-2">
 			{title}
