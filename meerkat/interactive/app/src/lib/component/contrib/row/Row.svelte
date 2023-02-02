@@ -1,9 +1,8 @@
 <script lang="ts">
-	import type { DataFrameRef } from '$lib/api/dataframe';
 	import Cell from '$lib/shared/cell/Cell.svelte';
+	import { dispatch, fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-	import { getContext } from 'svelte';
-	import { fetch_chunk, fetch_schema, dispatch } from '$lib/utils/api';
 
 	export let df: DataFrameRef;
 	export let selected_key: string;
@@ -30,10 +29,11 @@
 
 		dispatch(on_change.endpoint_id, {
 			detail: {
-			key: selected_key,
-			column: column,
-			value: event.detail.value
-		}});
+				key: selected_key,
+				column: column,
+				value: event.detail.value
+			}
+		});
 	};
 </script>
 
@@ -85,10 +85,7 @@
 							{#if rows == null}
 								No selection
 							{:else}
-								<Cell
-									{...rows.get_cell(0, column)}
-									percentage={false}
-								/>
+								<Cell {...rows.get_cell(0, column)} percentage={false} />
 							{/if}
 						{/await}
 					</div>
