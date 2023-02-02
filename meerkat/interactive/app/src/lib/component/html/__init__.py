@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import validator
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
+from meerkat.interactive.endpoint import Endpoint
 from meerkat.tools.utils import classproperty
 
 
@@ -28,7 +29,6 @@ class a(Slottable, HtmlMixin, Component):
 class div(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
-
 
 class flex(div):
 
@@ -98,10 +98,22 @@ class h5(Slottable, HtmlMixin, Component):
     classes: Optional[str] = "text-lg"
     style: Optional[str] = None
 
-
 class h6(Slottable, HtmlMixin, Component):
     classes: Optional[str] = "text-md"
     style: Optional[str] = None
+
+
+# class radio(Slottable, HtmlMixin, Component):
+#     classes: Optional[str] = None
+#     style: Optional[str] = None
+
+#     name: str = ""
+#     value: str = ""
+#     checked: bool = False
+#     disabled: bool = False
+#     color: str = "purple"
+
+#     on_change: Optional[Endpoint] = None
 
 class svg(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None

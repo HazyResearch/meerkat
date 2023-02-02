@@ -11,8 +11,8 @@ from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
-from meerkat.mixins.identifiable import IdentifiableMixin, classproperty
-from meerkat.tools.utils import nested_apply
+from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.tools.utils import classproperty, nested_apply
 
 
 class ComponentFrontend(BaseModel):
@@ -307,6 +307,23 @@ class BaseComponent(
         return values
 
     @root_validator(pre=False)
+    def _update_cache(cls, values):
+        # `cls._cache` only contains the values that were passed in
+        # `values` contains all the values, including the ones that
+        # were not passed in
+
+        # Users might run validators on the class, which will
+        # update the `values` dict. We need to make sure that
+        # the values in `cls._cache` are updated as well.
+        for k, v in cls._cache.items():
+            if isinstance(v, Store):
+                v.set(values[k])
+            else:
+                cls._cache[k] = values[k]
+            # TODO: other types of objects that need to be updated
+        return values
+
+    @root_validator(pre=False)
     def _check_inode(cls, values):
         """Unwrap NodeMixin objects to their underlying Node (except Stores)."""
         values.update(cls._cache)
@@ -354,7 +371,12 @@ class Component(BaseComponent):
         # This is a workaround because Pydantic automatically converts
         # all Store objects to their underlying values when validating
         # the class. We need to keep the Store objects around.
+
+        # Cache all the Store objects
         cls._cache = values.copy()
+
+        # Convert all the Store objects to their underlying values
+        # and return the unwrapped values
         for name, value in values.items():
             if isinstance(value, Store):
                 values[name] = value.__wrapped__

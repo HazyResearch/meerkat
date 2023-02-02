@@ -1,0 +1,148 @@
+// Vitest Snapshot v1
+
+exports[`Radio > should render Radio 1`] = `
+<body>
+  <div>
+    <div
+      class="bg-violet-50 p-2 rounded-lg w-fit"
+    >
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="test"
+          type="radio"
+          value="1"
+        />
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+    </div>
+    <!--&lt;Radio&gt;-->
+  </div>
+  <div>
+    <div
+      class="bg-violet-50 p-2 rounded-lg w-fit"
+    >
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="test"
+          type="radio"
+          value="2"
+        />
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+    </div>
+    <!--&lt;Radio&gt;-->
+  </div>
+</body>
+`;
+
+exports[`Radio > should render Radio 2`] = `
+<body>
+  <div>
+    <div
+      class="bg-violet-50 p-2 rounded-lg w-fit"
+    >
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="test"
+          type="radio"
+          value="1"
+        />
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+    </div>
+    <!--&lt;Radio&gt;-->
+  </div>
+  <div>
+    <div
+      class="bg-violet-50 p-2 rounded-lg w-fit"
+    >
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="test"
+          type="radio"
+          value="2"
+        />
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+    </div>
+    <!--&lt;Radio&gt;-->
+  </div>
+</body>
+`;
+
+exports[`RadioGroup > should render RadioGroup 1`] = `
+<body>
+  <div>
+    <div
+      class="bg-violet-50 p-2 rounded-lg w-fit flex flex-row space-x-4"
+    >
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="radio-group"
+          type="radio"
+          value="1"
+        />
+        1
+         
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="radio-group"
+          type="radio"
+          value="2"
+        />
+        2
+         
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+      <label
+        class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"
+      >
+        <input
+          class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600"
+          name="radio-group"
+          type="radio"
+          value="3"
+        />
+        3
+         
+      </label>
+      
+      <!--&lt;Label&gt;-->
+      <!--&lt;Radio&gt;-->
+    </div>
+    <!--&lt;RadioGroup&gt;-->
+  </div>
+</body>
+`;

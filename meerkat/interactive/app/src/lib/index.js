@@ -17,7 +17,7 @@ export { default as Progress } from './component/_internal/progress/Progress.sve
 export { default as Button } from './component/core/button/Button.svelte';
 export { default as Chat } from './component/core/chat/Chat.svelte';
 export { default as Choice } from './component/core/choice/Choice.svelte';
-export { default as CodeDisplay } from './component/core/codedisplay/CodeDisplay.svelte';
+export { default as Code } from './component/core/code/Code.svelte';
 export { default as Document } from './component/core/document/Document.svelte';
 export { default as Editor } from './component/core/editor/Editor.svelte';
 export { default as FileUpload } from './component/core/fileupload/FileUpload.svelte';
@@ -45,7 +45,6 @@ export { default as Plot } from './component/plotly/plot/Plot.svelte';
 export { API_URL } from './constants.js';
 /** Shared Components */
 export { default as Page } from './shared/Page.svelte';
-export { default as Code } from './shared/cell/code/Code.svelte';
 export { default } from './utils/api';
 export { meerkat_writable } from './utils/stores.js';
 export { nestedMap } from './utils/tools.js';

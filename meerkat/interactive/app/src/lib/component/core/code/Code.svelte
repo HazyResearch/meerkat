@@ -11,11 +11,9 @@
 		| 'tomorrow'
 		| 'twilight';
 
-	export let data: string;
+	export let body: string;
 	export let language: string = 'python';
 	export let theme: PrismTheme = 'okaidia';
-
-	let html_code = Prism.highlight(data, Prism.languages.js, language);
 </script>
 
 <svelte:head>
@@ -26,5 +24,7 @@
 </svelte:head>
 
 <div class="whitespace-pre overflow-auto h-full max-h-[50vh] my-1 rounded-lg py-2 px-4 bg-black">
-	<pre><code class="language-{language}">{@html html_code}</code></pre>
+	<pre><code class="language-{language}"
+			>{@html Prism.highlight(body, Prism.languages.js, language)}</code
+		></pre>
 </div>

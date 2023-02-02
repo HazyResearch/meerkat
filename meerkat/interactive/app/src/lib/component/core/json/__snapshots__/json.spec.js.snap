@@ -1,0 +1,90 @@
+// Vitest Snapshot v1
+
+exports[`Json > should render json 1`] = `
+<body>
+  <div>
+    <div
+      class="font-mono text-sm text-gray-800 bg-purple-50 rounded-lg p-2 "
+      style="--jsonPaddingLeft: 2rem;"
+    >
+      <span
+        class="_jsonBkt s-cVbE4rjiLSRa"
+        role="button"
+        tabindex="0"
+      >
+        {
+      </span>
+       
+      <ul
+        class="_jsonList s-cVbE4rjiLSRa"
+      >
+        <li
+          class="s-cVbE4rjiLSRa"
+        >
+          <span
+            class="_jsonKey s-cVbE4rjiLSRa"
+          >
+            "
+            hello
+            "
+          </span>
+          <span
+            class="_jsonSep s-cVbE4rjiLSRa"
+          >
+            :
+          </span>
+           
+          <span
+            class="_jsonVal string s-cVbE4rjiLSRa"
+          >
+            "world"
+          </span>
+          <span
+            class="_jsonSep s-cVbE4rjiLSRa"
+          >
+            ,
+          </span>
+          
+           
+        </li>
+        <li
+          class="s-cVbE4rjiLSRa"
+        >
+          <span
+            class="_jsonKey s-cVbE4rjiLSRa"
+          >
+            "
+            foo
+            "
+          </span>
+          <span
+            class="_jsonSep s-cVbE4rjiLSRa"
+          >
+            :
+          </span>
+           
+          <span
+            class="_jsonVal string s-cVbE4rjiLSRa"
+          >
+            "bar"
+          </span>
+          
+           
+        </li>
+      </ul>
+       
+      <span
+        class="_jsonBkt s-cVbE4rjiLSRa"
+        role="button"
+        tabindex="0"
+      >
+        }
+      </span>
+      
+      
+      <!--&lt;JsonView&gt;-->
+    </div>
+    <!--&lt;Json&gt;-->
+  </div>
+</body>
+`;

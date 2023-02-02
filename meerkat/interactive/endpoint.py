@@ -493,7 +493,7 @@ def endpoint(
     prefix: Union[str, APIRouter] = None,
     route: str = None,
     method: str = "POST",
-):
+) -> Endpoint:
     """Decorator to mark a function as an endpoint.
 
     An endpoint is a function that can be called to
