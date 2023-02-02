@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
 	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
@@ -22,6 +22,9 @@
 	export let keys_to_remove: Array<string>;
 	export let can_remove: boolean = true;
 	export let on_select: Endpoint = null;
+	export let on_remove: Endpoint;
+
+
 
 	// The columns corresponding to metadata to track.
 	export let metadata_columns: Array<string>;
@@ -32,6 +35,11 @@
 
 	let page: number = 0;
 	let per_page: number = 30;
+
+
+	setContext('removeRow', (id: any) => {
+		dispatch(on_remove.endpoint_id, { detail: { slice_id: id } });
+	});
 
 	$: schema_promise = fetch_schema({ df: df });
 

@@ -24,7 +24,6 @@
 			rows_promise = null;
 		}
 	}
-	console.log(on_change)
 
 	let on_edit = async (event: any, column: string) => {
 		if (on_change === null) return;
@@ -62,6 +61,7 @@
 							<Cell
 								{...rows.get_cell(0, column)}
 								on:edit={(event) => on_edit(event, column)}
+								editable={true}
 							/>
 						{/if}
 					{/await}

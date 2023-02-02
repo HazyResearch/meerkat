@@ -102,6 +102,7 @@ class ChangeList(BaseComponent):
                     .drop("slice")
                 )
                 slices.remove_column("slice")
+
                 return out
 
             stats_df = compute_slice_scores(examples=examples_df, slices=slices_df)
@@ -132,8 +133,8 @@ class ChangeList(BaseComponent):
             # the filter for the gallery
             # TODO(sabri): make this default to the active slice
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
-            examples_df = filter(examples_df)
-            current_examples = sort(examples_df)
+            current_examples = filter(examples_df)
+            current_examples = sort(current_examples)
 
             # removing dirty entries does not use the returned criteria.
             # but we need to pass it as an argument so that the topological sort
@@ -147,7 +148,6 @@ class ChangeList(BaseComponent):
                 on_match=append_to_sort.partial(criteria=slice_sort.criteria),
             )
             stats_df, _ = sb_match()
-
             stats_df = slice_sort(stats_df)
 
             selected_slice_id = mk.gui.Store("")
@@ -191,17 +191,26 @@ class ChangeList(BaseComponent):
                 # TODO: Need mk.None
                 selected.set(slice_id or "")
 
+            @mk.gui.endpoint
+            def on_remove(slice_id: str, slices_df: mk.DataFrame):
+                slice_repo.remove(slice_id)
+                mod = mk.gui.DataFrameModification(
+                    id=slices_df.id, scope=slices_df.columns
+                )
+                mod.add_to_queue()
+                slice_repo.write()
+
             plot = Plot(
                 df=stats_df,
                 x=DELTA_COLUMN,
                 y="name",
                 x_label="Accuracy Shift (μ)",
                 y_label="slice",
-                metadata_columns=["count"],
-                keys_to_remove=[],
+                metadata_columns=["count", "description"],
                 on_select=on_select_slice.partial(
                     criteria=filter.criteria, selected=selected_slice_id
                 ),
+                on_remove=on_remove.partial(slices_df=slices_df),
             )
 
             @mk.gui.endpoint
@@ -213,6 +222,7 @@ class ChangeList(BaseComponent):
                 # We have to force add the dataframe modification to trigger downstream updates
                 mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
                 mod.add_to_queue()
+                slice_repo.write()
 
             active_slice_view = Row(
                 df=stats_df,
@@ -221,20 +231,27 @@ class ChangeList(BaseComponent):
                 stat_columns=["count", DELTA_COLUMN],
                 # rename={""}
                 title="Active Slice",
-                on_change=on_write_row.partial(df=slices_df) # the edits should be written on the slices_df
+                on_change=on_write_row.partial(
+                    df=slices_df
+                ),  # the edits should be written on the slices_df
             )
 
             @mk.gui.reactive
             def subselect_columns(df):
                 return df[
-                        list(set([
-                            main_column,
-                            DELTA_COLUMN,
-                            label_column,
-                            v1_column,
-                            v2_column,
-                            current_examples.primary_key_name,
-                        ] + tag_columns))
+                    list(
+                        set(
+                            [
+                                main_column,
+                                DELTA_COLUMN,
+                                label_column,
+                                v1_column,
+                                v2_column,
+                                current_examples.primary_key_name,
+                            ]
+                            + tag_columns
+                        )
+                    )
                 ]
 
             gallery = mk.gui.Gallery(
@@ -263,7 +280,7 @@ class ChangeList(BaseComponent):
             # add a sort by created time
 
         discover = Discover(
-            df=current_examples,
+            df=examples_df,
             by=embed_column,
             target=v1_column,
             pred=v2_column,

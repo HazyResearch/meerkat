@@ -25,4 +25,5 @@ class Plot(Component):
     metadata_columns: list = Field(default_factory=list)
 
     on_select: EndpointProperty = None
+    on_remove: EndpointProperty = None
 
