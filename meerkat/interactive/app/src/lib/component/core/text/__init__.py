@@ -25,7 +25,9 @@ class TextFormatter(Formatter):
             encode_kwargs={},
         ),
         "key_value": Variant(
-            props={"view": "line"},
+            props={
+                "view": "line"
+            },
             encode_kwargs={},
         ),
         "full_screen": Variant(

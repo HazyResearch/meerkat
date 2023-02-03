@@ -28,8 +28,8 @@
 		<DynamicComponent {...slice_match} />
 		<DynamicComponent {...slice_sort} />
 		<!-- <DynamicComponent {...discover} /> -->
-		<div class=" px-2 py-1 bg-slate-100 rounded-md flex gap-1 align-center">
-			<InfoCircle/>
+		<div class="px-3 py-1 bg-slate-100 rounded-md flex gap-4 items-center">
+			<InfoCircle width={32} height={32} class="text-violet-800"/>
 			<div class="text-slate-800 text-left text-sm">
 				The plot below shows changes in performance across different data slices.
 				Click on a slice of data to bring it into focus on the right.

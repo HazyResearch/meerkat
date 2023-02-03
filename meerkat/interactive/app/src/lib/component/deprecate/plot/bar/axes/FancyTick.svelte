@@ -28,7 +28,9 @@
 		class="bg-slate-100 z-10 rounded px-2 py-1 grid grid-cols-[1fr_auto]"
 		use:tippy={{ content: document.getElementById(`fancy-tick-${id}`)?.innerHTML }}
 	>
+		<div class="whitespace-nowrap overflow-hidden text-ellipsis">
 		{name}
+		</div>
 
 		{#if can_remove}
 			<button

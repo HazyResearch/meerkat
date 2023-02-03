@@ -32,7 +32,7 @@
 		{/if}
 		<!-- Pivot item -->
 		<button
-			class="self-center rounded-sm hover:opacity-75 bg-white shadow-sm overflow-hidden"
+			class="self-center rounded-sm hover:opacity-75 bg-white shadow-sm aspect-video overflow-hidden"
 			style:height={`${height}vh`}
 			class:opacity-50={selected}
 			on:dblclick={(e) => {

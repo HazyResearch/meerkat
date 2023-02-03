@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Stats from '$lib/component/core/stats/Stats.svelte';
 	import { ArrowRight } from 'svelte-bootstrap-icons';
+    import { InfoCircle } from 'svelte-bootstrap-icons';
+
 
 	export let v1_name: string;
 	export let v2_name: string;
@@ -17,10 +19,14 @@
 
 </script>
 
-<div>
-    <div class="text-slate-800 text-center py-2">
-        This <span class="font-mono">ChangeList</span> compares the performance of model versions:
+<div class="flex flex-col gap-2">
+    <div class="px-3 py-1 bg-slate-100 rounded-md flex gap-4 items-center">
+        <InfoCircle  class="text-violet-800"/>
+        <div class="text-slate-800 text-center text-left text-sm">
+            This <span class="font-mono">ChangeList</span> compares the performance of model versions:
+        </div>
     </div>
+
 	<div class="grid grid-cols-[1fr_auto_1fr] justify-items-center items-center">
         <div class="flex flex-col gap-1 items-center">
 		    <div class="font-bold text-slate-800 text-md rounded-sm bg-slate-100 px-2">{v1_name}</div>
