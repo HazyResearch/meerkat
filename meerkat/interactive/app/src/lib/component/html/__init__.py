@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import validator
 
-from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import BaseComponent, Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.tools.utils import classproperty
 
@@ -29,6 +29,15 @@ class a(Slottable, HtmlMixin, Component):
 class div(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
+
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
 
 class flex(div):
 

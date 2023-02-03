@@ -4,14 +4,8 @@ import numpy as np
 from fastapi import HTTPException
 from pydantic import BaseModel, StrictInt, StrictStr
 
-from meerkat.columns.scalar import ScalarColumn
-from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.edit import EditTargetConfig
 from meerkat.interactive.endpoint import Endpoint, endpoint
-from meerkat.interactive.graph import trigger
-from meerkat.interactive.modification import DataFrameModification
-from meerkat.state import state
 
 
 class ColumnInfo(BaseModel):
@@ -31,7 +25,9 @@ class SchemaResponse(BaseModel):
 
 @endpoint(prefix="/df", route="/{df}/schema/")
 def schema(
-    df: DataFrame, columns: List[str] = None, variants: List[str] = None
+    df: DataFrame,
+    columns: List[str] = None,
+    variants: List[str] = None,
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
     return SchemaResponse(
@@ -43,7 +39,9 @@ def schema(
 
 
 def _get_column_infos(
-    df: DataFrame, columns: List[str] = None, variants: List[str] = None
+    df: DataFrame,
+    columns: List[str] = None,
+    variants: List[str] = None,
 ):
 
     if columns is None:
@@ -140,29 +138,3 @@ def rows(
         posidxs=posidxs,
         primary_key=df.primary_key_name,
     )
-
-
-@endpoint(prefix="/df", route="/{df}/remove_row_by_index/")
-def remove_row_by_index(df: DataFrame, row_index: int = Endpoint.EmbeddedBody()):
-    df = df[np.arange(len(df)) != row_index]
-
-    # Set the df so Meerkat knows it changed
-    df.set(df)
-
-
-@endpoint(prefix="/df", route="/{df}/edit/")
-def edit(
-    df: DataFrame,
-    value=Endpoint.EmbeddedBody(),  # don't set type
-    column: str = Endpoint.EmbeddedBody(),
-    row_id=Endpoint.EmbeddedBody(),
-    id_column: str = Endpoint.EmbeddedBody(),
-):
-
-    mask = df[id_column] == row_id
-    if mask.sum() == 0:
-        raise HTTPException(f"Row with id {row_id} not found in column {id_column}")
-    df[column][mask] = value
-
-    # Set the df so Meerkat knows it changed
-    df.set(df)

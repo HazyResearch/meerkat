@@ -1,5 +1,6 @@
-from typing import Any
-
+# TODO: Think about whether we can move to 
+# from typing_extensions import Protocol
+# in order to implement the EventInterface based type hints.
 
 class EventInterface:
     """
@@ -13,26 +14,4 @@ class EventInterface:
     ensure they have a signature that matches the keyword arguments defined
     in this class.
     """
-
     pass
-
-
-class OnClickInterface(EventInterface):
-    """
-    Interface for any on_click event.
-
-    This event is triggered when a user clicks on a component.
-    """
-
-    pass
-
-
-class OnChangeInterface(EventInterface):
-    """
-    Interface for any on_change event.
-
-    This event is triggered when a user changes the value of a component
-    e.g. radio button, checkbox, text input, etc.
-    """
-
-    value: Any

@@ -1,5 +1,7 @@
 from typing import Any, List, Optional, Union
 
+from pydantic import validator
+
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.event import OnChangeInterface
@@ -20,9 +22,18 @@ class Select(Component):
     """
 
     values: List[Any]
-    labels: List[str]
+    labels: List[str] = None
     value: Any = None
     disabled: bool = False
     classes: str = ""
 
     on_change: Optional[Endpoint[OnChangeInterface]] = None
+
+    @validator("labels", pre=True, always=True)
+    def set_labels(cls, v, values):
+        """
+        If labels are not provided, use the values as labels.
+        """
+        if v is None:
+            return values['values']
+        return v

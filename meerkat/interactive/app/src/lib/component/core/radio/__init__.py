@@ -2,6 +2,11 @@ from typing import List, Literal, Optional
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.event import EventInterface
+
+
+class OnChangeRadio(EventInterface):
+    index: int
 
 
 class Radio(Slottable, Component):
@@ -21,7 +26,13 @@ class Radio(Slottable, Component):
         color (Literal['blue', 'red', 'green', 'purple', 'teal', 'yellow', 'orange']): The color of this radio button.
         classes (str): The Tailwind classes to apply to the component.
 
-        on_change (Optional[Endpoint]): The endpoint to call when this radio button is selected.
+        on_change: The endpoint to call when this radio button is selected.
+            The endpoint must have the following signature:
+
+            `def on_change(index: int): ...`
+
+            with
+                index (int): The index of the selected radio button.
     """
 
     name: str
@@ -32,7 +43,11 @@ class Radio(Slottable, Component):
     ] = "purple"
     classes: str = "bg-violet-50 p-2 rounded-lg w-fit"
 
-    on_change: Optional[Endpoint] = None
+    on_change: Optional[Endpoint[OnChangeRadio]] = None
+
+
+class OnChangeRadioGroup(EventInterface):
+    index: int
 
 
 class RadioGroup(Component):
@@ -50,7 +65,13 @@ class RadioGroup(Component):
         color (Literal['blue', 'red', 'green', 'purple', 'teal', 'yellow', 'orange']): The color of the radio buttons.
         classes (str): The Tailwind classes to apply to the component.
 
-        on_change (Optional[Endpoint]): The endpoint to call when the selected radio button changes.
+        on_change: The endpoint to call when the selected radio button changes.
+            The endpoint must have the following signature:
+
+            `def on_change(index: int): ...`
+
+            with
+                index (int): The index of the selected radio button.
     """
 
     values: List[str]
@@ -62,4 +83,4 @@ class RadioGroup(Component):
     ] = "purple"
     classes: str = "bg-violet-50 p-2 rounded-lg w-fit"
 
-    on_change: Optional[Endpoint] = None
+    on_change: Optional[Endpoint[OnChangeRadioGroup]] = None
