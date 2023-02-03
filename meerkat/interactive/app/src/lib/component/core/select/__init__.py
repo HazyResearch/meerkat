@@ -4,12 +4,16 @@ from pydantic import validator
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
-from meerkat.interactive.event import OnChangeInterface
+from meerkat.interactive.event import EventInterface
+
+
+class OnChangeSelect(EventInterface):
+    value: Union[str, int, float, bool, None]
 
 
 class Select(Component):
     """
-    A selection dropdown, which can be used to select a single value from a list of options.
+    A selection dropdown that can be used to select a single value from a list of options.
 
     Args:
         values (List[Any]): A list of values to select from.
@@ -18,7 +22,14 @@ class Select(Component):
         disabled (bool): Whether the select is disabled.
         classes (str): The Tailwind classes to apply to the select.
 
-        on_change: An endpoint to call when the value changes.
+        on_change: The `Endpoint` to call when the selected value changes. \
+            It must have the following signature:
+
+            `(value: int)`
+
+            with
+                value (Union[str, int, float, bool, None]): The value of the \
+                selected radio button.
     """
 
     values: List[Any]
@@ -27,7 +38,7 @@ class Select(Component):
     disabled: bool = False
     classes: str = ""
 
-    on_change: Optional[Endpoint[OnChangeInterface]] = None
+    on_change: Optional[Endpoint[OnChangeSelect]] = None
 
     @validator("labels", pre=True, always=True)
     def set_labels(cls, v, values):
@@ -35,5 +46,5 @@ class Select(Component):
         If labels are not provided, use the values as labels.
         """
         if v is None:
-            return values['values']
+            return values["values"]
         return v

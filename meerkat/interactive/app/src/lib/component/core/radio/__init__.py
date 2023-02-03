@@ -26,10 +26,10 @@ class Radio(Slottable, Component):
         color (Literal['blue', 'red', 'green', 'purple', 'teal', 'yellow', 'orange']): The color of this radio button.
         classes (str): The Tailwind classes to apply to the component.
 
-        on_change: The endpoint to call when this radio button is selected.
-            The endpoint must have the following signature:
+        on_change: The `Endpoint` to call when this radio button is selected. \
+            It must have the following signature:
 
-            `def on_change(index: int): ...`
+            `(index: int)`
 
             with
                 index (int): The index of the selected radio button.
@@ -65,10 +65,10 @@ class RadioGroup(Component):
         color (Literal['blue', 'red', 'green', 'purple', 'teal', 'yellow', 'orange']): The color of the radio buttons.
         classes (str): The Tailwind classes to apply to the component.
 
-        on_change: The endpoint to call when the selected radio button changes.
-            The endpoint must have the following signature:
+        on_change: The `Endpoint` to call when the selected radio button changes. \
+            It must have the following signature:
 
-            `def on_change(index: int): ...`
+            `(index: int)`
 
             with
                 index (int): The index of the selected radio button.
