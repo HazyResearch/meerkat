@@ -16,6 +16,16 @@ from meerkat.tools.lazy_loader import LazyLoader
 torch = LazyLoader("torch")
 
 
+def is_subclass(v, cls):
+    """Check if `v` is a subclass of `cls`, with guard for TypeError."""
+    try:
+        _is_subclass = issubclass(v, cls)
+    except TypeError:
+        _is_subclass = False
+
+    return _is_subclass
+
+
 def has_var_kwargs(fn: Callable) -> bool:
     """Check if a function has variable keyword arguments e.g. **kwargs.
 
