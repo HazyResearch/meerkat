@@ -13,6 +13,7 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
+from meerkat.tools.utils import has_var_args
 
 logger = logging.getLogger(__name__)
 
@@ -165,19 +166,13 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             f"route={self.route})"
         )
 
-    @staticmethod
-    def _has_var_positional(foo):
-        # Check if `foo` has a `*args` parameter
-        signature = inspect.signature(foo)
-        return any(p.kind == p.VAR_POSITIONAL for p in signature.parameters.values())
-
     def _validate_fn(self):
         """Validate the function `fn`."""
         if not callable(self.fn):
             raise TypeError(f"Endpoint function {self.fn} is not callable.")
 
         # Disallow *args
-        if self._has_var_positional(self.fn):
+        if has_var_args(self.fn):
             raise TypeError(
                 f"Endpoint function {self.fn} has a `*args` parameter."
                 " Please use keyword arguments instead."

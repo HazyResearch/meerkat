@@ -471,13 +471,21 @@ class DataFrame(
         return self._get(slice(0, len(self), 1), materialize=True)
 
     def set(self, value: DataFrame):
-        # FIXME: This should not be called outside of an endpoint. Add explicit check
-        # fot that.
+        """
+        Set the data of this DataFrame to the data of another DataFrame.
+
+        This is used inside endpoints to tell Meerkat when a DataFrame has been
+        modified. Calling this method outside of an endpoint will not have any
+        effect on the graph.
+        """
         self._set_data(value._data)
         self._set_state(value._get_state())
 
         if self.has_inode():
             # Add a modification if it's on the graph
+            # TODO: think about what the scope should be.
+            #   How does `scope` relate to the the skip_fn mechanism
+            #   in Operation?
             mod = DataFrameModification(id=self.inode.id, scope=self.columns)
             mod.add_to_queue()
 

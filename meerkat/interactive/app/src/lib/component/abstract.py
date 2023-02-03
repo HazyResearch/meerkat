@@ -1,6 +1,8 @@
 import collections
 import inspect
 import os
+import typing
+import warnings
 from typing import Dict, List, Literal, Set
 
 from pydantic import BaseModel, Extra, root_validator
@@ -8,11 +10,12 @@ from pydantic import BaseModel, Extra, root_validator
 from meerkat.constants import MEERKAT_NPM_PACKAGE, PathHelper
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.tools.utils import classproperty, nested_apply
+from meerkat.tools.utils import classproperty, has_var_kwargs, nested_apply
 
 
 class ComponentFrontend(BaseModel):
@@ -304,6 +307,153 @@ class BaseComponent(
         # all Store objects to their underlying values when validating
         # the class. We need to keep the Store objects around.
         cls._cache = values.copy()
+        return values
+
+    @root_validator(pre=True)
+    def _endpoint_name_starts_with_on(cls, values):
+        """
+        Make sure that all `Endpoint` fields have a name that starts with `on_`.
+        """
+        # TODO: this shouldn't really be a validator, this needs to be run
+        # exactly once when the class is created.
+
+        # Iterate over all fields in the class
+        for k, v in cls.__fields__.items():
+            if issubclass(v.type_, Endpoint):
+                if not k.startswith("on_"):
+                    raise ValueError(
+                        f"Endpoint {k} must have a name that starts with `on_`"
+                    )
+        return values
+
+    @staticmethod
+    def _get_event_interface_from_typehint(type_hint):
+        """
+        Recurse on type hints to find all the Endpoint[EventInterface] types.
+
+        Only run this on the type hints of a Component, for fields that are
+        endpoints.
+
+        Returns:
+            EventInterface: The EventInterface that the endpoint expects. None if
+                the endpoint does not have a type hint for the EventInterface.
+        """
+        if isinstance(type_hint, typing._GenericAlias):
+            origin = typing.get_origin(type_hint)
+            args = typing.get_args(type_hint)
+
+            try:
+                is_endpoint_subclass = issubclass(origin, Endpoint)
+            except TypeError:
+                is_endpoint_subclass = False
+
+            if is_endpoint_subclass:
+                # Endpoint[XXX]
+                if len(args) != 1:
+                    raise TypeError(
+                        "Endpoint type hints should only have one EventInterface."
+                    )
+                if not issubclass(args[0], EventInterface):
+                    raise TypeError(
+                        "Endpoint type hints should be of type EventInterface."
+                    )
+                return args[0]
+            else:
+                # Alias[XXX]
+                for arg in args:
+                    out = BaseComponent._get_event_interface_from_typehint(arg)
+                    if out is not None:
+                        return out
+        return None
+
+    @root_validator(pre=True)
+    def _endpoint_signature_matches(cls, values):
+        """
+        Make sure that the signature of the Endpoint that is passed in matches
+        the parameter names and types that are sent from Svelte.
+
+        Procedurally, this validator:
+            - Gets the type hints for this BaseComponent subclass.
+            - Gets all fields that are endpoints.
+            - Gets the EventInterface from the Endpoint type hint.
+            - Gets the parameters from the EventInterface.
+            - Gets the function passed by the user.
+            - Gets the parameters from the function.
+            - Compares the two sets of parameters.
+        """
+
+        type_hints = typing.get_type_hints(cls)
+
+        # Get all fields that pydantic tells us are endpoints.
+        for field, value in cls.__fields__.items():
+            if not issubclass(value.type_, Endpoint):
+                continue
+
+            # Pull out the EventInterface from Endpoint.
+            event_interface = cls._get_event_interface_from_typehint(type_hints[field])
+            if event_interface is None:
+                warnings.warn(
+                    f"Endpoint `{field}` does not have a type hint. "
+                    "We recommend subclassing EventInterface to provide "
+                    "an explicit type hint to users."
+                )
+                continue
+
+            # Get the parameters from the EventInterface.
+            event_interface_params = typing.get_type_hints(event_interface).keys()
+
+            # Get the endpoint passed by the user.
+            endpoint = values[field]
+            # Raise an error if it's not an Endpoint.
+            if not isinstance(endpoint, Endpoint):
+                raise TypeError(
+                    f"Endpoint `{field}` should be of type Endpoint, "
+                    f"but is of type {type(endpoint)}."
+                )
+
+            fn = endpoint.fn
+            fn_signature = inspect.signature(fn)
+            fn_params = fn_signature.parameters.keys()
+
+            # Make sure that the parameters passed by the user are a superset of
+            # the parameters expected by the EventInterface.
+            # NOTE: if the function has a ** argument, which will absorb any extra
+            # parameters passed by the Svelte dispatch call. So we do not need to
+            # do the superset check.
+            remaining_params = event_interface_params - fn_params
+            if not has_var_kwargs(fn) and len(remaining_params) > 0:
+                raise TypeError(
+                    f"Endpoint `{field}` will be called with parameters: "
+                    f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    "\n"
+                    f"Function specified by the user is missing the following parameters: "
+                    f"{', '.join(f'`{param}`' for param in remaining_params)}. "
+                )
+
+            # Check that the frontend will provide all of the necessary arguments to call fn.
+            # i.e. fn should not have any remaining args once the frontend sends over the inputs.
+            # Do this by making a set of all fn parameters that don't have defaults.
+            # This set should be a subset of the EventInterface.parameters.
+
+            # Get all the parameters that don't have default values
+            required_fn_params = {
+                k: v
+                for k, v in fn_signature.parameters.items()
+                if v.default is v.empty
+                and v.kind not in (v.VAR_POSITIONAL, v.VAR_KEYWORD)
+            }
+
+            # Make sure that the EventInterface parameters are a super set of these
+            # required parameters.
+            if not set(required_fn_params).issubset(set(event_interface_params)):
+                raise TypeError(
+                    f"Endpoint `{field}` will be called with parameters: "
+                    f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    "\n"
+                    f"The function `{fn}` expects the following parameters: "
+                    f"{', '.join(f'`{param}`' for param in required_fn_params)}. "
+                )
+
         return values
 
     @root_validator(pre=False)

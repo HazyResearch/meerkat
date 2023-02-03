@@ -1,3 +1,4 @@
+import inspect
 import weakref
 from collections import defaultdict
 from collections.abc import Mapping
@@ -13,6 +14,34 @@ from yaml.constructor import ConstructorError
 from meerkat.tools.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
+
+
+def has_var_kwargs(fn: Callable) -> bool:
+    """Check if a function has variable keyword arguments e.g. **kwargs.
+
+    Args:
+        fn: The function to check.
+
+    Returns:
+        True if the function has variable keyword arguments, False otherwise.
+    """
+    sig = inspect.signature(fn)
+    params = sig.parameters.values()
+    return any([True for p in params if p.kind == p.VAR_KEYWORD])
+
+
+def has_var_args(fn: Callable) -> bool:
+    """Check if a function has variable positional arguments e.g. *args.
+
+    Args:
+        fn: The function to check.
+
+    Returns:
+        True if the function has variable positional arguments, False otherwise.
+    """
+    sig = inspect.signature(fn)
+    params = sig.parameters.values()
+    return any([True for p in params if p.kind == p.VAR_POSITIONAL])
 
 
 class classproperty(property):
