@@ -2,6 +2,7 @@ from typing import Any, List, Optional, Union
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.event import OnChangeInterface
 
 
 class Select(Component):
@@ -24,4 +25,4 @@ class Select(Component):
     disabled: bool = False
     classes: str = ""
 
-    on_change: Optional[Endpoint] = None
+    on_change: Optional[Endpoint[OnChangeInterface]] = None

@@ -444,6 +444,8 @@ class BaseComponent(
                 raise TypeError(
                     f"Endpoint `{field}` will be called with parameters: "
                     f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    f"Check the {event_interface.__name__} class to see what parameters "
+                    "are expected to be passed in."
                     "\n"
                     f"The function `{fn}` expects the following parameters: "
                     f"{', '.join(f'`{param}`' for param in required_fn_params)}. "
