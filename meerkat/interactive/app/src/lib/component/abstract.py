@@ -16,7 +16,7 @@ from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.tools.utils import classproperty, has_var_kwargs, nested_apply
+from meerkat.tools.utils import classproperty, has_var_kwargs, is_subclass, nested_apply
 
 
 class ComponentFrontend(BaseModel):
@@ -320,7 +320,7 @@ class BaseComponent(
 
         # Iterate over all fields in the class
         for k, v in cls.__fields__.items():
-            if issubclass(v.type_, Endpoint):
+            if is_subclass(v.type_, Endpoint):
                 if not k.startswith("on_"):
                     raise ValueError(
                         f"Endpoint {k} must have a name that starts with `on_`"
@@ -343,12 +343,7 @@ class BaseComponent(
             origin = _get_type_hint_origin(type_hint)
             args = _get_type_hint_args(type_hint)
 
-            try:
-                is_endpoint_subclass = issubclass(origin, Endpoint)
-            except TypeError:
-                is_endpoint_subclass = False
-
-            if is_endpoint_subclass:
+            if is_subclass(origin, Endpoint):
                 # Endpoint[XXX]
                 if len(args) != 1:
                     raise TypeError(
@@ -387,7 +382,7 @@ class BaseComponent(
 
         # Get all fields that pydantic tells us are endpoints.
         for field, value in cls.__fields__.items():
-            if not issubclass(value.type_, Endpoint):
+            if not is_subclass(value.type_, Endpoint):
                 continue
 
             # Pull out the EventInterface from Endpoint.
@@ -452,6 +447,8 @@ class BaseComponent(
                 raise TypeError(
                     f"Endpoint `{field}` will be called with parameters: "
                     f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    f"Check the {event_interface.__name__} class to see what parameters "
+                    "are expected to be passed in."
                     "\n"
                     f"The function `{fn}` expects the following parameters: "
                     f"{', '.join(f'`{param}`' for param in required_fn_params)}. "

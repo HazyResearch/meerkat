@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class EventInterface:
     """
     Defines the interface for an event.
@@ -16,7 +19,7 @@ class EventInterface:
 
 class OnClickInterface(EventInterface):
     """
-    Interface for the on:click event.
+    Interface for any on_click event.
 
     This event is triggered when a user clicks on a component.
     """
@@ -26,10 +29,10 @@ class OnClickInterface(EventInterface):
 
 class OnChangeInterface(EventInterface):
     """
-    Interface for the on:change event.
+    Interface for any on_change event.
 
     This event is triggered when a user changes the value of a component
     e.g. radio button, checkbox, text input, etc.
     """
 
-    value: str
+    value: Any
