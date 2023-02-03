@@ -59,11 +59,6 @@ class Page(IdentifiableMixin):
         self.height = height
         self.width = width
 
-        # # Call `init_run`
-        # # KG: TODO: figure out if we need this here.
-        # svelte_writer = SvelteWriter()
-        # svelte_writer.init_run()
-
     def __call__(self):
         """Return the FastAPI object, this allows Page objects to be
         targeted by uvicorn when running a script."""

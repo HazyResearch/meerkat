@@ -4,13 +4,14 @@
 	import { Avatar, Button, Textarea } from 'flowbite-svelte';
 	import { createEventDispatcher } from 'svelte';
 	import Message from './Message.svelte';
+
 	const eventDispatcher = createEventDispatcher();
 
 	export let df: DataFrameRef;
 	export let imgChatbot: string;
 	export let imgUser: string;
 
-	$: messages_promise = fetch_chunk({ df: df, start: 0, end: 100000 });
+	$: messages_promise = fetch_chunk({ df, start: 0, end: 100000 });
 
 	let value: string = '';
 	let send = () => {
@@ -19,8 +20,8 @@
 	};
 </script>
 
-<div class="bg-violet-100 p-4 rounded-lg flex flex-col h-full justify-between shadow-md">
-	<div class="flex flex-col-reverse overflow-y-scroll h-full">
+<div class="h-full bg-violet-100 p-4 rounded-lg flex flex-col justify-between shadow-md">
+	<div class="flex flex-col-reverse overflow-y-scroll">
 		{#await messages_promise then messages}
 			{#each messages.rows as _, i}
 				<Message
