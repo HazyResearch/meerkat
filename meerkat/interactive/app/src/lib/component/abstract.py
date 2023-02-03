@@ -1,6 +1,7 @@
 import collections
 import inspect
 import os
+import sys
 import typing
 import warnings
 from typing import Dict, List, Literal, Set
@@ -339,8 +340,8 @@ class BaseComponent(
                 the endpoint does not have a type hint for the EventInterface.
         """
         if isinstance(type_hint, typing._GenericAlias):
-            origin = typing.get_origin(type_hint)
-            args = typing.get_args(type_hint)
+            origin = _get_type_hint_origin(type_hint)
+            args = _get_type_hint_args(type_hint)
 
             try:
                 is_endpoint_subclass = issubclass(origin, Endpoint)
@@ -426,12 +427,14 @@ class BaseComponent(
                     f"Endpoint `{field}` will be called with parameters: "
                     f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
                     "\n"
-                    f"Function specified by the user is missing the following parameters: "
+                    f"Function specified by the user is missing the "
+                    "following parameters: "
                     f"{', '.join(f'`{param}`' for param in remaining_params)}. "
                 )
 
-            # Check that the frontend will provide all of the necessary arguments to call fn.
-            # i.e. fn should not have any remaining args once the frontend sends over the inputs.
+            # Check that the frontend will provide all of the necessary arguments
+            # to call fn. i.e. fn should not have any remaining args once the
+            # frontend sends over the inputs.
             # Do this by making a set of all fn parameters that don't have defaults.
             # This set should be a subset of the EventInterface.parameters.
 
@@ -558,3 +561,21 @@ class Component(BaseComponent):
                 value.attach_to_inode(value.create_inode())
 
         return values
+
+
+def _get_type_hint_args(type_hint):
+    """Get the arguments of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_args(type_hint)
+    else:
+        return type_hint.__args__
+
+
+def _get_type_hint_origin(type_hint):
+    """Get the origin of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_origin(type_hint)
+    else:
+        return type_hint.__origin__
