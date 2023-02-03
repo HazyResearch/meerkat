@@ -14,7 +14,7 @@ class Markdown(Component):
     Argument descriptions below are taken directly from the marked.js documentation.
 
     Args:
-        data: The markdown data to render.
+        body: The markdown data to render.
         classes: The Tailwind classes to apply to the component, see @tailwindcss/typography \
             for the classes that are specifically available to style this component.
         baseUrl: The base URL to use for relative links.

@@ -1,5 +1,5 @@
 from meerkat.interactive import Page, endpoint
-from meerkat.interactive.app.src.lib.component.button import Button
+from meerkat.interactive.app.src.lib.component.core.button import Button
 
 
 @endpoint

@@ -3,7 +3,7 @@ import meerkat as mk
 
 @mk.gui.endpoint
 def on_change(checked: bool):
-    print(checked)
+    print(checked, flush=True)
 
 
 checkbox = mk.gui.core.Checkbox(
