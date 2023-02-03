@@ -7,7 +7,17 @@ from fastapi import HTTPException
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
+
+
+class OnGetMatchSchemaMatch(EventInterface):
+    pass
+
+
+class OnMatchMatch(EventInterface):
+    against: str
+    match: str
 
 
 @endpoint
@@ -104,9 +114,8 @@ def set_criterion(
 
     except Exception as e:
         raise e
-    
-    return criterion
 
+    return criterion
 
 
 @dataclass
@@ -138,8 +147,8 @@ class Match(Component):
     encoder: str = "clip"
     title: str = "Match"
 
-    on_match: EndpointProperty = None
-    get_match_schema: EndpointProperty = None
+    on_match: EndpointProperty[OnMatchMatch] = None
+    get_match_schema: EndpointProperty[OnGetMatchSchemaMatch] = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -152,7 +161,7 @@ class Match(Component):
         self.get_match_schema = get_match_schema.partial(df=self.df)
 
         self.criterion: MatchCriterion = Store(
-            MatchCriterion(against=None, query=None, name=None), 
+            MatchCriterion(against=None, query=None, name=None),
             backend_only=True,
         )
 

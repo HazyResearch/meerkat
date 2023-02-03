@@ -1,6 +1,11 @@
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store
+
+
+class OnChangeToggle(EventInterface):
+    value: bool
 
 
 @endpoint
@@ -22,7 +27,7 @@ class Toggle(Component):
     title: str = ""
     value: bool = False
 
-    on_toggle: Endpoint = None
+    on_toggle: Endpoint[OnChangeToggle] = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

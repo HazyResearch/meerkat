@@ -1,7 +1,12 @@
-from typing import Optional, Union
+from typing import Any, Optional
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.event import EventInterface
+
+
+class OnChangeSlider(EventInterface):
+    value: Any
 
 
 class Slider(Component):
@@ -24,4 +29,4 @@ class Slider(Component):
     disabled: bool = False
     classes: str = "bg-violet-50 px-4 py-1 rounded-lg"
 
-    on_change: Optional[Endpoint] = None
+    on_change: Optional[Endpoint[OnChangeSlider]] = None
