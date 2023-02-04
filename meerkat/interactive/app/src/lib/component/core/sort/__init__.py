@@ -28,6 +28,7 @@ def _format_criteria(
         for criterion in criteria
     ]
 
+
 @reactive
 def sort_by_criteria(
     data: DataFrame,
@@ -67,7 +68,6 @@ class Sort(Component):
     criteria: Union[List[SortCriterion], SortCriterion] = Field(
         default_factory=lambda: []
     )
-    # criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"
 
     def __call__(self, df: DataFrame = None) -> DataFrame:

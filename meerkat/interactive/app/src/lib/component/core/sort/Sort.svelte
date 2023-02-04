@@ -13,6 +13,24 @@
 	export let criteria: SortCriterion[];
 	export let title: string = '';
 
+	// Users may change criteria rapidly on the frontend.
+	// As such, sort needs to be performant.
+	// We implement a smart debouncing mechanism that only triggers
+	// the sort when criteria has meaningfully changed. It ignores cases where:
+	//   1. The user changes an attribute of a criterion (e.g. value, ascending, etc.) 
+	//      to the same value.
+	//   2. The user removes an inactive criterion.
+	// In theory, all of this logic to skip the sort can (any maybe should) be
+	// executed on the backend. However, this will require a roundtrip to the
+	// backend every time an attribute of a criterion is changed, which can be slow.
+	//
+	// * One design is to have a frontend view of the criteria (i.e. criteria_frontend).
+	// If the criteria changes from the backend, the view will be reset to the criteria.
+	// This will ensure the frontend view is always up to date with the backend.
+	// When the user interacts with the frontend, they will be manipulating the frontend view.
+	// When the frontend view changes meaningfully, we will set the backend criteria to the 
+	// updated criteria.
+
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
 	let criteria_frontend: SortCriterion[] = [];
