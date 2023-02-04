@@ -252,8 +252,6 @@ def defer(
         # can only infer output type if the the input columns are nonempty
         if output_type is None and first_row is not None:
             output_type = infer_column_type([first_row])
-            print("debug 1", first_row)
-            print("output_type", output_type)
 
         if not isinstance(output_type, Type):
             raise ValueError(
@@ -270,8 +268,6 @@ def defer(
                 outputs[output_key]: infer_column_type([col])
                 for output_key, col in first_row.items()
             }
-            print("debug 2", first_row)
-            print("output_type", output_type)
         if not isinstance(output_type, Mapping):
             raise ValueError(
                 "Must provide a `output_type` mapping if `outputs` is a mapping."
@@ -454,6 +450,8 @@ def _materialize(
     num_blocks: int,
     blocks_per_window: int,
 ):
+    import logging
+    
     import numpy as np
     import pandas as pd
     import ray
@@ -461,12 +459,13 @@ def _materialize(
     from tqdm import tqdm
 
     import meerkat as mk
+    from meerkat.columns.abstract import column
 
     from .concat import concat
 
     if use_ray:
-        ray.init(ignore_reinit_error=True)
-        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
+        ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
+        ray.data.set_progress_bars(enabled=pbar)
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
@@ -523,30 +522,30 @@ def _materialize(
         ).__next__()
         result = []
         if data._output_type == mk.NumPyTensorColumn:
-            print("Using to_numpy_refs()")
             for partition in result_ds.to_numpy_refs():
                 result.append(ray.get(partition))
-            return np.stack(result)
+            return column(np.stack(result))
         elif data._output_type == mk.TorchTensorColumn:
-            print("Using to_torch()")
             for partition in result_ds.to_torch():
                 result.append(partition[0])
-            return torch.stack(result)
+            return column(torch.stack(result))
         elif data._output_type == mk.PandasScalarColumn:
-            print("Using to_pandas_refs()")
             for partition in result_ds.to_pandas_refs():
-                result.extend(ray.get(partition))
-            return result
+                result.append(ray.get(partition))
+            return column(pd.concat(result)["value"])
         elif data._output_type == mk.ArrowScalarColumn:
             print("Using to_arrow_refs()")
             for partition in result_ds.to_arrow_refs():
-                result.extend(ray.get(partition))
+                result.append(ray.get(partition)["value"].combine_chunks())
+            # from meerkat.columns.abstract import infer_column_type
+            # return infer_column_type(result)
             return result
+            import pyarrow as pa
+            return column(pa.concat_arrays(result))
         elif data._output_type == mk.ObjectColumn:
-            print("Using iter_batches()")
             for partition in result_ds.iter_batches():
                 result.extend(partition)
-            return result
+            return column(result)
         else:
             raise ValueError(f"Unsupported output type {data._output_type}.")
 
