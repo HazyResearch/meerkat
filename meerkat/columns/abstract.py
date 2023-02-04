@@ -276,7 +276,9 @@ class Column(
     def _get_default_formatter(self) -> "Formatter":
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
-        from meerkat.interactive.app.src.lib.component.core.scalar import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.core.scalar import (
+            ScalarFormatter,
+        )
 
         return ScalarFormatter()
 
@@ -652,6 +654,7 @@ class Column(
     def is_mmap(self):
         return False
 
+
 def infer_column_type(data: Sequence) -> Type[Column]:
 
     if isinstance(data, Column):
@@ -659,10 +662,12 @@ def infer_column_type(data: Sequence) -> Type[Column]:
 
     if isinstance(data, pd.Series):
         from .scalar.pandas import PandasScalarColumn
+
         return PandasScalarColumn
-    
+
     if isinstance(data, pa.Array):
         from .scalar.arrow import ArrowScalarColumn
+
         return ArrowScalarColumn
 
     if torch.is_tensor(data):
@@ -676,6 +681,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
     if isinstance(data, np.ndarray):
         if len(data.shape) == 1:
             from .scalar.pandas import PandasScalarColumn
+
             return PandasScalarColumn
         from .tensor.numpy import NumPyTensorColumn
 
@@ -683,13 +689,15 @@ def infer_column_type(data: Sequence) -> Type[Column]:
 
     if isinstance(data, Sequence):
         from .tensor.numpy import NumPyTensorColumn
-        if len(data) != 0 and (
-            isinstance(data[0], (np.ndarray, NumPyTensorColumn))
-        ):
+
+        if len(data) != 0 and (isinstance(data[0], (np.ndarray, NumPyTensorColumn))):
             return NumPyTensorColumn
 
         from .tensor.torch import TorchTensorColumn
-        if len(data) != 0 and (isinstance(data[0], TorchTensorColumn) or torch.is_tensor(data[0])):
+
+        if len(data) != 0 and (
+            isinstance(data[0], TorchTensorColumn) or torch.is_tensor(data[0])
+        ):
             return TorchTensorColumn
 
         if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
@@ -702,6 +710,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
         return ObjectColumn
     else:
         raise ValueError(f"Cannot create column out of data of type {type(data)}")
+
 
 def column(data: Sequence) -> Column:
     """Create a Meerkat column from data.
