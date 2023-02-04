@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from typing import Callable, Collection, Sequence, Union
+from typing import Callable, Collection, Sequence, Type, Union
 
 import dill
 import numpy as np
@@ -52,7 +52,7 @@ class DeferredColumn(Column):
     def __init__(
         self,
         data: Union[DeferredOp, BlockView],
-        output_type: type = None,
+        output_type: Type["Column"] = None,
         *args,
         **kwargs,
     ):

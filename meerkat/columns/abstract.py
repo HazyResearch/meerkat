@@ -344,7 +344,7 @@ class Column(
         batch_size: int = 1,
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
-        output_type: Union[Mapping[str, type], type] = None,
+        output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
         materialize: bool = True,
         **kwargs,
     ) -> Optional[Union[Dict, List, Column]]:
