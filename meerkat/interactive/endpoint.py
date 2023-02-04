@@ -470,7 +470,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         return v
 
 
-class EndpointProperty(Endpoint):
+class EndpointProperty(Endpoint, Generic[T]):
     pass
 
 

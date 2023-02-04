@@ -73,6 +73,9 @@ class ChangeList(BaseComponent):
         with mk.gui.react():
 
             examples_df = mk.merge(base_examples, membership_df, on=df.primary_key_name)
+
+            examples_df = mk.sample(examples_df, len(examples_df))
+            
             # SLICE OVERVIEW
             @mk.gui.reactive
             def compute_slice_scores(examples: mk.DataPanel, slices: mk.DataPanel):

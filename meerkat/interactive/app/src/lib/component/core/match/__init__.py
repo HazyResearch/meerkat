@@ -11,14 +11,6 @@ from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
 
-class OnGetMatchSchemaMatch(EventInterface):
-    pass
-
-
-class OnMatchMatch(EventInterface):
-    against: str
-    match: str
-
 
 @endpoint
 def get_match_schema(df: DataFrame):
@@ -126,6 +118,14 @@ class MatchCriterion:
     query_embedding: np.ndarray = None
 
 
+class OnGetMatchSchemaMatch(EventInterface):
+    pass
+
+
+class OnMatchMatch(EventInterface):
+    criterion: MatchCriterion
+
+
 @reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
@@ -147,8 +147,10 @@ class Match(Component):
     encoder: str = "clip"
     title: str = "Match"
 
-    on_match: EndpointProperty[OnMatchMatch] = None
-    get_match_schema: EndpointProperty[OnGetMatchSchemaMatch] = None
+    # TODO: Revisit this, how to deal with endpoint interfaces when there is composition
+    # and positional arguments
+    on_match: EndpointProperty = None
+    get_match_schema: EndpointProperty = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

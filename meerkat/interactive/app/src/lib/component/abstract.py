@@ -320,7 +320,11 @@ class BaseComponent(
 
         # Iterate over all fields in the class
         for k, v in cls.__fields__.items():
-            if is_subclass(v.type_, Endpoint):
+            # TODO: revisit this. Here we only enforce the on_* naming convention for 
+            # endpoints, not endpoint properties, but this should be reconsidered.
+            if is_subclass(v.type_, Endpoint) and not is_subclass(
+                v.type_, EndpointProperty
+            ):
                 if not k.startswith("on_"):
                     raise ValueError(
                         f"Endpoint {k} must have a name that starts with `on_`"
