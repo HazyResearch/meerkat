@@ -276,7 +276,7 @@ class Column(
     def _get_default_formatter(self) -> "Formatter":
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
-        from meerkat.interactive.app.src.lib.component.scalar import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.core.scalar import ScalarFormatter
 
         return ScalarFormatter()
 
