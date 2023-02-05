@@ -3,11 +3,13 @@
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
 	import { InfoCircle } from 'svelte-bootstrap-icons';
 
+	export let code_control: boolean = false;
 
 	export let gallery: ComponentType;
 	export let gallery_match: ComponentType;
 	export let gallery_filter: ComponentType;
 	export let gallery_sort: ComponentType;
+	export let gallery_code: ComponentType;
 	export let discover: ComponentType;
 	export let plot: ComponentType;
 	export let active_slice: ComponentType;
@@ -27,6 +29,7 @@
 		<DynamicComponent {...global_stats} />
 		<DynamicComponent {...slice_match} />
 		<DynamicComponent {...slice_sort} />
+
 		<!-- <DynamicComponent {...discover} /> -->
 		<div class="px-3 py-1 bg-slate-100 rounded-md flex gap-4 items-center">
 			<InfoCircle width={32} height={32} class="text-violet-800"/>
@@ -43,16 +46,19 @@
 				Slice Focus View
 			</div>
 		</div>
-		<div class="grid grid-rows-auto grid-flow-col gap-3">
+		<div class="grid grid-cols-[1fr_1fr] gap-3">
 			<div class="flex flex-col space-y-3">
 				<DynamicComponent {...active_slice} />
 				<!-- <StatsLabeler {...gallery_editor} /> -->
 			</div>
 			<div class="flex flex-col space-y-3">
 				<DynamicComponent {...gallery_match} />
-
-				<DynamicComponent {...gallery_filter} />
-				<DynamicComponent {...gallery_sort} />
+				{#if code_control}
+					<DynamicComponent {...gallery_code} />
+				{:else}
+					<DynamicComponent {...gallery_filter} />
+					<DynamicComponent {...gallery_sort} />
+				{/if}
 			</div>
 		</div>
 		<DynamicComponent {...gallery} />

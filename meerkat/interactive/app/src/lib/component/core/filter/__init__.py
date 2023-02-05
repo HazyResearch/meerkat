@@ -177,6 +177,7 @@ class Filter(Component):
     operations: Store[List[str]] = Field(
         default_factory=lambda: Store(list(_operator_str_to_func.keys()))
     )
+
     title: str = "Filter"
 
     def __call__(self, df: DataFrame = None) -> DataFrame:

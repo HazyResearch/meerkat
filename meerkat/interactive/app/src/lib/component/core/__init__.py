@@ -3,6 +3,7 @@ from .chat import Chat
 from .checkbox import Checkbox
 from .choice import Choice
 from .code import Code
+from .code_cell import CodeCell
 from .document import Document
 from .editor import Editor
 from .fileupload import FileUpload
@@ -36,6 +37,7 @@ __all__ = [
     "Checkbox",
     "Choice",
     "Code",
+    "CodeCell",
     "Document",
     "Editor",
     "FileUpload",

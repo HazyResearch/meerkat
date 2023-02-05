@@ -5,6 +5,7 @@ from .app.src.lib.component.abstract import BaseComponent, Component
 from .app.src.lib.component.contrib.mocha import ChangeList
 from .app.src.lib.component.core.button import Button
 from .app.src.lib.component.core.choice import Choice
+from .app.src.lib.component.core.code_cell import CodeCell
 from .app.src.lib.component.core.code import Code
 from .app.src.lib.component.core.document import Document
 from .app.src.lib.component.core.editor import Editor
@@ -90,6 +91,7 @@ __all__ = [
     "Caption",
     "Choice",
     "Code",
+    "CodeCell",
     "Document",
     "EditTarget",
     "Editor",

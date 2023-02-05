@@ -20,19 +20,22 @@ DELTA_COLUMN = "delta"
 
 class ChangeList(BaseComponent):
 
+    code_control: bool = False
+
     gallery: BaseComponent
     gallery_match: BaseComponent
     gallery_filter: BaseComponent
     gallery_sort: BaseComponent
+    gallery_code: BaseComponent
     discover: BaseComponent
     plot: BaseComponent
     active_slice: BaseComponent
     slice_sort: BaseComponent
     slice_match: BaseComponent
     global_stats: BaseComponent
-    metric: str = "Accuracy", 
-    v1_name: str = None, 
-    v2_name: str = None,
+    metric: str = ("Accuracy",)
+    v1_name: str = (None,)
+    v2_name: str = (None,)
 
     def __init__(
         self,
@@ -44,9 +47,10 @@ class ChangeList(BaseComponent):
         embed_column: str,
         repo_path: str,
         tag_columns: List[str] = None,
-        metric: str = "Accuracy", 
-        v1_name: str = None, 
+        metric: str = "Accuracy",
+        v1_name: str = None,
         v2_name: str = None,
+        code_control: bool = False,
     ):
         from mocha.repo import SliceRepo
         import meerkat as mk
@@ -75,7 +79,7 @@ class ChangeList(BaseComponent):
             examples_df = mk.merge(base_examples, membership_df, on=df.primary_key_name)
 
             examples_df = mk.sample(examples_df, len(examples_df))
-            
+
             # SLICE OVERVIEW
             @mk.gui.reactive
             def compute_slice_scores(examples: mk.DataPanel, slices: mk.DataPanel):
@@ -143,11 +147,14 @@ class ChangeList(BaseComponent):
                 df=examples_df, criteria=sort_criteria, title="Sort Examples"
             )
 
+
             # the filter for the gallery
             # TODO(sabri): make this default to the active slice
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
+            code = mk.gui.CodeCell()
             current_examples = filter(examples_df)
             current_examples = sort(current_examples)
+            current_examples = code(current_examples)
 
             # removing dirty entries does not use the returned criteria.
             # but we need to pass it as an argument so that the topological sort
@@ -163,11 +170,9 @@ class ChangeList(BaseComponent):
             stats_df, _ = sb_match()
             stats_df = slice_sort(stats_df)
 
-            selected_slice_id = mk.gui.Store("")
-
             @mk.gui.endpoint
             def on_select_slice(
-                slice_id: str, criteria: mk.gui.Store, selected: mk.gui.Store
+                slice_id: str, criteria: mk.gui.Store, code: str 
             ):
                 """Update the gallery filter criteria with the selected slice.
 
@@ -177,16 +182,17 @@ class ChangeList(BaseComponent):
                 with the new one.
                 """
                 source = "on_select_slice"
-                wrapped = [
-                    x if isinstance(x, FilterCriterion) else FilterCriterion(**x)
-                    for x in criteria
-                ]
-                on_select_criterion = [x for x in wrapped if x.source == source]
-                assert (
-                    len(on_select_criterion) <= 1
-                ), "Something went wrong - Cannot have more than one selected slice"
-                for x in on_select_criterion:
-                    wrapped.remove(x)
+                # wrapped = [
+                #     x if isinstance(x, FilterCriterion) else FilterCriterion(**x)
+                #     for x in criteria
+                # ]
+                # on_select_criterion = [x for x in wrapped if x.source == source]
+                # assert (
+                #     len(on_select_criterion) <= 1
+                # ), "Something went wrong - Cannot have more than one selected slice"
+                # for x in on_select_criterion:
+                #     wrapped.remove(x)
+                wrapped = []
 
                 if slice_id:
                     wrapped.append(
@@ -198,11 +204,11 @@ class ChangeList(BaseComponent):
                             source=source,
                         )
                     )
-
+                code.set("df")
                 criteria.set(wrapped)
                 # set to empty string if None
                 # TODO: Need mk.None
-                selected.set(slice_id or "")
+                # selected.set(slice_id or "")
 
             @mk.gui.endpoint
             def on_remove(slice_id: str, slices_df: mk.DataFrame):
@@ -212,6 +218,16 @@ class ChangeList(BaseComponent):
                 )
                 mod.add_to_queue()
                 slice_repo.write()
+            
+            @mk.gui.reactive
+            def get_selected_slice_id(criteria: List[FilterCriterion], code: str):
+                if len(criteria) == 1 and code == "df":
+                    criterion = criteria[0]
+                    if criterion.source == "on_select_slice":
+                        return slice_repo._slice_id(criterion.column)
+                return "" 
+            
+            selected_slice_id = get_selected_slice_id(filter.criteria, code.code)
 
             plot = Plot(
                 df=stats_df,
@@ -220,9 +236,7 @@ class ChangeList(BaseComponent):
                 x_label="Accuracy Shift",
                 y_label="slice",
                 metadata_columns=["count", "description"],
-                on_select=on_select_slice.partial(
-                    criteria=filter.criteria, selected=selected_slice_id
-                ),
+                on_select=on_select_slice.partial(criteria=filter.criteria, code=code.code),
                 on_remove=on_remove.partial(slices_df=slices_df),
             )
 
@@ -300,7 +314,6 @@ class ChangeList(BaseComponent):
             on_discover=add_discovered_slices,
         )
 
-        
         stats = GlobalStats(
             v1_name=v1_name,
             v2_name=v2_name,
@@ -308,12 +321,13 @@ class ChangeList(BaseComponent):
             v2_mean=examples_df[v2_column].mean(),
             shift=examples_df[DELTA_COLUMN].mean(),
             inconsistency=examples_df[DELTA_COLUMN].std(),
-            metric=metric
+            metric=metric,
         )
         super().__init__(
             gallery_match=match,
             gallery_filter=filter,
             gallery_sort=sort,
+            gallery_code=code,
             gallery=gallery,
             discover=discover,
             global_stats=stats,
@@ -324,4 +338,5 @@ class ChangeList(BaseComponent):
             v1_name=v1_name,
             v2_name=v2_name,
             metric=metric,
+            code_control=code_control,
         )

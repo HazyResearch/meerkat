@@ -34,7 +34,7 @@
 	let metadata: Array<any> = [];
 
 	let page: number = 0;
-	let per_page: number = 30;
+	let per_page: number = 15;
 
 
 	setContext('removeRow', (id: any) => {
