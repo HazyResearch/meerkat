@@ -114,12 +114,11 @@
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">
-
 			<button
 				on:click={addCriterion}
 				class="px-3 bg-slate-200 flex items-center gap-1.5 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
-				<ClipboardPlus/> Add Sort
+				<ClipboardPlus /> Add Sort
 			</button>
 			<button
 				on:click={handleClear}
