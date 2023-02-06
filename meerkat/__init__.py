@@ -80,6 +80,7 @@ from_huggingface = DataFrame.from_huggingface
 read = DataFrame.read
 
 # This statement needs to be after the imports above.
+# Do not move it.
 import meerkat.interactive.svelte
 
 __all__ = [
