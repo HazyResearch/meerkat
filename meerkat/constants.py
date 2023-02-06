@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -325,6 +326,27 @@ class App:
         # omits libraries that are not installed
         installed_libraries = [p for p in libraries for o in output if p in o]
         return installed_libraries
+
+    def get_mk_package_info(self) -> List[str]:
+        """Get the list of components available in the (currently)
+        installed Meerkat package. This is used to exclude components
+        that cannot be used in the app, specifically when writing 
+        ComponentContext.svelte.
+
+        Uses a heuristic that goes through the index.js file of the Meerkat
+        package and extracts components with a regex. It's not a problem if 
+        extra imports (that are not components) are included in this list, 
+        as long as all components are included.
+        """
+        package_path = os.path.join(self.appdir, "node_modules", MEERKAT_NPM_PACKAGE)
+        index_js_path = os.path.join(package_path, "index.js")
+        with open(index_js_path, "r") as f:
+            index_js = f.read()
+        components = re.findall(
+            r"export \{ default as (\w+) \}",
+            index_js,
+        )
+        return components
 
     def install(self, dev=False):
         """Run e.g. `npm install` on an app directory."""

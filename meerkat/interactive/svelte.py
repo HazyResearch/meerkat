@@ -59,8 +59,7 @@ class SvelteWriter(metaclass=Singleton):
         return self.app.appdir
 
     def run(self):
-        """Write component wrappers and context at the start of a run.
-        """
+        """Write component wrappers and context at the start of a run."""
         self.import_app_components()
         self.cleanup()
         self.write_all_component_wrappers()  # src/lib/wrappers/
@@ -203,6 +202,25 @@ class SvelteWriter(metaclass=Singleton):
             or c.library == MEERKAT_NPM_PACKAGE
             and not self.app.is_user_app
         ]
+
+        # For the Meerkat npm package, check the components offered by the
+        # user's installed version, and filter out the ones that aren't available
+        if MEERKAT_NPM_PACKAGE in installed_libraries and self.app.is_user_app:
+            mk_components = set([f"Meerkat{c}" for c in self.app.get_mk_package_info()])
+            components = [
+                c
+                for c in components
+                if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                or c.library != MEERKAT_NPM_PACKAGE
+            ]
+            frontend_components = [
+                c
+                for c in frontend_components
+                if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                or c.library != MEERKAT_NPM_PACKAGE
+            ]
 
         return template.render(
             components=components,
