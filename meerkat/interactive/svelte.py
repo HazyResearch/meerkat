@@ -206,21 +206,28 @@ class SvelteWriter(metaclass=Singleton):
         # For the Meerkat npm package, check the components offered by the
         # user's installed version, and filter out the ones that aren't available
         if MEERKAT_NPM_PACKAGE in installed_libraries and self.app.is_user_app:
-            mk_components = set([f"Meerkat{c}" for c in self.app.get_mk_package_info()])
-            components = [
-                c
-                for c in components
-                if (c.frontend_alias in mk_components and c.namespace == "meerkat")
-                or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
-                or c.library != MEERKAT_NPM_PACKAGE
-            ]
-            frontend_components = [
-                c
-                for c in frontend_components
-                if (c.frontend_alias in mk_components and c.namespace == "meerkat")
-                or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
-                or c.library != MEERKAT_NPM_PACKAGE
-            ]
+            try:
+                mk_components = set([f"Meerkat{c}" for c in self.app.get_mk_package_info()])
+                components = [
+                    c
+                    for c in components
+                    if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                    or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                    or c.library != MEERKAT_NPM_PACKAGE
+                ]
+                frontend_components = [
+                    c
+                    for c in frontend_components
+                    if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                    or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                    or c.library != MEERKAT_NPM_PACKAGE
+                ]
+            except Exception as e:
+                logger.error(
+                    "Error getting Meerkat package info. "
+                    "Components from the Meerkat npm package may not be available."
+                )
+                logger.debug(e)
 
         return template.render(
             components=components,
