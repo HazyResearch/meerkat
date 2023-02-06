@@ -13,14 +13,19 @@ from meerkat.interactive.graph import Store, no_react, react, reactive
 def base_on_run(
     new_query: str, query: str, df: DataFrame, criteria_df: DataFrame, manifest_session
 ):
-    if new_query == "":
+    if new_query == "" or new_query == "__default__":
         query.set("__default__")
+        return
+    
+    variables = {}
+    exec(new_query, None,  variables)
+    prompt, answers = variables["prompt"], variables["answers"]
 
     df = df.view()
 
     def _run_inference(question: Sequence[str]):
         return manifest_session.run(
-            [new_query.format(question=question) for question in question]
+            [prompt.format(question=question) for question in question]
         )
 
     # df = df.sample(100)  # TODO: remove this
@@ -31,7 +36,7 @@ def base_on_run(
         out = df.map(_run_inference, is_batched_fn=True, batch_size=200, pbar=True)
 
         criteria_df[column_name] = criteria_df.primary_key.isin(
-            df[out.str.contains("Yes")].primary_key
+            df[out.isin(answers)].primary_key
         )
 
     query.set(new_query)
@@ -39,7 +44,6 @@ def base_on_run(
 
 @reactive
 def filter_df(df: DataFrame, criteria_df: DataFrame, query: str):
-    print(criteria_df.columns)
     df = df[
         df.primary_key.isin(criteria_df.primary_key[criteria_df[_hash_query(query)]])
     ]

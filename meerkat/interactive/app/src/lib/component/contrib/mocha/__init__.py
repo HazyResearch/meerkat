@@ -156,6 +156,7 @@ class ChangeList(BaseComponent):
                 manifest_session=Manifest(
                     client_name = "huggingface",
                     client_connection = "http://127.0.0.1:7861",
+                    temperature=0.1
                 )
             )
             # code = mk.gui.FilterCodeCell(df=examples_df)

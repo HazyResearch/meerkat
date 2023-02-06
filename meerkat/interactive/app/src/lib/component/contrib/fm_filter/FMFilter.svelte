@@ -44,6 +44,6 @@
 
 </script>
 
-<div class="h-32 w-full rounded-md border-slate-400 bg-slate-100 pt-2 pb-1 px-1">
+<div class="h-48 w-full rounded-md border-slate-400 bg-slate-100 pt-2 pb-1 px-1">
 	<div bind:this={divEl} class="h-full w-full" />
 </div>
