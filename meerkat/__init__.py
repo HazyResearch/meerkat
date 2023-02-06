@@ -23,7 +23,6 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 import meerkat.interactive as gui
-
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
