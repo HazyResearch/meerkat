@@ -7,7 +7,7 @@ from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
 from meerkat.interactive.app.src.lib.component.contrib.row import Row
 from meerkat.interactive.app.src.lib.component.contrib.global_stats import GlobalStats
 from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
-from manifest import Manifest
+from meerkat.tools.lazy_loader import LazyLoader
 
 import numpy as np
 from ...abstract import BaseComponent
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from meerkat.dataframe import DataFrame
 
 
+manifest = LazyLoader('manifest')
 DELTA_COLUMN = "delta"
 
 
@@ -154,7 +155,7 @@ class ChangeList(BaseComponent):
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
             fm_filter = mk.gui.FMFilter(
                 df=examples_df, 
-                manifest_session=Manifest(
+                manifest_session=manifest.Manifest(
                     client_name = "huggingface",
                     client_connection = "http://127.0.0.1:7861",
                     temperature=0.1
