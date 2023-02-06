@@ -7,6 +7,7 @@ from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
 from meerkat.interactive.app.src.lib.component.contrib.row import Row
 from meerkat.interactive.app.src.lib.component.contrib.global_stats import GlobalStats
 from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
+from manifest import Manifest
 
 import numpy as np
 from ...abstract import BaseComponent
@@ -150,7 +151,14 @@ class ChangeList(BaseComponent):
             # the filter for the gallery
             # TODO(sabri): make this default to the active slice
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
-            code = mk.gui.CodeCell()
+            code = mk.gui.FMFilter(
+                df=examples_df, 
+                manifest_session=Manifest(
+                    client_name = "huggingface",
+                    client_connection = "http://127.0.0.1:7861",
+                )
+            )
+            # code = mk.gui.FilterCodeCell(df=examples_df)
             current_examples = filter(examples_df)
             current_examples = sort(current_examples)
             current_examples = code(current_examples)
@@ -201,7 +209,7 @@ class ChangeList(BaseComponent):
                             source=source,
                         )
                     )
-                code.set("df")
+                code.set("__default__")
                 criteria.set(wrapped)
                 # set to empty string if None
                 # TODO: Need mk.None
@@ -218,13 +226,13 @@ class ChangeList(BaseComponent):
 
             @mk.gui.reactive
             def get_selected_slice_id(criteria: List[FilterCriterion], code: str):
-                if len(criteria) == 1 and code == "df":
+                if len(criteria) == 1 and code == "__default__":
                     criterion = criteria[0]
                     if criterion.source == "on_select_slice":
                         return slice_repo._slice_id(criterion.column)
                 return ""
 
-            selected_slice_id = get_selected_slice_id(filter.criteria, code.code)
+            selected_slice_id = get_selected_slice_id(filter.criteria, code.query)
 
             plot = Plot(
                 df=stats_df,
@@ -234,7 +242,7 @@ class ChangeList(BaseComponent):
                 y_label="slice",
                 metadata_columns=["count", "description"],
                 on_select=on_select_slice.partial(
-                    criteria=filter.criteria, code=code.code
+                    criteria=filter.criteria, code=code.query
                 ),
                 on_remove=on_remove.partial(slices_df=slices_df),
             )
@@ -293,7 +301,7 @@ class ChangeList(BaseComponent):
                 on_slice_creation=on_slice_creation.partial(
                     examples_df=examples_df
                 ).compose(
-                    on_select_slice.partial(criteria=filter.criteria, code=code.code)
+                    on_select_slice.partial(criteria=filter.criteria, code=code.query)
                 ),
             )
 
