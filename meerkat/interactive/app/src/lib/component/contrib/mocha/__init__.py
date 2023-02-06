@@ -27,6 +27,7 @@ class ChangeList(BaseComponent):
     gallery_match: BaseComponent
     gallery_filter: BaseComponent
     gallery_sort: BaseComponent
+    gallery_fm_filter: BaseComponent
     gallery_code: BaseComponent
     discover: BaseComponent
     plot: BaseComponent
@@ -151,7 +152,7 @@ class ChangeList(BaseComponent):
             # the filter for the gallery
             # TODO(sabri): make this default to the active slice
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
-            code = mk.gui.FMFilter(
+            fm_filter = mk.gui.FMFilter(
                 df=examples_df, 
                 manifest_session=Manifest(
                     client_name = "huggingface",
@@ -159,10 +160,11 @@ class ChangeList(BaseComponent):
                     temperature=0.1
                 )
             )
-            # code = mk.gui.FilterCodeCell(df=examples_df)
+            code = mk.gui.CodeCell()
             current_examples = filter(examples_df)
-            current_examples = sort(current_examples)
             current_examples = code(current_examples)
+            current_examples = fm_filter(current_examples)
+            current_examples = sort(current_examples)
 
             # removing dirty entries does not use the returned criteria.
             # but we need to pass it as an argument so that the topological sort
@@ -179,7 +181,7 @@ class ChangeList(BaseComponent):
             stats_df = slice_sort(stats_df)
 
             @mk.gui.endpoint
-            def on_select_slice(slice_id: str, criteria: mk.gui.Store, code: str):
+            def on_select_slice(slice_id: str, criteria: mk.gui.Store, code: str, query: str):
                 """Update the gallery filter criteria with the selected slice.
 
                 The gallery should be filtered based on the selected slice.
@@ -210,7 +212,8 @@ class ChangeList(BaseComponent):
                             source=source,
                         )
                     )
-                code.set("__default__")
+                code.set("df")
+                query.set("__default__")
                 criteria.set(wrapped)
                 # set to empty string if None
                 # TODO: Need mk.None
@@ -226,14 +229,14 @@ class ChangeList(BaseComponent):
                 slice_repo.write()
 
             @mk.gui.reactive
-            def get_selected_slice_id(criteria: List[FilterCriterion], code: str):
-                if len(criteria) == 1 and code == "__default__":
+            def get_selected_slice_id(criteria: List[FilterCriterion], code: str, query: str):
+                if len(criteria) == 1 and query == "__default__" and code == "df":
                     criterion = criteria[0]
                     if criterion.source == "on_select_slice":
                         return slice_repo._slice_id(criterion.column)
                 return ""
 
-            selected_slice_id = get_selected_slice_id(filter.criteria, code.query)
+            selected_slice_id = get_selected_slice_id(filter.criteria, code.code, fm_filter.query)
 
             plot = Plot(
                 df=stats_df,
@@ -243,7 +246,7 @@ class ChangeList(BaseComponent):
                 y_label="slice",
                 metadata_columns=["count", "description"],
                 on_select=on_select_slice.partial(
-                    criteria=filter.criteria, code=code.query
+                    criteria=filter.criteria, query=fm_filter.query, code=code.code
                 ),
                 on_remove=on_remove.partial(slices_df=slices_df),
             )
@@ -274,6 +277,7 @@ class ChangeList(BaseComponent):
             def on_slice_creation(examples_df: mk.DataFrame):
                 current_df = filter(examples_df)
                 current_df = code(current_df)
+                current_df = fm_filter(current_df)
 
                 slice_id = slice_repo.add(
                     name=f"Unnamed Slice",
@@ -302,7 +306,7 @@ class ChangeList(BaseComponent):
                 on_slice_creation=on_slice_creation.partial(
                     examples_df=examples_df
                 ).compose(
-                    on_select_slice.partial(criteria=filter.criteria, code=code.query)
+                    on_select_slice.partial(criteria=filter.criteria, query=fm_filter.query, code=code.code)
                 ),
             )
 
@@ -370,6 +374,7 @@ class ChangeList(BaseComponent):
             gallery_match=match,
             gallery_filter=filter,
             gallery_sort=sort,
+            gallery_fm_filter=fm_filter,
             gallery_code=code,
             gallery=gallery,
             discover=discover,

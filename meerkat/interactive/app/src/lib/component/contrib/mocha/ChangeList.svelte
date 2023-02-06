@@ -8,6 +8,7 @@
 	export let gallery: ComponentType;
 	export let gallery_match: ComponentType;
 	export let gallery_filter: ComponentType;
+	export let gallery_fm_filter: ComponentType;
 	export let gallery_sort: ComponentType;
 	export let gallery_code: ComponentType;
 	export let discover: ComponentType;
@@ -52,10 +53,11 @@
 				<!-- <StatsLabeler {...gallery_editor} /> -->
 			</div>
 			<div class="flex flex-col space-y-3">
-				<DynamicComponent {...gallery_match} />
 				{#if code_control}
 					<DynamicComponent {...gallery_code} />
+					<DynamicComponent {...gallery_fm_filter} />
 				{:else}
+					<DynamicComponent {...gallery_match} />
 					<DynamicComponent {...gallery_filter} />
 					<DynamicComponent {...gallery_sort} />
 				{/if}

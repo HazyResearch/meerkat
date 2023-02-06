@@ -13,6 +13,7 @@ from meerkat.interactive.graph import Store, no_react, react, reactive
 def base_on_run(
     new_query: str, query: str, df: DataFrame, criteria_df: DataFrame, manifest_session
 ):
+    print(new_query)
     if new_query == "" or new_query == "__default__":
         query.set("__default__")
         return
