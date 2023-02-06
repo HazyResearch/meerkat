@@ -45,7 +45,7 @@ def get_subclasses_recursive(cls: type) -> List[type]:
 
 
 class SvelteWriter(metaclass=Singleton):
-    """Class that handles writing Svelte components to the Meerkat app."""
+    """Class that handles writing Svelte components to a Meerkat app."""
 
     def __init__(self):
         self.app = App(appdir=PathHelper().appdir)
@@ -60,9 +60,6 @@ class SvelteWriter(metaclass=Singleton):
 
     def run(self):
         """Write component wrappers and context at the start of a run.
-
-        Called by the `mk run` CLI, `Page.__init__` constructor and
-        `mk.gui.start` function.
         """
         self.import_app_components()
         self.cleanup()
@@ -90,7 +87,6 @@ class SvelteWriter(metaclass=Singleton):
         Returns:
             List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
         """
-        # from meerkat.interactive.startup import get_subclasses_recursive
         if self._components:
             return self._components
 
@@ -223,7 +219,7 @@ class SvelteWriter(metaclass=Singleton):
             path=component.path,
             prop_names=component.prop_names,
             event_names=component.event_names,
-            use_bindings=True,  # not issubclass(component, Component)
+            use_bindings=True,
             prop_bindings=component.prop_bindings,
             slottable=component.slottable,
         )
@@ -272,8 +268,6 @@ class SvelteWriter(metaclass=Singleton):
         self,
         exclude_classes: Set[str] = {"Component", "BaseComponent"},
     ):
-        # from meerkat.interactive.startup import get_subclasses_recursive
-
         # Recursively find all subclasses of BaseComponent
         subclasses = get_subclasses_recursive(BaseComponent)
         for subclass in subclasses:
@@ -302,7 +296,7 @@ We only run the following code if
   - a script importing `meerkat` is run directly with Python e.g. `python myscript.py`
   - a notebook importing `meerkat` is run directly with Jupyter
   - a script was run with `mk run` and we are in the `mk run` process
-  - a script was run with `mk run`, we are in the `mk run` subprocess
+  - a script was run with `mk run`, we are in its `uvicorn` subprocess
     and this is a live reload run (i.e. not the first run of the subprocess)
 """
 if (
@@ -315,7 +309,7 @@ if (
 
 if MEERKAT_RUN_SUBPROCESS:
     # Increment the MEERKAT_RUN_RELOAD_COUNT
-    # so that the subprocess knows that it has been reloaded
+    # so that the `uvicorn` subprocess knows that it has been reloaded
     # on a subsequent live reload run
     write_file(
         f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload",
