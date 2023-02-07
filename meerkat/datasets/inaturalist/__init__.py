@@ -3,7 +3,6 @@ import os
 from typing import List
 
 import pandas as pd
-from torchvision.datasets.utils import download_and_extract_archive
 
 import meerkat as mk
 
@@ -30,6 +29,7 @@ def build_inaturalist_df(
         download: Whether to download the dataset if it does not yet exist.
         splits: A list of splits to include. Defaults to all splits.
     """
+    from torchvision.datasets.utils import download_and_extract_archive
 
     if splits is None:
         splits = ["train", "test", "val"]
