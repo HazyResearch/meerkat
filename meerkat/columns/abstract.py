@@ -39,6 +39,7 @@ from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
+    import torch
     from meerkat.interactive.formatter.base import Formatter
 
 torch = LazyLoader("torch")
@@ -559,7 +560,7 @@ class Column(
         else:
             return ConcatWriter(output_type=cls, template=template)
 
-    Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
+    Columnable = Union[Sequence, np.ndarray, pd.Series, "torch.Tensor"]
 
     @classmethod
     # @capture_provenance()
@@ -602,7 +603,7 @@ class Column(
             f"Cannot convert column of type {type(self)} to Arrow Array."
         )
 
-    def to_torch(self) -> torch.Tensor:
+    def to_torch(self) -> "torch.Tensor":
         """Convert the column to a PyTorch Tensor.
 
         If the column cannot be converted to a PyTorch Tensor, this method will raise a

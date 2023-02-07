@@ -5,7 +5,7 @@ import functools
 import logging
 import numbers
 import os
-from typing import Any, Callable, List, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -39,6 +39,9 @@ from meerkat.tools.lazy_loader import LazyLoader
 from .abstract import ScalarColumn
 
 torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -348,7 +351,7 @@ class PandasScalarColumn(
         # returns indices of ascending order of array
         return self.data.argsort(kind=kind)
 
-    def to_tensor(self) -> torch.Tensor:
+    def to_tensor(self) -> "torch.Tensor":
         """Use `column.to_tensor()` instead of `torch.tensor(column)`, which is
         very slow."""
         dtype = self.data.values.dtype
@@ -360,7 +363,7 @@ class PandasScalarColumn(
         # TODO (Sabri): understand why `torch.tensor(column)` is so slow
         return torch.tensor(self.data.values)
 
-    def to_numpy(self) -> torch.Tensor:
+    def to_numpy(self) -> "torch.Tensor":
         return self.values
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:

@@ -9,7 +9,6 @@ import uuid
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 
-import nbformat as nbf
 import rich
 from jinja2 import Environment, FileSystemLoader
 from tabulate import tabulate
@@ -17,6 +16,8 @@ from tabulate import tabulate
 from meerkat.tools.singleton import Singleton
 
 if TYPE_CHECKING:
+    import nbformat as nbf
+
     from meerkat.interactive.page import Page
 
 
@@ -67,12 +68,12 @@ MEERKAT_CLI_PROCESS = os.path.basename(sys.argv[0]) == "mk"
 
 # A flag to indicate whether we are specifically in the `mk run` script.
 MEERKAT_RUN_PROCESS = (os.path.basename(sys.argv[0]) == "mk") and (
-    sys.argv[1] == "run" or sys.argv[1] == "demo"
+    len(sys.argv) > 1 and (sys.argv[1] == "run" or sys.argv[1] == "demo")
 )
 
 # A flag to indicate whether we are specifically in the `mk init` script.
 MEERKAT_INIT_PROCESS = (os.path.basename(sys.argv[0]) == "mk") and (
-    sys.argv[1] == "init"
+    len(sys.argv) > 1 and sys.argv[1] == "init"
 )
 
 # Create a Jinja2 environment.
@@ -315,6 +316,18 @@ class App:
         Returns:
             List[str]: List of libraries that are installed
         """
+        # Check in node_modules
+        installed_libraries = []
+        for library in libraries:
+            if os.path.exists(os.path.join(self.appdir, "node_modules", library)):
+                installed_libraries.append(library)
+        logger.debug(f"Installed libraries: {installed_libraries}")
+        return installed_libraries
+
+        # KG: This is the correct way to check if a library is installed, but
+        # it takes around 0.4s, which is too slow for it to be done on every
+        # import. Leave this code here for now, but we should find a way to
+        # use it in the future (or perhaps use package-lock.json). (TODO)
         p = subprocess.run(
             ["npm", "list"] + list(libraries) + ["--parseable", "--silent"],
             cwd=self.appdir,
@@ -330,12 +343,12 @@ class App:
     def get_mk_package_info(self) -> List[str]:
         """Get the list of components available in the (currently)
         installed Meerkat package. This is used to exclude components
-        that cannot be used in the app, specifically when writing 
+        that cannot be used in the app, specifically when writing
         ComponentContext.svelte.
 
         Uses a heuristic that goes through the index.js file of the Meerkat
-        package and extracts components with a regex. It's not a problem if 
-        extra imports (that are not components) are included in this list, 
+        package and extracts components with a regex. It's not a problem if
+        extra imports (that are not components) are included in this list,
         as long as all components are included.
         """
         package_path = os.path.join(self.appdir, "node_modules", MEERKAT_NPM_PACKAGE)
@@ -530,7 +543,9 @@ class MeerkatApp(App):
         # Copy favicon.png to the new app
         shutil.copy(favicon_path, f"{self.appdir}/static/favicon.png")
 
-    def render_example_ipynb(self) -> nbf.NotebookNode:
+    def render_example_ipynb(self) -> "nbf.NotebookNode":
+        import nbformat as nbf
+
         nb = nbf.v4.new_notebook()
         text = """# Interactive Notebook Example"""
 
@@ -584,6 +599,8 @@ page.launch()"""
         self.write_file("../example.py", JINJA_ENV.get_template("example.py").render())
 
     def write_example_ipynb(self):
+        import nbformat as nbf
+
         with open("example.ipynb", "w") as f:
             nbf.write(self.render_example_ipynb(), f)
 

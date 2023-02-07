@@ -1,9 +1,13 @@
 import random
-from typing import Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from meerkat.tools.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
+
 
 
 class TemporalDownsampling(object):
@@ -43,7 +47,7 @@ class TemporalDownsampling(object):
                 "Downsampling must be by a factor of 1 (no upsampling) or greater."
             )
 
-    def __call__(self, video: torch.Tensor) -> torch.Tensor:
+    def __call__(self, video: "torch.Tensor") -> "torch.Tensor":
         video_length = video.size(self.time_dim)
         downsampled_indices = torch.arange(
             0, video_length, self.downsample_factor
@@ -165,7 +169,7 @@ class TemporalCrop(object):
             end = video_length
         return start, end
 
-    def _build_indices(self, start: int, length: int) -> torch.LongTensor:
+    def _build_indices(self, start: int, length: int) -> "torch.LongTensor":
         vanilla_indices = torch.arange(start, start + self.clip_length)
         if vanilla_indices.max().item() >= length:
             if self.padding_mode == "loop":
@@ -174,7 +178,7 @@ class TemporalCrop(object):
                 vanilla_indices[vanilla_indices >= length] = length - 1
         return vanilla_indices
 
-    def __call__(self, video: torch.Tensor) -> torch.Tensor:
+    def __call__(self, video: "torch.Tensor") -> "torch.Tensor":
         video_length = video.size(self.time_dim)
         clips = []
         for clip_number in range(self.n_clips):

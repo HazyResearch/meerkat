@@ -70,7 +70,7 @@ def bit(
     model.to(device)
 
     @torch.no_grad()
-    def _embed(batch: torch.tensor):
+    def _embed(batch: "torch.Tensor"):
         model(batch)  # run forward pass, but don't collect output
         return extractor.activation
 

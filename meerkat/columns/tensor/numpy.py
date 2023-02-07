@@ -7,7 +7,7 @@ import numbers
 import os
 import shutil
 from mmap import mmap
-from typing import Any, Callable, List, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -25,6 +25,10 @@ from meerkat.writers.concat_writer import ConcatWriter
 from .abstract import TensorColumn
 
 torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
+
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -297,7 +301,7 @@ class NumPyTensorColumn(
 
         return idxs
 
-    def to_torch(self) -> torch.Tensor:
+    def to_torch(self) -> "torch.Tensor":
         return torch.tensor(self.data)
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,10 @@ from ..abstract import Column
 
 torch = LazyLoader("torch")
 
-ScalarColumnTypes = Union[np.ndarray, torch.TensorType, pd.Series, List]
+if TYPE_CHECKING:
+    import torch
+
+ScalarColumnTypes = Union[np.ndarray, "torch.TensorType", pd.Series, List]
 
 
 class ScalarColumn(Column):
