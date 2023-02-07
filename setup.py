@@ -63,6 +63,10 @@ REQUIRED = [
     "tabulate",
 ]
 
+# Read in docs/requirements.txt
+with open("docs/requirements.txt") as f:
+    DOCS_REQUIREMENTS = f.read().splitlines()
+
 # What packages are optional?
 EXTRAS = {
     "dev": [
@@ -71,18 +75,13 @@ EXTRAS = {
         "flake8>=3.8.4",
         "docformatter>=1.4",
         "pytest-cov>=2.10.1",
-        "sphinx-rtd-theme>=0.5.1",
-        "nbsphinx>=0.8.0",
-        "sphinx-toolbox",
         "recommonmark>=0.7.1",
         "parameterized",
         "pre-commit>=2.9.3",
-        "sphinx-autobuild",
-        "sphinx-copybutton",
-        "sphinx_design",
         "twine",
         "httpx",
-    ],
+    ]
+    + DOCS_REQUIREMENTS,
     "embeddings-mac": [
         "faiss-cpu",
         "umap-learn[plot]",
