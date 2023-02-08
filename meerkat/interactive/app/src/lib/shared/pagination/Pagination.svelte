@@ -6,6 +6,7 @@
 	export let page: number = 0;
 	export let perPage: number = 10;
 	export let totalItems: number;
+	export let dropdownPlacement: string = 'bottom';
 
 	$: pageCount = Math.ceil(totalItems / perPage);
 	$: startItem = page * perPage + 1;
@@ -58,7 +59,7 @@
 			Page <span class="font-bold">{page + 1}</span> of
 			<span class="font-bold">{pageCount}</span>
 		</button>
-		<Dropdown {open} class="w-fit">
+		<Dropdown placement={dropdownPlacement} {open} class="w-fit">
 			{#each [10, 20, 50, 100, 200] as p}
 				<DropdownItem
 					on:click={() => {

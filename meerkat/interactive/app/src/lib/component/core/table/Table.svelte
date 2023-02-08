@@ -57,7 +57,7 @@
 				{/await}
 			</div>
 			<div class="absolute z-10 bottom-0 w-[90%] left-[5%] mb-8">
-				<Pagination bind:page bind:perPage totalItems={schema.nrows} />
+				<Pagination bind:page bind:perPage totalItems={schema.nrows} dropdownPlacement="top" />
 			</div>
 		</div>
 	{:catch error}

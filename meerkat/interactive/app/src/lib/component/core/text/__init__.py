@@ -14,8 +14,37 @@ class Text(Component):
     view: str = "line"
     editable: bool = False
 
+    def __init__(
+        self,
+        data: str,
+        *,
+        view: str = "line",
+        editable: bool = False,
+    ):
+        """
+        Display text.
+
+        Args:
+            data: The text to display.
+            view: The view of the text. Can be "line" or "wrapped".
+            editable: Whether the text is editable.
+        """
+        super().__init__(
+            data=data,
+            view=view,
+            editable=editable,
+        )
+
 
 class TextFormatter(Formatter):
+    """
+    Formatter for Text component.
+
+    Args:
+        component_class: The component class to format.
+        data_prop: The property name of the data to format.
+        variants: The variants of the component.
+    """
 
     component_class: type = Text
     data_prop: str = "data"
@@ -25,9 +54,7 @@ class TextFormatter(Formatter):
             encode_kwargs={},
         ),
         "key_value": Variant(
-            props={
-                "view": "line"
-            },
+            props={"view": "line"},
             encode_kwargs={},
         ),
         "full_screen": Variant(
@@ -35,7 +62,6 @@ class TextFormatter(Formatter):
             encode_kwargs={},
         ),
     }
-
 
     def _encode(self, cell: Any):
         return str(cell)
