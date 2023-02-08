@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 from argparse import Namespace
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import numpy as np
 import pandas as pd
-from datasets import DatasetInfo
 
 from meerkat.columns.abstract import Column
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
@@ -17,6 +16,9 @@ from .config import base_config, populate_defaults
 from .transforms import initialize_transform
 
 torch_collate = LazyLoader("torch.utils.data._utils.collate")
+
+if TYPE_CHECKING:
+    from datasets import DatasetInfo
 
 try:
     import wilds

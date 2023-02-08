@@ -23,9 +23,6 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 import meerkat.interactive as gui
-
-# This statement needs to be after the imports above.
-import meerkat.interactive.svelte
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
@@ -81,6 +78,9 @@ from_arrow = DataFrame.from_arrow
 from_huggingface = DataFrame.from_huggingface
 read = DataFrame.read
 
+# This statement needs to be after the imports above.
+# Do not move it.
+import meerkat.interactive.svelte
 
 __all__ = [
     "DataFrame",

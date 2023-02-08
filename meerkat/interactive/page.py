@@ -3,10 +3,9 @@ from functools import partial, wraps
 from typing import Callable
 
 import rich
-from IPython.display import IFrame
 from pydantic import BaseModel
-from meerkat.constants import MEERKAT_RUN_SUBPROCESS, is_notebook
 
+from meerkat.constants import MEERKAT_RUN_SUBPROCESS, is_notebook
 from meerkat.interactive import html
 from meerkat.interactive.app.src.lib.component._internal.progress import Progress
 from meerkat.interactive.app.src.lib.component.abstract import (
@@ -16,6 +15,8 @@ from meerkat.interactive.app.src.lib.component.abstract import (
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
 
+if is_notebook():
+    from IPython.display import IFrame
 
 def page(fn: Callable):
     @wraps(fn)

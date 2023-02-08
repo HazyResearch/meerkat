@@ -4,7 +4,6 @@ import base64
 from io import BytesIO
 from typing import TYPE_CHECKING, Any
 
-from IPython.display import Audio
 from PIL import Image
 
 import meerkat as mk
@@ -53,4 +52,6 @@ def audio_file_formatter(cell: FileCell) -> str:
 
     # TODO (Sabri): Implement based on audio_formatter so we can include transform
     #
+    from IPython.display import Audio
+
     return Audio(filename=cell.absolute_path)._repr_html_()

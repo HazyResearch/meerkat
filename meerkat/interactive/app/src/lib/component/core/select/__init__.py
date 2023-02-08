@@ -25,7 +25,7 @@ class Select(Component):
         on_change: The `Endpoint` to call when the selected value changes. \
             It must have the following signature:
 
-            `(value: int)`
+            `(value: Union[str, int, float, bool, None])`
 
             with
                 value (Union[str, int, float, bool, None]): The value of the \

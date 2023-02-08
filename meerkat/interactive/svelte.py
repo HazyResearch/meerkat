@@ -45,7 +45,7 @@ def get_subclasses_recursive(cls: type) -> List[type]:
 
 
 class SvelteWriter(metaclass=Singleton):
-    """Class that handles writing Svelte components to the Meerkat app."""
+    """Class that handles writing Svelte components to a Meerkat app."""
 
     def __init__(self):
         self.app = App(appdir=PathHelper().appdir)
@@ -59,11 +59,7 @@ class SvelteWriter(metaclass=Singleton):
         return self.app.appdir
 
     def run(self):
-        """Write component wrappers and context at the start of a run.
-
-        Called by the `mk run` CLI, `Page.__init__` constructor and
-        `mk.gui.start` function.
-        """
+        """Write component wrappers and context at the start of a run."""
         self.import_app_components()
         self.cleanup()
         self.write_all_component_wrappers()  # src/lib/wrappers/
@@ -90,7 +86,6 @@ class SvelteWriter(metaclass=Singleton):
         Returns:
             List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
         """
-        # from meerkat.interactive.startup import get_subclasses_recursive
         if self._components:
             return self._components
 
@@ -208,6 +203,32 @@ class SvelteWriter(metaclass=Singleton):
             and not self.app.is_user_app
         ]
 
+        # For the Meerkat npm package, check the components offered by the
+        # user's installed version, and filter out the ones that aren't available
+        if MEERKAT_NPM_PACKAGE in installed_libraries and self.app.is_user_app:
+            try:
+                mk_components = set([f"Meerkat{c}" for c in self.app.get_mk_package_info()])
+                components = [
+                    c
+                    for c in components
+                    if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                    or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                    or c.library != MEERKAT_NPM_PACKAGE
+                ]
+                frontend_components = [
+                    c
+                    for c in frontend_components
+                    if (c.frontend_alias in mk_components and c.namespace == "meerkat")
+                    or (c.library == MEERKAT_NPM_PACKAGE and c.namespace != "meerkat")
+                    or c.library != MEERKAT_NPM_PACKAGE
+                ]
+            except Exception as e:
+                logger.error(
+                    "Error getting Meerkat package info. "
+                    "Components from the Meerkat npm package may not be available."
+                )
+                logger.debug(e)
+
         return template.render(
             components=components,
             frontend_components=frontend_components,
@@ -223,7 +244,7 @@ class SvelteWriter(metaclass=Singleton):
             path=component.path,
             prop_names=component.prop_names,
             event_names=component.event_names,
-            use_bindings=True,  # not issubclass(component, Component)
+            use_bindings=True,
             prop_bindings=component.prop_bindings,
             slottable=component.slottable,
         )
@@ -272,8 +293,6 @@ class SvelteWriter(metaclass=Singleton):
         self,
         exclude_classes: Set[str] = {"Component", "BaseComponent"},
     ):
-        # from meerkat.interactive.startup import get_subclasses_recursive
-
         # Recursively find all subclasses of BaseComponent
         subclasses = get_subclasses_recursive(BaseComponent)
         for subclass in subclasses:
@@ -302,7 +321,7 @@ We only run the following code if
   - a script importing `meerkat` is run directly with Python e.g. `python myscript.py`
   - a notebook importing `meerkat` is run directly with Jupyter
   - a script was run with `mk run` and we are in the `mk run` process
-  - a script was run with `mk run`, we are in the `mk run` subprocess
+  - a script was run with `mk run`, we are in its `uvicorn` subprocess
     and this is a live reload run (i.e. not the first run of the subprocess)
 """
 if (
@@ -315,7 +334,7 @@ if (
 
 if MEERKAT_RUN_SUBPROCESS:
     # Increment the MEERKAT_RUN_RELOAD_COUNT
-    # so that the subprocess knows that it has been reloaded
+    # so that the `uvicorn` subprocess knows that it has been reloaded
     # on a subsequent live reload run
     write_file(
         f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload",

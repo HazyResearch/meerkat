@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Dict, Hashable, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Hashable, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -16,12 +16,15 @@ from .abstract import AbstractBlock, BlockIndex, BlockView
 
 torch = LazyLoader("torch")
 
+if TYPE_CHECKING:
+    import torch
+
 
 class TorchBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:
-        device: torch.device
-        dtype: torch.dtype
+        device: "torch.device"
+        dtype: "torch.dtype"
         nrows: int
         shape: Tuple[int]
         klass: type
@@ -44,11 +47,11 @@ class TorchBlock(AbstractBlock):
             dtype=self.data.dtype,
         )
 
-    def _get_data(self, index: BlockIndex) -> torch.Tensor:
+    def _get_data(self, index: BlockIndex) -> "torch.Tensor":
         return self.data[:, index]
 
     @classmethod
-    def from_column_data(cls, data: torch.Tensor) -> Tuple[TorchBlock, BlockView]:
+    def from_column_data(cls, data: "torch.Tensor") -> Tuple[TorchBlock, BlockView]:
         """[summary]
 
         Args:

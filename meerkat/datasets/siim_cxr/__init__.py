@@ -4,8 +4,11 @@ from glob import glob
 
 import numpy as np
 import pandas as pd
-import torchvision.transforms as transforms
 from PIL import Image
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+transforms = LazyLoader("torchvision.transforms")
 
 from meerkat.cells.volume import MedicalVolumeCell
 

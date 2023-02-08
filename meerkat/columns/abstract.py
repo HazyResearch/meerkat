@@ -39,6 +39,7 @@ from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
+    import torch
     from meerkat.interactive.formatter.base import Formatter
 
 torch = LazyLoader("torch")
@@ -178,7 +179,7 @@ class Column(
                 other words, we assume that the index passed in has already been
                 remapped via `_remap_index`, if `self.visible_rows` is not `None`.
             materialize (bool, optional): Materialize and return the object. This
-                argument is used by subclasses of `AbstractColumn` that hold data in an
+                argument is used by subclasses of `Column` that hold data in an
                 unmaterialized format. Defaults to False.
         """
         return self._data[index]
@@ -191,7 +192,7 @@ class Column(
                 other words, we assume that the index passed in has already been
                 remapped via `_remap_index`, if `self.visible_rows` is not `None`.
             materialize (bool, optional): Materialize and return the object. This
-                argument is used by subclasses of `AbstractColumn` that hold data in an
+                argument is used by subclasses of `Column` that hold data in an
                 unmaterialized format. Defaults to False.
         """
         if materialize:
@@ -421,7 +422,7 @@ class Column(
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
-            AbstractColumn: A view of the column with the sorted data.
+            Column: A view of the column with the sorted data.
         """
         raise NotImplementedError
 
@@ -437,7 +438,7 @@ class Column(
             kind (str): The kind of sort to use. Defaults to 'quicksort'. Options
                 include 'quicksort', 'mergesort', 'heapsort', 'stable'.
         Return:
-            AbstractColumn: A view of the column with the sorted data.
+            Column: A view of the column with the sorted data.
         """
         raise NotImplementedError
 
@@ -467,7 +468,7 @@ class Column(
                 use for sampling.
 
         Return:
-            AbstractColumn: A random sample of rows from the DataFrame.
+            Column: A random sample of rows from the DataFrame.
         """
         from meerkat import sample
 
@@ -495,7 +496,7 @@ class Column(
         """Tests whether two columns.
 
         Args:
-            other (AbstractColumn): [description]
+            other (Column): [description]
         """
         raise NotImplementedError()
 
@@ -559,7 +560,7 @@ class Column(
         else:
             return ConcatWriter(output_type=cls, template=template)
 
-    Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
+    Columnable = Union[Sequence, np.ndarray, pd.Series, "torch.Tensor"]
 
     @classmethod
     # @capture_provenance()
@@ -602,7 +603,7 @@ class Column(
             f"Cannot convert column of type {type(self)} to Arrow Array."
         )
 
-    def to_torch(self) -> torch.Tensor:
+    def to_torch(self) -> "torch.Tensor":
         """Convert the column to a PyTorch Tensor.
 
         If the column cannot be converted to a PyTorch Tensor, this method will raise a
