@@ -43,7 +43,7 @@
 
     .xlabel {
         @apply top-0 left-1/2;
-        transform: translate(-190px, -55px);
+        transform: translate(-160px, -55px);
     }
 
 	.ylabel {
