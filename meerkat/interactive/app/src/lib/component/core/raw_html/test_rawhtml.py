@@ -2,7 +2,7 @@ import functools
 
 import meerkat as mk
 from meerkat.interactive import Page
-from meerkat.interactive.app.src.lib.component.raw_html import RawHTML
+from meerkat.interactive.app.src.lib.component.core.raw_html import RawHTML
 
 rawhtml = functools.partial(
     RawHTML,
