@@ -78,8 +78,8 @@ df = _empty_df()
 
 chat = Chat(
     df=df,
-    imgChatbot="https://placeimg.com/200/200/animals",
-    imgUser="https://placeimg.com/200/200/people",
+    img_chatbot="https://placeimg.com/200/200/animals",
+    img_user="https://placeimg.com/200/200/people",
     on_send=on_send.partial(df=df),
 )
 

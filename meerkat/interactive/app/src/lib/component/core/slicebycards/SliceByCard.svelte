@@ -86,8 +86,8 @@
 						id={index.toString()}
 						main={{
 							data: row[main_index],
-							cell_component: main_component,
-							cell_props: {
+							cellComponent: main_component,
+							cellProps: {
 								...main_props
 							}
 						}}

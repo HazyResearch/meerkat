@@ -18,9 +18,6 @@ from meerkat.tools.singleton import Singleton
 if TYPE_CHECKING:
     import nbformat as nbf
 
-    from meerkat.interactive.page import Page
-
-
 logger = logging.getLogger(__name__)
 
 

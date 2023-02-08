@@ -9,7 +9,7 @@
 
 
 	let run_search = async (text) => {
-		await dispatch(on_run.endpoint_id, {
+		await dispatch(on_run.endpointId, {
 			detail: {
 				new_query: text
 			}

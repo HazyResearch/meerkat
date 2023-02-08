@@ -1,8 +1,8 @@
-import { global_stores } from "$lib/utils/stores";
+import { globalStores } from "$lib/utils/stores";
 import { get } from "svelte/store";
 
 
-export async function get_request(url: string): Promise<any> {
+export async function getRequest(url: string): Promise<any> {
     const res: Response = await fetch(url);
     if (!res.ok) {
         throw new Error('HTTP status ' + res.status);
@@ -31,19 +31,21 @@ export async function post(url: string, data: any): Promise<any> {
 
 export async function modify(url: string, data: any): Promise<any> {
     const modifications = await post(url, data);
-    return apply_modifications(modifications);
+    return applyModifications(modifications);
 }
 
-export function apply_modifications(modifications: Array<any>) {
+export function applyModifications(modifications: Array<any>) {
+    console.log("Applying modifications", modifications);
     for (const modification of modifications) {
+        console.log(modification.type);
         if (modification.type === 'ref') {
             // Node modification
-            if (!global_stores.has(modification.id)) {
+            if (!globalStores.has(modification.id)) {
                 // derived objects may not be maintained on the frontend 
                 // TODO: consider adding a mechanism to add new derived objects to the frontend
                 continue
             }
-            const store = global_stores.get(modification.id)
+            const store = globalStores.get(modification.id)
             store.update((value: any) => {
                 value.scope = modification.scope;
                 return value
@@ -51,7 +53,9 @@ export function apply_modifications(modifications: Array<any>) {
             )
         } else if (modification.type === 'store') {
             // Store modification
-            const store = global_stores.get(modification.id);
+            const store = globalStores.get(modification.id);
+
+            console.log("Modification", modification, "Store", store);
 
             if (store === undefined) {
                 console.log(

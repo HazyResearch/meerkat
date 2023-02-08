@@ -39,10 +39,10 @@ class Chat(Component):
     df: DataFrame
 
     # The image to display for the chatbot.
-    imgChatbot: str = "http://placekitten.com/200/300"
+    img_chatbot: str = "http://placekitten.com/200/300"
 
     # The image to display for the user.
-    imgUser: str = "http://placekitten.com/200/300"
+    img_user: str = "http://placekitten.com/200/300"
 
     # Endpoint to call when a message is sent.
     # Endpoint should take a paramter called `message`, which is

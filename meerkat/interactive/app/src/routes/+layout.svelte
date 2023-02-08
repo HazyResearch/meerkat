@@ -1,14 +1,10 @@
 <script lang="ts">
-	import ComponentContext from '$lib/ComponentContext.svelte';
-	import Meerkat from '$lib/Meerkat.svelte';
-	import Modals from '$lib/shared/common/Modals.svelte';
-
 	import '$lib/app.css';
+	import ComponentContext from '$lib/ComponentContext.svelte';
+	import Modals from '$lib/shared/common/Modals.svelte';
 </script>
 
 <ComponentContext>
-	<Meerkat>
-		<slot />
-		<Modals />
-	</Meerkat>
+	<slot />
+	<Modals />
 </ComponentContext>

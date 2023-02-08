@@ -9,6 +9,7 @@ from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
 from meerkat.interactive.graph import Store, no_react, trigger
+
 # from meerkat.interactive.graph.reactivity import _create_nodes_for_nodeables
 # from meerkat.interactive.graph.utils import _get_nodeables, _replace_nodeables_with_nodes, _replace_nodes_with_nodeables
 from meerkat.interactive.node import Node, NodeMixin
@@ -87,7 +88,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
 class EndpointFrontend(BaseModel):
     """A schema for sending an endpoint to the frontend."""
 
-    endpoint_id: Union[str, None]
+    endpointId: Union[str, None]
 
 
 # TODO: technically Endpoint doesn't need to be NodeMixin (probably)
@@ -185,7 +186,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     @property
     def frontend(self):
         return EndpointFrontend(
-            endpoint_id=self.id,
+            endpointId=self.id,
         )
 
     def run(self, *args, **kwargs) -> Any:
@@ -284,14 +285,14 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                     arg.attach_to_inode(node)
 
                 arg.inode.add_child(self.inode, triggers=False)
-        
+
         # TODO (sabri): make this work for derived dataframes
         # There's a subtle issue with partial that we should figure out. I spent an
-        # hour or so on it, but am gonna table it til after the deadline tomorrow 
-        # because I have a hacky workaround. Basically, if we create an endpoint 
+        # hour or so on it, but am gonna table it til after the deadline tomorrow
+        # because I have a hacky workaround. Basically, if we create an endpoint
         # partial passing a "derived" dataframe, when the endpoint is called, we
-        # should expect that the current value of the dataframe will be passed. 
-        # Currently, the original value of the dataframe is passed. It makes sense to 
+        # should expect that the current value of the dataframe will be passed.
+        # Currently, the original value of the dataframe is passed. It makes sense to
         # me why this is happening, but the right fix is eluding me.
 
         fn = partial(self.fn, *args, **kwargs)

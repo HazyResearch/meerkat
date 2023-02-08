@@ -1,10 +1,8 @@
-import type { Writable } from "svelte/store";
-
 export interface CellInterface {
     data: any;
     column?: string;
-    cell_component?: string;
-    cell_props?: object;
+    cellComponent?: string;
+    cellProps?: object;
 }
 
 export interface ComponentType {
@@ -17,16 +15,10 @@ export interface ComponentType {
 };
 
 export interface Endpoint {
-    endpoint_id: string;
+    endpointId: string;
 };
 
 export interface PageType {
     name: string;
     component: ComponentType
-};
-
-export interface EditTarget {
-    target: Writable<any>
-    target_id_column: string
-    source_id_column: string
 };

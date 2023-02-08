@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import Table from '$lib/shared/table/Table.svelte';
-	import { fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import { fetchChunk, fetchSchema } from '$lib/utils/api';
 	import type { DataFrameChunk, DataFrameRef } from '$lib/utils/dataframe';
 	import { createEventDispatcher } from 'svelte';
 
@@ -10,32 +10,32 @@
 	export let df: DataFrameRef;
 
 	export let page: number = 0;
-	export let per_page: number = 100;
+	export let perPage: number = 100;
 	export let editable: boolean = false;
-	export let id_column: string = null;
+	export let idColumn: string = null;
 
-	export let column_widths: Array<number>;
+	export let columnWidths: Array<number>;
 
-	$: schema_promise = fetch_schema({ df: df });
-	$: rows_promise = fetch_chunk({ df: df, start: page * per_page, end: (page + 1) * per_page });
+	$: schemaPromise = fetchSchema({ df: df });
+	$: rowsPromise = fetchChunk({ df: df, start: page * perPage, end: (page + 1) * perPage });
 
-	$: schema_promise.then((s: any) => {
-		if (column_widths == null) {
-			column_widths = Array.apply(null, Array(s.columns.length)).map((x, i) => 256);
+	$: schemaPromise.then((s: any) => {
+		if (columnWidths == null) {
+			columnWidths = Array.apply(null, Array(s.columns.length)).map((x, i) => 256);
 		}
 	});
 
 	async function handle_edit(event: any) {
-		let rows: DataFrameChunk = await rows_promise;
+		let rows: DataFrameChunk = await rowsPromise;
 
 		let { row, column, value } = event.detail;
-		let row_id_column_index = rows.column_infos.findIndex((c) => c.name === id_column);
-		let row_index = rows.indices.indexOf(row);
-		let row_id = rows.rows[row_index][row_id_column_index];
+		let rowIdColumnIndex = rows.columnInfos.findIndex((c) => c.name === idColumn);
+		let rowIndex = rows.indices.indexOf(row);
+		let rowId = rows.rows[rowIndex][rowIdColumnIndex];
 
 		dispatch('edit', {
 			row: row,
-			row_id: row_id,
+			row_id: rowId,
 			column: column,
 			value: event.detail.value
 		});
@@ -43,26 +43,21 @@
 </script>
 
 <div class="h-full flex-1 rounded-lg overflow-hidden bg-slate-50">
-	{#await schema_promise}
+	{#await schemaPromise}
 		waiting....
 	{:then schema}
-		<div class="h-full">
+		<div class="relative h-full">
 			<div class="h-full overflow-y-scroll pb-28">
-				{#await rows_promise}
-					<Table rows={null} {schema} {column_widths} />
+				{#await rowsPromise}
+					<Table rows={null} {schema} {columnWidths} />
 				{:then rows}
-					<Table {rows} {schema} {column_widths} {editable} {id_column} on:edit={handle_edit} />
+					<Table {rows} {schema} {columnWidths} {editable} {idColumn} on:edit={handle_edit} />
 				{:catch error}
 					{error}
 				{/await}
 			</div>
 			<div class="absolute z-10 bottom-0 w-[90%] left-[5%] mb-8">
-				<Pagination
-					bind:page
-					bind:per_page
-					loaded_items={schema.nrows}
-					total_items={schema.nrows}
-				/>
+				<Pagination bind:page bind:perPage totalItems={schema.nrows} />
 			</div>
 		</div>
 	{:catch error}

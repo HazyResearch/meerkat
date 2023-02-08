@@ -18,11 +18,11 @@
 		console.log('Endpoint', endpoint);
 	});
 
-	let start_payload;
+	let startPayload;
 	eventSource.addEventListener('start', (event) => {
-		start_payload = JSON.parse(event.data);
+		startPayload = JSON.parse(event.data);
 		running = true;
-		console.log('Start', start_payload);
+		console.log('Start', startPayload);
 	});
 
 	eventSource.addEventListener('progress', (event) => {

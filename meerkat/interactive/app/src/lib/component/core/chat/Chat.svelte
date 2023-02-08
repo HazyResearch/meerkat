@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fetch_chunk } from '$lib/utils/api';
+	import { fetchChunk } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import { Avatar, Button, Textarea } from 'flowbite-svelte';
 	import { createEventDispatcher } from 'svelte';
@@ -11,7 +11,7 @@
 	export let imgChatbot: string;
 	export let imgUser: string;
 
-	$: messages_promise = fetch_chunk({ df, start: 0, end: 100000 });
+	$: messages_promise = fetchChunk({ df, start: 0, end: 100000 });
 
 	let value: string = '';
 	let send = () => {
@@ -25,13 +25,13 @@
 		{#await messages_promise then messages}
 			{#each messages.rows as _, i}
 				<Message
-					message={messages.get_cell(messages.full_length - i - 1, 'message').data}
-					name={messages.get_cell(messages.full_length - i - 1, 'name').data}
-					time={messages.get_cell(messages.full_length - i - 1, 'time').data}
+					message={messages.getCell(messages.fullLength - i - 1, 'message').data}
+					name={messages.getCell(messages.fullLength - i - 1, 'name').data}
+					time={messages.getCell(messages.fullLength - i - 1, 'time').data}
 				>
 					<svelte:fragment slot="avatar">
 						<Avatar
-							src={messages.get_cell(messages.full_length - i - 1, 'sender').data === 'chatbot'
+							src={messages.getCell(messages.fullLength - i - 1, 'sender').data === 'chatbot'
 								? imgChatbot
 								: imgUser}
 							stacked={true}

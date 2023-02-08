@@ -50,11 +50,12 @@ class Page(IdentifiableMixin):
 
         super().__init__(id=id)
 
-        self.component = html.div(
+        self.component = html.flexcol(
             slots=[
                 Progress(),
                 component,
             ],
+            classes="h-full",
         )
         self.name = name
         self.height = height

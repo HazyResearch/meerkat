@@ -17,13 +17,13 @@ class Markdown(Component):
         body: The markdown data to render.
         classes: The Tailwind classes to apply to the component, see @tailwindcss/typography \
             for the classes that are specifically available to style this component.
-        baseUrl: The base URL to use for relative links.
+        base_url: The base URL to use for relative links.
         breaks: If true, add <br> on a single line break (copies GitHub behavior on comments, 
             but not on rendered markdown files). Requires gfm be true.
         gfm: If true, use approved GitHub Flavored Markdown (GFM) specification.
-        headerIds: If true, include an id attribute when emitting headings (h1, h2, h3, etc).
-        headerPrefix: A string to prefix the id attribute when emitting headings (h1, h2, h3, etc).
-        langPrefix: A string to prefix the className in a <code> block. Useful for syntax highlighting.
+        header_ids: If true, include an id attribute when emitting headings (h1, h2, h3, etc).
+        header_prefix: A string to prefix the id attribute when emitting headings (h1, h2, h3, etc).
+        lang_prefix: A string to prefix the className in a <code> block. Useful for syntax highlighting.
         mangle: If true, autolinked email address is escaped with HTML character references.
         pedantic: If true, conform to the original markdown.pl as much as possible. Don't fix original 
             markdown bugs or behavior. Turns off and overrides gfm.
@@ -36,12 +36,12 @@ class Markdown(Component):
 
     body: str
     classes: str = ""
-    baseUrl: Optional[str] = None
+    base_url: Optional[str] = None
     breaks: bool = True
     gfm: bool = True
-    headerIds: bool = True
-    headerPrefix: str = ""
-    langPrefix: str = "language-"
+    header_ids: bool = True
+    header_prefix: str = ""
+    lang_prefix: str = "language-"
     mangle: bool = True
     pedantic: bool = False
     sanitize: bool = False

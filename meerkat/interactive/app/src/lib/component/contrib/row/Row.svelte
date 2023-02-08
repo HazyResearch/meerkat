@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Cell from '$lib/shared/cell/Cell.svelte';
-	import { dispatch, fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import { dispatch, fetchChunk, fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
 	import { Scissors } from 'svelte-bootstrap-icons';
@@ -15,13 +15,13 @@
 	export let on_change: Endpoint | null = null;
 	export let on_slice_creation: Endpoint | null = null;
 
-	$: schema_promise = fetch_schema({ df: df });
+	$: schema_promise = fetchSchema({ df: df });
 
 	$: slice_exists = selected_key !== null && selected_key !== '';
 	let rows_promise: any = null;
 	$: {
 		if (selected_key !== null && selected_key !== '') {
-			rows_promise = fetch_chunk({ df: df, keyidxs: [selected_key] });
+			rows_promise = fetchChunk({ df: df, keyidxs: [selected_key] });
 		} else {
 			rows_promise = null;
 		}
@@ -30,7 +30,7 @@
 	let on_edit = async (event: any, column: string) => {
 		if (on_change === null) return;
 
-		dispatch(on_change.endpoint_id, {
+		dispatch(on_change.endpointId, {
 			detail: {
 				key: selected_key,
 				column: column,
@@ -72,7 +72,7 @@
 			class:bg-violet-500={!slice_exists}
 			class:bg-slate-300={slice_exists}
 			disabled={slice_exists}
-			on:click={() => dispatch(on_slice_creation.endpoint_id, { detail: {} })}
+			on:click={() => dispatch(on_slice_creation.endpointId, { detail: {} })}
 		>
 			<Scissors />
 			Create Slice

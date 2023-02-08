@@ -1,13 +1,11 @@
 <script lang="ts">
-	// FIXME
-	import { getContext } from 'svelte';
 	import Status from '$lib/shared/common/Status.svelte';
-	import Select from 'svelte-select';
+	import { fetchSchema } from '$lib/utils/api';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
 	import type { EditTarget } from '$lib/utils/types';
+	import Select from 'svelte-select';
 	import { get, type Writable } from 'svelte/store';
-	import type { DataFrameRef, DataFrameSchema } from '$lib/api/dataframe';
 
-	const { fetch_schema, edit_target } = getContext('Meerkat');
 
 	export let df: DataFrameRef;
 	export let target: EditTarget;
@@ -19,14 +17,14 @@
 
 	let status: string = 'waiting';
 
-	let schema_promise: any;
-	let items_promise: any;
+	let schemaPromise: any;
+	let itemsPromise: any;
 
 	$: target.target = get(target.target);
 
 	$: {
-		schema_promise = fetch_schema(target.target);
-		items_promise = schema_promise.then((schema: DataFrameSchema) => {
+		schemaPromise = fetchSchema(target.target);
+		itemsPromise = schemaPromise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
 					value: column.name,
@@ -36,12 +34,12 @@
 		});
 	}
 
-	const on_key_press = (e) => {
-		if (e.charCode === 13) on_edit();
+	const onKeyPress = (e) => {
+		if (e.charCode === 13) onEdit();
 		else status = 'waiting';
 	};
 
-	let on_edit = async () => {
+	let onEdit = async () => {
 		if ($col === '') {
 			status = 'error';
 			return;
@@ -100,12 +98,12 @@
 			bind:value={$text}
 			placeholder="Enter a value..."
 			class="input input-bordered grow h-10 px-3 rounded-md shadow-md"
-			on:keypress={on_key_press}
+			on:keypress={onKeyPress}
 		/>
 		<div class="text-slate-400 px-2">for</div>
 
 		<div class="themed pr-2 w-48" bind:this={select_div}>
-			{#await items_promise}
+			{#await itemsPromise}
 				<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 			{:then items}
 				<Select

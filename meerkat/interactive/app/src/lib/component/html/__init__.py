@@ -41,11 +41,31 @@ class div(Slottable, HtmlMixin, Component):
 
 class flex(div):
 
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
+
+
     @validator("classes", pre=True, always=True)
     def make_flex(cls, v):
         return "flex flex-row " + v if v is not None else "flex flex-row"
 
 class flexcol(div):
+
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
+
     
     @validator("classes", pre=True, always=True)
     def make_flexcol(cls, v):

@@ -1,11 +1,9 @@
 from .button import Button
 from .chat import Chat
 from .checkbox import Checkbox
-from .choice import Choice
 from .code import Code
 from .code_cell import CodeCell
 from .document import Document
-from .editor import Editor
 from .fileupload import FileUpload
 from .filter import Filter
 from .gallery import Gallery
@@ -18,6 +16,7 @@ from .put import Put
 from .radio import Radio, RadioGroup
 from .raw_html import RawHTML
 from .scalar import Scalar
+from .select import Select
 from .slicebycards import SliceByCards
 from .slider import Slider
 from .sort import Sort
@@ -28,18 +27,15 @@ from .text import Text
 from .textbox import Textbox
 from .toggle import Toggle
 from .vega import Vega
-from .select import Select
 
 __all__ = [
     "Button",
     "Caption",
     "Chat",
     "Checkbox",
-    "Choice",
     "Code",
     "CodeCell",
     "Document",
-    "Editor",
     "FileUpload",
     "Filter",
     "Gallery",
@@ -54,6 +50,7 @@ __all__ = [
     "RadioGroup",
     "RawHTML",
     "Scalar",
+    "Select",
     "SliceByCards",
     "Slider",
     "Sort",

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ColumnInfo, DataFrameChunk, DataFrameSchema } from '$lib/api/dataframe';
 	import Cell from '$lib/shared/cell/Cell.svelte';
+	import type { ColumnInfo, DataFrameChunk, DataFrameSchema } from '$lib/utils/dataframe';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import { zip } from 'underscore';
@@ -10,66 +10,63 @@
 	export let rows: DataFrameChunk | null;
 	export let schema: DataFrameSchema;
 	export let editable: boolean = false;
-	export let id_column: string = null;
-	let column_infos: Array<ColumnInfo> = schema.columns;
+	export let idColumn: string = null;
+	let columnInfos: Array<ColumnInfo> = schema.columns;
 
-	export let column_widths = Array.apply(null, Array(column_infos.length)).map((x, i) => 256);
-	let column_unit: string = 'px';
+	export let columnWidths = Array.apply(null, Array(columnInfos.length)).map((x, i) => 256);
+	let columnUnit: string = 'px';
 
-	let resize_props = {
-		col_being_resized: -1,
+	let resizeProps = {
+		colBeingResized: -1,
 		x: 0,
-		w_left: 0,
-		w_right: 0,
+		wLeft: 0,
+		wRight: 0,
 		dx: 0
 	};
 
-	let resize_methods = {
-		mousedown(col_index: number) {
+	let resizeMethods = {
+		mousedown(colIndex: number) {
 			return (e: MouseEvent) => {
 				// Update all the resize props
-				resize_props.col_being_resized = col_index;
-				resize_props.x = e.clientX;
-				resize_props.w_left = column_widths[col_index];
-				resize_props.w_right = column_widths[col_index + 1];
+				resizeProps.colBeingResized = colIndex;
+				resizeProps.x = e.clientX;
+				resizeProps.wLeft = columnWidths[colIndex];
+				resizeProps.wRight = columnWidths[colIndex + 1];
 
 				// Attach listeners for events
-				window.addEventListener('mousemove', resize_methods.mousemove);
-				window.addEventListener('mouseup', resize_methods.mouseup);
+				window.addEventListener('mousemove', resizeMethods.mousemove);
+				window.addEventListener('mouseup', resizeMethods.mouseup);
 			};
 		},
 
 		mousemove(e: MouseEvent) {
-			if (resize_props.col_being_resized === -1) return;
+			if (resizeProps.colBeingResized === -1) return;
 
 			// Determine how far the mouse has been moved
-			resize_props.dx = e.clientX - resize_props.x;
+			resizeProps.dx = e.clientX - resizeProps.x;
 
 			// Update the width of column
-			if (
-				resize_props.w_left + resize_props.dx > 164 &&
-				resize_props.w_right - resize_props.dx > 164
-			) {
-				column_widths[resize_props.col_being_resized] = resize_props.w_left + resize_props.dx;
-				column_widths[resize_props.col_being_resized + 1] = resize_props.w_right - resize_props.dx;
+			if (resizeProps.wLeft + resizeProps.dx > 164 && resizeProps.wRight - resizeProps.dx > 164) {
+				columnWidths[resizeProps.colBeingResized] = resizeProps.wLeft + resizeProps.dx;
+				columnWidths[resizeProps.colBeingResized + 1] = resizeProps.wRight - resizeProps.dx;
 			}
 		},
 
 		mouseup(e: MouseEvent) {
-			window.removeEventListener('mousemove', resize_methods.mousemove);
-			window.removeEventListener('mouseup', resize_methods.mouseup);
+			window.removeEventListener('mousemove', resizeMethods.mousemove);
+			window.removeEventListener('mouseup', resizeMethods.mouseup);
 		}
 	};
 
-	let table_width: number;
+	let tableWidth: number;
 	onMount(async () => {
-		column_widths = Array.apply(null, Array(column_infos.length)).map(
-			(x, i) => table_width / column_infos.length
+		columnWidths = Array.apply(null, Array(columnInfos.length)).map(
+			(x, i) => tableWidth / columnInfos.length
 		);
-		column_unit = 'px';
+		columnUnit = 'px';
 	});
 
-	function handle_edit(event: any, row: number, column: string) {
+	function handleEdit(event: any, row: number, column: string) {
 		dispatch('edit', {
 			row: row,
 			column: column,
@@ -82,9 +79,9 @@
 	class="table pl-4 pr-4 table-fixed overflow-x-scroll text-sm w-fit dark:text-gray-300 dark:bg-gray-700"
 >
 	<div class="table-header-group">
-		<div class="table-row" bind:clientWidth={table_width}>
-			{#each column_infos as column, col_index}
-				<div class="table-cell" style="width:{column_widths[col_index]}{column_unit}">
+		<div class="table-row" bind:clientWidth={tableWidth}>
+			{#each columnInfos as column, col_index}
+				<div class="table-cell" style="width:{columnWidths[col_index]}{columnUnit}">
 					<slot id="header-cell">
 						<div class="flex flex-col items-center">
 							<div class="pb-1 font-bold">{column.name}</div>
@@ -95,7 +92,7 @@
 							</div>
 						</div>
 					</slot>
-					<div class="resizer rounded-md" on:mousedown={resize_methods.mousedown(col_index)} />
+					<div class="resizer rounded-md" on:mousedown={resizeMethods.mousedown(col_index)} />
 				</div>
 			{/each}
 		</div>
@@ -105,15 +102,15 @@
 		{#if rows}
 			{#each zip(rows.rows, rows.indices) as [row, index]}
 				<div class="table-row">
-					{#each zip(row, rows.column_infos) as [value, column_info]}
+					{#each zip(row, rows.columnInfos) as [value, columnInfo]}
 						<div class="table-cell align-middle p-5">
 							<Cell
 								data={value}
-								cell_component={column_info.cell_component}
-								cell_props={column_info.cell_props}
-								cell_data_prop={column_info.cell_data_prop}
-								editable={editable && column_info.name !== id_column}
-								on:edit={(event) => handle_edit(event, index, column_info.name)}
+								cellComponent={columnInfo.cellComponent}
+								cellProps={columnInfo.cellProps}
+								cellDataProp={columnInfo.cellDataProp}
+								editable={editable && columnInfo.name !== idColumn}
+								on:edit={(event) => handleEdit(event, index, columnInfo.name)}
 							/>
 						</div>
 					{/each}

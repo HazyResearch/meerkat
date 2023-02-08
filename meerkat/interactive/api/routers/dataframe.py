@@ -11,16 +11,16 @@ from meerkat.interactive.endpoint import Endpoint, endpoint
 class ColumnInfo(BaseModel):
     name: str
     type: str
-    cell_component: str
-    cell_props: Dict[str, Any]
-    cell_data_prop: str
+    cellComponent: str
+    cellProps: Dict[str, Any]
+    cellDataProp: str
 
 
 class SchemaResponse(BaseModel):
     id: str
     columns: List[ColumnInfo]
     nrows: int = None
-    primary_key: str = None
+    primaryKey: str = None
 
 
 @endpoint(prefix="/df", route="/{df}/schema/")
@@ -34,7 +34,7 @@ def schema(
         id=df.id,
         columns=_get_column_infos(df, columns, variants=variants),
         nrows=len(df),
-        primary_key=df.primary_key_name,
+        primaryKey=df.primary_key_name,
     )
 
 
@@ -64,21 +64,21 @@ def _get_column_infos(
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cell_component=df[col].formatter.component_class.alias,
-            cell_props=df[col].formatter.get_props(variants=variants),
-            cell_data_prop=df[col].formatter.data_prop,
+            cellComponent=df[col].formatter.component_class.alias,
+            cellProps=df[col].formatter.get_props(variants=variants),
+            cellDataProp=df[col].formatter.data_prop,
         )
         for col in columns
     ]
 
 
 class RowsResponse(BaseModel):
-    column_infos: List[ColumnInfo]
+    columnInfos: List[ColumnInfo]
     posidxs: List[int] = None
     rows: List[List[Any]]
-    full_length: int
+    fullLength: int
     # primary key
-    primary_key: Optional[str] = None
+    primaryKey: Optional[str] = None
 
 
 @endpoint(prefix="/df", route="/{df}/rows/")
@@ -132,9 +132,9 @@ def rows(
             ]
         )
     return RowsResponse(
-        column_infos=column_infos,
+        columnInfos=column_infos,
         rows=rows,
-        full_length=full_length,
+        fullLength=full_length,
         posidxs=posidxs,
-        primary_key=df.primary_key_name,
+        primaryKey=df.primary_key_name,
     )

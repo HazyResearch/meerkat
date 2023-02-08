@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dispatch, fetch_chunk } from '$lib/utils/api';
+	import { dispatch, fetchChunk } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
 	import Plot from '../plot/Plot.svelte';
@@ -10,7 +10,7 @@
 	export let config: Record<string, any> = { displayModeBar: false };
 	export let on_click: Endpoint;
 
-	$: data_promise = fetch_chunk({
+	$: data_promise = fetchChunk({
 		df: df,
 		start: 0,
 		columns: [x, y],
@@ -18,9 +18,9 @@
 	}).then((chunk) => {
 		return [
 			{
-				x: chunk.get_column(x).data,
-				y: chunk.get_column(y).data,
-				keyidx: chunk.get_column(chunk.primary_key).data,
+				x: chunk.getColumn(x).data,
+				y: chunk.getColumn(y).data,
+				keyidx: chunk.getColumn(chunk.primaryKey).data,
 				type: 'bar'
 			}
 		];
@@ -33,7 +33,7 @@
 		e.detail.points;
 		console.log(e);
 		if (endpoint) {
-			dispatch(endpoint.endpoint_id, {
+			dispatch(endpoint.endpointId, {
 				detail: {
 					keyidxs: e.detail.points.map((p) => data[0].keyidx[p.pointIndex])
 				}

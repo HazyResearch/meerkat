@@ -1,38 +1,36 @@
 <script lang="ts">
-	import type { DataFrameRef } from '$lib/api/dataframe';
-	import { getContext } from 'svelte';
-	import { closeModal } from 'svelte-modals';
-	import Cell from '../cell/Cell.svelte';
+	import { fetchChunk, fetchSchema } from '$lib/utils/api';
+	import type { DataFrameRef } from '$lib/utils/dataframe';
+	import ArrowLeft from 'svelte-bootstrap-icons/lib/ArrowLeft.svelte';
 	import ChevronLeft from 'svelte-bootstrap-icons/lib/ChevronLeft.svelte';
 	import ChevronRight from 'svelte-bootstrap-icons/lib/ChevronRight.svelte';
-	import ArrowLeft from 'svelte-bootstrap-icons/lib/ArrowLeft.svelte';
+	import { closeModal } from 'svelte-modals';
+	import Cell from '../cell/Cell.svelte';
 
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
 	export let posidx: number;
-	export let main_column: string;
+	export let mainColumn: string;
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
 	export let card_flex_grow: boolean = false;
 	export let as_modal: boolean = false;
 
-	const { fetch_chunk, fetch_schema } = getContext('Meerkat');
-
-	$: schema_promise = fetch_schema({ df: df, variants: ['small'] }).then((schema) => {
-		if (main_column === undefined) {
-			main_column = schema.columns[0].name;
+	$: schema_promise = fetchSchema({ df: df, variants: ['small'] }).then((schema) => {
+		if (mainColumn === undefined) {
+			mainColumn = schema.columns[0].name;
 		}
 		return schema;
 	});
 
-	$: main_chunk_promise = fetch_chunk({
+	$: mainChunkPromise = fetchChunk({
 		df: df,
 		posidxs: [posidx],
-		columns: [main_column],
+		columns: [mainColumn],
 		variants: ['full_screen']
 	});
-	$: chunk_promise = fetch_chunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
+	$: chunk_promise = fetchChunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
 
 	const increment = async () => {
 		let chunk = await chunk_promise;
@@ -78,15 +76,15 @@
 									<!-- Key-Value Pair -->
 									<button
 										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-3 py-1"
-										class:bg-slate-200={main_column === column.name}
+										class:bg-slate-200={mainColumn === column.name}
 										on:click={() => {
-											main_column = column.name;
+											mainColumn = column.name;
 										}}
 									>
 										<!-- Key -->
 										<span
 											class="text-bf text-slate-600 text-left font-mono"
-											class:font-bold={main_column === column.name}
+											class:font-bold={mainColumn === column.name}
 										>
 											{column.name}
 										</span>
@@ -95,7 +93,7 @@
 											class="text-gray-600 text-right whitespace-nowrap overflow-hidden text-ellipsis"
 										>
 											{#await chunk_promise then chunk}
-												<Cell {...chunk.get_cell(0, column.name)} Cell />
+												<Cell {...chunk.getCell(0, column.name)} />
 											{/await}
 										</span>
 									</button>
@@ -140,7 +138,7 @@
 
 						<!-- Main column header -->
 						<div class="justify-self-center text-xl font-bold font-mono text-slate-600 ">
-							{main_column}
+							{mainColumn}
 						</div>
 						<!-- Close button -->
 						<button
@@ -152,8 +150,8 @@
 					</div>
 					<!-- Main section -->
 					<div class="flex p-10 items-center h-full w-full justify-center justify-self-center">
-						{#await main_chunk_promise then chunk}
-							<Cell {...chunk.get_cell(0, main_column)} />
+						{#await mainChunkPromise then chunk}
+							<Cell {...chunk.getCell(0, mainColumn)} />
 						{/await}
 					</div>
 				</div>

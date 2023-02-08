@@ -15,7 +15,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = dispatch(get_discover_schema.endpoint_id, { detail: {} });
+		schema_promise = dispatch(get_discover_schema.endpointId, { detail: {} });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
@@ -27,7 +27,7 @@
 			return;
 		}
 		status = 'working';
-		let promise = dispatch(on_discover.endpoint_id, {
+		let promise = dispatch(on_discover.endpointId, {
 			detail: {
 				by: by
 			}

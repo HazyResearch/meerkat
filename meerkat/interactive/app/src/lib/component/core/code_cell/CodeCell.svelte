@@ -6,10 +6,8 @@
 	export let code: string;
 	export let on_run: Endpoint;
 
-
-
-	let run_search = async (text) => {
-		await dispatch(on_run.endpoint_id, {
+	let runSearch = async (text) => {
+		await dispatch(on_run.endpointId, {
 			detail: {
 				new_code: text
 			}
@@ -29,19 +27,18 @@
 			minimap: { enabled: false }
 		});
 		editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
-			run_search(editor.getValue());
+			runSearch(editor.getValue());
 		});
 		return () => {
 			editor.dispose();
 		};
 	});
 
-	$: { 
+	$: {
 		if (editor) {
-			editor.setValue(code); 
+			editor.setValue(code);
 		}
 	}
-
 </script>
 
 <div class="h-32 w-full rounded-md border-slate-400 bg-slate-100 pt-2 pb-1 px-1">

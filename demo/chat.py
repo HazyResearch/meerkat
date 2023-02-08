@@ -1,5 +1,5 @@
 """
-Build a simple chat app.
+Build a simple chat app with Meerkat.
 """
 from datetime import datetime
 
@@ -61,8 +61,8 @@ df = _empty_df()
 
 chat = Chat(
     df=df,
-    imgChatbot="https://placeimg.com/200/200/animals",
-    imgUser="https://placeimg.com/200/200/people",
+    img_chatbot="https://placeimg.com/200/200/animals",
+    img_user="https://placeimg.com/200/200/people",
     on_send=on_send.partial(df=df),
 )
 

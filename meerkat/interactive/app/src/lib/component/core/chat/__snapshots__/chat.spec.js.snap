@@ -4,10 +4,10 @@ exports[`Chat > should render chat 1`] = `
 <body>
   <div>
     <div
-      class="bg-violet-100 p-4 rounded-lg flex flex-col h-full justify-between shadow-md"
+      class="h-full bg-violet-100 p-4 rounded-lg flex flex-col justify-between shadow-md"
     >
       <div
-        class="flex flex-col-reverse overflow-y-scroll h-full"
+        class="flex flex-col-reverse overflow-y-scroll"
       >
         <div
           class="flex ml-2 pl-4 pr-4 mb-4"

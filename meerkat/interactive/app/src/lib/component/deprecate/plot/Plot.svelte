@@ -1,16 +1,11 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-	import { getContext, setContext } from 'svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
-	import ScatterPlot from '$lib/shared/plot/layercake/ScatterPlot.svelte';
-	import HorizontalBarPlot from './bar/HorizontalBarPlot.svelte';
-	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
-	import { BarLoader } from 'svelte-loading-spinners';
 	import type { Point2D } from '$lib/shared/plot/types';
+	import type { DataFrameChunk, DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-	import type { DataFrameChunk, DataFrameRef } from '$lib/api/dataframe';
-
-	const { fetch_chunk, fetch_schema, dispatch } = getContext('Meerkat');
+	import { setContext } from 'svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
+	import FancyHorizontalBarPlot from './bar/FancyHorizontalBarPlot.svelte';
 
 	export let df: DataFrameRef;
 	export let x: string;
@@ -24,8 +19,6 @@
 	export let on_select: Endpoint = null;
 	export let on_remove: Endpoint;
 
-
-
 	// The columns corresponding to metadata to track.
 	export let metadata_columns: Array<string>;
 
@@ -36,9 +29,8 @@
 	let page: number = 0;
 	let per_page: number = 15;
 
-
 	setContext('removeRow', (id: any) => {
-		dispatch(on_remove.endpoint_id, { detail: { slice_id: id } });
+		dispatch(on_remove.endpointId, { detail: { slice_id: id } });
 	});
 
 	$: schema_promise = fetch_schema({ df: df });
@@ -83,7 +75,7 @@
 			return;
 		}
 
-		const promise = dispatch(on_select.endpoint_id, {
+		const promise = dispatch(on_select.endpointId, {
 			detail: {
 				// FIXME: Should we support multiple selections?
 				// If there is nothing in the array we should return an empty string
@@ -122,7 +114,12 @@
 	{/await}
 	{#await schema_promise then schema}
 		<div class=" z-10 bottom-0 w-full m-0 py-3">
-			<Pagination bind:page bind:per_page loaded_items={schema.nrows} total_items={schema.nrows} />
+			<Pagination
+				bind:page
+				bind:perPage={per_page}
+				loaded_items={schema.nrows}
+				totalItems={schema.nrows}
+			/>
 		</div>
 	{/await}
 </div>

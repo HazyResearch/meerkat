@@ -1,5 +1,3 @@
-/** Meerkat Component */
-export { default as Meerkat } from './Meerkat.svelte';
 /**
  * CSS
  * Need to export the styles, otherwise users of this Meerkat package don't see styling
@@ -19,10 +17,8 @@ export { default as Row } from './component/contrib/row/Row.svelte';
 export { default as Button } from './component/core/button/Button.svelte';
 export { default as Chat } from './component/core/chat/Chat.svelte';
 export { default as Checkbox } from './component/core/checkbox/Checkbox.svelte';
-export { default as Choice } from './component/core/choice/Choice.svelte';
 export { default as Code } from './component/core/code/Code.svelte';
 export { default as Document } from './component/core/document/Document.svelte';
-export { default as Editor } from './component/core/editor/Editor.svelte';
 export { default as FileUpload } from './component/core/fileupload/FileUpload.svelte';
 export { default as Filter } from './component/core/filter/Filter.svelte';
 export { default as Gallery } from './component/core/gallery/Gallery.svelte';
@@ -55,6 +51,5 @@ export { API_URL } from './constants.js';
 /** Shared Components */
 export { default as Page } from './shared/Page.svelte';
 export { default } from './utils/api';
-export { meerkat_writable } from './utils/stores.js';
+export { meerkatWritable } from './utils/stores.js';
 export { nestedMap } from './utils/tools.js';
-

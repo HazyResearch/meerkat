@@ -5,11 +5,9 @@ from .app.src.lib.component.abstract import BaseComponent, Component
 from .app.src.lib.component.contrib.mocha import ChangeList
 from .app.src.lib.component.contrib.fm_filter import FMFilter
 from .app.src.lib.component.core.button import Button
-from .app.src.lib.component.core.choice import Choice
 from .app.src.lib.component.core.code_cell import CodeCell, FilterCodeCell
 from .app.src.lib.component.core.code import Code
 from .app.src.lib.component.core.document import Document
-from .app.src.lib.component.core.editor import Editor
 from .app.src.lib.component.core.filter import Filter
 from .app.src.lib.component.core.gallery import Gallery
 from .app.src.lib.component.core.image import Image
@@ -90,13 +88,11 @@ __all__ = [
     # <<<< Core Components >>>>
     "Button",
     "Caption",
-    "Choice",
     "Code",
     "CodeCell",
     "FilterCodeCell",
     "Document",
     "EditTarget",
-    "Editor",
     "Filter",
     "Gallery",
     "Header", 
@@ -104,6 +100,7 @@ __all__ = [
     "Markdown",
     "Match",
     "MultiSelect",
+    "Put",
     "SliceByCards",
     "Sort",
     "Stats",
@@ -114,7 +111,6 @@ __all__ = [
     "Textbox",
     "Title", 
     "Toggle",
-    "Put",
     # <<<< Utilities >>>>
     "print",
 ]

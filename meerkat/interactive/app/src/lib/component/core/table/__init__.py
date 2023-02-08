@@ -8,12 +8,30 @@ from meerkat.interactive.endpoint import Endpoint
 
 
 class Table(Component):
+
     df: DataFrame
     per_page: int = 100
     editable: bool = False
     id_column: Optional[str] = None
 
-    on_edit: Endpoint = None
+    on_edit: Optional[Endpoint] = None
+
+    def __init__(
+        self,
+        df: DataFrame,
+        *,
+        per_page: int = 100,
+        editable: bool = False,
+        id_column: Optional[str] = None,
+        on_edit: Optional[Endpoint] = None,
+    ):
+        super().__init__(
+            df=df,
+            per_page=per_page,
+            editable=editable,
+            id_column=id_column,
+            on_edit=on_edit,
+        )
 
     # Create a Pydantic validator to ensure that the id_column is in the df
     # when editable is True

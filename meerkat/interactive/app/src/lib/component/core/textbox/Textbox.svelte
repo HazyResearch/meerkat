@@ -2,9 +2,6 @@
 	/** Text in the textbox. */
 	export let text: string;
 
-	/** Title the textbox to help the user. */
-	export let title: string = '';
-
 	let timer: any;
 	const debounce = (v: string) => {
 		clearTimeout(timer);
@@ -21,13 +18,3 @@
 	on:keyup={({ target: { value } }) => debounce(value)}
 	on:keypress
 />
-<!-- <div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col">
-	{#if title != ''}
-		<div class="font-bold text-xl text-slate-600 self-start pl-2">
-			{title}
-		</div>
-	{/if}
-	<div class="px-2 w-full flex items-center">
-		
-	</div>
-</div> -->

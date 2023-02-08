@@ -12,7 +12,7 @@
 	let run_search = async (text) => {
 		console.log('run search');
 		dispatch(
-			on_run.endpoint_id,
+			on_run.endpointId,
 			{
 				new_code: text
 			},

@@ -1,25 +1,25 @@
 <script lang="ts">
 	export let data: { [key: string]: number } = {};
 
-	const format_number = (number: number) => {
+	const formatNumber = (number: number) => {
 		if (Number.isInteger(number) && number < 1000) {
 			return number.toString();
 		}
-		const symbol_to_divisor = [
+		const symbolToDivisor = [
 			['B', 9],
 			['M', 6],
 			['K', 3]
 		];
-		let number_str = number.toFixed(2);
-		for (let i = 0; i < symbol_to_divisor.length; i++) {
-			const symbol: string = symbol_to_divisor[i][0];
-			const divisor: number = Math.pow(10, symbol_to_divisor[i][1]);
+		let numberStr = number.toFixed(2);
+		for (let i = 0; i < symbolToDivisor.length; i++) {
+			const symbol: string = symbolToDivisor[i][0];
+			const divisor: number = Math.pow(10, symbolToDivisor[i][1]);
 			if (number >= divisor) {
-				number_str = `${(number / divisor).toFixed(2)}${symbol}`;
+				numberStr = `${(number / divisor).toFixed(2)}${symbol}`;
 				break;
 			}
 		}
-		return number_str;
+		return numberStr;
 	};
 </script>
 
@@ -28,7 +28,7 @@
 		<div class="bg-slate-100 rounded-md flex flex-col shadow-sm py-0.5">
 			<div class="text-slate-400 text-md px-2 self-center">{k}</div>
 			<div class="font-bold text-xl self-center">
-				{format_number(v)}
+				{formatNumber(v)}
 			</div>
 		</div>
 	{/each}
