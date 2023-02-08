@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
@@ -22,10 +22,10 @@ class Slider(Component):
         classes (str): The Tailwind classes to apply to the component.
     """
 
-    value: float = 0
-    min: float = 0.0
-    max: float = 100.0
-    step: float = 1.0
+    value: Union[int, float] = 0
+    min: Union[int, float] = 0.0
+    max: Union[int, float] = 100.0
+    step: Union[int, float] = 1.0
     disabled: bool = False
     classes: str = "bg-violet-50 px-4 py-1 rounded-lg"
 

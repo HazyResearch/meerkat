@@ -58,6 +58,9 @@ class Title(Markdown):
     This will place the text in an `<h1>` tag.
     """
 
+    def __init__(self, text: str, *, classes: str = "", **kwargs):
+        super().__init__(body=text, classes=classes, **kwargs)
+
     @validator("body", pre=True)
     def make_title(cls, v):
         return f"# {v}"
@@ -70,6 +73,8 @@ class Header(Markdown):
     Use this component for the main header of a section.
     This will place the text in an `<h2>` tag.
     """
+    def __init__(self, text: str, *, classes: str = "", **kwargs):
+        super().__init__(body=text, classes=classes, **kwargs)
 
     @validator("body", pre=True)
     def make_header(cls, v):
@@ -83,6 +88,8 @@ class Subheader(Markdown):
     Use this component for the subheader of a section.
     This will place the text in an `<h3>` tag.
     """
+    def __init__(self, text: str, *, classes: str = "", **kwargs):
+        super().__init__(body=text, classes=classes, **kwargs)
 
     @validator("body", pre=True)
     def make_subheader(cls, v):
@@ -99,6 +106,8 @@ class Caption(Markdown):
     Default Tailwind classes:
         text-sm text-gray-400
     """
+    def __init__(self, text: str, *, classes: str = "", **kwargs):
+        super().__init__(body=text, classes=classes, **kwargs)
 
     @validator("classes", pre=True, always=True)
     def add_classes(cls, v):
