@@ -26,7 +26,6 @@ def add_one(data):
 class FileColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
-        "transform": [True, False],
         "use_base_dir": [True, False],
     }
 
@@ -36,14 +35,12 @@ class FileColumnTestBed(AbstractColumnTestBed):
         self,
         tmpdir: str,
         length: int = 16,
-        transform: bool = False,
         use_base_dir: bool = False,
         seed: int = 123,
     ):
         self.paths = []
         self.data = []
 
-        self.transform = add_one if transform else None
 
         self.tmp_dir = tmpdir
         self.files_dir = os.path.join(tmpdir, "files")
@@ -64,12 +61,9 @@ class FileColumnTestBed(AbstractColumnTestBed):
                 self.paths.append(os.path.join(self.files_dir, filename))
 
         self.data = np.arange(length)
-        if self.transform is not None:
-            self.data = self.data + 1
 
         self.col = FileColumn.from_filepaths(
             self.paths,
-            transform=self.transform,
             loader=load_json,
             base_dir=self.base_dir,
         )

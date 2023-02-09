@@ -10,7 +10,6 @@ import pytest
 import torch
 import torchvision.datasets.folder as folder
 from PIL import Image
-from torchvision.transforms.functional import to_tensor
 
 import meerkat
 from meerkat import ImageColumn
@@ -29,7 +28,6 @@ from ..abstract import AbstractColumnTestBed, column_parametrize
 class ImageColumnTestBed(AbstractColumnTestBed):
 
     DEFAULT_CONFIG = {
-        "transform": [True, False],
         "use_base_dir": [True, False],
     }
 
@@ -39,7 +37,6 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         self,
         tmpdir: str,
         length: int = 16,
-        transform: bool = False,
         use_base_dir: bool = False,
         seed: int = 123,
     ):
@@ -48,15 +45,13 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         self.ims = []
         self.data = []
 
-        transform = to_tensor if transform else None
-
         self.base_dir = tmpdir if use_base_dir else None
 
         for i in range(0, length):
             self.image_arrays.append((i * np.ones((4, 4, 3))).astype(np.uint8))
             im = Image.fromarray(self.image_arrays[-1])
             self.ims.append(im)
-            self.data.append(transform(im) if transform else im)
+            self.data.append(im)
             filename = "{}.png".format(i)
             im.save(os.path.join(tmpdir, filename))
             if use_base_dir:
@@ -64,12 +59,9 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             else:
                 self.image_paths.append(os.path.join(tmpdir, filename))
 
-        if transform is not None:
-            self.data = torch.stack(self.data)
-        self.transform = transform
+
         self.col = ImageColumn.from_filepaths(
             self.image_paths,
-            transform=transform,
             loader=folder.default_loader,
             base_dir=self.base_dir,
         )
@@ -88,41 +80,22 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 # can't check for cell column equivalence because the `fn` is a bound
                 # method of different objects (since we perform batching then convert)
                 # non-batched fns to batched functions, so we call get
-                if self.transform is None:
-                    return {
-                        "fn": lambda x, k=0: x.get().rotate(45 + salt + k),
-                        "expected_result": ObjectColumn(
-                            [im.rotate(45 + salt + kwarg) for im in self.ims]
-                        ),
-                    }
-                else:
-                    return {
-                        "fn": lambda x, k=0: x.get() + salt + k,
-                        "expected_result": TorchTensorColumn(
-                            torch.stack([self.transform(im) for im in self.ims])
-                            + salt
-                            + kwarg
-                        ),
-                    }
-        else:
-            if self.transform is None:
                 return {
-                    "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
-                    if batched
-                    else (lambda x, k=0: x.rotate(45 + salt + k)),
+                    "fn": lambda x, k=0: x.get().rotate(45 + salt + k),
                     "expected_result": ObjectColumn(
                         [im.rotate(45 + salt + kwarg) for im in self.ims]
                     ),
                 }
-            else:
-                return {
-                    "fn": lambda x, k=0: x + salt + k,
-                    "expected_result": TorchTensorColumn(
-                        torch.stack([self.transform(im) for im in self.ims])
-                        + salt
-                        + kwarg
-                    ),
-                }
+
+        else:
+            return {
+                "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
+                if batched
+                else (lambda x, k=0: x.rotate(45 + salt + k)),
+                "expected_result": ObjectColumn(
+                    [im.rotate(45 + salt + kwarg) for im in self.ims]
+                ),
+            }
 
     def get_filter_spec(
         self,
@@ -152,38 +125,23 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     "expected_result": self.col[: 4 + salt + kwarg],
                 }
         else:
-            if self.transform is None:
-                return {
-                    "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
-                    if batched
-                    else (lambda x, k=0: x.rotate(45 + salt + k)),
-                    "expected_result": ObjectColumn(
-                        [im.rotate(45 + salt + kwarg) for im in self.ims]
-                    ),
-                }
-            else:
-                return {
-                    "fn": lambda x, k=0: (
-                        (x.mean(dim=[1, 2, 3]) if batched else x.mean()) > salt + k
-                    ).to(bool),
-                    "expected_result": self.col[
-                        torch.stack([self.transform(im) for im in self.ims])
-                        .mean(dim=[1, 2, 3])
-                        .numpy()
-                        > salt + kwarg
-                    ],
-                }
+            return {
+                "fn": (lambda x, k=0: [im.rotate(45 + salt + k) for im in x])
+                if batched
+                else (lambda x, k=0: x.rotate(45 + salt + k)),
+                "expected_result": ObjectColumn(
+                    [im.rotate(45 + salt + kwarg) for im in self.ims]
+                ),
+            }
+          
 
     def get_data(self, index, materialize: bool = True):
         if materialize:
             if isinstance(index, int):
                 return self.data[index]
 
-            if self.transform is not None:
-                return self.data[index]
-            else:
-                index = np.arange(len(self.data))[index]
-                return [self.data[idx] for idx in index]
+            index = np.arange(len(self.data))[index]
+            return [self.data[idx] for idx in index]
         else:
             if isinstance(index, int):
                 return FileCell(

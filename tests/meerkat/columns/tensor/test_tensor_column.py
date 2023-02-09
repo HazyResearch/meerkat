@@ -105,7 +105,7 @@ def test_to_pandas(testbed):
         assert (series.values == testbed.col.data).all()
     else:
         for idx in range(len(testbed.col)):
-            assert (series.iloc[idx] == testbed.col[idx]).all()
+            assert (series.iloc[idx] == testbed.col[idx].numpy()).all()
 
 
 def test_repr_pandas(testbed):

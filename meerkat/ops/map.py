@@ -1,5 +1,6 @@
 from inspect import signature
 from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Type, Union
+import warnings
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView
@@ -209,15 +210,8 @@ def defer(
         args = [data]
         kwargs = {}
     elif isinstance(data, DataFrame):
-        if inputs == "row":
-            args = []
-            kwargs = {col_name: col for col_name, col in data.items()}
-            
-            def wrapper(*args, **kwargs):
-                return base_function(kwargs)
-            function = wrapper
-
-        elif isinstance(inputs, Mapping):
+        args, kwargs = None, None
+        if isinstance(inputs, Mapping):
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
         elif isinstance(inputs, Sequence):
@@ -225,23 +219,35 @@ def defer(
             args = [data[col_name] for col_name in inputs]
             kwargs = {}
         elif inputs is None:
-            # infer mapping from function signature
+            # infer mapping from function signature if possible otherwise pass full row
             args = []
             kwargs = {}
             for name, param in signature(function).parameters.items():
                 if name in data:
                     kwargs[name] = data[name]
                 elif param.default is param.empty:
-                    raise ValueError(
+                    warnings.warn(
                         f"Non-default argument '{name}' does not have a corresponding "
                         "column in the DataFrame. If your function expects a full "
-                        "DataFrame row, pass ``inputs='row'`` to ``map``. Otherwise, " 
-                        "please provide an `inputs` mapping ",
+                        "DataFrame row, pass ``inputs='row'`` to ``map``. Otherwise, "
+                        "please provide an `inputs` mapping "
                         "or pass a lambda function with a different signature. "
-                        "See map documentation for more details."
+                        "See map documentation for more details.",
                     )
-        else:
-            raise ValueError("`inputs` must be a mapping or sequence.")
+                    inputs = "row"
+                    break
+
+        if inputs is "row":
+            args = []
+            kwargs = {col_name: col for col_name, col in data.items()}
+
+            def wrapper(*args, **kwargs):
+                return base_function(kwargs)
+
+            function = wrapper
+
+        if args is None or kwargs is None:
+            raise ValueError("``inputs`` must be Mapping, Sequence or 'row'")
 
     op = DeferredOp(
         fn=function,
@@ -457,7 +463,7 @@ def _materialize(
     blocks_per_window: int,
 ):
     import logging
-    
+
     import numpy as np
     import pandas as pd
     import torch
@@ -470,6 +476,7 @@ def _materialize(
 
     if use_ray:
         import ray
+
         ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
         ray.data.set_progress_bars(enabled=pbar)
 
@@ -547,6 +554,7 @@ def _materialize(
             # return infer_column_type(result)
             return result
             import pyarrow as pa
+
             return column(pa.concat_arrays(result))
         elif data._output_type == mk.ObjectColumn:
             for partition in result_ds.iter_batches():

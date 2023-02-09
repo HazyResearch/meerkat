@@ -254,7 +254,7 @@ class TorchTensorColumn(
     def to_tensor(self) -> "torch.Tensor":
         return self.data
 
-    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+    def to_pandas(self, allow_objects: bool = True) -> pd.Series:
         if len(self.shape) == 1:
             return pd.Series(self.to_numpy())
         elif allow_objects:
