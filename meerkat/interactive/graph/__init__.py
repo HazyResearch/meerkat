@@ -1,8 +1,6 @@
 import logging
 from typing import List
 
-from tqdm import tqdm
-
 from meerkat.errors import TriggerError
 from meerkat.interactive.graph.operation import Operation
 from meerkat.interactive.graph.reactivity import (

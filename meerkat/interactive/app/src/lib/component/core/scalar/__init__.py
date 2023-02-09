@@ -21,7 +21,12 @@ class ScalarFormatter(Formatter):
     component_class: type = Scalar
     data_prop: str = "data"
 
-    def __init__(self, dtype: str = "auto", precision: int = 3, percentage: bool = False):
+    def __init__(
+        self,
+        dtype: str = "auto",
+        precision: int = 3,
+        percentage: bool = False,
+    ):
         super().__init__(dtype=dtype, precision=precision, percentage=percentage)
 
     def _encode(self, cell: Any):

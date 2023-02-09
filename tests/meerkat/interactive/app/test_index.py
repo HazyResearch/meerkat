@@ -49,7 +49,8 @@ def test_index_js():
     # Assert that the list of components in Python is the same as the list of
     # components exported in index.js
     assert set(py_components) == set(exported_components), (
-        "The list of components exported in app/src/lib/index.js is not the same as the list "
+        "The list of components exported in app/src/lib/index.js is "
+        "not the same as the list "
         "of components defined in Python. Make sure to export all components in "
         "index.js and to define all components in Python (with @meerkat-ml/meerkat "
         "library)."

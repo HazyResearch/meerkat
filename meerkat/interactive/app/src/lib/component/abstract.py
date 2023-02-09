@@ -383,8 +383,11 @@ class BaseComponent(
 
         # Get all fields that pydantic tells us are endpoints.
         for field, value in cls.__fields__.items():
-            if not is_subclass(value.type_, Endpoint) or \
-            field not in values or values[field] is None:
+            if (
+                not is_subclass(value.type_, Endpoint)
+                or field not in values
+                or values[field] is None
+            ):
                 continue
 
             # Pull out the EventInterface from Endpoint.

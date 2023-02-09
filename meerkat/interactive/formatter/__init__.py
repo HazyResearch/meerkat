@@ -1,8 +1,3 @@
-from meerkat.interactive.app.src.lib.component.core.scalar import ScalarFormatter
-
-from .base import Formatter
-
-
 # # backwards compatibility
 class DeprecatedFormatter:
     pass

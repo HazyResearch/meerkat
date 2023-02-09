@@ -26,7 +26,8 @@ class Formatter(ABC):
         default_props, required_props = self._get_props()
         if not all(k in kwargs for k in required_props):
             raise ValueError(
-                f"Missing required properties {required_props} for {self.__class__.__name__}"
+                "Missing required properties "
+                f"{required_props} for {self.__class__.__name__}"
             )
 
         default_props.update(kwargs)

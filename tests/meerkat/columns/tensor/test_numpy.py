@@ -4,7 +4,6 @@ import numpy as np
 import numpy.testing as np_test
 import pandas as pd
 import pytest
-import torch
 from numpy.lib.format import open_memmap
 
 from meerkat import NumPyTensorColumn, TorchTensorColumn

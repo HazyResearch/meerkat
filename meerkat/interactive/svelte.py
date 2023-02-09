@@ -95,10 +95,10 @@ class SvelteWriter(metaclass=Singleton):
         subclasses = [c for c in subclasses if c.__name__ not in exclude_classes]
         subclasses = sorted(subclasses, key=lambda c: c.alias)
 
-        logger.debug(
-            f"Found {len(subclasses)} components.\n"
-            f"{tabulate([[subclass.__module__, subclass.__name__] for subclass in subclasses])}"
+        tabulated_subclasses = tabulate(
+            [[subclass.__module__, subclass.__name__] for subclass in subclasses]
         )
+        logger.debug(f"Found {len(subclasses)} components.\n" f"{tabulated_subclasses}")
 
         self._components = subclasses
         return subclasses

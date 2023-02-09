@@ -19,7 +19,6 @@ from meerkat.columns.deferred.base import DeferredCell
 from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
-from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from ....utils import product_parametrize
 from ..abstract import AbstractColumnTestBed, column_parametrize

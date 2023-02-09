@@ -472,7 +472,8 @@ def test_row_indexing_view_copy_semantics():
 # ):
 #     df = testbed.df
 #     map_specs = {
-#         name: col_testbed.get_map_spec(batched=batched, materialize=materialize, salt=1)
+#         name: col_testbed.get_map_spec(batched=batched,
+#           materialize=materialize, salt=1)
 #         for name, col_testbed in testbed.column_testbeds.items()
 #     }
 
@@ -505,7 +506,8 @@ def test_row_indexing_view_copy_semantics():
 # def test_map_return_multiple_img_only(
 #     testbed: DataFrameTestBed, batched: bool, materialize: bool
 # ):
-#     test_map_return_multiple(testbed=testbed, batched=batched, materialize=materialize)
+#     test_map_return_multiple(testbed=testbed, batched=batched,
+#       materialize=materialize)
 
 
 # @product_parametrize(
@@ -560,13 +562,15 @@ def test_row_indexing_view_copy_semantics():
 # def test_map_update_new(testbed: DataFrameTestBed, batched: bool, materialize: bool):
 #     df = testbed.df
 #     map_specs = {
-#         name: col_testbed.get_map_spec(batched=batched, materialize=materialize, salt=1)
+#         name: col_testbed.get_map_spec(batched=batched,
+#           materialize=materialize, salt=1)
 #         for name, col_testbed in testbed.column_testbeds.items()
 #     }
 
 #     def func(x):
 #         out = {
-#             f"{key}_new": map_spec["fn"](x[key]) for key, map_spec in map_specs.items()
+#             f"{key}_new": map_spec["fn"](x[key])
+#               for key, map_spec in map_specs.items()
 #         }
 #         return out
 
@@ -581,24 +585,28 @@ def test_row_indexing_view_copy_semantics():
 #             if "output_type" in map_spec
 #         },
 #     )
-#     assert set(result.columns) == set(df.columns) | {f"{key}_new" for key in df.columns}
+#     assert set(result.columns) == set(df.columns) |
+#           {f"{key}_new" for key in df.columns}
 #     assert isinstance(result, DataFrame)
 #     for key, map_spec in map_specs.items():
 #         assert result[f"{key}_new"].is_equal(map_spec["expected_result"])
 
 
-# @product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
+# @product_parametrize(params={"batched": [True, False],
+#               "materialize": [True, False]})
 # def test_map_update_existing(
 #     testbed: DataFrameTestBed, batched: bool, materialize: bool
 # ):
 #     df = testbed.df
 #     map_specs = {
-#         name: col_testbed.get_map_spec(batched=batched, materialize=materialize, salt=1)
+#         name: col_testbed.get_map_spec(batched=batched,
+#           materialize=materialize, salt=1)
 #         for name, col_testbed in testbed.column_testbeds.items()
 #     }
 
 #     def func(x):
-#         out = {f"{key}": map_spec["fn"](x[key]) for key, map_spec in map_specs.items()}
+#         out = {f"{key}": map_spec["fn"](x[key])
+#           for key, map_spec in map_specs.items()}
 #         return out
 
 #     result = df.update(
@@ -619,7 +627,8 @@ def test_row_indexing_view_copy_semantics():
 #         assert result[key].is_equal(map_spec["expected_result"])
 
 
-# @product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
+# @product_parametrize(params={"batched": [True, False],
+#               "materialize": [True, False]})
 # def test_filter(testbed: DataFrameTestBed, batched: bool, materialize: bool):
 #     df = testbed.df
 #     name = list(testbed.column_testbeds.keys())[0]

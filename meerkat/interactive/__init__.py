@@ -111,6 +111,9 @@ __all__ = [
     "Textbox",
     "Title",
     "Toggle",
+    # <<<< Contrib Components >>>>
+    "ChangeList",
+    "FMFilter",
     # <<<< Utilities >>>>
     "print",
 ]

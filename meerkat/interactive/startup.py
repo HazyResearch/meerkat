@@ -487,7 +487,8 @@ def run_frontend(
         with open(".buildprint", "w") as f:
             f.write(str(buildprint))
 
-        # If the most recent file change is the same as the last build, skip the build step
+        # If the most recent file change is the same as the last build,
+        # skip the build step
         skip_build = skip_build or (last_buildprint == buildprint)
         process = run_frontend_prod(
             port, apiurl, libpath, package_manager, env, skip_build
