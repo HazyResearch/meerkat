@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from meerkat.dataframe import DataFrame
 
 
-manifest = LazyLoader('manifest')
+manifest = LazyLoader("manifest")
 DELTA_COLUMN = "delta"
 
 
@@ -156,12 +156,12 @@ class ChangeList(BaseComponent):
             # TODO(sabri): make this default to the active slice
             filter = mk.gui.Filter(df=examples_df, title="Filter Examples")
             fm_filter = mk.gui.FMFilter(
-                df=examples_df, 
+                df=examples_df,
                 manifest_session=manifest.Manifest(
-                    client_name = "huggingface",
-                    client_connection = "http://127.0.0.1:7861",
-                    temperature=0.1
-                )
+                    client_name="huggingface",
+                    client_connection="http://127.0.0.1:7861",
+                    temperature=0.1,
+                ),
             )
             code = mk.gui.CodeCell()
             current_examples = filter(examples_df)
@@ -184,7 +184,12 @@ class ChangeList(BaseComponent):
             stats_df = slice_sort(stats_df)
 
             @mk.gui.endpoint
-            def on_select_slice(slice_id: str, criteria: mk.gui.Store, code: str, query: str):
+            def on_select_slice(
+                slice_id: str,
+                criteria: mk.gui.Store,
+                code: str,
+                query: str,
+            ):
                 """Update the gallery filter criteria with the selected slice.
 
                 The gallery should be filtered based on the selected
@@ -233,14 +238,20 @@ class ChangeList(BaseComponent):
                 slice_repo.write()
 
             @mk.gui.reactive
-            def get_selected_slice_id(criteria: List[FilterCriterion], code: str, query: str):
+            def get_selected_slice_id(
+                criteria: List[FilterCriterion],
+                code: str,
+                query: str,
+            ):
                 if len(criteria) == 1 and query == "__default__" and code == "df":
                     criterion = criteria[0]
                     if criterion.source == "on_select_slice":
                         return slice_repo._slice_id(criterion.column)
                 return ""
 
-            selected_slice_id = get_selected_slice_id(filter.criteria, code.code, fm_filter.query)
+            selected_slice_id = get_selected_slice_id(
+                filter.criteria, code.code, fm_filter.query
+            )
 
             plot = Plot(
                 df=stats_df,
@@ -261,7 +272,8 @@ class ChangeList(BaseComponent):
                 if not key:
                     return
                 df[column][df.primary_key._keyidx_to_posidx(key)] = value
-                # # We have to force add the dataframe modification to trigger downstream updates
+                # We have to force add the dataframe modification to trigger 
+                # downstream updates
                 mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
                 mod.add_to_queue()
                 slice_repo.write()
@@ -284,7 +296,7 @@ class ChangeList(BaseComponent):
                 current_df = fm_filter(current_df)
 
                 slice_id = slice_repo.add(
-                    name=f"Unnamed Slice",
+                    name="Unnamed Slice",
                     membership=mk.DataFrame(
                         {
                             current_df.primary_key_name: current_df.primary_key,
@@ -295,7 +307,6 @@ class ChangeList(BaseComponent):
                 )
                 slice_repo.write()
                 return slice_id
-
 
             active_slice_view = Row(
                 df=stats_df,
@@ -310,7 +321,11 @@ class ChangeList(BaseComponent):
                 on_slice_creation=on_slice_creation.partial(
                     examples_df=examples_df
                 ).compose(
-                    on_select_slice.partial(criteria=filter.criteria, query=fm_filter.query, code=code.code)
+                    on_select_slice.partial(
+                        criteria=filter.criteria,
+                        query=fm_filter.query,
+                        code=code.code,
+                    )
                 ),
             )
 
