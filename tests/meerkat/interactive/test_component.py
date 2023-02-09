@@ -66,7 +66,7 @@ def test_component_creation_fails_with_bad_endpoint():
     @mk.gui.endpoint
     def test_endpoint_8(arg_0, arg_1, arg_2, arg_3):
         pass
-    
+
     Test(on_click=test_endpoint_6.partial(arg_3=3))
     Test(on_click=test_endpoint_7.partial(3))
     Test(on_click=test_endpoint_8.partial(3, arg_3=3))
