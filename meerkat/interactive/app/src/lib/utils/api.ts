@@ -4,8 +4,8 @@ import { get } from 'svelte/store';
 import { API_URL } from "../constants.js";
 import { DataFrameChunk, type DataFrameRef } from './dataframe.js';
 
-export const updateStore = async (store_id: string, value: any) => {
-    const modifications = await modify(`${get(API_URL)}/store/${store_id}/update`, { value: value });
+export const updateStore = async (storeId: string, value: any) => {
+    const modifications = await modify(`${get(API_URL)}/store/${storeId}/update`, { value: value });
     return modifications;
 };
 
@@ -50,7 +50,7 @@ export interface DataFrameChunkRequest {
     end?: number | null
     posidxs?: Array<number> | null
     keyidxs?: Array<string | number> | null
-    key_column?: string | null
+    keyColumn?: string | null
     variants?: Array<string> | null
 }
 
@@ -61,14 +61,14 @@ export const fetchChunk = async ({
     end = null,
     posidxs = null,
     keyidxs = null,
-    key_column = null,
+    keyColumn = null,
     variants = null
 }: DataFrameChunkRequest) => {
     const result = await post(`${get(API_URL)}/df/${df.refId}/rows`, {
         start: start,
         end: end,
         posidxs: posidxs,
-        key_column: key_column,
+        key_column: keyColumn,
         keyidxs: keyidxs,
         columns: columns,
         variants: variants

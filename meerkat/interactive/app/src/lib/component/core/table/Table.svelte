@@ -12,7 +12,7 @@
 	export let page: number = 0;
 	export let perPage: number = 100;
 	export let editable: boolean = false;
-	export let idColumn: string = null;
+	export let idColumn: string | null = null;
 
 	export let columnWidths: Array<number>;
 

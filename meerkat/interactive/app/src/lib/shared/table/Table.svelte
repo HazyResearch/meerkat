@@ -10,7 +10,7 @@
 	export let rows: DataFrameChunk | null;
 	export let schema: DataFrameSchema;
 	export let editable: boolean = false;
-	export let idColumn: string = null;
+	export let idColumn: string | null = null;
 	let columnInfos: Array<ColumnInfo> = schema.columns;
 
 	export let columnWidths = Array.apply(null, Array(columnInfos.length)).map((x, i) => 256);

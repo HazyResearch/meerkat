@@ -35,9 +35,7 @@ export async function modify(url: string, data: any): Promise<any> {
 }
 
 export function applyModifications(modifications: Array<any>) {
-    console.log("Applying modifications", modifications);
     for (const modification of modifications) {
-        console.log(modification.type);
         if (modification.type === 'ref') {
             // Node modification
             if (!globalStores.has(modification.id)) {
@@ -55,18 +53,16 @@ export function applyModifications(modifications: Array<any>) {
             // Store modification
             const store = globalStores.get(modification.id);
 
-            console.log("Modification", modification, "Store", store);
-
             if (store === undefined) {
                 console.log(
-                    "Store is not maintained on the frontend. Only stores passed as props to a component are maintained in `global_stores`.",
+                    "Store is not maintained on the frontend. Only stores passed as props to a component are maintained in `globalStores`.",
                     modification.id
                 )
                 continue;
             }
             // set with trigger=false so that the store change doesn't trigger backend 
-            if (!("trigger_store" in store)) {
-                throw "Must use `meerkat_writable` for backend stores."
+            if (!("triggerStore" in store)) {
+                throw "Must use `meerkatWritable` for backend stores."
             }
             // only update the store if the value has changed
             if (modification.value !== get(store)) {
