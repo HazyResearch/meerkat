@@ -446,34 +446,6 @@ def map(
     )
 
 
-<<<<<<< HEAD
-=======
-# from ray.data import Datasource
-# from typing import List, Any
-# from ray.data.block import BlockMetadata, Block
-# from ray.data.datasource import WriteResult
-# from ray.types import ObjectRef
-
-
-# class NumPyDatasource(Datasource):
-#     def __init__(self):
-#         self._data = []
-
-#     def do_write(
-#         self,
-#         blocks: List[ObjectRef[Block]],
-#         metadata: List[BlockMetadata],
-#         ray_remote_args: Dict[str, Any],
-#         **write_args,
-#     ) -> List[ObjectRef[WriteResult]]:
-#         self._data.append(blocks)
-#         return blocks
-    
-#     def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
-#         return 0
-
-
->>>>>>> clever-dev
 def _materialize(
     data: Union["DataFrame", "Column"],
     batch_size: int,
@@ -495,14 +467,9 @@ def _materialize(
     from .concat import concat
 
     if use_ray:
-<<<<<<< HEAD
+        import ray
         ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
         ray.data.set_progress_bars(enabled=pbar)
-=======
-        import ray
-        ray.init(ignore_reinit_error=True)
-        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
->>>>>>> clever-dev
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
