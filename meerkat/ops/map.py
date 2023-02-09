@@ -1,5 +1,5 @@
 from inspect import signature
-from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Type, Union
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView
@@ -76,7 +76,7 @@ def defer(
     batch_size: int = 1,
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
-    output_type: Union[Mapping[str, type], type] = None,
+    output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
     materialize: bool = True,
 ) -> Union["DataFrame", "DeferredColumn"]:
     """Create one or more DeferredColumns that lazily applies a function to
@@ -218,9 +218,9 @@ def defer(
                     kwargs[name] = data[name]
                 elif param.default is param.empty:
                     raise ValueError(
-                        f"Non-default argument {name} does not have a corresponding "
+                        f"Non-default argument '{name}' does not have a corresponding "
                         f"column in the DataFrame. Please provide an `inputs` mapping "
-                        f"pass a lambda function with a different signature."
+                        f"or pass a lambda function with a different signature."
                     )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
@@ -237,6 +237,7 @@ def defer(
     block = DeferredBlock.from_block_data(data=op)
 
     first_row = op._get(0) if len(op) > 0 else None
+    _infer_column_type([first_row])
 
     if outputs is None and isinstance(first_row, Dict):
         # support for splitting a dict into multiple columns without specifying outputs
@@ -310,6 +311,8 @@ def map(
     output_type: Union[Mapping[str, type], type] = None,
     materialize: bool = True,
     use_ray: bool = False,
+    num_blocks: int = 100,
+    blocks_per_window: int = 10,
     pbar: bool = False,
     **kwargs,
 ):
@@ -370,6 +373,9 @@ def map(
         ${inputs}
         ${outputs}
         ${output_type}
+        ${use_ray}
+        ${num_blocks}
+        ${blocks_per_window}
         pbar (bool): Show a progress bar. Defaults to False.
 
     Returns:
@@ -425,23 +431,135 @@ def map(
         output_type=output_type,
         materialize=materialize,
     )
-    return _materialize(deferred, batch_size=batch_size, pbar=pbar, use_ray=use_ray)
+    return _materialize(
+        deferred,
+        batch_size=batch_size,
+        pbar=pbar,
+        use_ray=use_ray,
+        num_blocks=num_blocks,
+        blocks_per_window=blocks_per_window,
+    )
+
+
+from ray.data import Datasource
+from typing import List, Any
+from ray.data.block import BlockMetadata, Block
+from ray.data.datasource import WriteResult
+from ray.types import ObjectRef
+
+
+class NumPyDatasource(Datasource):
+    def __init__(self):
+        self._data = []
+
+    def do_write(
+        self,
+        blocks: List[ObjectRef[Block]],
+        metadata: List[BlockMetadata],
+        ray_remote_args: Dict[str, Any],
+        **write_args,
+    ) -> List[ObjectRef[WriteResult]]:
+        self._data.append(blocks)
+        return blocks
+    
+    def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
+        return 0
 
 
 def _materialize(
-    data: Union["DataFrame", "Column"], batch_size: int, pbar: bool, use_ray: bool
+    data: Union["DataFrame", "Column"],
+    batch_size: int,
+    pbar: bool,
+    use_ray: bool,
+    num_blocks: int,
+    blocks_per_window: int,
 ):
+    import numpy as np
+    import pandas as pd
+    import ray
+    import torch
     from tqdm import tqdm
+
+    import meerkat as mk
 
     from .concat import concat
 
     if use_ray:
-        # TODO (dean): Implement this with ray for linear pipelines only, if there are
-        # branches raises a valueerror.
-        # Build the pipeline by following `data.args` and `data.kwargs`
-        # `out = df.defer(lambda img: np.array(img.resize((100, 100)))).defer(lambda img: (img.mean(), img.std()))`
-        # `out["0"].data.args[0].data.kwargs["img"]`
-        raise NotImplementedError
+        ray.init(ignore_reinit_error=True)
+        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
+
+        # Step 1: Walk through the DeferredColumns and build a list of functions
+        curr = data
+        fns = []
+        while isinstance(curr, mk.DeferredColumn):
+            fns.append(curr.data.fn)
+
+            # For linear pipelines, there will be either one elem in args or one key in
+            # kwargs
+            if curr.data.args:
+                if len(curr.data.args) > 1:
+                    raise ValueError("Multiple args not supported.")
+                curr = curr.data.args[0]
+            elif curr.data.kwargs:
+                if len(curr.data.kwargs) > 1:
+                    raise ValueError("Multiple kwargs not supported.")
+                curr = curr.data.kwargs[next(iter(curr.data.kwargs))]
+            else:
+                raise ValueError("No args or kwargs.")
+
+        # Step 2: Create the ray dataset from the base column
+        if isinstance(curr, mk.ScalarColumn):
+            ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
+            fns.append(lambda x: x["0"])
+        elif isinstance(curr, mk.TensorColumn):
+            ds = ray.data.from_torch(curr).repartition(num_blocks)
+        elif isinstance(curr, mk.ObjectColumn):
+            ds = ray.data.from_items(curr).repartition(num_blocks)
+        else:
+            raise ValueError(f"Base column is of unsupported type {type(curr)}.")
+
+        # Step 3: Build the pipeline by walking backwards through fns
+        pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
+        for fn in reversed(fns):
+            # TODO (dean): if batch_size > 1, then use map_batches
+            pipe = pipe.map(fn)
+
+        datasource = NumPyDatasource()
+        pipe = pipe.write_datasource(datasource)
+        breakpoint()
+
+        # Step 4: Collect the results
+        # TODO (dean): support different output types
+        result_ds = iter(
+            pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()
+        ).__next__()
+        if data._output_type in [np.int64, np.float32, np.float64, np.ndarray]:
+            print("Using to_numpy_refs()")
+            result = []
+            for partition in result_ds.to_numpy_refs():
+                result.append(ray.get(partition))
+            return np.stack(result)
+        elif data._output_type in [torch.Tensor]:
+            print("Using to_torch()")
+            result = []
+            for partition in result_ds.to_torch():
+                result.append(partition[0])
+            return torch.stack(result)
+        elif data._output_type in [str, int, float, bool, pd.Series, pd.DataFrame]:
+            print("Using to_pandas_refs()")
+            result = []
+            for partition in result_ds.to_pandas_refs():
+                result.extend(ray.get(partition))
+            return result
+        elif isinstance(data._output_type, object):
+            print("Using iter_batches()")
+            result = []
+            for partition in result_ds.iter_batches():
+                result.extend(partition)
+            return result
+        else:
+            raise ValueError(f"Unsupported output type {data._output_type}.")
+
     else:
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):

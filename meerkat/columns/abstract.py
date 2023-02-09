@@ -14,6 +14,7 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
+    Type,
     Union,
 )
 
@@ -653,6 +654,56 @@ class Column(
     def is_mmap(self):
         return False
 
+def infer_column_type(data: Sequence) -> Type[Column]:
+
+    if isinstance(data, Column):
+        return type(data)
+
+    if isinstance(data, pd.Series):
+        from .scalar.pandas import PandasScalarColumn
+        return PandasScalarColumn
+    
+    if isinstance(data, pa.Array):
+        from .scalar.arrow import ArrowScalarColumn
+        return ArrowScalarColumn
+
+    if torch.is_tensor(data):
+        from .tensor.torch import TorchTensorColumn
+
+        # FIXME: Once we have a torch scalar column we should use that here
+        # if len(data.shape) == 1:
+        #     return ScalarColumn(data.cpu().detach().numpy())
+        return TorchTensorColumn
+
+    if isinstance(data, np.ndarray):
+        if len(data.shape) == 1:
+            from .scalar.pandas import PandasScalarColumn
+            return PandasScalarColumn
+        from .tensor.numpy import NumPyTensorColumn
+
+        return NumPyTensorColumn
+
+    if isinstance(data, Sequence):
+        from .tensor.numpy import NumPyTensorColumn
+        if len(data) != 0 and (
+            isinstance(data[0], (np.ndarray, NumPyTensorColumn))
+        ):
+            return NumPyTensorColumn
+
+        from .tensor.torch import TorchTensorColumn
+        if len(data) != 0 and (isinstance(data[0], TorchTensorColumn) or torch.is_tensor(data[0])):
+            return TorchTensorColumn
+
+        if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
+            from .scalar.pandas import PandasScalarColumn
+
+            return PandasScalarColumn
+
+        from .object.base import ObjectColumn
+
+        return ObjectColumn
+    else:
+        raise ValueError(f"Cannot create column out of data of type {type(data)}")
 
 def column(data: Sequence) -> Column:
     """Create a Meerkat column from data.
@@ -660,39 +711,8 @@ def column(data: Sequence) -> Column:
     The Meerkat column type is inferred from the type and structure of
     the data passed in.
     """
-    from .scalar import ScalarColumn
-    from .tensor import TensorColumn
-
     if isinstance(data, Column):
         # TODO: Need ton make this view but should decide where to do it exactly
         return data  # .view()
 
-    if isinstance(data, pd.Series) or isinstance(data, pa.Array):
-        return ScalarColumn(data)
-
-    if torch.is_tensor(data):
-        if len(data.shape) == 1:
-            return ScalarColumn(data.cpu().detach().numpy())
-        return TensorColumn(data)
-
-    if isinstance(data, np.ndarray):
-        if len(data.shape) == 1:
-            return ScalarColumn(data)
-        return TensorColumn(data)
-
-    if isinstance(data, Sequence):
-        if len(data) != 0 and (
-            isinstance(data[0], (np.ndarray, TensorColumn)) or torch.is_tensor(data[0])
-        ):
-            return TensorColumn(data)
-
-        if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
-            from .scalar import ScalarColumn
-
-            return ScalarColumn(data)
-
-        from .object.base import ObjectColumn
-
-        return ObjectColumn(data)
-    else:
-        raise ValueError(f"Cannot create column out of data of type {type(data)}")
+    return infer_column_type(data)(data)
