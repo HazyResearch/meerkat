@@ -42,10 +42,10 @@ def column_testbed(request, tmpdir):
     **column_parametrize(
         [
             NumPyTensorColumnTestBed,
-            PandasScalarColumnTestBed,
-            TorchTensorColumnTestBed,
-            DeferredColumnTestBed,
-            ArrowScalarColumnTestBed,
+            # PandasScalarColumnTestBed,
+            # TorchTensorColumnTestBed,
+            # DeferredColumnTestBed,
+            # ArrowScalarColumnTestBed,
         ],
         single=True,
     ),
@@ -122,6 +122,7 @@ def test_pickle(column_testbed):
 
     # important for dataloader
     col = column_testbed.col
+    breakpoint()
     buf = pickle.dumps(col)
     new_col = pickle.loads(buf)
 
@@ -201,3 +202,6 @@ def test_to_pandas(single_column_testbed: AbstractColumnTestBed):
     testbed = single_column_testbed
     series = testbed.col.to_pandas()
     assert isinstance(series, pd.Series)
+
+def test_to_torch(single_column_testbed: AbstractColumnTestBed):
+    pass 

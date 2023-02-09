@@ -110,6 +110,9 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
             data = self.data.filter(pa.array(index))
         else:
             data = self.data.take(index)
+        
+        if isinstance(index, int):
+            return data.as_py()
         return data
 
     def get_data_to_set(self, data_index):
