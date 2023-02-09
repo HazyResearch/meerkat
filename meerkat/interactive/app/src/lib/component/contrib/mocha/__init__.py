@@ -22,7 +22,6 @@ DELTA_COLUMN = "delta"
 
 
 class ChangeList(BaseComponent):
-
     code_control: bool = False
 
     gallery: BaseComponent
@@ -88,7 +87,8 @@ class ChangeList(BaseComponent):
             # SLICE OVERVIEW
             @mk.gui.reactive
             def compute_slice_scores(examples: mk.DataPanel, slices: mk.DataPanel):
-                """Produce a DataFrame with average delta's (and counts) for each slice."""
+                """Produce a DataFrame with average delta's (and counts) for
+                each slice."""
 
                 sb = examples.sliceby(
                     slices["slice_id"].apply(slice_repo._slice_column)
@@ -187,9 +187,10 @@ class ChangeList(BaseComponent):
             def on_select_slice(slice_id: str, criteria: mk.gui.Store, code: str, query: str):
                 """Update the gallery filter criteria with the selected slice.
 
-                The gallery should be filtered based on the selected slice.
-                If no slice is selected, there shouldn't be any filtering based on the slice.
-                When the selected slice is changed, we should replace the existing filter criteria
+                The gallery should be filtered based on the selected
+                slice. If no slice is selected, there shouldn't be any
+                filtering based on the slice. When the selected slice is
+                changed, we should replace the existing filter criteria
                 with the new one.
                 """
                 source = "on_select_slice"

@@ -37,7 +37,6 @@ from .columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
 class DataFrameTestBed:
-
     DEFAULT_CONFIG = {
         "consolidated": [True, False],
     }

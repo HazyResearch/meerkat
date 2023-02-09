@@ -11,7 +11,6 @@ class Registry(_Registry):
     _ALIAS_KEYWORDS = ("_aliases", "_ALIASES")
 
     def __init__(self, name: str):
-
         super().__init__(name=name)
 
         self._metadata_map = {}

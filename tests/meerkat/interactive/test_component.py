@@ -6,10 +6,8 @@ from meerkat.interactive.event import EventInterface
 
 
 def test_component_creation_fails_with_bad_endpoint():
-    """
-    Raise an error if an Endpoint with a mismatched function signature
-    is passed to a Component.
-    """
+    """Raise an error if an Endpoint with a mismatched function signature is
+    passed to a Component."""
 
     class TestEventInterface(EventInterface):
         arg_1: int

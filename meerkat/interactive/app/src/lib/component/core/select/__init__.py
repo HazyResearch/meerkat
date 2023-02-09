@@ -12,8 +12,8 @@ class OnChangeSelect(EventInterface):
 
 
 class Select(Component):
-    """
-    A selection dropdown that can be used to select a single value from a list of options.
+    """A selection dropdown that can be used to select a single value from a
+    list of options.
 
     Args:
         values (List[Any]): A list of values to select from.
@@ -42,9 +42,7 @@ class Select(Component):
 
     @validator("labels", pre=True, always=True)
     def set_labels(cls, v, values):
-        """
-        If labels are not provided, use the values as labels.
-        """
+        """If labels are not provided, use the values as labels."""
         if v is None:
             return values["values"]
         return v

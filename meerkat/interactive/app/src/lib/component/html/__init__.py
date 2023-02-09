@@ -41,16 +41,15 @@ class div(Slottable, HtmlMixin, Component):
         style: Optional[str] = None,
     ):
         """A div element.
-        
+
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
 class flex(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -63,7 +62,7 @@ class flex(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -73,7 +72,6 @@ class flex(div):
         return "flex flex-row " + v if v is not None else "flex flex-row"
 
 class flexcol(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -86,7 +84,7 @@ class flexcol(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -96,7 +94,6 @@ class flexcol(div):
         return "flex flex-col " + v if v is not None else "flex flex-col"
 
 class grid(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -109,7 +106,7 @@ class grid(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
     
@@ -118,7 +115,6 @@ class grid(div):
         return "grid " + v if v is not None else "grid"
 
 class gridcols2(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -131,7 +127,7 @@ class gridcols2(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -140,7 +136,6 @@ class gridcols2(div):
         return "grid grid-cols-2 " + v if v is not None else "grid grid-cols-2"
     
 class gridcols3(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -153,7 +148,7 @@ class gridcols3(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -162,7 +157,6 @@ class gridcols3(div):
         return "grid grid-cols-3 " + v if v is not None else "grid grid-cols-3"
 
 class gridcols4(div):
-
     def __init__(
         self, 
         slots: Optional[List[BaseComponent]] = None, 
@@ -175,7 +169,7 @@ class gridcols4(div):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -211,7 +205,7 @@ class h1(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -232,7 +226,7 @@ class h2(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -252,7 +246,7 @@ class h3(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -272,7 +266,7 @@ class h4(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -292,7 +286,7 @@ class h5(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -312,7 +306,7 @@ class h6(Slottable, HtmlMixin, Component):
         Args:
             slots (List[BaseComponent], optional): The components to render inside this div. Defaults to None.
             classes (str, optional): The Tailwind classes to apply to this div. Defaults to None.
-            style (str, optional): The inline CSS to apply to this div. Defaults to None.    
+            style (str, optional): The inline CSS to apply to this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
 
@@ -410,7 +404,6 @@ class form(Slottable, HtmlMixin, Component):
     target: Optional[str] = None
 
 class button(Slottable, HtmlMixin, Component):
-    
     classes: Optional[str] = None
     style: Optional[str] = None
 

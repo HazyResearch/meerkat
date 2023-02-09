@@ -456,10 +456,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         app.include_router(self.router)
 
     def __call__(self, *args, __fn_only=False, **kwargs):
-        """
-        Calling the endpoint will just call .run(...) by default.
-        If `__fn_only=True` is specified, it will call the raw
-        function underlying this endpoint.
+        """Calling the endpoint will just call .run(...) by default.
+
+        If `__fn_only=True` is specified, it will call the raw function
+        underlying this endpoint.
         """
         if __fn_only:
             # FIXME(Sabri): This isn't working for some reason. The '__fn_only' arg

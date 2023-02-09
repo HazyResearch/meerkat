@@ -472,12 +472,11 @@ class DataFrame(
         return self._get(slice(0, len(self), 1), materialize=True)
 
     def set(self, value: DataFrame):
-        """
-        Set the data of this DataFrame to the data of another DataFrame.
+        """Set the data of this DataFrame to the data of another DataFrame.
 
-        This is used inside endpoints to tell Meerkat when a DataFrame has been
-        modified. Calling this method outside of an endpoint will not have any
-        effect on the graph.
+        This is used inside endpoints to tell Meerkat when a DataFrame
+        has been modified. Calling this method outside of an endpoint
+        will not have any effect on the graph.
         """
         self._set_data(value._data)
         self._set_state(value._get_state())

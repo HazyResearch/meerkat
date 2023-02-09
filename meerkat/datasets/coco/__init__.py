@@ -61,7 +61,6 @@ class coco(DatasetBuilder):
         return df
 
     def download(self):
-
         for split in ["train", "val", "test"]:
             downloaded_path = download_url(
                 IMAGE_URL.format(version=self.version, split=split), self.dataset_dir

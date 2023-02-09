@@ -9,7 +9,6 @@ from meerkat.interactive.formatter.base import Formatter, Variant
 
 
 class Text(Component):
-
     data: str
     view: str = "line"
     editable: bool = False
@@ -21,8 +20,7 @@ class Text(Component):
         view: str = "line",
         editable: bool = False,
     ):
-        """
-        Display text.
+        """Display text.
 
         Args:
             data: The text to display.
@@ -37,8 +35,7 @@ class Text(Component):
 
 
 class TextFormatter(Formatter):
-    """
-    Formatter for Text component.
+    """Formatter for Text component.
 
     Args:
         component_class: The component class to format.

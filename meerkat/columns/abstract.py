@@ -658,7 +658,6 @@ class Column(
 
 
 def infer_column_type(data: Sequence) -> Type[Column]:
-
     if isinstance(data, Column):
         return type(data)
 
@@ -715,7 +714,6 @@ def infer_column_type(data: Sequence) -> Type[Column]:
 
 
 def infer_column_type(data: Sequence) -> Type[Column]:
-
     if isinstance(data, Column):
         return type(data)
 

@@ -139,7 +139,6 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
 
 
 class Match(Component):
-
     df: DataFrame
     against: str
     text: str = ""

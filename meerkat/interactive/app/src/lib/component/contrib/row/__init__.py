@@ -7,7 +7,6 @@ from ...abstract import Component
 
 
 class Row(Component):
-
     df: "DataFrame"
     columns: List[str] 
     rename: Dict[str, str] = {}

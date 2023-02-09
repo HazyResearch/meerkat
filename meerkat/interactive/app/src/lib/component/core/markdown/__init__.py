@@ -6,9 +6,7 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Markdown(Component):
-
-    """
-    Render markdown with GitHub Flavored Markdown (GFM) syntax.
+    """Render markdown with GitHub Flavored Markdown (GFM) syntax.
 
     The implementation of this component uses the marked.js library (https://github.com/markedjs/marked).
     Argument descriptions below are taken directly from the marked.js documentation.
@@ -18,19 +16,19 @@ class Markdown(Component):
         classes: The Tailwind classes to apply to the component, see @tailwindcss/typography \
             for the classes that are specifically available to style this component.
         base_url: The base URL to use for relative links.
-        breaks: If true, add <br> on a single line break (copies GitHub behavior on comments, 
+        breaks: If true, add <br> on a single line break (copies GitHub behavior on comments,
             but not on rendered markdown files). Requires gfm be true.
         gfm: If true, use approved GitHub Flavored Markdown (GFM) specification.
         header_ids: If true, include an id attribute when emitting headings (h1, h2, h3, etc).
         header_prefix: A string to prefix the id attribute when emitting headings (h1, h2, h3, etc).
         lang_prefix: A string to prefix the className in a <code> block. Useful for syntax highlighting.
         mangle: If true, autolinked email address is escaped with HTML character references.
-        pedantic: If true, conform to the original markdown.pl as much as possible. Don't fix original 
+        pedantic: If true, conform to the original markdown.pl as much as possible. Don't fix original
             markdown bugs or behavior. Turns off and overrides gfm.
         sanitize: If true, sanitize the HTML passed into markdownString with the sanitizer function.
         silent: If true, the parser does not throw any exception.
         smartypants: If true, use "smart" typographic punctuation for things like quotes and dashes.
-        xhtml: If true, emit self-closing HTML tags for void elements (<br/>, <img/>, etc.) with a "/" 
+        xhtml: If true, emit self-closing HTML tags for void elements (<br/>, <img/>, etc.) with a "/"
             as required by XHTML.
     """
 
@@ -51,11 +49,10 @@ class Markdown(Component):
 
 
 class Title(Markdown):
-    """
-    Display title text.
+    """Display title text.
 
-    Use this component for the main title of a page.
-    This will place the text in an `<h1>` tag.
+    Use this component for the main title of a page. This will place the
+    text in an `<h1>` tag.
     """
 
     def __init__(self, text: str, *, classes: str = "", **kwargs):
@@ -67,11 +64,10 @@ class Title(Markdown):
 
 
 class Header(Markdown):
-    """
-    Display header text.
+    """Display header text.
 
-    Use this component for the main header of a section.
-    This will place the text in an `<h2>` tag.
+    Use this component for the main header of a section. This will place
+    the text in an `<h2>` tag.
     """
     def __init__(self, text: str, *, classes: str = "", **kwargs):
         super().__init__(body=text, classes=classes, **kwargs)
@@ -82,11 +78,10 @@ class Header(Markdown):
 
 
 class Subheader(Markdown):
-    """
-    Display subheader text.
+    """Display subheader text.
 
-    Use this component for the subheader of a section.
-    This will place the text in an `<h3>` tag.
+    Use this component for the subheader of a section. This will place
+    the text in an `<h3>` tag.
     """
     def __init__(self, text: str, *, classes: str = "", **kwargs):
         super().__init__(body=text, classes=classes, **kwargs)
@@ -97,8 +92,7 @@ class Subheader(Markdown):
 
 
 class Caption(Markdown):
-    """
-    Display caption text in a smaller, gray font size.
+    """Display caption text in a smaller, gray font size.
 
     Use this component for explanatory text that is not the main body of a section.
     This will place the text in a `<p>` tag.

@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 # StoreModification object (it only ends up sending the ids).
 @endpoint(prefix="/store", route="/{store}/update/")
 def update(store: Store, value=Endpoint.EmbeddedBody()):
-    """Triggers the computational graph when a store on the frontend changes."""
+    """Triggers the computational graph when a store on the frontend
+    changes."""
 
     logger.debug(f"Updating store {store} with value {value}.")
 

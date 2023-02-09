@@ -24,7 +24,6 @@ def add_one(data):
 
 
 class FileColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "transform": [True, False],
         "use_base_dir": [True, False],

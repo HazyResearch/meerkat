@@ -60,9 +60,7 @@ def test_sort_multiple_criteria():
 
 
 def test_skip_sort_disabled():
-    """
-    If a criterion is disabled, it should be skipped.
-    """
+    """If a criterion is disabled, it should be skipped."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     with mk.gui.react():
@@ -85,9 +83,8 @@ def test_skip_sort_disabled():
 
 
 def test_skip_sort_order():
-    """
-    When the order of the sort criteria changes, the output dataframe should change.
-    """
+    """When the order of the sort criteria changes, the output dataframe should
+    change."""
     df = mk.DataFrame(
         {"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "b": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
     )

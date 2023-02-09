@@ -8,7 +8,6 @@ from meerkat.interactive.endpoint import Endpoint
 
 
 class Table(Component):
-
     df: DataFrame
     per_page: int = 100
     editable: bool = False

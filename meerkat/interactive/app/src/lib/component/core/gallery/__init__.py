@@ -5,7 +5,6 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Gallery(Component):
-
     df: DataFrame
     main_column: str
     tag_columns: List[str] = []

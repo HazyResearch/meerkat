@@ -27,7 +27,6 @@ def loader(filepath):
 
 
 class AudioColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "transform": [True, False],
         "use_base_dir": [True, False],

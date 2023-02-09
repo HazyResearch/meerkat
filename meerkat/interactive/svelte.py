@@ -75,8 +75,7 @@ class SvelteWriter(metaclass=Singleton):
         self,
         exclude_classes: Set[str] = {"Component", "BaseComponent"},
     ) -> List[Type["BaseComponent"]]:
-        """
-        Get all subclasses of BaseComponent, excluding the ones in
+        """Get all subclasses of BaseComponent, excluding the ones in
         `exclude_classes`.
 
         Args:
@@ -105,8 +104,8 @@ class SvelteWriter(metaclass=Singleton):
         return subclasses
 
     def get_all_frontend_components(self) -> List[Type["BaseComponent"]]:
-        """
-        Get all subclasses of BaseComponent that have a unique frontend_alias.
+        """Get all subclasses of BaseComponent that have a unique
+        frontend_alias.
 
         Returns:
             List[Type["BaseComponent"]]: List of subclasses of BaseComponent.
@@ -128,10 +127,8 @@ class SvelteWriter(metaclass=Singleton):
         return frontend_components
 
     def import_app_components(self):
-        """
-        Import all components inside the app/src/lib/components directory
-        to register custom user components from their app.
-        """
+        """Import all components inside the app/src/lib/components directory to
+        register custom user components from their app."""
         if self._ran_import_app_components:
             # Only run this once in a process
             return

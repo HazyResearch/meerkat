@@ -39,7 +39,6 @@ def discover(df: DataFrame, by: str, target: str, pred: str):
 
 
 class Discover(Component):
-
     df: DataFrame
     by: str
     target: str = None

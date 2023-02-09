@@ -10,8 +10,7 @@ class OnChangeSlider(EventInterface):
 
 
 class Slider(Component):
-    """
-    A slider that allows the user to select a value from a range.
+    """A slider that allows the user to select a value from a range.
 
     Args:
         value (float): The current value of the slider.

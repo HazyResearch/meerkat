@@ -37,7 +37,6 @@ class DeferredCellOp:
         return arg
 
     def _get(self):
-
         args = [self.prepare_arg(arg) for arg in self.args]
         kwargs = {kw: self.prepare_arg(arg) for kw, arg in self.kwargs.items()}
         out = self.fn(*args, **kwargs)
@@ -357,7 +356,6 @@ class DeferredBlock(AbstractBlock):
         )
 
     def __init__(self, data: DeferredOp):
-
         self.data = data
 
     @classmethod

@@ -69,7 +69,6 @@ class lvis(DatasetBuilder):
         self.include_segmentations = include_segmentations
 
     def build(self):
-
         out = self._read_build_cache()
         if out is not None:
             return out

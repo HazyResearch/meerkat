@@ -84,7 +84,6 @@ class Arg(DocComponent):
 
 class ArgDescription(DocComponent):
     def fix_indentation(self, docstring: str) -> str:
-
         # get common leading whitespace from docstring
         lines = docstring.splitlines()
         leading_whitespace = min(

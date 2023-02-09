@@ -2,7 +2,6 @@ from ...abstract import BaseComponent
 
 
 class ChangeList(BaseComponent):
-
     gallery: BaseComponent
     gallery_match: BaseComponent
     gallery_filter: BaseComponent

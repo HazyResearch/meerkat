@@ -22,7 +22,6 @@ class Tab(FrontendMixin):
 
 
 class Tabs(BaseComponent):
-
     # TODO: Add option for setting the default selected tab.
     tabs: Union[Mapping[str, BaseComponent], Sequence[Tab]]
 

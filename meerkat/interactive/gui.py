@@ -82,7 +82,6 @@ class SliceByGUI(GUI):
 
 
 class Aggregation(IdentifiableMixin):
-
     _self_identifiable_group: str = "aggregations"
 
     def __init__(self, func: Callable[[mk.DataFrame], Union[int, float, str]]):

@@ -9,7 +9,6 @@ from ..utils import extract
 
 @datasets.register()
 class fer(DatasetBuilder):
-
     VERSIONS = ["plus"]
 
     info = DatasetInfo(

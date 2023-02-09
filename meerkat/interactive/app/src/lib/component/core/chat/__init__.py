@@ -11,12 +11,11 @@ class OnSendChat(EventInterface):
 
 
 class Chat(Component):
-    """
-    A chat component.
+    """A chat component.
 
     Args:
         df (DataFrame): The dataframe to sync with the chat. \
-            It must have the following columns: 
+            It must have the following columns:
                 message (str): The message to display.
                 name (str): The name of the sender.
                 time (str): The time the message was sent.

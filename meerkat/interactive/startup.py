@@ -1,7 +1,6 @@
 """Startup script for interactive Meerkat.
 
-Some code and design patters are borrowed from 
-Gradio and Pynecone.
+Some code and design patters are borrowed from Gradio and Pynecone.
 """
 
 import atexit

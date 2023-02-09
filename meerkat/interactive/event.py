@@ -4,8 +4,7 @@
 
 
 class EventInterface:
-    """
-    Defines the interface for an event.
+    """Defines the interface for an event.
 
     Subclass this to define the interface for a new event type.
     The class will specify the keyword arguments returned by an event from the

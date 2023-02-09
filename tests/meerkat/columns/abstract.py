@@ -32,7 +32,6 @@ def obj_to_id(obj: Any):
 
 
 class AbstractColumnTestBed:
-
     DEFAULT_CONFIG = {}
 
     # subclasses can add pytest marks which will be applied to all

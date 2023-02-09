@@ -21,7 +21,6 @@ def _write_empty_image(dst):
 
 @datasets.register()
 class wikipaintings(DatasetBuilder):
-
     VERSIONS = ["main"]
 
     info = DatasetInfo(
@@ -35,7 +34,6 @@ class wikipaintings(DatasetBuilder):
     )
 
     def build(self):
-
         df = mk.read(os.path.join(self.dataset_dir, "data.mk"))
         df = df[~df["qid"].duplicated()]
         df = df[~df["title"].duplicated()]
@@ -43,7 +41,6 @@ class wikipaintings(DatasetBuilder):
         return df
 
     def download(self):
-
         url = "https://query.wikidata.org/sparql"
         query = """
         SELECT ?painting ?paintingLabel ?image ?date

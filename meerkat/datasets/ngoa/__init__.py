@@ -20,7 +20,6 @@ def _write_empty_image(dst):
 
 @datasets.register()
 class ngoa(DatasetBuilder):
-
     VERSIONS = ["main"]
 
     info = DatasetInfo(
@@ -34,7 +33,6 @@ class ngoa(DatasetBuilder):
     )
 
     def build(self):
-
         base_dir = os.path.join(self.dataset_dir, "data")
         db = {}
         db["objects"] = mk.DataFrame.from_csv(
@@ -84,6 +82,5 @@ class ngoa(DatasetBuilder):
         return db
 
     def download(self):
-
         # clone the repo using subprocess
         subprocess.call(["git", "clone", REPO, self.dataset_dir])

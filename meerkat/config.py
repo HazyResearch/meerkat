@@ -12,7 +12,6 @@ DATASETS_ENV_VARIABLE = "MEERKAT_DATASETS"
 
 @dataclass
 class MeerkatConfig:
-
     display: DisplayConfig
     datasets: DatasetsConfig
     system: SystemConfig
