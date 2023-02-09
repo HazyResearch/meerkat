@@ -13,11 +13,13 @@ class Radio(Slottable, Component):
     """
     A single radio button.
 
-    If you just want a basic group of radio buttons, use the RadioGroup component instead.
-    Use this component only if you want to customize the layout of a group of radio buttons.
+    If you just want a basic group of radio buttons, use the 
+    RadioGroup component instead. Use this component only if 
+    you want to customize the layout of a group of radio buttons.
 
-    For more advanced use cases, we recommend either using the basic HTML radio button element
-    and styling it yourself with Tailwind, or using the Flowbite Radio component.
+    For more advanced use cases, we recommend either using the 
+    basic HTML radio button element and styling it yourself with 
+    Tailwind, or using the Flowbite Radio component.
 
     Args:
         name (str): The name of this radio button. Assign the same name to multiple radio buttons to group them together.

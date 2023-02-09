@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
     from meerkat.interactive.formatter.base import Formatter
 
-torch = LazyLoader("torch")
+torch = LazyLoader("torch")  # noqa: F811
 
 logger = logging.getLogger(__name__)
 

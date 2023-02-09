@@ -320,7 +320,7 @@ class BaseComponent(
 
         # Iterate over all fields in the class
         for k, v in cls.__fields__.items():
-            # TODO: revisit this. Here we only enforce the on_* naming convention for 
+            # TODO: revisit this. Here we only enforce the on_* naming convention for
             # endpoints, not endpoint properties, but this should be reconsidered.
             if is_subclass(v.type_, Endpoint) and not is_subclass(
                 v.type_, EndpointProperty
@@ -386,7 +386,8 @@ class BaseComponent(
 
         # Get all fields that pydantic tells us are endpoints.
         for field, value in cls.__fields__.items():
-            if not is_subclass(value.type_, Endpoint) or field not in values or values[field] is None:
+            if not is_subclass(value.type_, Endpoint) or \
+            field not in values or values[field] is None:
                 continue
 
             # Pull out the EventInterface from Endpoint.
@@ -451,8 +452,8 @@ class BaseComponent(
                 raise TypeError(
                     f"Endpoint `{field}` will be called with parameters: "
                     f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
-                    f"Check the {event_interface.__name__} class to see what parameters "
-                    "are expected to be passed in."
+                    f"Check the {event_interface.__name__} class to see what "
+                    "parameters are expected to be passed in."
                     "\n"
                     f"The function `{fn}` expects the following parameters: "
                     f"{', '.join(f'`{param}`' for param in required_fn_params)}. "

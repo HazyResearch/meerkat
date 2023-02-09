@@ -136,20 +136,20 @@ def run_script(
 
     Args:
         script (str): the script to run.
-        server_name (str, optional): the name of the server to run the script on. Defaults
-            to "localhost".
-        port (int, optional): the port to run the script on. Defaults to the default API
-            port in Meerkat, which is 5000.
-        dev (bool, optional): whether to run the script in development mode. Defaults to
-            True.
+        server_name (str, optional): the name of the server to run the
+            script on. Defaults to "localhost".
+        port (int, optional): the port to run the script on. Defaults to
+            the default API port in Meerkat, which is 5000.
+        dev (bool, optional): whether to run the script in development
+            mode. Defaults to True.
         target (str, optional): the target `Page` instance to run. Defaults to
             "page".
     """
     # Make sure script is in module format.
     script = os.path.abspath(script)  # to_py_module_name(script)
 
-    # Run the script with uvicorn. This will start the FastAPI server and serve the
-    # backend.
+    # Run the script with uvicorn. This will start the FastAPI server
+    # and serve the backend.
     env = os.environ.copy()
     if frontend_url is not None:
         env["MEERKAT_FRONTEND_URL"] = frontend_url

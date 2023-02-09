@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 import pandas as pd
+from fastapi.encoders import jsonable_encoder
 
 from meerkat.columns.abstract import Column
 from meerkat.interactive.endpoint import Endpoint, endpoint
@@ -12,7 +13,6 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
 
-from fastapi.encoders import jsonable_encoder
 
 logger = logging.getLogger(__name__)
 
