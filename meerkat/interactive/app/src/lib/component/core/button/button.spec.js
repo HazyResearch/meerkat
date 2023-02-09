@@ -6,22 +6,22 @@ describe('Button', () => {
 	it('should render button', async () => {
 		const { container, component } = render(Button, {
 			props: {
-                title: 'hello',
-            },
+				title: 'hello',
+			},
 		});
 		expect(container).toMatchSnapshot();
 
-        // Check the button is rendered
-        const button = screen.getByRole('button');
-        expect(button).toBeInTheDocument();
-        expect(button).toHaveTextContent('hello');
+		// Check the button is rendered
+		const button = screen.getByRole('button');
+		expect(button).toBeInTheDocument();
+		expect(button).toHaveTextContent('hello');
 
-        // Mock the click event
+		// Mock the click event
 		const click = vi.fn();
 		component.$on(`click`, click);
 
-        // Click the button
-        await fireEvent.click(button);
+		// Click the button
+		await fireEvent.click(button);
 
 		// Check the send event was fired
 		expect(click).toHaveBeenCalledTimes(1);

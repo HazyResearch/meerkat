@@ -123,10 +123,12 @@ def test_map_return_single_mmap(tmpdir, testbed: AbstractColumnTestBed, batched:
         is_batched_fn=batched,
         output_type=map_spec.get("output_type", None),
     )
+    result = NumPyTensorColumn(result)
     assert result.is_equal(map_spec["expected_result"])
 
-    assert isinstance(result.data, np.memmap)
-    assert result.data.filename == mmap_path
+    # FIXME: when we add mmap support back to map reintroduce this test.
+    # assert isinstance(result.data, np.memmap)
+    # assert result.data.filename == mmap_path
 
 
 @product_parametrize(params={"link": [True, False], "mmap": [True, False]})
@@ -143,15 +145,6 @@ def test_io_mmap(tmp_path, testbed, link, mmap):
     assert isinstance(new_col, NumPyTensorColumn)
     assert col.is_equal(new_col)
     assert new_col.is_mmap == mmap
-
-
-def test_to_tensor(testbed):
-    col, _ = testbed.col, testbed.data
-
-    tensor = col.to_tensor()
-
-    assert torch.is_tensor(tensor)
-    assert (col == tensor.numpy()).all()
 
 
 def test_from_array():

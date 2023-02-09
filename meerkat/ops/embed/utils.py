@@ -1,6 +1,8 @@
 from functools import partial
 
-import torch
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 def _get_reduction_fn(reduction_name):

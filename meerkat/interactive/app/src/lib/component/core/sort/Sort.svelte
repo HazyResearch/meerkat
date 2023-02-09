@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { fetch_schema } from '$lib/utils/api';
-	import type { DataFrameSchema } from '$lib/utils/dataframe';
+	import { fetchSchema } from '$lib/utils/api';
+	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
+	import { ClipboardPlus, Trash } from 'svelte-bootstrap-icons';
 	import { dndzone } from 'svelte-dnd-action';
 	import Select from 'svelte-select';
 	import SvelteTooltip from 'svelte-tooltip';
@@ -8,28 +9,46 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import type { SortCriterion } from './types';
 
-	export let df: any;
+	export let df: DataFrameRef;
 	export let criteria: SortCriterion[];
 	export let title: string = '';
 
+	// Users may change criteria rapidly on the frontend.
+	// As such, sort needs to be performant.
+	// We implement a smart debouncing mechanism that only triggers
+	// the sort when criteria has meaningfully changed. It ignores cases where:
+	//   1. The user changes an attribute of a criterion (e.g. value, ascending, etc.)
+	//      to the same value.
+	//   2. The user removes an inactive criterion.
+	// In theory, all of this logic to skip the sort can (any maybe should) be
+	// executed on the backend. However, this will require a roundtrip to the
+	// backend every time an attribute of a criterion is changed, which can be slow.
+	//
+	// * One design is to have a frontend view of the criteria (i.e. criteria_frontend).
+	// If the criteria changes from the backend, the view will be reset to the criteria.
+	// This will ensure the frontend view is always up to date with the backend.
+	// When the user interacts with the frontend, they will be manipulating the frontend view.
+	// When the frontend view changes meaningfully, we will set the backend criteria to the
+	// updated criteria.
+
 	// Initialize the value to be the value of the store.
 	// let criteria_frontend: FilterCriterion[] = $criteria;
-	let criteria_frontend: SortCriterion[] = [];
+	let criteriaFrontend: SortCriterion[] = [];
 
 	// FIXME: Temporarily have to do this to update the frontend criteria
 	// when the backend criteria changes.
 	$: {
-		criteria_frontend = criteria;
+		criteriaFrontend = criteria;
 	}
 	// criteria.subscribe((value) => {
 	// 	criteria_frontend = $criteria;
 	// });
 
-	let schema_promise;
-	let items_promise;
+	let schemaPromise;
+	let itemsPromise;
 	$: {
-		schema_promise = fetch_schema({ df: df });
-		items_promise = schema_promise.then((schema: DataFrameSchema) => {
+		schemaPromise = fetchSchema({ df: df });
+		itemsPromise = schemaPromise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
 					value: column.name,
@@ -41,14 +60,14 @@
 
 	const trigger_sort = () => {
 		// Need to reset the array to trigger.
-		criteria = criteria_frontend;
+		criteria = criteriaFrontend;
 	};
 
 	const onInputChange = (criterion: SortCriterion, input_id: string, value: any) => {
 		const is_same_value = criterion[input_id] === value;
 		criterion[input_id] = value;
 		// Required for reactivity.
-		criteria_frontend = criteria_frontend;
+		criteriaFrontend = criteriaFrontend;
 		if (!is_same_value) {
 			criterion.is_enabled = true;
 			trigger_sort();
@@ -56,7 +75,7 @@
 	};
 
 	const setCheckbox = (criterion: SortCriterion, value: boolean, ignore_check: boolean = false) => {
-		// Setting to the same value, do nothing.
+		// Setting to the same value, do nothing.fetchSchema
 		criterion.is_enabled = value;
 		trigger_sort();
 	};
@@ -74,20 +93,20 @@
 	const addCriterion = () => {
 		// Add a new filter criteria.
 		const uuid_gen = uuidv4();
-		criteria_frontend = [
+		criteriaFrontend = [
 			{ id: uuid_gen, is_enabled: false, column: '', ascending: true },
-			...criteria_frontend
+			...criteriaFrontend
 		];
 	};
 
 	const deleteCriterion = (index: number) => {
 		// Delete a filter criteria.
 		// Store should only update if we are removing a criterion that is enabled.
-		const is_enabled: boolean = criteria_frontend[index].is_enabled;
-		criteria_frontend = criteria_frontend.filter((_, i) => i !== index);
+		const is_enabled: boolean = criteriaFrontend[index].is_enabled;
+		criteriaFrontend = criteriaFrontend.filter((_, i) => i !== index);
 
 		if (is_enabled) {
-			criteria = criteria_frontend;
+			criteria = criteriaFrontend;
 		}
 	};
 
@@ -97,42 +116,44 @@
 
 	const flipDurationMs = 300;
 	function handleDndConsider(e) {
-		criteria_frontend = e.detail.items;
+		criteriaFrontend = e.detail.items;
 	}
 	function handleDndFinalize(e) {
-		criteria_frontend = e.detail.items;
+		criteriaFrontend = e.detail.items;
 		trigger_sort();
 	}
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-30 flex flex-col">
+<div class="bg-slate-100 py-2 rounded-lg  z-30 flex flex-col">
 	<div class="flex space-x-6">
 		{#if title != ''}
-			<div class="font-bold text-xl text-slate-600 self-start pl-2">
+			<div class="font-bold text-md text-slate-600 self-start pl-2">
 				{title}
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">
 			<button
 				on:click={addCriterion}
-				class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md"
-				>+ Add Sort</button
+				class="px-3 bg-slate-200 flex items-center gap-1.5 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<ClipboardPlus /> Add Sort
+			</button>
 			<button
 				on:click={handleClear}
-				class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"
+				class="px-2 flex items-center gap-1.5 bg-slate-200 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<Trash />
 				Clear
 			</button>
 		</div>
 	</div>
 	<div class="form-control w-full">
 		<section
-			use:dndzone={{ items: criteria_frontend, flipDurationMs: flipDurationMs }}
+			use:dndzone={{ items: criteriaFrontend, flipDurationMs: flipDurationMs }}
 			on:consider={handleDndConsider}
 			on:finalize={handleDndFinalize}
 		>
-			{#each criteria_frontend as criterion, i (criterion.id)}
+			{#each criteriaFrontend as criterion, i (criterion.id)}
 				<div
 					class="py-2 input-group w-full flex items-center"
 					animate:flip={{ duration: flipDurationMs }}
@@ -150,7 +171,7 @@
 
 					<!-- Column selector -->
 					<div class="themed px-1 grow">
-						{#await items_promise}
+						{#await itemsPromise}
 							<Select id="column" placeholder="...a column." loading={true} showChevron={true} />
 						{:then items}
 							<Select

@@ -1,10 +1,14 @@
-from typing import List, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
-import torch
 
 from meerkat import DataFrame, NumPyTensorColumn, TensorColumn, TorchTensorColumn
-from meerkat.interactive.graph import reactive
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
 
 
 def search(
@@ -58,8 +62,8 @@ def search(
 
 
 def _torch_search(
-    query: torch.Tensor, by: torch.Tensor, metric: str, k: int
-) -> torch.tensor:
+    query: "torch.Tensor", by: "torch.Tensor", metric: str, k: int
+) -> "torch.Tensor":
     if len(query.shape) == 1:
         query = query.unsqueeze(0)
 
@@ -72,5 +76,5 @@ def _torch_search(
     return scores, indices
 
 
-def _numpy_search(query: torch.Tensor, by: torch.Tensor, metric: str, k: int):
+def _numpy_search(query: "torch.Tensor", by: "torch.Tensor", metric: str, k: int):
     raise NotImplementedError()

@@ -1,6 +1,7 @@
 """Unittests for Datasets."""
 import os
 import tempfile
+import warnings
 from functools import wraps
 from itertools import product
 from typing import Dict, Sequence, Set
@@ -12,7 +13,7 @@ import pytest
 import torch
 import ujson as json
 
-import meerkat
+import meerkat as mk
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredColumn
@@ -23,6 +24,8 @@ from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph.operation import Operation
+from meerkat.interactive.node import NodeMixin
 from meerkat.row import Row
 
 from ..utils import product_parametrize
@@ -1173,7 +1176,7 @@ def test_repr(testbed):
 
 @product_parametrize(params={"max_rows": [6, 16, 20]})
 def test_repr_pandas(testbed, max_rows: int):
-    meerkat.config.display.max_rows = max_rows
+    mk.config.display.max_rows = max_rows
     df, _ = testbed.df._repr_pandas_()
     assert isinstance(df, pd.DataFrame)
     assert len(df) == min(len(df), max_rows + 1)
@@ -1287,3 +1290,335 @@ def test_scalar_setitem(x):
             assert np.all(np.isinf(df["extra_column"]))
     else:
         assert all(df["extra_column"] == x)
+
+
+@mk.gui.endpoint
+def _set_store_or_df(store, value):
+    store.set(value)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        # Instance variables.
+        "_data",
+        "_primary_key",
+        # Properties.
+        "gui",
+        "data",
+        "columns",
+        "primary_key",
+        "primary_key_name",
+        "nrows",
+        "ncols",
+        "shape",
+    ],
+)
+def test_reactivity_attributes_and_properties(name):
+    """Test that attributes and properties of the dataframe are reactive."""
+
+    class Foo:
+        pass
+
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10), "c": [Foo()] * 10})
+
+    # These should return an object that can be attached to a node.
+    # i.e. we should be able to put the output on the graph.
+    with mk.gui.react():
+        out = getattr(df, name)
+    assert isinstance(out, NodeMixin)
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    # Check the operation name
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == name
+
+    # No reactivity.
+    # We want to check that the output is not a Store.
+    # it can be other NodeMixIns, because these are classes built into meerkat.
+    out = getattr(df, name)
+    assert not isinstance(out, mk.gui.Store)
+
+
+def test_reactivity_len():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        with pytest.warns(UserWarning):
+            length = len(df)
+    assert length == 10
+
+    # Warnings should not be raised if we are not in a reactive context.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        length = len(df)
+    assert length == 10
+
+
+def test_reactivity_contains():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    store = mk.gui.Store("a")
+    with mk.gui.react():
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            a_contains = df.contains(store)
+    inode = a_contains.inode
+
+    assert a_contains
+    assert isinstance(a_contains, mk.gui.Store)
+    assert isinstance(a_contains, bool)
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == "contains"
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(a_contains.inode)
+
+    # Change the store
+    _set_store_or_df(store, "c")
+    assert not inode.obj
+
+    # The `in` operator coerces the output of __contains__ to a bool.
+    # Store.__bool__ cannot return a bool due to cpython limitations.
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        with pytest.warns(UserWarning):
+            a_in = "a" in df
+    assert not isinstance(a_in, mk.gui.Store)
+
+
+def test_reactivity_size():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        shape = df.size()
+    inode = shape.inode
+
+    assert shape == (10, 2)
+    assert isinstance(shape, mk.gui.Store)
+    assert isinstance(shape, tuple)
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == "size"
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(shape.inode)
+
+    # Change the dataframe
+    _set_store_or_df(df, DataFrame({"a": np.arange(5)}))
+    assert inode.obj == (5, 1)
+
+
+@pytest.mark.parametrize("axis", ["rows", "columns"])
+def test_reactivity_append(axis: str):
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    if axis == "rows":
+        df2 = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    else:
+        df2 = DataFrame({"c": np.arange(10), "d": torch.arange(10)})
+
+    with mk.gui.react():
+        df_append = df.append(df2, axis=axis)
+    inode = df_append.inode
+
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == "append"
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(df_append.inode)
+
+    # Change the input dataframe
+    if axis == "rows":
+        _set_store_or_df(df, DataFrame({"a": np.arange(5), "b": torch.arange(5)}))
+        assert inode.obj.shape() == (15, 2)
+    else:
+        _set_store_or_df(
+            df, DataFrame({"alpha": np.arange(10), "beta": torch.arange(10)})
+        )
+        assert inode.obj.columns == ["alpha", "beta", "c", "d"]
+
+
+@pytest.mark.parametrize("op_name", ["head", "tail"])
+def test_reactivity_head_tail(op_name: str):
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    with mk.gui.react():
+        df_slice = getattr(df, op_name)()
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == op_name
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(df_slice.inode)
+
+
+def test_reactivity_getitem_multiple_columns():
+    df = DataFrame(
+        {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
+    )
+    store = mk.gui.Store(["a", "b"])
+    with mk.gui.react():
+        df_col = df[store]
+    inode = df_col.inode
+
+    assert isinstance(df_col, DataFrame)
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == "__getitem__"
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(df_col.inode)
+    assert len(store.inode.trigger_children) == 1
+    assert id(store.inode.trigger_children[0]) == id(op.inode)
+
+    # Change the store
+    _set_store_or_df(store, ["c"])
+    assert np.all(inode.obj["c"] == df["c"])
+
+    # Change the dataframe
+    _set_store_or_df(df, DataFrame({"c": np.arange(5)}))
+    assert np.all(inode.obj["c"] == np.arange(5))
+
+
+def test_reactivity_getitem_single_column():
+    # TODO: We need to add support for column modifications in _update_result
+    # in operation.
+    df = DataFrame(
+        {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
+    )
+    store = mk.gui.Store("b")
+    with mk.gui.react():
+        df_col = df[store]
+    inode = df_col.inode
+
+    _set_store_or_df(df, DataFrame({"c": np.arange(5)}))
+    store.set("c")
+    assert np.all(inode.obj["a"] == np.arange(5))
+
+
+def test_reactivity_getitem_slicing():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    store = mk.gui.Store(slice(0, 5))
+    with mk.gui.react():
+        df_col = df[store]
+    inode = df_col.inode
+
+    assert isinstance(df_col, DataFrame)
+    assert df.inode.has_trigger_children()
+    assert len(df.inode.trigger_children) == 1
+    op = df.inode.trigger_children[0].obj
+    assert isinstance(op, Operation)
+    assert op.fn.__name__ == "__getitem__"
+    assert len(op.inode.trigger_children) == 1
+    assert id(op.inode.trigger_children[0]) == id(df_col.inode)
+    assert len(store.inode.trigger_children) == 1
+    assert id(store.inode.trigger_children[0]) == id(op.inode)
+
+    # Change the store
+    _set_store_or_df(store, slice(5, 10))
+    assert np.all(inode.obj["a"] == np.arange(5, 10))
+    assert np.all(inode.obj["b"] == np.arange(25, 30))
+
+    # Change the dataframe
+    _set_store_or_df(df, DataFrame({"a": np.arange(5)}))
+    assert len(inode.obj) == 0
+    _set_store_or_df(store, slice(0, 5))
+    assert np.all(inode.obj["a"] == np.arange(5))
+
+
+def test_reactivity_merge():
+    df1 = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    df2 = DataFrame({"a": np.arange(10), "d": torch.arange(20, 30)})
+    on = mk.gui.Store("a")
+    with mk.gui.react():
+        df_merge = df1.merge(df2, on=on)
+    inode = df_merge.inode
+
+    assert np.all(df_merge.to_pandas() == df1.merge(df2, on="a").to_pandas())
+    assert len(df1.inode.trigger_children) == 1
+    assert len(df2.inode.trigger_children) == 1
+    assert df1.inode.trigger_children[0].obj.fn.__name__ == "merge"
+    assert df2.inode.trigger_children[0].obj.fn.__name__ == "merge"
+
+    new_df = df1.copy()
+    new_df["a"][-1] = 20
+    _set_store_or_df(df1, new_df)
+    assert len(inode.obj) == 9
+
+
+def test_reactivity_sort():
+    a, b = np.arange(10), np.arange(20, 30)
+    np.random.shuffle(a)
+    np.random.shuffle(b)
+
+    df = DataFrame({"a": a, "b": b})
+    store = mk.gui.Store("a")
+    with mk.gui.react():
+        df_sort = df.sort(by=store)
+    inode = df_sort.inode
+
+    assert np.all(inode.obj["a"] == np.arange(10))
+
+    _set_store_or_df(store, "b")
+    assert np.all(inode.obj["b"] == np.arange(20, 30))
+
+
+def test_reactivity_sample():
+    df = DataFrame({"a": np.arange(100)})
+    frac = mk.gui.Store(0.1)
+    with mk.gui.react():
+        df_sample = df.sample(frac=frac)
+    inode = df_sample.inode
+
+    assert len(inode.obj) == 10
+
+    _set_store_or_df(frac, 0.2)
+    assert len(inode.obj) == 20
+
+
+def test_reactivity_rename():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    store = mk.gui.Store({"a": "c"})
+    with mk.gui.react():
+        df_rename = df.rename(mapper=store)
+    inode = df_rename.inode
+
+    assert list(inode.obj.keys()) == ["c", "b"]
+
+    # rename is an out-of-place method.
+    # renaming occurs on the source dataframe, which has columns "a" and "b".
+    # Calling `rename` with "b" -> "d" will operate on the source dataframe.
+    # Thus column "a" should still exist.
+    _set_store_or_df(store, {"b": "d"})
+    assert list(inode.obj.keys()) == ["a", "d"]
+
+
+def test_reactivity_drop():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    store = mk.gui.Store(["a"])
+    with mk.gui.react():
+        df_drop = df.drop(columns=store)
+    inode = df_drop.inode
+
+    assert list(inode.obj.keys()) == ["b"]
+
+    # drop is an out-of-place method.
+    # Thus, column "a" will still exist when `drop` is rerun with argument "b".
+    _set_store_or_df(store, ["b"])
+    assert list(inode.obj.keys()) == ["a"]
+
+
+def test_reactivity_keys():
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    with mk.gui.react():
+        keys = df.keys()
+    inode = keys.inode
+
+    assert list(keys) == ["a", "b"]
+
+    _set_store_or_df(df, DataFrame({"c": np.arange(10)}))
+    assert list(inode.obj) == ["c"]

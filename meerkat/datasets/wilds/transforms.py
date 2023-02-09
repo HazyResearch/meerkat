@@ -1,7 +1,6 @@
-import torch
-
 from meerkat.tools.lazy_loader import LazyLoader
 
+torch = LazyLoader("torch")
 transforms = LazyLoader("torchvision.transforms")
 transformers = LazyLoader("transformers")
 

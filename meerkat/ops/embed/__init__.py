@@ -1,17 +1,20 @@
 from typing import Callable, Union
 
 import PIL
-import torch
 
 import meerkat as mk
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import choose_device
 
-from .bit import bit
 from .clip import clip
 from .encoder import Encoder
 from .registry import encoders
 from .robust import robust
 from .transformers import transformers
+
+bit = LazyLoader(".bit")
+
+torch = LazyLoader("torch")
 
 __all__ = ["clip", "bit", "transformers", "robust", "embed"]
 

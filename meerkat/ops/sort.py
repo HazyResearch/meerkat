@@ -1,5 +1,5 @@
-from typing import List, Union
 from time import sleep
+from typing import List, Union
 
 import numpy as np
 
@@ -44,7 +44,6 @@ def sort(
             f"Length of `ascending` ({len(ascending)}) must be the same as "
             f"length of `by` ({len(by)})."
         )
-
     df = data[by].to_pandas()
     df["_sort_idx_"] = np.arange(len(df))
     df = df.sort_values(by=by, ascending=ascending, kind=kind, inplace=False)

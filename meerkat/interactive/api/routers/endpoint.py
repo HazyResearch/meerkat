@@ -1,14 +1,16 @@
 import logging
+import traceback
+
+import numpy as np
+import pandas as pd
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
-import torch
-import numpy as np
-import pandas as pd 
-
-from meerkat.errors import TriggerError
-from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.columns.abstract import Column
+from meerkat.interactive.endpoint import Endpoint, endpoint
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +41,7 @@ def dispatch(
 
         logger.debug("Exception in dispatch", exc_info=True)
         state.progress_queue.add(None)
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Only return store modifications that are not backend_only

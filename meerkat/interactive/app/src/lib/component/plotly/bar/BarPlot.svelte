@@ -1,45 +1,47 @@
 <script lang="ts">
-	import Plot from '../plot/Plot.svelte'
-	import { getContext } from 'svelte';
-	import type { DataFrameRef } from '$lib/api/dataframe';
+	import { dispatch, fetchChunk } from '$lib/utils/api';
+	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-
-	const { fetch_chunk, dispatch } = getContext('Meerkat');
+	import Plot from '../plot/Plot.svelte';
 
 	export let df: DataFrameRef;
 	export let x: string;
 	export let y: string;
-    export let config: Record<string, any>  = {displayModeBar: false}
-    export let on_click: Endpoint;
+	export let config: Record<string, any> = { displayModeBar: false };
+	export let on_click: Endpoint;
 
-	$: data_promise = fetch_chunk({
+	$: data_promise = fetchChunk({
 		df: df,
 		start: 0,
 		columns: [x, y],
 		variants: ['small']
 	}).then((chunk) => {
-		return [{
-			x: chunk.get_column(x).data,
-			y: chunk.get_column(y).data,
-            keyidx: chunk.get_column(chunk.primary_key).data,
-			type: 'bar'
-		}];
+		return [
+			{
+				x: chunk.getColumn(x).data,
+				y: chunk.getColumn(y).data,
+				keyidx: chunk.getColumn(chunk.primaryKey).data,
+				type: 'bar'
+			}
+		];
 	});
 
-    const layout = {xaxis: { title: x}, yaxis: {title: y}}
+	const layout = { xaxis: { title: x }, yaxis: { title: y } };
 
-    async function on_endpoint(endpoint:Endpoint, e){
-        let data = await data_promise
-        e.detail.points
-        console.log(e);
-        if (endpoint) {
-            dispatch(endpoint.endpoint_id, {"detail": {
-                keyidxs: e.detail.points.map((p) => data[0].keyidx[p.pointIndex]),
-            }});
-        }
-    }
+	async function on_endpoint(endpoint: Endpoint, e) {
+		let data = await data_promise;
+		e.detail.points;
+		console.log(e);
+		if (endpoint) {
+			dispatch(endpoint.endpointId, {
+				detail: {
+					keyidxs: e.detail.points.map((p) => data[0].keyidx[p.pointIndex])
+				}
+			});
+		}
+	}
 </script>
 
 {#await data_promise then data}
-	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e) }/>
+	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
 {/await}

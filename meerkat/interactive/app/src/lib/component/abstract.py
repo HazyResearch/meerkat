@@ -1,17 +1,22 @@
 import collections
 import inspect
 import os
+import sys
+import typing
+import warnings
 from typing import Dict, List, Literal, Set
 
 from pydantic import BaseModel, Extra, root_validator
 
+from meerkat.constants import MEERKAT_NPM_PACKAGE, PathHelper
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
-from meerkat.mixins.identifiable import IdentifiableMixin, classproperty
-from meerkat.tools.utils import nested_apply
+from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.tools.utils import classproperty, has_var_kwargs, is_subclass, nested_apply
 
 
 class ComponentFrontend(BaseModel):
@@ -26,27 +31,23 @@ class ComponentFrontend(BaseModel):
 class WrappableMixin:
     @classproperty
     def wrapper_import_style(cls) -> Literal["default", "named", "none"]:
-        from meerkat.interactive.svelte import SvelteWriter
-
-        svelte_writer = SvelteWriter()
-
         # TODO: this will create issues if users want to use plotly components
         # in mk init apps. In general, we need to make the library / namespace
         # distinction more explicit and this system more robust.
-        if cls.library == "@meerkat-ml/meerkat" and (
+        if cls.library == MEERKAT_NPM_PACKAGE and (
             cls.namespace == "meerkat" or cls.namespace == "plotly"
         ):
             # Meerkat components
-            if not svelte_writer.is_user_appdir:
+            if not PathHelper().is_user_app:
                 # In Meerkat package
                 # Use named import: import Something from "path/to/component";
                 return "named"
             else:
-                # Use default import: import { Something } from "@meerkat-ml/meerkat";
+                # Use default import: import { Something } from MEERKAT_NPM_PACKAGE;
                 return "default"
-        elif cls.library == "@meerkat-ml/meerkat":
+        elif cls.library == MEERKAT_NPM_PACKAGE:
             # Custom user components
-            if svelte_writer.is_user_appdir:
+            if PathHelper().is_user_app:
                 # Use named import: import Something from "path/to/component";
                 return "named"
             else:
@@ -206,7 +207,7 @@ class BaseComponent(
 
     @classproperty
     def library(cls):
-        return "@meerkat-ml/meerkat"
+        return MEERKAT_NPM_PACKAGE
 
     @classproperty
     def namespace(cls):
@@ -214,14 +215,12 @@ class BaseComponent(
 
     @classproperty
     def path(cls):
-        from meerkat.interactive.svelte import svelte_writer
-
-        if not cls.library == "@meerkat-ml/meerkat" or (
-            cls.library == "@meerkat-ml/meerkat"
+        if not cls.library == MEERKAT_NPM_PACKAGE or (
+            cls.library == MEERKAT_NPM_PACKAGE
             # KG: TODO: Temporary hack to be able to use multiple namespaces
             # for components provided natively in the Meerkat library.
             and (cls.namespace == "meerkat" or cls.namespace == "plotly")
-            and svelte_writer.is_user_appdir
+            and PathHelper().is_user_app
         ):
             return cls.library
 
@@ -311,6 +310,173 @@ class BaseComponent(
         cls._cache = values.copy()
         return values
 
+    @root_validator(pre=True)
+    def _endpoint_name_starts_with_on(cls, values):
+        """
+        Make sure that all `Endpoint` fields have a name that starts with `on_`.
+        """
+        # TODO: this shouldn't really be a validator, this needs to be run
+        # exactly once when the class is created.
+
+        # Iterate over all fields in the class
+        for k, v in cls.__fields__.items():
+            # TODO: revisit this. Here we only enforce the on_* naming convention for 
+            # endpoints, not endpoint properties, but this should be reconsidered.
+            if is_subclass(v.type_, Endpoint) and not is_subclass(
+                v.type_, EndpointProperty
+            ):
+                if not k.startswith("on_"):
+                    raise ValueError(
+                        f"Endpoint {k} must have a name that starts with `on_`"
+                    )
+        return values
+
+    @staticmethod
+    def _get_event_interface_from_typehint(type_hint):
+        """
+        Recurse on type hints to find all the Endpoint[EventInterface] types.
+
+        Only run this on the type hints of a Component, for fields that are
+        endpoints.
+
+        Returns:
+            EventInterface: The EventInterface that the endpoint expects. None if
+                the endpoint does not have a type hint for the EventInterface.
+        """
+        if isinstance(type_hint, typing._GenericAlias):
+            origin = _get_type_hint_origin(type_hint)
+            args = _get_type_hint_args(type_hint)
+
+            if is_subclass(origin, Endpoint):
+                # Endpoint[XXX]
+                if len(args) != 1:
+                    raise TypeError(
+                        "Endpoint type hints should only have one EventInterface."
+                    )
+                if not issubclass(args[0], EventInterface):
+                    raise TypeError(
+                        "Endpoint type hints should be of type EventInterface."
+                    )
+                return args[0]
+            else:
+                # Alias[XXX]
+                for arg in args:
+                    out = BaseComponent._get_event_interface_from_typehint(arg)
+                    if out is not None:
+                        return out
+        return None
+
+    @root_validator(pre=True)
+    def _endpoint_signature_matches(cls, values):
+        """
+        Make sure that the signature of the Endpoint that is passed in matches
+        the parameter names and types that are sent from Svelte.
+
+        Procedurally, this validator:
+            - Gets the type hints for this BaseComponent subclass.
+            - Gets all fields that are endpoints.
+            - Gets the EventInterface from the Endpoint type hint.
+            - Gets the parameters from the EventInterface.
+            - Gets the function passed by the user.
+            - Gets the parameters from the function.
+            - Compares the two sets of parameters.
+        """
+
+        type_hints = typing.get_type_hints(cls)
+
+        # Get all fields that pydantic tells us are endpoints.
+        for field, value in cls.__fields__.items():
+            if not is_subclass(value.type_, Endpoint) or field not in values or values[field] is None:
+                continue
+
+            # Pull out the EventInterface from Endpoint.
+            event_interface = cls._get_event_interface_from_typehint(type_hints[field])
+            if event_interface is None:
+                warnings.warn(
+                    f"Endpoint `{field}` does not have a type hint. "
+                    "We recommend subclassing EventInterface to provide "
+                    "an explicit type hint to users."
+                )
+                continue
+
+            # Get the parameters from the EventInterface.
+            event_interface_params = typing.get_type_hints(event_interface).keys()
+
+            # Get the endpoint passed by the user.
+            endpoint = values[field]
+            # Raise an error if it's not an Endpoint.
+            if not isinstance(endpoint, Endpoint):
+                raise TypeError(
+                    f"Endpoint `{field}` should be of type Endpoint, "
+                    f"but is of type {type(endpoint)}."
+                )
+
+            fn = endpoint.fn
+            fn_signature = inspect.signature(fn)
+            fn_params = fn_signature.parameters.keys()
+
+            # Make sure that the parameters passed by the user are a superset of
+            # the parameters expected by the EventInterface.
+            # NOTE: if the function has a ** argument, which will absorb any extra
+            # parameters passed by the Svelte dispatch call. So we do not need to
+            # do the superset check.
+            remaining_params = event_interface_params - fn_params
+            if not has_var_kwargs(fn) and len(remaining_params) > 0:
+                raise TypeError(
+                    f"Endpoint `{field}` will be called with parameters: "
+                    f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    "\n"
+                    f"Function specified by the user is missing the "
+                    "following parameters: "
+                    f"{', '.join(f'`{param}`' for param in remaining_params)}. "
+                )
+
+            # Check that the frontend will provide all of the necessary arguments
+            # to call fn. i.e. fn should not have any remaining args once the
+            # frontend sends over the inputs.
+            # Do this by making a set of all fn parameters that don't have defaults.
+            # This set should be a subset of the EventInterface.parameters.
+
+            # Get all the parameters that don't have default values
+            required_fn_params = {
+                k: v
+                for k, v in fn_signature.parameters.items()
+                if v.default is v.empty
+                and v.kind not in (v.VAR_POSITIONAL, v.VAR_KEYWORD)
+            }
+
+            # Make sure that the EventInterface parameters are a super set of these
+            # required parameters.
+            if not set(required_fn_params).issubset(set(event_interface_params)):
+                raise TypeError(
+                    f"Endpoint `{field}` will be called with parameters: "
+                    f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
+                    f"Check the {event_interface.__name__} class to see what parameters "
+                    "are expected to be passed in."
+                    "\n"
+                    f"The function `{fn}` expects the following parameters: "
+                    f"{', '.join(f'`{param}`' for param in required_fn_params)}. "
+                )
+
+        return values
+
+    @root_validator(pre=False)
+    def _update_cache(cls, values):
+        # `cls._cache` only contains the values that were passed in
+        # `values` contains all the values, including the ones that
+        # were not passed in
+
+        # Users might run validators on the class, which will
+        # update the `values` dict. We need to make sure that
+        # the values in `cls._cache` are updated as well.
+        for k, v in cls._cache.items():
+            if isinstance(v, Store):
+                v.set(values[k])
+            else:
+                cls._cache[k] = values[k]
+            # TODO: other types of objects that need to be updated
+        return values
+
     @root_validator(pre=False)
     def _check_inode(cls, values):
         """Unwrap NodeMixin objects to their underlying Node (except Stores)."""
@@ -359,7 +525,12 @@ class Component(BaseComponent):
         # This is a workaround because Pydantic automatically converts
         # all Store objects to their underlying values when validating
         # the class. We need to keep the Store objects around.
+
+        # Cache all the Store objects
         cls._cache = values.copy()
+
+        # Convert all the Store objects to their underlying values
+        # and return the unwrapped values
         for name, value in values.items():
             if isinstance(value, Store):
                 values[name] = value.__wrapped__
@@ -391,3 +562,21 @@ class Component(BaseComponent):
                 value.attach_to_inode(value.create_inode())
 
         return values
+
+
+def _get_type_hint_args(type_hint):
+    """Get the arguments of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_args(type_hint)
+    else:
+        return type_hint.__args__
+
+
+def _get_type_hint_origin(type_hint):
+    """Get the origin of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_origin(type_hint)
+    else:
+        return type_hint.__origin__

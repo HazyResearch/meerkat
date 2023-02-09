@@ -4,26 +4,31 @@ import abc
 import functools
 import logging
 import os
-from typing import Callable, List, Mapping, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.torch_block import TorchBlock
 from meerkat.mixins.cloneable import CloneableMixin
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.writers.concat_writer import ConcatWriter
 from meerkat.writers.numpy_writer import NumpyMemmapWriter
 
 from ..abstract import Column
 from .abstract import TensorColumn
 
+torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
+
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
-Columnable = Union[Sequence, np.ndarray, pd.Series, torch.Tensor]
+Columnable = Union[Sequence, np.ndarray, pd.Series, "torch.Tensor"]
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +47,7 @@ def getattr_decorator(fn: Callable):
     return wrapper
 
 
-def _as_tensor(data: Union[torch.Tensor, np.ndarray, pd.Series]) -> torch.Tensor:
+def _as_tensor(data: Union["torch.Tensor", np.ndarray, pd.Series]) -> "torch.Tensor":
     """Overloaded as_tensor function to support other data types."""
     if not isinstance(data, (np.ndarray, torch.Tensor)):
         data = np.asarray(data)
@@ -170,6 +175,7 @@ class TorchTensorColumn(
     @staticmethod
     def _get_default_formatter() -> Callable:
         from meerkat.interactive.formatter import ScalarFormatter
+
         return ScalarFormatter()
 
     @classmethod
@@ -180,7 +186,7 @@ class TorchTensorColumn(
         else:
             return super(TorchTensorColumn, cls).from_data(data)
 
-    def _copy_data(self) -> torch.Tensor:
+    def _copy_data(self) -> "torch.Tensor":
         return self._data.clone()
 
     def _view_data(self) -> object:
@@ -191,7 +197,7 @@ class TorchTensorColumn(
         torch.save(self.data, os.path.join(path, "data.pt"))
 
     @staticmethod
-    def _read_data(path: str) -> torch.Tensor:
+    def _read_data(path: str) -> "torch.Tensor":
         return torch.load(os.path.join(path, "data.pt"))
 
     def sort(
@@ -245,7 +251,7 @@ class TorchTensorColumn(
     def is_equal(self, other: Column) -> bool:
         return (other.__class__ == self.__class__) and (self.data == other.data).all()
 
-    def to_tensor(self) -> torch.Tensor:
+    def to_tensor(self) -> "torch.Tensor":
         return self.data
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:
@@ -270,7 +276,7 @@ class TorchTensorColumn(
 
     def mean(
         self, dim: int = None, keepdim: bool = False, *args, **kwargs
-    ) -> torch.Tensor:
+    ) -> "torch.Tensor":
         # torch only supports mean for floating point dtypes
         if self.data.dtype not in [
             torch.float,

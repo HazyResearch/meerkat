@@ -5,14 +5,16 @@ from dataclasses import dataclass
 from typing import Dict, Hashable, List, Sequence, Tuple, Union
 
 import pandas as pd
-import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
+
+torch = LazyLoader("torch")
 
 
 class PandasBlock(AbstractBlock):

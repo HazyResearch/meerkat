@@ -1,15 +1,27 @@
 import logging
-from typing import List
 
+import numpy as np
+import pandas as pd
+
+from meerkat.columns.abstract import Column
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store, trigger
-from meerkat.interactive.modification import Modification, StoreModification
+from meerkat.interactive.modification import StoreModification
 from meerkat.state import state
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
+
+from fastapi.encoders import jsonable_encoder
 
 logger = logging.getLogger(__name__)
 
+
+# KG: do not use -> List[Modification] as the return type for the `update`
+# fn. This causes Pydantic to drop several fields from the
+# StoreModification object (it only ends up sending the ids).
 @endpoint(prefix="/store", route="/{store}/update/")
-def update(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
+def update(store: Store, value=Endpoint.EmbeddedBody()):
     """Triggers the computational graph when a store on the frontend changes."""
 
     logger.debug(f"Updating store {store} with value {value}.")
@@ -26,7 +38,7 @@ def update(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
         logger.debug("Store value did not change. Skipping trigger.")
         return []
 
-    # Ready the modification queue 
+    # Ready the modification queue
     state.modification_queue.ready()
 
     # Set the new value of the store
@@ -42,5 +54,17 @@ def update(store: Store, value=Endpoint.EmbeddedBody()) -> List[Modification]:
         if not (isinstance(m, StoreModification) and m.backend_only)
     ]
 
+    logger.debug(f"Returning modifications: {modifications}.")
+
     # Return the modifications
-    return modifications
+    return jsonable_encoder(
+        modifications,
+        custom_encoder={
+            np.ndarray: lambda v: v.tolist(),
+            torch.Tensor: lambda v: v.tolist(),
+            pd.Series: lambda v: v.tolist(),
+            Column: lambda v: v.to_json(),
+            np.int64: lambda v: int(v),
+            np.float64: lambda v: float(v),
+        },
+    )

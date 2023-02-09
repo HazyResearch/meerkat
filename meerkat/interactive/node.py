@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from pydantic import BaseModel, ValidationError
 
@@ -8,7 +8,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 
 
 class NodeFrontendModel(BaseModel):
-    ref_id: str
+    refId: str
     type: str
     is_store: bool = True
 
@@ -17,12 +17,12 @@ class Node(IdentifiableMixin, FrontendMixin):
 
     _self_identifiable_group: str = "nodes"
 
-    def __init__(self, obj: any, **kwargs):
+    def __init__(self, obj: Any, **kwargs):
         """A node in the computational graph. This could be an object or an
         operation.
 
         Args:
-            obj (any): This could be any class that has NodeMixin (e.g. store,
+            obj (Any): This could be any class that has NodeMixin (e.g. store,
                 Operation, DataFrame, Column).
         """
         super().__init__(**kwargs)
@@ -46,7 +46,7 @@ class Node(IdentifiableMixin, FrontendMixin):
     @property
     def frontend(self):
         return NodeFrontendModel(
-            ref_id=self.id,
+            refId=self.id,
             type=self.obj.__class__.__name__,
         )
 
@@ -139,6 +139,7 @@ class NodeMixin(FrontendMixin):
 
     @property
     def frontend(self) -> BaseModel:
+        assert self.inode is not None, "Node not set."
         return self.inode.frontend
 
     @classmethod
@@ -153,7 +154,7 @@ class NodeMixin(FrontendMixin):
         return v
 
 
-def _topological_sort(root_nodes: List[NodeMixin]) -> List[NodeMixin]:
+def _topological_sort(root_nodes: List[NodeMixin]) -> Iterable[NodeMixin]:
     """
     Perform a topological sort on a graph.
     TODO: Add a check to ensure the graph is acyclic.

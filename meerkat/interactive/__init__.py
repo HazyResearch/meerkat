@@ -2,15 +2,22 @@ import pathlib
 
 from .app.src.lib.component import contrib, core, flowbite, html, plotly
 from .app.src.lib.component.abstract import BaseComponent, Component
+from .app.src.lib.component.contrib.fm_filter import FMFilter
+from .app.src.lib.component.contrib.mocha import ChangeList
 from .app.src.lib.component.core.button import Button
-from .app.src.lib.component.core.choice import Choice
-from .app.src.lib.component.core.codedisplay import CodeDisplay
+from .app.src.lib.component.core.code import Code
+from .app.src.lib.component.core.code_cell import CodeCell, FilterCodeCell
 from .app.src.lib.component.core.document import Document
-from .app.src.lib.component.core.editor import Editor
 from .app.src.lib.component.core.filter import Filter
 from .app.src.lib.component.core.gallery import Gallery
 from .app.src.lib.component.core.image import Image
-from .app.src.lib.component.core.markdown import Markdown
+from .app.src.lib.component.core.markdown import (
+    Caption,
+    Header,
+    Markdown,
+    Subheader,
+    Title,
+)
 from .app.src.lib.component.core.match import Match
 from .app.src.lib.component.core.multiselect import MultiSelect
 from .app.src.lib.component.core.put import Put
@@ -22,7 +29,6 @@ from .app.src.lib.component.core.tabs import Tabs
 from .app.src.lib.component.core.text import Text
 from .app.src.lib.component.core.textbox import Textbox
 from .app.src.lib.component.core.toggle import Toggle
-from .app.src.lib.shared.cell.code import Code
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from .graph import (
@@ -81,27 +87,30 @@ __all__ = [
     "plotly",
     # <<<< Core Components >>>>
     "Button",
-    "Choice",
+    "Caption",
     "Code",
-    "CodeDisplay",
+    "CodeCell",
+    "FilterCodeCell",
     "Document",
     "EditTarget",
-    "Editor",
     "Filter",
     "Gallery",
+    "Header",
     "Image",
     "Markdown",
     "Match",
     "MultiSelect",
+    "Put",
     "SliceByCards",
     "Sort",
     "Stats",
+    "Subheader",
     "Table",
     "Tabs",
     "Text",
     "Textbox",
+    "Title",
     "Toggle",
-    "Put",
     # <<<< Utilities >>>>
     "print",
 ]

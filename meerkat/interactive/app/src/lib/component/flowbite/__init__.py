@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
-from meerkat.mixins.identifiable import classproperty
+from meerkat.tools.utils import classproperty
 
 from .types import (
     ActivityType,

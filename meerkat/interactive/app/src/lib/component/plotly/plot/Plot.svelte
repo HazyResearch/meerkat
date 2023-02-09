@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Source: https://github.com/aknakos/sveltekit-plotly 
+	// Source: https://github.com/aknakos/sveltekit-plotly
 	import { PlotlyLib } from '../store';
 
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -23,7 +23,6 @@
 	const onClick = (d) => dispatch('click', d);
 	const onSelected = (d) => dispatch('selected', d);
 	const onRelayout = (d) => dispatch('relayout', d);
-
 
 	const generatePlot = (node, data, layout, config, reloadPlot) => {
 		return $PlotlyLib.newPlot(node, data, { ...layout }, { ...config }).then(() => {

@@ -7,13 +7,15 @@ from mmap import mmap
 from typing import Dict, Hashable, Sequence, Tuple, Union
 
 import numpy as np
-import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
 from meerkat.errors import ConsolidationError
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
+
+torch = LazyLoader("torch")
 
 
 class NumPyBlock(AbstractBlock):

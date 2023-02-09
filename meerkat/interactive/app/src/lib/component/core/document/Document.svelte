@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fetch_chunk } from '$lib/utils/api';
+	import { fetchChunk } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import CheckmarkOutline from 'carbon-icons-svelte/lib/CheckmarkOutline.svelte';
 	import CloseOutline from 'carbon-icons-svelte/lib/CloseOutline.svelte';
@@ -13,10 +13,10 @@
 	export let df: DataFrameRef;
 
 	// More component props
-	export let text_column: string;
-	export let paragraph_column: string;
-	export let label_column: string;
-	export let id_column: string;
+	export let textColumn: string;
+	export let paragraphColumn: string;
+	export let labelColumn: string;
+	export let idColumn: string;
 
 	let dispatch = createEventDispatcher();
 
@@ -29,44 +29,44 @@
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the text_column
-	$: text_df_promise = fetch_chunk({ df, start: 0, end: null, columns: [text_column] });
+	$: textDfPromise = fetchChunk({ df, start: 0, end: null, columns: [textColumn] });
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the paragraph_column if it's not null
-	let paragraph_df_promise: any;
-	$: if (paragraph_column) {
-		paragraph_df_promise = fetch_chunk({ df, start: 0, end: null, columns: [paragraph_column] });
+	let paragraphDfPromise: any;
+	$: if (paragraphColumn) {
+		paragraphDfPromise = fetchChunk({ df, start: 0, end: null, columns: [paragraphColumn] });
 	}
 
 	// Fetch data for the `df` dataframe
 	// This fetches all the data from the label_column and id_column
-	let label_id_df_promise: any;
-	$: if (label_column) {
+	let labelIdDfPromise: any;
+	$: if (labelColumn) {
 		// The name of the id_column was told to us by the edit_target
-		label_id_df_promise = fetch_chunk({
+		labelIdDfPromise = fetchChunk({
 			df,
 			start: 0,
 			end: null,
-			columns: [label_column, id_column]
+			columns: [labelColumn, idColumn]
 		});
 	}
 
 	// Here's a function that takes in an array of sentences, an array of paragraph_indices (i.e. what paragraph each sentence is in)
 	// and an array containing [label, id] pairs for each sentence
 	// It returns an array of objects, each of which contains the sentence, sentence_index, label and id
-	let create_paragraphs = (sentences: any, paragraph_indices: any, labels_and_ids: any) => {
+	let createParagraphs = (sentences: any, paragraphIndices: any, labelsAndIds: any) => {
 		// Make a list of lists of paragraphs
 		let paragraphs: Array<any> = [];
-		let curr_paragraph_index = -1;
+		let currParagraphIndex = -1;
 		for (let i = 0; i < sentences.length; i++) {
-			let paragraph_index = paragraph_indices[i];
+			let paragraphIndex = paragraphIndices[i];
 			let sentence = sentences[i];
-			let [label, id] = labels_and_ids[i];
-			if (paragraph_index > curr_paragraph_index) {
+			let [label, id] = labelsAndIds[i];
+			if (paragraphIndex > currParagraphIndex) {
 				paragraphs.push([]);
-				curr_paragraph_index = paragraph_index;
+				currParagraphIndex = paragraphIndex;
 			}
-			paragraphs[curr_paragraph_index].push({
+			paragraphs[currParagraphIndex].push({
 				sentence: sentence,
 				label: label,
 				id: id
@@ -77,20 +77,20 @@
 </script>
 
 <div class="document">
-	{#await text_df_promise}
+	{#await textDfPromise}
 		Waiting...
-	{:then text_df}
-		{#await paragraph_df_promise}
+	{:then textDf}
+		{#await paragraphDfPromise}
 			Waiting
-		{:then paragraph_df}
-			{#await label_id_df_promise}
+		{:then paragraphDf}
+			{#await labelIdDfPromise}
 				Waiting
-			{:then label_df}
-				{#if paragraph_df}
+			{:then labelDf}
+				{#if paragraphDf}
 					<!-- Create an array of paragraphs. 
 					Each element is an array of objects. 
 					Each object contains 'sentence', 'id', 'label' -->
-					{@const paragraphs = create_paragraphs(text_df.rows, paragraph_df.rows, label_df.rows)}
+					{@const paragraphs = createParagraphs(textDf.rows, paragraphDf.rows, labelDf.rows)}
 
 					{#each paragraphs as paragraph, i}
 						<div class="flex">
@@ -111,7 +111,7 @@
 										class:sentence
 									>
 										{sentence}
-										<div class="text_interactions">
+										<div class="text-interactions">
 											<div class="selecting">
 												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<i
@@ -149,7 +149,7 @@
 					{/each}
 				{:else}
 					<!-- no paragraph index -->
-					{#each text_df.rows as paragraph, i}
+					{#each textDf.rows as paragraph, i}
 						<div class="flex">
 							<div class="font-mono pr-6 whitespace-nowrap self-center">Paragraph {i + 1}</div>
 							<p>{paragraph}</p>
@@ -171,7 +171,7 @@
 		@apply border border-dotted;
 	}
 
-	.text_interactions {
+	.text-interactions {
 		@apply relative inline-flex w-0 h-0 overflow-hidden;
 	}
 
@@ -192,7 +192,7 @@
 		@apply text-black bg-gray-100 z-[999];
 	}
 
-	.sentence:hover > .text_interactions {
+	.sentence:hover > .text-interactions {
 		@apply overflow-visible;
 	}
 </style>

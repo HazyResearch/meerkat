@@ -30,13 +30,12 @@ def on_send(df: mk.DataFrame, message: str):
 
 def test_on_send():
     df = _default_df()
-    chat = mk.gui.Chat(
+    chat = mk.gui.core.Chat(
         df=df,
-        imgChatbot="https://placeimg.com/200/200/animals",
-        imgUser="https://placeimg.com/200/200/people",
+        img_chatbot="https://placeimg.com/200/200/animals",
+        img_user="https://placeimg.com/200/200/people",
         on_send=on_send.partial(df=df),
     )
-
     chat.on_send(message="hello")
     assert len(df) == 3
     assert df["message"][1] == "hello"

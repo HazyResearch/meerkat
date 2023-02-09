@@ -48,7 +48,7 @@
 				class={selected_bars.has(d.id) ? `bar--selected` : `bar`}
 				{x}
 				y={$yGet(d)}
-				height={$yScale.bandwidth()}
+				height={$yScale.bandwidth() * 0.95}
 				{width}
 				rx="3"
 				on:click={select_point(d.id)}

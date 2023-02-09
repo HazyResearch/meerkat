@@ -15,7 +15,7 @@
 	let schema_promise;
 	let items_promise;
 	$: {
-		schema_promise = dispatch(get_discover_schema.endpoint_id, { detail: {} });
+		schema_promise = dispatch(get_discover_schema.endpointId, { detail: {} });
 		items_promise = schema_promise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => ({ value: column.name, label: column.name }));
 		});
@@ -27,7 +27,7 @@
 			return;
 		}
 		status = 'working';
-		let promise = dispatch(on_discover.endpoint_id, {
+		let promise = dispatch(on_discover.endpointId, {
 			detail: {
 				by: by
 			}
@@ -52,7 +52,7 @@
 	$: by_item = { value: by, label: by };
 </script>
 
-<div class="bg-slate-100 py-1 rounded-lg drop-shadow-md z-50 flex flex-col">
+<div class="bg-slate-100 py-1 rounded-lg z-50 flex flex-col">
 	<div class="form-control">
 		<div class="input-group w-100% flex items-center space-x-3">
 			<div class="px-3">
@@ -64,7 +64,7 @@
 			>
 				Discover
 			</button>
-			<div class="themed pr-2 w-48">
+			<!-- <div class="themed pr-2 w-48">
 				{#await items_promise}
 					<Select id="column" placeholder="...a column." isWaiting={true} showIndicator={true} />
 				{:then items}
@@ -79,7 +79,7 @@
 						on:clear={handleClear}
 					/>
 				{/await}
-			</div>
+			</div> -->
 		</div>
 	</div>
 </div>

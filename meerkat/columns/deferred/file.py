@@ -30,7 +30,7 @@ FILE_SHARED_DOCS = {
         loader (Union[str, Callable[[Union[str, IO]], Any]]): a callable that 
             accepts a filepath or an I/O stream and returns data.
         """
-    ), 
+    ),
     "cache_dir": docs.Arg(
         """
         cache_dir (str, optional): the directory on disk where downloaded
@@ -78,7 +78,6 @@ FILE_SHARED_DOCS = {
 
 
 class FileLoader:
-    
     @docs.doc(source=FILE_SHARED_DOCS)
     def __init__(
         self,

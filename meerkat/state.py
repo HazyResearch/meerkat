@@ -1,7 +1,7 @@
-import time
 import logging
 import os
 import subprocess
+import time
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional
 
@@ -183,7 +183,7 @@ class ModificationQueue:
                     "Modification queue is taking a long time to unready."
                     "Check for deadlocks."
                 )
-            
+
         self._ready = True
         logger.debug("Modification queue is now ready.")
 

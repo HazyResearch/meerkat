@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { update_store } from '$lib/utils/api';
+	import { updateStore } from '$lib/utils/api';
 
-	export let store_id: string;
+	export let storeId: string;
 	export let store: any;
-	export let is_backend_store: boolean;
+	export let isBackendStore: boolean;
 
 	// KG: We make all Store objects backend stores
 	// This means that Stores will always be synced with the backend
 	// The check for undefined ensures we don't
 	// set this for other NodeMixin objects (i.e. non-Store objects like DataFrames)
-	if (is_backend_store !== undefined) {
-		is_backend_store = true;
+	if (isBackendStore !== undefined) {
+		isBackendStore = true;
 	}
 
 	// this assumes that all the stores are created with meerkat_writable
-	let trigger_store = store.trigger_store;
+	let triggerStore = store.triggerStore;
 
 	let _mounted = false;
 	// Callback that runs when the store changes
@@ -23,12 +23,12 @@
 			_mounted = true;
 			return;
 		}
-		if (!is_backend_store) {
+		if (!isBackendStore) {
 			return;
 		}
-		update_store(store_id, $store);
+		updateStore(storeId, $store);
 	};
 
-	// only respond to trigger_store
-	$: $trigger_store, callback();
+	// only respond to triggerStore
+	$: $triggerStore, callback();
 </script>

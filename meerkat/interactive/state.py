@@ -3,7 +3,8 @@ from pydantic import BaseModel, Extra, validator
 from meerkat.interactive.endpoint import endpoint
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
-from meerkat.mixins.identifiable import IdentifiableMixin, classproperty
+from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.tools.utils import classproperty
 
 
 class EndpointMixin:

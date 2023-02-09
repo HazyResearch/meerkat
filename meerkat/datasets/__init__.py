@@ -34,8 +34,6 @@ __all__ = [
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
 REGISTRIES = ["meerkat", "huggingface"]
 
-catalog = datasets.catalog
-
 
 def get(
     name: str,

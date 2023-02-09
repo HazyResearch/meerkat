@@ -4,20 +4,20 @@
 	// switch on status for color
 	const colors = {
 		success: {
-			text_color: 'text-green-800',
-			bg_color: 'bg-green-100'
+			textColor: 'text-green-800',
+			bgColor: 'bg-green-100'
 		},
 		error: {
-			text_color: 'text-red-800',
-			bg_color: 'bg-red-100'
+			textColor: 'text-red-800',
+			bgColor: 'bg-red-100'
 		},
 		waiting: {
-			text_color: 'text-violet-800',
-			bg_color: 'bg-violet-100'
+			textColor: 'text-violet-800',
+			bgColor: 'bg-violet-100'
 		},
 		working: {
-			text_color: 'text-violet-800',
-			bg_color: 'bg-violet-100'
+			textColor: 'text-violet-800',
+			bgColor: 'bg-violet-100'
 		}
 	};
     let color: any;
@@ -25,7 +25,7 @@
 </script>
 
 <div
-	class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 {color.text_color} {color.bg_color} rounded-lg dark:bg-red-800 dark:text-red-200"
+	class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 {color.textColor} {color.bgColor} rounded-lg dark:bg-red-800 dark:text-red-200"
 >
 	{#if status === 'success'}
 		<svg

@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Union
+
 from rich.logging import RichHandler
 
 logger = logging.getLogger(__name__)
@@ -13,8 +14,8 @@ logger = logging.getLogger(__name__)
 def initialize_logging(
     log_dir: str = None,
     log_name: str = "meerkat.log",
-    format: str = "[%(funcName)s()] [%(name)s:%(lineno)s] :: %(message)s",
-    level: int = os.environ.get('MEERKAT_LOGGING_LEVEL', logging.WARNING),
+    format: str = "[%(funcName)s()] [%(name)s: %(lineno)s] :: %(message)s",
+    level: int = os.environ.get("MEERKAT_LOGGING_LEVEL", logging.WARNING),
 ) -> None:
     """Initialize logging for Meerkat."""
 

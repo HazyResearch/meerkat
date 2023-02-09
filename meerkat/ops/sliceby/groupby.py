@@ -5,6 +5,7 @@ from typing import Dict, List, Sequence, Tuple, Union
 import numpy as np
 
 from meerkat.dataframe import DataFrame
+from meerkat.interactive.graph.reactivity import reactive
 
 from .sliceby import SliceBy
 
@@ -19,6 +20,7 @@ class GroupBy(SliceBy):
         super().__init__(data=data, by=by, sets=sets)
 
 
+@reactive
 def groupby(
     data: DataFrame,
     by: Union[str, Sequence[str]] = None,

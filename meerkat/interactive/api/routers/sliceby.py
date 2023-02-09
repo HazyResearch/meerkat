@@ -74,9 +74,9 @@ def get_rows(
             [df[info.name].formatter.encode(row[info.name]) for info in column_infos]
         )
     return RowsResponse(
-        column_infos=column_infos,
+        columnInfos=column_infos,
         rows=rows,
-        full_length=full_length,
+        fullLength=full_length,
         indices=indices,
     )
 

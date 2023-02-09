@@ -1,9 +1,10 @@
-from typing import Dict, List, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, TypeVar, Union
 
 from pydantic import StrictBool, StrictFloat, StrictInt, StrictStr
 
-from meerkat.dataframe import DataFrame
-from meerkat.ops.sliceby.sliceby import SliceBy
+if TYPE_CHECKING:
+    from meerkat.dataframe import DataFrame
+    from meerkat.ops.sliceby.sliceby import SliceBy
 
 Primitive = Union[StrictInt, StrictStr, StrictFloat, StrictBool]
 Storeable = Union[
@@ -14,4 +15,4 @@ Storeable = Union[
     Dict[Primitive, List[Primitive]],
     List[Dict[Primitive, Primitive]],
 ]
-T = TypeVar("T", DataFrame, SliceBy)
+T = TypeVar("T", "DataFrame", "SliceBy")

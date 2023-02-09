@@ -5,7 +5,7 @@
 	export let html: string;
 	export let view: string = 'full';
 
-	$: sanitized_html = sanitizeHtml(html);
+	$: sanitizedHtml = sanitizeHtml(html);
 </script>
 
 {#if view === 'logo'}
@@ -13,7 +13,7 @@
 {:else if view === 'thumbnail'}
 	<div class="thumbnail h-full aspect-square rounded-md shadow-md border-black">
 		<iframe
-			srcdoc={sanitized_html}
+			srcdoc={sanitizedHtml}
 			title={'title'}
 			class="rounded-md"
 			frameborder="0"
@@ -23,7 +23,7 @@
 {:else}
 	<div class="h-full w-full rounded-md shadow-md border-black">
 		<iframe
-			srcdoc={sanitized_html}
+			srcdoc={sanitizedHtml}
 			title={'title'}
 			class="rounded-md"
 			frameborder="0"

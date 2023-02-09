@@ -100,7 +100,7 @@ def trigger() -> List[Modification]:
             # TODO: check this
             # mods = [mod for mod in mods if not isinstance(mod, StoreModification)]
             new_modifications.extend(mods)
-        
+
         state.progress_queue.add({"op": "Done!", "progress": 100})
         logger.debug("Done running trigger pipeline.")
 

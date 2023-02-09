@@ -1,7 +1,6 @@
 import random
 
 from PIL import Image
-from torchvision.datasets.cifar import CIFAR10
 
 import meerkat as mk
 
@@ -25,6 +24,8 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
     Returns:
         a DataFrame containing columns `raw_image`, `image` and `label`
     """
+    from torchvision.datasets.cifar import CIFAR10
+
     dfs = []
     for split in ["train", "test"]:
         dataset = CIFAR10(

@@ -1,5 +1,3 @@
-/** Meerkat Component */
-export { default as Meerkat } from './Meerkat.svelte';
 /**
  * CSS
  * Need to export the styles, otherwise users of this Meerkat package don't see styling
@@ -12,24 +10,31 @@ export { default as styles } from "./app.css";
 /** Internal Components */
 export { default as Progress } from './component/_internal/progress/Progress.svelte';
 /** Contrib Components */
-// export { default as Discover } from './component/contrib/discover/Discover.svelte';
+export { default as ChangeList } from './component/contrib/change_list/ChangeList.svelte';
+export { default as Discover } from './component/contrib/discover/Discover.svelte';
+export { default as Row } from './component/contrib/row/Row.svelte';
 /** Core Components */
 export { default as Button } from './component/core/button/Button.svelte';
 export { default as Chat } from './component/core/chat/Chat.svelte';
-export { default as Choice } from './component/core/choice/Choice.svelte';
-export { default as CodeDisplay } from './component/core/codedisplay/CodeDisplay.svelte';
+export { default as Checkbox } from './component/core/checkbox/Checkbox.svelte';
+export { default as Code } from './component/core/code/Code.svelte';
 export { default as Document } from './component/core/document/Document.svelte';
-export { default as Editor } from './component/core/editor/Editor.svelte';
 export { default as FileUpload } from './component/core/fileupload/FileUpload.svelte';
 export { default as Filter } from './component/core/filter/Filter.svelte';
 export { default as Gallery } from './component/core/gallery/Gallery.svelte';
 export { default as Image } from './component/core/image/Image.svelte';
+export { default as Json } from './component/core/json/Json.svelte';
 export { default as Markdown } from './component/core/markdown/Markdown.svelte';
 export { default as Match } from './component/core/match/Match.svelte';
 export { default as MultiSelect } from './component/core/multiselect/MultiSelect.svelte';
 export { default as Put } from './component/core/put/Put.svelte';
+export { default as Radio } from './component/core/radio/Radio.svelte';
+export { default as RadioGroup } from './component/core/radio/RadioGroup.svelte';
+export { default as RawHTML } from './component/core/raw_html/RawHTML.svelte';
 export { default as Scalar } from './component/core/scalar/Scalar.svelte';
+export { default as Select } from './component/core/select/Select.svelte';
 export { default as SliceByCards } from './component/core/slicebycards/SliceByCards.svelte';
+export { default as Slider } from './component/core/slider/Slider.svelte';
 export { default as Sort } from './component/core/sort/Sort.svelte';
 export { default as Stats } from './component/core/stats/Stats.svelte';
 export { default as Table } from './component/core/table/Table.svelte';
@@ -37,7 +42,7 @@ export { default as Tabs } from './component/core/tabs/Tabs.svelte';
 export { default as Text } from './component/core/text/Text.svelte';
 export { default as Textbox } from './component/core/textbox/Textbox.svelte';
 export { default as Toggle } from './component/core/toggle/Toggle.svelte';
-export { default as RawHTML } from './component/core/raw_html/RawHTML.svelte';
+export { default as Vega } from './component/core/vega/Vega.svelte';
 /** Plotly Components */
 export { default as BarPlot } from './component/plotly/bar/BarPlot.svelte';
 export { default as Plot } from './component/plotly/plot/Plot.svelte';
@@ -45,7 +50,6 @@ export { default as Plot } from './component/plotly/plot/Plot.svelte';
 export { API_URL } from './constants.js';
 /** Shared Components */
 export { default as Page } from './shared/Page.svelte';
-export { default as Code } from './shared/cell/code/Code.svelte';
 export { default } from './utils/api';
-export { meerkat_writable } from './utils/stores.js';
+export { meerkatWritable } from './utils/stores.js';
 export { nestedMap } from './utils/tools.js';

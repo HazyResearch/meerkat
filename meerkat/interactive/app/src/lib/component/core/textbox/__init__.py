@@ -1,9 +1,12 @@
-from typing import Optional
-
 from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Textbox(Component):
+    """
+    A textbox that can be used to get user input.
 
-    text: Optional[str] = ""
-    title: str = ""
+    Attributes:
+        text: The text in the textbox.
+    """
+
+    text: str = ""

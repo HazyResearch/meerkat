@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fetch_schema } from '$lib/utils/api';
+	import { fetchSchema } from '$lib/utils/api';
 
 	import type { Writable } from 'svelte/store';
 	import SliceByCard from './SliceByCard.svelte';
@@ -10,7 +10,7 @@
 	export let tag_columns: Writable<Array<string>>;
 	export let aggregations: any;
 
-	$: schema_promise = fetch_schema($df);
+	$: schema_promise = fetchSchema($df);
 	$: info_promise = get_sliceby_info($sliceby.ref_id);
 	let aggregations_promise = aggregate_sliceby($sliceby.ref_id, (aggregations = aggregations));
 </script>

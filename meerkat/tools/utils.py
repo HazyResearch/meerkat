@@ -1,3 +1,4 @@
+import inspect
 import weakref
 from collections import defaultdict
 from collections.abc import Mapping
@@ -7,9 +8,63 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 import dill
 import numpy as np
 import pandas as pd
-import torch
 import yaml
 from yaml.constructor import ConstructorError
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
+
+
+def is_subclass(v, cls):
+    """Check if `v` is a subclass of `cls`, with guard for TypeError."""
+    try:
+        _is_subclass = issubclass(v, cls)
+    except TypeError:
+        _is_subclass = False
+
+    return _is_subclass
+
+
+def has_var_kwargs(fn: Callable) -> bool:
+    """Check if a function has variable keyword arguments e.g. **kwargs.
+
+    Args:
+        fn: The function to check.
+
+    Returns:
+        True if the function has variable keyword arguments, False otherwise.
+    """
+    sig = inspect.signature(fn)
+    params = sig.parameters.values()
+    return any([True for p in params if p.kind == p.VAR_KEYWORD])
+
+
+def has_var_args(fn: Callable) -> bool:
+    """Check if a function has variable positional arguments e.g. *args.
+
+    Args:
+        fn: The function to check.
+
+    Returns:
+        True if the function has variable positional arguments, False otherwise.
+    """
+    sig = inspect.signature(fn)
+    params = sig.parameters.values()
+    return any([True for p in params if p.kind == p.VAR_POSITIONAL])
+
+
+class classproperty(property):
+    """Taken from https://stackoverflow.com/a/13624858.
+
+    The behavior of class properties using the @classmethod and
+    @property decorators has changed across Python versions. This class
+    (should) provide consistent behavior across Python versions. See
+    https://stackoverflow.com/a/1800999 for more information.
+    """
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)
 
 
 class WeakMapping(Mapping):
@@ -69,7 +124,13 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
     ("meerkat.columns.arrow_column", "meerkat.columns.scalar.arrow"),
     ("meerkat.columns.image_column", "meerkat.columns.deferred.image"),
     ("meerkat.columns.file_column", "meerkat.columns.deferred.file"),
+    ("meerkat.columns.list_column", "meerkat.columns.object.base"),
     ("meerkat.block.lambda_block", "meerkat.block.deferred_block"),
+    (
+        "meerkat.interactive.app.src.lib.component.filter",
+        "meerkat.interactive.app.src.lib.component.core.filter",
+    ),
+    ("ListColumn", "ObjectColumn"),
     ("LambdaBlock", "DeferredBlock"),
     ("NumpyBlock", "NumPyBlock"),
 ]

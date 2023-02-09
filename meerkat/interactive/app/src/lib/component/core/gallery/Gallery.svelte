@@ -1,7 +1,7 @@
 <script lang="ts">
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
-	import { fetch_chunk, fetch_schema } from '$lib/utils/api';
+	import { fetchChunk, fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import { Dropdown, DropdownItem } from 'flowbite-svelte';
 	import { setContext } from 'svelte';
@@ -12,15 +12,15 @@
 	import Selected from './Selected.svelte';
 
 	export let df: DataFrameRef;
-	export let main_column: string;
-	export let tag_columns: Array<string>;
+	export let mainColumn: string;
+	export let tagColumns: Array<string>;
 	export let selected: Array<string>;
 
 	export let page: number = 0;
-	export let per_page: number = 20;
-	export let cell_size: number = 24;
+	export let perPage: number = 20;
+	export let cellSize: number = 24;
 
-	$: schema_promise = fetch_schema({
+	$: schemaPromise = fetchSchema({
 		df: df,
 		variants: ['small']
 	});
@@ -29,23 +29,23 @@
 		openModal(RowModal, {
 			df: df,
 			posidx: posidx,
-			main_column: main_column
+			mainColumn: mainColumn
 		});
 	});
 
-	$: chunk_promise = fetch_chunk({
+	$: chunkPromise = fetchChunk({
 		df: df,
-		start: page * per_page,
-		end: (page + 1) * per_page,
-		columns: [main_column, ...tag_columns],
-		variants: ['small']
+		start: page * perPage,
+		end: (page + 1) * perPage,
+		columns: [mainColumn, ...tagColumns],
+		variants: ['gallery']
 	});
 
-	let dropdown_open: boolean = false;
+	let dropdownOpen: boolean = false;
 </script>
 
 <div class="flex-1 rounded-lg overflow-hidden bg-slate-50 h-full">
-	{#await schema_promise}
+	{#await schemaPromise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 		</div>
@@ -55,7 +55,7 @@
 				<!-- Left header section -->
 				<div class="flex justify-self-start items-center">
 					<span class="font-semibold">
-						<GallerySlider bind:size={cell_size} />
+						<GallerySlider bind:size={cellSize} />
 					</span>
 					<div class="font-semibold self-center px-10 flex space-x-2">
 						{#if selected.length > 0}
@@ -70,17 +70,17 @@
 					<button
 						class="font-bold font-mono text-xl text-slate-600 self-center justify-self-center"
 						on:click={() => {
-							dropdown_open = !dropdown_open;
+							dropdownOpen = !dropdownOpen;
 						}}
 					>
-						{main_column}
+						{mainColumn}
 					</button>
-					<Dropdown open={dropdown_open} class="w-fit">
+					<Dropdown open={dropdownOpen} class="w-fit">
 						{#each schema.columns as col}
 							<DropdownItem
 								on:click={() => {
-									main_column = col.name;
-									dropdown_open = false;
+									mainColumn = col.name;
+									dropdownOpen = false;
 								}}
 							>
 								<div class="text-slate-600 font-mono">
@@ -93,16 +93,22 @@
 
 				<!-- Right header section -->
 				<div class="flex self-center justify-self-end items-center">
-					<Pagination bind:page bind:per_page total_items={schema.nrows} />
+					<Pagination bind:page bind:perPage totalItems={schema.nrows} />
 				</div>
 			</div>
 			<div class="h-full overflow-y-scroll">
-				{#await chunk_promise}
+				{#await chunkPromise}
 					<div class="h-full flex items-center justify-center">
 						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 					</div>
 				{:then chunk}
-					<Cards {schema} {chunk} {main_column} {tag_columns} bind:cell_size bind:selected />
+					<Cards
+						{chunk}
+						mainColumn={mainColumn}
+						tagColumns={tagColumns}
+						bind:cellSize={cellSize}
+						bind:selected
+					/>
 				{:catch error}
 					{error}
 				{/await}

@@ -11,8 +11,10 @@ logger = logging.getLogger(__name__)
 STREAM_DELAY = 0.150  # second
 RETRY_TIMEOUT = 15000  # milisecond
 
+
 async def progress_generator():
     from meerkat.state import state
+
     progress_queue = state.progress_queue
 
     while True:
@@ -59,6 +61,7 @@ async def progress_generator():
 
         await asyncio.sleep(STREAM_DELAY)
 
-@endpoint(prefix='/subscribe', route='/progress/', method='GET')
+
+@endpoint(prefix="/subscribe", route="/progress/", method="GET")
 def progress():
     return EventSourceResponse(progress_generator())

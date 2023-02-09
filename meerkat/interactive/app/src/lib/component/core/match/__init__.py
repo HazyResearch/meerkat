@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
 
@@ -104,9 +105,8 @@ def set_criterion(
 
     except Exception as e:
         raise e
-    
-    return criterion
 
+    return criterion
 
 
 @dataclass
@@ -115,6 +115,14 @@ class MatchCriterion:
     query: str
     name: str
     query_embedding: np.ndarray = None
+
+
+class OnGetMatchSchemaMatch(EventInterface):
+    pass
+
+
+class OnMatchMatch(EventInterface):
+    criterion: MatchCriterion
 
 
 @reactive
@@ -126,6 +134,7 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     data_embedding = df[criterion.against]
     scores = (data_embedding @ criterion.query_embedding.T).squeeze()
     df[criterion.name] = scores
+
     return df, criterion.name
 
 
@@ -137,6 +146,8 @@ class Match(Component):
     encoder: str = "clip"
     title: str = "Match"
 
+    # TODO: Revisit this, how to deal with endpoint interfaces when there is composition
+    # and positional arguments
     on_match: EndpointProperty = None
     get_match_schema: EndpointProperty = None
 
@@ -151,7 +162,7 @@ class Match(Component):
         self.get_match_schema = get_match_schema.partial(df=self.df)
 
         self.criterion: MatchCriterion = Store(
-            MatchCriterion(against=None, query=None, name=None), 
+            MatchCriterion(against=None, query=None, name=None),
             backend_only=True,
         )
 

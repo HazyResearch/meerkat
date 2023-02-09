@@ -3,7 +3,6 @@ from .routers import (  # noqa: F401
     dataframe,
     endpoint,
     llm,
-    ops,
     page,
     sliceby,
     store,

@@ -29,39 +29,7 @@ def _format_criteria(
     ]
 
 
-def _skip_sort(
-    new_criteria: List[Union[SortCriterion, Dict[str, Any]]],
-    old_criteria: List[Union[SortCriterion, Dict[str, Any]]],
-) -> bool:
-    """Returns whether the sort operation should be skipped.
-
-    The sort operation should be skipped when the active (i.e. enabled)
-    sorting criteria are the same and in the same order.
-
-    Returns:
-        bool: Whether the sort operation should be skipped.
-    """
-
-    def _to_list(criteria: List[SortCriterion]):
-        return [
-            (criterion.column, criterion.ascending, criterion.source)
-            for criterion in criteria
-        ]
-
-    old_criteria = _format_criteria(old_criteria)
-    new_criteria = _format_criteria(new_criteria)
-
-    # Remove disabled sorting criteria.
-    old_criteria = [criterion for criterion in old_criteria if criterion.is_enabled]
-    new_criteria = [criterion for criterion in new_criteria if criterion.is_enabled]
-
-    if len(new_criteria) != len(old_criteria):
-        return False
-
-    return _to_list(old_criteria) == _to_list(new_criteria)
-
-
-@reactive(skip_fn=_skip_sort)
+@reactive
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],
@@ -100,7 +68,6 @@ class Sort(Component):
     criteria: Union[List[SortCriterion], SortCriterion] = Field(
         default_factory=lambda: []
     )
-    # criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"
 
     def __call__(self, df: DataFrame = None) -> DataFrame:

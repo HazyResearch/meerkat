@@ -1,17 +1,13 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import Check2 from 'svelte-bootstrap-icons/lib/Check2.svelte';
 	import EraserFill from 'svelte-bootstrap-icons/lib/EraserFill.svelte';
 	import X from 'svelte-bootstrap-icons/lib/X.svelte';
-	import Check2 from 'svelte-bootstrap-icons/lib/Check2.svelte';
 
-	import Status from '$lib/shared/common/Status.svelte';
+	import Interval from '$lib/shared/cell/interval/Interval.svelte';
+	import { fetchChunk } from '$lib/utils/api';
 	import type { EditTarget } from '$lib/utils/types';
 	import { get, type Writable } from 'svelte/store';
 	import Phases from './Phases.svelte';
-	import Interval from '$lib/shared/cell/interval/Interval.svelte';
-	import { map } from 'underscore';
-
-	const { edit_target, fetch_chunk } = getContext('Meerkat');
 
 	export let df: Writable;
 	export let label_target: EditTarget;
@@ -36,7 +32,7 @@
 	$: {
 		$df; // needed to trigger on df change
 		console.log(col)
-		counts_promise = fetch_chunk(
+		counts_promise = fetchChunk(
 			label_target.target.ref_id,
 			undefined,
 			undefined,

@@ -2,7 +2,10 @@ from collections.abc import Callable, Mapping, Sequence
 from types import SimpleNamespace
 
 import numpy as np
-import torch
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 class FunctionInspectorMixin:

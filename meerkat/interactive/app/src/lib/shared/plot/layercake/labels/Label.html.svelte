@@ -18,11 +18,15 @@
 >
 	<!-- Inner div styles the label.
         For y-axis, it rotates and translates it about a modified origin and positions it center left. -->
-	<div class="label {axis === 'x' ? 'xlabel' : 'ylabel'}">
+	<div class="label {axis === 'x' ? 'xlabel' : 'ylabel'} w-full">
 		{#if inputable}
 			<input bind:value={label} />
 		{:else}
-			<div>{label}</div>
+			<div class="grid grid-cols-[auto_1fr_auto]">
+				<div class="">v1</div>
+				<div class="text-center">{label}</div>
+				<div class=" ">v2</div>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -39,7 +43,7 @@
 
     .xlabel {
         @apply top-0 left-1/2;
-        transform: translate(-55px, -55px);
+        transform: translate(-160px, -55px);
     }
 
 	.ylabel {

@@ -25,7 +25,6 @@ import dill
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 import yaml
 from pandas._libs import lib
 
@@ -34,6 +33,8 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
+from meerkat.interactive.graph.reactivity import is_reactive, reactive
+from meerkat.interactive.graph.store import Store
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -44,7 +45,10 @@ from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin, capture_provenance
 from meerkat.row import Row
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
+
+torch = LazyLoader("torch")
 
 try:
     from typing import Literal
@@ -133,10 +137,33 @@ class DataFrame(
         )
 
     def __len__(self):
-        return self.nrows
+        # __len__ is required to return an int. It cannot return a Store[int].
+        # As such, it cannot be wrapped in `@reactive` decorator.
+        # To get the length of a DataFrame in a reactive way, use `df.nrows`.
+        _len = self.nrows
+        if is_reactive():
+            warnings.warn(
+                "Calling len(dataframe) is not reactive. Use `df.nrows` to get"
+                "a reactive variable representing the number of rows in a DataFrame."
+            )
+        return _len.value if isinstance(_len, Store) else _len
 
     def __contains__(self, item):
+        # __contains__ is called when using the `in` keyword.
+        # `in` casts the output to a boolean (i.e. `bool(output)`).
+        # Store.__bool__ is not reactive because __bool__ has to return
+        # a bool (not a Store). Thus, we cannot wrap __contains__ in
+        # `@reactive` decorator.
+        if is_reactive():
+            warnings.warn(
+                "The `in` operator is not reactive. Use `df.contains(...)`:\n"
+                "\t>>> df.contains(item)"
+            )
         return item in self.columns
+
+    @reactive
+    def contains(self, item):
+        return self.__contains__(item)
 
     @property
     def data(self) -> BlockManager:
@@ -236,7 +263,7 @@ class DataFrame(
         """
         self[column] = np.arange(self.nrows)
         self.set_primary_key(column, inplace=True)
-    
+
     def _infer_primary_key(self, create: bool = False) -> str:
         """Infer the primary key from the data."""
         for column in self.columns:
@@ -253,7 +280,7 @@ class DataFrame(
         """Number of rows in the DataFrame."""
         if self.ncols == 0:
             return 0
-        return self.data.nrows
+        return self._data.nrows
 
     @property
     def ncols(self):
@@ -264,6 +291,11 @@ class DataFrame(
     def shape(self):
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
+
+    @reactive(nested_return=False)
+    def size(self):
+        """Shape of the DataFrame (num_rows, num_columns)."""
+        return self.shape
 
     def add_column(self, name: str, data: Column.Columnable, overwrite=False) -> None:
         """Add a column to the DataFrame."""
@@ -308,7 +340,8 @@ class DataFrame(
 
         logger.info(f"Removed column `{column}`.")
 
-    @capture_provenance(capture_args=["axis"])
+    # @capture_provenance(capture_args=["axis"])
+    @reactive
     def append(
         self,
         df: DataFrame,
@@ -325,10 +358,12 @@ class DataFrame(
             [self, df], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
 
+    @reactive
     def head(self, n: int = 5) -> DataFrame:
         """Get the first `n` examples of the DataFrame."""
         return self[:n]
 
+    @reactive
     def tail(self, n: int = 5) -> DataFrame:
         """Get the last `n` examples of the DataFrame."""
         return self[-n:]
@@ -417,6 +452,7 @@ class DataFrame(
             )
 
     # @capture_provenance(capture_args=[])
+    @reactive
     def __getitem__(self, posidx):
         return self._get(posidx, materialize=False)
 
@@ -435,13 +471,21 @@ class DataFrame(
         return self._get(slice(0, len(self), 1), materialize=True)
 
     def set(self, value: DataFrame):
-        # FIXME: This should not be called outside of an endpoint. Add explicit check
-        # fot that.
+        """
+        Set the data of this DataFrame to the data of another DataFrame.
+
+        This is used inside endpoints to tell Meerkat when a DataFrame has been
+        modified. Calling this method outside of an endpoint will not have any
+        effect on the graph.
+        """
         self._set_data(value._data)
         self._set_state(value._get_state())
 
         if self.has_inode():
             # Add a modification if it's on the graph
+            # TODO: think about what the scope should be.
+            #   How does `scope` relate to the the skip_fn mechanism
+            #   in Operation?
             mod = DataFrameModification(id=self.inode.id, scope=self.columns)
             mod.add_to_queue()
 
@@ -1013,7 +1057,8 @@ class DataFrame(
             **kwargs,
         )
 
-    @capture_provenance(capture_args=["function"])
+    # @capture_provenance(capture_args=["function"])
+    @reactive
     def filter(
         self,
         function: Optional[Callable] = None,
@@ -1064,6 +1109,7 @@ class DataFrame(
         # filter returns a new dataframe
         return self[indices]
 
+    @reactive
     def merge(
         self,
         right: meerkat.DataFrame,
@@ -1089,6 +1135,7 @@ class DataFrame(
             validate=validate,
         )
 
+    @reactive
     def sort(
         self,
         by: Union[str, List[str]],
@@ -1113,6 +1160,7 @@ class DataFrame(
 
         return sort(data=self, by=by, ascending=ascending, kind=kind)
 
+    @reactive
     def sample(
         self,
         n: int = None,
@@ -1153,6 +1201,7 @@ class DataFrame(
             random_state=random_state,
         )
 
+    @reactive
     def rename(
         self,
         mapper: Union[Dict, Callable] = None,
@@ -1220,6 +1269,7 @@ class DataFrame(
 
         return new_df
 
+    @reactive
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
     ) -> DataFrame:
@@ -1241,13 +1291,16 @@ class DataFrame(
         return self[[c for c in self.columns if c not in columns]]
 
     def items(self):
+        # TODO: Add support for decorating iterators with reactive.
         for name in self.columns:
             yield name, self.data[name]
 
+    @reactive
     def keys(self):
         return self.columns
 
     def values(self):
+        # TODO: Add support for decorating iterators with reactive.
         for name in self.columns:
             yield self.data[name]
 
@@ -1346,26 +1399,31 @@ class DataFrame(
     def __finalize__(self, *args, **kwargs):
         return self
 
+    @reactive
     def groupby(self, *args, **kwargs):
         from meerkat.ops.sliceby.groupby import groupby
 
         return groupby(self, *args, **kwargs)
 
+    @reactive
     def sliceby(self, *args, **kwargs):
         from meerkat.ops.sliceby.sliceby import sliceby
 
         return sliceby(self, *args, **kwargs)
 
+    @reactive
     def clusterby(self, *args, **kwargs):
         from meerkat.ops.sliceby.clusterby import clusterby
 
         return clusterby(self, *args, **kwargs)
 
+    @reactive
     def explainby(self, *args, **kwargs):
         from meerkat.ops.sliceby.explainby import explainby
 
         return explainby(self, *args, **kwargs)
 
+    @reactive
     def aggregate(
         self, function: Union[str, Callable], nuisance: str = "drop", *args, **kwargs
     ) -> Dict[str, Any]:
@@ -1373,6 +1431,7 @@ class DataFrame(
 
         return aggregate(self, function, *args, **kwargs)
 
+    @reactive
     def mean(self, *args, nuisance: str = "drop", **kwargs):
         from meerkat.ops.aggregate.aggregate import aggregate
 

@@ -7,14 +7,16 @@ from typing import Dict, Hashable, List, Sequence, Union
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
+
+torch = LazyLoader("torch")
 
 
 class ArrowBlock(AbstractBlock):

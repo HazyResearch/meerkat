@@ -1,28 +1,16 @@
 <script lang="ts">
-    import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
-    import type {Component} from '$lib/utils/types';
-
-	interface Tab {
-		label: string;
-		id: string;
-        component: Component
-	}
+	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
+	import type { Tab } from './types';
 
 	export let tabs: Array<Tab> = [];
-    
-    let activeTabId = tabs[0].id;
 
+	let activeTabId = tabs[0].id;
 	function setActiveTab(id: string): void {
-		if (id === activeTabId) {
-			activeTabId = '';
-		} else {
-			activeTabId = id;
-		}
+		activeTabId = id === activeTabId ? '' : id;
 	}
-
 </script>
 
-<div class="flex">
+<div class="flex mb-2">
 	<div class="flex-grow flex justify-center">
 		{#each tabs as { label, id }}
 			<button
@@ -37,8 +25,8 @@
 	</div>
 </div>
 
-{#each tabs as {id, component}}
-    {#if id === activeTabId}
-        <DynamicComponent {...component} />
-    {/if}
+{#each tabs as { id, component }}
+	{#if id === activeTabId}
+		<DynamicComponent {...component} />
+	{/if}
 {/each}

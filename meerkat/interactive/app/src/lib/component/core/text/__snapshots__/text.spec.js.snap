@@ -1,0 +1,16 @@
+// Vitest Snapshot v1
+
+exports[`Text > should render Text 1`] = `
+<body>
+  <div>
+    <div
+      class="text-ellipsis whitespace-nowrap overflow-hidden"
+    >
+      hello
+    </div>
+    
+    
+    <!--&lt;Text&gt;-->
+  </div>
+</body>
+`;

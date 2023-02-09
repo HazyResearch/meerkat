@@ -1,57 +1,33 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { setContext } from 'svelte/internal';
 	import { writable } from 'svelte/store';
 
 	export let data: any;
-	export let cell_component: string = '';
-	export let cell_props: object = {};
-	export let cell_data_prop: string = 'data';
+	export let cellComponent: string = '';
+	export let cellProps: object = {};
+	export let cellDataProp: string = 'data';
 	export let editable: boolean = false;
-	export let column: string = '';
+
+	const dispatch = createEventDispatcher();
+	setContext('cellEdit', (data: any) => {
+		dispatch('edit', { value: data });
+	});
 
 	// need to actually create a new object, since we don't want to modify the
 	// cell_props that were passed in
 	$: {
-		cell_props = {...cell_props};
-		cell_props[cell_data_prop] = data;
+		cellProps = { ...cellProps };
+		cellProps[cellDataProp] = data;
 
 		// iterate over cell_props and turn them into stores if they aren't already
-		for (const [key, value] of Object.entries(cell_props)) {
+		for (const [key, value] of Object.entries(cellProps)) {
 			if (value === null || value.subscribe === undefined) {
-				cell_props[key] = writable(value);
+				cellProps[key] = writable(value);
 			}
 		}
 	}
-
-	const dispatch = createEventDispatcher();
-
-	function edit() {
-		dispatch('edit', {
-			value: data
-		});
-	}
-
-
 </script>
 
-<DynamicComponent name={cell_component} props={cell_props} />
-
-<!-- {#if cell_component === 'image'}
-	<Image {data} {...cell_props} />
-{:else if cell_component === 'code'}
-	<Code {data} {...cell_props} />
-{:else if cell_component === 'website'} 
-	<Website {data} {...cell_props} />
-{:else}
-	{#if editable}
-		<input 				
-			class="input input-bordered grow h-7 px-3 rounded-md shadow-md"
-			on:change={edit} 
-			bind:value={data} 
-		/>
-	{:else}
-		<BasicType {data} {...cell_props} />
-	{/if}
-{/if} -->
+<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable) }} />

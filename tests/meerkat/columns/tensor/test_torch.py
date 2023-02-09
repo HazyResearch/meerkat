@@ -97,7 +97,7 @@ def test_to_tensor(testbed):
 
 
 def test_to_pandas(testbed):
-    series = testbed.col.to_pandas()
+    series = testbed.col.to_pandas(allow_objects=True)
 
     assert isinstance(series, pd.Series)
 
@@ -105,7 +105,7 @@ def test_to_pandas(testbed):
         assert (series.values == testbed.col.data).all()
     else:
         for idx in range(len(testbed.col)):
-            assert (series.iloc[idx] == testbed.col[idx]).all()
+            assert (series.iloc[idx] == testbed.col[idx].numpy()).all()
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test_from_numpyable(data):
 
 
 def test_repr_pandas(testbed):
-    series = testbed.col.to_pandas()
+    series = testbed.col.to_pandas(allow_objects=True)
     assert isinstance(series, pd.Series)
 
 

@@ -17,7 +17,7 @@ class ImageFormatter(Formatter):
     data_prop: str = "data"
 
     variants: dict = {
-        "small": Variant(
+        "gallery": Variant(
             props={},
             encode_kwargs={"thumbnail": True},
         )

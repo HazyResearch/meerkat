@@ -17,14 +17,18 @@ class HTMLFormatter(Formatter):
     data_prop: str = "html"
 
     variants: dict = {
-        "small": Variant(
+        "gallery": Variant(
             props={"view": "thumbnail"},
             encode_kwargs={},
         ),
-        "tiny": Variant(
+        "key_value": Variant(
             props={"view": "logo"},
             encode_kwargs={},
-        )
+        ),
+        "fullscreen": Variant(
+            props={"view": "full"},
+            encode_kwargs={},
+        ),
     }
     
     def _encode(self, data: str, thumbnail: bool = False) -> str:

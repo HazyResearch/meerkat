@@ -1,8 +1,8 @@
-import os
-import requests
 import datetime
+import os
 
 import PIL
+import requests
 
 import meerkat as mk
 from meerkat.columns.deferred.image import load_image
@@ -58,7 +58,6 @@ class wikipaintings(DatasetBuilder):
         r = requests.get(url, params={"format": "json", "query": query})
         data = r.json()
 
-
         def extract_year(date: str):
             try:
                 return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").year
@@ -72,7 +71,7 @@ class wikipaintings(DatasetBuilder):
                     "title": row["paintingLabel"]["value"],
                     "image_url": row["image"]["value"],
                     "year": extract_year(row["date"]["value"]),
-                    "artist": row["artistLabel"]["value"]
+                    "artist": row["artistLabel"]["value"],
                 }
                 for row in data["results"]["bindings"]
             ]

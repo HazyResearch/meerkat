@@ -4,6 +4,8 @@ import pytest
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
 
+# TODO (arjun): undo the skip filter stuff
+
 
 @mk.gui.endpoint
 def _set_criteria(criteria, store):

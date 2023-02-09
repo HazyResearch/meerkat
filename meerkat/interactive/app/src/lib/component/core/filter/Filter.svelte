@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { fetch_schema } from '$lib/utils/api';
+	import { fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
+	import { ClipboardPlus, Trash } from 'svelte-bootstrap-icons';
 	import Select from 'svelte-select';
 	import type { FilterCriterion } from './types';
 
@@ -11,11 +12,11 @@
 
 	let criteria_frontend: FilterCriterion[] = [];
 
-	let schema_promise;
-	let items_promise;
+	let schemaPromise;
+	let itemsPromise;
 	$: {
-		schema_promise = fetch_schema({ df: df });
-		items_promise = schema_promise.then((schema: DataFrameSchema) => {
+		schemaPromise = fetchSchema({ df: df });
+		itemsPromise = schemaPromise.then((schema: DataFrameSchema) => {
 			return schema.columns.map((column) => {
 				return {
 					value: column.name,
@@ -25,7 +26,7 @@
 		});
 	}
 
-	const trigger_filter = () => {
+	const triggerFilter = () => {
 		// // We have to unpack the values of the dropdown values.
 		// // TODO: Figure out how to bind the dropdown item.value only
 
@@ -41,11 +42,11 @@
 	const setCheckbox = (
 		criterion: FilterCriterion,
 		value: boolean,
-		ignore_check: boolean = false
+		ignoreCheck: boolean = false
 	) => {
 		// Setting to the same value, do nothing.
 		criterion.is_enabled = value;
-		trigger_filter();
+		triggerFilter();
 	};
 
 	const disableCheckbox = (criterion: FilterCriterion) => {
@@ -84,23 +85,25 @@
 	};
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg drop-shadow-md z-40 flex flex-col">
+<div class="bg-slate-100 py-2 rounded-lg z-40 flex flex-col">
 	<div class="flex space-x-6">
 		{#if title != ''}
-			<div class="font-bold text-xl text-slate-600 self-start pl-2">
+			<div class="font-bold text-md text-slate-600 self-start pl-2">
 				{title}
 			</div>
 		{/if}
 		<div class="flex space-x-4 px-2">
 			<button
 				on:click={addCriterion}
-				class="px-3 bg-violet-100 rounded-md text-violet-800 hover:drop-shadow-md"
-				>+ Add Filter</button
+				class="px-3 bg-slate-200 flex items-center gap-1.5 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<ClipboardPlus /> Add Filter
+			</button>
 			<button
 				on:click={handleClear}
-				class="px-3 bg-red-100 rounded-md text-red-800 hover:drop-shadow-md"
+				class="px-2 flex items-center gap-1.5 bg-slate-200 rounded-md text-slate-800 hover:drop-shadow-sm"
 			>
+				<Trash />
 				Clear
 			</button>
 		</div>
@@ -120,7 +123,7 @@
 				</div>
 
 				<div class="px-1 grow">
-					{#await items_promise}
+					{#await itemsPromise}
 						<Select id="column" placeholder="...a column." loading={true} showChevron={true} />
 					{:then items}
 						<Select
@@ -154,7 +157,7 @@
 						on:keypress={(e) => {
 							if (e.charCode === 13 && !disableCheckbox(criterion)) {
 								criterion.is_enabled = true;
-								trigger_filter();
+								triggerFilter();
 							}
 						}}
 						class="input-bordered w-full rounded-md shadow-md"

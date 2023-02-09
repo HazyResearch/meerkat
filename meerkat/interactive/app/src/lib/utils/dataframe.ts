@@ -3,12 +3,12 @@
  * actually hold any of its data. 
  */
 export interface DataFrameRef {
-    ref_id: string;
+    refId: string;
 }
 
 export interface DataFrameSchema {
     columns: Array<ColumnInfo>;
-    primary_key: string;
+    primaryKey: string;
     nrows: number;
     id: string;
 }
@@ -19,9 +19,9 @@ export interface DataFrameSchema {
 export interface ColumnInfo {
     name: string;
     type: string;
-    cell_component: string;
-    cell_props: any,
-    cell_data_prop: string,
+    cellComponent: string;
+    cellProps: any,
+    cellDataProp: string,
 }
 
 /**
@@ -30,51 +30,51 @@ export interface ColumnInfo {
  */
 export class DataFrameChunk {
 
-    column_infos: Array<ColumnInfo>
+    columnInfos: Array<ColumnInfo>
     columns: Array<string>
     posidxs: Array<number>
     keyidxs: Array<string>
     rows: Array<Array<any>>
-    full_length: number
-    primary_key: string
+    fullLength: number
+    primaryKey: string
 
     constructor(
-        column_infos: Array<ColumnInfo>,
+        columnInfos: Array<ColumnInfo>,
         posidxs: Array<number>,
         rows: Array<Array<any>>,
-        full_length: number,
-        primary_key: string
+        fullLength: number,
+        primaryKey: string
     ) {
-        this.column_infos = column_infos;
-        this.columns = this.column_infos.map((col: any) => col.name);
+        this.columnInfos = columnInfos;
+        this.columns = this.columnInfos.map((col: any) => col.name);
         this.posidxs = posidxs;
         this.rows = rows;
-        this.full_length = full_length;
-        this.primary_key = primary_key
+        this.fullLength = fullLength;
+        this.primaryKey = primaryKey
 
-        let primary_key_index = this.columns.findIndex((c) => c === primary_key);
-        this.keyidxs = this.rows.map((row) => row[primary_key_index])
+        let primaryKeyIndex = this.columns.findIndex((c) => c === primaryKey);
+        this.keyidxs = this.rows.map((row) => row[primaryKeyIndex])
     }
 
-    get_cell(row: number, column: string) {
-        let column_idx = this.columns.indexOf(column);
-        let column_info = this.column_infos[column_idx];
+    getCell(row: number, column: string) {
+        let columnIdx = this.columns.indexOf(column);
+        let columnInfo = this.columnInfos[columnIdx];
         return {
             data: this.rows[row][this.columns.indexOf(column)],
-            cell_component: column_info.cell_component,
-            cell_props: column_info.cell_props,
-            cell_data_prop: column_info.cell_data_prop,
+            cellComponent: columnInfo.cellComponent,
+            cellProps: columnInfo.cellProps,
+            cellDataProp: columnInfo.cellDataProp,
             column: column
         }
     }
-    get_column(column: string) {
-        let column_idx = this.columns.indexOf(column);
-        let column_info = this.column_infos[column_idx];
+    getColumn(column: string) {
+        let columnIdx = this.columns.indexOf(column);
+        let columnInfo = this.columnInfos[columnIdx];
         return {
-            data: this.rows.map((row) => row[column_idx]),
-            cell_component: column_info.cell_component,
-            cell_props: column_info.cell_props,
-            cell_data_prop: column_info.cell_data_prop,
+            data: this.rows.map((row) => row[columnIdx]),
+            cellComponent: columnInfo.cellComponent,
+            cellProps: columnInfo.cellProps,
+            cellDataProp: columnInfo.cellDataProp,
             column: column
         }
     }

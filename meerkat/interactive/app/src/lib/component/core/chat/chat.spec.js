@@ -6,7 +6,7 @@ describe('Chat', () => {
 	it('should render chat', async () => {
 		const { container, component } = render(Chat, {
 			props: {
-				df: { ref_id: 'mock' },
+				df: { refId: 'mock' },
 				imgChatbot: 'https://placeimg.com/200/200/animals',
 				imgUser: 'https://placeimg.com/200/200/people',
 			},

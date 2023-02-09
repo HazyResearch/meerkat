@@ -1,19 +1,19 @@
-import { apply_modifications, modify, post } from '$lib/utils/requests';
+import { applyModifications, modify, post } from '$lib/utils/requests';
 import toast from 'svelte-french-toast';
 import { get } from 'svelte/store';
 import { API_URL } from "../constants.js";
 import { DataFrameChunk, type DataFrameRef } from './dataframe.js';
 
-export const update_store = async (store_id: string, value: any) => {
-    const modifications = await modify(`${get(API_URL)}/store/${store_id}/update`, { value: value });
+export const updateStore = async (storeId: string, value: any) => {
+    const modifications = await modify(`${get(API_URL)}/store/${storeId}/update`, { value: value });
     return modifications;
 };
 
-export const dispatch = async (endpoint_id: string, payload: any = {}) => {
-    if (endpoint_id === null) {
+export const dispatch = async (endpointId: string, payload: any = {}) => {
+    if (endpointId === null) {
         return;
     }
-    const promise = post(`${get(API_URL)}/endpoint/${endpoint_id}/dispatch`, payload).catch(
+    const promise = post(`${get(API_URL)}/endpoint/${endpointId}/dispatch`, payload).catch(
         (error) => {
             console.log(error);
             toast.error(error.message);
@@ -23,7 +23,7 @@ export const dispatch = async (endpoint_id: string, payload: any = {}) => {
     );
     const { result, modifications, error } = await promise;
     // Code below is executed only if the promise is successful.
-    apply_modifications(modifications);
+    applyModifications(modifications);
     return result;
 };
 
@@ -33,12 +33,12 @@ export interface DataFrameChunkRequest {
     variants?: Array<string> | null
 }
 
-export const fetch_schema = async ({
+export const fetchSchema = async ({
     df,
     columns = null,
     variants = null
 }: DataFrameChunkRequest) => {
-    return await post(`${get(API_URL)}/df/${df.ref_id}/schema`, {
+    return await post(`${get(API_URL)}/df/${df.refId}/schema`, {
         columns: columns, variants: variants
     });
 }
@@ -50,42 +50,42 @@ export interface DataFrameChunkRequest {
     end?: number | null
     posidxs?: Array<number> | null
     keyidxs?: Array<string | number> | null
-    key_column?: string | null
+    keyColumn?: string | null
     variants?: Array<string> | null
 }
 
-export const fetch_chunk = async ({
+export const fetchChunk = async ({
     df,
     columns = null,
     start = null,
     end = null,
     posidxs = null,
     keyidxs = null,
-    key_column = null,
+    keyColumn = null,
     variants = null
 }: DataFrameChunkRequest) => {
-    const result = await post(`${get(API_URL)}/df/${df.ref_id}/rows`, {
+    const result = await post(`${get(API_URL)}/df/${df.refId}/rows`, {
         start: start,
         end: end,
         posidxs: posidxs,
-        key_column: key_column,
+        key_column: keyColumn,
         keyidxs: keyidxs,
         columns: columns,
         variants: variants
     });
 
     return new DataFrameChunk(
-        result.column_infos,
+        result.columnInfos,
         result.posidxs,
         result.rows,
-        result.full_length,
-        result.primary_key
+        result.fullLength,
+        result.primaryKey
     );
 }
 
 export default {
-    update_store,
-    dispatch,
-    fetch_schema,
-    fetch_chunk
+    updateStore: updateStore,
+    dispatch: dispatch,
+    fetchSchema: fetchSchema,
+    fetchChunk: fetchChunk
 };

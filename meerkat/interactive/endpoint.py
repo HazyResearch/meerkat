@@ -8,11 +8,12 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Store, trigger
+from meerkat.interactive.graph import Store, no_react, trigger
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.state import state
+from meerkat.tools.utils import has_var_args
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
 class EndpointFrontend(BaseModel):
     """A schema for sending an endpoint to the frontend."""
 
-    endpoint_id: Union[str, None]
+    endpointId: Union[str, None]
 
 
 # TODO: technically Endpoint doesn't need to be NodeMixin (probably)
@@ -160,13 +161,10 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             name = self.fn.func.__name__
         else:
             name = None
-        return f"Endpoint(id={self.id}, name={name}, prefix={self.prefix}, route={self.route})"
-
-    @staticmethod
-    def _has_var_positional(foo):
-        # Check if `foo` has a `*args` parameter
-        signature = inspect.signature(foo)
-        return any(p.kind == p.VAR_POSITIONAL for p in signature.parameters.values())
+        return (
+            f"Endpoint(id={self.id}, name={name}, prefix={self.prefix}, "
+            f"route={self.route})"
+        )
 
     def _validate_fn(self):
         """Validate the function `fn`."""
@@ -174,7 +172,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             raise TypeError(f"Endpoint function {self.fn} is not callable.")
 
         # Disallow *args
-        if self._has_var_positional(self.fn):
+        if has_var_args(self.fn):
             raise TypeError(
                 f"Endpoint function {self.fn} has a `*args` parameter."
                 " Please use keyword arguments instead."
@@ -185,7 +183,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
     @property
     def frontend(self):
         return EndpointFrontend(
-            endpoint_id=self.id,
+            endpointId=self.id,
         )
 
     def run(self, *args, **kwargs) -> Any:
@@ -254,7 +252,9 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
         try:
-            result = partial_fn()
+            # The function should not add any operations to the graph.
+            with no_react():
+                result = partial_fn()
         except Exception as e:
             # Unready the modification queue
             state.modification_queue.unready()
@@ -282,6 +282,15 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
                     arg.attach_to_inode(node)
 
                 arg.inode.add_child(self.inode, triggers=False)
+
+        # TODO (sabri): make this work for derived dataframes
+        # There's a subtle issue with partial that we should figure out. I spent an
+        # hour or so on it, but am gonna table it til after the deadline tomorrow
+        # because I have a hacky workaround. Basically, if we create an endpoint
+        # partial passing a "derived" dataframe, when the endpoint is called, we
+        # should expect that the current value of the dataframe will be passed.
+        # Currently, the original value of the dataframe is passed. It makes sense to
+        # me why this is happening, but the right fix is eluding me.
 
         fn = partial(self.fn, *args, **kwargs)
         fn.__name__ = self.fn.__name__
@@ -470,7 +479,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         return v
 
 
-class EndpointProperty(Endpoint):
+class EndpointProperty(Endpoint, Generic[T]):
     pass
 
 
@@ -488,7 +497,7 @@ def endpoint(
     prefix: Union[str, APIRouter] = None,
     route: str = None,
     method: str = "POST",
-):
+) -> Endpoint:
     """Decorator to mark a function as an endpoint.
 
     An endpoint is a function that can be called to

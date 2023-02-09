@@ -1,6 +1,5 @@
 import functools
 
-import meerkat as mk
 from meerkat.interactive import Page
 from meerkat.interactive.app.src.lib.component.html import (
     div,

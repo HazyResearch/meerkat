@@ -7,12 +7,11 @@ import numbers
 import os
 import shutil
 from mmap import mmap
-from typing import Any, Callable, List, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import torch
 from numpy.core._exceptions import UFuncTypeError
 from yaml.representer import Representer
 
@@ -20,9 +19,16 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.numpy_block import NumPyBlock
 from meerkat.columns.abstract import Column
 from meerkat.mixins.aggregate import AggregationError
+from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.writers.concat_writer import ConcatWriter
 
 from .abstract import TensorColumn
+
+torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
+
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -295,10 +301,10 @@ class NumPyTensorColumn(
 
         return idxs
 
-    def to_torch(self) -> torch.Tensor:
+    def to_torch(self) -> "torch.Tensor":
         return torch.tensor(self.data)
 
-    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+    def to_pandas(self, allow_objects: bool = True) -> pd.Series:
         if len(self.shape) == 1:
             return pd.Series(self.data)
         elif allow_objects:
@@ -315,7 +321,7 @@ class NumPyTensorColumn(
 
     def to_numpy(self) -> np.ndarray:
         return self.data
-    
+
     def to_json(self) -> List[Any]:
         return self.data.tolist()
 

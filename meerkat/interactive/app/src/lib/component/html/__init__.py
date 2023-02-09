@@ -1,9 +1,14 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import validator
 
-from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
-from meerkat.mixins.identifiable import classproperty
+from meerkat.interactive.app.src.lib.component.abstract import (
+    BaseComponent,
+    Component,
+    Slottable,
+)
+from meerkat.interactive.endpoint import Endpoint
+from meerkat.tools.utils import classproperty
 
 
 class HtmlMixin:
@@ -29,14 +34,42 @@ class div(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
 
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
 
 class flex(div):
+
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
+
 
     @validator("classes", pre=True, always=True)
     def make_flex(cls, v):
         return "flex flex-row " + v if v is not None else "flex flex-row"
 
 class flexcol(div):
+
+    def __init__(
+        self, 
+        slots: Optional[List[BaseComponent]] = None, 
+        *, 
+        classes: Optional[str] = None, 
+        style: Optional[str] = None,
+    ):
+        super().__init__(slots=slots, classes=classes, style=style)
+
     
     @validator("classes", pre=True, always=True)
     def make_flexcol(cls, v):
@@ -98,10 +131,22 @@ class h5(Slottable, HtmlMixin, Component):
     classes: Optional[str] = "text-lg"
     style: Optional[str] = None
 
-
 class h6(Slottable, HtmlMixin, Component):
     classes: Optional[str] = "text-md"
     style: Optional[str] = None
+
+
+# class radio(Slottable, HtmlMixin, Component):
+#     classes: Optional[str] = None
+#     style: Optional[str] = None
+
+#     name: str = ""
+#     value: str = ""
+#     checked: bool = False
+#     disabled: bool = False
+#     color: str = "purple"
+
+#     on_change: Optional[Endpoint] = None
 
 class svg(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None

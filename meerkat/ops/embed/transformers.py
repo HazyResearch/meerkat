@@ -1,8 +1,13 @@
-from typing import Dict, List, Union
+from typing import TYPE_CHECKING, Dict, List, Union
 
-import torch
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .encoder import Encoder
+
+torch = LazyLoader("torch")
+
+if TYPE_CHECKING:
+    import torch
 
 
 def transformers(
@@ -31,7 +36,7 @@ def transformers(
 
     model.to(device)
 
-    def _encode(x: List[str]) -> torch.Tensor:
+    def _encode(x: List[str]) -> "torch.Tensor":
         # need to coerce to list in case someone passes in a pandas series or ndarray
         x = list(x)
         return model(

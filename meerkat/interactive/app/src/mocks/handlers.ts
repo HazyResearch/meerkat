@@ -1,41 +1,41 @@
 import { rest } from 'msw';
 
 const messages = {
-    column_infos: [
+    columnInfos: [
         {
             name: "id",
             type: "number",
-            cell_component: "Cell",
-            cell_props: {},
-            cell_data_prop: "data"
+            cellComponent: "Cell",
+            cellProps: {},
+            cellDataProp: "data"
         },
         {
             name: "message",
             type: "string",
-            cell_component: "Cell",
-            cell_props: {},
-            cell_data_prop: "data"
+            cellComponent: "Cell",
+            cellProps: {},
+            cellDataProp: "data"
         },
         {
             name: "name",
             type: "string",
-            cell_component: "Cell",
-            cell_props: {},
-            cell_data_prop: "data"
+            cellComponent: "Cell",
+            cellProps: {},
+            cellDataProp: "data"
         },
         {
             name: "time",
             type: "string",
-            cell_component: "Cell",
-            cell_props: {},
-            cell_data_prop: "data"
+            cellComponent: "Cell",
+            cellProps: {},
+            cellDataProp: "data"
         },
         {
             name: "sender",
             type: "string",
-            cell_component: "Cell",
-            cell_props: {},
-            cell_data_prop: "data"
+            cellComponent: "Cell",
+            cellProps: {},
+            cellDataProp: "data"
         }
     ],
     posidxs: [0, 1, 2, 3],
@@ -45,8 +45,15 @@ const messages = {
         [2, "how can i help", "chatbot", "2021-01-01 00:00:00"],
         [3, "im good thanks", "user", "2021-01-01 00:00:00"],
     ],
-    full_length: 4,
-    primary_key: "id"
+    fullLength: 4,
+    primaryKey: "id"
+}
+
+const schema = {
+    id: "mock",
+    columns: messages.columnInfos,
+    primaryKey: "id",
+    nrows: 4
 }
 
 
@@ -54,6 +61,10 @@ const messages = {
 export const handlers = [
     rest.post(`http://test.app/df/mock/rows`, (req, res, ctx) => {
         return res(ctx.status(200), ctx.json(messages))
+    }),
+
+    rest.post(`http://test.app/df/mock/schema`, (req, res, ctx) => {
+        return res(ctx.status(200), ctx.json(schema))
     }),
 
     rest.get(`http://test.app/api/`, (req, res, ctx) => {

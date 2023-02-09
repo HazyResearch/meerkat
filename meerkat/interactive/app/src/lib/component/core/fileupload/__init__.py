@@ -1,6 +1,12 @@
 from typing import Optional
+
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.event import EventInterface
+
+
+class OnUploadFileUpload(EventInterface):
+    pass
 
 
 class FileUpload(Component):
@@ -14,4 +20,4 @@ class FileUpload(Component):
     directory: bool = False
     multiple: bool = False
 
-    on_upload: Endpoint = None
+    on_upload: Endpoint[OnUploadFileUpload] = None

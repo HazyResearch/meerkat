@@ -6,8 +6,8 @@ import uvicorn
 
 # By default, the local server will try to open on localhost, port 7860.
 # If that is not available, then it will try 7861, 7862, ... 7959.
-API_PORT = os.getenv("MK_API_PORT", "5000")
-FRONTEND_PORT = os.getenv("MK_FRONTEND_PORT", "8000")
+API_PORT = int(os.getenv("MK_API_PORT", "5000"))
+FRONTEND_PORT = int(os.getenv("MK_FRONTEND_PORT", "8000"))
 INITIAL_PORT_VALUE = int(os.getenv("MK_SERVER_PORT", "7860"))
 TRY_NUM_PORTS = int(os.getenv("MK_NUM_PORTS", "100"))
 LOCALHOST_NAME = os.getenv("MK_SERVER_NAME", "127.0.0.1")

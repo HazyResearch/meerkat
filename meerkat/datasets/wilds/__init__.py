@@ -2,19 +2,23 @@
 from __future__ import annotations
 
 from argparse import Namespace
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import numpy as np
 import pandas as pd
-from datasets import DatasetInfo
-from torch.utils.data._utils.collate import default_collate
 
 from meerkat.columns.abstract import Column
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
+from meerkat.tools.lazy_loader import LazyLoader
 
 from .config import base_config, populate_defaults
 from .transforms import initialize_transform
+
+torch_collate = LazyLoader("torch.utils.data._utils.collate")
+
+if TYPE_CHECKING:
+    from datasets import DatasetInfo
 
 try:
     import wilds
@@ -165,8 +169,12 @@ class WILDSInputColumn(Column):
             transform = initialize_transform(
                 transform_name, config=config, dataset=dataset
             )
-            # wilds defaults to torch `default_collate`
-            collate = default_collate if dataset.collate is None else dataset.collate
+            # wilds defaults to torch torch_collate.`default_collate`
+            collate = (
+                torch_collate.default_collate
+                if dataset.collate is None
+                else dataset.collate
+            )
         else:
             transform = collate = None
 
