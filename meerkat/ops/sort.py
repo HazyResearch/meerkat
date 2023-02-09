@@ -1,5 +1,5 @@
-from typing import List, Union
 from time import sleep
+from typing import List, Union
 
 import numpy as np
 

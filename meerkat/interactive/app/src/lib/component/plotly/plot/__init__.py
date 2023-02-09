@@ -1,4 +1,5 @@
 from meerkat.tools.utils import classproperty
+
 from ...abstract import Component
 
 

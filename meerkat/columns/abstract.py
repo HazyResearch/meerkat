@@ -40,6 +40,7 @@ from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
     import torch
+
     from meerkat.interactive.formatter.base import Formatter
 
 torch = LazyLoader("torch")

@@ -1,11 +1,10 @@
-from typing import Any
 import math
 import textwrap
+from typing import Any
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pandas.io.formats.format import format_array
-
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.formatter.base import Formatter

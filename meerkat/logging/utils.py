@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Union
+
 from rich.logging import RichHandler
 
 logger = logging.getLogger(__name__)

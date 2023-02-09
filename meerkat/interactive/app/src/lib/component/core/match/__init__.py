@@ -11,7 +11,6 @@ from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
 
-
 @endpoint
 def get_match_schema(df: DataFrame):
     import meerkat as mk

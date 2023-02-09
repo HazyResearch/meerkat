@@ -2,7 +2,11 @@ from typing import List, Optional
 
 from pydantic import validator
 
-from meerkat.interactive.app.src.lib.component.abstract import BaseComponent, Component, Slottable
+from meerkat.interactive.app.src.lib.component.abstract import (
+    BaseComponent,
+    Component,
+    Slottable,
+)
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.tools.utils import classproperty
 

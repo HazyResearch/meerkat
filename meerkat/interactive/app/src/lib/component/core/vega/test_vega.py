@@ -1,5 +1,4 @@
 import meerkat as mk
-
 from meerkat.interactive.app.src.lib.component.core.vega import Vega
 
 vega = Vega(

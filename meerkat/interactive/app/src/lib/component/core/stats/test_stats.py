@@ -2,7 +2,6 @@ import meerkat as mk
 from meerkat.interactive import Page
 from meerkat.interactive.app.src.lib.component.core.stats import Stats
 
-
 component = mk.gui.html.div(
     slots=[
         Stats(

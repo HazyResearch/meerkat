@@ -1,15 +1,16 @@
 import os
-from typing import List, TYPE_CHECKING
-
-from meerkat.ops.sliceby.sliceby import SliceBy
-from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
-from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
-from meerkat.interactive.app.src.lib.component.contrib.row import Row
-from meerkat.interactive.app.src.lib.component.contrib.global_stats import GlobalStats
-from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
-from meerkat.tools.lazy_loader import LazyLoader
+from typing import TYPE_CHECKING, List
 
 import numpy as np
+
+from meerkat.interactive.app.src.lib.component.contrib.discover import Discover
+from meerkat.interactive.app.src.lib.component.contrib.global_stats import GlobalStats
+from meerkat.interactive.app.src.lib.component.contrib.row import Row
+from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
+from meerkat.interactive.app.src.lib.component.deprecate.plot import Plot
+from meerkat.ops.sliceby.sliceby import SliceBy
+from meerkat.tools.lazy_loader import LazyLoader
+
 from ...abstract import BaseComponent
 
 if TYPE_CHECKING:
@@ -56,6 +57,7 @@ class ChangeList(BaseComponent):
         code_control: bool = False,
     ):
         from mocha.repo import SliceRepo
+
         import meerkat as mk
 
         v1_name = v1_name or v1_column

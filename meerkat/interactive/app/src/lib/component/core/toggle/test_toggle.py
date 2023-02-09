@@ -1,4 +1,5 @@
 from typing import Any
+
 from meerkat.interactive import Page, endpoint, print
 from meerkat.interactive.app.src.lib.component.core.toggle import Toggle
 
