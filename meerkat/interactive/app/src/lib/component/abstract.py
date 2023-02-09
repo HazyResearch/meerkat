@@ -93,9 +93,8 @@ class SlotsMixin:
     def __init__(self, slots: List["BaseComponent"] = [], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if not iterable(slots):
+        if isinstance(slots, BaseComponent) or not iterable(slots):
             slots = [slots]
-
         self._slots = slots
 
     @property
@@ -153,6 +152,18 @@ class BaseComponent(
         return cls.namespace.title() + cls.__name__
 
     @classproperty
+    def frontend_alias(cls):
+        """Alias for this component that is used in the frontend.
+
+        This is not unique, and it is possible to have multiple
+        components with the same frontend alias. This is useful for
+        components that are just wrappers around other components, e.g.
+        a layout BaseComponent that subclasses a Grid BaseComponent will still
+        have the same frontend alias as the Grid BaseComponent.
+        """
+        return cls.namespace.title() + cls.component_name
+
+    @classproperty
     def component_name(cls):
         # Inheriting an existing BaseComponent and modifying it on the Python side
         # should not change the name of the component used on the frontend
@@ -182,18 +193,6 @@ class BaseComponent(
             if k.startswith("on_")
             and not issubclass(cls.__fields__[k].type_, EndpointProperty)
         ]
-
-    @classproperty
-    def frontend_alias(cls):
-        """Alias for this component that is used in the frontend.
-
-        This is not unique, and it is possible to have multiple
-        components with the same frontend alias. This is useful for
-        components that are just wrappers around other components, e.g.
-        a layout BaseComponent that subclasses a Grid BaseComponent will still
-        have the same frontend alias as the Grid BaseComponent.
-        """
-        return cls.namespace.title() + cls.component_name
 
     @classproperty
     def identifiable_group(self):
