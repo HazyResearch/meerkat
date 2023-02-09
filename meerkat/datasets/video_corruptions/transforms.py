@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     import torch
 
 
-
 class TemporalDownsampling(object):
     """Video transformation for performing temporal downsampling (i.e. reading
     in every Nth frame only). This can be used in tandem with VideoCell by

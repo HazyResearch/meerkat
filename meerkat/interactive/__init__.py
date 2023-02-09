@@ -95,7 +95,7 @@ __all__ = [
     "EditTarget",
     "Filter",
     "Gallery",
-    "Header", 
+    "Header",
     "Image",
     "Markdown",
     "Match",
@@ -109,7 +109,7 @@ __all__ = [
     "Tabs",
     "Text",
     "Textbox",
-    "Title", 
+    "Title",
     "Toggle",
     # <<<< Utilities >>>>
     "print",

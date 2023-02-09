@@ -16,6 +16,7 @@ from .abstract import AbstractBlock, BlockIndex, BlockView
 
 torch = LazyLoader("torch")
 
+
 class PandasBlock(AbstractBlock):
     @dataclass(eq=True, frozen=True)
     class Signature:

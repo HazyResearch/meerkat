@@ -25,7 +25,7 @@ def get_cifar10(download_dir: str, frac_val: float = 0.0, download: bool = True)
         a DataFrame containing columns `raw_image`, `image` and `label`
     """
     from torchvision.datasets.cifar import CIFAR10
-    
+
     dfs = []
     for split in ["train", "test"]:
         dataset = CIFAR10(

@@ -18,6 +18,7 @@ from meerkat.state import state
 if is_notebook():
     from IPython.display import IFrame
 
+
 def page(fn: Callable):
     @wraps(fn)
     def wrapper(*args, **kwargs):

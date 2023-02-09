@@ -152,9 +152,8 @@ class DeferredColumn(Column):
         # materialize a sample into a column
         from meerkat.interactive.formatter.base import DeferredFormatter
 
-        col = self._get(index=slice(0,1,1), materialize=True)
+        col = self._get(index=slice(0, 1, 1), materialize=True)
         return DeferredFormatter(col.formatter)
-
 
     def _repr_cell(self, idx):
         return self[idx]

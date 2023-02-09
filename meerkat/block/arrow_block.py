@@ -16,7 +16,7 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
-torch = LazyLoader('torch')
+torch = LazyLoader("torch")
 
 
 class ArrowBlock(AbstractBlock):

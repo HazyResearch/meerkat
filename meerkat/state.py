@@ -183,7 +183,7 @@ class ModificationQueue:
                     "Modification queue is taking a long time to unready."
                     "Check for deadlocks."
                 )
-            
+
         self._ready = True
         logger.debug("Modification queue is now ready.")
 

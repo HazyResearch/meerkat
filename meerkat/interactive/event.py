@@ -1,6 +1,7 @@
-# TODO: Think about whether we can move to 
+# TODO: Think about whether we can move to
 # from typing_extensions import Protocol
 # in order to implement the EventInterface based type hints.
+
 
 class EventInterface:
     """
@@ -14,4 +15,5 @@ class EventInterface:
     ensure they have a signature that matches the keyword arguments defined
     in this class.
     """
+
     pass

@@ -126,7 +126,10 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
     ("meerkat.columns.file_column", "meerkat.columns.deferred.file"),
     ("meerkat.columns.list_column", "meerkat.columns.object.base"),
     ("meerkat.block.lambda_block", "meerkat.block.deferred_block"),
-    ("meerkat.interactive.app.src.lib.component.filter", "meerkat.interactive.app.src.lib.component.core.filter"),
+    (
+        "meerkat.interactive.app.src.lib.component.filter",
+        "meerkat.interactive.app.src.lib.component.core.filter",
+    ),
     ("ListColumn", "ObjectColumn"),
     ("LambdaBlock", "DeferredBlock"),
     ("NumpyBlock", "NumPyBlock"),

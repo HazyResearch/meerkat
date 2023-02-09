@@ -8,6 +8,7 @@ from .file import FileColumn
 torchaudio = LazyLoader("torchaudio")
 torch = LazyLoader("torch")
 
+
 class AudioColumn(FileColumn):
     """A lambda column where each cell represents an audio file on disk. The
     underlying data is a `PandasSeriesColumn` of strings, where each string is

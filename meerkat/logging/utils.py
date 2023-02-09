@@ -15,7 +15,7 @@ def initialize_logging(
     log_dir: str = None,
     log_name: str = "meerkat.log",
     format: str = "[%(funcName)s()] [%(name)s: %(lineno)s] :: %(message)s",
-    level: int = os.environ.get('MEERKAT_LOGGING_LEVEL', logging.WARNING),
+    level: int = os.environ.get("MEERKAT_LOGGING_LEVEL", logging.WARNING),
 ) -> None:
     """Initialize logging for Meerkat."""
 

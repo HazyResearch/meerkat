@@ -16,7 +16,6 @@ class AbstractCell(abc.ABC):
         """Get the metadata associated with this cell."""
         return {}
 
-
     def __getitem__(self, index):
         return self.get()[index]
 

@@ -207,7 +207,9 @@ class SvelteWriter(metaclass=Singleton):
         # user's installed version, and filter out the ones that aren't available
         if MEERKAT_NPM_PACKAGE in installed_libraries and self.app.is_user_app:
             try:
-                mk_components = set([f"Meerkat{c}" for c in self.app.get_mk_package_info()])
+                mk_components = set(
+                    [f"Meerkat{c}" for c in self.app.get_mk_package_info()]
+                )
                 components = [
                     c
                     for c in components
@@ -240,8 +242,7 @@ class SvelteWriter(metaclass=Singleton):
         from meerkat.interactive.startup import snake_case_to_camel_case
 
         prop_names_camel_case = [
-            snake_case_to_camel_case(prop_name) 
-            for prop_name in component.prop_names
+            snake_case_to_camel_case(prop_name) for prop_name in component.prop_names
         ]
 
         return template.render(

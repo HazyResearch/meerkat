@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     import torch
 
 
-
 def transformers(
     variant: str = "bert-large-cased", device: Union[int, str] = "cpu"
 ) -> Dict[str, Encoder]:

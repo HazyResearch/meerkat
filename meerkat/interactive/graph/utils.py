@@ -16,6 +16,7 @@ def _replace_nodeables_with_nodes(obj):
 
 def _replace_nodes_with_nodeables(obj, unwrap_stores=True):
     from meerkat.interactive.graph.store import Store
+
     if isinstance(obj, Node):
         obj = obj.obj
         if unwrap_stores:

@@ -27,15 +27,15 @@ class DataFrameGUI(GUI):
                 df=self.df,
                 **kwargs,
             ),
-            id="table"
+            id="table",
         ).launch()
 
-    def gallery(self, main_column: str=None, tag_columns: List[str]=None, **kwargs):
+    def gallery(self, main_column: str = None, tag_columns: List[str] = None, **kwargs):
         if tag_columns is None:
             tag_columns = []
         if main_column is None:
             main_column = self.df.columns[0]
-            
+
         return Page(
             component=mk.gui.Gallery(
                 df=self.df,
@@ -43,7 +43,7 @@ class DataFrameGUI(GUI):
                 tag_columns=tag_columns,
                 **kwargs,
             ),
-            id="gallery"
+            id="gallery",
         ).launch()
 
 

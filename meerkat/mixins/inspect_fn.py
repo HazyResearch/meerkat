@@ -5,7 +5,7 @@ import numpy as np
 
 from meerkat.tools.lazy_loader import LazyLoader
 
-torch = LazyLoader('torch')
+torch = LazyLoader("torch")
 
 
 class FunctionInspectorMixin:
