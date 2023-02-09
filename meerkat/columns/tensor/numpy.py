@@ -304,7 +304,7 @@ class NumPyTensorColumn(
     def to_torch(self) -> "torch.Tensor":
         return torch.tensor(self.data)
 
-    def to_pandas(self, allow_objects: bool = False) -> pd.Series:
+    def to_pandas(self, allow_objects: bool = True) -> pd.Series:
         if len(self.shape) == 1:
             return pd.Series(self.data)
         elif allow_objects:
