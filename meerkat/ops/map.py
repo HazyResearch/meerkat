@@ -194,7 +194,7 @@ def defer(
     """
     from meerkat import DeferredColumn
     from meerkat.block.deferred_block import DeferredBlock, DeferredOp
-    from meerkat.columns.abstract import Column
+    from meerkat.columns.abstract import Column, infer_column_type
     from meerkat.dataframe import DataFrame
 
     # prepare arguments for LambdaOp
@@ -252,9 +252,9 @@ def defer(
     if outputs is None or outputs == "single":
         # can only infer output type if the the input columns are nonempty
         if output_type is None and first_row is not None:
-            output_type = type(first_row)
+            output_type = infer_column_type([first_row])
 
-        if not isinstance(output_type, type):
+        if not isinstance(output_type, Type):
             raise ValueError(
                 "Must provide a single `output_type` if `outputs` is None."
             )
@@ -266,13 +266,13 @@ def defer(
     elif isinstance(outputs, Mapping):
         if output_type is None:
             output_type = {
-                outputs[output_key]: type(col) for output_key, col in first_row.items()
+                outputs[output_key]: infer_column_type([col])
+                for output_key, col in first_row.items()
             }
         if not isinstance(output_type, Mapping):
             raise ValueError(
                 "Must provide a `output_type` mapping if `outputs` is a mapping."
             )
-
         return DataFrame(
             {
                 col: DeferredColumn(
@@ -308,7 +308,7 @@ def map(
     batch_size: int = 1,
     inputs: Union[Mapping[str, str], Sequence[str]] = None,
     outputs: Union[Mapping[any, str], Sequence[str]] = None,
-    output_type: Union[Mapping[str, type], type] = None,
+    output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
     materialize: bool = True,
     use_ray: bool = False,
     num_blocks: int = 100,
@@ -373,9 +373,11 @@ def map(
         ${inputs}
         ${outputs}
         ${output_type}
-        ${use_ray}
-        ${num_blocks}
-        ${blocks_per_window}
+        use_ray (bool): Use Ray to parallelize the computation. Defaults to False.
+        num_blocks (int): When using Ray, the number of blocks to split the data
+            into. Defaults to 100.
+        blocks_per_window (int): When using Ray, the number of blocks to process
+            in a single Ray task. Defaults to 10.
         pbar (bool): Show a progress bar. Defaults to False.
 
     Returns:
@@ -441,31 +443,6 @@ def map(
     )
 
 
-from ray.data import Datasource
-from typing import List, Any
-from ray.data.block import BlockMetadata, Block
-from ray.data.datasource import WriteResult
-from ray.types import ObjectRef
-
-
-class NumPyDatasource(Datasource):
-    def __init__(self):
-        self._data = []
-
-    def do_write(
-        self,
-        blocks: List[ObjectRef[Block]],
-        metadata: List[BlockMetadata],
-        ray_remote_args: Dict[str, Any],
-        **write_args,
-    ) -> List[ObjectRef[WriteResult]]:
-        self._data.append(blocks)
-        return blocks
-    
-    def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
-        return 0
-
-
 def _materialize(
     data: Union["DataFrame", "Column"],
     batch_size: int,
@@ -474,6 +451,8 @@ def _materialize(
     num_blocks: int,
     blocks_per_window: int,
 ):
+    import logging
+    
     import numpy as np
     import pandas as pd
     import ray
@@ -481,12 +460,13 @@ def _materialize(
     from tqdm import tqdm
 
     import meerkat as mk
+    from meerkat.columns.abstract import column
 
     from .concat import concat
 
     if use_ray:
-        ray.init(ignore_reinit_error=True)
-        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
+        ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
+        ray.data.set_progress_bars(enabled=pbar)
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
@@ -511,10 +491,23 @@ def _materialize(
         if isinstance(curr, mk.ScalarColumn):
             ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
             fns.append(lambda x: x["0"])
-        elif isinstance(curr, mk.TensorColumn):
+        elif isinstance(curr, mk.NumPyTensorColumn):
+            ds = ray.data.from_numpy(curr).repartition(num_blocks)
+        elif isinstance(curr, mk.TorchTensorColumn):
             ds = ray.data.from_torch(curr).repartition(num_blocks)
         elif isinstance(curr, mk.ObjectColumn):
             ds = ray.data.from_items(curr).repartition(num_blocks)
+        elif isinstance(curr, mk.DataFrame):
+            print("hi")
+            ds = ray.data.from_pandas(
+                pd.DataFrame(
+                    {
+                        str(idx): arg.to_pandas()
+                        for idx, arg in enumerate(curr.data.args)
+                    }
+                )
+            )
+            fns.append(lambda row: row.values())
         else:
             raise ValueError(f"Base column is of unsupported type {type(curr)}.")
 
@@ -524,39 +517,36 @@ def _materialize(
             # TODO (dean): if batch_size > 1, then use map_batches
             pipe = pipe.map(fn)
 
-        datasource = NumPyDatasource()
-        pipe = pipe.write_datasource(datasource)
-        breakpoint()
-
         # Step 4: Collect the results
-        # TODO (dean): support different output types
         result_ds = iter(
             pipe.rewindow(blocks_per_window=num_blocks).iter_datasets()
         ).__next__()
-        if data._output_type in [np.int64, np.float32, np.float64, np.ndarray]:
-            print("Using to_numpy_refs()")
-            result = []
+        result = []
+        if data._output_type == mk.NumPyTensorColumn:
             for partition in result_ds.to_numpy_refs():
                 result.append(ray.get(partition))
-            return np.stack(result)
-        elif data._output_type in [torch.Tensor]:
-            print("Using to_torch()")
-            result = []
+            return column(np.stack(result))
+        elif data._output_type == mk.TorchTensorColumn:
             for partition in result_ds.to_torch():
                 result.append(partition[0])
-            return torch.stack(result)
-        elif data._output_type in [str, int, float, bool, pd.Series, pd.DataFrame]:
-            print("Using to_pandas_refs()")
-            result = []
+            return column(torch.stack(result))
+        elif data._output_type == mk.PandasScalarColumn:
             for partition in result_ds.to_pandas_refs():
-                result.extend(ray.get(partition))
+                result.append(ray.get(partition))
+            return column(pd.concat(result)["value"])
+        elif data._output_type == mk.ArrowScalarColumn:
+            print("Using to_arrow_refs()")
+            for partition in result_ds.to_arrow_refs():
+                result.append(ray.get(partition)["value"].combine_chunks())
+            # from meerkat.columns.abstract import infer_column_type
+            # return infer_column_type(result)
             return result
-        elif isinstance(data._output_type, object):
-            print("Using iter_batches()")
-            result = []
+            import pyarrow as pa
+            return column(pa.concat_arrays(result))
+        elif data._output_type == mk.ObjectColumn:
             for partition in result_ds.iter_batches():
                 result.extend(partition)
-            return result
+            return column(result)
         else:
             raise ValueError(f"Unsupported output type {data._output_type}.")
 

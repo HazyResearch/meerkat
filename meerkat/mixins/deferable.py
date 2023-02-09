@@ -1,11 +1,12 @@
 import logging
-from typing import TYPE_CHECKING, Callable, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Callable, Mapping, Sequence, Type, Union
 
 from pandas.util._decorators import doc
 
 from meerkat.ops.map import defer
 
 if TYPE_CHECKING:
+    from meerkat.columns.abstract import Column
     from meerkat.columns.deferred.base import DeferredColumn
     from meerkat.dataframe import DataFrame
 
@@ -24,7 +25,7 @@ class DeferrableMixin:
         batch_size: int = 1,
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
-        output_type: Union[Mapping[str, type], type] = None,
+        output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
     ) -> Union["DataFrame", "DeferredColumn"]:
         return defer(
             data=self,
