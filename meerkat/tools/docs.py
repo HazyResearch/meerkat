@@ -64,8 +64,19 @@ class DocComponent(abc.ABC):
         raise NotImplementedError()
 
 
-class Body:
-    pass 
+class DescriptionSection(DocComponent):
+    def fix_indentation(self, docstring: str) -> str:
+        # get common leading whitespace from docstring ignoring first line
+        lines = docstring.splitlines()
+        leading_whitespace = min(
+            len(line) - len(line.lstrip()) for line in lines[1:] if line.strip()
+        )
+
+        prefix = leading_whitespace * " "
+        text = indent(dedent(self.text), prefix)
+
+        return text
+
 
 class Arg(DocComponent):
     def fix_indentation(self, docstring: str) -> str:

@@ -11,41 +11,24 @@ if TYPE_CHECKING:
 
 
 _SHARED_DOCS_ = {
-    "": docs.Arg(
+    "input_description": docs.DescriptionSection(
         """
     *What gets passed to function?*
 
-    *   If ${data} is a :class:`DataFrame`, then the function's signature is
-        inspected to determine which columns to pass as keyword arguments to the
-        function.
+    *   If ${data} is a :class:`DataFrame` and ``outputs`` is not passed, then the 
+        function's signature is inspected to determine which columns to pass as keyword 
+        arguments to the function.
         For example, if the function is
         ``lambda age, residence: age > 18 and residence == "NY"``, then
         the columns ``age`` and ``residence`` will be passed to the function. If the
         columns are not present in the DataFrame, then a `ValueError` will be raised.
-        The mapping between columns and function arguments can be overridden by passing
+    *   If ${data} is a :class:`DataFrame` and ``outputs`` is  ``"single"``, then 
+        mapping between columns and function arguments can be overridden by passing
         a the ``inputs`` argument.
     *   If ${data} is a :class:`Column` then values of the
         column are passed as a single positional argument to the function. The
         ``inputs`` argument is ignored.
-
-    *What gets returned by map?*
-
-    *   If ``function`` returns a single value, then ``map``
-        will return a :class:`Column` object.
-
-    *   If ``function`` returns a dictionary, then ``map`` will return a
-        :class:`DataFrame`. The keys of the
-        dictionary are used as column names. The ``outputs`` argument can be used to
-        override the column names.
-
-    *   If ``function`` returns a tuple, then ``map`` will return a :class:`DataFrame`.
-        The column names will be integers. The column names can be overriden by passing
-        a tuple to the ``outputs`` argument.
-
-    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"``
-        to the ``outputs`` argument will cause ``map`` to return a single
-        :class:`ObjectColumn`.
-        """
+    """
     ),
     "function": docs.Arg(
         """
@@ -125,20 +108,7 @@ def defer(
 
     Learn more in the user guide: :ref:`guide/dataframe/ops/mapping/deferred`.
 
-    *What gets passed to function?*
-
-    *   If ${data} is a :class:`DataFrame`, then the function's signature is
-        inspected to determine which columns to pass as keyword arguments to the
-        function.
-        For example, if the function is
-        ``lambda age, residence: age > 18 and residence == "NY"``, then
-        the columns ``age`` and ``residence`` will be passed to the function. If the
-        columns are not present in the DataFrame, then a `ValueError` will be raised.
-        The mapping between columns and function arguments can be overridden by passing
-        a the ``inputs`` argument.
-    *   If ${data} is a :class:`Column` then values of the
-        column are passed as a single positional argument to the function. The
-        ``inputs`` argument is ignored.
+    {input_description}
 
     *What gets returned by defer?*
 
@@ -233,12 +203,21 @@ def defer(
     from meerkat.columns.abstract import Column, infer_column_type
     from meerkat.dataframe import DataFrame
 
+    base_function = function
     # prepare arguments for LambdaOp
     if isinstance(data, Column):
         args = [data]
         kwargs = {}
     elif isinstance(data, DataFrame):
-        if isinstance(inputs, Mapping):
+        if inputs == "row":
+            args = []
+            kwargs = {col_name: col for col_name, col in data.items()}
+            
+            def wrapper(*args, **kwargs):
+                return base_function(kwargs)
+            function = wrapper
+
+        elif isinstance(inputs, Mapping):
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
         elif isinstance(inputs, Sequence):
@@ -255,8 +234,11 @@ def defer(
                 elif param.default is param.empty:
                     raise ValueError(
                         f"Non-default argument '{name}' does not have a corresponding "
-                        f"column in the DataFrame. Please provide an `inputs` mapping "
-                        f"or pass a lambda function with a different signature."
+                        "column in the DataFrame. If your function expects a full "
+                        "DataFrame row, pass ``inputs='row'`` to ``map``. Otherwise, " 
+                        "please provide an `inputs` mapping ",
+                        "or pass a lambda function with a different signature. "
+                        "See map documentation for more details."
                     )
         else:
             raise ValueError("`inputs` must be a mapping or sequence.")
@@ -273,7 +255,6 @@ def defer(
     block = DeferredBlock.from_block_data(data=op)
 
     first_row = op._get(0) if len(op) > 0 else None
-    _infer_column_type([first_row])
 
     if outputs is None and isinstance(first_row, Dict):
         # support for splitting a dict into multiple columns without specifying outputs
@@ -361,6 +342,27 @@ def map(
     computed later.
 
     Learn more in the user guide: :ref:`guide/dataframe/ops/mapping`.
+
+    {input_description}
+
+    *What gets returned by defer?*
+
+    *   If ``function`` returns a single value, then ``defer``
+        will return a :class:`DeferredColumn` object.
+
+    *   If ``function`` returns a dictionary, then ``defer`` will return a
+        :class:`DataFrame` containing :class:`DeferredColumn` objects. The keys of the
+        dictionary are used as column names. The ``outputs`` argument can be used to
+        override the column names.
+
+    *   If ``function`` returns a tuple, then ``defer`` will return a :class:`DataFrame`
+        containing :class:`DeferredColumn` objects. The column names will be integers.
+        The column names can be overriden by passing a tuple to the ``outputs``
+        argument.
+
+    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"`` to
+        the ``outputs`` argument will cause ``defer`` to return a single
+        :class:`DeferredColumn` that materializes to a :class:`ObjectColumn`
 
     .. note::
         This function is also available as a method of :class:`DataFrame` and
