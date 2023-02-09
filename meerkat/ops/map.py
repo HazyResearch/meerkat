@@ -1,6 +1,6 @@
+import warnings
 from inspect import signature
 from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Type, Union
-import warnings
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView

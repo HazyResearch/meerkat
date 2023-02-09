@@ -58,7 +58,6 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             else:
                 self.image_paths.append(os.path.join(tmpdir, filename))
 
-
         self.col = ImageColumn.from_filepaths(
             self.image_paths,
             loader=folder.default_loader,
@@ -132,7 +131,6 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     [im.rotate(45 + salt + kwarg) for im in self.ims]
                 ),
             }
-          
 
     def get_data(self, index, materialize: bool = True):
         if materialize:
