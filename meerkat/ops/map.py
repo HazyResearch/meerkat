@@ -455,7 +455,7 @@ def _materialize(
     blocks_per_window: int,
 ):
     import logging
-    
+
     import numpy as np
     import pandas as pd
     import torch
@@ -468,6 +468,7 @@ def _materialize(
 
     if use_ray:
         import ray
+
         ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
         ray.data.set_progress_bars(enabled=pbar)
 
@@ -545,6 +546,7 @@ def _materialize(
             # return infer_column_type(result)
             return result
             import pyarrow as pa
+
             return column(pa.concat_arrays(result))
         elif data._output_type == mk.ObjectColumn:
             for partition in result_ds.iter_batches():

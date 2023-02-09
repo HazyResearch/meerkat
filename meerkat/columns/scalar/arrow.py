@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Sequence, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence, Set
 
 import pyarrow as pa
 from pyarrow.compute import equal
@@ -10,7 +10,6 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
-
 
 from ..abstract import Column
 from .abstract import ScalarColumn

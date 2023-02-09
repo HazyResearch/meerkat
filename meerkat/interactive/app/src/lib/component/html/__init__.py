@@ -7,7 +7,6 @@ from meerkat.interactive.app.src.lib.component.abstract import (
     Component,
     Slottable,
 )
-from meerkat.interactive.endpoint import Endpoint
 from meerkat.tools.utils import classproperty
 
 

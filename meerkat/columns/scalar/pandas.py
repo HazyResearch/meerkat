@@ -278,7 +278,7 @@ class PandasScalarColumn(
 
         cell = self[0]
         if isinstance(cell, np.generic):
-            return ScalarFormatter(dtype= type(cell.item()).__name__)
+            return ScalarFormatter(dtype=type(cell.item()).__name__)
 
         return ScalarFormatter()
 

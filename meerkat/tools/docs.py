@@ -65,7 +65,8 @@ class DocComponent(abc.ABC):
 
 
 class Body:
-    pass 
+    pass
+
 
 class Arg(DocComponent):
     def fix_indentation(self, docstring: str) -> str:
