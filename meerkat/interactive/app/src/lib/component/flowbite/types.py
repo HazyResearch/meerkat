@@ -86,17 +86,6 @@ class DotType:
     color: Optional[str] = None
 
 
-@dataclass
-class drawerTransitionParamTypes:
-    amount: Optional[int] = None
-    delay: Optional[int] = None
-    duration: Optional[int] = None
-    easing: callable = None
-    opacity: Optional[number] = None
-    x: Optional[int] = None
-    y: Optional[int] = None
-
-
 DrawerTransitionTypes = Optional[
     Literal[
         "fade",
@@ -115,13 +104,6 @@ DrawerTransitionTypes = Optional[
 ]
 
 
-@dataclass
-class DropdownType:
-    name: str
-    href: str
-    divider: Optional[bool] = None
-
-
 FormColorType = Literal["blue", "red", "green", "purple", "teal", "yellow", "orange"]
 Gradientduotones = Literal[
     "purple2blue",
@@ -135,31 +117,11 @@ Gradientduotones = Literal[
 
 
 @dataclass
-class GroupTimelineType:
-    title: str
-    src: str
-    alt: str
-    href: Optional[str] = None
-    isPrivate: Optional[bool] = None
-    comment: Optional[str] = None
-
-
-@dataclass
 class IconType:
     name: str
     size: Optional[int] = None
     color: Optional[Colors] = None
     class_: Optional[str] = None
-
-
-@dataclass
-class IconTabType:
-    name: str
-    active: bool
-    href: str
-    rel: Optional[str] = None
-    icon: Optional[str] = None
-    iconSize: Optional[int] = None
 
 
 @dataclass
@@ -398,16 +360,6 @@ TransitionTypes = Literal[
     "out:blur",
 ]
 
-
-@dataclass
-class CheckboxType:
-    id: str
-    label: str
-    checked: Optional[bool] = None
-    disabled: Optional[bool] = None
-    helper: Optional[str] = None
-
-
 Colors = Literal[
     "blue",
     "gray",
@@ -420,12 +372,6 @@ Colors = Literal[
     "white",
     "custom",
 ]
-
-
-@dataclass
-class DotType:
-    top: Optional[bool] = None
-    color: Optional[str] = None
 
 
 @dataclass
@@ -530,54 +476,6 @@ InputType = Literal[
     "week",
     "search",
 ]
-
-
-@dataclass
-class InteractiveTabType:
-    name: str
-    id: int
-    content: str
-    active: Optional[bool] = None
-    disabled: Optional[bool] = None
-    icon: Optional[IconType] = None
-    iconSize: Optional[int] = None
-
-
-@dataclass
-class ListGroupItemType:
-    current: Optional[bool] = None
-    disabled: Optional[bool] = None
-    href: Optional[str] = None
-
-
-@dataclass
-class LinkType:
-    name: str
-    href: Optional[str] = None
-    rel: Optional[str] = None
-    active: Optional[bool] = None
-
-
-@dataclass
-class ListCardType:
-    img: ImgType
-    field1: str
-    field2: str = ""
-    field3: str = ""
-
-
-@dataclass
-class NavbarType:
-    name: str
-    href: str
-    rel: str = ""
-    child: List["NavbarType"] = None
-
-
-@dataclass
-class PageType:
-    pageNum: number
-    href: str
 
 
 SizeType = Literal["xs", "sm", "md", "lg", "xl"]

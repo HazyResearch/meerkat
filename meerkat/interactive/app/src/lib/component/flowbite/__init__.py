@@ -1,5 +1,4 @@
 import datetime
-import uuid
 from typing import Any, Dict, List, Literal, Optional, Union
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
@@ -8,49 +7,16 @@ from meerkat.tools.utils import classproperty
 
 from .types import (
     ActivityType,
-    AlignType,
-    AuthFieldType,
     Buttonshadows,
     ButtonType,
-    Buttontypes,
-    CheckboxType,
-    Colors,
-    DotType,
     DrawerTransitionTypes,
-    DropdownType,
     FormColorType,
-    FormSizeType,
-    Gradientduotones,
     GroupTimelineType,
-    IconTabType,
-    IconType,
-    ImgType,
-    InputType,
-    InteractiveTabType,
     LinkType,
-    ListCardType,
-    ListGroupItemType,
-    NavbarType,
-    PageType,
-    PillTabType,
     Placement,
     ReviewType,
-    SelectOptionType,
-    SidebarCtaType,
-    SidebarType,
     SiteType,
     SizeType,
-    SocialMediaLinkType,
-    SocialMediaType,
-    TabHeadType,
-    TableDataHelperType,
-    TabType,
-    Textsize,
-    TimelineItemHorizontalType,
-    TimelineItemType,
-    TimelineItemVerticalType,
-    ToggleColorType,
-    TransitionParamTypes,
     TransitionTypes,
     number,
 )
@@ -69,7 +35,8 @@ class FlowbiteSvelteMixin:
 class Accordion(Slottable, FlowbiteSvelteMixin, Component):
     multiple: bool = False
     flush: bool = False
-    activeClasses: str = "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800"
+    activeClasses: str = "bg-gray-100 dark:bg-gray-800 text-gray-900 "
+    "dark:text-white focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800"
     inactiveClasses: str = (
         "text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:dark:bg-gray-800"
     )
@@ -80,9 +47,11 @@ class AccordionItem(Slottable, FlowbiteSvelteMixin, Component):
     open: bool = False
     activeClasses: str = None
     inactiveClasses: str = None
-    defaultClass: str = "flex items-center justify-between w-full font-medium text-left group-first:rounded-t-xl"
+    defaultClass: str = "flex items-center justify-between w-full font-medium "
+    "text-left group-first:rounded-t-xl"
     transitionType: Literal["slide", "fade"] = "slide"
     transitionParams: dict = {}
+
 
 class Alert(Slottable, FlowbiteSvelteMixin, Component):
     dismissable: bool = False
@@ -90,6 +59,7 @@ class Alert(Slottable, FlowbiteSvelteMixin, Component):
     color: Literal[
         "blue", "dark", "red", "green", "yellow", "indigo", "purple", "pink"
     ] = "blue"
+
 
 class Avatar(Slottable, FlowbiteSvelteMixin, Component):
     src: str = ""
@@ -119,16 +89,20 @@ class Badge(Slottable, FlowbiteSvelteMixin, Component):
 class Breadcrumb(Slottable, FlowbiteSvelteMixin, Component):
     solid: bool = False
     navClass: str = "flex"
-    solidClass: str = "flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700"
+    solidClass: str = "flex px-5 py-3 text-gray-700 border border-gray-200 "
+    "rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700"
     olClass: str = "inline-flex items-center space-x-1 md:space-x-3"
 
 
 class BreadcrumbItem(Slottable, FlowbiteSvelteMixin, Component):
     home: bool = False
     href: str = None
-    linkClass: str = "ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white"
-    spanClass: str = "ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400"
-    homeClass: str = "inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+    linkClass: str = "ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 "
+    "md:ml-2 dark:text-gray-400 dark:hover:text-white"
+    spanClass: str = "ml-1 text-sm font-medium text-gray-500 md:ml-2 "
+    "dark:text-gray-400"
+    homeClass: str = "inline-flex items-center text-sm font-medium "
+    "text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
 
 
 class Button(Slottable, FlowbiteSvelteMixin, Component):
@@ -401,7 +375,9 @@ class Indicator(Slottable, FlowbiteSvelteMixin, Component):
 
 
 class Kbd(Slottable, FlowbiteSvelteMixin, Component):
-    kbdClass: str = "text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"
+    kbdClass: str = "text-xs font-semibold text-gray-800 bg-gray-100 "
+    "border border-gray-200 rounded-lg dark:bg-gray-600 "
+    "dark:text-gray-100 dark:border-gray-500"
 
 
 class ArrowKeyDown(Slottable, FlowbiteSvelteMixin, Component):
@@ -505,21 +481,29 @@ class NavBrand(Slottable, FlowbiteSvelteMixin, Component):
 class NavLi(Slottable, FlowbiteSvelteMixin, Component):
     href: str = ""
     active: bool = False
-    activeClass: str = "text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-white dark:bg-blue-600 md:dark:bg-transparent"
-    nonActiveClass: str = "text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+    activeClass: str = "text-white bg-blue-700 md:bg-transparent "
+    "md:text-blue-700 md:dark:text-white dark:bg-blue-600 md:dark:bg-transparent"
+    nonActiveClass: str = "text-gray-700 hover:bg-gray-100 md:hover:bg-transparent "
+    "md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white "
+    "dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
 
 
 class NavUl(Slottable, FlowbiteSvelteMixin, Component):
     divClass: str = "w-full md:block md:w-auto"
-    ulClass: str = "flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium"
+    ulClass: str = "flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 "
+    "md:text-sm md:font-medium"
     hidden: bool = True
     # slideParams: SlideParams = {delay: 250, duration: 500, easing: quintOut}
 
 
 class Pagination(Slottable, FlowbiteSvelteMixin, Component):
     pages: List[LinkType] = []
-    activeClass: str = "text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-    normalClass: str = "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    activeClass: str = "text-blue-600 border border-gray-300 bg-blue-50 "
+    "hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 "
+    "dark:bg-gray-700 dark:text-white"
+    normalClass: str = "text-gray-500 bg-white hover:bg-gray-100 "
+    "hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 "
+    "dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
     ulClass: str = "inline-flex -space-x-px items-center"
     table: bool = False
 
@@ -528,7 +512,9 @@ class PaginationItem(Slottable, FlowbiteSvelteMixin, Component):
     href: str = None
     active: bool = False
     activeClass: str = ""
-    normalClass: str = "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+    normalClass: str = "text-gray-500 bg-white hover:bg-gray-100 "
+    "hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 "
+    "dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 
 
 class Popover(Slottable, FlowbiteSvelteMixin, Component):
@@ -589,7 +575,8 @@ class Progressbar(Slottable, FlowbiteSvelteMixin, Component):
         "blue", "gray", "red", "green", "yellow", "purple", "indigo"
     ] = "blue"
     labelInsideClass: str = (
-        "text-blue-100 text-xs font-medium text-center p-0.5 leading-none rounded-full"
+        "text-blue-100 text-xs font-medium text-center p-0.5 leading-none "
+        "rounded-full"
     )
 
 
@@ -612,7 +599,8 @@ class AdvancedRating(Slottable, FlowbiteSvelteMixin, Component):
 
 
 class ScoreRating(Slottable, FlowbiteSvelteMixin, Component):
-    desc1Class: str = "bg-blue-100 w-8 text-blue-800 text-sm font-semibold inline-flex items-center p-1.5 rounded dark:bg-blue-200 dark:text-blue-800"
+    desc1Class: str = "bg-blue-100 w-8 text-blue-800 text-sm font-semibold "
+    "inline-flex items-center p-1.5 rounded dark:bg-blue-200 dark:text-blue-800"
     desc2Class: str = "ml-2 w-24 font-medium text-gray-900 dark:text-white"
     desc3spanClass: str = "mx-2 w-1 h-1 bg-gray-900 rounded-full dark:bg-gray-500"
     desc3pClass: str = "text-sm w-24 font-medium text-gray-500 dark:text-gray-400"
@@ -644,15 +632,20 @@ class SidebarBrand(Slottable, FlowbiteSvelteMixin, Component):
 class SidebarCta(Slottable, FlowbiteSvelteMixin, Component):
     divWrapperClass: str = "p-4 mt-6 bg-blue-50 rounded-lg dark:bg-blue-900"
     divClass: str = "flex items-center mb-3"
-    spanClass: str = "bg-orange-100 text-orange-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-orange-200 dark:text-orange-900"
+    spanClass: str = "bg-orange-100 text-orange-800 text-sm font-semibold "
+    "mr-2 px-2.5 py-0.5 rounded dark:bg-orange-200 dark:text-orange-900"
     label: str = ""
 
 
 class SidebarDropdownItem(Slottable, FlowbiteSvelteMixin, Component):
-    aClass: str = "flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+    aClass: str = "flex items-center p-2 pl-11 w-full text-base font-normal "
+    "text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 "
+    "dark:text-white dark:hover:bg-gray-700"
     href: str = ""
     label: str = ""
-    activeClass: str = "flex items-center p-2 pl-11 text-base font-normal text-gray-900 bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+    activeClass: str = "flex items-center p-2 pl-11 text-base font-normal "
+    "text-gray-900 bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white "
+    "hover:bg-gray-100 dark:hover:bg-gray-700"
     active: bool = False
 
     # Events
@@ -668,7 +661,9 @@ class SidebarDropdownItem(Slottable, FlowbiteSvelteMixin, Component):
 
 
 class SidebarDropdownWrapper(Slottable, FlowbiteSvelteMixin, Component):
-    btnClass: str = "flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+    btnClass: str = "flex items-center p-2 w-full text-base font-normal "
+    "text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 "
+    "dark:text-white dark:hover:bg-gray-700"
     label: str = ""
     spanClass: str = "flex-1 ml-3 text-left whitespace-nowrap"
     ulClass: str = "py-2 space-y-2"
@@ -682,11 +677,14 @@ class SidebarGroup(Slottable, FlowbiteSvelteMixin, Component):
 
 
 class SidebarItem(Slottable, FlowbiteSvelteMixin, Component):
-    aClass: str = "flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+    aClass: str = "flex items-center p-2 text-base font-normal text-gray-900 "
+    "rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
     href: str = ""
     label: str = ""
     spanClass: str = "ml-3"
-    activeClass: str = "flex items-center p-2 text-base font-normal text-gray-900 bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+    activeClass: str = "flex items-center p-2 text-base font-normal text-gray-900 "
+    "bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white hover:bg-gray-100 "
+    "dark:hover:bg-gray-700"
     active: bool = False
 
     # Events
@@ -739,9 +737,12 @@ class Tabs(Slottable, FlowbiteSvelteMixin, Component):
     contentClass: str = "p-4 bg-gray-50 rounded-lg dark:bg-gray-800 mt-4"
     divider: bool = True
     activeClasses: str = (
-        "p-4 text-blue-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:text-blue-500"
+        "p-4 text-blue-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 "
+        "dark:text-blue-500"
     )
-    inactiveClasses: str = "p-4 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+    inactiveClasses: str = "p-4 text-gray-500 rounded-t-lg hover:text-gray-600 "
+    "hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 "
+    "dark:hover:text-gray-300"
 
 
 class TabItem(Slottable, FlowbiteSvelteMixin, Component):
@@ -872,7 +873,8 @@ class ActivityItem(Slottable, FlowbiteSvelteMixin, Component):
 
 
 class Group(Slottable, FlowbiteSvelteMixin, Component):
-    divClass: str = "p-5 mb-4 bg-gray-50 rounded-lg border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
+    divClass: str = "p-5 mb-4 bg-gray-50 rounded-lg border border-gray-100 "
+    "dark:bg-gray-800 dark:border-gray-700"
     timeClass: str = "text-lg font-semibold text-gray-900 dark:text-white"
     date: str = ""  # date: Union[Date, str] = ""
 
@@ -1066,7 +1068,8 @@ class Hr(Slottable, FlowbiteSvelteMixin, Component):
     divClass: str = "inline-flex justify-center items-center w-full"
     hrClass: str = "bg-gray-200 rounded border-0 dark:bg-gray-700"
     iconDivClass: str = "absolute left-1/2 px-4 bg-white -translate-x-1/2 "
-    textSpanClass: str = "absolute left-1/2 px-3 font-medium text-gray-900 bg-white -translate-x-1/2 dark:text-white "
+    textSpanClass: str = "absolute left-1/2 px-3 font-medium text-gray-900 "
+    "bg-white -translate-x-1/2 dark:text-white "
     middleBgColor: str = "dark:bg-gray-900"
 
 
@@ -1104,7 +1107,9 @@ class P(Slottable, FlowbiteSvelteMixin, Component):
     justify: bool = False
     italic: bool = False
     firstupper: bool = False
-    upperClass: str = "first-line:uppercase first-line:tracking-widest first-letter:text-7xl first-letter:font-bold first-letter:text-gray-900 dark:first-letter:text-gray-100 first-letter:mr-3 first-letter:float-left"
+    upperClass: str = "first-line:uppercase first-line:tracking-widest "
+    "first-letter:text-7xl first-letter:font-bold first-letter:text-gray-900 "
+    "dark:first-letter:text-gray-100 first-letter:mr-3 first-letter:float-left"
     opacity: Union[number, None] = None
     whitespace: Literal["normal", "nowrap", "pre", "preline", "prewrap"] = "normal"
     size: Literal[
@@ -1122,7 +1127,15 @@ class P(Slottable, FlowbiteSvelteMixin, Component):
         "8xl",
         "9xl",
     ] = "base"
-    space: Literal["tighter", "tight", "normal", "wide", "wider", "widest", None] = None
+    space: Literal[
+        "tighter",
+        "tight",
+        "normal",
+        "wide",
+        "wider",
+        "widest",
+        None,
+    ] = None
     weight: Literal[
         "thin",
         "extralight",
@@ -1149,9 +1162,11 @@ class Span(Slottable, FlowbiteSvelteMixin, Component):
     gradient: bool = False
     highlight: bool = False
     highlightClass: str = "text-blue-600 dark:text-blue-500"
-    decorationClass: str = "decoration-2 decoration-blue-400 dark:decoration-blue-600"
+    decorationClass: str = "decoration-2 decoration-blue-400 "
+    "dark:decoration-blue-600"
     gradientClass: str = (
-        "text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400"
+        "text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 "
+        "from-sky-400"
     )
 
 
