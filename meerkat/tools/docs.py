@@ -64,6 +64,9 @@ class DocComponent(abc.ABC):
         raise NotImplementedError()
 
 
+class Body:
+    pass 
+
 class Arg(DocComponent):
     def fix_indentation(self, docstring: str) -> str:
         # get common leading whitespace from docstring ignoring first line

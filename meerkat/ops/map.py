@@ -11,6 +11,42 @@ if TYPE_CHECKING:
 
 
 _SHARED_DOCS_ = {
+    "": docs.Arg(
+        """
+    *What gets passed to function?*
+
+    *   If ${data} is a :class:`DataFrame`, then the function's signature is
+        inspected to determine which columns to pass as keyword arguments to the
+        function.
+        For example, if the function is
+        ``lambda age, residence: age > 18 and residence == "NY"``, then
+        the columns ``age`` and ``residence`` will be passed to the function. If the
+        columns are not present in the DataFrame, then a `ValueError` will be raised.
+        The mapping between columns and function arguments can be overridden by passing
+        a the ``inputs`` argument.
+    *   If ${data} is a :class:`Column` then values of the
+        column are passed as a single positional argument to the function. The
+        ``inputs`` argument is ignored.
+
+    *What gets returned by map?*
+
+    *   If ``function`` returns a single value, then ``map``
+        will return a :class:`Column` object.
+
+    *   If ``function`` returns a dictionary, then ``map`` will return a
+        :class:`DataFrame`. The keys of the
+        dictionary are used as column names. The ``outputs`` argument can be used to
+        override the column names.
+
+    *   If ``function`` returns a tuple, then ``map`` will return a :class:`DataFrame`.
+        The column names will be integers. The column names can be overriden by passing
+        a tuple to the ``outputs`` argument.
+
+    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"``
+        to the ``outputs`` argument will cause ``map`` to return a single
+        :class:`ObjectColumn`.
+        """
+    ),
     "function": docs.Arg(
         """
         function (Callable): The function that will be applied to the rows of
@@ -326,39 +362,6 @@ def map(
 
     Learn more in the user guide: :ref:`guide/dataframe/ops/mapping`.
 
-    *What gets passed to function?*
-
-    *   If ${data} is a :class:`DataFrame`, then the function's signature is
-        inspected to determine which columns to pass as keyword arguments to the
-        function.
-        For example, if the function is
-        ``lambda age, residence: age > 18 and residence == "NY"``, then
-        the columns ``age`` and ``residence`` will be passed to the function. If the
-        columns are not present in the DataFrame, then a `ValueError` will be raised.
-        The mapping between columns and function arguments can be overridden by passing
-        a the ``inputs`` argument.
-    *   If ${data} is a :class:`Column` then values of the
-        column are passed as a single positional argument to the function. The
-        ``inputs`` argument is ignored.
-
-    *What gets returned by map?*
-
-    *   If ``function`` returns a single value, then ``map``
-        will return a :class:`Column` object.
-
-    *   If ``function`` returns a dictionary, then ``map`` will return a
-        :class:`DataFrame`. The keys of the
-        dictionary are used as column names. The ``outputs`` argument can be used to
-        override the column names.
-
-    *   If ``function`` returns a tuple, then ``map`` will return a :class:`DataFrame`.
-        The column names will be integers. The column names can be overriden by passing
-        a tuple to the ``outputs`` argument.
-
-    *   If ``function`` returns a tuple or a dictionary, then passing ``"single"``
-        to the ``outputs`` argument will cause ``map`` to return a single
-        :class:`ObjectColumn`.
-
     .. note::
         This function is also available as a method of :class:`DataFrame` and
         :class:`Column` under the name ``map``.
@@ -443,6 +446,34 @@ def map(
     )
 
 
+<<<<<<< HEAD
+=======
+# from ray.data import Datasource
+# from typing import List, Any
+# from ray.data.block import BlockMetadata, Block
+# from ray.data.datasource import WriteResult
+# from ray.types import ObjectRef
+
+
+# class NumPyDatasource(Datasource):
+#     def __init__(self):
+#         self._data = []
+
+#     def do_write(
+#         self,
+#         blocks: List[ObjectRef[Block]],
+#         metadata: List[BlockMetadata],
+#         ray_remote_args: Dict[str, Any],
+#         **write_args,
+#     ) -> List[ObjectRef[WriteResult]]:
+#         self._data.append(blocks)
+#         return blocks
+    
+#     def on_write_complete(self, write_results: List[WriteResult], **kwargs) -> None:
+#         return 0
+
+
+>>>>>>> clever-dev
 def _materialize(
     data: Union["DataFrame", "Column"],
     batch_size: int,
@@ -455,7 +486,6 @@ def _materialize(
     
     import numpy as np
     import pandas as pd
-    import ray
     import torch
     from tqdm import tqdm
 
@@ -465,8 +495,14 @@ def _materialize(
     from .concat import concat
 
     if use_ray:
+<<<<<<< HEAD
         ray.init(ignore_reinit_error=True, logging_level=logging.ERROR)
         ray.data.set_progress_bars(enabled=pbar)
+=======
+        import ray
+        ray.init(ignore_reinit_error=True)
+        ray.data.set_progress_bars(enabled=not pbar)  # 0 is enabled, 1 is disabled
+>>>>>>> clever-dev
 
         # Step 1: Walk through the DeferredColumns and build a list of functions
         curr = data
