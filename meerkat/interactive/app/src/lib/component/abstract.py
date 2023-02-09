@@ -93,9 +93,8 @@ class SlotsMixin:
     def __init__(self, slots: List["BaseComponent"] = [], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if not iterable(slots):
+        if isinstance(slots, BaseComponent) or not iterable(slots):
             slots = [slots]
-
         self._slots = slots
 
     @property
@@ -153,6 +152,18 @@ class BaseComponent(
         return cls.namespace.title() + cls.__name__
 
     @classproperty
+    def frontend_alias(cls):
+        """Alias for this component that is used in the frontend.
+
+        This is not unique, and it is possible to have multiple
+        components with the same frontend alias. This is useful for
+        components that are just wrappers around other components, e.g.
+        a layout BaseComponent that subclasses a Grid BaseComponent will
+        still have the same frontend alias as the Grid BaseComponent.
+        """
+        return cls.namespace.title() + cls.component_name
+
+    @classproperty
     def component_name(cls):
         # Inheriting an existing BaseComponent and modifying it on the Python side
         # should not change the name of the component used on the frontend
@@ -182,18 +193,6 @@ class BaseComponent(
             if k.startswith("on_")
             and not issubclass(cls.__fields__[k].type_, EndpointProperty)
         ]
-
-    @classproperty
-    def frontend_alias(cls):
-        """Alias for this component that is used in the frontend.
-
-        This is not unique, and it is possible to have multiple
-        components with the same frontend alias. This is useful for
-        components that are just wrappers around other components, e.g.
-        a layout BaseComponent that subclasses a Grid BaseComponent will still
-        have the same frontend alias as the Grid BaseComponent.
-        """
-        return cls.namespace.title() + cls.component_name
 
     @classproperty
     def identifiable_group(self):
@@ -312,15 +311,14 @@ class BaseComponent(
 
     @root_validator(pre=True)
     def _endpoint_name_starts_with_on(cls, values):
-        """
-        Make sure that all `Endpoint` fields have a name that starts with `on_`.
-        """
+        """Make sure that all `Endpoint` fields have a name that starts with
+        `on_`."""
         # TODO: this shouldn't really be a validator, this needs to be run
         # exactly once when the class is created.
 
         # Iterate over all fields in the class
         for k, v in cls.__fields__.items():
-            # TODO: revisit this. Here we only enforce the on_* naming convention for 
+            # TODO: revisit this. Here we only enforce the on_* naming convention for
             # endpoints, not endpoint properties, but this should be reconsidered.
             if is_subclass(v.type_, Endpoint) and not is_subclass(
                 v.type_, EndpointProperty
@@ -333,8 +331,8 @@ class BaseComponent(
 
     @staticmethod
     def _get_event_interface_from_typehint(type_hint):
-        """
-        Recurse on type hints to find all the Endpoint[EventInterface] types.
+        """Recurse on type hints to find all the Endpoint[EventInterface]
+        types.
 
         Only run this on the type hints of a Component, for fields that are
         endpoints.
@@ -368,9 +366,8 @@ class BaseComponent(
 
     @root_validator(pre=True)
     def _endpoint_signature_matches(cls, values):
-        """
-        Make sure that the signature of the Endpoint that is passed in matches
-        the parameter names and types that are sent from Svelte.
+        """Make sure that the signature of the Endpoint that is passed in
+        matches the parameter names and types that are sent from Svelte.
 
         Procedurally, this validator:
             - Gets the type hints for this BaseComponent subclass.
@@ -386,7 +383,8 @@ class BaseComponent(
 
         # Get all fields that pydantic tells us are endpoints.
         for field, value in cls.__fields__.items():
-            if not is_subclass(value.type_, Endpoint) or field not in values or values[field] is None:
+            if not is_subclass(value.type_, Endpoint) or \
+            field not in values or values[field] is None:
                 continue
 
             # Pull out the EventInterface from Endpoint.
@@ -451,8 +449,8 @@ class BaseComponent(
                 raise TypeError(
                     f"Endpoint `{field}` will be called with parameters: "
                     f"{', '.join(f'`{param}`' for param in event_interface_params)}. "
-                    f"Check the {event_interface.__name__} class to see what parameters "
-                    "are expected to be passed in."
+                    f"Check the {event_interface.__name__} class to see what "
+                    "parameters are expected to be passed in."
                     "\n"
                     f"The function `{fn}` expects the following parameters: "
                     f"{', '.join(f'`{param}`' for param in required_fn_params)}. "
@@ -479,7 +477,8 @@ class BaseComponent(
 
     @root_validator(pre=False)
     def _check_inode(cls, values):
-        """Unwrap NodeMixin objects to their underlying Node (except Stores)."""
+        """Unwrap NodeMixin objects to their underlying Node (except
+        Stores)."""
         values.update(cls._cache)
         for name, value in values.items():
             if isinstance(value, NodeMixin) and not isinstance(value, Store):

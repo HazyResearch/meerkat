@@ -6,7 +6,6 @@ from meerkat.interactive.graph import Store
 
 
 class Document(Component):
-
     df: DataFrame
     text_column: str
     paragraph_column: Optional[str] = None

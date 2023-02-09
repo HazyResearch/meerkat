@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class DatasetInfo:
-
     name: str
     full_name: str = None
     description: str = None

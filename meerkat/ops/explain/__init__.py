@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Mapping, Tuple, Union
 
-from meerkat import Column, DataFrame, TorchTensorColumn, embed
+from meerkat import Column, DataFrame, TorchTensorColumn
 
 if TYPE_CHECKING:
     from domino import Slicer

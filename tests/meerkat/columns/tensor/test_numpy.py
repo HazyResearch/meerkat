@@ -15,7 +15,6 @@ from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class NumPyTensorColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "num_dims": [1, 2, 3],
         "dim_length": [1, 5],

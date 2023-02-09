@@ -1,25 +1,27 @@
 import hashlib
-from typing import Any, Dict, List, Optional, Sequence, Union
-
-import numpy as np
+from typing import Sequence
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store, no_react, react, reactive
+from meerkat.interactive.graph import Store, no_react, reactive
 
 
 @endpoint
 def base_on_run(
-    new_query: str, query: str, df: DataFrame, criteria_df: DataFrame, manifest_session
+    new_query: str,
+    query: str,
+    df: DataFrame,
+    criteria_df: DataFrame,
+    manifest_session,
 ):
     print(new_query)
     if new_query == "" or new_query == "__default__":
         query.set("__default__")
         return
-    
+
     variables = {}
-    exec(new_query, None,  variables)
+    exec(new_query, None, variables)
     prompt, answers = variables["prompt"], variables["answers"]
 
     df = df.view()

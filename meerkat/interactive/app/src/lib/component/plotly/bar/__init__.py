@@ -6,7 +6,6 @@ from ...abstract import Component
 
 
 class BarPlot(Component):
-
     df: DataFrame
     x: str
     y: str

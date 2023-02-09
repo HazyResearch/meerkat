@@ -13,7 +13,6 @@ from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class PandasScalarColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "contiguous_index": [True, False],
         "dtype": ["float", "int", "str"],

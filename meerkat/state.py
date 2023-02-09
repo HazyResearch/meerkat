@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Secrets:
-
     api_keys: Dict[str, str] = field(default_factory=dict)
 
     def add(self, api: str, api_key: str):
@@ -39,7 +38,6 @@ class Secrets:
 
 @dataclass
 class LanguageModel:
-
     manifest: Any = None
 
     def set(self, client: str = "ai21", engine: str = "j1-jumbo"):
@@ -59,7 +57,6 @@ class LanguageModel:
 
 @dataclass
 class APIInfo:
-
     api: Optional[FastAPI]
     port: Optional[int]
     server: Optional[Server] = None
@@ -89,7 +86,6 @@ class APIInfo:
 
 @dataclass
 class FrontendInfo:
-
     package_manager: Optional[str]
     port: Optional[int]
     name: str = "localhost"
@@ -211,7 +207,6 @@ class ProgressQueue:
 
 @dataclass
 class GlobalState:
-
     api_info: Optional[APIInfo] = None
     frontend_info: Optional[FrontendInfo] = None
     identifiables: Identifiables = field(default_factory=Identifiables)

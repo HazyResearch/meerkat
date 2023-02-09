@@ -12,7 +12,6 @@ from ..registry import datasets
 
 @datasets.register()
 class celeba(DatasetBuilder):
-
     VERSIONS = ["main"]
 
     info = DatasetInfo(

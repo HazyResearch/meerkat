@@ -25,9 +25,12 @@ const config = {
 		rollupOptions: {
 			// Externalize deps
 			external: [
-				// Exclude everything inside `deprecate` folders
-				new RegExp('./src/lib/component/deprecate/.*'),
-				new RegExp('./src/lib/shared/deprecate/.*'),
+				// // Exclude everything inside `deprecate` folders
+				// TODO: KG restore this, it was failiing because
+				// components in the deprecate folder had Python
+				// bindings that were seen.
+				// new RegExp('./src/lib/component/deprecate/.*'),
+				// new RegExp('./src/lib/shared/deprecate/.*'),
 			],
 		}
 	}

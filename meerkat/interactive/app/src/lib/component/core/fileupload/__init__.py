@@ -10,7 +10,6 @@ class OnUploadFileUpload(EventInterface):
 
 
 class FileUpload(Component):
-
     files: list = []
     filenames: list = []
     contents: list = []

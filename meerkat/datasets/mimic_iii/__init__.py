@@ -18,7 +18,6 @@ def _write_empty_image(dst):
 
 @datasets.register()
 class mimic_iii(DatasetBuilder):
-
     VERSIONS = ["main"]
 
     info = DatasetInfo(
@@ -35,7 +34,6 @@ class mimic_iii(DatasetBuilder):
         pass
 
     def download(self):
-
         # clone the repo using subprocess
         # "wget -r -N -c -np --user seyuboglu --ask-password https://physionet.org/files/mimiciii/1.4/"
         subprocess.call(

@@ -16,7 +16,6 @@ from meerkat.dataframe import DataFrame
 
 
 class AbstractColumnTestBed:
-
     DEFAULT_CONFIG = {}
 
     @classmethod

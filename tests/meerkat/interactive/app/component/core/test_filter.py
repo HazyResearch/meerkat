@@ -13,7 +13,6 @@ def _set_criteria(criteria, store):
 
 
 def test_filter_single_criterion():
-
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     with mk.gui.react():
@@ -38,7 +37,6 @@ def test_filter_single_criterion():
 @pytest.mark.parametrize("op", [">", "<", ">=", "<=", "==", "in", "not in"])
 @pytest.mark.parametrize("value", [5, [5, 10]])
 def test_filter_operations(op, value):
-
     if "in" not in op and isinstance(value, (list, tuple)):
         # Skip these cases because they are not valid.
         return
@@ -82,10 +80,8 @@ def test_filter_bool():
 
 
 def test_skip_filter_disabled():
-    """
-    Test logic for skipping the filter component when adding/modifying
-    disabled criteria.
-    """
+    """Test logic for skipping the filter component when adding/modifying
+    disabled criteria."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     with mk.gui.react():
@@ -110,10 +106,8 @@ def test_skip_filter_disabled():
 
 
 def test_skip_filter_duplicate():
-    """
-    If a criterion is added that is a duplicate of an existing criterion,
-    it should be skipped.
-    """
+    """If a criterion is added that is a duplicate of an existing criterion, it
+    should be skipped."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
     with mk.gui.react():
@@ -132,9 +126,10 @@ def test_skip_filter_duplicate():
 
 
 def test_skip_filter_order():
-    """
-    Filter criteria are order-agnostic. If the same criteria are added in a
-    different order, the output dataframe should not change.
+    """Filter criteria are order-agnostic.
+
+    If the same criteria are added in a different order, the output
+    dataframe should not change.
     """
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 

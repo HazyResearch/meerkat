@@ -74,7 +74,8 @@ class ColumnIOMixin:
         if "_formatter" not in col.__dict__ or isinstance(
             col.formatter, DeprecatedFormatter
         ):
-            # PATCH: backwards compatability patch for old dataframes saved before v0.2.4
+            # PATCH: backwards compatability patch for old dataframes
+            # saved before v0.2.4
             col.formatter = col._get_default_formatter()
 
         return col

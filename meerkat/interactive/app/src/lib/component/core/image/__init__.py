@@ -7,12 +7,10 @@ from meerkat.interactive.formatter.base import Formatter, Variant
 
 
 class Image(Component):
-
     data: str
     classes: str = ""
 
 class ImageFormatter(Formatter):
-
     component_class: type = Image
     data_prop: str = "data"
 
@@ -41,7 +39,6 @@ class ImageFormatter(Formatter):
         return f'<img src="{encoded}">'
 
 class DeferredImageFormatter(ImageFormatter):
-
     component_class: type = Image
     data_prop: str = "data"
 

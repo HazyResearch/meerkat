@@ -153,7 +153,6 @@ class MeerkatLoader(yaml.FullLoader):
             return super().find_python_module(name=name, mark=mark, unsafe=unsafe)
 
     def find_python_name(self, name: str, mark, unsafe=False):
-
         for old, new in BACKWARDS_COMPAT_REPLACEMENTS:
             if old in name:
                 name = name.replace(old, new)

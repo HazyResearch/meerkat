@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 import pandas as pd
+from fastapi.encoders import jsonable_encoder
 
 from meerkat.columns.abstract import Column
 from meerkat.interactive.endpoint import Endpoint, endpoint
@@ -12,7 +13,6 @@ from meerkat.tools.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
 
-from fastapi.encoders import jsonable_encoder
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 # StoreModification object (it only ends up sending the ids).
 @endpoint(prefix="/store", route="/{store}/update/")
 def update(store: Store, value=Endpoint.EmbeddedBody()):
-    """Triggers the computational graph when a store on the frontend changes."""
+    """Triggers the computational graph when a store on the frontend
+    changes."""
 
     logger.debug(f"Updating store {store} with value {value}.")
 

@@ -11,7 +11,6 @@ from meerkat.interactive.formatter.base import Formatter
 
 
 class Scalar(BaseComponent):
-
     data: Any
     dtype: str = None
     precision: int = 3
@@ -19,7 +18,6 @@ class Scalar(BaseComponent):
 
 
 class ScalarFormatter(Formatter):
-
     component_class: type = Scalar
     data_prop: str = "data"
 

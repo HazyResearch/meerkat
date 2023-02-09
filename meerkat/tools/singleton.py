@@ -1,6 +1,5 @@
 class Singleton(type):
-    """
-    A metaclass that ensures only one instance of a class is created.
+    """A metaclass that ensures only one instance of a class is created.
 
     Usage:
 

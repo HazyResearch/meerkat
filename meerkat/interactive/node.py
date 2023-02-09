@@ -14,7 +14,6 @@ class NodeFrontendModel(BaseModel):
 
 
 class Node(IdentifiableMixin, FrontendMixin):
-
     _self_identifiable_group: str = "nodes"
 
     def __init__(self, obj: Any, **kwargs):

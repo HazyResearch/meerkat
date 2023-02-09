@@ -25,7 +25,6 @@ SliceKey = Union[str, int]
 
 
 class SliceBy(IdentifiableMixin):
-
     _self_identifiable_group: str = "slicebys"
 
     def __init__(

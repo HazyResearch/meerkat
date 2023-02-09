@@ -25,7 +25,6 @@ class StoreFrontend(BaseModel):
 
 # ObjectProxy must be the last base class
 class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
-
     _self_identifiable_group: str = "stores"
 
     def __init__(self, wrapped: T, backend_only: bool = False):

@@ -15,11 +15,10 @@ import dill
 import yaml
 
 import meerkat.tools.docs as docs
-from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
+from meerkat.block.deferred_block import DeferredOp
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
-from meerkat.tools.lazy_loader import LazyLoader
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 FILE_SHARED_DOCS = {
     "loader": docs.Arg(
         """
-        loader (Union[str, Callable[[Union[str, IO]], Any]]): a callable that 
+        loader (Union[str, Callable[[Union[str, IO]], Any]]): a callable that
             accepts a filepath or an I/O stream and returns data.
         """
     ),

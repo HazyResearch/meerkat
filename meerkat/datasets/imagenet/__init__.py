@@ -14,7 +14,6 @@ from ..registry import datasets
 
 @datasets.register()
 class imagenet(DatasetBuilder):
-
     VERSIONS = ["ilsvrc2012"]
 
     info = DatasetInfo(

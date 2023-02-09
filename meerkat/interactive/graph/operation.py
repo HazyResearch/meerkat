@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 
 
 def _check_fn_has_leading_self_arg(fn: Callable):
-    """
-    # FIXME: super hacky
-    # We need to figure out why Store.__eq__ (and potentially other dunder methods)
-    # are passed into `reactive` as the class method instead of the instance method.
-    # In the meantime, we can check if the first argument is `self` and if so,
-    # we can assume that the function is an instance method.
+    """# FIXME: super hacky
+
+    # We need to figure out why Store.__eq__ (and potentially other
+    dunder methods) # are passed into `reactive` as the class method
+    instead of the instance method. # In the meantime, we can check if
+    the first argument is `self` and if so, # we can assume that the
+    function is an instance method.
     """
     import inspect
 

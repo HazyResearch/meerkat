@@ -17,7 +17,6 @@ def concat_images(x: PIL.Image.Image, y: PIL.Image.Image):
 
 @datasets.register()
 class rfw(DatasetBuilder):
-
     VERSIONS = ["main"]
 
     GROUPS = ["Caucasian", "African", "Asian", "Indian"]
@@ -33,7 +32,6 @@ class rfw(DatasetBuilder):
     )
 
     def build(self):
-
         dfs = []
         for group in self.GROUPS:
             df = pd.read_csv(

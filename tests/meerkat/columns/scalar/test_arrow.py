@@ -21,7 +21,6 @@ def to_numpy(array: Union[pa.Array, pa.ChunkedArray]):
 
 
 class ArrowScalarColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "dtype": ["float", "int", "str"],
     }

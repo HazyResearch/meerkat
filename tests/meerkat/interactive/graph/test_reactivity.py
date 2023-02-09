@@ -121,12 +121,11 @@ def test_default_nested_return():
 
 
 def test_nested_reactive_fns():
-    """
-    When reactive functions are executed, only the outer function should
-    be added as a child to the input stores.
+    """When reactive functions are executed, only the outer function should be
+    added as a child to the input stores.
 
-    In simpler language, a reactive function run inside another reactive function
-    will not add things to the graph.
+    In simpler language, a reactive function run inside another reactive
+    function will not add things to the graph.
     """
 
     @mk.gui.react()
@@ -173,9 +172,7 @@ def test_nested_reactive_fns():
 )
 @pytest.mark.parametrize("use_kwargs", [False, True])
 def test_unpacking(x, use_kwargs):
-    """
-    Test that all stores are unpacked correctly.
-    """
+    """Test that all stores are unpacked correctly."""
 
     def _are_equal(x, y):
         if isinstance(x, Mapping):

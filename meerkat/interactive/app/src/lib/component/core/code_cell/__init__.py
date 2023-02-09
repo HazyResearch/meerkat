@@ -1,5 +1,3 @@
-from typing import Any, Dict, List, Optional, Sequence, Union
-
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
@@ -25,7 +23,8 @@ def run_filter_code_cell(df: DataFrame, code: str):
 
 @endpoint
 def base_on_run(code: Store[str], new_code: str):
-    # TODO: there is some checks we can do here, before setting (e.g. empty string, syntax checks)
+    # TODO: there is some checks we can do here,
+    # before setting (e.g. empty string, syntax checks)
     code.set(new_code)
     return code
 
@@ -52,7 +51,8 @@ class CodeCell(Component):
 
 class FilterCodeCell(CodeCell):
     def __init__(self, df: DataFrame, code: str = None, on_run: Endpoint = None):
-        code = f"def condition({', '.join(map(lambda x: x.value, df.columns[:4]))}):\n   return True"
+        code = f"def condition({', '.join(map(lambda x: x.value, df.columns[:4]))})"
+        ":\n   return True"
         super().__init__(code=code, on_run=on_run)
 
     def __call__(self, df: DataFrame):

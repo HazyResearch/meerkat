@@ -8,6 +8,5 @@ class OnClickButton(EventInterface):
 
 
 class Button(Component):
-
     title: str
     on_click: Endpoint[EventInterface] = None

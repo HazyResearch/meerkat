@@ -26,7 +26,6 @@ from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class ImageColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "use_base_dir": [True, False],
     }

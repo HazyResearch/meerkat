@@ -8,7 +8,6 @@ from meerkat.ops.sliceby.sliceby import SliceBy
 
 
 class Aggregation(IdentifiableMixin):
-
     _self_identifiable_group: str = "aggregations"
 
     def __init__(self, func: Callable[["DataFrame"], Union[int, float, str]]):

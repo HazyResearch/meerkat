@@ -12,7 +12,6 @@ class RawHTML(Component):
 
 
 class HTMLFormatter(Formatter):
-
     component_class: type = RawHTML
     data_prop: str = "html"
 

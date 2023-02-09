@@ -37,7 +37,6 @@ class PageFrontend(BaseModel):
 
 
 class Page(IdentifiableMixin):
-
     _self_identifiable_group: str = "pages"
 
     def __init__(
@@ -63,14 +62,13 @@ class Page(IdentifiableMixin):
         self.width = width
 
     def __call__(self):
-        """Return the FastAPI object, this allows Page objects to be
-        targeted by uvicorn when running a script."""
+        """Return the FastAPI object, this allows Page objects to be targeted
+        by uvicorn when running a script."""
         from meerkat.interactive.api import MeerkatAPI
 
         return MeerkatAPI
 
     def launch(self, return_url: bool = False):
-
         if state.frontend_info is None:
             rich.print("Frontend is not initialized. Running `mk.gui.start()`.")
             from .startup import start

@@ -25,7 +25,8 @@ logger = logging.getLogger(__name__)
 # Assert that the path to this file ends with "meerkat/meerkat/constants.py"
 assert os.path.abspath(__file__).endswith(
     "meerkat/meerkat/constants.py"
-), "This file should be meerkat/meerkat/constants.py. If it was moved, update the assert"
+), "This file should be meerkat/meerkat/constants.py. "
+"If it was moved, update the assert"
 " and the path to the MEERKAT_BASE_DIR below."
 
 # Base directory is meerkat/ (two levels up)
@@ -48,13 +49,15 @@ MEERKAT_TEMPLATES_DIR = os.path.join(
     MEERKAT_BASE_DIR, "meerkat", "interactive", "templates"
 )
 
-# Environment variables that should primarily be used inside the subprocess run by `mk run`
-# (i.e. the subprocess that is used to run the script that is passed to `mk run`).
+# Environment variables that should primarily be used inside the
+# subprocess run by `mk run` (i.e. the subprocess that is used to
+# run the script that is passed to `mk run`).
 
 # A flag to indicate whether we are running in a subprocess of `mk run`.
 MEERKAT_RUN_SUBPROCESS = int(os.environ.get("MEERKAT_RUN_SUBPROCESS", 0))
 
-# The `script_path` that was passed to `mk run`, if we are running in a subprocess of `mk run`.
+# The `script_path` that was passed to `mk run`, if we are running in a
+# subprocess of `mk run`.
 MEERKAT_RUN_SCRIPT_PATH = os.environ.get("MEERKAT_RUN_SCRIPT_PATH", None)
 
 # A unique ID for the current run, available only in the subprocess of `mk run`.
@@ -107,9 +110,7 @@ class PackageManager(str, Enum):
 
 
 class PathHelper(metaclass=Singleton):
-    """
-    Information about important paths.
-    """
+    """Information about important paths."""
 
     def __init__(self) -> None:
         # Cache properties.
@@ -119,9 +120,10 @@ class PathHelper(metaclass=Singleton):
 
     @property
     def rundir(self):
-        """
-        The directory from which the current script was run.
-        This is the directory from which the `python <script>` or `mk` command was run.
+        """The directory from which the current script was run.
+
+        This is the directory from which the `python <script>` or `mk`
+        command was run.
         """
         if self._rundir is None:
             self._rundir = os.getcwd()
@@ -129,10 +131,11 @@ class PathHelper(metaclass=Singleton):
 
     @property
     def scriptpath(self):
-        """
-        The path to the current script being run.
-        This is the path to the script as it is passed to `python <script>`.
-        This will return the correct path even if the script is run with `mk run`.
+        """The path to the current script being run.
+
+        This is the path to the script as it is passed to `python
+        <script>`. This will return the correct path even if the script
+        is run with `mk run`.
         """
         if self._scriptpath is None:
             if MEERKAT_RUN_PROCESS:
@@ -140,28 +143,31 @@ class PathHelper(metaclass=Singleton):
                 # This is the path to the script as it is passed to `mk run`.
                 self._scriptpath = sys.argv[2]
             elif MEERKAT_RUN_SUBPROCESS:
-                # If we are running in a subprocess of `mk run`, then we can't use sys.argv[0]
-                # because it will be the path to the `mk` script, not the path to the script
-                # that was passed to `mk run`.
+                # If we are running in a subprocess of `mk run`, then we can't use
+                # sys.argv[0] because it will be the path to the `mk` script, not
+                # the path to the script that was passed to `mk run`.
                 # Instead, we use the MEERKAT_RUN_SCRIPT_PATH environment variable.
                 assert (
                     MEERKAT_RUN_SCRIPT_PATH is not None
-                ), "Something is wrong. MEERKAT_RUN_SCRIPT_PATH should be set by `mk run`."
+                ), "Something is wrong. MEERKAT_RUN_SCRIPT_PATH should be set"
+                " by `mk run`."
                 self._scriptpath = MEERKAT_RUN_SCRIPT_PATH
             elif is_notebook():
                 # If we are running inside a notebook, then we return None.
                 self._scriptpath = None
             else:
-                # If we are not running in a subprocess of `mk run`, then we can use sys.argv[0].
-                # This is the path to the script as it is passed to `python <script>`.
+                # If we are not running in a subprocess of `mk run`, then we
+                # can use sys.argv[0]. This is the path to the script as it is
+                # passed to `python <script>`.
                 self._scriptpath = sys.argv[0]
 
         return self._scriptpath
 
     @property
     def scriptpath_abs(self):
-        """
-        The absolute path to the current script. See `scriptpath` for more information.
+        """The absolute path to the current script.
+
+        See `scriptpath` for more information.
         """
         if is_notebook():
             return None
@@ -169,8 +175,9 @@ class PathHelper(metaclass=Singleton):
 
     @property
     def scriptdir_abs(self):
-        """
-        The directory containing the current script. See `scriptpath` for more information.
+        """The directory containing the current script.
+
+        See `scriptpath` for more information.
         """
         if is_notebook():
             return None
@@ -178,37 +185,36 @@ class PathHelper(metaclass=Singleton):
 
     @property
     def scriptname(self):
-        """
-        The name of the current script.
-        """
+        """The name of the current script."""
         if is_notebook():
             return None
         return os.path.basename(self.scriptpath_abs)
 
     @property
     def appdir(self):
-        """
-        The absolute path to the app/ directory.
+        """The absolute path to the app/ directory.
 
         Rules for determining the app directory:
 
-        1. By default, the app directory points to the internal app directory, which is
-            MEERKAT_INTERNAL_APP_DIR.
-        2. This is not the case if the script or notebook that is being run is next to an
-            app/ directory. In this case, Meerkat should infer that this directory should
-            be used as the app directory.
+        1. By default, the app directory points to the internal app directory,
+            which is MEERKAT_INTERNAL_APP_DIR.
+        2. This is not the case if the script or notebook that is being run is
+            next to an app/ directory. In this case, Meerkat should infer that
+            this directory should be used as the app directory.
         3. This is also not the case if the user explicitly sets the app directory.
             Either by
                 passing in a flag to `mk run` on the CLI, or
-                passing in an argument to `mk.gui.start` in a Python script or notebook, or
-                setting the MEERKAT_APP_DIR environment variable.
-        4. Finally, none of these rules apply if the user is running the `mk init` script. In
-            this case, the app directory will be created, and we should point to this location.
+                passing in an argument to `mk.gui.start` in a Python script
+                or notebook, or setting the MEERKAT_APP_DIR environment variable.
+        4. Finally, none of these rules apply if the user is running the `mk init`
+            script. In this case, the app directory will be created, and we should
+            point to this location.
         """
         if self._appdir is not None:
             return self._appdir
 
-        # If the user is running the `mk init` script, then the app directory will be created.
+        # If the user is running the `mk init` script, then the app directory
+        # will be created.
         if MEERKAT_INIT_PROCESS:
             # `rundir` is the directory from which the `mk` script was run.
             self._appdir = os.path.join(PathHelper().rundir, "app")
@@ -218,23 +224,26 @@ class PathHelper(metaclass=Singleton):
         self._appdir = MEERKAT_INTERNAL_APP_DIR
 
         if is_notebook():
-            # If we are running inside a notebook, and the notebook is next to an app/ directory,
-            # then use that as the app directory.
+            # If we are running inside a notebook, and the notebook is next to
+            # an app/ directory, then use that as the app directory.
             candidate_path = os.path.join(os.getcwd(), "app")
             if os.path.exists(candidate_path):
                 # The notebook is next to an app/ directory. Point to this directory.
                 self._appdir = candidate_path
             return self._appdir
 
-        # If the script is next to an app/ directory, then use that as the app directory.
+        # If the script is next to an app/ directory, then use that
+        # as the app directory.
         candidate_path = os.path.join(PathHelper().scriptdir_abs, "app")
         if os.path.exists(candidate_path):
             # The script is next to an app/ directory. Point to this directory.
             self._appdir = candidate_path
 
-        # If the user has explicitly set the app directory, then use that as the app directory.
+        # If the user has explicitly set the app directory, then use
+        # that as the app directory.
         if MEERKAT_APP_DIR is not None:
-            # The user has explicitly set the app directory. Point to this directory.
+            # The user has explicitly set the app directory.
+            # Point to this directory.
             self._appdir = MEERKAT_APP_DIR
 
         # Use the absolute path.
@@ -244,10 +253,8 @@ class PathHelper(metaclass=Singleton):
 
     @property
     def is_user_app(self) -> bool:
-        """
-        Returns True if the app directory being used does not point to the
-        internal Meerkat app directory.
-        """
+        """Returns True if the app directory being used does not point to the
+        internal Meerkat app directory."""
         return self.appdir != MEERKAT_INTERNAL_APP_DIR
 
     def __repr__(self) -> str:
@@ -288,10 +295,8 @@ class App:
 
     @property
     def is_user_app(self) -> bool:
-        """
-        Returns True if the app directory being used does not point to the
-        internal Meerkat app directory.
-        """
+        """Returns True if the app directory being used does not point to the
+        internal Meerkat app directory."""
         return self.appdir != MEERKAT_INTERNAL_APP_DIR
 
     def create(self):
@@ -303,8 +308,7 @@ class App:
         return os.path.exists(self.appdir)
 
     def filter_installed_libraries(self, libraries: List[str]) -> List[str]:
-        """
-        Given a list of libraries, return the libraries that are installed
+        """Given a list of libraries, return the libraries that are installed
         in the app directory.
 
         Args:
@@ -338,15 +342,14 @@ class App:
         return installed_libraries
 
     def get_mk_package_info(self) -> List[str]:
-        """Get the list of components available in the (currently)
-        installed Meerkat package. This is used to exclude components
-        that cannot be used in the app, specifically when writing
-        ComponentContext.svelte.
+        """Get the list of components available in the (currently) installed
+        Meerkat package. This is used to exclude components that cannot be used
+        in the app, specifically when writing ComponentContext.svelte.
 
-        Uses a heuristic that goes through the index.js file of the Meerkat
-        package and extracts components with a regex. It's not a problem if
-        extra imports (that are not components) are included in this list,
-        as long as all components are included.
+        Uses a heuristic that goes through the index.js file of the
+        Meerkat package and extracts components with a regex. It's not a
+        problem if extra imports (that are not components) are included
+        in this list, as long as all components are included.
         """
         package_path = os.path.join(self.appdir, "node_modules", MEERKAT_NPM_PACKAGE)
         index_js_path = os.path.join(package_path, "index.js")
@@ -437,10 +440,8 @@ class App:
 
 class MeerkatApp(App):
     def create(self):
-        """
-        Run an installer that will call create-svelte in
-        order to create a new app.
-        """
+        """Run an installer that will call create-svelte in order to create a
+        new app."""
         installer_app = CreateSvelteInstallerApp(
             appdir="./installer",
             appname=self.appname,
@@ -456,8 +457,9 @@ class MeerkatApp(App):
 
         # Print instructions
         # 1. The new app is at name
-        rich.print(f":arrow_right: The new app is at [purple]./app[/purple]")
-        # 2. To see an example of how to make a component, see src/lib/components/ExampleComponent.svelte
+        rich.print(":arrow_right: The new app is at [purple]./app[/purple]")
+        # 2. To see an example of how to make a component,
+        # see src/lib/components/ExampleComponent.svelte
         rich.print(
             ":arrow_right: To see an example of how to make a custom component, see "
             "[purple]./app/src/lib/components/ExampleComponent.svelte[/purple] "
@@ -654,12 +656,11 @@ page.launch()"""
 
 
 class CreateSvelteInstallerApp(App):
-    """
-    An installer app that is used to call `create-svelte` and create a new
+    """An installer app that is used to call `create-svelte` and create a new
     SvelteKit app.
 
-    Rather than directly calling `create-svelte`, we use this installer app
-    to make it easier to add setup steps programatically.
+    Rather than directly calling `create-svelte`, we use this installer
+    app to make it easier to add setup steps programatically.
     """
 
     def render_package_json(self):
@@ -671,17 +672,17 @@ class CreateSvelteInstallerApp(App):
         )
 
     def create(self):
-        """
-        Create the installer app that will be used to run `create-svelte`.
-        """
+        """Create the installer app that will be used to run `create-
+        svelte`."""
         super().create()
         self.write_file("package.json", self.render_package_json())
         self.write_file("installer.js", self.render_installer_js())
 
     def install(self):
-        """
-        Install the installer app. This will run `create-svelte`,
-        which in turn will create the SvelteKit app.
+        """Install the installer app.
+
+        This will run `create-svelte`, which in turn will create the
+        SvelteKit app.
         """
         # Install the `create-svelte` dependency.
         super().install()
@@ -698,9 +699,7 @@ class CreateSvelteInstallerApp(App):
 
 
 class SystemHelper(metaclass=Singleton):
-    """
-    Information about the user's system.
-    """
+    """Information about the user's system."""
 
     def __init__(self):
         # Cache properties.
@@ -710,23 +709,17 @@ class SystemHelper(metaclass=Singleton):
 
     @property
     def is_windows(self) -> bool:
-        """
-        Returns True if the system is Windows.
-        """
+        """Returns True if the system is Windows."""
         return sys.platform == "win32"
 
     @property
     def is_linux(self) -> bool:
-        """
-        Returns True if the system is Linux.
-        """
+        """Returns True if the system is Linux."""
         return sys.platform == "linux"
 
     @property
     def is_macos(self) -> bool:
-        """
-        Returns True if the system is MacOS.
-        """
+        """Returns True if the system is MacOS."""
         return sys.platform == "darwin"
 
     @property
@@ -780,7 +773,8 @@ class SystemHelper(metaclass=Singleton):
                     "Alternatively, you can install Node manually."
                 )
             rich.print(
-                "[yellow]Installing Node with Homebrew. This may take a few minutes.[/yellow]"
+                "[yellow]Installing Node with Homebrew. "
+                "This may take a few minutes.[/yellow]"
             )
             return subprocess.run(["brew install node"], shell=True, check=True)
         elif self.is_linux:

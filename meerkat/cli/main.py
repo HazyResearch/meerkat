@@ -171,7 +171,7 @@ def _run(
         )
     else:
         rich.print(":wrench: Production mode is [bold violet]on[/bold violet]")
-    rich.print(f":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]")
+    rich.print(":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]")
     rich.print()
 
     # Run the frontend

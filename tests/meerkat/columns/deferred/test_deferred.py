@@ -13,7 +13,6 @@ from ..abstract import AbstractColumnTestBed, column_parametrize
 
 
 class DeferredColumnTestBed(AbstractColumnTestBed):
-
     DEFAULT_CONFIG = {
         "batched": [True, False],
         "from_df": [True, False],

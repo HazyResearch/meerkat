@@ -6,7 +6,6 @@ class AggregationError(ValueError):
 
 
 class AggregateMixin:
-
     AGGREGATIONS = [
         "mean",
     ]
@@ -23,7 +22,6 @@ class AggregateMixin:
             return function(self, *args, **kwargs)
 
     def mean(self, *args, **kwargs):
-
         raise AggregationError(
             f"Aggregation 'mean' not implemented for column of type {type(self)}."
         )

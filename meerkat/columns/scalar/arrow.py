@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Sequence, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence, Set
 
 import pyarrow as pa
 from pyarrow.compute import equal
@@ -10,7 +10,6 @@ from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
-
 
 from ..abstract import Column
 from .abstract import ScalarColumn
@@ -23,7 +22,6 @@ torch = LazyLoader("torch")
 
 
 class ArrowScalarColumn(ScalarColumn):
-
     block_class: type = ArrowBlock
 
     def __init__(
@@ -69,7 +67,6 @@ class ArrowScalarColumn(ScalarColumn):
         return self.data[index]
 
     def _get_default_formatter(self) -> "Formatter":
-
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.app.src.lib.component.core.scalar import (

@@ -46,7 +46,6 @@ class DeferredCell(AbstractCell):
 
 
 class DeferredColumn(Column):
-
     block_class: type = DeferredBlock
 
     def __init__(

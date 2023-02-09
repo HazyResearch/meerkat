@@ -1,7 +1,6 @@
 """Startup script for interactive Meerkat.
 
-Some code and design patters are borrowed from 
-Gradio and Pynecone.
+Some code and design patters are borrowed from Gradio and Pynecone.
 """
 
 import atexit
@@ -136,20 +135,20 @@ def run_script(
 
     Args:
         script (str): the script to run.
-        server_name (str, optional): the name of the server to run the script on. Defaults
-            to "localhost".
-        port (int, optional): the port to run the script on. Defaults to the default API
-            port in Meerkat, which is 5000.
-        dev (bool, optional): whether to run the script in development mode. Defaults to
-            True.
+        server_name (str, optional): the name of the server to run the
+            script on. Defaults to "localhost".
+        port (int, optional): the port to run the script on. Defaults to
+            the default API port in Meerkat, which is 5000.
+        dev (bool, optional): whether to run the script in development
+            mode. Defaults to True.
         target (str, optional): the target `Page` instance to run. Defaults to
             "page".
     """
     # Make sure script is in module format.
     script = os.path.abspath(script)  # to_py_module_name(script)
 
-    # Run the script with uvicorn. This will start the FastAPI server and serve the
-    # backend.
+    # Run the script with uvicorn. This will start the FastAPI server
+    # and serve the backend.
     env = os.environ.copy()
     if frontend_url is not None:
         env["MEERKAT_FRONTEND_URL"] = frontend_url
@@ -287,8 +286,8 @@ def run_frontend_dev(
             raise TimeoutError(
                 """Could not start frontend dev server.
 
-Here are the stderr logs (if they are empty, this is likely an 
-issue with how we recognize if the server started successfully, please 
+Here are the stderr logs (if they are empty, this is likely an
+issue with how we recognize if the server started successfully, please
 file an issue on GitHub):
 """
                 + process.stderr.read().decode("utf-8")
@@ -347,7 +346,8 @@ def run_frontend_prod(
         logger.debug("Skipping build step.")
 
     # File find replacement for the VITE_API_URL_PLACEHOLDER
-    # Replace VITE_API_URL||"http://some.url.here:port" with VITE_API_URL||"http://localhost:8000"
+    # Replace VITE_API_URL||"http://some.url.here:port" with
+    # VITE_API_URL||"http://localhost:8000"
     # using a regex
     file_find_replace(
         libpath / "build",
@@ -383,8 +383,9 @@ def run_frontend_prod(
     # )
 
     # Alternately we run the statically built app with a simple python server
-    # Note: this does not seem to work with [slug] routes, so we should use the preview
-    # mode instead (gives a 404 error). We can use this if we explicitly write routes for each
+    # Note: this does not seem to work with [slug] routes, so we
+    # should use the preview mode instead (gives a 404 error).
+    # We can use this if we explicitly write routes for each
     # page. We are using this to serve pages using /?id=page_id for now.
     os.chdir(libpath / "build")
     process = subprocess.Popen(
@@ -416,17 +417,26 @@ def run_frontend(
     """Run the frontend server.
 
     Args:
-        package_manager (Literal["npm", "bun"], optional): The package manager to use. Defaults to "npm".
-        port (int, optional): The port to run the frontend server on. Defaults to FRONTEND_PORT.
-        dev (bool, optional): Whether to run the frontend in development mode. Defaults to True.
-        shareable (bool, optional): Whether to create a shareable link. Defaults to False.
-        subdomain (str, optional): The subdomain to use for the shareable link. Defaults to "app".
-        apiurl (str, optional): The URL of the API server. Defaults to None.
-        appdir (str, optional): The directory of the frontend app. Defaults to APP_DIR.
-        skip_build (bool, optional): Whether to skip the build step in production. Defaults to False.
+        package_manager (Literal["npm", "bun"], optional):
+            The package manager to use. Defaults to "npm".
+        port (int, optional): The port to run the frontend server on.
+            Defaults to FRONTEND_PORT.
+        dev (bool, optional): Whether to run the frontend in development mode.
+            Defaults to True.
+        shareable (bool, optional): Whether to create a shareable link.
+            Defaults to False.
+        subdomain (str, optional): The subdomain to use for the shareable link.
+            Defaults to "app".
+        apiurl (str, optional): The URL of the API server.
+            Defaults to None.
+        appdir (str, optional): The directory of the frontend app.
+            Defaults to APP_DIR.
+        skip_build (bool, optional): Whether to skip the build step in production.
+            Defaults to False.
 
     Returns:
-        FrontendInfo: A FrontendInfo object containing the port and process of the frontend server.
+        FrontendInfo: A FrontendInfo object containing the port
+            and process of the frontend server.
     """
     currdir = os.getcwd()
 
@@ -527,11 +537,13 @@ def start(
             subdomain will be generated.
         api_server_name (str): the name of the API server. Defaults to "localhost".
         api_port (int): the port to use for the Meerkat API server. Defaults to 5000.
-        frontend_port (int): the port to use for the Meerkat Vite server. Defaults to 8000.
+        frontend_port (int): the port to use for the Meerkat Vite server.
+            Defaults to 8000.
         dev (bool): whether to run in development mode. Defaults to True.
 
     Returns:
-        Tuple[APIInfo, FrontendInfo]: A tuple containing the APIInfo and FrontendInfo objects.
+        Tuple[APIInfo, FrontendInfo]: A tuple containing the APIInfo and
+            FrontendInfo objects.
     """
     if MEERKAT_RUN_SUBPROCESS:
         rich.print(

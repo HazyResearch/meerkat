@@ -15,7 +15,6 @@ class Variant:
 
 
 class Formatter(ABC):
-
     component_class: Type["BaseComponent"]
     data_prop: str = "data"
     variants: Dict[str, Variant] = {}
@@ -34,8 +33,7 @@ class Formatter(ABC):
         self._props = default_props
 
     def encode(self, cell: Any, variants: List[str] = None, **kwargs):
-        """Encode the cell on the backend before sending it to the
-        frontend.
+        """Encode the cell on the backend before sending it to the frontend.
 
         The cell is lazily loaded, so when used on a LambdaColumn,
         ``cell`` will be a ``LambdaCell``. This is important for

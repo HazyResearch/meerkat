@@ -51,7 +51,6 @@ class DatasetBuilder(ABC):
         )
 
     def __call__(self):
-
         if self.download_mode in ["force", "extract"] or (
             self.download_mode == "reuse" and not self.is_downloaded()
         ):

@@ -1,7 +1,4 @@
-"""
-Adapted from
-https://github.com/facebookresearch/detectron2
-"""
+"""Adapted from https://github.com/facebookresearch/detectron2."""
 import importlib
 import os
 import platform
