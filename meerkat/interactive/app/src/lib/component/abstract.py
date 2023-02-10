@@ -548,7 +548,8 @@ class Component(BaseComponent):
             # (i.e. this will exclude DataFrame, Endpoint etc. as well as
             # fields that are already Stores)
             if (
-                cls.__fields__[name].type_ == Endpoint
+                name not in cls.__fields__
+                or cls.__fields__[name].type_ == Endpoint
                 or cls.__fields__[name].type_ == EndpointProperty
             ):
                 # Separately skip Endpoint fields by looking at the field type,

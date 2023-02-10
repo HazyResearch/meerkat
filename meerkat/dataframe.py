@@ -1202,6 +1202,20 @@ class DataFrame(
         )
 
     @reactive
+    def shuffle(self, seed: int = None) -> DataFrame:
+        """Shuffle the rows of the DataFrame out-of-place.
+
+        Args:
+            seed (int): Random seed to use for shuffling.
+
+        Returns:
+            DataFrame: A shuffled view of the DataFrame.
+        """
+        from meerkat import shuffle
+
+        return shuffle(data=self, seed=seed)
+
+    @reactive
     def rename(
         self,
         mapper: Union[Dict, Callable] = None,

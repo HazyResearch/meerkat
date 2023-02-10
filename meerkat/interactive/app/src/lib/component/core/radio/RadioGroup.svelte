@@ -23,6 +23,7 @@
 	export let classes: string = 'bg-violet-50 p-2 rounded-lg w-fit';
     classes += horizontal ? ' flex flex-row space-x-4' : ' flex flex-col space-y-2';
 
+	console.log("selected,", selected)
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -36,6 +37,7 @@
 			bind:color
             bind:group
             class="{disabled ? 'text-gray-400' : 'text-purple-500'}"
+			checked={selected === i}
 		>   
 			{value}
 		</Radio>

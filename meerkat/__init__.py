@@ -47,6 +47,7 @@ from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
 from meerkat.ops.sample import sample
 from meerkat.ops.search import search
+from meerkat.ops.shuffle import shuffle
 from meerkat.ops.sliceby.clusterby import clusterby
 from meerkat.ops.sliceby.explainby import explainby
 from meerkat.ops.sliceby.groupby import groupby
@@ -110,6 +111,7 @@ __all__ = [
     "embed",
     "sort",
     "sample",
+    "shuffle",
     "groupby",
     "clusterby",
     "explainby",
