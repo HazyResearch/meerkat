@@ -1,5 +1,6 @@
 import base64
 from io import BytesIO
+from typing import Union
 
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.app.src.lib.component.abstract import Component
@@ -25,7 +26,10 @@ class ImageFormatter(Formatter):
     def __init__(self, classes: str = ""):
         super().__init__(classes=classes)
 
-    def _encode(self, image: Image, thumbnail: bool = False) -> str:
+    def _encode(self, image: Union[str, Image], thumbnail: bool = False) -> str:
+        if isinstance(image, str):
+            return image
+
         with BytesIO() as buffer:
             if thumbnail:
                 image.thumbnail((256, 256))

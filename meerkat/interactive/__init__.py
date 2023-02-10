@@ -4,6 +4,7 @@ from .app.src.lib.component import contrib, core, flowbite, html, plotly
 from .app.src.lib.component.abstract import BaseComponent, Component
 from .app.src.lib.component.contrib.fm_filter import FMFilter
 from .app.src.lib.component.contrib.mocha import ChangeList
+from .app.src.lib.shared.cell.website import Website
 from .app.src.lib.component.core.button import Button
 from .app.src.lib.component.core.code import Code
 from .app.src.lib.component.core.code_cell import CodeCell, FilterCodeCell
@@ -114,6 +115,8 @@ __all__ = [
     # <<<< Contrib Components >>>>
     "ChangeList",
     "FMFilter",
+    # <<<< Shared Components >>>>
+    "Website",
     # <<<< Utilities >>>>
     "print",
 ]
