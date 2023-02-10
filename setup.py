@@ -59,7 +59,7 @@ REQUIRED = [
     "typer",
     "jinja2",
     "nbformat",
-    "sse-starlette"
+    "sse-starlette",
     "tabulate",
 ]
 
