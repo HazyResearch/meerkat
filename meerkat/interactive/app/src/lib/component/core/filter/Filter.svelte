@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
-	import { ClipboardPlus, Trash } from 'svelte-bootstrap-icons';
+	import ClipboardPlus from 'svelte-bootstrap-icons/lib/ClipboardPlus.svelte';
+	import Trash from 'svelte-bootstrap-icons/lib/Trash.svelte';
 	import Select from 'svelte-select';
 	import type { FilterCriterion } from './types';
 
@@ -85,7 +86,7 @@
 	};
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg z-40 flex flex-col">
+<div class="bg-slate-100 p-2 rounded-lg z-40 flex flex-col my-2">
 	<div class="flex space-x-6">
 		{#if title != ''}
 			<div class="font-bold text-md text-slate-600 self-start pl-2">
