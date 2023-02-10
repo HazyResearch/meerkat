@@ -1,5 +1,6 @@
 import meerkat as mk
 from meerkat.interactive.app.src.lib.component.core.image import DeferredImageFormatter, ImageFormatter
+from meerkat.interactive.app.src.lib.shared.cell.website import WebsiteFormatter
 
 
 df = mk.get("olivierdehaene/xkcd", registry="huggingface")['train']
@@ -7,6 +8,8 @@ for col in df.columns:
     df[col] = df[col].to_numpy()
 
 df['image_url'].formatter = ImageFormatter()
+df['url'].formatter = WebsiteFormatter(height=30)
+df['explained_url'].formatter = WebsiteFormatter(height=30)
 
 filter = mk.gui.Filter(df=df)
 
@@ -21,6 +24,7 @@ gallery = mk.gui.html.div(
     ],
     classes="flex flex-col h-[80vh]",
 )
+
 
 
 
