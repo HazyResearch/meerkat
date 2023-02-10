@@ -584,9 +584,12 @@ def cleanup():
         return
 
     if MEERKAT_RUN_PROCESS:
-        # Remove the reload counter file if running from the `mk run` process.
-        os.remove(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload")
-
+        try:
+            # Remove the reload counter file if running from the `mk run` process.
+            os.remove(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload")
+        except FileNotFoundError:
+            pass
+        
     if state.frontend_info or state.api_info:
         # Keep message inside if statement to avoid printing when not needed
         # e.g. when running `mk run --help`

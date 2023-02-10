@@ -666,7 +666,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
 
         return PandasScalarColumn
 
-    if isinstance(data, pa.Array):
+    if isinstance(data, (pa.Array, pa.ChunkedArray)):
         from .scalar.arrow import ArrowScalarColumn
 
         return ArrowScalarColumn

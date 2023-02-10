@@ -101,7 +101,7 @@ def get(
 
                 # Add version argument if specified
                 if version is not None:
-                    kwargs["version"] = version
+                    kwargs["name"] = version
                 dataset = DataFrame.from_huggingface(
                     path=name,
                     download_mode=mapping[download_mode],
