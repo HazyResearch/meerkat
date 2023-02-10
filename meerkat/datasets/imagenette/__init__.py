@@ -95,9 +95,9 @@ class imagenette(DatasetBuilder):
 
 
 def download_imagenette(
-    download_dir, 
-    version="160px", 
-    overwrite: bool = False, 
+    download_dir,
+    version="160px",
+    overwrite: bool = False,
     return_df: bool = False,
 ):
     """Download Imagenette dataset.

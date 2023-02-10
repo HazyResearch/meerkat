@@ -389,4 +389,5 @@ class PandasScalarColumn(
     def to_json(self) -> List[Any]:
         return self.data.tolist()
 
+
 PandasSeriesColumn = PandasScalarColumn
