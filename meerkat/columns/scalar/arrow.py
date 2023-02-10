@@ -125,3 +125,8 @@ class ArrowScalarColumn(ScalarColumn):
 
     def to_arrow(self) -> pa.Array:
         return self.data
+
+    """TODO(KG)
+    This column is missing a .dtype property that prevents
+    it from being used with the Filter component.
+    """

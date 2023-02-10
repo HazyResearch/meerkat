@@ -397,6 +397,7 @@ class path(Slottable, HtmlMixin, Component):
     stroke_linejoin: Optional[str] = None
     stroke_width: Optional[str] = None
 
+
 class ul(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
@@ -468,8 +469,6 @@ class button(Slottable, HtmlMixin, Component):
 #     pass
 
 
-
-
 # FIXME: remove closing tags in the Wrapper.svelte transipler
 # class input(HtmlMixin, Component):
 #     classes: Optional[str] = None
@@ -486,6 +485,7 @@ class button(Slottable, HtmlMixin, Component):
 #     alt: str = ""
 #     width: str = ""
 #     height: str = ""
+
 
 class textarea(Slottable, HtmlMixin, Component):
     pass

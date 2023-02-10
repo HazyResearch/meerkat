@@ -232,7 +232,7 @@ def install(
     package_manager: PackageManager = typer.Option(
         "npm", show_choices=True, help="Package manager to use"
     ),
-    run_dev: bool = typer.Option(True, help="Run `npm run dev` after installation"),
+    run_dev: bool = typer.Option(False, help="Run `npm run dev` after installation"),
 ):
     """Install npm and other dependencies for interactive Meerkat."""
     SystemHelper().install_node()

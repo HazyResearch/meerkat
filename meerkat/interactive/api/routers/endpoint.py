@@ -60,5 +60,10 @@ def dispatch(
             torch.Tensor: lambda v: v.tolist(),
             pd.Series: lambda v: v.tolist(),
             Column: lambda v: v.to_json(),
+            np.int64: lambda v: int(v),
+            np.float64: lambda v: float(v),
+            np.int32: lambda v: int(v),
+            np.bool_: lambda v: bool(v),
+            np.bool8: lambda v: bool(v),
         },
     )

@@ -174,7 +174,9 @@ class TorchTensorColumn(
 
     @staticmethod
     def _get_default_formatter() -> Callable:
-        from meerkat.interactive.formatter import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.core.scalar import (
+            ScalarFormatter,
+        )
 
         return ScalarFormatter()
 

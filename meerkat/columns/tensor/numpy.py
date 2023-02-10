@@ -209,7 +209,9 @@ class NumPyTensorColumn(
             return self[index]
 
     def _get_default_formatter(self):
-        from meerkat.interactive.formatter import ScalarFormatter
+        from meerkat.interactive.app.src.lib.component.core.scalar import (
+            ScalarFormatter,
+        )
 
         if len(self) == 0:
             return ScalarFormatter()

@@ -6,17 +6,20 @@
 	export let chunk: DataFrameChunk;
 	export let layout = 'gimages'; // 'gimages' or 'masonry'
 
-	// Main column to display.
+	/** Main column to display. */
 	export let mainColumn: string = 'image';
 
-	// Columns to use for tags in the GalleryView.
+	/** Columns to use for tags in the GalleryView. */ 
 	export let tagColumns: Array<string> = [];
 
-	// Columns size to display
+	/** Columns size to display. */
 	export let cellSize: number = 6;
 
-	// Selected rows
+	/** Selected rows. */ 
 	export let selected: Array<string> = [];
+
+	/** Whether to allow selection. */
+	export let allowSelection: boolean = false;
 
 	$: pivotHeight = layout === 'gimages' ? cellSize : undefined;
 	$: numColumns = layout === 'masonry' ? cellSize : undefined;
@@ -38,6 +41,9 @@
 			bind:height={pivotHeight}
 			selected={selected.includes(keyidx)}
 			on:click={(e) => {
+				if (!allowSelection) {
+					return;
+				}
 				if (e.detail.shiftKey) {
 					if (selected.length === 0) {
 						selected.push(keyidx);

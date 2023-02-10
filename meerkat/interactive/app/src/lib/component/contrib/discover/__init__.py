@@ -1,6 +1,5 @@
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store
+from meerkat.interactive.endpoint import EndpointProperty, endpoint
 
 from ...abstract import Component
 

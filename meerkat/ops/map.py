@@ -1,6 +1,6 @@
+import warnings
 from inspect import signature
 from typing import TYPE_CHECKING, Callable, Dict, Mapping, Sequence, Tuple, Type, Union
-import warnings
 
 import meerkat.tools.docs as docs
 from meerkat.block.abstract import BlockView
@@ -16,14 +16,14 @@ _SHARED_DOCS_ = {
         """
     *What gets passed to function?*
 
-    *   If ${data} is a :class:`DataFrame` and ``outputs`` is not passed, then the 
-        function's signature is inspected to determine which columns to pass as keyword 
-        arguments to the function.
+    *   If ${data} is a :class:`DataFrame` and ``outputs`` is not passed, then the \
+        function's signature is inspected to determine which columns to pass as \
+        keyword arguments to the function.
         For example, if the function is
         ``lambda age, residence: age > 18 and residence == "NY"``, then
         the columns ``age`` and ``residence`` will be passed to the function. If the
         columns are not present in the DataFrame, then a `ValueError` will be raised.
-    *   If ${data} is a :class:`DataFrame` and ``outputs`` is  ``"single"``, then 
+    *   If ${data} is a :class:`DataFrame` and ``outputs`` is  ``"single"``, then \
         mapping between columns and function arguments can be overridden by passing
         a the ``inputs`` argument.
     *   If ${data} is a :class:`Column` then values of the

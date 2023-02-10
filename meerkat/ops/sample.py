@@ -3,8 +3,10 @@ from typing import Union
 import numpy as np
 
 from meerkat import Column, DataFrame
+from meerkat.interactive.graph.reactivity import reactive
 
 
+@reactive
 def sample(
     data: Union[DataFrame, Column],
     n: int = None,

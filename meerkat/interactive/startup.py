@@ -487,7 +487,8 @@ def run_frontend(
         with open(".buildprint", "w") as f:
             f.write(str(buildprint))
 
-        # If the most recent file change is the same as the last build, skip the build step
+        # If the most recent file change is the same as the last build,
+        # skip the build step
         skip_build = skip_build or (last_buildprint == buildprint)
         process = run_frontend_prod(
             port, apiurl, libpath, package_manager, env, skip_build
@@ -583,8 +584,11 @@ def cleanup():
         return
 
     if MEERKAT_RUN_PROCESS:
-        # Remove the reload counter file if running from the `mk run` process.
-        os.remove(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload")
+        try:
+            # Remove the reload counter file if running from the `mk run` process.
+            os.remove(f"{PathHelper().appdir}/.{MEERKAT_RUN_ID}.reload")
+        except FileNotFoundError:
+            pass
 
     if state.frontend_info or state.api_info:
         # Keep message inside if statement to avoid printing when not needed

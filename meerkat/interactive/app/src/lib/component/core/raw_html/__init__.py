@@ -1,7 +1,3 @@
-import base64
-from io import BytesIO
-
-from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.formatter.base import Formatter, Variant
 
@@ -29,7 +25,7 @@ class HTMLFormatter(Formatter):
             encode_kwargs={},
         ),
     }
-    
+
     def _encode(self, data: str, thumbnail: bool = False) -> str:
         return data
 

@@ -9,7 +9,7 @@ lint:
 	flake8 meerkat/ tests/
 
 test:
-	pytest
+	pytest tests/
 
 test-basic:
 	set -e

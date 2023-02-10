@@ -69,10 +69,10 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
 # Create a Store that will hold the query.
 query = Store("")
 # Pass this to a Textbox component, which will allow the user to modify the query.
-query_component = mk.gui.Textbox(text=query, title="Question")
+query_component = mk.gui.Textbox(text=query)
 
 # Pass the directory to a Textbox component, which will allow the user to modify the directory.
-dir_component = mk.gui.Textbox(text=dir, title="Directory")
+dir_component = mk.gui.Textbox(text=dir)
 
 # Create a button that will call the query_gpt_index endpoint when clicked.
 button = mk.gui.Button(

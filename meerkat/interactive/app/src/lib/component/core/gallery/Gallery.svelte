@@ -20,6 +20,8 @@
 	export let perPage: number = 20;
 	export let cellSize: number = 24;
 
+	export let allowSelection: boolean = false;
+
 	$: schemaPromise = fetchSchema({
 		df: df,
 		variants: ['small']
@@ -44,7 +46,7 @@
 	let dropdownOpen: boolean = false;
 </script>
 
-<div class="flex-1 rounded-lg overflow-hidden bg-slate-50 h-full">
+<div class="flex-1 rounded-lg overflow-hidden bg-slate-50 h-full shadow-md">
 	{#await schemaPromise}
 		<div class="flex justify-center items-center h-full">
 			<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
@@ -102,13 +104,7 @@
 						<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
 					</div>
 				{:then chunk}
-					<Cards
-						{chunk}
-						mainColumn={mainColumn}
-						tagColumns={tagColumns}
-						bind:cellSize={cellSize}
-						bind:selected
-					/>
+					<Cards {chunk} {mainColumn} {tagColumns} {allowSelection} bind:cellSize bind:selected />
 				{:catch error}
 					{error}
 				{/await}

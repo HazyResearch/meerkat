@@ -14,10 +14,10 @@
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
-	export let card_flex_grow: boolean = false;
-	export let as_modal: boolean = false;
+	export let cardFlexGrow: boolean = false;
+	export let asModal: boolean = false;
 
-	$: schema_promise = fetchSchema({ df: df, variants: ['small'] }).then((schema) => {
+	$: schemaPromise = fetchSchema({ df: df, variants: ['small'] }).then((schema) => {
 		if (mainColumn === undefined) {
 			mainColumn = schema.columns[0].name;
 		}
@@ -30,11 +30,11 @@
 		columns: [mainColumn],
 		variants: ['full_screen']
 	});
-	$: chunk_promise = fetchChunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
+	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
 
 	const increment = async () => {
-		let chunk = await chunk_promise;
-		if (posidx < chunk.full_length - 1) {
+		let chunk = await chunkPromise;
+		if (posidx < chunk.fullLength - 1) {
 			posidx += 1;
 		}
 	};
@@ -46,11 +46,14 @@
 	};
 
 	const onKeyPress = async (e) => {
-		if (e.charCode === 113) {
+		// q / esc / enter
+		if (e.charCode === 113 || e.charCode === 13 || e.charCode === 27) {
 			closeModal();
-		} else if (e.charCode === 97) {
+		// a / left arrow
+		} else if (e.charCode === 97 || e.charCode === 37) {
 			decrement();
-		} else if (e.charCode === 100) {
+		// d / right arrow
+		} else if (e.charCode === 100 || e.charCode === 39) {
 			increment();
 		}
 	};
@@ -59,11 +62,13 @@
 <svelte:window on:keypress={onKeyPress} />
 
 {#if isOpen}
-	<div class="w-full fixed top-0 bottom-0 right-0 left-0 flex justify-center items-center z-[100]">
+	<div
+		class="w-full fixed top-0 bottom-0 right-0 left-0 flex flex-col justify-center items-center z-[100]"
+	>
 		<div
 			class="w-[90%] h-[90%] bg-white rounded-lg grid-rows-2 overflow-x-hidden"
-			class:flex-grow={card_flex_grow}
-			class:card-modal={as_modal}
+			class:flex-grow={cardFlexGrow}
+			class:card-modal={asModal}
 		>
 			<div class="h-full grid grid-cols-[auto_1fr]">
 				<div class="w-80 bg-slate-100 overflow-y-scroll drop-shadow-lg">
@@ -71,7 +76,7 @@
 						<div class="text-center font-bold text-gray-600 text-xl">Columns</div>
 						<!-- Key-Value Pairs -->
 						<div class="flex-col flex space-y-1 ">
-							{#await schema_promise then schema}
+							{#await schemaPromise then schema}
 								{#each schema.columns as column}
 									<!-- Key-Value Pair -->
 									<button
@@ -92,7 +97,7 @@
 										<span
 											class="text-gray-600 text-right whitespace-nowrap overflow-hidden text-ellipsis"
 										>
-											{#await chunk_promise then chunk}
+											{#await chunkPromise then chunk}
 												<Cell {...chunk.getCell(0, column.name)} />
 											{/await}
 										</span>
@@ -118,7 +123,7 @@
 									</button>
 								</li>
 								<li>
-									{#await schema_promise then schema}
+									{#await schemaPromise then schema}
 										<button class="w-18 px-1 h-8 text-slate-800">
 											Row <span class="font-bold">{posidx}</span> of
 											<span class="font-bold">{schema.nrows}</span>
@@ -156,6 +161,9 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="h-fit bg-slate-100 mt-1 w-[90%] rounded-lg text-center text-sm text-gray-600 font-mono">
+			a : previous row | d : next row | q : close
 		</div>
 	</div>
 {/if}

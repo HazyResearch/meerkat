@@ -19,7 +19,6 @@ from meerkat.columns.deferred.base import DeferredCell
 from meerkat.columns.deferred.file import FileCell
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
-from meerkat.columns.tensor.torch import TorchTensorColumn
 
 from ....utils import product_parametrize
 from ..abstract import AbstractColumnTestBed, column_parametrize
@@ -57,7 +56,6 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                 self.image_paths.append(filename)
             else:
                 self.image_paths.append(os.path.join(tmpdir, filename))
-
 
         self.col = ImageColumn.from_filepaths(
             self.image_paths,
@@ -132,7 +130,6 @@ class ImageColumnTestBed(AbstractColumnTestBed):
                     [im.rotate(45 + salt + kwarg) for im in self.ims]
                 ),
             }
-          
 
     def get_data(self, index, materialize: bool = True):
         if materialize:

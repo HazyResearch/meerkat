@@ -272,7 +272,7 @@ class ChangeList(BaseComponent):
                 if not key:
                     return
                 df[column][df.primary_key._keyidx_to_posidx(key)] = value
-                # We have to force add the dataframe modification to trigger 
+                # We have to force add the dataframe modification to trigger
                 # downstream updates
                 mod = mk.gui.DataFrameModification(id=df.id, scope=[column])
                 mod.add_to_queue()

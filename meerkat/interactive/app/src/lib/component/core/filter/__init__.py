@@ -11,8 +11,9 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.graph import Store, reactive
 
 
-def filter_by_operator(*args, **kwargs): 
+def filter_by_operator(*args, **kwargs):
     raise NotImplementedError()
+
 
 def _in(column: Column, value):
     if not isinstance(value, (tuple, list)):

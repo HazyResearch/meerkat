@@ -3,17 +3,20 @@ from meerkat.interactive import Page, print
 from meerkat.interactive.app.src.lib.component.core.text import Text
 
 text_1 = Text(
-    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, vitae aliquam nis"
-    "l nisl sit amet nisl. Nulla",
+    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+    "Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, "
+    "vitae aliquam nisl nisl sit amet nisl. Nulla",
 )
 text_2 = Text(
-    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, vitae aliquam nis"
-    "l nisl sit amet nisl. Nulla",
+    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+    "Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, "
+    "vitae aliquam nisl nisl sit amet nisl. Nulla",
     editable=True,
 )
 text_3 = Text(
-    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, vitae aliquam nis"
-    "l nisl sit amet nisl. Nulla",
+    data="Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+    "Sed euismod, nisl vitae ultricies lacinia, nisl nisl aliquam nisl, "
+    "vitae aliquam nisl nisl sit amet nisl. Nulla",
     view="wrapped",
 )
 

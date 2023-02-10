@@ -67,5 +67,8 @@ def update(store: Store, value=Endpoint.EmbeddedBody()):
             Column: lambda v: v.to_json(),
             np.int64: lambda v: int(v),
             np.float64: lambda v: float(v),
+            np.int32: lambda v: int(v),
+            np.bool_: lambda v: bool(v),
+            np.bool8: lambda v: bool(v),
         },
     )

@@ -666,63 +666,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
 
         return PandasScalarColumn
 
-    if isinstance(data, pa.Array):
-        from .scalar.arrow import ArrowScalarColumn
-
-        return ArrowScalarColumn
-
-    if torch.is_tensor(data):
-        from .tensor.torch import TorchTensorColumn
-
-        # FIXME: Once we have a torch scalar column we should use that here
-        # if len(data.shape) == 1:
-        #     return ScalarColumn(data.cpu().detach().numpy())
-        return TorchTensorColumn
-
-    if isinstance(data, np.ndarray):
-        if len(data.shape) == 1:
-            from .scalar.pandas import PandasScalarColumn
-
-            return PandasScalarColumn
-        from .tensor.numpy import NumPyTensorColumn
-
-        return NumPyTensorColumn
-
-    if isinstance(data, Sequence):
-        from .tensor.numpy import NumPyTensorColumn
-
-        if len(data) != 0 and (isinstance(data[0], (np.ndarray, NumPyTensorColumn))):
-            return NumPyTensorColumn
-
-        from .tensor.torch import TorchTensorColumn
-
-        if len(data) != 0 and (
-            isinstance(data[0], TorchTensorColumn) or torch.is_tensor(data[0])
-        ):
-            return TorchTensorColumn
-
-        if len(data) != 0 and isinstance(data[0], (str, int, float, bool, np.generic)):
-            from .scalar.pandas import PandasScalarColumn
-
-            return PandasScalarColumn
-
-        from .object.base import ObjectColumn
-
-        return ObjectColumn
-    else:
-        raise ValueError(f"Cannot create column out of data of type {type(data)}")
-
-
-def infer_column_type(data: Sequence) -> Type[Column]:
-    if isinstance(data, Column):
-        return type(data)
-
-    if isinstance(data, pd.Series):
-        from .scalar.pandas import PandasScalarColumn
-
-        return PandasScalarColumn
-
-    if isinstance(data, pa.Array):
+    if isinstance(data, (pa.Array, pa.ChunkedArray)):
         from .scalar.arrow import ArrowScalarColumn
 
         return ArrowScalarColumn

@@ -40,7 +40,6 @@ class FileColumnTestBed(AbstractColumnTestBed):
         self.paths = []
         self.data = []
 
-
         self.tmp_dir = tmpdir
         self.files_dir = os.path.join(tmpdir, "files")
         os.makedirs(self.files_dir, exist_ok=True)

@@ -21,9 +21,8 @@ class Plot(Component):
     y_label: str = None
     type: str = Store("scatter")
     slot: str = None
-    keys_to_remove: list =  Field(default_factory=list)
+    keys_to_remove: list = Field(default_factory=list)
     metadata_columns: list = Field(default_factory=list)
 
     on_select: EndpointProperty = None
     on_remove: EndpointProperty = None
-

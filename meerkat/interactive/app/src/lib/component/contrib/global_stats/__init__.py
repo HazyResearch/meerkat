@@ -10,4 +10,3 @@ class GlobalStats(Component):
     shift: float
     inconsistency: float
     metric: str = "Accuracy"
-
