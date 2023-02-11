@@ -85,6 +85,12 @@ _SHARED_DOCS_ = {
             Defaults to None.
         """
     ),
+    "materialize": docs.Arg(
+        """
+        materialize (bool, optional): Whether to materialize the input column(s). 
+            Defaults to True.  
+        """
+    ),
 }
 
 
@@ -150,6 +156,7 @@ def defer(
         ${inputs}
         ${outputs}
         ${output_type}
+        ${materialize}
 
     Returns:
         Union[DataFrame, DeferredColumn]: A :class:`DeferredColumn` or a
@@ -385,6 +392,7 @@ def map(
         ${inputs}
         ${outputs}
         ${output_type}
+        ${materialize}
         use_ray (bool): Use Ray to parallelize the computation. Defaults to False.
         num_blocks (int): When using Ray, the number of blocks to split the data
             into. Defaults to 100.

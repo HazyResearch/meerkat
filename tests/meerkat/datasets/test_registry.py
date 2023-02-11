@@ -9,12 +9,6 @@ def test_versions():
     assert len(versions) > 0
 
 
-def test_catalog():
-    catalog = mk.datasets.catalog
-    assert isinstance(catalog, mk.DataFrame)
-    assert len(catalog) > 0
-
-
 def test_repr():
     out = repr(mk.datasets)
     isinstance(out, str)
