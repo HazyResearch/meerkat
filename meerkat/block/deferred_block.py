@@ -29,10 +29,11 @@ class DeferredCellOp:
     @staticmethod
     def prepare_arg(arg):
         from ..columns.deferred.base import AbstractCell
+        from ..columns.deferred.base import DeferredColumn
 
         if isinstance(arg, AbstractCell):
             return arg.get()
-        elif isinstance(arg, Column):
+        elif isinstance(arg, DeferredColumn):
             return arg()
         return arg
 
