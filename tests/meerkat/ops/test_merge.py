@@ -291,7 +291,7 @@ class TestMerge:
         out = df1.merge(df2, on="a", how="inner")
         assert isinstance(out["img"], ImageColumn)
         assert [str(fp) for fp in out["img"].data.args[0]] == [
-            img_col_test_bed.image_paths[row] for row in rows
+            os.path.basename(img_col_test_bed.image_paths[row]) for row in rows
         ]
 
     def test_no_columns(tmpdir):
@@ -358,6 +358,7 @@ class TestMerge:
             df1.merge(df2)
 
     def test_check_merge_columns(self):
+        import meerkat as mk
         length = 16
         # check dictionary not hashable
         df1 = DataFrame.from_batch(
@@ -410,7 +411,7 @@ class TestMerge:
         # checks if Cells in cell columns are NOT hashable
         df1 = DataFrame.from_batch(
             {
-                "a": ImageColumn.from_filepaths(["a"] * length),
+                "a": mk.column(["a"] * length).defer(lambda x: x + "b"),
                 "b": list(np.arange(length)),
             }
         )

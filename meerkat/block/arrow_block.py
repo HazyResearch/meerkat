@@ -107,8 +107,10 @@ class ArrowBlock(AbstractBlock):
 
         if isinstance(index, int):
             # if indexing a single row, we do not return a block manager, just a dict
+            # Convert to Python object for consistency with other ScalarColumn
+            # implementations.
             return {
-                name: self.data[col._block_index][index]
+                name: self.data[col._block_index][index].as_py()
                 for name, col in block_ref.columns.items()
             }
 

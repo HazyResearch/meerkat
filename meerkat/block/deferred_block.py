@@ -93,6 +93,7 @@ class DeferredOp:
     batch_size: int
     return_format: type = None
     return_index: Union[str, int] = None
+    materialize_inputs: bool = True
 
     @staticmethod
     def concat(ops: Sequence[DeferredOp]):
@@ -152,6 +153,7 @@ class DeferredOp:
             "return_format": self.return_format,
             "is_batched_fn": self.is_batched_fn,
             "batch_size": self.batch_size,
+            "materialize_inputs": self.materialize_inputs,
         }
         state_path = os.path.join(path, "state.dill")
         dill.dump(state, open(state_path, "wb"))
@@ -234,14 +236,14 @@ class DeferredOp:
             # if column has already been indexed
             kwarg: indexed_inputs[id(column)]
             if id(column) in indexed_inputs
-            else column._get(index, materialize=materialize)
+            else column._get(index, materialize=self.materialize_inputs)
             for kwarg, column in self.kwargs.items()
         }
 
         args = [
             indexed_inputs[id(column)]
             if id(column) in indexed_inputs
-            else column._get(index, materialize=materialize)
+            else column._get(index, materialize=self.materialize_inputs)
             for column in self.args
         ]
 
