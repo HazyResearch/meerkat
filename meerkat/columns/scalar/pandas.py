@@ -68,6 +68,10 @@ def getattr_decorator(fn: Callable):
 
 class _ReturnColumnMixin:
     def __getattribute__(self, name):
+        if name == "__class__":
+            # This is needed to avoid _pickle.PicklingError: args[0] from __newobj__ 
+            # args has the wrong class when pickling
+            return super().__getattribute__(name)
         try:
             attr = super().__getattribute__(name)
             if isinstance(attr, Callable):
@@ -82,12 +86,14 @@ class _ReturnColumnMixin:
                 return attr
         except AttributeError:
             raise AttributeError(
-                f"'{self.__class__.__name__}' object has no attribute '{name}'"
+                f"object has no attribute '{name}'"
             )
 
 
 class _MeerkatStringMethods(_ReturnColumnMixin, StringMethods):
-    pass
+    
+    def __init__(self, data: Column):
+        super().__init__(data.data)
 
 
 class _MeerkatDatetimeProperties(_ReturnColumnMixin, DatetimeProperties):

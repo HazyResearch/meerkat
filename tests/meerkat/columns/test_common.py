@@ -7,7 +7,7 @@ import pytest
 from meerkat import DeferredColumn, NumPyTensorColumn, TorchTensorColumn
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.columns.scalar.pandas import PandasScalarColumn
-from meerkat.errors import ImmutableError
+from meerkat.errors import ConversionError, ImmutableError
 
 from ...utils import product_parametrize
 from .abstract import AbstractColumnTestBed, column_parametrize
@@ -22,11 +22,11 @@ from .tensor.test_torch import TorchTensorColumnTestBed
 @pytest.fixture(
     **column_parametrize(
         [
-            # NumPyTensorColumnTestBed,
-            # PandasScalarColumnTestBed,
-            # TorchTensorColumnTestBed,
-            # DeferredColumnTestBed,
-            # ArrowScalarColumnTestBed,
+            NumPyTensorColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
             # FileColumnTestBed,
             ImageColumnTestBed,
             # AudioColumnTestBed,
@@ -42,10 +42,10 @@ def column_testbed(request, tmpdir):
     **column_parametrize(
         [
             NumPyTensorColumnTestBed,
-            # PandasScalarColumnTestBed,
-            # TorchTensorColumnTestBed,
-            # DeferredColumnTestBed,
-            # ArrowScalarColumnTestBed,
+            PandasScalarColumnTestBed,
+            TorchTensorColumnTestBed,
+            DeferredColumnTestBed,
+            ArrowScalarColumnTestBed,
         ],
         single=True,
     ),
@@ -122,7 +122,6 @@ def test_pickle(column_testbed):
 
     # important for dataloader
     col = column_testbed.col
-    breakpoint()
     buf = pickle.dumps(col)
     new_col = pickle.loads(buf)
 
@@ -200,8 +199,12 @@ def test_repr_pandas(single_column_testbed: AbstractColumnTestBed):
 
 def test_to_pandas(single_column_testbed: AbstractColumnTestBed):
     testbed = single_column_testbed
-    series = testbed.col.to_pandas()
-    assert isinstance(series, pd.Series)
+    if isinstance(testbed.col, DeferredColumn):
+        with pytest.raises(ConversionError):
+            series = testbed.col.to_pandas()
+    else: 
+        series = testbed.col.to_pandas()
+        assert isinstance(series, pd.Series)
 
 def test_to_torch(single_column_testbed: AbstractColumnTestBed):
     pass 
