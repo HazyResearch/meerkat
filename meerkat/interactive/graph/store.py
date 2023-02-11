@@ -156,6 +156,10 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         return super().__bool__()
 
     @reactive
+    def to_str(self):
+        return super().__str__()
+
+    @reactive
     def __add__(self, other):
         return super().__add__(other)
 

@@ -10,6 +10,7 @@ class Gallery(Component):
     tag_columns: List[str] = []
     selected: List[int] = []
     allow_selection: bool = False
+    cell_size: int = 24
 
     def __init__(
         self,
@@ -19,6 +20,7 @@ class Gallery(Component):
         tag_columns: List[str] = [],
         selected: List[int] = [],
         allow_selection: bool = False,
+        cell_size: int = 24,
     ):
         """Gallery view of a DataFrame.
 
@@ -38,4 +40,5 @@ class Gallery(Component):
             tag_columns=tag_columns,
             selected=selected,
             allow_selection=allow_selection,
+            cell_size=cell_size,
         )

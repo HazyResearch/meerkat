@@ -1,3 +1,8 @@
+"""A head-to-head reader study.
+
+In a head-to-head reader study, the user inspects all variants of an image
+and selects the best one.
+"""
 import numpy as np
 from PIL import Image
 
@@ -5,7 +10,7 @@ import meerkat as mk
 
 
 def add_noise(img: Image) -> Image:
-    """Add noise to the image."""
+    """Simulate a noisy image."""
     img = np.asarray(img).copy()
     img += np.round(np.random.randn(*img.shape) * 10).astype(np.uint8)
     img = np.clip(img, 0, 255)
@@ -13,16 +18,15 @@ def add_noise(img: Image) -> Image:
 
 
 @mk.gui.endpoint
-def on_label(index):
-    # Add the label to the dataframe.
-    # Every time the user clicks on a label, we should add it to the dataframe.
+def on_label(index, df):
+    """Add a label to the dataframe."""
     df["label"][row] = index
     row.set(row + 1)
     print("Dataframe", df["label"][: row.value].data)
 
 
 @mk.gui.endpoint
-def go_back(row):
+def go_back(row, df):
     row.set(max(0, row - 1))
 
 
@@ -35,7 +39,7 @@ def go_forward(row, df):
 def get_selected(label, value_list):
     # Label needs to be converted to a string because the values
     # are auto converted to strings by the RadioGroup component.
-    # TODO: Fix this so that value list remains a list of ints.s
+    # TODO: Fix this so that value list remains a list of ints.
     label = str(label)
     selected = value_list.index(label) if label in value_list else None
     return selected
@@ -50,32 +54,28 @@ def select_row(df, row):
 
 df = mk.get("imagenette", version="160px")
 df["noisy_img"] = mk.defer(df["img"], add_noise)
+img_columns = ["img", "noisy_img"]
 # Shuffle the dataset.
 df = df.shuffle(seed=20)
-# We want to randomize which images are shown on each gallery pane.
-# TODO: Add a column indicating which column should be displayed.
-df["img1"] = df["img"]
-df["img2"] = df["noisy_img"]
-# Initialize labels to -1.
-df["label"] = -np.ones(len(df), dtype=np.int32)
+# Randomize which images are shown on each gallery pane.
+state = np.random.RandomState(20)
+df["index"] = np.asarray(
+    [state.permutation(np.asarray(img_columns)) for _ in range(len(df))]
+)
+df["img1"] = mk.defer(df, lambda df: df[df["index"][0]])
+df["img2"] = mk.defer(df, lambda df: df[df["index"][1]])
+anonymized_img_columns = ["img1", "img2"]
+# Initialize labels to empty strings.
+df["label"] = np.full(len(df), "")
 
 with mk.gui.react():
     row = mk.gui.Store(0)
     label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
+    cell_size = mk.gui.Store(24)
 
-    values = mk.gui.Store([0, 1])
-    selected = get_selected(label, values)
-    print("Selected inode", selected.inode.id)
-    radio = mk.gui.core.RadioGroup(
-        name="Better Image",
-        values=values,
-        selected=selected,
-        on_change=on_label,
-        classes="bg-violet-50 p-2 rounded-lg w-fit flex items-center justify-center",
-    )
     back = mk.gui.core.Button(
         title="<",
-        on_click=go_back.partial(row),
+        on_click=go_back.partial(row=row, df=df),
         classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
     )
     forward = mk.gui.core.Button(
@@ -83,19 +83,39 @@ with mk.gui.react():
         on_click=go_forward.partial(row=row, df=df),
         classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
     )
+    label_buttons = [
+        mk.gui.core.Button(
+            title=f"{label}",
+            on_click=on_label.partial(index=label, df=df),
+            classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
+        )
+        for label in anonymized_img_columns
+    ]
+    # We need to explicitly add the markdown hashes.
+    label_display = mk.gui.core.markdown.Markdown(body="## Label: " + label)
 
     display_df = select_row(df, row)
-    img1 = mk.gui.core.Gallery(df=display_df, main_column="img1")
-    img2 = mk.gui.core.Gallery(df=display_df, main_column="img2")
+    cell_size = mk.gui.Store(24)
+    galleries = [
+        mk.gui.core.Gallery(df=display_df, main_column=main_column, cell_size=cell_size)
+        for main_column in anonymized_img_columns
+    ]
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
     component=mk.gui.html.flexcol(
         [
-            mk.gui.html.gridcols2([img1, img2], classes="gap-4"),
-            mk.gui.html.gridcols3([back, radio, forward], classes="gap-4"),
-        ],
-        classes="gap-y-4",
+            mk.gui.html.gridcols2(galleries, classes="gap-4"),
+            mk.gui.html.div(label_display),
+            mk.gui.html.gridcols3(
+                [
+                    back,
+                    mk.gui.html.gridcols2(label_buttons, classes="gap-x-2"),
+                    forward,
+                ],
+                classes="gap-4 self-center justify-self-center w-full items-center",
+            ),
+        ]
     ),
     id="reader-study",
 )
