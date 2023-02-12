@@ -69,8 +69,8 @@ class ReactifiableMixin:
         # FIXME: We may be able to get rid of this distinction by decorating
         # Store.__call__ with @reactive.
         if (
-            is_reactive()
-            and is_obj_reactive
+            is_obj_reactive
+            and is_reactive()
             and not is_method_or_fn
             # Ignore dunder attributes.
             and not name.startswith("__")

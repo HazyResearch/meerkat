@@ -1330,11 +1330,12 @@ def test_reactivity_attributes_and_properties(name):
         pass
 
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10), "c": [Foo()] * 10})
+    df = df.react()
 
     # These should return an object that can be attached to a node.
     # i.e. we should be able to put the output on the graph.
-    with mk.gui._react():
-        out = getattr(df, name)
+    out = getattr(df, name)
+
     assert isinstance(out, NodeMixin)
     assert df.inode.has_trigger_children()
     assert len(df.inode.trigger_children) == 1
