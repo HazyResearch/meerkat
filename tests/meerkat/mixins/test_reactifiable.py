@@ -1,3 +1,5 @@
+import pytest
+
 import meerkat as mk
 from meerkat.mixins.reactifiable import ReactifiableMixin
 
@@ -37,19 +39,36 @@ def test_reactive_setter_inplace():
     assert id(foo) == id(foo2) == id(foo3)
 
 
-def test_instance_method():
+@pytest.mark.parametrize("react", [True, False])
+@pytest.mark.parametrize("attr", ["x", "my_x"])
+def test_attributes(react: bool, attr: str):
+    foo = Foo(1)
+    if react:
+        foo = foo.react()
+
+    x = getattr(foo, attr)
+    assert x == 1
+    assert (not react) ^ isinstance(x, mk.gui.Store)
+
+
+@pytest.mark.parametrize("react", [True, False])
+def test_instance_method(react: bool):
     y = mk.gui.Store(4)
 
     foo = Foo(1)
+    if react:
+        foo = foo.react()
+
     x = foo.add(y)
     assert x == 5
-    assert not isinstance(x, mk.gui.Store)
     assert isinstance(x, int)
+    assert (not react) ^ isinstance(x, mk.gui.Store)
 
-    foo = foo.react()
-    x = foo.add(y)
-    assert isinstance(x, mk.gui.Store)
-    assert isinstance(x, int)
+    if react:
+        assert len(y.inode.trigger_children) == 1
+        assert y.inode.trigger_children[0].obj.fn.__name__ == "add"
+    else:
+        assert y.inode is None
 
 
 def test_class_method():
