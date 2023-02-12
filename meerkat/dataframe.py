@@ -44,7 +44,7 @@ from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.indexing import IndexerMixin, MaterializationMixin
 from meerkat.mixins.inspect_fn import FunctionInspectorMixin
 from meerkat.mixins.reactifiable import ReactifiableMixin
-from meerkat.provenance import ProvenanceMixin, capture_provenance
+from meerkat.provenance import ProvenanceMixin
 from meerkat.row import Row
 from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
@@ -493,7 +493,7 @@ class DataFrame(
         self.data.consolidate()
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_batch(
         cls,
         batch: Batch,
@@ -502,7 +502,7 @@ class DataFrame(
         return cls(batch)
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_batches(
         cls,
         batches: Sequence[Batch],
@@ -517,7 +517,7 @@ class DataFrame(
         )
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_pandas(
         cls,
         df: pd.DataFrame,
@@ -563,7 +563,7 @@ class DataFrame(
         return df
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_arrow(
         cls,
         table: pa.Table,
@@ -605,7 +605,7 @@ class DataFrame(
             return cls.from_arrow(dataset._data)
 
     @classmethod
-    @capture_provenance(capture_args=["filepath"])
+    # @capture_provenance(capture_args=["filepath"])
     def from_csv(
         cls, filepath: str, primary_key: str = None, *args, **kwargs
     ) -> DataFrame:
@@ -627,7 +627,7 @@ class DataFrame(
         return df
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_feather(
         cls,
         filepath: str,
@@ -662,7 +662,7 @@ class DataFrame(
         return df
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_parquet(
         cls,
         filepath: str,
@@ -695,7 +695,7 @@ class DataFrame(
         return df
 
     @classmethod
-    @capture_provenance()
+    # @capture_provenance()
     def from_json(
         cls,
         filepath: str,
@@ -956,7 +956,7 @@ class DataFrame(
             for cell_batch in cell_dl:
                 yield cell_batch() if materialize else cell_batch
 
-    @capture_provenance(capture_args=["with_indices"])
+    # @capture_provenance(capture_args=["with_indices"])
     def update(
         self,
         function: Optional[Callable] = None,

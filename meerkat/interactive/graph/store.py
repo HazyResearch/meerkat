@@ -430,7 +430,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     @_reactive
     def __getitem__(self, key):
-        print("getitem", self, "key", key)
         return super().__getitem__(key)
 
     # TODO(Arjun): Check whether this needs to be reactive.
@@ -523,8 +522,6 @@ def make_store(value: Union[str, Storeable]) -> Store:
 def _unpack_stores_from_object(
     obj: Any, unpack_nested: bool = False
 ) -> Tuple[Any, List[Store]]:
-    # TODO: cannot put return type hint here because it causes a circular import
-    # for `Store` even with TYPE_CHECKING.
     """Unpack all the `Store` objects from a given object.
 
     By default, if a store is nested inside another store,

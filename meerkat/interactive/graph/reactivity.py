@@ -303,7 +303,8 @@ def react(
 
     if isinstance(input, DataFrame):
         # TODO: Set some property of the DataFrame to indicate that it is reactive.
-        pass
+        input.reactive = True
+        return input
 
     if callable(input):
         if inspect.isclass(input):

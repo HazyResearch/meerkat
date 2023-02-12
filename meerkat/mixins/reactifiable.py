@@ -9,12 +9,12 @@ class ReactifiableMixin:
     to the graph. This means if the object changes, the attribute
     will be fetched again.
 
-
     Outside of this context, the method will not add operations and the outputs
     to the graph.
-
-    TODO: Clean and investigate failure points of this function.
     """
+    # TODO: Clean and investigate failure points of this function.
+
+    reactive: bool = False
 
     def __getattribute__(self, name: str) -> Any:
         from meerkat.interactive.graph import _reactive, is_reactive, no_react

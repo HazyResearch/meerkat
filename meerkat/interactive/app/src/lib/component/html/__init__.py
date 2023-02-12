@@ -207,6 +207,25 @@ class p(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None
     style: Optional[str] = None
 
+    def __init__(
+        self,
+        slots: Optional[List[BaseComponent]] = None,
+        *,
+        classes: Optional[str] = None,
+        style: Optional[str] = None,
+    ):
+        """A p element.
+
+        Args:
+            slots (List[BaseComponent], optional): The components to
+                render inside this div. Defaults to None.
+            classes (str, optional): The Tailwind classes to apply to
+                this div. Defaults to None.
+            style (str, optional): The inline CSS to apply to this div.
+                Defaults to None.
+        """
+        super().__init__(slots=slots, classes=classes, style=style)
+
 
 class span(Slottable, HtmlMixin, Component):
     classes: Optional[str] = None

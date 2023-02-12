@@ -14,7 +14,7 @@
 <input
 	type="text"
 	placeholder="Write some text..."
-	class="grow h-10 px-3 rounded-md shadow-md"
+	class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
 	on:keyup={({ target: { value } }) => debounce(value)}
 	on:keypress
 />
