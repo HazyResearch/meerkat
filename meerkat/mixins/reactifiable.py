@@ -1,4 +1,5 @@
 import inspect
+import warnings
 from typing import Any
 
 
@@ -58,10 +59,19 @@ class ReactifiableMixin:
         #       but rather when the function is called. This will be handled based
         #       on the is_reactive(). Only when the object is not reactive, do we
         #       need to handle this case.
-        if _is_reactive_fn:
-            if not is_obj_reactive:
+        if is_method_or_fn:
+            if not is_obj_reactive or name in ["react", "no_react"]:
                 return no_react()(attr)
-            return attr
+            # TODO: Verify this check needs to be valid for both _reactive
+            # and @no_react decorators.
+            elif not _is_reactive_fn:
+                # If the object is reactive, but the function is not decorated with
+                # @reactive, then we need to wrap the function with @reactive.
+                # This is because the object is reactive and we want the function
+                # to be reactive.
+                return _reactive(attr)
+            else:
+                return attr
 
         # TODO: Handle functions that are stored as attributes.
         # These functions should be wrapped in reactive when the object is reactive.
@@ -71,7 +81,6 @@ class ReactifiableMixin:
         if (
             is_obj_reactive
             and is_reactive()
-            and not is_method_or_fn
             # Ignore dunder attributes.
             and not name.startswith("__")
             # Ignore all node-related attributes. These should never be accessed
@@ -89,3 +98,41 @@ class ReactifiableMixin:
             return _fn(self)
         else:
             return attr
+
+    def _reactive_warning(self, name, placeholder="obj"):
+        from meerkat.interactive.graph import is_reactive
+
+        if is_reactive():
+            warnings.warn(
+                f"Calling {name}({placeholder}) is not reactive. Use `mk.{name}({placeholder})` to get"
+                f"a reactive variable (i.e. a Store). `mk.{name}({placeholder})` behaves exactly"
+                f"like {name}({placeholder}) outside of this difference."
+            )
+
+    def __len__(self):
+        self._reactive_warning("len")
+        return super().__len__()
+
+    def __int__(self):
+        self._reactive_warning("int")
+        return super().__int__()
+
+    def __long__(self):
+        self._reactive_warning("long")
+        return super().__long__()
+
+    def __float__(self):
+        self._reactive_warning("float")
+        return super().__float__()
+
+    def __complex__(self):
+        self._reactive_warning("complex")
+        return super().__complex__()
+
+    def __oct__(self):
+        self._reactive_warning("oct")
+        return super().__oct__()
+
+    def __hex__(self):
+        self._reactive_warning("hex")
+        return super().__hex__()

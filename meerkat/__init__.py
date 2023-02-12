@@ -41,7 +41,18 @@ from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
-from meerkat.ops.cond import cand, cnot, cor, to_bool
+from meerkat.ops.cond import (
+    _bool,
+    _complex,
+    _float,
+    _hex,
+    _int,
+    _len,
+    _oct,
+    cand,
+    cnot,
+    cor,
+)
 from meerkat.ops.embed import embed
 from meerkat.ops.map import defer, map
 from meerkat.ops.merge import merge
@@ -79,13 +90,25 @@ from_arrow = DataFrame.from_arrow
 from_huggingface = DataFrame.from_huggingface
 read = DataFrame.read
 
-# This statement needs to be after the imports above.
-# Do not move it.
+# aliases for meerkat magic method invokers.
+len = _len
+int = _int
+float = _float
+complex = _complex
+hex = _hex
+oct = _oct
+bool = _bool
+
+# These statements needs to be after the imports above.
+# Do not move them.
 import meerkat.interactive.svelte
+from meerkat.interactive import no_react, react
 
 __all__ = [
     "DataFrame",
     "Row",
+    "react",
+    "no_react",
     # <<<< Columns >>>>
     "column",
     "Column",
@@ -119,7 +142,13 @@ __all__ = [
     "cand",
     "cor",
     "cnot",
-    "to_bool",
+    "bool",
+    "len",
+    "int",
+    "float",
+    "complex",
+    "hex",
+    "oct",
     # <<<< I/O >>>>
     "from_csv",
     "from_json",

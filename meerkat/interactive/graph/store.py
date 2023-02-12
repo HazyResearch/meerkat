@@ -163,19 +163,6 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __nonzero__(self):
         return super().__nonzero__()
 
-    def __bool__(self):
-        # __bool__ cannot be reactive because Python expects
-        # __bool__ to return a bool and not a Store.
-        # This means stores cannot be used in logical statements.
-        if is_reactive():
-            warnings.warn(
-                "bool(store) is not reactive. If you are using the store in "
-                "a logical context and you want to preserve reactivity, you "
-                "should use `mk.to_bool` (equivalent to `bool(store)`) or "
-                "`mk.cnot` (equivalent to `not store`)."
-            )
-        return super().__bool__()
-
     @_reactive
     def to_str(self):
         return super().__str__()
@@ -392,37 +379,67 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __invert__(self):
         return super().__invert__()
 
+    # While __index__ must return an integer, we decorate it with @_reactive
+    # to make sure that wrapper methods calling __index__ handle non-integer values
+    # appropriately.
+    # NOTE: This only works if __index__ is always called from wrapper methods
+    # and the user/developer has a way of intercepting these methods or creating
+    # recommended practices for avoiding this error.
     @_reactive
+    def __index__(self):
+        return super().__index__()
+
+    def _reactive_warning(self, name):
+        if is_reactive():
+            warnings.warn(
+                f"Calling {name}(store) is not reactive. Use `mk.{name}(store)` to get"
+                f"a reactive variable (i.e. a Store). `mk.{name}(store)` behaves"
+                f"exactly like {name}(store) outside of this difference."
+            )
+
+    # Don't use @_reactive on:
+    #   - __len__
+    #   - __int__
+    #   - __long__
+    #   - __float__
+    #   - __complex__
+    #   - __oct__
+    #   - __hex__
+    # Python requires that __len__ must return an integer (i.e. not a Store).
+    # As such, we cannot make it reactive.
+    # We allow the user to call len(store), which will return an integer (i.e. not reactive).
+    # We raise a warning to remind the user that len(store) is not reactive.
+    def __len__(self):
+        self._reactive_warning("len")
+        return super().__len__()
+
     def __int__(self):
+        self._reactive_warning("int")
         return super().__int__()
 
-    @_reactive
     def __long__(self):
+        self._reactive_warning("long")
         return super().__long__()
 
-    @_reactive
     def __float__(self):
+        self._reactive_warning("float")
         return super().__float__()
 
-    @_reactive
     def __complex__(self):
+        self._reactive_warning("complex")
         return super().__complex__()
 
-    @_reactive
     def __oct__(self):
+        self._reactive_warning("oct")
         return super().__oct__()
 
-    @_reactive
     def __hex__(self):
+        self._reactive_warning("hex")
         return super().__hex__()
 
-    # @reactive
-    # def __index__(self):
-    #     return super().__index__()
-
-    # @reactive
-    # def __len__(self):
-    #     return super().__len__()
+    def __bool__(self):
+        self._reactive_warning("bool")
+        return super().__bool__()
 
     @_reactive
     def __contains__(self, value):

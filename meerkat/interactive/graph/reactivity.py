@@ -114,6 +114,7 @@ def _reactive(
             unpacked_args, _ = _unpack_stores_from_object(list(args))
             unpacked_kwargs, _ = _unpack_stores_from_object(kwargs)
 
+            _force_no_react = False
             if hasattr(fn, "__self__") and fn.__self__ is not None:
                 args = (fn.__self__, *args)
 
@@ -134,6 +135,25 @@ def _reactive(
                 if isinstance(args[0], Store):
                     unpacked_args[0] = args[0]
             elif _check_fn_has_leading_self_arg(fn):
+                # If the object is a ReactifiableMixin and fn has a leading self arg,
+                # (i.e. fn(self, ...)), then we need to check if the function
+                # should be added to the graph.
+                # The fn will only be added to the graph when the object is reactive.
+                # For ReactifiableMixin instances, we can check if the object is
+                # reactive using the _reactive attribute.
+                # This is required for magic methods for ReactifiableMixin instances
+                # because shorthand accessors (e.g. x[0] for x.__getitem__(0)) do not
+                # use the __getattribute__ method.
+                obj = args[0]
+                if isinstance(obj, ReactifiableMixin):
+                    with no_react():
+                        is_obj_reactive = obj._reactive
+                    _force_no_react = not is_obj_reactive
+
+                    # If the object is reactive, then we let the function pass through.
+                    # the global reactive context (i.e. is_reactive()) will determine if
+                    # the function is sadded to the graph.
+
                 # If `fn` is an instance method, then the first argument in `args`
                 # is the instance. We should **not** unpack the `self` argument
                 # if it is a Store.
@@ -145,7 +165,7 @@ def _reactive(
                 result = fn(*unpacked_args, **unpacked_kwargs)
                 # result = fn(*args, **kwargs)
 
-            if not is_reactive():
+            if not is_reactive() or _force_no_react:
                 # If we are not in a reactive context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
@@ -224,7 +244,7 @@ def is_reactive_fn(fn: Callable) -> bool:
 
 
 def react(
-    input: Union[Callable, Any],
+    input: Union[Callable, Any] = None,
     nested_return: bool = None,
     skip_fn: Callable[..., bool] = None,
 ) -> Union[Callable, Any]:
@@ -301,6 +321,9 @@ def react(
         >>> # y will be a `Store` object, and will re-run when `x` changes
     """
     from meerkat.interactive.graph.store import Store
+
+    if input is None:
+        return partial(react, nested_return=nested_return, skip_fn=skip_fn)
 
     # We setup an `if` condition that catches:
     # - primitive types (int, float, str, etc.)
@@ -545,11 +568,11 @@ class _react:
 
 
 class no_react(_react):
-    def __init__(self, nested_return: bool = None):
-        super().__init__(reactive=False, nested_return=nested_return)
+    def __init__(self):
+        super().__init__(reactive=False, nested_return=False, skip_fn=None)
 
     def clone(self):
-        return self.__class__(nested_return=self._nested_return)
+        return self.__class__()
 
 
 def _nested_apply(obj: object, fn: Callable):
@@ -611,3 +634,7 @@ def _create_nodes_for_nodeables(*nodeables: NodeMixin):
         if not nodeable.has_inode():
             inode_id = None if not isinstance(nodeable, Store) else nodeable.id
             nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
+
+
+def _is_reactifiable_method(fn: Callable):
+    return _check_fn_has_leading_self_arg(fn)
