@@ -15,7 +15,6 @@ from meerkat.interactive.graph.store import (
     Store,
     StoreFrontend,
     make_store,
-    store_field,
 )
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort
@@ -31,7 +30,6 @@ __all__ = [
     "Store",
     "StoreFrontend",
     "make_store",
-    "store_field",
     "Operation",
     "trigger",
 ]

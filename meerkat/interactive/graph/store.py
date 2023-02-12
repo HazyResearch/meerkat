@@ -12,7 +12,7 @@ from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable, T
 from meerkat.mixins.identifiable import IdentifiableMixin
 
-__all__ = ["Store", "StoreFrontend", "make_store", "store_field"]
+__all__ = ["Store", "StoreFrontend", "make_store"]
 logger = logging.getLogger(__name__)
 
 
@@ -62,8 +62,17 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def detail(self):
         return f"Store({self.__wrapped__}) has id {self.id} and node {self.inode}"
 
-    def set(self, new_value: T):
-        """Set the value of the store."""
+    def set(self, new_value: T) -> None:
+        """Set the value of the store.
+        
+        This will trigger any reactive functions that depend on this store.
+
+        Args:
+            new_value (T): The new value of the store.
+
+        Returns:
+            None
+        """
         if isinstance(new_value, Store):
             # if the value is a store, then we need to unpack so it can be sent to the
             # frontend
@@ -491,16 +500,6 @@ class _IteratorStore(Store):
     @_reactive
     def __next__(self):
         return next(self.__wrapped__)
-
-
-def store_field(value: str) -> Field:
-    """Utility for creating a pydantic field with a default factory that
-    creates a Store object wrapping the given value.
-
-    TODO (karan): Take a look at this again. I think we might be able to
-    get rid of this in favor of just passing value.
-    """
-    return Field(default_factory=lambda: Store(value))
 
 
 def make_store(value: Union[str, Storeable]) -> Store:
