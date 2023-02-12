@@ -4,11 +4,11 @@ from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
 from meerkat.interactive import (
     Button,
-    Header,
     Caption,
-    Subheader,
+    Header,
     Page,
     Store,
+    Subheader,
     Textbox,
     endpoint,
     html,
@@ -126,7 +126,9 @@ text = html.div(
 
 # Print the values of the variables to the console, so we can see them.
 # This will reprint them whenever any of the variables change.
-print("\n", "Query:", query_component.text, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
+print(
+    "\n", "Query:", query_component.text, "\n", "Dir:", dir, "\n", "Index:", index, "\n"
+)
 
 page = Page(
     # Layout the Interface components one row each, and launch the page.
@@ -135,7 +137,9 @@ page = Page(
             # fileupload_component,
             Header("GPT-Index Demo"),
             Subheader("Directory Path"),
-            Caption(f"It should contain a few files to build the GPT-Index. Defaults to {dir}."),
+            Caption(
+                f"It should contain a few files to build the GPT-Index. Defaults to {dir}."
+            ),
             dir_component,
             Subheader("Query"),
             Caption("Ask a question!"),
