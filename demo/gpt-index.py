@@ -4,6 +4,9 @@ from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
 from meerkat.interactive import (
     Button,
+    Header,
+    Caption,
+    Subheader,
     Page,
     Store,
     Textbox,
@@ -11,16 +14,24 @@ from meerkat.interactive import (
     html,
     print,
     react,
-    start,
 )
 
-# Start off with a default directory
-dir = Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
-savefilename = "gpt_index"
 
-
+# Decorate with @react so that this fn is reactive when called with inputs
+# that are reactive. Otherwise, the function is defined as any normal function.
 @react
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
+    """
+    Function that loads the GPTSimpleVectorIndex from disk if it exists.
+    Otherwise it builds the index and saves it to disk.
+
+    Args:
+        dir (str): The directory where the index is saved.
+        savefilename (str): The name of the file where the index is saved.
+
+    Returns:
+        GPTSimpleVectorIndex: The index.
+    """
     if not dir or not os.path.exists(dir):
         return None
 
@@ -42,18 +53,35 @@ def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
     return index
 
 
+# Start off with a default directory
+
+# Use `react` to create a reactive variable that can be used in reactive functions.
+# Anything passed to `react` will have its methods made reactive e.g. passing in a
+# `str` will make the `str`'s methods reactive.
+# `react` returns a `Store` object, which is a thin wrapper around the object passed
+# to `react` that (almost always) behaves like the object passed to `react`.
+dir: Store = react("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
+# This is the same as
+# dir = Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
+
 # Create the index, and assign it to a variable.
-index = load_index(dir=dir, savefilename=savefilename)
+# We can pass in `dir` here directly, as if it were a `str`.
+index = load_index(dir=dir, savefilename="gpt_index")
 
 # Create a variable that will be used to store the response from the index
 # for the last query. We will display this in the UI.
-last_response = Store("The response will appear here.")
+last_response: Store = react("The response will appear here.")
 
 
 @endpoint
-def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
+def query_gpt_index(index: GPTSimpleVectorIndex, query: str, last_response: Store):
     """
     A function that given an index and query, will return the response from the index.
+
+    Args:
+        index (GPTSimpleVectorIndex): The index.
+        query (str): The query.
+        last_response (Store): The store that will hold the last response.
     """
     if not index:
         last_response.set(
@@ -72,37 +100,45 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str):
 # FileUpload component, which can be used to upload files.
 # fileupload_component = FileUpload()
 
-# Create a Store that will hold the query.
-query = Store("")
 
-# Pass this to a Textbox component, which will allow the user to modify the query.
-query_component = Textbox(query)
+# Create a Textbox for the user to provide a query.
+query_component = Textbox()
 
-# Pass the directory to a Textbox component, which will allow the user to modify the directory.
+# Create a Textbox for the user to provide a directory.
 dir_component = Textbox(dir)
 
-# Create a button that will call the query_gpt_index endpoint when clicked.
+# Create a button that will call the `query_gpt_index` endpoint when clicked.
 button = Button(
     title="Query GPT-Index",
-    on_click=query_gpt_index.partial(index=index, query=query),
+    on_click=query_gpt_index.partial(
+        index=index,
+        query=query_component.text,
+        last_response=last_response,
+    ),
 )
 
-# Write some HTML to display the response from the index nicely.
+# Display the response from the index.
+# Use HTML to display the response from the index nicely.
 text = html.div(
-    html.p(slots=last_response, classes="font-mono whitespace-pre-wrap"),
-    classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200",
+    html.p(last_response, classes="font-mono whitespace-pre-wrap"),
+    classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200 rounded-sm p-2",
 )
 
 # Print the values of the variables to the console, so we can see them.
 # This will reprint them whenever any of the variables change.
-print("\n", "Query:", query, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
+print("\n", "Query:", query_component.text, "\n", "Dir:", dir, "\n", "Index:", index, "\n")
 
 page = Page(
     # Layout the Interface components one row each, and launch the page.
     component=html.flexcol(
         slots=[
             # fileupload_component,
+            Header("GPT-Index Demo"),
+            Subheader("Directory Path"),
+            Caption(f"It should contain a few files to build the GPT-Index. Defaults to {dir}."),
             dir_component,
+            Subheader("Query"),
+            Caption("Ask a question!"),
             query_component,
             button,
             text,
