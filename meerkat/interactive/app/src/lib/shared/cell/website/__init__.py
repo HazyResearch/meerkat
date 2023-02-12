@@ -3,7 +3,6 @@ from meerkat.interactive.formatter.base import Formatter
 
 
 class Website(Component):
-
     data: str
     height: int
 

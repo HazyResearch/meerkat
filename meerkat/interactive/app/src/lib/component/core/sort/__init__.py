@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.graph import reactive
+from meerkat.interactive.graph import _reactive
 
 
 class SortCriterion(BaseModel):
@@ -29,7 +29,7 @@ def _format_criteria(
     ]
 
 
-@reactive
+@_reactive
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],
@@ -76,7 +76,7 @@ class Sort(Component):
         return sort_by_criteria(df, self.criteria)
 
     @staticmethod
-    @reactive
+    @_reactive
     def create_criterion(column: str, ascending: bool, source: str = ""):
         return SortCriterion(
             id=str(uuid.uuid4()),

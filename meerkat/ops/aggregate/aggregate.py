@@ -2,12 +2,12 @@ import warnings
 from typing import Any, Callable, Dict, Union
 
 import meerkat as mk
-from meerkat.interactive.graph.reactivity import reactive
+from meerkat.interactive.graph.reactivity import _reactive
 
 from ...mixins.aggregate import AggregationError
 
 
-@reactive
+@_reactive
 def aggregate(
     data: mk.DataFrame,
     function: Union[Callable, str],

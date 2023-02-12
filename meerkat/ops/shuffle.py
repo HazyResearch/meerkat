@@ -3,10 +3,10 @@ from typing import Union
 import numpy as np
 
 from meerkat import Column, DataFrame
-from meerkat.interactive.graph.reactivity import reactive
+from meerkat.interactive.graph.reactivity import _reactive
 
 
-@reactive
+@_reactive
 def shuffle(data: Union[DataFrame, Column], seed=None) -> Union[DataFrame, Column]:
     """Shuffle the rows of a DataFrame or Column.
 

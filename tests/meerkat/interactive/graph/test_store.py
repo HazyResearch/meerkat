@@ -36,7 +36,7 @@ def test_store_reactive_math(react: bool):
     }
 
     out = {}
-    with mk.gui.react(reactive=react):
+    with mk.gui._react(reactive=react):
         out["add"] = store + 1
         out["sub"] = store - 1
         out["mul"] = store * 1
@@ -90,7 +90,7 @@ def test_store_imethod(other):
         }
 
     out = {}
-    with mk.gui.react():
+    with mk.gui._react():
         for k in expected:
             with pytest.warns(UserWarning):
                 out[k] = getattr(store, k)(other)
@@ -105,11 +105,11 @@ def test_store_imethod(other):
 def test_store_as_iterator(react: bool):
     store = mk.gui.Store((1, 2))
 
-    with mk.gui.react(react):
+    with mk.gui._react(react):
         store_iter = iter(store)
     assert isinstance(store_iter, mk.gui.Store if react else Iterator)
 
-    with mk.gui.react(react):
+    with mk.gui._react(react):
         for x in store_iter:
             assert isinstance(x, mk.gui.Store if react else int)
 
@@ -118,7 +118,7 @@ def test_store_as_iterator(react: bool):
 def test_tuple_unpack(react: bool):
     store = mk.gui.Store((1, 2))
 
-    with mk.gui.react(react):
+    with mk.gui._react(react):
         a, b = store
 
     if react:
@@ -131,7 +131,7 @@ def test_tuple_unpack(react: bool):
 
 @pytest.mark.parametrize("react", [False, True])
 def test_tuple_unpack_return_value(react: bool):
-    @mk.gui.react(nested_return=False)
+    @mk.gui._react(nested_return=False)
     def add(seq: Tuple[int]):
         return tuple(x + 1 for x in seq)
 
@@ -139,7 +139,7 @@ def test_tuple_unpack_return_value(react: bool):
     # We need to use the `react` decorator here because tuple unpacking
     # happens outside of the function `add`. Without the decorator, the
     # tuple unpacking will not be reactive.
-    with mk.gui.react(react):
+    with mk.gui._react(react):
         a, b = add(store)
 
     if react:
@@ -153,7 +153,7 @@ def test_tuple_unpack_return_value(react: bool):
 @pytest.mark.parametrize("react", [False, True])
 def test_bool(react: bool):
     store = mk.gui.Store(0)
-    with mk.gui.react(react):
+    with mk.gui._react(react):
         if react:
             with pytest.warns(UserWarning):
                 out_bool = bool(store)

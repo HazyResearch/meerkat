@@ -1,5 +1,5 @@
 import rich
 
-from meerkat.interactive.graph.reactivity import react
+from meerkat.interactive.graph.reactivity import _reactive
 
-print = react()(rich.print)
+print = _reactive(rich.print)

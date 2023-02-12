@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Dict, List, Sequence, Tuple, Union
 import numpy as np
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph.reactivity import reactive
+from meerkat.interactive.graph.reactivity import _reactive
 from meerkat.ops.cluster import cluster
 
 from .sliceby import SliceBy
@@ -24,7 +24,7 @@ class ClusterBy(SliceBy):
         super().__init__(data=data, by=by, sets=sets)
 
 
-@reactive
+@_reactive
 def clusterby(
     data: DataFrame,
     by: Union[str, Sequence[str]],

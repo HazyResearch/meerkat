@@ -8,7 +8,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
-from meerkat.interactive.graph import Store, reactive
+from meerkat.interactive.graph import Store, _reactive
 
 
 @endpoint
@@ -125,7 +125,7 @@ class OnMatchMatch(EventInterface):
     criterion: MatchCriterion
 
 
-@reactive
+@_reactive
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
     if criterion == None or criterion.against is None:  # noqa: E711

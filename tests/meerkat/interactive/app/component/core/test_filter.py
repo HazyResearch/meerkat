@@ -15,7 +15,7 @@ def _set_criteria(criteria, store):
 def test_filter_single_criterion():
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.react():
+    with mk.gui._react():
         filter = mk.gui.Filter(df=df)
         out = filter(df)
     node = out.inode
@@ -64,7 +64,7 @@ def test_filter_operations(op, value):
         value = ",".join([str(v) for v in value])
     expected = df[expected]["a"]
 
-    with mk.gui.react():
+    with mk.gui._react():
         filter = mk.gui.Filter(df=df)
         out = filter(df)
     node = out.inode
@@ -84,7 +84,7 @@ def test_skip_filter_disabled():
     disabled criteria."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.react():
+    with mk.gui._react():
         filter = mk.gui.Filter(df=df)
         out = filter(df)
     node = out.inode
@@ -110,7 +110,7 @@ def test_skip_filter_duplicate():
     should be skipped."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.react():
+    with mk.gui._react():
         filter = mk.gui.Filter(df=df)
         out = filter(df)
     node = out.inode
@@ -133,7 +133,7 @@ def test_skip_filter_order():
     """
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.react():
+    with mk.gui._react():
         filter = mk.gui.Filter(df=df)
         out = filter(df)
     node = out.inode

@@ -1,12 +1,12 @@
 import logging
 import warnings
-from typing import Any, Generic, Iterator, Union
+from typing import Any, Generic, Iterator, List, Tuple, Union
 
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
 
-from meerkat.interactive.graph.reactivity import is_reactive, reactive
+from meerkat.interactive.graph.reactivity import _reactive, is_reactive, no_react, react
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable, T
@@ -80,16 +80,25 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __repr__(self) -> str:
         return f"{type(self).__name__}({repr(self.__wrapped__)})"
 
-    def __getattr__(self, name: str) -> Any:
-        attr = getattr(self.__wrapped__, name)
+    @_reactive
+    def __call__(self):
+        return self.__wrapped__()
 
-        if callable(attr):
-            # Instance method
-            return reactive(attr)
+    def __getattr__(self, name: str) -> Any:
+        # Only create a reactive function if we are in a reactive context
+        # This is like creating another `getattr` function that is reactive
+        # and calling it with `self` as the first argument.
+        if is_reactive():
+
+            @react
+            def wrapper(wrapped, name: str = name):
+                return getattr(wrapped, name)
+
+            # Note: this should work for both methods and properties.
+            return wrapper(self)
         else:
-            # Attribute
-            return reactive(lambda wrapped: getattr(wrapped, name))(self)
-            # return reactive(lambda store: getattr(store.__wrapped__, name))(self)
+            # Otherwise, just return the `attr` as is.
+            return getattr(self.__wrapped__, name)
 
     @classmethod
     def __get_validators__(cls):
@@ -111,34 +120,34 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
                 return cls(v)
         return v
 
-    @reactive
+    @_reactive
     def __lt__(self, other):
         return super().__lt__(other)
 
-    @reactive
+    @_reactive
     def __le__(self, other):
         return super().__le__(other)
 
-    @reactive
+    @_reactive
     def __eq__(self, other):
         return super().__eq__(other)
 
-    @reactive
+    @_reactive
     def __ne__(self, other):
         return super().__ne__(other)
 
-    @reactive
+    @_reactive
     def __gt__(self, other):
         return super().__gt__(other)
 
-    @reactive
+    @_reactive
     def __ge__(self, other):
         return super().__ge__(other)
 
     def __hash__(self):
         return hash(self.__wrapped__)
 
-    @reactive
+    @_reactive
     def __nonzero__(self):
         return super().__nonzero__()
 
@@ -155,119 +164,119 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
             )
         return super().__bool__()
 
-    @reactive
+    @_reactive
     def to_str(self):
         return super().__str__()
 
-    @reactive
+    @_reactive
     def __add__(self, other):
         return super().__add__(other)
 
-    @reactive
+    @_reactive
     def __sub__(self, other):
         return super().__sub__(other)
 
-    @reactive
+    @_reactive
     def __mul__(self, other):
         return super().__mul__(other)
 
-    @reactive
+    @_reactive
     def __div__(self, other):
         return super().__div__(other)
 
-    @reactive
+    @_reactive
     def __truediv__(self, other):
         return super().__truediv__(other)
 
-    @reactive
+    @_reactive
     def __floordiv__(self, other):
         return super().__floordiv__(other)
 
-    @reactive
+    @_reactive
     def __mod__(self, other):
         return super().__mod__(other)
 
-    @reactive(nested_return=False)
+    # @reactive(nested_return=False)
     def __divmod__(self, other):
         return super().__divmod__(other)
 
-    @reactive
+    @_reactive
     def __pow__(self, other, *args):
         return super().__pow__(other, *args)
 
-    @reactive
+    @_reactive
     def __lshift__(self, other):
         return super().__lshift__(other)
 
-    @reactive
+    @_reactive
     def __rshift__(self, other):
         return super().__rshift__(other)
 
-    @reactive
+    @_reactive
     def __and__(self, other):
         return super().__and__(other)
 
-    @reactive
+    @_reactive
     def __xor__(self, other):
         return super().__xor__(other)
 
-    @reactive
+    @_reactive
     def __or__(self, other):
         return super().__or__(other)
 
-    @reactive
+    @_reactive
     def __radd__(self, other):
         return super().__radd__(other)
 
-    @reactive
+    @_reactive
     def __rsub__(self, other):
         return super().__rsub__(other)
 
-    @reactive
+    @_reactive
     def __rmul__(self, other):
         return super().__rmul__(other)
 
-    @reactive
+    @_reactive
     def __rdiv__(self, other):
         return super().__rdiv__(other)
 
-    @reactive
+    @_reactive
     def __rtruediv__(self, other):
         return super().__rtruediv__(other)
 
-    @reactive
+    @_reactive
     def __rfloordiv__(self, other):
         return super().__rfloordiv__(other)
 
-    @reactive
+    @_reactive
     def __rmod__(self, other):
         return super().__rmod__(other)
 
-    @reactive
+    @_reactive
     def __rdivmod__(self, other):
         return super().__rdivmod__(other)
 
-    @reactive
+    @_reactive
     def __rpow__(self, other, *args):
         return super().__rpow__(other, *args)
 
-    @reactive
+    @_reactive
     def __rlshift__(self, other):
         return super().__rlshift__(other)
 
-    @reactive
+    @_reactive
     def __rrshift__(self, other):
         return super().__rrshift__(other)
 
-    @reactive
+    @_reactive
     def __rand__(self, other):
         return super().__rand__(other)
 
-    @reactive
+    @_reactive
     def __rxor__(self, other):
         return super().__rxor__(other)
 
-    @reactive
+    @_reactive
     def __ror__(self, other):
         return super().__ror__(other)
 
@@ -355,89 +364,92 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         )
         return self.__or__(other)
 
-    @reactive
+    @_reactive
     def __neg__(self):
         return super().__neg__()
 
-    @reactive
+    @_reactive
     def __pos__(self):
         return super().__pos__()
 
-    @reactive
+    @_reactive
     def __abs__(self):
         return super().__abs__()
 
-    @reactive
+    @_reactive
     def __invert__(self):
         return super().__invert__()
 
-    @reactive
+    @_reactive
     def __int__(self):
         return super().__int__()
 
-    @reactive
+    @_reactive
     def __long__(self):
         return super().__long__()
 
-    @reactive
+    @_reactive
     def __float__(self):
         return super().__float__()
 
-    @reactive
+    @_reactive
     def __complex__(self):
         return super().__complex__()
 
-    @reactive
+    @_reactive
     def __oct__(self):
         return super().__oct__()
 
-    @reactive
+    @_reactive
     def __hex__(self):
         return super().__hex__()
 
-    @reactive
-    def __index__(self):
-        return super().__index__()
+    # @reactive
+    # def __index__(self):
+    #     return super().__index__()
 
-    @reactive
-    def __len__(self):
-        return super().__len__()
+    # @reactive
+    # def __len__(self):
+    #     return super().__len__()
 
-    @reactive
+    @_reactive
     def __contains__(self, value):
         return super().__contains__(value)
 
-    @reactive
+    @_reactive
     def __getitem__(self, key):
+        print("getitem", self, "key", key)
         return super().__getitem__(key)
 
-    @reactive
-    def __setitem__(self, key, value):
-        # Make a shallow copy of the value because this operation is not in-place.
-        obj = self.__wrapped__.copy()
-        obj[key] = value
-        warnings.warn(f"{type(self).__name__}.__setitem__ is out-of-place.")
-        return type(self)(obj, backend_only=self._self_backend_only)
+    # TODO(Arjun): Check whether this needs to be reactive.
+    # @reactive
+    # def __setitem__(self, key, value):
+    #     print("In setitem", self, "key", key, "value", value, "type", type(value))
+    #     # Make a shallow copy of the value because this operation is not in-place.
+    #     obj = self.__wrapped__.copy()
+    #     obj[key] = value
+    #     warnings.warn(f"{type(self).__name__}.__setitem__ is out-of-place.")
+    #     return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_reactive
     def __delitem__(self, key):
         obj = self.__wrapped__.copy()
         del obj[key]
         warnings.warn(f"{type(self).__name__}.__delitem__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_reactive
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
-    @reactive
+    @_reactive
     def __setslice__(self, i, j, value):
         obj = self.__wrapped__.copy()
         obj[i:j] = value
         warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_reactive
     def __delslice__(self, i, j):
         obj = self.__wrapped__.copy()
         del obj[i:j]
@@ -476,7 +488,7 @@ class _IteratorStore(Store):
             raise ValueError("wrapped object must be an Iterator.")
         super().__init__(wrapped, backend_only)
 
-    @reactive
+    @_reactive
     def __next__(self):
         return next(self.__wrapped__)
 
@@ -504,3 +516,65 @@ def make_store(value: Union[str, Storeable]) -> Store:
         Store: The Store wrapping value.
     """
     return value if isinstance(value, Store) else Store(value)
+
+
+def _unpack_stores_from_object(
+    obj: Any, unpack_nested: bool = False
+) -> Tuple[Any, List[Store]]:
+    # TODO: cannot put return type hint here because it causes a circular import
+    # for `Store` even with TYPE_CHECKING.
+    """Unpack all the `Store` objects from a given object.
+
+    By default, if a store is nested inside another store,
+    it is not unpacked. If `unpack_nested` is True, then all stores
+    are unpacked.
+
+    Args:
+        obj: The object to unpack stores from.
+        unpack_nested: Whether to unpack nested stores.
+
+    Returns:
+        A tuple of the unpacked object and a list of the stores.
+    """
+    # Must use no_react here so that calling a method on a `Store`
+    # e.g. `obj.items()` doesn't return new `Store` objects.
+    # Note: cannot use `no_react` as a decorator on this fn because
+    # it will automatically unpack the stores in the arguments.
+    with no_react():
+        if not unpack_nested and isinstance(obj, Store):
+            return obj.value, [obj]
+
+        _type = type(obj)
+        if isinstance(obj, Store):
+            _type = type(obj.value)
+
+        if isinstance(obj, (list, tuple)):
+            stores = []
+            unpacked = []
+            for x in obj:
+                x, stores_i = _unpack_stores_from_object(x, unpack_nested)
+                unpacked.append(x)
+                stores.extend(stores_i)
+
+            if isinstance(obj, Store):
+                stores.append(obj)
+
+            return _type(unpacked), stores
+        elif isinstance(obj, dict):
+            stores = []
+            unpacked = {}
+            for k, v in obj.items():
+                k, stores_i_k = _unpack_stores_from_object(k, unpack_nested)
+                v, stores_i_v = _unpack_stores_from_object(v, unpack_nested)
+                unpacked[k] = v
+                stores.extend(stores_i_k)
+                stores.extend(stores_i_v)
+
+            if isinstance(obj, Store):
+                stores.append(obj)
+
+            return _type(unpacked), stores
+        elif isinstance(obj, Store):
+            return obj.value, [obj]
+        else:
+            return obj, []

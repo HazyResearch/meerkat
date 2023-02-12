@@ -16,7 +16,7 @@ def test_boolean_operators_multiple_arguments(x, y, react, comp):
     elif comp == mk.cor:
         expected = x or y
 
-    with mk.gui.react():
+    with mk.gui._react():
         out = comp(x_store, y_store)
 
     assert out == expected
@@ -36,7 +36,7 @@ def test_boolean_operators_single_operator(x, react, comp):
     elif comp == mk.cnot:
         expected = not x
 
-    with mk.gui.react():
+    with mk.gui._react():
         out = comp(x_store)
 
     assert out == expected

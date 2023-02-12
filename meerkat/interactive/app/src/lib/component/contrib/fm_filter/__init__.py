@@ -4,7 +4,7 @@ from typing import Sequence
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store, no_react, reactive
+from meerkat.interactive.graph import Store, _reactive, no_react
 
 
 @endpoint
@@ -45,7 +45,7 @@ def base_on_run(
     query.set(new_query)
 
 
-@reactive
+@_reactive
 def filter_df(df: DataFrame, criteria_df: DataFrame, query: str):
     df = df[
         df.primary_key.isin(criteria_df.primary_key[criteria_df[_hash_query(query)]])

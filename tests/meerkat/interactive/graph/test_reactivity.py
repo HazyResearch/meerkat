@@ -5,8 +5,8 @@ import pandas as pd
 import pytest
 
 import meerkat as mk
-from meerkat.interactive.graph import is_reactive, reactive, trigger
-from meerkat.interactive.graph.reactivity import _unpack_stores
+from meerkat.interactive.graph import _reactive, is_reactive, trigger
+from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
@@ -16,7 +16,7 @@ def _create_dummy_df() -> mk.DataFrame:
     return mk.DataFrame.from_pandas(df)
 
 
-@reactive
+@_reactive
 def _add_to_list(_keys: List[str], new_key: str):
     return _keys + [new_key]
 
@@ -24,7 +24,7 @@ def _add_to_list(_keys: List[str], new_key: str):
 def test_react_context_manager_basic():
     df = _create_dummy_df()
 
-    with mk.gui.react():
+    with mk.gui._react():
         keys_reactive = df.keys()
         _ = _add_to_list(keys_reactive, "c")
 
@@ -39,7 +39,7 @@ def test_react_context_manager_basic():
 def test_react_context_manager_nested():
     df = _create_dummy_df()
 
-    with mk.gui.react():
+    with mk.gui._react():
         keys_reactive = df.keys()
         assert is_reactive()
         with mk.gui.no_react():
@@ -54,13 +54,13 @@ def test_react_context_instance_method():
     rng = np.random.RandomState(0)
 
     # TODO: Why is this decorator affecting the return type?
-    @reactive
+    @_reactive
     def _subselect_df(df: mk.DataFrame) -> mk.DataFrame:
         cols = list(rng.choice(df.columns, 3))
         return df[cols]
 
     df = mk.DataFrame({str(k): [k] for k in range(1000)})
-    with mk.gui.react():
+    with mk.gui._react():
         df_sub = _subselect_df(df)
         keys_reactive = df_sub.keys()
 
@@ -80,7 +80,7 @@ def test_react_context_instance_method():
 
 @pytest.mark.parametrize("react", [False, True])
 def test_react_as_decorator(react: bool):
-    @mk.gui.react(react)
+    @mk.gui._react(react)
     def add(a, b):
         return a + b
 
@@ -100,22 +100,22 @@ def test_react_as_decorator(react: bool):
 def test_default_nested_return():
     """By default, nested return is None."""
 
-    @reactive
+    @_reactive
     def _return_tuple():
         return ("a", "b")
 
-    @reactive
+    @_reactive
     def _return_list():
         return ["a", "b"]
 
-    with mk.gui.react():
+    with mk.gui._react():
         out = _return_tuple()
         a, b = out
     assert isinstance(out, tuple)
     assert isinstance(a, mk.gui.Store)
     assert isinstance(b, mk.gui.Store)
 
-    with mk.gui.react():
+    with mk.gui._react():
         out = _return_list()
     assert isinstance(out, list)
 
@@ -128,11 +128,11 @@ def test_nested_reactive_fns():
     function will not add things to the graph.
     """
 
-    @mk.gui.react()
+    @mk.gui._react()
     def _inner(x):
         return ["a", "b", x]
 
-    @mk.gui.react()
+    @mk.gui._react()
     def _outer(x):
         return ["example"] + _inner(x)
 
@@ -184,15 +184,13 @@ def test_unpacking(x, use_kwargs):
 
     if use_kwargs:
         inputs = {"wrapped": x}
-        unpacked_args, unpacked_kwargs, stores = _unpack_stores(**inputs)
-        assert len(unpacked_args) == 0
+        unpacked_kwargs, _ = _unpack_stores_from_object(inputs)
         assert len(unpacked_kwargs) == 1
         outputs = unpacked_kwargs
     else:
         inputs = [x]
-        unpacked_args, unpacked_kwargs, stores = _unpack_stores(*inputs)
+        unpacked_args, _ = _unpack_stores_from_object(inputs)
         assert len(unpacked_args) == 1
-        assert len(unpacked_kwargs) == 0
         outputs = unpacked_args
 
     # Recursively check for equality.
@@ -206,17 +204,17 @@ def test_instance_methods():
         def __init__(self, x):
             self.x = x
 
-        @reactive
+        @_reactive
         def add(self, y):
             return self.x + y
 
-        @reactive
+        @_reactive
         def __eq__(self, __o: int) -> bool:
             return self.x == __o
 
     foo = Foo(1)
     val = mk.gui.Store(2)
-    with mk.gui.react():
+    with mk.gui._react():
         out_add = foo.add(val)
         out_eq = foo == val
     assert isinstance(out_add, mk.gui.Store)

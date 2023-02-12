@@ -17,7 +17,7 @@ class ReactifiableMixin:
     """
 
     def __getattribute__(self, name: str) -> Any:
-        from meerkat.interactive.graph import is_reactive, no_react, reactive
+        from meerkat.interactive.graph import _reactive, is_reactive, no_react
 
         # We assume accessing the attribute twice will not result in different values.
         # We dont explicitly check for this because it is expensive.
@@ -39,7 +39,7 @@ class ReactifiableMixin:
                 return super().__getattribute__(name)
 
             _fn.__name__ = name
-            _fn = reactive(_fn, nested_return=False)
+            _fn = _reactive(_fn, nested_return=False)
 
             return _fn(self)
         else:

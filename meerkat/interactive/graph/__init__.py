@@ -4,11 +4,12 @@ from typing import List
 from meerkat.errors import TriggerError
 from meerkat.interactive.graph.operation import Operation
 from meerkat.interactive.graph.reactivity import (
+    _react,
+    _reactive,
     get_reactive_kwargs,
     is_reactive,
     no_react,
     react,
-    reactive,
 )
 from meerkat.interactive.graph.store import (
     Store,
@@ -21,10 +22,11 @@ from meerkat.interactive.node import _topological_sort
 from meerkat.state import state
 
 __all__ = [
-    "react",
+    "_react",
     "no_react",
-    "reactive",
+    "_reactive",
     "is_reactive",
+    "react",
     "get_reactive_kwargs",
     "Store",
     "StoreFrontend",

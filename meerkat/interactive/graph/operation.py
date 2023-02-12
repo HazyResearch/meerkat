@@ -177,7 +177,7 @@ def _update_result(
         # defined that can be used to check if the value has changed.
         if isinstance(result, (str, int, float, bool, type(None), tuple)):
             # We can just check if the value is the same
-            if result != update:
+            if result.value != update:
                 result.set(update)
                 modifications.append(
                     StoreModification(id=result.inode.id, value=update)

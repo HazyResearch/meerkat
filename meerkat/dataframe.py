@@ -34,7 +34,7 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import is_reactive, reactive
+from meerkat.interactive.graph.reactivity import _reactive, is_reactive
 from meerkat.interactive.graph.store import Store
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
@@ -162,7 +162,7 @@ class DataFrame(
             )
         return item in self.columns
 
-    @reactive
+    @_reactive
     def contains(self, item):
         return self.__contains__(item)
 
@@ -293,7 +293,7 @@ class DataFrame(
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
 
-    @reactive(nested_return=False)
+    @_reactive(nested_return=False)
     def size(self):
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.shape
@@ -342,7 +342,7 @@ class DataFrame(
         logger.info(f"Removed column `{column}`.")
 
     # @capture_provenance(capture_args=["axis"])
-    @reactive
+    @_reactive
     def append(
         self,
         df: DataFrame,
@@ -359,12 +359,12 @@ class DataFrame(
             [self, df], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
 
-    @reactive
+    @_reactive
     def head(self, n: int = 5) -> DataFrame:
         """Get the first `n` examples of the DataFrame."""
         return self[:n]
 
-    @reactive
+    @_reactive
     def tail(self, n: int = 5) -> DataFrame:
         """Get the last `n` examples of the DataFrame."""
         return self[-n:]
@@ -453,7 +453,7 @@ class DataFrame(
             )
 
     # @capture_provenance(capture_args=[])
-    @reactive
+    @_reactive
     def __getitem__(self, posidx):
         return self._get(posidx, materialize=False)
 
@@ -1058,7 +1058,7 @@ class DataFrame(
         )
 
     # @capture_provenance(capture_args=["function"])
-    @reactive
+    @_reactive
     def filter(
         self,
         function: Optional[Callable] = None,
@@ -1109,7 +1109,7 @@ class DataFrame(
         # filter returns a new dataframe
         return self[indices]
 
-    @reactive
+    @_reactive
     def merge(
         self,
         right: meerkat.DataFrame,
@@ -1135,7 +1135,7 @@ class DataFrame(
             validate=validate,
         )
 
-    @reactive
+    @_reactive
     def sort(
         self,
         by: Union[str, List[str]],
@@ -1160,7 +1160,7 @@ class DataFrame(
 
         return sort(data=self, by=by, ascending=ascending, kind=kind)
 
-    @reactive
+    @_reactive
     def sample(
         self,
         n: int = None,
@@ -1201,7 +1201,7 @@ class DataFrame(
             random_state=random_state,
         )
 
-    @reactive
+    @_reactive
     def shuffle(self, seed: int = None) -> DataFrame:
         """Shuffle the rows of the DataFrame out-of-place.
 
@@ -1215,7 +1215,7 @@ class DataFrame(
 
         return shuffle(data=self, seed=seed)
 
-    @reactive
+    @_reactive
     def rename(
         self,
         mapper: Union[Dict, Callable] = None,
@@ -1283,7 +1283,7 @@ class DataFrame(
 
         return new_df
 
-    @reactive
+    @_reactive
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
     ) -> DataFrame:
@@ -1309,7 +1309,7 @@ class DataFrame(
         for name in self.columns:
             yield name, self.data[name]
 
-    @reactive
+    @_reactive
     def keys(self):
         return self.columns
 
@@ -1413,31 +1413,31 @@ class DataFrame(
     def __finalize__(self, *args, **kwargs):
         return self
 
-    @reactive
+    @_reactive
     def groupby(self, *args, **kwargs):
         from meerkat.ops.sliceby.groupby import groupby
 
         return groupby(self, *args, **kwargs)
 
-    @reactive
+    @_reactive
     def sliceby(self, *args, **kwargs):
         from meerkat.ops.sliceby.sliceby import sliceby
 
         return sliceby(self, *args, **kwargs)
 
-    @reactive
+    @_reactive
     def clusterby(self, *args, **kwargs):
         from meerkat.ops.sliceby.clusterby import clusterby
 
         return clusterby(self, *args, **kwargs)
 
-    @reactive
+    @_reactive
     def explainby(self, *args, **kwargs):
         from meerkat.ops.sliceby.explainby import explainby
 
         return explainby(self, *args, **kwargs)
 
-    @reactive
+    @_reactive
     def aggregate(
         self, function: Union[str, Callable], nuisance: str = "drop", *args, **kwargs
     ) -> Dict[str, Any]:
@@ -1445,7 +1445,7 @@ class DataFrame(
 
         return aggregate(self, function, *args, **kwargs)
 
-    @reactive
+    @_reactive
     def mean(self, *args, nuisance: str = "drop", **kwargs):
         from meerkat.ops.aggregate.aggregate import aggregate
 

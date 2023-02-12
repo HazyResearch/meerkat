@@ -9,6 +9,7 @@ from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
 from meerkat.interactive.graph import Store, no_react, trigger
+from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin
@@ -18,13 +19,13 @@ from meerkat.tools.utils import has_var_args
 logger = logging.getLogger(__name__)
 
 # KG: must declare this dynamically defined model here,
-# otherwise I was getting an error due to FastAPI
-# when only declaring this inside the Endpoint class
+# otherwise we get a FastAPI error
+# when only declaring this inside the Endpoint class.
 FnPydanticModel = None
 
 
 class SingletonRouter(type):
-    """A metaclass that ensures that only one instance of a router is created.
+    """A metaclass that ensures that only one instance of a router is created,
 
     *for a given prefix*.
 
@@ -54,7 +55,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
     # class doesn't check if an endpoint is already registered.
     # As a patch, we're generating one router per Endpoint object
     # (this could generate multiple routers for the same prefix, but
-    # that's not a problem).
+    # that's not been a problem).
     """A very simple FastAPI router.
 
     This router allows you to pass in arbitrary keyword arguments that are
@@ -90,43 +91,7 @@ class EndpointFrontend(BaseModel):
 
 # TODO: technically Endpoint doesn't need to be NodeMixin (probably)
 class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
-    """Create an endpoint from a function in Meerkat.
-
-    Typically, you will not need to call this class directly, but
-    instead use the `endpoint` decorator.
-
-    Attributes:
-        fn (Callable): The function to create an endpoint from.
-        prefix (str): The prefix for this endpoint.
-        route (str): The route for this endpoint.
-
-    Note:
-    All endpoints can be hit with a POST request at
-    /{endpoint_id}/dispatch/
-    The request needs a JSON body with the following keys:
-        - kwargs: a dictionary of keyword arguments to be
-            passed to the endpoint function `fn`
-        - payload: additional payload, if any
-
-    Optionally, the user can customize how endpoints are
-    organized by specifying a prefix and a route. The prefix
-    is a string that is used to identify a router. For example,
-    the prefix for the router that handles endpoints is "/endpoint".
-    The route is a string that is used to identify an endpoint
-    within a router. For example, the route for the endpoint
-    that handles the `get` function could be "/get".
-
-    If only a prefix is specified, then the route will be the
-    name of the function e.g. "my_endpoint". If both a prefix
-    and a route are specified, then the route will be the
-    specified route e.g. "/specific/route/".
-
-    Refer to the FastAPI documentation for more information
-    on how to create routers and endpoints.
-    """
-
     EmbeddedBody = partial(Body, embed=True)
-
     _self_identifiable_group: str = "endpoints"
 
     def __init__(
@@ -135,6 +100,40 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         prefix: Union[str, APIRouter] = None,
         route: str = None,
     ):
+        """Create an endpoint from a function in Meerkat.
+
+        Typically, you will not need to call this class directly, but
+        instead use the `endpoint` decorator.
+
+        Attributes:
+            fn (Callable): The function to create an endpoint from.
+            prefix (str): The prefix for this endpoint.
+            route (str): The route for this endpoint.
+
+        Note:
+        All endpoints can be hit with a POST request at
+        /{endpoint_id}/dispatch/
+        The request needs a JSON body with the following keys:
+            - kwargs: a dictionary of keyword arguments to be
+                passed to the endpoint function `fn`
+            - payload: additional payload, if any
+
+        Optionally, the user can customize how endpoints are
+        organized by specifying a prefix and a route. The prefix
+        is a string that is used to identify a router. For example,
+        the prefix for the router that handles endpoints is "/endpoint".
+        The route is a string that is used to identify an endpoint
+        within a router. For example, the route for the endpoint
+        that handles the `get` function could be "/get".
+
+        If only a prefix is specified, then the route will be the
+        name of the function e.g. "my_endpoint". If both a prefix
+        and a route are specified, then the route will be the
+        specified route e.g. "/specific/route/".
+
+        Refer to the FastAPI documentation for more information
+        on how to create routers and endpoints.
+        """
         super().__init__()
         if fn is None:
             self.id = None
@@ -300,7 +299,7 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             route=None,
         )
 
-    def compose(self, fn: Union[Endpoint, callable]) -> Endpoint:
+    def compose(self, fn: Union[Endpoint, Callable]) -> Endpoint:
         """Create a new Endpoint that applies `fn` to the return value of this
         Endpoint. Effectively equivalent to `fn(self.fn(*args, **kwargs))`.
 
@@ -515,30 +514,18 @@ def endpoint(
     function will automatically trigger reactive functions that
     depend on them.
 
-    Warning: Due to this, we do not recommend running endpoints manually
-    in your Python code. This can lead to unexpected behavior e.g.
-    running an endpoint inside an operation may change a Store
-    that causes the operation to be triggered repeatedly,
-    leading to an infinite loop.
-
-    Almost all use cases can be handled by using the frontend to trigger
-    endpoints.
-
     .. code-block:: python
 
         @endpoint
         def increment(count: Store, step: int = 1):
-            count._ += step
+            count.set(count + step)
             # ^ update the count Store, which will trigger operations
             #   that depend on it
 
-            # return the updated value to the frontend
-            return count._
-
-        # Now you can create a button that calls the increment endpoint
+        # Create a button that calls the increment endpoint
         counter = Store(0)
         button = Button(on_click=increment(counter))
-        # ^ read this as: call the increment endpoint with the counter
+        # ^ read this as: call the increment endpoint with the `counter`
         # Store when the button is clicked
 
     Args:
@@ -557,28 +544,30 @@ def endpoint(
     if fn is None:
         return partial(endpoint, prefix=prefix, route=route, method=method)
 
+    @wraps(fn)
     def _endpoint(fn: Callable):
-        # Gather up all the arguments that are hinted as Stores
+        # Gather up
+        # 1. all the arguments that are hinted as Stores
+        # 2. the hinted arguments that subclass IdentifiableMixin
+        #    e.g. Store, Endpoint, Page, etc.
         stores = set()
-        # Also gather up the hinted arguments that subclass IdentifiableMixin
-        # e.g. Store, Endpoint, Page, etc.
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):
                 stores.add(name)
 
-            # Add all the identifiables
             if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
+                # This will also include `Store`, so it will be a superset
+                # of `stores`
                 identifiables[name] = annot
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            # Keep the arguments that were not annotated to be stores or
-            # references
+            # Keep the arguments that were not annotated to be `Stores`
             fn_signature = inspect.signature(fn)
             fn_bound_arguments = fn_signature.bind(*args, **kwargs).arguments
 
-            # Identifiables that are passed into the function
+            # `Identifiables` that are passed into the function
             # may be passed in as a string id, or as the object itself
             # If they are passed in as a string id, we need to get the object
             # from the registry
@@ -610,17 +599,46 @@ def endpoint(
                         # These are *args under the `args` key
                         # These are the only arguments that will be passed in as
                         # *args to the fn
-                        _args = v
+                        _args, _ = _unpack_stores_from_object(list(v))
                     elif k == "kwargs":
                         # These are **kwargs under the `kwargs` key
+                        v, _ = _unpack_stores_from_object(v)
                         _kwargs = {**_kwargs, **v}
                     else:
                         # All other positional arguments that were not *args were
                         # bound, so they become kwargs
+                        v, _ = _unpack_stores_from_object(v)
                         _kwargs[k] = v
 
-            # Run the function
-            result = fn(*_args, **_kwargs)
+            try:
+                # Run the function
+                result = fn(*_args, **_kwargs)
+            except Exception as e:
+                # If the function raises an exception, log it and return
+                # the exception
+                # In case the exception is about .set() being missing, add
+                # a more helpful error message
+                if "no attribute 'set'" in str(e):
+                    # Get the name of the object that was passed in
+                    # as a Store, but did not have a .set() method
+                    obj_name = str(e).split("'")[1].strip("'")
+                    # Update the error message to be more helpful
+                    e = AttributeError(
+                        f"Exception raised in endpoint `{fn.__name__}`. "
+                        f"The object of type `{obj_name}` that you called to "
+                        "update with `.set()` "
+                        "is not a `Store`. You probably forgot to "
+                        "annotate this object's typehint in the signature of "
+                        f"`{fn.__name__}` as a `Store` i.e. \n\n"
+                        "@endpoint\n"
+                        f"def {fn.__name__}(..., parameter: Store, ...):\n\n"
+                        "Remember that without this type annotation, the object "
+                        "will be automatically unpacked by Meerkat inside the endpoint "
+                        "if it is a `Store`."
+                    )
+
+                logger.exception(e)
+                raise e
 
             # Return the result of the function
             return result

@@ -8,7 +8,7 @@ def test_operation_with_skip():
         # Arbitrary contrived noop function.
         return new_x == 2 or new_y == 2
 
-    @mk.gui.react(skip_fn=skip_fn)
+    @mk.gui._react(skip_fn=skip_fn)
     def fn(x: int, y: int):
         return x + y
 
@@ -42,7 +42,7 @@ def test_instance_method_with_skip():
         def __init__(self, x: int):
             self.x = x
 
-        @mk.gui.react(skip_fn=skip_fn)
+        @mk.gui._react(skip_fn=skip_fn)
         def fn(self, y):
             return self.x + y
 

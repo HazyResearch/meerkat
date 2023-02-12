@@ -1,7 +1,7 @@
-from meerkat.interactive.graph import reactive
+from meerkat.interactive.graph import _reactive
 
 
-@reactive
+@_reactive
 def cand(*args):
     """Overloaded ``and`` operator.
 
@@ -19,7 +19,7 @@ def cand(*args):
     return x
 
 
-@reactive
+@_reactive
 def cor(*args):
     """Overloaded ``or`` operator.
 
@@ -37,7 +37,7 @@ def cor(*args):
     return x
 
 
-@reactive
+@_reactive
 def to_bool(x):
     """Overloaded ``bool`` operator.
 
@@ -52,7 +52,7 @@ def to_bool(x):
     return bool(x)
 
 
-@reactive
+@_reactive
 def cnot(x):
     """Overloaded ``not`` operator.
 

@@ -6,12 +6,12 @@ from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
 
-@mk.gui.reactive
+@mk.gui._reactive
 def binary_op(df_1: mk.DataFrame, df_2: mk.DataFrame) -> mk.DataFrame:
     return mk.DataFrame({"a": df_1["a"] + df_2["a"]})
 
 
-@mk.gui.reactive
+@mk.gui._reactive
 def unary_op(df_1) -> mk.DataFrame:
     return mk.DataFrame({"a": df_1["a"] * 3})
 
@@ -26,7 +26,7 @@ def test_trigger():
     df_1 = mk.DataFrame({"a": np.arange(10)})
     df_2 = mk.DataFrame({"a": np.arange(10)})
 
-    with mk.gui.react():
+    with mk.gui._react():
         derived_1 = binary_op(df_1, df_2)
         derived_2 = unary_op(derived_1)
         derived_3 = binary_op(derived_1, derived_2)
