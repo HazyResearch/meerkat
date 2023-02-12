@@ -98,8 +98,7 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
 
         else:
             return {
-                "fn": lambda x, k=0: x
-                > salt + (k if self.dtype != "str" else str(k)),
+                "fn": lambda x, k=0: x > salt + (k if self.dtype != "str" else str(k)),
                 "expected_result": self.col[to_numpy(self.col.data) > salt + kwarg],
             }
 
@@ -110,7 +109,7 @@ class ArrowScalarColumnTestBed(AbstractColumnTestBed):
             data = self.data.filter(pa.array(index))
         else:
             data = self.data.take(index)
-        
+
         if isinstance(index, int):
             return data.as_py()
         return data

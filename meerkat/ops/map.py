@@ -87,8 +87,8 @@ _SHARED_DOCS_ = {
     ),
     "materialize": docs.Arg(
         """
-        materialize (bool, optional): Whether to materialize the input column(s). 
-            Defaults to True.  
+        materialize (bool, optional): Whether to materialize the input column(s).
+            Defaults to True.
         """
     ),
 }
@@ -263,7 +263,7 @@ def defer(
         is_batched_fn=is_batched_fn,
         batch_size=batch_size,
         return_format=type(outputs) if outputs is not None else None,
-        materialize_inputs=materialize
+        materialize_inputs=materialize,
     )
 
     block = DeferredBlock.from_block_data(data=op)

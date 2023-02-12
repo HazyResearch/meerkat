@@ -69,7 +69,7 @@ def getattr_decorator(fn: Callable):
 class _ReturnColumnMixin:
     def __getattribute__(self, name):
         if name == "__class__":
-            # This is needed to avoid _pickle.PicklingError: args[0] from __newobj__ 
+            # This is needed to avoid _pickle.PicklingError: args[0] from __newobj__
             # args has the wrong class when pickling
             return super().__getattribute__(name)
         try:
@@ -85,13 +85,10 @@ class _ReturnColumnMixin:
             else:
                 return attr
         except AttributeError:
-            raise AttributeError(
-                f"object has no attribute '{name}'"
-            )
+            raise AttributeError(f"object has no attribute '{name}'")
 
 
 class _MeerkatStringMethods(_ReturnColumnMixin, StringMethods):
-    
     def __init__(self, data: Column):
         super().__init__(data.data)
 

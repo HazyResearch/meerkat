@@ -202,9 +202,10 @@ def test_to_pandas(single_column_testbed: AbstractColumnTestBed):
     if isinstance(testbed.col, DeferredColumn):
         with pytest.raises(ConversionError):
             series = testbed.col.to_pandas()
-    else: 
+    else:
         series = testbed.col.to_pandas()
         assert isinstance(series, pd.Series)
 
+
 def test_to_torch(single_column_testbed: AbstractColumnTestBed):
-    pass 
+    pass

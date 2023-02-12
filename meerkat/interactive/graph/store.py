@@ -1,15 +1,15 @@
 import logging
 import warnings
-from typing import Any, Generic, Iterator, List, Tuple, Union
+from typing import Any, Generic, Iterator, List, Tuple, TypeVar, Union
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
 
 from meerkat.interactive.graph.reactivity import _reactive, is_reactive, no_react, react
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
-from meerkat.interactive.types import Storeable, T
+from meerkat.interactive.types import Storeable
 from meerkat.mixins.identifiable import IdentifiableMixin
 
 __all__ = ["Store", "StoreFrontend", "make_store"]
@@ -21,6 +21,9 @@ class StoreFrontend(BaseModel):
     value: Any
     has_children: bool
     is_store: bool = True
+
+
+T = TypeVar("T")
 
 
 # ObjectProxy must be the last base class
@@ -64,7 +67,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
 
     def set(self, new_value: T) -> None:
         """Set the value of the store.
-        
+
         This will trigger any reactive functions that depend on this store.
 
         Args:

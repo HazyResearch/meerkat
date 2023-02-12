@@ -359,6 +359,7 @@ class TestMerge:
 
     def test_check_merge_columns(self):
         import meerkat as mk
+
         length = 16
         # check dictionary not hashable
         df1 = DataFrame.from_batch(

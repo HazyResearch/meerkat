@@ -146,13 +146,13 @@ def merge(
         merged = None
 
     if merged is not None:
-        # add columns in both `left_on` and `right_on`, casting to the column type in left
+        # add columns in both `left_on` and `right_on`,
+        # casting to the column type in left
         for name, column in merged_df.iteritems():
             merged.add_column(name, left[name]._clone(data=column.values))
             merged.data.reorder(merged.columns[-1:] + merged.columns[:-1])
     else:
         merged = DataFrame.from_pandas(merged_df)
-        
 
     # set primary key if either the `left` or `right` has a primary key in the result
     # note, the `check_primary_key` wrapper wrapper ensures that the primary_key is

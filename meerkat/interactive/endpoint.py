@@ -611,8 +611,9 @@ def endpoint(
                         _kwargs[k] = v
 
             try:
-                # Run the function
-                result = fn(*_args, **_kwargs)
+                with no_react():
+                    # Run the function
+                    result = fn(*_args, **_kwargs)
             except Exception as e:
                 # If the function raises an exception, log it and return
                 # the exception

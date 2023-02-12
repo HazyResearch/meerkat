@@ -11,11 +11,7 @@ from meerkat.interactive.graph.reactivity import (
     no_react,
     react,
 )
-from meerkat.interactive.graph.store import (
-    Store,
-    StoreFrontend,
-    make_store,
-)
+from meerkat.interactive.graph.store import Store, StoreFrontend, make_store
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort
 from meerkat.state import state

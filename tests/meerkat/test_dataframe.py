@@ -820,9 +820,7 @@ class DataFrameSubclass(DataFrame):
 
 def test_subclass():
     df1 = DataFrameSubclass({"a": np.arange(3), "b": ["may", "jun", "jul"]})
-    df2 = DataFrameSubclass(
-        {"c": np.arange(3), "d": ["2021", "2022", "2023"]}
-    )
+    df2 = DataFrameSubclass({"c": np.arange(3), "d": ["2021", "2022", "2023"]})
 
     assert isinstance(df1[np.asarray([0, 1])], DataFrameSubclass)
     assert isinstance(df1[:2], DataFrameSubclass)
@@ -1079,7 +1077,6 @@ def test_json_io(testbed, tmpdir):
                 assert np.all(df2[name].to_numpy() == col.to_numpy())
             else:
                 assert np.allclose(df2[name].to_numpy(), col.to_numpy())
-
 
 
 def test_constructor():
@@ -1495,7 +1492,8 @@ def test_reactivity_getitem_multiple_columns():
     _set_store_or_df(df, DataFrame({"c": np.arange(5)}))
     assert np.all(inode.obj["c"].to_numpy() == np.arange(5))
 
-# TODO: Add these tests back in 
+
+# TODO: Add these tests back in
 # def test_reactivity_getitem_single_column():
 #     # TODO: We need to add support for column modifications in _update_result
 #     # in operation.
@@ -1528,6 +1526,7 @@ def test_reactivity_getitem_single_column():
     with mk.gui._react():
         df_col = df[store]
     inode = df_col.inode
+
 
 #     assert isinstance(df_col, DataFrame)
 #     assert df.inode.has_trigger_children()
@@ -1566,6 +1565,7 @@ def test_reactivity_getitem_slicing():
         df_col = df[store]
     inode = df_col.inode
 
+
 #     assert np.all(df_merge.to_pandas() == df1.merge(df2, on="a").to_pandas())
 #     assert len(df1.inode.trigger_children) == 1
 #     assert len(df2.inode.trigger_children) == 1
@@ -1590,6 +1590,7 @@ def test_reactivity_merge():
         df_merge = df1.merge(df2, on=on)
     inode = df_merge.inode
 
+
 #     df = DataFrame({"a": a, "b": b})
 #     store = mk.gui.Store("a")
 #     with mk.gui.react():
@@ -1610,11 +1611,11 @@ def test_reactivity_merge():
 #     inode = df_sample.inode
 
 #     assert len(inode.obj) == 10
-    # df = DataFrame({"a": a, "b": b})
-    # store = mk.gui.Store("a")
-    # with mk.gui._react():
-    #     df_sort = df.sort(by=store)
-    # inode = df_sort.inode
+# df = DataFrame({"a": a, "b": b})
+# store = mk.gui.Store("a")
+# with mk.gui._react():
+#     df_sort = df.sort(by=store)
+# inode = df_sort.inode
 
 #     _set_store_or_df(frac, 0.2)
 #     assert len(inode.obj) == 20
@@ -1632,6 +1633,7 @@ def test_reactivity_sample():
     with mk.gui._react():
         df_sample = df.sample(frac=frac)
     inode = df_sample.inode
+
 
 #     assert list(inode.obj.keys()) == ["c", "b"]
 
@@ -1656,6 +1658,7 @@ def test_reactivity_rename():
         df_rename = df.rename(mapper=store)
     inode = df_rename.inode
 
+
 #     assert list(inode.obj.keys()) == ["b"]
 
 #     # drop is an out-of-place method.
@@ -1676,10 +1679,10 @@ def test_reactivity_drop():
         df_drop = df.drop(columns=store)
     inode = df_drop.inode
 
-#     assert list(keys) == ["a", "b"]
+    #     assert list(keys) == ["a", "b"]
 
-#     _set_store_or_df(df, DataFrame({"c": np.arange(10)}))
-#     assert list(inode.obj) == ["c"]
+    #     _set_store_or_df(df, DataFrame({"c": np.arange(10)}))
+    #     assert list(inode.obj) == ["c"]
     # drop is an out-of-place method.
     # Thus, column "a" will still exist when `drop` is rerun with argument "b".
     _set_store_or_df(store, ["b"])
