@@ -11,8 +11,11 @@ from meerkat.interactive.graph.utils import (
     _replace_nodeables_with_nodes,
 )
 from meerkat.interactive.node import NodeMixin
+from meerkat.mixins.reactifiable import ReactifiableMixin
 
 __all__ = ["_react", "_reactive", "is_reactive", "get_reactive_kwargs"]
+
+_REACTIVE_FN = "_reactive"
 
 
 def _reactive(
@@ -205,9 +208,19 @@ def _reactive(
 
             return result
 
+        setattr(wrapper, "__wrapper__", _REACTIVE_FN)
         return wrapper
 
     return __reactive(fn)
+
+
+def is_reactive_fn(fn: Callable) -> bool:
+    """Check if a function is wrapped by a the `reactive` decorator."""
+    return (
+        hasattr(fn, "__wrapped__")
+        and hasattr(fn, "__wrapper__")
+        and fn.__wrapper__ == _REACTIVE_FN
+    )
 
 
 def react(
@@ -287,7 +300,6 @@ def react(
         >>> y = f(x)
         >>> # y will be a `Store` object, and will re-run when `x` changes
     """
-    from meerkat.dataframe import DataFrame
     from meerkat.interactive.graph.store import Store
 
     # We setup an `if` condition that catches:
@@ -301,10 +313,9 @@ def react(
     # - built-in functions, such as `len`, `sum`, etc.
     # - methods of classes (e.g. `pd.DataFrame.head`)
 
-    if isinstance(input, DataFrame):
+    if isinstance(input, ReactifiableMixin):
         # TODO: Set some property of the DataFrame to indicate that it is reactive.
-        input.reactive = True
-        return input
+        return input.react()
 
     if callable(input):
         if inspect.isclass(input):
@@ -536,6 +547,9 @@ class _react:
 class no_react(_react):
     def __init__(self, nested_return: bool = None):
         super().__init__(reactive=False, nested_return=nested_return)
+
+    def clone(self):
+        return self.__class__(nested_return=self._nested_return)
 
 
 def _nested_apply(obj: object, fn: Callable):

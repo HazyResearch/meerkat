@@ -8,6 +8,7 @@ from meerkat.interactive.graph.reactivity import (
     _reactive,
     get_reactive_kwargs,
     is_reactive,
+    is_reactive_fn,
     no_react,
     react,
 )
@@ -21,6 +22,7 @@ __all__ = [
     "no_react",
     "_reactive",
     "is_reactive",
+    "is_reactive_fn",
     "react",
     "get_reactive_kwargs",
     "Store",

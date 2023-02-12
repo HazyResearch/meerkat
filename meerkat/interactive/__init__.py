@@ -32,7 +32,7 @@ from .app.src.lib.component.core.toggle import Toggle
 from .app.src.lib.shared.cell.website import Website
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
-from .graph import Store, no_react, react
+from .graph import Store, _react, _reactive, is_reactive, no_react, react  # noqa: F401
 from .modification import DataFrameModification, Modification
 from .page import Page, page
 from .startup import start
@@ -61,6 +61,7 @@ __all__ = [
     # Reactivity
     "react",
     "no_react",
+    "is_reactive",
     # Modification Types
     "DataFrameModification",
     "Modification",
