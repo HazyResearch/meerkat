@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 
 import meerkat as mk
+from meerkat.interactive import endpoint, react, html, Store
 
 
 def add_noise(img: Image) -> Image:
@@ -17,7 +18,7 @@ def add_noise(img: Image) -> Image:
     return Image.fromarray(img)
 
 
-@mk.gui.endpoint
+@endpoint
 def on_label(index, df):
     """Add a label to the dataframe."""
     df["label"][row] = index
@@ -25,17 +26,17 @@ def on_label(index, df):
     print("Dataframe", df["label"][: row.value].data)
 
 
-@mk.gui.endpoint
+@endpoint
 def go_back(row, df):
     row.set(max(0, row - 1))
 
 
-@mk.gui.endpoint
+@endpoint
 def go_forward(row, df):
     row.set(min(row + 1, len(df) - 1))
 
 
-@mk.gui.react()
+@react()
 def get_selected(label, value_list):
     # Label needs to be converted to a string because the values
     # are auto converted to strings by the RadioGroup component.
@@ -45,7 +46,7 @@ def get_selected(label, value_list):
     return selected
 
 
-@mk.gui.react()
+@react()
 def select_row(df, row):
     # We have to do this because range indexing doesn't work with
     # stores.
@@ -55,8 +56,10 @@ def select_row(df, row):
 df = mk.get("imagenette", version="160px")
 df["noisy_img"] = mk.defer(df["img"], add_noise)
 img_columns = ["img", "noisy_img"]
+
 # Shuffle the dataset.
 df = df.shuffle(seed=20)
+
 # Randomize which images are shown on each gallery pane.
 state = np.random.RandomState(20)
 df["index"] = np.asarray(
@@ -65,52 +68,53 @@ df["index"] = np.asarray(
 df["img1"] = mk.defer(df, lambda df: df[df["index"][0]])
 df["img2"] = mk.defer(df, lambda df: df[df["index"][1]])
 anonymized_img_columns = ["img1", "img2"]
+
 # Initialize labels to empty strings.
 df["label"] = np.full(len(df), "")
 
-with mk.gui.react():
-    row = mk.gui.Store(0)
-    label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
-    cell_size = mk.gui.Store(24)
 
-    back = mk.gui.core.Button(
-        title="<",
-        on_click=go_back.partial(row=row, df=df),
+row = Store(0)
+label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
+cell_size = mk.gui.Store(24)
+
+back = mk.gui.core.Button(
+    title="<",
+    on_click=go_back.partial(row=row, df=df),
+    classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
+)
+forward = mk.gui.core.Button(
+    title=">",
+    on_click=go_forward.partial(row=row, df=df),
+    classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
+)
+label_buttons = [
+    mk.gui.core.Button(
+        title=f"{label}",
+        on_click=on_label.partial(index=label, df=df),
         classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
     )
-    forward = mk.gui.core.Button(
-        title=">",
-        on_click=go_forward.partial(row=row, df=df),
-        classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
-    )
-    label_buttons = [
-        mk.gui.core.Button(
-            title=f"{label}",
-            on_click=on_label.partial(index=label, df=df),
-            classes="bg-slate-100 py-3 px-6 rounded-lg drop-shadow-md w-fit hover:bg-slate-200",  # noqa: E501
-        )
-        for label in anonymized_img_columns
-    ]
-    # We need to explicitly add the markdown hashes.
-    label_display = mk.gui.core.markdown.Markdown(body="## Label: " + label)
+    for label in anonymized_img_columns
+]
+# We need to explicitly add the markdown hashes.
+label_display = mk.gui.core.markdown.Markdown(body="## Label: " + label)
 
-    display_df = select_row(df, row)
-    cell_size = mk.gui.Store(24)
-    galleries = [
-        mk.gui.core.Gallery(df=display_df, main_column=main_column, cell_size=cell_size)
-        for main_column in anonymized_img_columns
-    ]
+display_df = select_row(df, row)
+cell_size = mk.gui.Store(24)
+galleries = [
+    mk.gui.core.Gallery(df=display_df, main_column=main_column, cell_size=cell_size)
+    for main_column in anonymized_img_columns
+]
 
-mk.gui.start(shareable=False)
+
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(
+    component=html.flexcol(
         [
-            mk.gui.html.gridcols2(galleries, classes="gap-4"),
-            mk.gui.html.div(label_display),
-            mk.gui.html.gridcols3(
+            html.gridcols2(galleries, classes="gap-4"),
+            html.div(label_display),
+            html.gridcols3(
                 [
                     back,
-                    mk.gui.html.gridcols2(label_buttons, classes="gap-x-2"),
+                    html.gridcols2(label_buttons, classes="gap-x-2"),
                     forward,
                 ],
                 classes="gap-4 self-center justify-self-center w-full items-center",

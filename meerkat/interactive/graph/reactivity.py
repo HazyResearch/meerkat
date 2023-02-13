@@ -374,7 +374,6 @@ def react(
     # - methods of classes (e.g. `pd.DataFrame.head`)
 
     if isinstance(input, ReactifiableMixin):
-        # TODO: Set some property of the DataFrame to indicate that it is reactive.
         return input.react()
 
     if callable(input):

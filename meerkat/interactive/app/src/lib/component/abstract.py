@@ -132,6 +132,9 @@ class BaseComponent(
     PythonToSvelteMixin,
     BaseModel,
 ):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def __getattribute__(self, name):
         value = super().__getattribute__(name)
         if isinstance(value, Node):

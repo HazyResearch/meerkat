@@ -62,7 +62,7 @@ class ReactifiableMixin:
         #       on the is_reactive(). Only when the object is not reactive, do we
         #       need to handle this case.
         if is_method_or_fn:
-            if not is_obj_reactive or name in ["react", "no_react"]:
+            if not is_obj_reactive or name in ["react", "no_react", "attach_to_inode"]:
                 return no_react()(attr)
             # TODO: Verify this check needs to be valid for both _reactive
             # and @no_react decorators.
