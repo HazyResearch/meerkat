@@ -5,30 +5,29 @@ from PIL import Image
 from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
 
 # Load the dataset
-df = mk.get("poloclub/diffusiondb", version="large_random_1k", registry="huggingface")[
-    "train"
-]
+df = mk.get(
+    "poloclub/diffusiondb",
+    version="large_random_1k",
+    registry="huggingface",
+)["train"]
 for col in df.columns:
     df[col] = df[col].to_numpy()
 
-df['image_path'] = df['image'].defer(lambda x: x['path'])
-df['image'] = df['image_path'].map(lambda x: Image.open(x))
+df["image_path"] = df["image"].defer(lambda x: x["path"])
+df["image"] = df["image_path"].map(lambda x: Image.open(x))
 
 # Add a filtering component
-filter = mk.gui.Filter(df=df)
-
-with mk.gui.react():
-    df_filtered = filter(df)
-    df_grouped = df_filtered.groupby("cfg").count()
-    df_grouped = df_grouped.rename({'height': 'count'})
-
-mk.gui.print(df_filtered)
+df = mk.react(df)
+filter = mk.gui.Filter(df)
+df_filtered = filter(df)
+df_grouped = df_filtered.groupby("cfg").count()
+df_grouped = df_grouped.rename({"height": "count"})
 
 # Visualize the images in a gallery
 gallery = mk.gui.Gallery(df_filtered, main_column="image")
 
 # Add a plot component
-plot = mk.gui.plotly.BarPlot(df=df_grouped, x="cfg", y="count")
+plot = mk.gui.plotly.BarPlot(df_grouped, x="cfg", y="count")
 
 table = mk.gui.Table(df_grouped)
 

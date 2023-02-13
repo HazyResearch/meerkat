@@ -11,6 +11,16 @@ class BarPlot(Component):
     y: str
     on_click: EndpointProperty = None
 
+    def __init__(
+        self,
+        df: DataFrame,
+        *,
+        x: str,
+        y: str,
+        on_click: EndpointProperty = None,
+    ):
+        super().__init__(df=df, x=x, y=y, on_click=on_click)
+
     @classproperty
     def namespace(cls):
         return "plotly"

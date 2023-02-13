@@ -21,23 +21,19 @@ df_clip = mk.DataFrame.read(
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
 
-with mk.gui.react():
-    # Match
-    match = mk.gui.Match(df=df, against=EMBED_COLUMN)
-    examples_df = match(df)[0]
 
-    # Sort
-    df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
+# Match
+match = mk.gui.Match(df=df, against=EMBED_COLUMN)
+examples_df = match(df)[0]
+
+# Sort
+df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
 
 # Gallery
-gallery = mk.gui.Gallery(
-    df=df_sorted,
-    main_column=IMAGE_COLUMN,
-)
+gallery = mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN)
 
-mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(slots=[match, gallery]), 
+    component=mk.gui.html.flexcol([match, gallery]), 
     id="match",
 )
 page.launch()

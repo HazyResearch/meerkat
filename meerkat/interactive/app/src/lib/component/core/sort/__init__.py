@@ -29,7 +29,7 @@ def _format_criteria(
     ]
 
 
-@react
+@react()
 def sort_by_criteria(
     data: DataFrame,
     criteria: Sequence[Union[SortCriterion, Dict[str, Any]]],
@@ -85,7 +85,7 @@ class Sort(Component):
         return sort_by_criteria(df, self.criteria)
 
     @staticmethod
-    @react
+    @react()
     def create_criterion(column: str, ascending: bool, source: str = ""):
         return SortCriterion(
             id=str(uuid.uuid4()),

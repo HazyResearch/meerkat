@@ -8,7 +8,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
-from meerkat.interactive.graph import Store, _reactive
+from meerkat.interactive.graph import Store, react
 
 
 @endpoint
@@ -125,7 +125,7 @@ class OnMatchMatch(EventInterface):
     criterion: MatchCriterion
 
 
-@_reactive
+@react()
 def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
     df = df.view()
     if criterion == None or criterion.against is None:  # noqa: E711
@@ -150,8 +150,26 @@ class Match(Component):
     on_match: EndpointProperty = None
     get_match_schema: EndpointProperty = None
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        df: DataFrame = None,
+        *,
+        against: str,
+        text: str = "",
+        encoder: str = "clip",
+        title: str = "Match",
+        on_match: EndpointProperty = None,
+        get_match_schema: EndpointProperty = None,
+    ):
+        super().__init__(
+            df=df,
+            against=against,
+            text=text,
+            encoder=encoder,
+            title=title,
+            on_match=on_match,
+            get_match_schema=get_match_schema,
+        )
 
         # we do not add the against or the query to the partial, because we don't
         # want them to be maintained on the backend

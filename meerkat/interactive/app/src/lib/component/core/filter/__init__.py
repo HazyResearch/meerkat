@@ -8,7 +8,7 @@ from meerkat.columns.abstract import Column
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.graph import Store, _reactive
+from meerkat.interactive.graph import Store, react
 
 
 def filter_by_operator(*args, **kwargs):
@@ -98,7 +98,7 @@ def _format_criteria(
     ]
 
 
-@_reactive
+@react
 def filter(
     data: Union["DataFrame", "Column"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],
@@ -183,6 +183,19 @@ class Filter(Component):
     )
 
     title: str = "Filter"
+
+    def __init__(
+        self,
+        df: DataFrame = None,
+        *,
+        criteria: List[FilterCriterion] = [],
+        operations: List[str] = list(_operator_str_to_func.keys()),
+    ):
+        super().__init__(
+            df=df,
+            criteria=criteria,
+            operations=operations,
+        )
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:
