@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING, Sequence, Set
+import warnings
 
 import pyarrow as pa
+import pyarrow.compute as pac
 from pyarrow.compute import equal
 
 from meerkat.block.abstract import BlockView
@@ -86,7 +88,7 @@ class ArrowScalarColumn(ScalarColumn):
     def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
-        return equal(self.data, other.data)
+        return pac.equal(self.data, other.data)
 
     @classmethod
     def _state_keys(cls) -> Set:
@@ -126,7 +128,43 @@ class ArrowScalarColumn(ScalarColumn):
     def to_arrow(self) -> pa.Array:
         return self.data
 
+    def dtype(self):
+        pass
+
     """TODO(KG)
     This column is missing a .dtype property that prevents
     it from being used with the Filter component.
     """
+
+    KWARG_MAPPING = {"skipna": "skip_nulls"}
+    COMPUTE_FN_MAPPING = {"var": "variance", "std": "stddev"}
+
+    def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
+        kwargs = {self.KWARG_MAPPING.get(k, k): v for k, v in kwargs.items()}
+        out = getattr(pac, self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn))(self.data, **kwargs)
+        return out.as_py()
+
+    def mode(self, **kwargs) -> ScalarColumn:
+        if "n" in "kwargs":
+            raise ValueError(
+                "Meerkat does not support passing `n` to `mode` when "
+                "backend is Arrow."
+            )
+
+        # matching behavior of Pandas, get all counts, but only return top modes
+        struct_array = pac.mode(self.data, n=len(self), **kwargs)
+        modes = []
+        count = struct_array[0]["count"]
+        for mode in struct_array:
+            if count != mode["count"]:
+                break
+            modes.append(mode["mode"].as_py())
+        return ArrowScalarColumn(modes)
+
+    def median(self, skipna: bool = True, **kwargs) -> any:
+        warnings.warn("Arrow")
+        return pac.approximate_median(self.data, skip_nulls=skipna).as_py()
+    
+
+
+        

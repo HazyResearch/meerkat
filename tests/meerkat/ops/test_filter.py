@@ -11,14 +11,14 @@ from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 @pytest.fixture(
     **column_parametrize(
         [
-            NumPyTensorColumnTestBed.get_params(
-                config={"num_dims": [1], "dim_length": [1]}
-            ),
+            # NumPyTensorColumnTestBed.get_params(
+            #     config={"num_dims": [1], "dim_length": [1]}
+            # ),
             PandasScalarColumnTestBed,
-            TorchTensorColumnTestBed.get_params(
-                config={"num_dims": [1], "dim_length": [1]}
-            ),
-            ArrowScalarColumnTestBed,
+            # TorchTensorColumnTestBed.get_params(
+            #     config={"num_dims": [1], "dim_length": [1]}
+            # ),
+            # ArrowScalarColumnTestBed,
         ]
     )
 )

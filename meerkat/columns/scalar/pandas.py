@@ -159,6 +159,10 @@ class PandasScalarColumn(
     # sparse = CachedAccessor("sparse", SparseAccessor)
 
     def _set_data(self, data: object):
+        if isinstance(data, PandasScalarColumn):
+            # unpack series if it is a PandasScalarColumn
+            data = data.data
+
         if isinstance(data, BlockView):
             if not isinstance(data.block, PandasBlock):
                 raise ValueError(
@@ -391,6 +395,9 @@ class PandasScalarColumn(
 
     def to_json(self) -> List[Any]:
         return self.data.tolist()
+
+    def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
+        return getattr(self.data, compute_fn)(**kwargs)
 
 
 PandasSeriesColumn = PandasScalarColumn
