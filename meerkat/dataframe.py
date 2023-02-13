@@ -34,7 +34,7 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import _reactive, is_reactive, no_react
+from meerkat.interactive.graph.reactivity import is_reactive, no_react, react
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -106,12 +106,27 @@ class DataFrame(
         if primary_key is True:
             self._infer_primary_key(create=True)
 
+    def _react(self):
+        """Converts the object to a reactive object in-place."""
+        self._reactive = True
+        for col in self.columns:
+            self[col].react()
+        return self
+
+    def _no_react(self):
+        """Converts the object to a non-reactive object in-place."""
+        self._reactive = False
+        for col in self.columns:
+            self[col].no_react()
+        return self
+
     @property
     def gui(self):
         from meerkat.interactive.gui import DataFrameGUI
 
         return DataFrameGUI(self)
 
+    @no_react()
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -123,6 +138,7 @@ class DataFrame(
             {rename[k]: v for k, v in formatters.items()},
         )
 
+    @no_react()
     def _repr_html_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -131,11 +147,13 @@ class DataFrame(
 
         return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
 
+    @no_react()
     def __repr__(self):
         return (
             f"{self.__class__.__name__}" f"(nrows: {self.nrows}, ncols: {self.ncols})"
         )
 
+    @no_react()
     def __len__(self):
         # __len__ is required to return an int. It cannot return a Store[int].
         # As such, it cannot be wrapped in `@reactive` decorator.
@@ -145,6 +163,7 @@ class DataFrame(
             _len = self.nrows
         return _len
 
+    @no_react()
     def __contains__(self, item):
         # __contains__ is called when using the `in` keyword.
         # `in` casts the output to a boolean (i.e. `bool(output)`).
@@ -158,7 +177,7 @@ class DataFrame(
             )
         return item in self.columns
 
-    @_reactive
+    @react()
     def contains(self, item):
         return self.__contains__(item)
 
@@ -289,7 +308,7 @@ class DataFrame(
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.nrows, self.ncols
 
-    @_reactive(nested_return=False)
+    @react(nested_return=False)
     def size(self):
         """Shape of the DataFrame (num_rows, num_columns)."""
         return self.shape
@@ -338,7 +357,7 @@ class DataFrame(
         logger.info(f"Removed column `{column}`.")
 
     # @capture_provenance(capture_args=["axis"])
-    @_reactive
+    @react()
     def append(
         self,
         df: DataFrame,
@@ -355,12 +374,12 @@ class DataFrame(
             [self, df], axis=axis, suffixes=suffixes, overwrite=overwrite
         )
 
-    @_reactive
+    @react()
     def head(self, n: int = 5) -> DataFrame:
         """Get the first `n` examples of the DataFrame."""
         return self[:n]
 
-    @_reactive
+    @react()
     def tail(self, n: int = 5) -> DataFrame:
         """Get the last `n` examples of the DataFrame."""
         return self[-n:]
@@ -449,7 +468,7 @@ class DataFrame(
             )
 
     # @capture_provenance(capture_args=[])
-    @_reactive
+    @react()
     def __getitem__(self, posidx):
         return self._get(posidx, materialize=False)
 
@@ -1054,7 +1073,7 @@ class DataFrame(
         )
 
     # @capture_provenance(capture_args=["function"])
-    @_reactive
+    @react()
     def filter(
         self,
         function: Optional[Callable] = None,
@@ -1105,7 +1124,7 @@ class DataFrame(
         # filter returns a new dataframe
         return self[indices]
 
-    @_reactive
+    @react()
     def merge(
         self,
         right: meerkat.DataFrame,
@@ -1131,7 +1150,7 @@ class DataFrame(
             validate=validate,
         )
 
-    @_reactive
+    @react()
     def sort(
         self,
         by: Union[str, List[str]],
@@ -1156,7 +1175,7 @@ class DataFrame(
 
         return sort(data=self, by=by, ascending=ascending, kind=kind)
 
-    @_reactive
+    @react()
     def sample(
         self,
         n: int = None,
@@ -1197,7 +1216,7 @@ class DataFrame(
             random_state=random_state,
         )
 
-    @_reactive
+    @react()
     def shuffle(self, seed: int = None) -> DataFrame:
         """Shuffle the rows of the DataFrame out-of-place.
 
@@ -1211,7 +1230,7 @@ class DataFrame(
 
         return shuffle(data=self, seed=seed)
 
-    @_reactive
+    @react()
     def rename(
         self,
         mapper: Union[Dict, Callable] = None,
@@ -1279,7 +1298,7 @@ class DataFrame(
 
         return new_df
 
-    @_reactive
+    @react()
     def drop(
         self, columns: Union[str, Collection[str]], check_exists=True
     ) -> DataFrame:
@@ -1305,7 +1324,7 @@ class DataFrame(
         for name in self.columns:
             yield name, self.data[name]
 
-    @_reactive
+    @react()
     def keys(self):
         return self.columns
 
@@ -1409,31 +1428,31 @@ class DataFrame(
     def __finalize__(self, *args, **kwargs):
         return self
 
-    @_reactive
+    @react()
     def groupby(self, *args, **kwargs):
         from meerkat.ops.sliceby.groupby import groupby
 
         return groupby(self, *args, **kwargs)
 
-    @_reactive
+    @react()
     def sliceby(self, *args, **kwargs):
         from meerkat.ops.sliceby.sliceby import sliceby
 
         return sliceby(self, *args, **kwargs)
 
-    @_reactive
+    @react()
     def clusterby(self, *args, **kwargs):
         from meerkat.ops.sliceby.clusterby import clusterby
 
         return clusterby(self, *args, **kwargs)
 
-    @_reactive
+    @react()
     def explainby(self, *args, **kwargs):
         from meerkat.ops.sliceby.explainby import explainby
 
         return explainby(self, *args, **kwargs)
 
-    @_reactive
+    @react()
     def aggregate(
         self, function: Union[str, Callable], nuisance: str = "drop", *args, **kwargs
     ) -> Dict[str, Any]:
@@ -1441,7 +1460,7 @@ class DataFrame(
 
         return aggregate(self, function, *args, **kwargs)
 
-    @_reactive
+    @react()
     def mean(self, *args, nuisance: str = "drop", **kwargs):
         from meerkat.ops.aggregate.aggregate import aggregate
 
@@ -1464,3 +1483,7 @@ def is_listlike(obj) -> bool:
         and not isinstance(obj, str)
     )
     return is_column or is_sequential
+
+
+DataFrame.react = DataFrame._react
+DataFrame.no_react = DataFrame._no_react

@@ -53,7 +53,6 @@ def sort_by_criteria(
 
 
 class Sort(Component):
-
     df: DataFrame
     criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"

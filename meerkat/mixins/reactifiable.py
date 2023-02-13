@@ -30,67 +30,69 @@ class ReactifiableMixin:
         self._reactive = False
         return self
 
-    # def __getattribute__(self, name: str) -> Any:
-    #     from meerkat.interactive.graph import (
-    #         _reactive,
-    #         is_reactive,
-    #         is_reactive_fn,
-    #         no_react,
-    #     )
+    def __getattribute__(self, name: str) -> Any:
+        from meerkat.interactive.graph.reactivity import (
+            _reactive,
+            is_noreact_fn,
+            is_reactive,
+            is_reactive_fn,
+            no_react,
+        )
 
-    #     # We assume accessing the attribute twice will not result in different values.
-    #     # We dont explicitly check for this because it is expensive.
-    #     with no_react():
-    #         is_obj_reactive = super().__getattribute__("_reactive")
-    #         attr = super().__getattribute__(name)
-    #         is_method_or_fn = inspect.ismethod(attr) or inspect.isfunction(attr)
-    #         _is_reactive_fn = is_method_or_fn and is_reactive_fn(attr)
+        # We assume accessing the attribute twice will not result in different values.
+        # We dont explicitly check for this because it is expensive.
+        with no_react():
+            is_obj_reactive = super().__getattribute__("_reactive")
+            attr = super().__getattribute__(name)
+            is_method_or_fn = inspect.ismethod(attr) or inspect.isfunction(attr)
+            _is_reactive_fn = is_method_or_fn and is_reactive_fn(attr)
+            _is_noreact_fn = is_method_or_fn and is_noreact_fn(attr)
 
-    #     # If the attribute is a method or function that is decorated with @reactive,
-    #     # then we need to determine if we should return a reactive version.
-    #     #   1. If the object is reactive, then we do not need to do anything.
-    #     #      The function is already decorated with @reactive and will be
-    #     #      handled accordingly.
-    #     #   2. If the object is not reactive, then we need to return
-    #     #      a non-reactive function. We can achieve this by wrapping the function
-    #     #      with @no_react.
-    #     # NOTE: We only have to do (2) when the object is not reactive. We should not
-    #     #       check the is_reactive() state when the function is fetched (i.e. here),
-    #     #       but rather when the function is called. This will be handled based
-    #     #       on the is_reactive(). Only when the object is not reactive, do we
-    #     #       need to handle this case.
-    #     if is_method_or_fn:
-    #         if not is_obj_reactive or name in ["react", "no_react"]:
-    #             return no_react()(attr)
-    #         # TODO: Verify this check needs to be valid for both _reactive
-    #         # and @no_react decorators.
-    #         elif not _is_reactive_fn:
-    #             # If the object is reactive, but the function is not decorated with
-    #             # @reactive, then we need to wrap the function with @reactive.
-    #             # This is because the object is reactive and we want the function
-    #             # to be reactive.
-    #             return _reactive(attr)
-    #         else:
-    #             return attr
+        # If the attribute is a method or function that is decorated with @reactive,
+        # then we need to determine if we should return a reactive version.
+        #   1. If the object is reactive, then we do not need to do anything.
+        #      The function is already decorated with @reactive and will be
+        #      handled accordingly.
+        #   2. If the object is not reactive, then we need to return
+        #      a non-reactive function. We can achieve this by wrapping the function
+        #      with @no_react.
+        # NOTE: We only have to do (2) when the object is not reactive. We should not
+        #       check the is_reactive() state when the function is fetched (i.e. here),
+        #       but rather when the function is called. This will be handled based
+        #       on the is_reactive(). Only when the object is not reactive, do we
+        #       need to handle this case.
+        if is_method_or_fn:
+            if not is_obj_reactive or name in ["react", "no_react", "attach_to_inode"]:
+                return no_react()(attr)
+            # TODO: Verify this check needs to be valid for both _reactive
+            # and @no_react decorators.
+            elif not _is_reactive_fn and not _is_noreact_fn:
+                # If the object is reactive, but the function is not decorated with
+                # @reactive, then we need to wrap the function with @reactive.
+                # This is because the object is reactive and we want the function
+                # to be reactive.
+                return _reactive(attr)
+            else:
+                return attr
 
-    #     # TODO: Handle functions that are stored as attributes.
-    #     # These functions should be wrapped in reactive when the object is reactive.
-    #     # For ordinary attributes, we need to check if reactive=True.
-    #     # FIXME: We may be able to get rid of this distinction by decorating
-    #     # Store.__call__ with @reactive.
-    #     if (
-    #         is_obj_reactive
-    #         and is_reactive()
-    #         # Ignore dunder attributes.
-    #         and not name.startswith("__")
-    #         # Ignore all node-related attributes. These should never be accessed
-    #         # in a reactive way.
-    #         and name not in ("_self_inode", "inode", "inode_id")
-    #     ):
-    #         # Only build the function if we are in a reactive context.
-    #         # TODO: Cache this function so that it is faster.
-    #         def _fn(_obj):
-    #             return super().__getattribute__(name)
+        # TODO: Handle functions that are stored as attributes.
+        # These functions should be wrapped in reactive when the object is reactive.
+        # For ordinary attributes, we need to check if reactive=True.
+        # FIXME: We may be able to get rid of this distinction by decorating
+        # Store.__call__ with @reactive.
+        if (
+            is_obj_reactive
+            and is_reactive()
+            # Ignore dunder attributes.
+            and not name.startswith("__")
+            # Ignore all node-related attributes. These should never be accessed
+            # in a reactive way.
+            and name not in ("_self_inode", "inode", "inode_id", "_reactive")
+        ):
+            # Only build the function if we are in a reactive context.
+            # TODO: Cache this function so that it is faster.
+            def _fn(_obj):
+                return super().__getattribute__(name)
 
     #         _fn.__name__ = name
     #         _fn = _reactive(_fn, nested_return=False)
@@ -104,8 +106,10 @@ class ReactifiableMixin:
 
         if is_reactive():
             warnings.warn(
-                f"Calling {name}({placeholder}) is not reactive. Use `mk.{name}({placeholder})` to get"
-                f"a reactive variable (i.e. a Store). `mk.{name}({placeholder})` behaves exactly"
+                f"Calling {name}({placeholder}) is not reactive. "
+                f"Use `mk.{name}({placeholder})` to get"
+                "a reactive variable (i.e. a Store). "
+                f"`mk.{name}({placeholder})` behaves exactly"
                 f"like {name}({placeholder}) outside of this difference."
             )
 

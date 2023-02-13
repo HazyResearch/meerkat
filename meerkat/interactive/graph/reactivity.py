@@ -16,6 +16,23 @@ from meerkat.mixins.reactifiable import ReactifiableMixin
 __all__ = ["_react", "_reactive", "is_reactive", "get_reactive_kwargs"]
 
 _REACTIVE_FN = "_reactive"
+_NO_REACT_FN = "_no_react"
+
+
+def isclassmethod(method):
+    """
+    StackOverflow: https://stackoverflow.com/a/19228282
+    """
+    bound_to = getattr(method, "__self__", None)
+    if not isinstance(bound_to, type):
+        # must be bound to a class
+        return False
+    name = method.__name__
+    for cls in bound_to.__mro__:
+        descriptor = vars(cls).get(name)
+        if descriptor is not None:
+            return isinstance(descriptor, classmethod)
+    return False
 
 
 def _reactive(
@@ -110,29 +127,36 @@ def _reactive(
                 return _fn_wrapper
 
             # Unpack the stores from the args and kwargs
-            # unpacked_args, unpacked_kwargs, _ = _unpack_stores(*args, **kwargs)
             unpacked_args, _ = _unpack_stores_from_object(list(args))
             unpacked_kwargs, _ = _unpack_stores_from_object(kwargs)
 
             _force_no_react = False
             if hasattr(fn, "__self__") and fn.__self__ is not None:
-                args = (fn.__self__, *args)
+                if isclassmethod(fn):
+                    # If the function is a classmethod, then it will always be
+                    # bound to the class when we grab it later in this block,
+                    # and we don't need to unpack the first argument.
+                    args = args
+                else:
+                    args = (fn.__self__, *args)
 
                 # Unpack the stores from the args and kwargs because
                 # args has changed!
                 # TODO: make this all nicer
-                # unpacked_args, unpacked_kwargs, _ = _unpack_stores(*args, **kwargs)
                 unpacked_args, _ = _unpack_stores_from_object(list(args))
                 unpacked_kwargs, _ = _unpack_stores_from_object(kwargs)
 
                 # The method bound to the class.
-                fn_class = getattr(fn.__self__.__class__, fn.__name__)
+                try:
+                    fn_class = getattr(fn.__self__.__class__, fn.__name__)
+                except AttributeError:
+                    fn_class = getattr(fn.__self__.mro()[0], fn.__name__)
                 fn = _fn_outer_wrapper(fn_class)
 
                 # If `fn` is an instance method, then the first argument in `args`
                 # is the instance. We should **not** unpack the `self` argument
                 # if it is a Store.
-                if isinstance(args[0], Store):
+                if args and isinstance(args[0], Store):
                     unpacked_args[0] = args[0]
             elif _check_fn_has_leading_self_arg(fn):
                 # If the object is a ReactifiableMixin and fn has a leading self arg,
@@ -163,7 +187,6 @@ def _reactive(
             # Call the function on the args and kwargs
             with no_react():
                 result = fn(*unpacked_args, **unpacked_kwargs)
-                # result = fn(*args, **kwargs)
 
             if not is_reactive() or _force_no_react:
                 # If we are not in a reactive context, then we don't need to create
@@ -190,41 +213,50 @@ def _reactive(
             else:
                 result = Store(result)
 
-            # Setup an Operation node if any of the args or kwargs
-            # were nodeables
-            op = None
+            with no_react():
+                # Setup an Operation node if any of the args or kwargs
+                # were nodeables
+                op = None
 
-            # Create Nodes for each NodeMixin object
-            _create_nodes_for_nodeables(*nodeables)
-            args = _replace_nodeables_with_nodes(args)
-            kwargs = _replace_nodeables_with_nodes(kwargs)
+                # Create Nodes for each NodeMixin object
+                _create_nodes_for_nodeables(*nodeables)
+                args = _replace_nodeables_with_nodes(args)
+                kwargs = _replace_nodeables_with_nodes(kwargs)
 
-            # Create the Operation node
-            op = Operation(
-                fn=fn, args=args, kwargs=kwargs, result=result, skip_fn=skip_fn
-            )
+                # Create the Operation node
+                op = Operation(
+                    fn=fn,
+                    args=args,
+                    kwargs=kwargs,
+                    result=result,
+                    skip_fn=skip_fn,
+                )
 
-            # For normal functions
-            # Make a node for the operation if it doesn't have one
-            if not op.has_inode():
-                op.attach_to_inode(op.create_inode())
+                # For normal functions
+                # Make a node for the operation if it doesn't have one
+                if not op.has_inode():
+                    op.attach_to_inode(op.create_inode())
 
-            # Add this Operation node as a child of all of the nodeables
-            _add_op_as_child(op, *nodeables, triggers=True)
+                # Add this Operation node as a child of all of the nodeables
+                _add_op_as_child(op, *nodeables, triggers=True)
 
-            # Attach the Operation node to its children (if it is not None)
-            def _foo(nodeable: NodeMixin):
-                # FIXME: make sure they are not returning a nodeable that
-                # is already in the dag. May be related to checking that the graph
-                # is acyclic.
-                if not nodeable.has_inode():
-                    inode_id = None if not isinstance(nodeable, Store) else nodeable.id
-                    nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
+                # Attach the Operation node to its children (if it is not None)
+                def _foo(nodeable: NodeMixin):
+                    # FIXME: make sure they are not returning a nodeable that
+                    # is already in the dag. May be related to checking that the graph
+                    # is acyclic.
+                    if not nodeable.has_inode():
+                        inode_id = (
+                            None if not isinstance(nodeable, Store) else nodeable.id
+                        )
+                        nodeable.attach_to_inode(
+                            nodeable.create_inode(inode_id=inode_id)
+                        )
 
-                if op is not None:
-                    op.inode.add_child(nodeable.inode)
+                    if op is not None:
+                        op.inode.add_child(nodeable.inode)
 
-            _nested_apply(result, _foo)
+                _nested_apply(result, _foo)
 
             return result
 
@@ -240,6 +272,15 @@ def is_reactive_fn(fn: Callable) -> bool:
         hasattr(fn, "__wrapped__")
         and hasattr(fn, "__wrapper__")
         and fn.__wrapper__ == _REACTIVE_FN
+    )
+
+
+def is_noreact_fn(fn: Callable) -> bool:
+    """Check if a function is wrapped by a the `no_react` decorator."""
+    return (
+        hasattr(fn, "__wrapped__")
+        and hasattr(fn, "__wrapper__")
+        and fn.__wrapper__ == _NO_REACT_FN
     )
 
 
@@ -337,7 +378,6 @@ def react(
     # - methods of classes (e.g. `pd.DataFrame.head`)
 
     if isinstance(input, ReactifiableMixin):
-        # TODO: Set some property of the DataFrame to indicate that it is reactive.
         return input.react()
 
     if callable(input):
@@ -544,6 +584,8 @@ class _react:
                     func, nested_return=self._nested_return, skip_fn=self._skip_fn
                 )(*args, **kwargs)
 
+        if not self._reactive:
+            setattr(decorate_context, "__wrapper__", _NO_REACT_FN)
         return cast(F, decorate_context)
 
     def __enter__(self):
