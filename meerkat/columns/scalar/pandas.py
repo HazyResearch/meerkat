@@ -384,20 +384,38 @@ class PandasScalarColumn(
             return False
         return (self.data.values == other.data.values).all()
 
-    def mean(self, skipna: bool = True):
+    def to_json(self) -> List[Any]:
+        return self.data.tolist()
+
+    def equals(self, other: Column) -> bool:
+        if other.__class__ != self.__class__:
+            return False
+        return self.data.equals(other.data)
+
+    def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
+        return getattr(self.data, compute_fn)(**kwargs)
+
+    def mean(self, skipna: bool = True, **kwargs):
         try:
-            return self.data.mean(skipna=skipna)
+            return self.data.mean(skipna=skipna, **kwargs)
         except TypeError:
             raise AggregationError(
                 "Cannot apply mean aggregation to Pandas Series with "
                 f" dtype '{self.data.dtype}'."
             )
 
-    def to_json(self) -> List[Any]:
-        return self.data.tolist()
-
-    def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
-        return getattr(self.data, compute_fn)(**kwargs)
+    def _dispatch_arithmetic_function(
+        self, other: ScalarColumn, compute_fn: str, right: bool, **kwargs
+    ):
+        if isinstance(other, Column):
+            assert isinstance(other, PandasScalarColumn)
+            other = other.data
+            
+        if right:
+            compute_fn = f"r{compute_fn}"
+        return self._clone(
+            data=getattr(self.data, f"__{compute_fn}__")(other, **kwargs)
+        )
 
 
 PandasSeriesColumn = PandasScalarColumn
