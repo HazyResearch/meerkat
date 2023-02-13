@@ -23,7 +23,7 @@ def isclassmethod(method):
     """
     StackOverflow: https://stackoverflow.com/a/19228282
     """
-    bound_to = getattr(method, '__self__', None)
+    bound_to = getattr(method, "__self__", None)
     if not isinstance(bound_to, type):
         # must be bound to a class
         return False
@@ -134,7 +134,7 @@ def _reactive(
             if hasattr(fn, "__self__") and fn.__self__ is not None:
                 if isclassmethod(fn):
                     # If the function is a classmethod, then it will always be
-                    # bound to the class when we grab it later in this block, 
+                    # bound to the class when we grab it later in this block,
                     # and we don't need to unpack the first argument.
                     args = args
                 else:
@@ -246,8 +246,12 @@ def _reactive(
                     # is already in the dag. May be related to checking that the graph
                     # is acyclic.
                     if not nodeable.has_inode():
-                        inode_id = None if not isinstance(nodeable, Store) else nodeable.id
-                        nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
+                        inode_id = (
+                            None if not isinstance(nodeable, Store) else nodeable.id
+                        )
+                        nodeable.attach_to_inode(
+                            nodeable.create_inode(inode_id=inode_id)
+                        )
 
                     if op is not None:
                         op.inode.add_child(nodeable.inode)
@@ -579,7 +583,7 @@ class _react:
                 return _reactive(
                     func, nested_return=self._nested_return, skip_fn=self._skip_fn
                 )(*args, **kwargs)
-        
+
         if not self._reactive:
             setattr(decorate_context, "__wrapper__", _NO_REACT_FN)
         return cast(F, decorate_context)

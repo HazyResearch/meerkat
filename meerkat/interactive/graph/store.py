@@ -407,7 +407,8 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     #   - __hex__
     # Python requires that __len__ must return an integer (i.e. not a Store).
     # As such, we cannot make it reactive.
-    # We allow the user to call len(store), which will return an integer (i.e. not reactive).
+    # We allow the user to call len(store), which will return an integer
+    # (i.e. not reactive).
     # We raise a warning to remind the user that len(store) is not reactive.
     def __len__(self):
         self._reactive_warning("len")

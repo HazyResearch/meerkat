@@ -6,7 +6,6 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Markdown(Component):
-
     body: str
     classes: str = ""
     base_url: Optional[str] = None

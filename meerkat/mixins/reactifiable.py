@@ -33,9 +33,9 @@ class ReactifiableMixin:
     def __getattribute__(self, name: str) -> Any:
         from meerkat.interactive.graph.reactivity import (
             _reactive,
+            is_noreact_fn,
             is_reactive,
             is_reactive_fn,
-            is_noreact_fn,
             no_react,
         )
 
@@ -106,8 +106,10 @@ class ReactifiableMixin:
 
         if is_reactive():
             warnings.warn(
-                f"Calling {name}({placeholder}) is not reactive. Use `mk.{name}({placeholder})` to get"
-                f"a reactive variable (i.e. a Store). `mk.{name}({placeholder})` behaves exactly"
+                f"Calling {name}({placeholder}) is not reactive. "
+                f"Use `mk.{name}({placeholder})` to get"
+                "a reactive variable (i.e. a Store). "
+                f"`mk.{name}({placeholder})` behaves exactly"
                 f"like {name}({placeholder}) outside of this difference."
             )
 

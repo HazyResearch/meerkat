@@ -143,10 +143,8 @@ def test_magic_method_not_decorated(react: bool):
 
 
 def test_instance_method_not_decorated():
-    """
-    Instance methods that are not decorated should, by default, be reactive
-    when the object is reactive.
-    """
+    """Instance methods that are not decorated should, by default, be reactive
+    when the object is reactive."""
     foo = Foo(1)
 
     # Object is reactive.

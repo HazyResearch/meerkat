@@ -24,7 +24,7 @@ import pyarrow as pa
 
 import meerkat.config
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import _reactive, no_react
+from meerkat.interactive.graph.reactivity import no_react
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
