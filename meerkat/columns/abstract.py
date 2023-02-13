@@ -62,7 +62,7 @@ class Column(
     MaterializationMixin,
     NodeMixin,
     ProvenanceMixin,
-    # ReactifiableMixin,
+    ReactifiableMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
@@ -267,7 +267,9 @@ class Column(
             **kwargs,
         )
 
+    @no_react()
     def __len__(self):
+        self._reactive_warning("len", "col")
         return self.full_length()
 
     def full_length(self):

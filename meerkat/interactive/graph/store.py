@@ -195,7 +195,7 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     def __mod__(self, other):
         return super().__mod__(other)
 
-    # @reactive(nested_return=False)
+    @_reactive(nested_return=False)
     def __divmod__(self, other):
         return super().__divmod__(other)
 
@@ -405,11 +405,11 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     #   - __complex__
     #   - __oct__
     #   - __hex__
-    # Python requires that __len__ must return an integer (i.e. not a Store).
-    # As such, we cannot make it reactive.
-    # We allow the user to call len(store), which will return an integer
-    # (i.e. not reactive).
-    # We raise a warning to remind the user that len(store) is not reactive.
+    # Python requires that these methods must return an primitive type
+    # (i.e. not a Store). As such, we cannot make them reactive.
+    # We allow the user to call these methods on stores (e.g. len(store)),
+    # which will return the appropriate primitive type (i.e. not reactive).
+    # We raise a warning to remind the user that these methods are not reactive.
     def __len__(self):
         self._reactive_warning("len")
         return super().__len__()

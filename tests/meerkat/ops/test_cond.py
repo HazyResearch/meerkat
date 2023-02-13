@@ -1,46 +1,123 @@
-# import pytest
+import pytest
 
-# import meerkat as mk
-
-
-# TODO(Arjun): how can we get these to pass?
-# @pytest.mark.parametrize("x", [False, True, -1, 0, 1, 2, 4.3])
-# @pytest.mark.parametrize("y", [False, True, -1, 0, 1, 2, 4.3])
-# @pytest.mark.parametrize("react", [False, True])
-# @pytest.mark.parametrize("comp", [mk.cand, mk.cor])
-# def test_boolean_operators_multiple_arguments(x, y, react, comp):
-#     x_store = mk.gui.Store(x)
-#     y_store = mk.gui.Store(y)
-
-#     if comp == mk.cand:
-#         expected = x and y
-#     elif comp == mk.cor:
-#         expected = x or y
-
-#     with mk.gui._react():
-#         out = comp(x_store, y_store)
-
-#     assert out == expected
-#     if react:
-#         assert isinstance(out, mk.gui.Store)
-#     assert isinstance(out, type(expected))
+import meerkat as mk
+from meerkat.interactive.node import NodeMixin
 
 
-# @pytest.mark.parametrize("x", [False, True, -1, 0, 1, 2, 4.3])
-# @pytest.mark.parametrize("react", [False, True])
-# @pytest.mark.parametrize("comp", [mk.to_bool, mk.cnot])
-# def test_boolean_operators_single_operator(x, react, comp):
-#     x_store = mk.gui.Store(x)
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1, 2, 4.3])
+@pytest.mark.parametrize("y", [False, True, -1, 0, 1, 2, 4.3])
+@pytest.mark.parametrize("react", [False, True])
+@pytest.mark.parametrize("comp", [mk.cand, mk.cor])
+def test_boolean_operators_multiple_arguments(x, y, react, comp):
+    x_store = mk.gui.Store(x)
+    y_store = mk.gui.Store(y)
 
-#     if comp == mk.to_bool:
-#         expected = bool(x)
-#     elif comp == mk.cnot:
-#         expected = not x
+    if comp == mk.cand:
+        expected = x and y
+    elif comp == mk.cor:
+        expected = x or y
 
-#     with mk.gui._react():
-#         out = comp(x_store)
+    with mk.gui._react():
+        out = comp(x_store, y_store)
 
-#     assert out == expected
-#     if react:
-#         assert isinstance(out, mk.gui.Store)
-#     assert isinstance(out, type(expected))
+    assert out == expected
+    if react:
+        assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, type(expected))
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1, 2, 4.3])
+@pytest.mark.parametrize("react", [False, True])
+@pytest.mark.parametrize("comp", [mk.bool, mk.cnot])
+def test_boolean_operators_single_operator(x, react, comp):
+    x_store = mk.gui.Store(x)
+
+    if comp == mk.bool:
+        expected = bool(x)
+    elif comp == mk.cnot:
+        expected = not x
+
+    with mk.gui._react():
+        out = comp(x_store)
+
+    assert out == expected
+    if react:
+        assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, type(expected))
+
+
+def _invoker_helper(x, *, mk_func, base_func):
+    if isinstance(x, NodeMixin):
+        x = mk.react(x)
+        # All custom classes that support __len__ should raise a warning
+        # when invoked with `len(obj)`. Because NodeMixin classes are
+        # custom classes in Meerkat, this is a check that we enforce.
+        with pytest.warns(UserWarning):
+            expected = base_func(x)
+    else:
+        expected = base_func(x)
+        x = mk.gui.Store(x)
+
+    out = mk_func(x)
+    assert out == expected
+    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, type(expected))
+
+    # Check the graph is created.
+    assert x.inode is not None
+    assert len(x.inode.trigger_children) == 1
+    op_node = x.inode.trigger_children[0]
+    assert op_node.obj.fn.__name__ == mk_func.__name__
+    assert len(op_node.trigger_children) == 1
+    assert op_node.trigger_children[0] == out.inode
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1.0, 1.0 + 1j, "1", "1+1j"])
+def test_bool(x):
+    """Test mk.bool works identically to bool."""
+    _invoker_helper(x, mk_func=mk.bool, base_func=bool)
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1.0, 1.0 + 1j, "1", "1+1j"])
+def test_complex(x):
+    """Test mk.complex works identically to complex."""
+    _invoker_helper(x, mk_func=mk.complex, base_func=complex)
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1.0, "10"])
+def test_int(x):
+    """Test mk.int works identically to int."""
+    _invoker_helper(x, mk_func=mk.int, base_func=int)
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0, 1.0, "1.0"])
+def test_float(x):
+    """Test mk.float works identically to float."""
+    _invoker_helper(x, mk_func=mk.float, base_func=float)
+
+
+@pytest.mark.parametrize(
+    "x",
+    [
+        [1, 2, 3],
+        "hello world",
+        (1, 2, 3),
+        mk.DataFrame({"a": [1, 2, 3]}),
+        mk.TensorColumn([1, 2, 3]),
+    ],
+)
+def test_len(x):
+    """Test mk.len works identically to len."""
+    _invoker_helper(x, mk_func=mk.len, base_func=len)
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0])
+def test_hex(x):
+    """Test mk.complex works identically to complex."""
+    _invoker_helper(x, mk_func=mk.hex, base_func=hex)
+
+
+@pytest.mark.parametrize("x", [False, True, -1, 0])
+def test_oct(x):
+    """Test mk.oct works identically to oct."""
+    _invoker_helper(x, mk_func=mk.oct, base_func=oct)

@@ -87,24 +87,27 @@ class ReactifiableMixin:
             and not name.startswith("__")
             # Ignore all node-related attributes. These should never be accessed
             # in a reactive way.
-            and name not in ("_self_inode", "inode", "inode_id", "_reactive")
+            # NOTE: There seems to be some dependence between NodeMixin and this class.
+            # Specially, anything that is a ReactifiableMixin should also be a
+            # NodeMixin. Consider having this class inherit from NodeMixin.
+            and name not in ("_self_inode", "inode", "inode_id", "_reactive", "id")
         ):
             # Only build the function if we are in a reactive context.
             # TODO: Cache this function so that it is faster.
             def _fn(_obj):
                 return super().__getattribute__(name)
 
-    #         _fn.__name__ = name
-    #         _fn = _reactive(_fn, nested_return=False)
+            _fn.__name__ = name
+            _fn = _reactive(_fn, nested_return=False)
 
-    #         return _fn(self)
-    #     else:
-    #         return attr
+            return _fn(self)
+        else:
+            return attr
 
     def _reactive_warning(self, name, placeholder="obj"):
-        from meerkat.interactive.graph import is_reactive
+        # from meerkat.interactive.graph import is_reactive
 
-        if is_reactive():
+        if self._reactive:
             warnings.warn(
                 f"Calling {name}({placeholder}) is not reactive. "
                 f"Use `mk.{name}({placeholder})` to get"

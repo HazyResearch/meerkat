@@ -188,10 +188,15 @@ def _reactive(
             with no_react():
                 result = fn(*unpacked_args, **unpacked_kwargs)
 
+            # TODO: Check if result is equal to one of the inputs.
+            # If it is, we need to copy it.
+
             if not is_reactive() or _force_no_react:
                 # If we are not in a reactive context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
+                if isinstance(result, ReactifiableMixin):
+                    result._reactive = False
                 return result
 
             # Now we're in a reactive context i.e. is_reactive() == True
@@ -212,6 +217,11 @@ def _reactive(
                 result = result
             else:
                 result = Store(result)
+
+            # If the object is a ReactifiableMixin, we should turn
+            # reactivity on.
+            if isinstance(result, ReactifiableMixin):
+                result._reactive = True
 
             with no_react():
                 # Setup an Operation node if any of the args or kwargs

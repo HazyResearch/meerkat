@@ -3,7 +3,7 @@ from typing import Any
 from meerkat.interactive.graph import react
 
 
-@react
+@react()
 def cand(*args):
     """Overloaded ``and`` operator.
 
@@ -21,7 +21,7 @@ def cand(*args):
     return x
 
 
-@react
+@react()
 def cor(*args):
     """Overloaded ``or`` operator.
 
@@ -39,22 +39,7 @@ def cor(*args):
     return x
 
 
-@react
-def _bool(x):
-    """Overloaded ``bool`` operator.
-
-    Use this when you want to use the ``bool`` operator on reactive values (e.g. Store).
-
-    Args:
-        x: The argument to convert to a bool.
-
-    Returns:
-        Store[bool] | bool: The result of the bool operation.
-    """
-    return bool(x)
-
-
-@react
+@react()
 def cnot(x):
     """Overloaded ``not`` operator.
 
@@ -70,7 +55,24 @@ def cnot(x):
 
 
 @react()
+def _bool(x):
+    """Overloaded ``bool`` operator.
+
+    Use this when you want to use the ``bool`` operator on reactive values (e.g. Store).
+
+    Args:
+        x: The argument to convert to a bool.
+
+    Returns:
+        Store[bool] | bool: The result of the bool operation.
+    """
+    return bool(x)
+
+
+@react()
 def _complex(real: Any, imag: Any = 0.0) -> complex:
+    if isinstance(real, str):
+        return complex(real)
     return complex(real, imag)
 
 

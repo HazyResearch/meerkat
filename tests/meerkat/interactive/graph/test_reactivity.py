@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 import meerkat as mk
-from meerkat.interactive.graph import _reactive, is_reactive, trigger
+from meerkat.interactive.graph import _reactive, is_reactive, react, trigger
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
@@ -54,16 +54,15 @@ def test_react_context_instance_method():
     rng = np.random.RandomState(0)
 
     # TODO: Why is this decorator affecting the return type?
-    @_reactive
+    @react()
     def _subselect_df(df: mk.DataFrame) -> mk.DataFrame:
         cols = list(rng.choice(df.columns, 3))
         return df[cols]
 
-    df = mk.DataFrame({str(k): [k] for k in range(1000)})
-    with mk.gui._react():
-        df_sub = _subselect_df(df)
-        keys_reactive = df_sub.keys()
-
+    df = mk.DataFrame({str(k): [k] for k in range(10)})
+    df = react(df)
+    df_sub = _subselect_df(df)
+    keys_reactive = df_sub.keys()
     keys0 = keys_reactive.__wrapped__
 
     state.modification_queue.queue = [DataFrameModification(id=df.id, scope=[])]
@@ -229,7 +228,7 @@ def test_instance_methods():
 
     # Trigger the functions.
     @mk.gui.endpoint
-    def set_val(val):
+    def set_val(val: mk.gui.Store):
         val.set(0)
 
     set_val(val)

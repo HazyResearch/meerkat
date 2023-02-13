@@ -1,4 +1,5 @@
 from typing import Dict
+
 import numpy as np
 import pandas as pd
 import pyarrow as pa
@@ -202,5 +203,4 @@ def test_truediv_scalar(backend: str, operands: Dict[str, np.array], right: bool
         correct = operands["a"] / operands["b"]
 
     assert isinstance(out, ScalarColumn)
-    breakpoint()
     assert out.equals(ScalarColumn(correct, backend=backend))

@@ -113,6 +113,8 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the
         result Reference, and are used to update the state of the GUI.
         """
+        from meerkat.interactive.graph.reactivity import no_react
+
         logger.debug(f"Running {repr(self)}")
 
         # Dereference the nodes.
@@ -128,7 +130,8 @@ class Operation(NodeMixin):
             if skip:
                 return []
 
-        update = self.fn(*args, **kwargs)
+        with no_react():
+            update = self.fn(*args, **kwargs)
 
         modifications = []
         self.result = _update_result(self.result, update, modifications=modifications)

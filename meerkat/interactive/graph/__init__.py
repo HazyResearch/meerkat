@@ -36,6 +36,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
+@no_react()
 def trigger() -> List[Modification]:
     """Trigger the computation graph of an interface based on a list of
     modifications.
