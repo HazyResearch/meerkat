@@ -31,10 +31,11 @@ class ReactifiableMixin:
         return self
 
     def __getattribute__(self, name: str) -> Any:
-        from meerkat.interactive.graph import (
+        from meerkat.interactive.graph.reactivity import (
             _reactive,
             is_reactive,
             is_reactive_fn,
+            is_noreact_fn,
             no_react,
         )
 
@@ -45,6 +46,7 @@ class ReactifiableMixin:
             attr = super().__getattribute__(name)
             is_method_or_fn = inspect.ismethod(attr) or inspect.isfunction(attr)
             _is_reactive_fn = is_method_or_fn and is_reactive_fn(attr)
+            _is_noreact_fn = is_method_or_fn and is_noreact_fn(attr)
 
         # If the attribute is a method or function that is decorated with @reactive,
         # then we need to determine if we should return a reactive version.
@@ -64,7 +66,7 @@ class ReactifiableMixin:
                 return no_react()(attr)
             # TODO: Verify this check needs to be valid for both _reactive
             # and @no_react decorators.
-            elif not _is_reactive_fn:
+            elif not _is_reactive_fn and not _is_noreact_fn:
                 # If the object is reactive, but the function is not decorated with
                 # @reactive, then we need to wrap the function with @reactive.
                 # This is because the object is reactive and we want the function
@@ -85,7 +87,7 @@ class ReactifiableMixin:
             and not name.startswith("__")
             # Ignore all node-related attributes. These should never be accessed
             # in a reactive way.
-            and name not in ("_self_inode", "inode", "inode_id")
+            and name not in ("_self_inode", "inode", "inode_id", "_reactive")
         ):
             # Only build the function if we are in a reactive context.
             # TODO: Cache this function so that it is faster.

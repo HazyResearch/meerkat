@@ -106,12 +106,27 @@ class DataFrame(
         if primary_key is True:
             self._infer_primary_key(create=True)
 
+    def _react(self):
+        """Converts the object to a reactive object in-place."""
+        self._reactive = True
+        for col in self.columns:
+            self[col].react()
+        return self
+
+    def _no_react(self):
+        """Converts the object to a non-reactive object in-place."""
+        self._reactive = False
+        for col in self.columns:
+            self[col].no_react()
+        return self
+
     @property
     def gui(self):
         from meerkat.interactive.gui import DataFrameGUI
 
         return DataFrameGUI(self)
 
+    @no_react()
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -123,6 +138,7 @@ class DataFrame(
             {rename[k]: v for k, v in formatters.items()},
         )
 
+    @no_react()
     def _repr_html_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -131,11 +147,13 @@ class DataFrame(
 
         return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
 
+    @no_react()
     def __repr__(self):
         return (
             f"{self.__class__.__name__}" f"(nrows: {self.nrows}, ncols: {self.ncols})"
         )
 
+    @no_react()
     def __len__(self):
         # __len__ is required to return an int. It cannot return a Store[int].
         # As such, it cannot be wrapped in `@reactive` decorator.
@@ -145,6 +163,7 @@ class DataFrame(
             _len = self.nrows
         return _len
 
+    @no_react()
     def __contains__(self, item):
         # __contains__ is called when using the `in` keyword.
         # `in` casts the output to a boolean (i.e. `bool(output)`).
@@ -1464,3 +1483,7 @@ def is_listlike(obj) -> bool:
         and not isinstance(obj, str)
     )
     return is_column or is_sequential
+
+
+DataFrame.react = DataFrame._react
+DataFrame.no_react = DataFrame._no_react

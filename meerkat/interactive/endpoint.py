@@ -259,7 +259,8 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
             state.modification_queue.unready()
             raise e
 
-        modifications = trigger()
+        with no_react():
+            modifications = trigger()
 
         # End the progress bar
         state.progress_queue.add(None)
