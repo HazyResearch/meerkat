@@ -70,6 +70,7 @@ class DeferredColumn(Column):
         """Subclasses like `ImageColumn` should be able to implement their own
         version."""
         return self.data.fn
+        
 
     def _create_cell(self, data: object) -> DeferredCell:
         return DeferredCell(data=data)
@@ -88,7 +89,7 @@ class DeferredColumn(Column):
             # support for blocks
             if materialize:
                 # materialize could change the data in unknown ways, cannot clone
-                return self.__class__.from_data(data=self.collate(data))
+                return self.convert_to_output_type(data=self.collate(data))
             else:
                 return self._clone(data=data)
 
@@ -156,3 +157,9 @@ class DeferredColumn(Column):
 
     def _repr_cell(self, idx):
         return self[idx]
+
+    def convert_to_output_type(self, data: any):
+        if self._output_type is None:
+            from meerkat import column
+            return column(data)
+        return self._output_type(data)

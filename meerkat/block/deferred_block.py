@@ -436,7 +436,7 @@ class DeferredBlock(AbstractBlock):
         else:
             if materialize:
                 outputs = {
-                    name: col.from_data(
+                    name: col.convert_to_output_type(
                         col.collate(
                             outputs
                             if (col._block_index is None)

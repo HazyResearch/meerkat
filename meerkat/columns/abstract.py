@@ -61,7 +61,7 @@ class Column(
     MaterializationMixin,
     NodeMixin,
     ProvenanceMixin,
-    ReactifiableMixin,
+    # ReactifiableMixin,
     abc.ABC,
 ):
     """An abstract class for Meerkat columns."""
