@@ -6,12 +6,13 @@ from pydantic import BaseModel, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
 
-from meerkat.interactive.graph.reactivity import reactive
-from meerkat.interactive.graph.marking import unmarked, is_unmarked_context
+from meerkat.interactive.graph.magic import _wand, is_magic_context
+from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable
 from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.reactifiable import MarkableMixin
 
 __all__ = ["Store", "StoreFrontend", "make_store"]
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ T = TypeVar("T")
 
 
 # ObjectProxy must be the last base class
-class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
+class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy):
     _self_identifiable_group: str = "stores"
 
     def __init__(self, wrapped: T, backend_only: bool = False):
@@ -90,24 +91,23 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         self.__wrapped__ = new_value
         mod.add_to_queue()
 
+    @unmarked()
     def __repr__(self) -> str:
         return f"{type(self).__name__}({repr(self.__wrapped__)})"
 
-    @reactive
-    def __call__(self):
-        return self.__wrapped__()
-
     def __getattr__(self, name: str) -> Any:
-        # Only create a reactive function if we are in a reactive context
+        # This method is only run when the attribute is not found in the class.
+        # In this case, we will always punt the call to the wrapped object.
+
+        # Only create a reactive function if we are not in an unmarked context
         # This is like creating another `getattr` function that is reactive
         # and calling it with `self` as the first argument.
-        if not is_unmarked_context():
-
-            @reactive
+        if is_magic_context():
+            @_wand
             def wrapper(wrapped, name: str = name):
                 return getattr(wrapped, name)
 
-            # Note: this should work for both methods and properties.
+            # Note: this will work for both methods and properties.
             return wrapper(self)
         else:
             # Otherwise, just return the `attr` as is.
@@ -133,152 +133,172 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
                 return cls(v)
         return v
 
-    @reactive
-    def __lt__(self, other):
-        return super().__lt__(other)
-
-    @reactive
-    def __le__(self, other):
-        return super().__le__(other)
-
-    @reactive
-    def __eq__(self, other):
-        return super().__eq__(other)
-
-    @reactive
-    def __ne__(self, other):
-        return super().__ne__(other)
-
-    @reactive
-    def __gt__(self, other):
-        return super().__gt__(other)
-
-    @reactive
-    def __ge__(self, other):
-        return super().__ge__(other)
-
     def __hash__(self):
         return hash(self.__wrapped__)
 
-    @reactive
+    @_wand
+    def __call__(self):
+        return self.__wrapped__()
+
+    @_wand
+    def __lt__(self, other):
+        return super().__lt__(other)
+
+    @_wand
+    def __le__(self, other):
+        return super().__le__(other)
+
+    @_wand
+    def __eq__(self, other):
+        return super().__eq__(other)
+
+    @_wand
+    def __ne__(self, other):
+        return super().__ne__(other)
+
+    @_wand
+    def __gt__(self, other):
+        return super().__gt__(other)
+
+    @_wand
+    def __ge__(self, other):
+        return super().__ge__(other)
+
+    @_wand
     def __nonzero__(self):
         return super().__nonzero__()
 
-    @reactive
+    @_wand
     def to_str(self):
         return super().__str__()
 
-    @reactive
+    @_wand
     def __add__(self, other):
         return super().__add__(other)
 
-    @reactive
+    @_wand
     def __sub__(self, other):
         return super().__sub__(other)
 
-    @reactive
+    @_wand
     def __mul__(self, other):
         return super().__mul__(other)
 
-    @reactive
+    @_wand
     def __div__(self, other):
         return super().__div__(other)
 
-    @reactive
+    @_wand
     def __truediv__(self, other):
         return super().__truediv__(other)
 
-    @reactive
+    @_wand
     def __floordiv__(self, other):
         return super().__floordiv__(other)
 
-    @reactive
+    @_wand
     def __mod__(self, other):
         return super().__mod__(other)
 
-    @reactive(nested_return=False)
+    @_wand
     def __divmod__(self, other):
         return super().__divmod__(other)
 
-    @reactive
+    @_wand
     def __pow__(self, other, *args):
         return super().__pow__(other, *args)
 
-    @reactive
+    @_wand
     def __lshift__(self, other):
         return super().__lshift__(other)
 
-    @reactive
+    @_wand
     def __rshift__(self, other):
         return super().__rshift__(other)
 
-    @reactive
+    @_wand
     def __and__(self, other):
         return super().__and__(other)
 
-    @reactive
+    @_wand
     def __xor__(self, other):
         return super().__xor__(other)
 
-    @reactive
+    @_wand
     def __or__(self, other):
         return super().__or__(other)
 
-    @reactive
+    @_wand
     def __radd__(self, other):
         return super().__radd__(other)
 
-    @reactive
+    @_wand
     def __rsub__(self, other):
         return super().__rsub__(other)
 
-    @reactive
+    @_wand
     def __rmul__(self, other):
         return super().__rmul__(other)
 
-    @reactive
+    @_wand
     def __rdiv__(self, other):
         return super().__rdiv__(other)
 
-    @reactive
+    @_wand
     def __rtruediv__(self, other):
         return super().__rtruediv__(other)
 
-    @reactive
+    @_wand
     def __rfloordiv__(self, other):
         return super().__rfloordiv__(other)
 
-    @reactive
+    @_wand
     def __rmod__(self, other):
         return super().__rmod__(other)
 
-    @reactive
+    @_wand
     def __rdivmod__(self, other):
         return super().__rdivmod__(other)
 
-    @reactive
+    @_wand
     def __rpow__(self, other, *args):
         return super().__rpow__(other, *args)
 
-    @reactive
+    @_wand
     def __rlshift__(self, other):
         return super().__rlshift__(other)
 
-    @reactive
+    @_wand
     def __rrshift__(self, other):
         return super().__rrshift__(other)
 
-    @reactive
+    @_wand
     def __rand__(self, other):
         return super().__rand__(other)
 
-    @reactive
+    @_wand
     def __rxor__(self, other):
         return super().__rxor__(other)
 
-    @reactive
+    @_wand
     def __ror__(self, other):
         return super().__ror__(other)
+
+    @_wand
+    def __neg__(self):
+        return super().__neg__()
+
+    @_wand
+    def __pos__(self):
+        return super().__pos__()
+
+    @_wand
+    def __abs__(self):
+        return super().__abs__()
+
+    @_wand
+    def __invert__(self):
+        return super().__invert__()
 
     # We do not need to decorate i-methods because they call their
     # out-of-place counterparts, which are reactive
@@ -364,41 +384,29 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         )
         return self.__or__(other)
 
-    @reactive
-    def __neg__(self):
-        return super().__neg__()
-
-    @reactive
-    def __pos__(self):
-        return super().__pos__()
-
-    @reactive
-    def __abs__(self):
-        return super().__abs__()
-
-    @reactive
-    def __invert__(self):
-        return super().__invert__()
-
-    # While __index__ must return an integer, we decorate it with @_reactive
+    # While __index__ must return an integer, we decorate it with @_wand
     # to make sure that wrapper methods calling __index__ handle non-integer values
     # appropriately.
     # NOTE: This only works if __index__ is always called from wrapper methods
     # and the user/developer has a way of intercepting these methods or creating
     # recommended practices for avoiding this error.
-    @reactive
+    @_wand
     def __index__(self):
         return super().__index__()
 
     def _reactive_warning(self, name):
-        if not is_unmarked_context():
+        # If the context is not unmarked and the store is operating in a magic
+        # context, this method will raise a warning.
+        # This will primarily be done by __dunder__ methods, which are called by
+        # builtin Python functions (e.g. __len__ -> len, __int__ -> int, etc.)
+        if not is_unmarked_context() and is_magic_context():
             warnings.warn(
                 f"Calling {name}(store) is not reactive. Use `mk.{name}(store)` to get"
                 f"a reactive variable (i.e. a Store). `mk.{name}(store)` behaves"
                 f"exactly like {name}(store) outside of this difference."
             )
 
-    # Don't use @_reactive on:
+    # Don't use @_wand on:
     #   - __len__
     #   - __int__
     #   - __long__
@@ -406,8 +414,9 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     #   - __complex__
     #   - __oct__
     #   - __hex__
-    # Python requires that these methods must return an primitive type
-    # (i.e. not a Store). As such, we cannot make them reactive.
+    # Python requires that these methods must return a primitive type
+    # (i.e. not a Store). As such, we cannot wrap them in @reactive using
+    # @_wand.
     # We allow the user to call these methods on stores (e.g. len(store)),
     # which will return the appropriate primitive type (i.e. not reactive).
     # We raise a warning to remind the user that these methods are not reactive.
@@ -443,11 +452,11 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
         self._reactive_warning("bool")
         return super().__bool__()
 
-    @reactive
+    @_wand
     def __contains__(self, value):
         return super().__contains__(value)
 
-    @reactive
+    @_wand
     def __getitem__(self, key):
         return super().__getitem__(key)
 
@@ -461,25 +470,25 @@ class Store(IdentifiableMixin, NodeMixin, Generic[T], ObjectProxy):
     #     warnings.warn(f"{type(self).__name__}.__setitem__ is out-of-place.")
     #     return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_wand
     def __delitem__(self, key):
         obj = self.__wrapped__.copy()
         del obj[key]
         warnings.warn(f"{type(self).__name__}.__delitem__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_wand
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
-    @reactive
+    @_wand
     def __setslice__(self, i, j, value):
         obj = self.__wrapped__.copy()
         obj[i:j] = value
         warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive
+    @_wand
     def __delslice__(self, i, j):
         obj = self.__wrapped__.copy()
         del obj[i:j]
@@ -517,7 +526,7 @@ class _IteratorStore(Store):
             raise ValueError("wrapped object must be an Iterator.")
         super().__init__(wrapped, backend_only)
 
-    @reactive
+    @_wand
     def __next__(self):
         return next(self.__wrapped__)
 

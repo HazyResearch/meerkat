@@ -188,7 +188,7 @@ def reactive(
             # If any of the inputs into fn are reactive, we need to add fn
             # to the graph.
             with unmarked():
-                any_inputs_reactive = _any_inputs_marked(*args, **kwargs)
+                any_inputs_marked = _any_inputs_marked(*args, **kwargs)
 
             # Call the function on the args and kwargs
             with unmarked():
@@ -197,7 +197,7 @@ def reactive(
             # TODO: Check if result is equal to one of the inputs.
             # If it is, we need to copy it.
 
-            if is_unmarked_context() or _force_no_react or not any_inputs_reactive:
+            if is_unmarked_context() or _force_no_react or not any_inputs_marked:
                 # If we are in an unmarked context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
