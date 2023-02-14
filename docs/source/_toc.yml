@@ -1,9 +1,13 @@
 format: jb-book
 root: index
 parts:
+  - caption: Home
+    chapters:
+      - file: overview
   - caption: Getting started
     chapters:
       - file: start/install
+      - file: start/quickstart
       - file: start/walkthrough
       - file: start/configure
 

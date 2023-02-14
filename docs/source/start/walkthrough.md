@@ -29,7 +29,7 @@ from meerkat.datasets.imagenette import download_imagenette
 
 dataset_dir = "./downloads"
 os.makedirs(dataset_dir, exist_ok=True)
-download_imagenette(dataset_dir);
+download_imagenette(dataset_dir, overwrite=True);
 ```
 
 Let's take a look at the CSV.

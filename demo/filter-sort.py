@@ -2,13 +2,12 @@ import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
 
-with mk.gui.reactive():
-    filter = mk.gui.Filter(df=df)
-    df = filter(df)
+filter = mk.gui.Filter(df=df)
+df = filter(df)
 
-    criteria = mk.gui.Store([])
-    sort = mk.gui.Sort(df=df, criteria=criteria)
-    df = sort(df)
+criteria = mk.gui.Store([])
+sort = mk.gui.Sort(df=df, criteria=criteria)
+df = sort(df)
 
 # Gallery
 gallery = mk.gui.Gallery(

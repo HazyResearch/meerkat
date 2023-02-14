@@ -32,27 +32,27 @@ df_clip = mk.DataFrame.read(
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
 
-with mk.gui.reactive():
-    # Match
-    sort_criteria = mk.gui.Store([])
-    match = mk.gui.Match(
-        df=df,
-        against=EMBED_COLUMN,
-        title="Search Examples",
-        on_match=append_to_sort.partial(criteria=sort_criteria),
-    )
-    df = match(df)[0]
+# with mk.gui.reactive():
+# Match
+sort_criteria = mk.gui.Store([])
+match = mk.gui.Match(
+    df=df,
+    against=EMBED_COLUMN,
+    title="Search Examples",
+    on_match=append_to_sort.partial(criteria=sort_criteria),
+)
+df = match(df)[0]
 
-    # Filter
-    filter = mk.gui.Filter(df=df)
-    df = filter(df)
+# Filter
+filter = mk.gui.Filter(df=df)
+df = filter(df)
 
-    # Sort
-    sort = mk.gui.Sort(df=df, criteria=sort_criteria, title="Sort Examples")
-    df = sort(df)
+# Sort
+sort = mk.gui.Sort(df=df, criteria=sort_criteria, title="Sort Examples")
+df = sort(df)
 
-    # Gallery
-    gallery = mk.gui.Gallery(df=df, main_column="img")
+# Gallery
+gallery = mk.gui.Gallery(df=df, main_column="img")
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
