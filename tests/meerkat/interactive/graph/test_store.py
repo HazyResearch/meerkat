@@ -9,7 +9,11 @@ from meerkat.interactive.graph.store import _IteratorStore
 
 
 def _is_out_magiced(
-    out, input_store: mk.gui.Store, *, op_name: str = None, op_num_children: int = None
+    out,
+    input_store: mk.gui.Store,
+    *,
+    op_name: str = None,
+    op_num_children: int = None,
 ):
     """Check if the output is magiced.
 

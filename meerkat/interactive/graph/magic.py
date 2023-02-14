@@ -54,7 +54,7 @@ def _wand(fn: Callable) -> Callable:
                 # Just wrap with `mark` and return.
                 with unmarked():
                     out = reactive(fn, nested_return=False)(*args, **kwargs)
-                    out = mark(out)
+                    # out = mark(out)
                 return out
 
         # setattr(wrapper, "__wrapper__", _MAGIC_FN)
