@@ -3,10 +3,11 @@ from typing import Iterator, Tuple
 import pytest
 
 import meerkat as mk
+from meerkat.interactive.graph.magic import magic
 
 
-@pytest.mark.parametrize("react", [False, True])
-def test_store_reactive_math(react: bool):
+@pytest.mark.parametrize("is_magic", [False, True])
+def test_store_reactive_math(is_magic: bool):
     """Test basic math methods are reactive.
 
     A method is reactive if it:
@@ -36,7 +37,7 @@ def test_store_reactive_math(react: bool):
     }
 
     out = {}
-    with mk.gui.reactive(reactive=react):
+    with magic(magic=is_magic):
         out["add"] = store + 1
         out["sub"] = store - 1
         out["mul"] = store * 1
@@ -55,14 +56,25 @@ def test_store_reactive_math(react: bool):
         out["gt"] = store > 1
         out["ge"] = store >= 1
 
+    op_children = {}
+    if is_magic:
+        assert len(store.inode.trigger_children) == len(expected)
+        op_children = {c.obj.fn.__name__: c for c in store.inode.trigger_children}
+    else:
+        assert store.inode is None
+
     for k, v in out.items():
-        if react:
+        if is_magic:
             assert isinstance(v, mk.gui.Store)
-            assert store.inode.has_trigger_children()
-            # TODO: Check the parent of the current child.
+            op_name = f"__{k}__"
+            op_inode = op_children[op_name]
+            assert len(op_inode.trigger_children) == 1
+            assert op_inode.trigger_children[0] is v.inode
         else:
-            assert not isinstance(v, mk.gui.Store)
-            assert store.inode is None
+            # If magic is not on, the output should still be a marked Store.
+            # However nothing should be on the graph.
+            assert isinstance(v, mk.gui.Store)
+            assert v.inode is None
 
         assert v == expected[k]
 

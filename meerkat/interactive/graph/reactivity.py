@@ -1,7 +1,7 @@
-import inspect
 from functools import partial, wraps
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union, cast
+from typing import Callable
 
+from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
 from meerkat.interactive.graph.operation import (
     Operation,
     _check_fn_has_leading_self_arg,
@@ -12,9 +12,8 @@ from meerkat.interactive.graph.utils import (
 )
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.reactifiable import MarkableMixin, ReactifiableMixin
-from meerkat.interactive.graph.marking import unmarked, is_unmarked_context
 
-__all__ = ["reactive", "reactive", "is_unmarked_context", "get_reactive_kwargs"]
+__all__ = ["reactive", "reactive", "is_unmarked_context"]
 
 _REACTIVE_FN = "reactive"
 
@@ -169,7 +168,7 @@ def reactive(
                 # because shorthand accessors (e.g. x[0] for x.__getitem__(0)) do not
                 # use the __getattribute__ method.
                 obj = args[0]
-                if isinstance(obj, ReactifiableMixin):
+                if isinstance(obj, MarkableMixin):
                     with unmarked():
                         is_obj_reactive = obj.marked
                     _force_no_react = not is_obj_reactive
@@ -287,7 +286,6 @@ def is_reactive_fn(fn: Callable) -> bool:
         and hasattr(fn, "__wrapper__")
         and fn.__wrapper__ == _REACTIVE_FN
     )
-
 
 
 def _nested_apply(obj: object, fn: Callable):

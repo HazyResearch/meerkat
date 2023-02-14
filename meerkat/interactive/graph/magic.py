@@ -24,7 +24,7 @@ def _wand(fn: Callable) -> Callable:
 
     When the magic context is active, the function will be wrapped in
     `reactive` and will be executed as a reactive function.
-    
+
     When the magic context is not active, the function will be effectively run
     with unmarked inputs (i.e. `with unmarked():`). This means that the function
     will not be added to the graph. The return value will be marked and returned.
@@ -54,7 +54,8 @@ def _wand(fn: Callable) -> Callable:
                 # Just wrap with `mark` and return.
                 with unmarked():
                     out = reactive(fn, nested_return=False)(*args, **kwargs)
-                return mark(out)
+                    out = mark(out)
+                return out
 
         # setattr(wrapper, "__wrapper__", _MAGIC_FN)
         return wrapper
@@ -73,6 +74,9 @@ class magic:
 
     """
 
+    def __init__(self, magic: bool = True) -> None:
+        self._magic = magic
+
     def __call__(self, func):
         @wraps(func)
         def decorate_context(*args, **kwargs):
@@ -83,14 +87,14 @@ class magic:
         return cast(F, decorate_context)
 
     def __enter__(self):
-        _IS_MAGIC_CONTEXT.append(True)
+        _IS_MAGIC_CONTEXT.append(self._magic)
         return self
 
     def __exit__(self, type, value, traceback):
         _IS_MAGIC_CONTEXT.pop(-1)
 
     def clone(self):
-        return self.__class__()
+        return self.__class__(self._magic)
 
 
 def is_magic_context() -> bool:
