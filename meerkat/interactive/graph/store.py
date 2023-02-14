@@ -509,16 +509,9 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     # def __next__(self):
     #     return next(self.__wrapped__)
 
+    @_wand
     def __iter__(self):
-        # FIXME: Find efficient way of mocking the iterator.
-        # This is inefficient because it loads each element
-        # of the wrapped object into memory.
-        # This would be inefficient for iterables that should not
-        # be loaded into memory (e.g. torch DataLoaders) or for long iterables
-        # This is a temporary solution to make the Store iterable.
-        # return iter([Store(x) if _is_reactive else x for x in self.value])
-        _iterator = iter(self.__wrapped__)
-        return _IteratorStore(_iterator) if not is_unmarked_context() else _iterator
+        return _IteratorStore(iter(self.__wrapped__))
 
 
 class _IteratorStore(Store):
