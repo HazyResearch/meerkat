@@ -25,6 +25,7 @@ from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.graph.operation import Operation
+from meerkat.interactive.graph.reactivity import is_reactive
 from meerkat.interactive.node import NodeMixin
 from meerkat.row import Row
 
@@ -1302,7 +1303,7 @@ def test_scalar_setitem(x):
 
 
 @mk.gui.endpoint
-def _set_store_or_df(store, value):
+def _set_store_or_df(store: mk.gui.Store, value):
     store.set(value)
 
 
@@ -1347,31 +1348,129 @@ def test_reactivity_attributes_and_properties(name):
     # No reactivity.
     # We want to check that the output is not a Store.
     # it can be other NodeMixIns, because these are classes built into meerkat.
-    out = getattr(df, name)
+    with mk.no_react():
+        out = getattr(df, name)
     assert not isinstance(out, mk.gui.Store)
 
 
 def test_reactivity_len():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    with mk.gui._react():
-        with pytest.warns(UserWarning):
-            length = len(df)
+
+    # Warning should be raised when is_reactive()==True and df is reactive.
+    df = df.react()
+    assert is_reactive() and df._reactive
+    with pytest.warns(UserWarning):
+        length = len(df)
     assert length == 10
+    assert not isinstance(length, mk.gui.Store)
 
     # Warnings should not be raised if we are not in a reactive context.
+    df = df.react()
+    with mk.no_react():
+        assert not is_reactive() and df._reactive
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            length = len(df)
+    assert length == 10
+    assert not isinstance(length, mk.gui.Store)
+
+    # Warnings should not be raised when the df is not reactive.
+    df = df.no_react()
+    assert is_reactive() and not df._reactive
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         length = len(df)
+    assert length == 10
+    assert not isinstance(length, mk.gui.Store)
+
+    # Calling df.__len__ directly should not raise the warning.
+    # This is because this way of calling length will actually
+    # return a Store.
+    # NOTE: People will almost always not do this. But it's an
+    # important edge case.
+    # TODO: Maybe df.__len__ should always return a primitive?
+    df = df.react()
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        length = df.__len__()
+    assert length == 10
+    assert isinstance(length, mk.gui.Store)
+
+    # mk.len should follow standard reactive protocols.
+    df = df.react()
+    assert is_reactive() and df._reactive
+    length = mk.len(df)
+    assert isinstance(length, mk.gui.Store)
+    assert length == 10
+    assert length.inode is not None
+
+    df = df.no_react()
+    assert is_reactive() and not df._reactive
+    length = mk.len(df)
+    assert not isinstance(length, mk.gui.Store)
     assert length == 10
 
 
 def test_reactivity_contains():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    store = mk.gui.Store("a")
-    with mk.gui._react():
+    df = df.react()
+
+    item = "a"
+
+    # Warning should be raised when is_reactive()==True and df is reactive.
+    assert is_reactive() and df._reactive
+    with pytest.warns(UserWarning):
+        out = item in df
+    assert not isinstance(out, mk.gui.Store)
+    assert out
+
+    # Warnings should not be raised if we are not in a reactive context.
+    df = df.react()
+    with mk.no_react():
+        assert not is_reactive() and df._reactive
         with warnings.catch_warnings():
             warnings.simplefilter("error")
-            a_contains = df.contains(store)
+            out = item in df
+    assert not isinstance(out, mk.gui.Store)
+    assert out
+
+    # Warnings should not be raised when the df is not reactive.
+    df = df.no_react()
+    assert is_reactive() and not df._reactive
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        out = item in df
+    assert not isinstance(out, mk.gui.Store)
+    assert out
+
+    # Calling df.__contains__ directly should not raise the warning.
+    # This is because this way of calling contains will actually
+    # return a Store.
+    # NOTE: People will almost always not do this. But it's an
+    # important edge case.
+    # TODO: Maybe df.__contains__ should always return a primitive?
+    df = df.react()
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        length = df.__contains__(item)
+    assert isinstance(length, mk.gui.Store)
+    assert out
+
+
+def test_reactivity_contains_alternate():
+    """
+    Test the alternate way determining if an item is in a dataframe.
+    i.e. df.contains(item)
+    """
+    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    item = mk.gui.Store("a")
+
+    df = df.react()
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        a_contains = df.contains(item)
+    assert isinstance(a_contains, mk.gui.Store)
+    assert a_contains.inode is not None
     inode = a_contains.inode
 
     assert a_contains
@@ -1385,23 +1484,16 @@ def test_reactivity_contains():
     assert len(op.inode.trigger_children) == 1
     assert id(op.inode.trigger_children[0]) == id(a_contains.inode)
 
-    # Change the store
-    _set_store_or_df(store, "c")
+    # Change the store - "c" is not in the df.
+    _set_store_or_df(item, "c")
     assert not inode.obj
-
-    # The `in` operator coerces the output of __contains__ to a bool.
-    # Store.__bool__ cannot return a bool due to cpython limitations.
-    df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    with mk.gui._react():
-        with pytest.warns(UserWarning):
-            a_in = "a" in df
-    assert not isinstance(a_in, mk.gui.Store)
 
 
 def test_reactivity_size():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    with mk.gui._react():
-        shape = df.size()
+    df = df.react()
+
+    shape = df.size()
     inode = shape.inode
 
     assert shape == (10, 2)
@@ -1423,13 +1515,14 @@ def test_reactivity_size():
 @pytest.mark.parametrize("axis", ["rows", "columns"])
 def test_reactivity_append(axis: str):
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
+    df = df.react()
+
     if axis == "rows":
         df2 = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
     else:
         df2 = DataFrame({"c": np.arange(10), "d": torch.arange(10)})
 
-    with mk.gui._react():
-        df_append = df.append(df2, axis=axis)
+    df_append = df.append(df2, axis=axis)
     inode = df_append.inode
 
     assert df.inode.has_trigger_children()
@@ -1454,8 +1547,9 @@ def test_reactivity_append(axis: str):
 @pytest.mark.parametrize("op_name", ["head", "tail"])
 def test_reactivity_head_tail(op_name: str):
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    with mk.gui._react():
-        df_slice = getattr(df, op_name)()
+    df = df.react()
+
+    df_slice = getattr(df, op_name)()
     assert df.inode.has_trigger_children()
     assert len(df.inode.trigger_children) == 1
     op = df.inode.trigger_children[0].obj
@@ -1469,9 +1563,10 @@ def test_reactivity_getitem_multiple_columns():
     df = DataFrame(
         {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
     )
-    store = mk.gui.Store(["a", "b"])
-    with mk.gui._react():
-        df_col = df[store]
+    df = df.react()
+    store = mk.react(["a", "b"])
+
+    df_col = df[store]
     inode = df_col.inode
 
     assert isinstance(df_col, DataFrame)
@@ -1675,9 +1770,9 @@ def test_reactivity_rename():
 #     inode = keys.inode
 def test_reactivity_drop():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
+    df = df.react()
     store = mk.gui.Store(["a"])
-    with mk.gui._react():
-        df_drop = df.drop(columns=store)
+    df_drop = df.drop(columns=store)
     inode = df_drop.inode
 
     #     assert list(keys) == ["a", "b"]
@@ -1692,8 +1787,8 @@ def test_reactivity_drop():
 
 def test_reactivity_keys():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
-    with mk.gui._react():
-        keys = df.keys()
+    df = df.react()
+    keys = df.keys()
     inode = keys.inode
 
     assert list(keys) == ["a", "b"]

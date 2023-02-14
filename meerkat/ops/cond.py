@@ -55,6 +55,16 @@ def cnot(x):
 
 
 @react()
+def _all(__iterable):
+    return all(__iterable)
+
+
+@react()
+def _any(__iterable):
+    return any(__iterable)
+
+
+@react()
 def _bool(x):
     """Overloaded ``bool`` operator.
 

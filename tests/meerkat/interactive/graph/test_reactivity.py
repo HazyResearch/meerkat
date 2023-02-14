@@ -11,9 +11,9 @@ from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
 
 
-def _create_dummy_df() -> mk.DataFrame:
+def _create_dummy_reactive_df() -> mk.DataFrame:
     df = pd.DataFrame({"a": np.arange(10), "b": np.arange(10) + 10})
-    return mk.DataFrame.from_pandas(df)
+    return mk.DataFrame.from_pandas(df).react()
 
 
 @_reactive()
@@ -21,30 +21,36 @@ def _add_to_list(_keys: List[str], new_key: str):
     return _keys + [new_key]
 
 
-def test_react_context_manager_basic():
-    df = _create_dummy_df()
+def test_react_basic():
+    df = _create_dummy_reactive_df()
 
-    with mk.gui._react():
-        keys_reactive = df.keys()
-        _ = _add_to_list(keys_reactive, "c")
+    keys_reactive = df.keys()
+    out = _add_to_list(keys_reactive, "c")
 
+    assert out.inode is not None
     assert isinstance(keys_reactive, mk.gui.Store)
     assert keys_reactive.inode.has_trigger_children()
+    op_node = keys_reactive.inode.trigger_children[0]
+    assert op_node.obj.fn.__name__ == "_add_to_list"
+    assert len(op_node.trigger_children) == 1
+    assert op_node.trigger_children[0] is out.inode
 
     # Outside of context manager.
-    keys = df.keys()
-    assert isinstance(keys, List)
+    with mk.no_react():
+        keys = df.keys()
+    assert not isinstance(keys, mk.gui.Store)
 
 
 def test_react_context_manager_nested():
-    df = _create_dummy_df()
+    df = _create_dummy_reactive_df()
 
-    with mk.gui._react():
-        keys_reactive = df.keys()
-        assert is_reactive()
-        with mk.gui.no_react():
-            assert not is_reactive()
-            keys = df.keys()
+    assert is_reactive()
+    with mk.gui.no_react():
+        assert not is_reactive()
+        keys = df.keys()
+        with mk.gui._react():
+            assert is_reactive()
+            keys_reactive = df.keys()
 
     assert isinstance(keys_reactive, mk.gui.Store)
     assert isinstance(keys, List)

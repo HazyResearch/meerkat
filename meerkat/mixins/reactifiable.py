@@ -62,6 +62,10 @@ class ReactifiableMixin:
         #       on the is_reactive(). Only when the object is not reactive, do we
         #       need to handle this case.
         if is_method_or_fn:
+            # There are some functions we never want to wrap.
+            # These functions should all be declared in the ReactifiableMixin.
+            if name in ["_reactive_warning"]:
+                return attr
             if not is_obj_reactive or name in ["react", "no_react", "attach_to_inode"]:
                 return no_react()(attr)
             # TODO: Verify this check needs to be valid for both _reactive
@@ -105,9 +109,9 @@ class ReactifiableMixin:
             return attr
 
     def _reactive_warning(self, name, placeholder="obj"):
-        # from meerkat.interactive.graph import is_reactive
+        from meerkat.interactive.graph import is_reactive
 
-        if self._reactive:
+        if is_reactive() and self._reactive:
             warnings.warn(
                 f"Calling {name}({placeholder}) is not reactive. "
                 f"Use `mk.{name}({placeholder})` to get"

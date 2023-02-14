@@ -34,7 +34,12 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import is_reactive, no_react, react
+from meerkat.interactive.graph.reactivity import (
+    _IS_REACTIVE,
+    is_reactive,
+    no_react,
+    react,
+)
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -153,7 +158,7 @@ class DataFrame(
             f"{self.__class__.__name__}" f"(nrows: {self.nrows}, ncols: {self.ncols})"
         )
 
-    @no_react()
+    # @no_react()
     def __len__(self):
         # __len__ is required to return an int. It cannot return a Store[int].
         # As such, it cannot be wrapped in `@reactive` decorator.
@@ -163,19 +168,18 @@ class DataFrame(
             _len = self.nrows
         return _len
 
-    @no_react()
     def __contains__(self, item):
         # __contains__ is called when using the `in` keyword.
-        # `in` casts the output to a boolean (i.e. `bool(output)`).
+        # `in` casts the output to a boolean (i.e. `bool(self.__contains__(item))`).
         # Store.__bool__ is not reactive because __bool__ has to return
         # a bool (not a Store). Thus, we cannot wrap __contains__ in
         # `@reactive` decorator.
-        if is_reactive():
+        if is_reactive() and self._reactive:
             warnings.warn(
                 "The `in` operator is not reactive. Use `df.contains(...)`:\n"
                 "\t>>> df.contains(item)"
             )
-        return item in self.columns
+        return self.columns.__contains__(item)
 
     @react()
     def contains(self, item):

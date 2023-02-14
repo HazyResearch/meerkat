@@ -72,6 +72,18 @@ def _invoker_helper(x, *, mk_func, base_func):
     assert op_node.trigger_children[0] == out.inode
 
 
+@pytest.mark.parametrize("x", [(), (1,), (1, 2), (0, 1, 2)])
+def test_all(x):
+    """Test mk.all works identically to all."""
+    _invoker_helper(x, mk_func=mk.all, base_func=all)
+
+
+@pytest.mark.parametrize("x", [(), (1,), (1, 2), (0, 1, 2)])
+def test_any(x):
+    """Test mk.any works identically to any."""
+    _invoker_helper(x, mk_func=mk.any, base_func=any)
+
+
 @pytest.mark.parametrize("x", [False, True, -1, 0, 1.0, 1.0 + 1j, "1", "1+1j"])
 def test_bool(x):
     """Test mk.bool works identically to bool."""

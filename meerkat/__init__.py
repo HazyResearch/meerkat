@@ -42,6 +42,8 @@ from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
 from meerkat.ops.cond import (
+    _all,
+    _any,
     _bool,
     _complex,
     _float,
@@ -91,6 +93,8 @@ from_huggingface = DataFrame.from_huggingface
 read = DataFrame.read
 
 # aliases for meerkat magic method invokers.
+all = _all
+any = _any
 len = _len
 int = _int
 float = _float
@@ -142,6 +146,8 @@ __all__ = [
     "cand",
     "cor",
     "cnot",
+    "all",
+    "any",
     "bool",
     "len",
     "int",

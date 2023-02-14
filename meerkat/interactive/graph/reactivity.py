@@ -184,6 +184,12 @@ def _reactive(
                 if isinstance(args[0], Store):
                     unpacked_args[0] = args[0]
 
+            # We need to check the arguments to see if they are reactive.
+            # If any of the inputs into fn are reactive, we need to add fn
+            # to the graph.
+            with no_react():
+                any_inputs_reactive = _any_inputs_reactive(*args, **kwargs)
+
             # Call the function on the args and kwargs
             with no_react():
                 result = fn(*unpacked_args, **unpacked_kwargs)
@@ -191,12 +197,10 @@ def _reactive(
             # TODO: Check if result is equal to one of the inputs.
             # If it is, we need to copy it.
 
-            if not is_reactive() or _force_no_react:
+            if not is_reactive() or _force_no_react or not any_inputs_reactive:
                 # If we are not in a reactive context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
-                if isinstance(result, ReactifiableMixin):
-                    result._reactive = False
                 return result
 
             # Now we're in a reactive context i.e. is_reactive() == True
@@ -690,3 +694,21 @@ def _create_nodes_for_nodeables(*nodeables: NodeMixin):
 
 def _is_reactifiable_method(fn: Callable):
     return _check_fn_has_leading_self_arg(fn)
+
+
+def _any_inputs_reactive(*args, **kwargs) -> bool:
+    """Returns True if any of the inputs are reactive.
+
+    Note: This function does not recursively check the arguments for
+    reactive inputs.
+    """
+    from meerkat.interactive.graph.store import Store
+
+    def _is_reactive(obj):
+        return isinstance(obj, Store) or (
+            isinstance(obj, ReactifiableMixin) and obj._reactive
+        )
+
+    return any(_is_reactive(arg) for arg in args) or any(
+        _is_reactive(arg) for arg in kwargs.values()
+    )
