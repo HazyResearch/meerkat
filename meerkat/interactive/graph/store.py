@@ -31,6 +31,8 @@ T = TypeVar("T")
 # ObjectProxy must be the last base class
 class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy):
     _self_identifiable_group: str = "stores"
+    # By default, stores are marked.
+    _self_marked = True
 
     def __init__(self, wrapped: T, backend_only: bool = False):
         if isinstance(wrapped, Iterator):
@@ -103,6 +105,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         # This is like creating another `getattr` function that is reactive
         # and calling it with `self` as the first argument.
         if is_magic_context():
+
             @_wand
             def wrapper(wrapped, name: str = name):
                 return getattr(wrapped, name)
