@@ -32,7 +32,7 @@ df_clip = mk.DataFrame.read(
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
 
-with mk.gui.react():
+with mk.gui.reactive():
     # Match
     sort_criteria = mk.gui.Store([])
     match = mk.gui.Match(

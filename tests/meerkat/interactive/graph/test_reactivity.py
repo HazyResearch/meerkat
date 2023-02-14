@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 import meerkat as mk
-from meerkat.interactive.graph import _reactive, is_reactive, react, trigger
+from meerkat.interactive.graph import reactive, is_unmarked_context, reactive, trigger
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
@@ -13,10 +13,10 @@ from meerkat.state import state
 
 def _create_dummy_reactive_df() -> mk.DataFrame:
     df = pd.DataFrame({"a": np.arange(10), "b": np.arange(10) + 10})
-    return mk.DataFrame.from_pandas(df).react()
+    return mk.DataFrame.from_pandas(df).mark()
 
 
-@_reactive()
+@reactive()
 def _add_to_list(_keys: List[str], new_key: str):
     return _keys + [new_key]
 
@@ -36,7 +36,7 @@ def test_react_basic():
     assert op_node.trigger_children[0] is out.inode
 
     # Outside of context manager.
-    with mk.no_react():
+    with mk.unmarked():
         keys = df.keys()
     assert not isinstance(keys, mk.gui.Store)
 
@@ -44,12 +44,12 @@ def test_react_basic():
 def test_react_context_manager_nested():
     df = _create_dummy_reactive_df()
 
-    assert is_reactive()
-    with mk.gui.no_react():
-        assert not is_reactive()
+    assert not is_unmarked_context()
+    with mk.gui.unmarked():
+        assert is_unmarked_context()
         keys = df.keys()
-        with mk.gui._react():
-            assert is_reactive()
+        with mk.gui.reactive():
+            assert not is_unmarked_context()
             keys_reactive = df.keys()
 
     assert isinstance(keys_reactive, mk.gui.Store)
@@ -60,13 +60,13 @@ def test_react_context_instance_method():
     rng = np.random.RandomState(0)
 
     # TODO: Why is this decorator affecting the return type?
-    @react()
+    @reactive()
     def _subselect_df(df: mk.DataFrame) -> mk.DataFrame:
         cols = list(rng.choice(df.columns, 3))
         return df[cols]
 
     df = mk.DataFrame({str(k): [k] for k in range(10)})
-    df = react(df)
+    df = reactive(df)
     df_sub = _subselect_df(df)
     keys_reactive = df_sub.keys()
     keys0 = keys_reactive.__wrapped__
@@ -85,7 +85,7 @@ def test_react_context_instance_method():
 
 @pytest.mark.parametrize("react", [False, True])
 def test_react_as_decorator(react: bool):
-    @mk.gui._react(react)
+    @mk.gui.reactive(react)
     def add(a, b):
         return a + b
 
@@ -105,22 +105,22 @@ def test_react_as_decorator(react: bool):
 def test_default_nested_return():
     """By default, nested return is None."""
 
-    @_reactive
+    @reactive
     def _return_tuple():
         return ("a", "b")
 
-    @_reactive
+    @reactive
     def _return_list():
         return ["a", "b"]
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         out = _return_tuple()
         a, b = out
     assert isinstance(out, tuple)
     assert isinstance(a, mk.gui.Store)
     assert isinstance(b, mk.gui.Store)
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         out = _return_list()
     assert isinstance(out, list)
 
@@ -133,11 +133,11 @@ def test_nested_reactive_fns():
     function will not add things to the graph.
     """
 
-    @mk.gui._react()
+    @mk.gui.reactive()
     def _inner(x):
         return ["a", "b", x]
 
-    @mk.gui._react()
+    @mk.gui.reactive()
     def _outer(x):
         return ["example"] + _inner(x)
 
@@ -210,17 +210,17 @@ def test_instance_methods():
         def __init__(self, x):
             self.x = x
 
-        @_reactive
+        @reactive
         def add(self, y):
             return self.x + y
 
-        @_reactive
+        @reactive
         def __eq__(self, __o: int) -> bool:
             return self.x == __o
 
     foo = Foo(1)
     val = mk.gui.Store(2)
-    with mk.gui._react():
+    with mk.gui.reactive():
         out_add = foo.add(val)
         out_eq = foo == val
     assert isinstance(out_add, mk.gui.Store)

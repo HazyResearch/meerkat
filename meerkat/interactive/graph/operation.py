@@ -10,6 +10,7 @@ from meerkat.interactive.modification import (
 )
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Primitive
+from meerkat.interactive.graph.marking import unmarked
 
 if TYPE_CHECKING:
     from meerkat.interactive.graph.store import Store
@@ -113,7 +114,6 @@ class Operation(NodeMixin):
         These modifications describe the delta changes made to the
         result Reference, and are used to update the state of the GUI.
         """
-        from meerkat.interactive.graph.reactivity import no_react
 
         logger.debug(f"Running {repr(self)}")
 
@@ -130,7 +130,7 @@ class Operation(NodeMixin):
             if skip:
                 return []
 
-        with no_react():
+        with unmarked():
             update = self.fn(*args, **kwargs)
 
         modifications = []

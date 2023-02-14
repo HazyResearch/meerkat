@@ -2,7 +2,7 @@ import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
 
-with mk.gui.react():
+with mk.gui.reactive():
     filter = mk.gui.Filter(df=df)
     df = filter(df)
 

@@ -8,7 +8,7 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Store, no_react, trigger
+from meerkat.interactive.graph import Store, unmarked, trigger
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
@@ -252,14 +252,14 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
 
         try:
             # The function should not add any operations to the graph.
-            with no_react():
+            with unmarked():
                 result = partial_fn()
         except Exception as e:
             # Unready the modification queue
             state.modification_queue.unready()
             raise e
 
-        with no_react():
+        with unmarked():
             modifications = trigger()
 
         # End the progress bar
@@ -612,7 +612,7 @@ def endpoint(
                         _kwargs[k] = v
 
             try:
-                with no_react():
+                with unmarked():
                     # Run the function
                     result = fn(*_args, **_kwargs)
             except Exception as e:

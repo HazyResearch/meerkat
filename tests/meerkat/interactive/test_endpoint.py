@@ -3,7 +3,7 @@ import pytest
 import meerkat as mk
 
 
-@pytest.mark.parametrize("fn_decorator", [mk.gui._reactive])
+@pytest.mark.parametrize("fn_decorator", [mk.gui.reactive])
 def test_endpoint_wrapping_reactive_fn(fn_decorator):
     """When an endpoint wraps a reactive function, reactivity should be
     disabled to prevent adding anything to the graph.
@@ -21,8 +21,8 @@ def test_endpoint_wrapping_reactive_fn(fn_decorator):
 
     # Test with @reactive decorator.
     x = mk.gui.Store(1)
-    with mk.gui._react():  # Turn on react context
-        assert mk.gui.is_reactive()  # Verify we are in a reactive context
+    with mk.gui.reactive():  # Turn on react context
+        assert not mk.gui.is_unmarked_context()  # Verify we are in a reactive context
         fn_endpoint(x)
     assert x == 4  # Verify the endpoint works
     assert x.inode is None  # Graph should be empty

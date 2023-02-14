@@ -13,13 +13,13 @@ from meerkat.interactive import (
     endpoint,
     html,
     print,
-    react,
+    reactive,
 )
 
 
 # Decorate with @react so that this fn is reactive when called with inputs
 # that are reactive. Otherwise, the function is defined as any normal function.
-@react
+@reactive
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
     """
     Function that loads the GPTSimpleVectorIndex from disk if it exists.
@@ -60,7 +60,7 @@ def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
 # `str` will make the `str`'s methods reactive.
 # `react` returns a `Store` object, which is a thin wrapper around the object passed
 # to `react` that (almost always) behaves like the object passed to `react`.
-dir: Store = react("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
+dir: Store = reactive("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
 # This is the same as
 # dir = Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
 
@@ -70,7 +70,7 @@ index = load_index(dir=dir, savefilename="gpt_index")
 
 # Create a variable that will be used to store the response from the index
 # for the last query. We will display this in the UI.
-last_response: Store = react("The response will appear here.")
+last_response: Store = reactive("The response will appear here.")
 
 
 @endpoint

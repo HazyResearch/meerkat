@@ -17,7 +17,7 @@ def test_boolean_operators_multiple_arguments(x, y, react, comp):
     elif comp == mk.cor:
         expected = x or y
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         out = comp(x_store, y_store)
 
     assert out == expected
@@ -37,7 +37,7 @@ def test_boolean_operators_single_operator(x, react, comp):
     elif comp == mk.cnot:
         expected = not x
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         out = comp(x_store)
 
     assert out == expected
@@ -48,7 +48,7 @@ def test_boolean_operators_single_operator(x, react, comp):
 
 def _invoker_helper(x, *, mk_func, base_func):
     if isinstance(x, NodeMixin):
-        x = mk.react(x)
+        x = mk.reactive(x)
         # All custom classes that support __len__ should raise a warning
         # when invoked with `len(obj)`. Because NodeMixin classes are
         # custom classes in Meerkat, this is a check that we enforce.

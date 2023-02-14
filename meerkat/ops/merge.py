@@ -9,14 +9,14 @@ from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
 from meerkat.errors import MergeError
-from meerkat.interactive.graph import _reactive
+from meerkat.interactive.graph import reactive
 from meerkat.ops.decorators import check_primary_key
 from meerkat.provenance import capture_provenance
 
 
 @capture_provenance(capture_args=["left_on", "on", "right_on", "how"])
 @check_primary_key
-@_reactive
+@reactive
 def merge(
     left: DataFrame,
     right: DataFrame,

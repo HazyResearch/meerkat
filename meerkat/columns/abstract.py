@@ -24,7 +24,7 @@ import pyarrow as pa
 
 import meerkat.config
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import no_react
+from meerkat.interactive.graph.marking import unmarked
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.aggregate import AggregateMixin
 from meerkat.mixins.blockable import BlockableMixin
@@ -108,11 +108,11 @@ class Column(
         # Log creation
         logger.info(f"Created `{self.__class__.__name__}` with {len(self)} rows.")
 
-    @no_react()
+    @unmarked()
     def __repr__(self):
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
-    @no_react()
+    @unmarked()
     def __str__(self):
         return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
 
@@ -267,7 +267,7 @@ class Column(
             **kwargs,
         )
 
-    @no_react()
+    @unmarked()
     def __len__(self):
         self._reactive_warning("len", "col")
         return self.full_length()
@@ -277,7 +277,7 @@ class Column(
             return 0
         return len(self._data)
 
-    @no_react()
+    @unmarked()
     def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
@@ -303,7 +303,7 @@ class Column(
         new_col.formatter = formatter
         return new_col
 
-    @no_react()
+    @unmarked()
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows
@@ -322,7 +322,7 @@ class Column(
 
         return col, self.formatter if self.formatter is None else self.formatter.html
 
-    @no_react()
+    @unmarked()
     def _repr_html_(self, max_rows: int = None):
         # pd.Series objects do not implement _repr_html_
         if max_rows is None:

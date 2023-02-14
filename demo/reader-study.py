@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 
 import meerkat as mk
-from meerkat.interactive import endpoint, react, html, Store
+from meerkat.interactive import endpoint, reactive, html, Store
 
 
 def add_noise(img: Image) -> Image:
@@ -36,7 +36,7 @@ def go_forward(row, df):
     row.set(min(row + 1, len(df) - 1))
 
 
-@react()
+@reactive()
 def get_selected(label, value_list):
     # Label needs to be converted to a string because the values
     # are auto converted to strings by the RadioGroup component.
@@ -46,7 +46,7 @@ def get_selected(label, value_list):
     return selected
 
 
-@react()
+@reactive()
 def select_row(df, row):
     # We have to do this because range indexing doesn't work with
     # stores.

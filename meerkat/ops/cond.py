@@ -1,9 +1,9 @@
 from typing import Any
 
-from meerkat.interactive.graph import react
+from meerkat.interactive.graph import reactive
 
 
-@react()
+@reactive()
 def cand(*args):
     """Overloaded ``and`` operator.
 
@@ -21,7 +21,7 @@ def cand(*args):
     return x
 
 
-@react()
+@reactive()
 def cor(*args):
     """Overloaded ``or`` operator.
 
@@ -39,7 +39,7 @@ def cor(*args):
     return x
 
 
-@react()
+@reactive()
 def cnot(x):
     """Overloaded ``not`` operator.
 
@@ -54,17 +54,17 @@ def cnot(x):
     return not x
 
 
-@react()
+@reactive()
 def _all(__iterable):
     return all(__iterable)
 
 
-@react()
+@reactive()
 def _any(__iterable):
     return any(__iterable)
 
 
-@react()
+@reactive()
 def _bool(x):
     """Overloaded ``bool`` operator.
 
@@ -79,35 +79,35 @@ def _bool(x):
     return bool(x)
 
 
-@react()
+@reactive()
 def _complex(real: Any, imag: Any = 0.0) -> complex:
     if isinstance(real, str):
         return complex(real)
     return complex(real, imag)
 
 
-@react()
+@reactive()
 def _int(__x, base: int = None):
     if base is None:
         return int(__x)
     return int(__x, base=base)
 
 
-@react()
+@reactive()
 def _float(__x: Any) -> float:
     return float(__x)
 
 
-@react()
+@reactive()
 def _len(__obj):
     return len(__obj)
 
 
-@react()
+@reactive()
 def _hex(__number: Any) -> str:
     return hex(__number)
 
 
-@react()
+@reactive()
 def _oct(__number: Any) -> str:
     return oct(__number)

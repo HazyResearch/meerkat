@@ -13,7 +13,7 @@ import yaml
 import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import Column
-from meerkat.interactive.graph.reactivity import no_react
+from meerkat.interactive.graph.marking import unmarked
 from meerkat.tools.utils import MeerkatLoader
 
 from .deferred_block import DeferredBlock
@@ -417,7 +417,7 @@ class BlockManager(MutableMapping):
         mgr.reorder(meta["_column_order"])
         return mgr
 
-    @no_react()
+    @unmarked()
     def _repr_pandas_(self, max_rows: int = None):
         if max_rows is None:
             max_rows = meerkat.config.display.max_rows

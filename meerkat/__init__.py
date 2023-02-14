@@ -106,13 +106,13 @@ bool = _bool
 # These statements needs to be after the imports above.
 # Do not move them.
 import meerkat.interactive.svelte
-from meerkat.interactive import no_react, react
+from meerkat.interactive import unmarked, reactive
 
 __all__ = [
     "DataFrame",
     "Row",
-    "react",
-    "no_react",
+    "reactive",
+    "unmarked",
     # <<<< Columns >>>>
     "column",
     "Column",

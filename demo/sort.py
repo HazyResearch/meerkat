@@ -1,8 +1,8 @@
 import meerkat as mk
-from meerkat.interactive import react
+from meerkat.interactive import reactive
 
 df = mk.get("imagenette", version="160px")
-df = react(df)
+df = reactive(df)
 assert isinstance(df, mk.DataFrame)
 
 sort = mk.gui.Sort(df)

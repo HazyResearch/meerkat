@@ -17,7 +17,7 @@ df["image_path"] = df["image"].defer(lambda x: x["path"])
 df["image"] = df["image_path"].map(lambda x: Image.open(x))
 
 # Add a filtering component
-df = mk.react(df)
+df = mk.reactive(df)
 filter = mk.gui.Filter(df)
 df_filtered = filter(df)
 df_grouped = df_filtered.groupby("cfg").count()

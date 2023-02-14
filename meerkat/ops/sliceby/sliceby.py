@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
 import numpy as np
 
 from meerkat.dataframe import DataFrame
-from meerkat.interactive.graph.reactivity import _reactive
+from meerkat.interactive.graph.reactivity import reactive
 from meerkat.mixins.identifiable import IdentifiableMixin
 
 
@@ -156,7 +156,7 @@ class SliceIndexer:
         return self.obj._get(key, index, materialize=False)
 
 
-@_reactive
+@reactive
 def sliceby(
     data: DataFrame,
     by: Union[str, Sequence[str]] = None,

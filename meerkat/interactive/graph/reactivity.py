@@ -11,12 +11,12 @@ from meerkat.interactive.graph.utils import (
     _replace_nodeables_with_nodes,
 )
 from meerkat.interactive.node import NodeMixin
-from meerkat.mixins.reactifiable import ReactifiableMixin
+from meerkat.mixins.reactifiable import MarkableMixin, ReactifiableMixin
+from meerkat.interactive.graph.marking import unmarked, is_unmarked_context
 
-__all__ = ["_react", "_reactive", "is_reactive", "get_reactive_kwargs"]
+__all__ = ["reactive", "reactive", "is_unmarked_context", "get_reactive_kwargs"]
 
-_REACTIVE_FN = "_reactive"
-_NO_REACT_FN = "_no_react"
+_REACTIVE_FN = "reactive"
 
 
 def isclassmethod(method):
@@ -35,7 +35,7 @@ def isclassmethod(method):
     return False
 
 
-def _reactive(
+def reactive(
     fn: Callable = None,
     nested_return: bool = None,
     skip_fn: Callable[..., bool] = None,
@@ -51,7 +51,7 @@ def _reactive(
 
     .. code-block:: python
 
-        @_reactive
+        @reactive
         def add(a: int, b: int) -> int:
             return a + b
 
@@ -66,7 +66,7 @@ def _reactive(
 
     .. code-block:: python
 
-        @_reactive
+        @reactive
         def concat(df1: mk.DataFrame, df2: mk.DataFrame) -> mk.DataFrame:
             return mk.concat([df1, df2])
 
@@ -88,7 +88,7 @@ def _reactive(
     if fn is None:
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
-        return partial(_reactive, nested_return=nested_return, skip_fn=skip_fn)
+        return partial(reactive, nested_return=nested_return, skip_fn=skip_fn)
 
     def __reactive(fn: Callable):
         @wraps(fn)
@@ -170,8 +170,8 @@ def _reactive(
                 # use the __getattribute__ method.
                 obj = args[0]
                 if isinstance(obj, ReactifiableMixin):
-                    with no_react():
-                        is_obj_reactive = obj._reactive
+                    with unmarked():
+                        is_obj_reactive = obj.marked
                     _force_no_react = not is_obj_reactive
 
                     # If the object is reactive, then we let the function pass through.
@@ -187,18 +187,18 @@ def _reactive(
             # We need to check the arguments to see if they are reactive.
             # If any of the inputs into fn are reactive, we need to add fn
             # to the graph.
-            with no_react():
-                any_inputs_reactive = _any_inputs_reactive(*args, **kwargs)
+            with unmarked():
+                any_inputs_reactive = _any_inputs_marked(*args, **kwargs)
 
             # Call the function on the args and kwargs
-            with no_react():
+            with unmarked():
                 result = fn(*unpacked_args, **unpacked_kwargs)
 
             # TODO: Check if result is equal to one of the inputs.
             # If it is, we need to copy it.
 
-            if not is_reactive() or _force_no_react or not any_inputs_reactive:
-                # If we are not in a reactive context, then we don't need to create
+            if is_unmarked_context() or _force_no_react or not any_inputs_reactive:
+                # If we are in an unmarked context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
                 return result
@@ -225,9 +225,9 @@ def _reactive(
             # If the object is a ReactifiableMixin, we should turn
             # reactivity on.
             if isinstance(result, ReactifiableMixin):
-                result._reactive = True
+                result.marked = True
 
-            with no_react():
+            with unmarked():
                 # Setup an Operation node if any of the args or kwargs
                 # were nodeables
                 op = None
@@ -281,354 +281,13 @@ def _reactive(
 
 
 def is_reactive_fn(fn: Callable) -> bool:
-    """Check if a function is wrapped by a the `reactive` decorator."""
+    """Check if a function is wrapped by the `reactive` decorator."""
     return (
         hasattr(fn, "__wrapped__")
         and hasattr(fn, "__wrapper__")
         and fn.__wrapper__ == _REACTIVE_FN
     )
 
-
-def is_noreact_fn(fn: Callable) -> bool:
-    """Check if a function is wrapped by a the `no_react` decorator."""
-    return (
-        hasattr(fn, "__wrapped__")
-        and hasattr(fn, "__wrapper__")
-        and fn.__wrapper__ == _NO_REACT_FN
-    )
-
-
-def react(
-    input: Union[Callable, Any] = None,
-    nested_return: bool = None,
-    skip_fn: Callable[..., bool] = None,
-) -> Union[Callable, Any]:
-    """Make a function or object reactive. Use as a decorator, or call with a
-    function or object.
-
-    If the input is a function, then the function will be added to a
-    computational graph, and will be re-run when any of its inputs change.
-
-    If the input is an object, then the object will become reactive: all of its
-    methods and properties will become reactive. It will be returned as a
-    `Store` object.
-
-    Args:
-        input: A function or object to make reactive.
-        nested_return: Whether the function returns a nested tuple of objects.
-            If `None`, then the function will be assumed to return a nested tuple
-            if the return value is a tuple.
-        skip_fn: A function that takes the same arguments as the function being
-            wrapped, and returns a boolean. If the function returns `True`, then
-            the function will not be added to the graph.
-
-    Returns:
-        A reactive function or object.
-
-    Examples:
-
-    Use `react` on primitive types:
-
-        >>> x: Store = react(1)
-        >>> # x is now a `Store` object
-        >>> y = x + 1
-        >>> # y will be a `Store` object, and will re-run when `x` changes
-
-    Use `react` on complex types:
-
-        >>> x: Store = react([1, 2, 3])
-        >>> y = x[0] + 1
-        >>> # y will be a `Store` object, and will re-run when `x` changes
-
-    Use `react` on instances of classes:
-
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({"a": [1, 2, 3]})
-        >>> x: Store = react(df)
-        >>> y = x.head()
-        >>> # y will be a `Store` object, and will re-run when `x` changes
-
-        >>> class Foo:
-        ...     def __init__(self, x):
-        ...         self.x = x
-        ...     def __call__(self):
-        ...         return self.x + 1
-        >>> f = Foo(1)
-        >>> x: Store = react(f)
-        >>> y = x()
-        >>> # y will be a `Store` object, and will re-run when `x` changes
-
-    Use `react` on built-in functions:
-
-        >>> print = react(print)
-        >>> x: Store = react(1)
-        >>> print(x)
-        >>> # The print statement will re-run when `x` changes
-
-
-    Use `react` as a decorator:
-
-        >>> @react
-        ... def f(x: int):
-        ...     return x + 1
-        >>> x: Store = react(1)
-        >>> y = f(x)
-        >>> # y will be a `Store` object, and will re-run when `x` changes
-    """
-    from meerkat.interactive.graph.store import Store
-
-    if input is None:
-        return partial(react, nested_return=nested_return, skip_fn=skip_fn)
-
-    # We setup an `if` condition that catches:
-    # - primitive types (int, float, str, etc.)
-    # - complex types (e.g. `list`, `dict`)
-    # - instances of classes (e.g. `pd.DataFrame`), regardless of whether they
-    #   are callable or not.
-    #
-    # The following are allowed to pass through to `_reactive`:
-    # - user-defined functions (standard functions, lambdas, etc.)
-    # - built-in functions, such as `len`, `sum`, etc.
-    # - methods of classes (e.g. `pd.DataFrame.head`)
-
-    if isinstance(input, ReactifiableMixin):
-        return input.react()
-
-    if callable(input):
-        if inspect.isclass(input):
-            # Allow anything that inspect.isclass() returns True for.
-            # For example, given a class `Test`, function `foo`
-            #   inspect.isclass(Test)           True        is a class
-            #   inspect.isclass(map)            True        has class implementation
-            #   inspect.isclass(range)          True        has class implementation
-            #   inspect.isclass(foo)            False       is a function
-            #   inspect.isclass(Test())         False       is an instance of a class
-            #   inspect.isclass(print)          False       is a built-in function
-            #   inspect.isclass(open)           False       is a built-in function
-            #   inspect.isclass(len)            False       is a built-in function
-            pass
-
-        elif inspect.isfunction(input):
-            # This is a standard function, lambda, etc.
-            # We let this pass through.
-            pass
-
-        elif inspect.isbuiltin(input):
-            # This is a built-in function, such as `len`, `sum`, etc.
-            # We let this pass through.
-            pass
-
-        elif inspect.ismethod(input):
-            # If we're here, we have a method of a class.
-            # We let this pass through.
-            pass
-
-        elif hasattr(input, "__self__") and input.__self__ is not None:
-            pass
-
-        else:
-            # If we're here, we (likely) have an instance of a class that has
-            # a `__call__` method. Wrap this in a `Store` and return it.
-            return Store(input)
-    else:
-        # Here, wrap whatever we get in a `Store` and return it.
-        # This will include:
-        # - instances of primitive types: int, float, complex, str, bytes,
-        #   bool, type(None)
-        # - instances of complex types: list, tuple, dict, set, frozenset, etc.
-        # - instances of classes (e.g. `pd.DataFrame`) that are not callable
-        return Store(input)
-
-    return _reactive(input, nested_return, skip_fn)
-
-
-# A stack that manages if reactive mode is enabled
-# The stack is reveresed so that the top of the stack is
-# the last index in the list.
-class _ReactiveState:
-    def __init__(
-        self,
-        *,
-        reactive: bool,
-        nested_return: Optional[bool],
-        skip_fn: Optional[Callable],
-    ) -> None:
-        self.reactive = reactive
-        self.kwargs = dict(nested_return=nested_return, skip_fn=skip_fn)
-
-    def __bool__(self):
-        return self.reactive
-
-    def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}("
-            f"reactive={self.reactive}, "
-            f"nested_return={self.kwargs['nested_return']}, "
-            f"skip_fn={self.kwargs['skip_fn']}"
-            ")"
-        )
-
-
-_IS_REACTIVE: List[_ReactiveState] = []
-
-
-def is_reactive() -> bool:
-    """Whether the code is in reactive context.
-
-    Returns:
-        bool: True if the code is in a reactive context.
-    """
-    # By default, we should assume we are in a reactive context.
-    # This will allow functions that are decorated with `reactive` to
-    # add nodes to the graph.
-    if len(_IS_REACTIVE) == 0:
-        return True
-
-    # TODO: we need to check this since users are only allowed the use
-    # of the `no_react` context manager. Therefore, everything is reactive
-    # by default, *unless the user has explicitly disabled it*.
-    return len(_IS_REACTIVE) > 0 and bool(_IS_REACTIVE[-1])
-
-
-def get_reactive_kwargs() -> Dict[str, Any]:
-    """Get the kwargs for the current reactive context.
-
-    Returns:
-        Dict[str, Any]: The kwargs for the current reactive context.
-    """
-    return _IS_REACTIVE[-1].kwargs
-
-
-# Used for annotating decorator usage of 'react'.
-# Adapted from PyTorch:
-# https://mypy.readthedocs.io/en/latest/generics.html#declaring-decorators
-FuncType = Callable[..., Any]
-F = TypeVar("F", bound=FuncType)
-
-
-class _react:
-    """Context-manager that is used control if code is an interface operation.
-
-    Code-blocks in this context manager will create nodes
-    in the operation graph, which are executed whenever their inputs
-    are modified.
-
-    A basic example that adds two numbers:
-
-    .. code-block:: python
-
-        a = Store(1)
-        b = Store(2)
-        with _react():
-            c = a + b
-
-    When either `a` or `b` is modified, the code block will re-execute
-    with the new values of `a` and `b`.
-
-    Also functions as a decorator. (Make sure to instantiate with parenthesis.):
-
-    .. code-block:: python
-
-            @_react()
-            def add(a: int, b: int) -> int:
-                return a + b
-
-            a = Store(1)
-            b = Store(2)
-            c = add(a, b)
-
-    A more complex example that concatenates two mk.DataFrame objects:
-
-    .. code-block:: python
-
-        @_react()
-        def concat(df1: mk.DataFrame, df2: mk.DataFrame) -> mk.DataFrame:
-            return mk.concat([df1, df2])
-
-        df1 = mk.DataFrame(...)
-        df2 = mk.DataFrame(...)
-        df3 = concat(df1, df2)
-
-    Args:
-        reactive: The function to decorate.
-        nested_return: Whether the function returns an object (e.g. List, Dict) with
-            a nested structure. If True, a `Store` or `Reference` will be created for
-            every element in the nested structure. If False, a single `Store` or
-            `Reference` wrapping the entire object will be created. For example, if the
-            function returns two DataFrames in a tuple, then `nested_return` should be
-            `True`. However, if the functions returns a variable length list of ints,
-            then `nested_return` should likely be `False`.
-        skip_fn: A function that returns True if the operation should be skipped.
-            This is useful for functions that are expensive to run.
-            The function should take in parameters starting with "old_" and "new_" and
-            ending with the name of the parameter. Instance methods cannot be used as
-            skip functions.
-
-            .. code-block:: python
-
-                def skip_fn(old_a: int, new_a: int, old_b: int, new_b: int) -> bool:
-                    # Addition is commutative, so we can skip the operation
-                    # if the values of a and b are the switched.
-                    return old_a == new_b and old_b == new_a
-
-                @react(skip_fn=skip_fn)
-                def add(a: int, b: int) -> int:
-                    return a + b
-
-    Returns:
-        A decorated function that creates an operation node in the operation graph.
-    """
-
-    def __init__(
-        self,
-        reactive: bool = True,
-        *,
-        nested_return: bool = None,
-        skip_fn: Callable = None,
-    ):
-        self._reactive = reactive
-        self._nested_return = nested_return
-        self._skip_fn = skip_fn
-
-    def __call__(self, func):
-        @wraps(func)
-        def decorate_context(*args, **kwargs):
-            with self.clone():
-                return _reactive(
-                    func, nested_return=self._nested_return, skip_fn=self._skip_fn
-                )(*args, **kwargs)
-
-        if not self._reactive:
-            setattr(decorate_context, "__wrapper__", _NO_REACT_FN)
-        return cast(F, decorate_context)
-
-    def __enter__(self):
-        _IS_REACTIVE.append(
-            _ReactiveState(
-                reactive=self._reactive,
-                nested_return=self._nested_return,
-                skip_fn=self._skip_fn,
-            )
-        )
-        return self
-
-    def __exit__(self, type, value, traceback):
-        _IS_REACTIVE.pop(-1)
-
-    def clone(self):
-        return self.__class__(
-            reactive=self._reactive,
-            nested_return=self._nested_return,
-            skip_fn=self._skip_fn,
-        )
-
-
-class no_react(_react):
-    def __init__(self):
-        super().__init__(reactive=False, nested_return=False, skip_fn=None)
-
-    def clone(self):
-        return self.__class__()
 
 
 def _nested_apply(obj: object, fn: Callable):
@@ -692,23 +351,16 @@ def _create_nodes_for_nodeables(*nodeables: NodeMixin):
             nodeable.attach_to_inode(nodeable.create_inode(inode_id=inode_id))
 
 
-def _is_reactifiable_method(fn: Callable):
-    return _check_fn_has_leading_self_arg(fn)
-
-
-def _any_inputs_reactive(*args, **kwargs) -> bool:
+def _any_inputs_marked(*args, **kwargs) -> bool:
     """Returns True if any of the inputs are reactive.
 
     Note: This function does not recursively check the arguments for
     reactive inputs.
     """
-    from meerkat.interactive.graph.store import Store
 
-    def _is_reactive(obj):
-        return isinstance(obj, Store) or (
-            isinstance(obj, ReactifiableMixin) and obj._reactive
-        )
+    def _is_marked(obj):
+        return isinstance(obj, MarkableMixin) and obj.marked
 
-    return any(_is_reactive(arg) for arg in args) or any(
-        _is_reactive(arg) for arg in kwargs.values()
+    return any(_is_marked(arg) for arg in args) or any(
+        _is_marked(arg) for arg in kwargs.values()
     )

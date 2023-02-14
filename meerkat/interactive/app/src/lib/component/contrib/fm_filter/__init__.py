@@ -4,7 +4,7 @@ from typing import Sequence
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store, _reactive, no_react
+from meerkat.interactive.graph import Store, reactive, unmarked
 
 
 @endpoint
@@ -45,7 +45,7 @@ def base_on_run(
     query.set(new_query)
 
 
-@_reactive
+@reactive
 def filter_df(df: DataFrame, criteria_df: DataFrame, query: str):
     df = df[
         df.primary_key.isin(criteria_df.primary_key[criteria_df[_hash_query(query)]])
@@ -60,7 +60,7 @@ class FMFilter(Component):
 
     def __init__(self, df=DataFrame, on_run: Endpoint = None, manifest_session=None):
         query = Store("__default__")
-        with no_react():
+        with unmarked():
             criteria_df = df[[df.primary_key_name]]
             criteria_df[_hash_query("__default__")] = True
         manifest_session = manifest_session

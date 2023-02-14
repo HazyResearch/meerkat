@@ -1,10 +1,10 @@
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
-from meerkat.interactive.graph import Store, _react
+from meerkat.interactive.graph import Store, reactive
 
 
-@_react()
+@reactive()
 def run_code_cell(df: DataFrame, code: str):
     df = df.view()  # this is needed to avoid cycles in simple df case
     lines = code.split("\n")
@@ -13,7 +13,7 @@ def run_code_cell(df: DataFrame, code: str):
     return eval(lines[-1], {}, _locals)
 
 
-@_react()
+@reactive()
 def run_filter_code_cell(df: DataFrame, code: str):
     df = df.view()  # this is needed to avoid cycles in simple df case
     _locals = locals()

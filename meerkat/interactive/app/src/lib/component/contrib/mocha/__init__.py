@@ -78,14 +78,14 @@ class ChangeList(BaseComponent):
         slices_df = slice_repo.slices
         base_examples = df
 
-        with mk.gui._react():
+        with mk.gui.reactive():
 
             examples_df = mk.merge(base_examples, membership_df, on=df.primary_key_name)
 
             examples_df = mk.sample(examples_df, len(examples_df))
 
             # SLICE OVERVIEW
-            @mk.gui._reactive
+            @mk.gui.reactive
             def compute_slice_scores(examples: mk.DataPanel, slices: mk.DataPanel):
                 """Produce a DataFrame with average delta's (and counts) for
                 each slice."""
@@ -237,7 +237,7 @@ class ChangeList(BaseComponent):
                 mod.add_to_queue()
                 slice_repo.write()
 
-            @mk.gui._reactive
+            @mk.gui.reactive
             def get_selected_slice_id(
                 criteria: List[FilterCriterion],
                 code: str,
@@ -278,7 +278,7 @@ class ChangeList(BaseComponent):
                 mod.add_to_queue()
                 slice_repo.write()
 
-            @mk.gui._reactive
+            @mk.gui.reactive
             def compute_stats(df: mk.DataFrame):
                 return {
                     "count": len(df),
@@ -329,7 +329,7 @@ class ChangeList(BaseComponent):
                 ),
             )
 
-            @mk.gui._reactive
+            @mk.gui.reactive
             def subselect_columns(df):
                 return df[
                     list(

@@ -4,26 +4,25 @@ from typing import List
 from meerkat.errors import TriggerError
 from meerkat.interactive.graph.operation import Operation
 from meerkat.interactive.graph.reactivity import (
-    _react,
-    _reactive,
-    get_reactive_kwargs,
-    is_reactive,
+    reactive,
     is_reactive_fn,
-    no_react,
-    react,
+    reactive
 )
+from meerkat.interactive.graph.marking import unmarked, mark, is_unmarked_fn, is_unmarked_context
 from meerkat.interactive.graph.store import Store, StoreFrontend, make_store
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort
 from meerkat.state import state
 
 __all__ = [
-    "_react",
-    "no_react",
-    "_reactive",
-    "is_reactive",
+    "reactive",
+    "unmarked",
+    "mark",
+    "is_unmarked_fn",
+    "reactive",
+    "is_unmarked_context",
     "is_reactive_fn",
-    "react",
+    "reactive",
     "get_reactive_kwargs",
     "Store",
     "StoreFrontend",
@@ -36,7 +35,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-@no_react()
+@unmarked()
 def trigger() -> List[Modification]:
     """Trigger the computation graph of an interface based on a list of
     modifications.

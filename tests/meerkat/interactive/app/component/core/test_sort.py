@@ -16,7 +16,7 @@ def test_sort_single_criterion():
 
     df = mk.DataFrame({"a": arr})
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         sort = mk.gui.Sort(df=df)
         out = sort(df)
     node = out.inode
@@ -37,7 +37,7 @@ def test_sort_multiple_criteria():
 
     df = mk.DataFrame({"a": a, "b": b})
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         sort = mk.gui.Sort(df=df)
         out = sort(df)
     node = out.inode
@@ -63,7 +63,7 @@ def test_skip_sort_disabled():
     """If a criterion is disabled, it should be skipped."""
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         sort = mk.gui.Sort(df=df)
         out = sort(df)
     node = out.inode
@@ -89,7 +89,7 @@ def test_skip_sort_order():
         {"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "b": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
     )
 
-    with mk.gui._react():
+    with mk.gui.reactive():
         sort = mk.gui.Sort(df=df)
         out = sort(df)
     node = out.inode
