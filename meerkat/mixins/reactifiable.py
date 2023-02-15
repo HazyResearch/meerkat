@@ -1,7 +1,13 @@
 import inspect
 import warnings
 from typing import Any
-from meerkat.interactive.graph.marking import is_unmarked_fn, unmarked, is_unmarked_context
+
+from meerkat.interactive.graph.marking import (
+    is_unmarked_context,
+    is_unmarked_fn,
+    unmarked,
+)
+
 
 class MarkableMixin:
     """A class that can be marked."""
@@ -15,8 +21,8 @@ class MarkableMixin:
     def mark(self):
         """Mark this object.
 
-        When marked, this object will trigger a reactive function
-        when passed in as an argument.
+        When marked, this object will trigger a reactive function when
+        passed in as an argument.
         """
         self._self_marked = True
         return self
@@ -45,10 +51,7 @@ class ReactifiableMixin(MarkableMixin):
 
     # TODO: Clean and investigate failure points of this function.
     def __getattribute__(self, name: str) -> Any:
-        from meerkat.interactive.graph.reactivity import (
-            reactive,
-            is_reactive_fn
-        )
+        from meerkat.interactive.graph.reactivity import is_reactive_fn, reactive
 
         # We assume accessing the attribute twice will not result in different values.
         # We dont explicitly check for this because it is expensive.
@@ -158,6 +161,7 @@ class ReactifiableMixin(MarkableMixin):
     We include the following dunder methods as examples of how to correctly
     implement them when using this Mixin.
     """
+
     def __len__(self):
         with unmarked():
             out = super().__len__()

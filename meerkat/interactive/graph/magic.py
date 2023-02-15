@@ -17,10 +17,9 @@ _MAGIC_FN = "magic"
 
 
 def _wand(fn: Callable) -> Callable:
-    """
-    Internal decorator that is used to mark a function with a wand.
-    Wand functions can be activated when the magic context is active
-    (`with magic:`).
+    """Internal decorator that is used to mark a function with a wand. Wand
+    functions can be activated when the magic context is active (`with
+    magic:`).
 
     When the magic context is active, the function will be wrapped in
     `reactive` and will be executed as a reactive function.
@@ -40,11 +39,8 @@ def _wand(fn: Callable) -> Callable:
     def __wand(fn: Callable):
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            """
-            Wrapper function that wraps the function in `reactive` if
-            the magic context is active, and just wraps with `mark`
-            otherwise.
-            """
+            """Wrapper function that wraps the function in `reactive` if the
+            magic context is active, and just wraps with `mark` otherwise."""
 
             # Check if magic context is active.
             if is_magic_context():
@@ -64,14 +60,11 @@ def _wand(fn: Callable) -> Callable:
 
 
 class magic:
-    """
-    A context manager and decorator that changes the behavior of
-    Store objects inside it. All methods, properties and public
-    attributes of Store objects will be wrapped in @reactive
-    decorators.
+    """A context manager and decorator that changes the behavior of Store
+    objects inside it. All methods, properties and public attributes of Store
+    objects will be wrapped in @reactive decorators.
 
     Examples:
-
     """
 
     def __init__(self, magic: bool = True) -> None:

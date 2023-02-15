@@ -58,11 +58,13 @@ class Foo(ReactifiableMixin):
 
 # TODO: Add tests for nested react/noreact funcs.
 
+
 def test_marking():
     foo = Foo(1)
     assert not foo.marked
     foo = foo.mark()
     assert foo.marked
+
 
 def test_reactive_setter_inplace():
     """Setting the .reactive property should be in-place."""
@@ -148,9 +150,8 @@ def test_magic_method_not_decorated(react: bool):
 
 
 def test_instance_method_not_decorated():
-    """
-    Instance methods that are not decorated should, by default, be unmarked.
-    """
+    """Instance methods that are not decorated should, by default, be
+    unmarked."""
     foo = Foo(1)
 
     # Object is reactive.

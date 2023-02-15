@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 import meerkat as mk
-from meerkat.interactive.graph import reactive, is_unmarked_context, reactive, trigger
+from meerkat.interactive.graph import is_unmarked_context, reactive, trigger
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state

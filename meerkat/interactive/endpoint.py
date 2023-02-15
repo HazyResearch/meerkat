@@ -8,7 +8,7 @@ from typing import Any, Callable, Generic, Union
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
-from meerkat.interactive.graph import Store, unmarked, trigger
+from meerkat.interactive.graph import Store, trigger, unmarked
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T

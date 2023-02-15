@@ -1,5 +1,5 @@
-from typing import Callable, Any, TypeVar, cast, List
 from functools import wraps
+from typing import Any, Callable, List, TypeVar, cast
 
 # Used for annotating decorator usage of 'react'.
 # Adapted from PyTorch:
@@ -13,10 +13,9 @@ _UNMARKED_FN = "unmarked"
 
 
 class unmarked:
-    """
-    A context manager and decorator that forces all objects within it to
-    behave as if they are not marked. This means that any functions
-    (reactive or not) called with those objects will never be rerun.
+    """A context manager and decorator that forces all objects within it to
+    behave as if they are not marked. This means that any functions (reactive
+    or not) called with those objects will never be rerun.
 
     Effectively, functions (by decoration) or blocks of code
     (with the context manager) behave as if they are not reactive.
@@ -157,7 +156,6 @@ def mark(input: T) -> T:
     Use `mark` on functions:
 
         >>> aggregation = mark(mean)
-
     """
     from meerkat.interactive.graph.store import Store
     from meerkat.mixins.reactifiable import MarkableMixin

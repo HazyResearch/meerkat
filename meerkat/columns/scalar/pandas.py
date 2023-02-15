@@ -410,7 +410,7 @@ class PandasScalarColumn(
         if isinstance(other, Column):
             assert isinstance(other, PandasScalarColumn)
             other = other.data
-            
+
         if right:
             compute_fn = f"r{compute_fn}"
         return self._clone(

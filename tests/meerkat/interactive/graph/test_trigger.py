@@ -78,7 +78,8 @@ def test_trigger():
 @pytest.mark.parametrize("check_equality", [False])
 @pytest.mark.parametrize("toggle_mark", [None, "a", "b"])
 def test_trigger_hybrid_marked_unmarked_inputs(check_equality: bool, toggle_mark: str):
-    """Test trigger functionality when some inputs are marked and some are not."""
+    """Test trigger functionality when some inputs are marked and some are
+    not."""
 
     a = mk.gui.Store(1)
     b = mk.gui.Store(2).unmark()

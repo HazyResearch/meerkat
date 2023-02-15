@@ -70,7 +70,6 @@ class DeferredColumn(Column):
         """Subclasses like `ImageColumn` should be able to implement their own
         version."""
         return self.data.fn
-        
 
     def _create_cell(self, data: object) -> DeferredCell:
         return DeferredCell(data=data)
@@ -161,5 +160,6 @@ class DeferredColumn(Column):
     def convert_to_output_type(self, data: any):
         if self._output_type is None:
             from meerkat import column
+
             return column(data)
         return self._output_type(data)

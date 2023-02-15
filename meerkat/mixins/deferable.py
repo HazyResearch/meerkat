@@ -26,7 +26,7 @@ class DeferrableMixin:
         inputs: Union[Mapping[str, str], Sequence[str]] = None,
         outputs: Union[Mapping[any, str], Sequence[str]] = None,
         output_type: Union[Mapping[str, Type["Column"]], Type["Column"]] = None,
-        materialize: bool = True
+        materialize: bool = True,
     ) -> Union["DataFrame", "DeferredColumn"]:
         return defer(
             data=self,
@@ -36,5 +36,5 @@ class DeferrableMixin:
             inputs=inputs,
             outputs=outputs,
             output_type=output_type,
-            materialize=materialize
+            materialize=materialize,
         )

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Sequence, Set
 import warnings
+from typing import TYPE_CHECKING, Sequence, Set
 
 import pyarrow as pa
 import pyarrow.compute as pac
@@ -142,11 +142,19 @@ class ArrowScalarColumn(ScalarColumn):
     """
 
     KWARG_MAPPING = {"skipna": "skip_nulls"}
-    COMPUTE_FN_MAPPING = {"var": "variance", "std": "stddev", "sub": "subtract", "mul": "multiply", "truediv": "divide"}
+    COMPUTE_FN_MAPPING = {
+        "var": "variance",
+        "std": "stddev",
+        "sub": "subtract",
+        "mul": "multiply",
+        "truediv": "divide",
+    }
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
         kwargs = {self.KWARG_MAPPING.get(k, k): v for k, v in kwargs.items()}
-        out = getattr(pac, self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn))(self.data, **kwargs)
+        out = getattr(pac, self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn))(
+            self.data, **kwargs
+        )
         return out.as_py()
 
     def mode(self, **kwargs) -> ScalarColumn:
@@ -169,25 +177,20 @@ class ArrowScalarColumn(ScalarColumn):
     def median(self, skipna: bool = True, **kwargs) -> any:
         warnings.warn("Arrow backend computes an approximate median.")
         return pac.approximate_median(self.data, skip_nulls=skipna).as_py()
-    
+
     def _dispatch_arithmetic_function(
         self, other: ScalarColumn, compute_fn: str, right: bool, **kwargs
     ):
         if isinstance(other, Column):
             assert isinstance(other, ArrowScalarColumn)
             other = other.data
-        
+
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
         if right:
-            
-            out = self._clone(
-                data=getattr(pac, compute_fn)(other, self.data, **kwargs)
-            )
+
+            out = self._clone(data=getattr(pac, compute_fn)(other, self.data, **kwargs))
             return out
         else:
             return self._clone(
                 data=getattr(pac, compute_fn)(self.data, other, **kwargs)
             )
-
-
-    

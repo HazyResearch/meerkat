@@ -2,13 +2,14 @@ import logging
 from typing import List
 
 from meerkat.errors import TriggerError
-from meerkat.interactive.graph.operation import Operation
-from meerkat.interactive.graph.reactivity import (
-    reactive,
-    is_reactive_fn,
-    reactive
+from meerkat.interactive.graph.marking import (
+    is_unmarked_context,
+    is_unmarked_fn,
+    mark,
+    unmarked,
 )
-from meerkat.interactive.graph.marking import unmarked, mark, is_unmarked_fn, is_unmarked_context
+from meerkat.interactive.graph.operation import Operation
+from meerkat.interactive.graph.reactivity import is_reactive_fn, reactive
 from meerkat.interactive.graph.store import Store, StoreFrontend, make_store
 from meerkat.interactive.modification import Modification
 from meerkat.interactive.node import _topological_sort

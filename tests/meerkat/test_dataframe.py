@@ -1458,8 +1458,8 @@ def test_reactivity_contains():
 
 
 def test_reactivity_contains_alternate():
-    """
-    Test the alternate way determining if an item is in a dataframe.
+    """Test the alternate way determining if an item is in a dataframe.
+
     i.e. df.contains(item)
     """
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
