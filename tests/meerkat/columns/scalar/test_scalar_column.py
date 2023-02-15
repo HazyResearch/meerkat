@@ -1,3 +1,4 @@
+import itertools
 from typing import Dict
 
 import numpy as np
@@ -111,6 +112,15 @@ def test_all(data: np.ndarray, backend: str):
 NUMERIC_COLUMN_OPERANDS = [{"a": col, "b": col + 1} for col in NUMERIC_COLUMNS]
 
 NUMERIC_SCALAR_OPERANDS = [{"a": col, "b": col[0].item()} for col in NUMERIC_COLUMNS]
+
+BOOL_COLUMN_OPERANDS = [
+    {"a": col_a, "b": col_b} for col_a, col_b in itertools.combinations(BOOL_COLUMNS, 2)
+]
+
+BOOL_SCALAR_OPERANDS = [
+    {"a": col_a, "b": col_b[0].item()}
+    for col_a, col_b in itertools.combinations(BOOL_COLUMNS, 2)
+]
 
 
 @product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
@@ -264,7 +274,7 @@ def test_mod_scalar(backend: str, operands: Dict[str, np.array], right: bool):
 def test_pow_column(backend: str, operands: Dict[str, np.array]):
     col_a = ScalarColumn(operands["a"], backend=backend)
     col_b = ScalarColumn(operands["b"], backend=backend)
-    out = col_a ** col_b
+    out = col_a**col_b
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] ** operands["b"], backend=backend))
 
@@ -358,3 +368,57 @@ def test_lt_scalar(backend: str, operands: Dict[str, np.array], right: bool):
 
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_and_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a & col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] & operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_and_scalar(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    out = col_a & operands["b"]
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] & operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_or_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a | col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] | operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_or_scalar(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    out = col_a | operands["b"]
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] | operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_xor_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a ^ col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] ^ operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_xor_scalar(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    out = col_a ^ operands["b"]
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] ^ operands["b"], backend=backend))
+
+@product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
+def test_invert_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    out = ~col_a
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(~operands["a"], backend=backend))
+

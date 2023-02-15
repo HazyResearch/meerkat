@@ -146,23 +146,37 @@ class ScalarColumn(Column):
         raise NotImplementedError()
 
     # FIXME: is there a right for comparison functions?
-    
+
     def __eq__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "eq")
-    
+
     def __ne__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "ne")
-    
+
     def __lt__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "lt")
-    
+
     def __le__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "le")
-    
+
     def __gt__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "gt")
-    
+
     def __ge__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "ge")
-    
+
     # logical functions
+    def _dispatch_logical_function(self, other, compute_fn: str, **kwargs):
+        raise NotImplementedError()
+
+    def __and__(self, other: ScalarColumn):
+        return self._dispatch_logical_function(other, "and")
+
+    def __or__(self, other: ScalarColumn):
+        return self._dispatch_logical_function(other, "or")
+
+    def __invert__(self):
+        return self._dispatch_logical_function(None, "invert")
+
+    def __xor__(self, other: ScalarColumn):
+        return self._dispatch_logical_function(other, "xor")

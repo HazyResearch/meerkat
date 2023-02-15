@@ -252,3 +252,16 @@ class ArrowScalarColumn(ScalarColumn):
         return self._clone(
             data=getattr(pac, compute_fn)(self.data, other, **kwargs)
         )
+
+    def _dispatch_logical_function(self, other: ScalarColumn, compute_fn: str, **kwargs):
+        if isinstance(other, Column):
+            assert isinstance(other, ArrowScalarColumn)
+            other = other.data
+
+        compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
+
+        if other is None:
+            return self._clone(data=getattr(pac, compute_fn)(self.data, **kwargs))
+        return self._clone(
+            data=getattr(pac, compute_fn)(self.data, other, **kwargs)
+        )
