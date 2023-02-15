@@ -129,7 +129,7 @@ class ChangeList(BaseComponent):
 
             stats_df = compute_slice_scores(examples=examples_df, slices=slices_df)
 
-            @mk.gui.endpoint
+            @mk.endpoint()
             def append_to_sort(match_criterion, criteria: mk.gui.Store):
                 SOURCE = "match"
                 criterion = mk.gui.Sort.create_criterion(
@@ -183,7 +183,7 @@ class ChangeList(BaseComponent):
             stats_df, _ = sb_match()
             stats_df = slice_sort(stats_df)
 
-            @mk.gui.endpoint
+            @mk.endpoint()
             def on_select_slice(
                 slice_id: str,
                 criteria: mk.gui.Store,
@@ -228,7 +228,7 @@ class ChangeList(BaseComponent):
                 # TODO: Need mk.None
                 # selected.set(slice_id or "")
 
-            @mk.gui.endpoint
+            @mk.endpoint()
             def on_remove(slice_id: str, slices_df: mk.DataFrame):
                 slice_repo.remove(slice_id)
                 mod = mk.gui.DataFrameModification(
@@ -266,7 +266,7 @@ class ChangeList(BaseComponent):
                 on_remove=on_remove.partial(slices_df=slices_df),
             )
 
-            @mk.gui.endpoint
+            @mk.endpoint()
             def on_write_row(key: str, column: str, value: str, df: mk.DataFrame):
                 """Change the value of a column in the slice_df."""
                 if not key:
@@ -289,7 +289,7 @@ class ChangeList(BaseComponent):
 
             stats = compute_stats(current_examples)
 
-            @mk.gui.endpoint
+            @mk.endpoint()
             def on_slice_creation(examples_df: mk.DataFrame):
                 current_df = filter(examples_df)
                 current_df = code(current_df)
@@ -353,7 +353,7 @@ class ChangeList(BaseComponent):
                 tag_columns=tag_columns,
             )
 
-        @mk.gui.endpoint
+        @mk.endpoint()
         def add_discovered_slices(eb: SliceBy):
             for key, slice in eb.slices.items():
                 col = np.zeros(len(slice_repo.membership))

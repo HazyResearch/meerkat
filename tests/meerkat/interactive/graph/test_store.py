@@ -61,7 +61,7 @@ def _is_out_unmagiced(out, input_store: mk.gui.Store):
     assert not isinstance(out, mk.gui.Store)
 
 
-@mk.gui.endpoint()
+@mk.endpoint()
 def _set_store(store: mk.gui.Store, value):
     store.set(value)
 

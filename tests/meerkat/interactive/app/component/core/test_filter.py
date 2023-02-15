@@ -7,7 +7,7 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 # TODO (arjun): undo the skip filter stuff
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def _set_criteria(criteria, store):
     store.set(criteria)
 

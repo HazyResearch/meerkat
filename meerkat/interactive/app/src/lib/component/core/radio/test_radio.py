@@ -1,7 +1,7 @@
 import meerkat as mk
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_change(index: int):
     print("on_change", index)
 
@@ -21,7 +21,7 @@ radios = mk.gui.html.flex(
 )
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_change(index: int):
     print("on_change", index)
 

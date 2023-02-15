@@ -15,14 +15,13 @@ def test_endpoint_wrapping_reactive_fn(fn_decorator):
     """
     fn = fn_decorator(lambda store: store + 3)
 
-    @mk.gui.endpoint
-    def fn_endpoint(store):
+    @mk.endpoint()
+    def fn_endpoint(store: mk.gui.Store):
         store.set(fn(store))
 
     # Test with @reactive decorator.
     x = mk.gui.Store(1)
-    with mk.gui.reactive():  # Turn on react context
-        assert not mk.gui.is_unmarked_context()  # Verify we are in a reactive context
-        fn_endpoint(x)
+    assert not mk.gui.is_unmarked_context()  # Verify we are in a reactive context
+    fn_endpoint(x)
     assert x == 4  # Verify the endpoint works
     assert x.inode is None  # Graph should be empty

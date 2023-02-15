@@ -13,7 +13,7 @@ def test_basic():
 def test_on_select():
     other = mk.gui.Store("")
 
-    @mk.gui.endpoint
+    @mk.endpoint()
     def on_select(new_value: str):
         other.set(new_value)
 
@@ -29,7 +29,7 @@ def test_on_select():
 def test_on_select_no_param():
     other = mk.gui.Store("")
 
-    @mk.gui.endpoint
+    @mk.endpoint()
     def on_select():
         other.set("set")
 

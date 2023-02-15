@@ -4,7 +4,7 @@ IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def append_to_sort(match_criterion, criteria: mk.gui.Store):
     """Add match criterion to the sort criteria.
 
@@ -27,7 +27,7 @@ df = mk.get("imagenette", version="160px")
 # To embed: df = mk.embed(df, input=IMAGE_COLUMN, out_col=EMBED_COLUMN, encoder="clip").
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/arjundd/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
-    overwrite=False, # set overwrite=True to download the embeddings again.
+    overwrite=False,  # set overwrite=True to download the embeddings again.
 )
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
@@ -64,6 +64,6 @@ page = mk.gui.Page(
         ],
         classes="grid-cols-1 gap-2",
     ),
-    id="image-search"
+    id="image-search",
 )
 page.launch()

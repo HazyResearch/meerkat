@@ -241,7 +241,7 @@ def test_instance_methods():
     assert val.inode.trigger_children[1].trigger_children[0] is out_eq.inode
 
     # Trigger the functions.
-    @mk.gui.endpoint
+    @mk.endpoint()
     def set_val(val: mk.gui.Store):
         val.set(0)
 

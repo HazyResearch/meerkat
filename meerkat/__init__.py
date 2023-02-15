@@ -107,6 +107,7 @@ bool = _bool
 # Do not move them.
 import meerkat.interactive.svelte
 from meerkat.interactive import Store, endpoint, mark, reactive, unmarked
+from meerkat.interactive.graph.magic import magic
 
 __all__ = [
     "DataFrame",
@@ -116,6 +117,7 @@ __all__ = [
     "Store",
     "mark",
     "endpoint",
+    "magic",
     # <<<< Columns >>>>
     "column",
     "Column",
