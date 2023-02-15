@@ -6,6 +6,7 @@ import pytest
 
 import meerkat as mk
 from meerkat.interactive.graph import is_unmarked_context, reactive, trigger
+from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.state import state
@@ -41,22 +42,20 @@ def test_react_basic():
     assert not isinstance(keys, mk.gui.Store)
 
 
-def test_react_context_manager_nested():
+def test_unmarked_context_manager():
     df = _create_dummy_reactive_df()
 
     assert not is_unmarked_context()
+    keys_reactive = df.keys()
     with mk.gui.unmarked():
         assert is_unmarked_context()
         keys = df.keys()
-        with mk.gui.reactive():
-            assert not is_unmarked_context()
-            keys_reactive = df.keys()
 
     assert isinstance(keys_reactive, mk.gui.Store)
     assert isinstance(keys, List)
 
 
-def test_react_context_instance_method():
+def test_trigger_instance_method():
     rng = np.random.RandomState(0)
 
     # TODO: Why is this decorator affecting the return type?
@@ -66,7 +65,8 @@ def test_react_context_instance_method():
         return df[cols]
 
     df = mk.DataFrame({str(k): [k] for k in range(10)})
-    df = reactive(df)
+    df = df.mark()
+
     df_sub = _subselect_df(df)
     keys_reactive = df_sub.keys()
     keys0 = keys_reactive.__wrapped__
@@ -83,20 +83,24 @@ def test_react_context_instance_method():
     assert keys1 != keys2
 
 
-@pytest.mark.parametrize("react", [False, True])
-def test_react_as_decorator(react: bool):
-    @mk.gui.reactive(react)
+@pytest.mark.parametrize("is_unmarked", [False, True])
+def test_unmarked_on_reactive_fn(is_unmarked: bool):
+    @mk.gui.reactive()
     def add(a, b):
         return a + b
 
     a = mk.gui.Store(1)
     b = mk.gui.Store(2)
-    c = add(a, b)
+    if is_unmarked:
+        with mk.gui.unmarked():
+            c = add(a, b)
+    else:
+        c = add(a, b)
 
-    expected_type = mk.gui.Store if react else int
+    expected_type = int if is_unmarked else mk.gui.Store
     assert isinstance(c, expected_type)
 
-    if react:
+    if not is_unmarked:
         assert a.inode.has_trigger_children() and b.inode.has_trigger_children()
     else:
         assert a.inode is None and b.inode is None
@@ -105,24 +109,29 @@ def test_react_as_decorator(react: bool):
 def test_default_nested_return():
     """By default, nested return is None."""
 
-    @reactive
-    def _return_tuple():
+    @reactive()
+    def _return_tuple(_s):
         return ("a", "b")
 
-    @reactive
-    def _return_list():
+    @reactive()
+    def _return_list(_s):
         return ["a", "b"]
 
-    with mk.gui.reactive():
-        out = _return_tuple()
-        a, b = out
-    assert isinstance(out, tuple)
+    _s = mk.gui.Store("")
+    with magic():
+        out = _return_tuple(_s)
+    a, b = out
+    assert not isinstance(out, mk.gui.Store)
     assert isinstance(a, mk.gui.Store)
     assert isinstance(b, mk.gui.Store)
 
-    with mk.gui.reactive():
-        out = _return_list()
-    assert isinstance(out, list)
+    with magic():
+        out = _return_list(_s)
+    a, b = out
+    # Lists are not unpacked by default.
+    assert isinstance(out, mk.gui.Store)
+    assert not isinstance(a, mk.gui.Store)
+    assert not isinstance(b, mk.gui.Store)
 
 
 def test_nested_reactive_fns():
@@ -210,19 +219,18 @@ def test_instance_methods():
         def __init__(self, x):
             self.x = x
 
-        @reactive
+        @reactive()
         def add(self, y):
             return self.x + y
 
-        @reactive
+        @reactive()
         def __eq__(self, __o: int) -> bool:
             return self.x == __o
 
     foo = Foo(1)
     val = mk.gui.Store(2)
-    with mk.gui.reactive():
-        out_add = foo.add(val)
-        out_eq = foo == val
+    out_add = foo.add(val)
+    out_eq = foo == val
     assert isinstance(out_add, mk.gui.Store)
     assert isinstance(out_eq, mk.gui.Store)
 
