@@ -1,5 +1,5 @@
 from functools import partial, wraps
-from typing import Callable
+from typing import Callable, Iterator
 
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
 from meerkat.interactive.graph.operation import (
@@ -11,7 +11,7 @@ from meerkat.interactive.graph.utils import (
     _replace_nodeables_with_nodes,
 )
 from meerkat.interactive.node import NodeMixin
-from meerkat.mixins.reactifiable import MarkableMixin, ReactifiableMixin
+from meerkat.mixins.reactifiable import MarkableMixin
 
 __all__ = ["reactive", "reactive", "is_unmarked_context"]
 
@@ -101,6 +101,7 @@ def reactive(
             """
             from meerkat.interactive.graph.store import (
                 Store,
+                _IteratorStore,
                 _unpack_stores_from_object,
             )
 
@@ -112,6 +113,8 @@ def reactive(
             # TODO (arjun): These if this assumption holds.
             nonlocal nested_return
             nonlocal fn
+
+            _is_unmarked_context = is_unmarked_context()
 
             # Check if fn is a bound method (i.e. an instance method).
             # If so, we need to functionalize the method (i.e. make the method
@@ -158,24 +161,21 @@ def reactive(
                 if args and isinstance(args[0], Store):
                     unpacked_args[0] = args[0]
             elif _check_fn_has_leading_self_arg(fn):
-                # If the object is a ReactifiableMixin and fn has a leading self arg,
+                # If the object is a MarkableMixin and fn has a leading self arg,
                 # (i.e. fn(self, ...)), then we need to check if the function
                 # should be added to the graph.
-                # The fn will only be added to the graph when the object is reactive.
-                # For ReactifiableMixin instances, we can check if the object is
-                # reactive using the _reactive attribute.
-                # This is required for magic methods for ReactifiableMixin instances
+                # If the object is a MarkableMixin, the fn will be added
+                # to the graph only when the object is marked (i.e. `obj.marked`).
+                # This is required for magic methods for MarkableMixin instances
                 # because shorthand accessors (e.g. x[0] for x.__getitem__(0)) do not
                 # use the __getattribute__ method.
-                obj = args[0]
-                if isinstance(obj, MarkableMixin):
-                    with unmarked():
-                        is_obj_reactive = obj.marked
-                    _force_no_react = not is_obj_reactive
-
-                    # If the object is reactive, then we let the function pass through.
-                    # the global reactive context (i.e. is_reactive()) will determine if
-                    # the function is sadded to the graph.
+                # TODO: When the function is an instance method, should
+                #       instance.marked determine if the function is reactive?
+                # obj = args[0]
+                # if isinstance(obj, MarkableMixin):
+                #     with unmarked():
+                #         is_obj_reactive = obj.marked
+                #     _force_no_react = not is_obj_reactive
 
                 # If `fn` is an instance method, then the first argument in `args`
                 # is the instance. We should **not** unpack the `self` argument
@@ -196,7 +196,7 @@ def reactive(
             # TODO: Check if result is equal to one of the inputs.
             # If it is, we need to copy it.
 
-            if is_unmarked_context() or _force_no_react or not any_inputs_marked:
+            if _is_unmarked_context or _force_no_react or not any_inputs_marked:
                 # If we are in an unmarked context, then we don't need to create
                 # any nodes in the graph.
                 # `fn` should be run as normal.
@@ -204,9 +204,9 @@ def reactive(
 
             # Now we're in a reactive context i.e. is_reactive() == True
 
-            # Get all the NodeMixin objects from the args and kwargs
+            # Get all the NodeMixin objects from the args and kwargs.
             # These objects will be parents of the Operation node
-            # that is created for this function
+            # that is created for this function.
             nodeables = _get_nodeables(*args, **kwargs)
 
             # By default, nested return is True when the output is a tuple.
@@ -218,13 +218,15 @@ def reactive(
                 result = _nested_apply(result, fn=_wrap_outputs)
             elif isinstance(result, NodeMixin):
                 result = result
+            elif isinstance(result, Iterator):
+                result = _IteratorStore(result)
             else:
                 result = Store(result)
 
             # If the object is a ReactifiableMixin, we should turn
             # reactivity on.
-            if isinstance(result, ReactifiableMixin):
-                result.marked = True
+            if isinstance(result, MarkableMixin):
+                result._self_marked = True
 
             with unmarked():
                 # Setup an Operation node if any of the args or kwargs
@@ -250,8 +252,10 @@ def reactive(
                 if not op.has_inode():
                     op.attach_to_inode(op.create_inode())
 
-                # Add this Operation node as a child of all of the nodeables
-                _add_op_as_child(op, *nodeables, triggers=True)
+                # Add this Operation node as a child of all of the nodeables.
+                # This function takes care of only adding it as a child for
+                # nodeables that are marked.
+                _add_op_as_child(op, *nodeables)
 
                 # Attach the Operation node to its children (if it is not None)
                 def _foo(nodeable: NodeMixin):
@@ -312,29 +316,26 @@ def _nested_apply(obj: object, fn: Callable):
     return _internal(obj)
 
 
-def _add_op_as_child(
-    op: Operation,
-    *nodeables: NodeMixin,
-    triggers: bool = True,
-):
+def _add_op_as_child(op: Operation, *nodeables: NodeMixin):
     """Add the operation as a child of the nodeables.
 
     Args:
         op: The operation to add as a child.
         nodeables: The nodeables to add the operation as a child.
-        triggers: Whether the operation is triggered by changes in the
-            nodeables.
     """
     for nodeable in nodeables:
         # Add the operation as a child of the nodeable
+        triggers = nodeable.marked if isinstance(nodeable, MarkableMixin) else True
         nodeable.inode.add_child(op.inode, triggers=triggers)
 
 
 def _wrap_outputs(obj):
-    from meerkat.interactive.graph.store import Store
+    from meerkat.interactive.graph.store import Store, _IteratorStore
 
     if isinstance(obj, NodeMixin):
         return obj
+    elif isinstance(obj, Iterator):
+        return _IteratorStore(obj)
     return Store(obj)
 
 

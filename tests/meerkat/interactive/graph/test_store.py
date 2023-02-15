@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Iterator, Tuple
 
 import pytest
 
@@ -58,9 +58,12 @@ def _is_out_unmagiced(out, input_store: mk.gui.Store):
         2. It is marked
         3. out.inode is None
     """
-    assert isinstance(out, mk.gui.Store)
-    assert out.marked
-    assert out.inode is None
+    assert not isinstance(out, mk.gui.Store)
+
+
+@mk.gui.endpoint()
+def _set_store(store: mk.gui.Store, value):
+    store.set(value)
 
 
 @pytest.mark.parametrize("is_magic", [False, True])
@@ -151,7 +154,8 @@ def test_store_imethod(other: int, is_magic: bool):
             "__ior__": store | other,
         }
 
-    store = original = mk.gui.Store(1)
+    store = mk.gui.Store(1)
+    original = store
 
     if is_magic:
         with pytest.warns(UserWarning):
@@ -166,9 +170,11 @@ def test_store_imethod(other: int, is_magic: bool):
                 out[k] = getattr(store, k)(other)
 
     for k, v in out.items():
+        assert not isinstance(
+            expected[k], mk.gui.Store
+        ), f"Expected: {k} returned a Store."
         assert isinstance(v, mk.gui.Store), f"{k} did not return a Store."
         assert v.marked
-        assert isinstance(expected[k], mk.gui.Store), f"{k} did not return a Store."
         assert id(v) != id(original), f"{k} did not return a new Store."
         assert v == expected[k], f"{k} did not return the correct value."
 
@@ -182,21 +188,37 @@ def test_store_as_iterator(is_magic: bool):
 
     # Regardless of if magic is on, the iterator should be a Store.
     # However, only when magic is on, should the store be added to the graph.
-    assert isinstance(store_iter, _IteratorStore)
     if is_magic:
+        assert isinstance(store_iter, _IteratorStore)
         _is_out_magiced(store_iter, store, op_name="__iter__", op_num_children=1)
     else:
+        assert isinstance(store_iter, Iterator)
         _is_out_unmagiced(store_iter, store)
 
     # When we fetch things from the iterator, they should be stores.
     # Similar to the above, only when magic is on, should the store be added
     # to the graph.
     with magic(is_magic):
-        for v in store_iter:
-            if is_magic:
-                _is_out_magiced(v, store_iter)
-            else:
-                _is_out_unmagiced(v, store_iter)
+        values = [v for v in store_iter]
+
+    for v in values:
+        if is_magic:
+            isinstance(v, mk.gui.Store)
+        else:
+            not isinstance(v, mk.gui.Store)
+
+    if not is_magic:
+        return
+
+    # Test the nodes get updated properly
+    assert len(values) == 2
+    with magic():
+        inode1 = values[0].inode
+        inode2 = values[1].inode
+
+    _set_store(store, [10, 11])
+    assert inode1.obj == 10
+    assert inode2.obj == 11
 
 
 @pytest.mark.parametrize("is_magic", [False, True])
@@ -206,15 +228,23 @@ def test_tuple_unpack(is_magic: bool):
     with magic(is_magic):
         a, b = store
 
-    assert isinstance(a, mk.gui.Store)
-    assert isinstance(b, mk.gui.Store)
-
     if is_magic:
-        _is_out_magiced(a, store)
-        _is_out_magiced(b, store)
+        assert isinstance(a, mk.gui.Store)
+        assert isinstance(b, mk.gui.Store)
     else:
-        _is_out_unmagiced(a, store)
-        _is_out_unmagiced(b, store)
+        assert not isinstance(a, mk.gui.Store)
+        assert not isinstance(b, mk.gui.Store)
+
+    if not is_magic:
+        return
+
+    # Test the nodes get updated properly
+    a_inode = a.inode
+    b_inode = b.inode
+
+    _set_store(store, [10, 11])
+    assert a_inode.obj == 10
+    assert b_inode.obj == 11
 
 
 @pytest.mark.parametrize("is_magic", [False, True])
@@ -224,18 +254,31 @@ def test_tuple_unpack_return_value(is_magic: bool):
         return tuple(x + 1 for x in seq)
 
     store = mk.gui.Store((1, 2))
-    # We need to use the `react` decorator here because tuple unpacking
+    # We need to use the `magic` decorator here because tuple unpacking
     # happens outside of the function `add`. Without the decorator, the
-    # tuple unpacking will not be reactive.
+    # tuple unpacking will not be added to the graph.
     with magic(is_magic):
         a, b = add(store)
+    assert a == 2
+    assert b == 3
 
     if is_magic:
-        _is_out_magiced(a, store)
-        _is_out_magiced(b, store)
+        assert isinstance(a, mk.gui.Store)
+        assert isinstance(b, mk.gui.Store)
     else:
-        _is_out_unmagiced(a, store)
-        _is_out_unmagiced(b, store)
+        assert not isinstance(a, mk.gui.Store)
+        assert not isinstance(b, mk.gui.Store)
+
+    if not is_magic:
+        return
+
+    # Test the nodes get updated properly
+    a_inode = a.inode
+    b_inode = b.inode
+
+    _set_store(store, [10, 11])
+    assert a_inode.obj == 11
+    assert b_inode.obj == 12
 
 
 @pytest.mark.parametrize("is_magic", [False, True])

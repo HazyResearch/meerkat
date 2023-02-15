@@ -1,3 +1,5 @@
+from typing import List
+
 from meerkat.interactive.node import Node, NodeMixin
 
 
@@ -33,7 +35,9 @@ def _replace_nodes_with_nodeables(obj, unwrap_stores=True):
     return obj
 
 
-def _get_nodeables(*args, **kwargs):
+def _get_nodeables(*args, **kwargs) -> List[NodeMixin]:
+    # TODO: figure out if we need to handle this case
+    # Store([Store(1), Store(2), Store(3)])
     nodeables = []
     for arg in args:
         if isinstance(arg, NodeMixin):

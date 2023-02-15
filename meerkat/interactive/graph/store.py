@@ -79,6 +79,11 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
 
         Returns:
             None
+
+        Note:
+            Even if the new_value is the same as the current value, this will
+            still trigger any reactive functions that depend on this store.
+            To avoid this, check for equality before calling this method.
         """
         if isinstance(new_value, Store):
             # if the value is a store, then we need to unpack so it can be sent to the
@@ -509,9 +514,11 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     # def __next__(self):
     #     return next(self.__wrapped__)
 
+    # @_wand: __iter__ behaves like a @_wand method, but cannot be decorated due to
+    # Pythonic limitations
     @_wand
     def __iter__(self):
-        return _IteratorStore(iter(self.__wrapped__))
+        return iter(self.__wrapped__)
 
 
 class _IteratorStore(Store):
@@ -520,7 +527,7 @@ class _IteratorStore(Store):
     def __init__(self, wrapped: T, backend_only: bool = False):
         if not isinstance(wrapped, Iterator):
             raise ValueError("wrapped object must be an Iterator.")
-        super().__init__(wrapped, backend_only)
+        super().__init__(wrapped, backend_only=backend_only)
 
     @_wand
     def __next__(self):

@@ -34,8 +34,8 @@ from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
-from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
+from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -109,14 +109,14 @@ class DataFrame(
 
     def _react(self):
         """Converts the object to a reactive object in-place."""
-        self.marked = True
+        self._self_marked = True
         for col in self.columns:
             self[col].mark()
         return self
 
     def _no_react(self):
         """Converts the object to a non-reactive object in-place."""
-        self.marked = False
+        self._self_marked = False
         for col in self.columns:
             self[col].unmark()
         return self

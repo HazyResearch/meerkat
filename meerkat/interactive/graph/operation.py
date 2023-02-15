@@ -2,6 +2,7 @@ import inspect
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Union
 
+from meerkat.interactive.graph.marking import unmarked
 from meerkat.interactive.graph.utils import _replace_nodes_with_nodeables
 from meerkat.interactive.modification import (
     DataFrameModification,
@@ -10,7 +11,6 @@ from meerkat.interactive.modification import (
 )
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Primitive
-from meerkat.interactive.graph.marking import unmarked
 
 if TYPE_CHECKING:
     from meerkat.interactive.graph.store import Store

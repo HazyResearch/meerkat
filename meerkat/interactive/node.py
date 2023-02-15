@@ -39,7 +39,8 @@ class Node(IdentifiableMixin, FrontendMixin):
         if child not in self.children:
             self.children[child] = triggers
 
-        # Don't overwrite triggers=True with triggers=False
+        # Don't overwrite triggers=True with triggers=False.
+        # TODO: why did we do this again? This is important though.
         self.children[child] = triggers | self.children[child]
 
     @property
@@ -63,7 +64,7 @@ class Node(IdentifiableMixin, FrontendMixin):
 
     def __eq__(self, other):
         """Two nodes are equal if they have the same id."""
-        return id(self) == id(other)
+        return self.id == other.id
 
     def has_children(self):
         """Returns True if this node has children."""
