@@ -416,6 +416,19 @@ class PandasScalarColumn(
         return self._clone(
             data=getattr(self.data, f"__{compute_fn}__")(other, **kwargs)
         )
+    
+
+    def _dispatch_comparison_function(
+        self, other: ScalarColumn, compute_fn: str, **kwargs
+    ):
+        if isinstance(other, Column):
+            assert isinstance(other, PandasScalarColumn)
+            other = other.data
+
+        return self._clone(
+            data=getattr(self.data, f"__{compute_fn}__")(other, **kwargs)
+        )
+
 
 
 PandasSeriesColumn = PandasScalarColumn

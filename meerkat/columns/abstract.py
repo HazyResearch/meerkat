@@ -110,11 +110,12 @@ class Column(
 
     @unmarked()
     def __repr__(self):
-        return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
+        
+        return f"column({reprlib.repr([x for x in self[:10]])}, backend={type(self).__name__}"
 
     @unmarked()
     def __str__(self):
-        return f"{self.__class__.__name__}({reprlib.repr(self.data)})"
+        return reprlib.repr([x for x in self[:10]])
 
     def streamlit(self):
         return self._repr_pandas_()

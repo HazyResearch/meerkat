@@ -135,14 +135,34 @@ class ScalarColumn(Column):
     def __rmod__(self, other: ScalarColumn):
         return self._dispatch_arithmetic_function(other, "mod", right=True)
 
-    def __divmod__(self, other: ScalarColumn):
-        return self._dispatch_arithmetic_function(other, "divmod", right=False)
-
-    def __rdivmod__(self, other: ScalarColumn):
-        return self._dispatch_arithmetic_function(other, "divmod", right=True)
-
     def __pow__(self, other: ScalarColumn):
         return self._dispatch_arithmetic_function(other, "pow", right=False)
 
     def __rpow__(self, other: ScalarColumn):
         return self._dispatch_arithmetic_function(other, "pow", right=True)
+
+    # comparison functions
+    def _dispatch_comparison_function(self, other, compute_fn: str, **kwargs):
+        raise NotImplementedError()
+
+    # FIXME: is there a right for comparison functions?
+    
+    def __eq__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "eq")
+    
+    def __ne__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "ne")
+    
+    def __lt__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "lt")
+    
+    def __le__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "le")
+    
+    def __gt__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "gt")
+    
+    def __ge__(self, other: ScalarColumn):
+        return self._dispatch_comparison_function(other, "ge")
+    
+    # logical functions

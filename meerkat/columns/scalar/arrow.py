@@ -148,6 +148,13 @@ class ArrowScalarColumn(ScalarColumn):
         "sub": "subtract",
         "mul": "multiply",
         "truediv": "divide",
+        "pow": "power",
+        "eq": "equal",
+        "ne": "not_equal",
+        "lt": "less",
+        "gt": "greater",
+        "le": "less_equal",
+        "ge": "greater_equal",
     }
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
@@ -187,10 +194,61 @@ class ArrowScalarColumn(ScalarColumn):
 
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
         if right:
-
             out = self._clone(data=getattr(pac, compute_fn)(other, self.data, **kwargs))
             return out
         else:
             return self._clone(
                 data=getattr(pac, compute_fn)(self.data, other, **kwargs)
             )
+
+    def _true_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
+
+        if isinstance(other, Column):
+            assert isinstance(other, ArrowScalarColumn)
+            other = other.data
+
+        # convert other to float if it is an integer
+        if isinstance(other, pa.ChunkedArray) or isinstance(other, pa.Array):
+            if other.type == pa.int64():
+                other = other.cast(pa.float64())
+        else:
+            other = pa.scalar(other, type=pa.float64())
+
+        if right:
+            return self._clone(pac.divide(other, self.data), **kwargs)
+        else:
+            return self._clone(pac.divide(self.data, other), **kwargs)
+
+    def __truediv__(self, other: ScalarColumn):
+        return self._true_div(other, right=False)
+
+    def __rtruediv__(self, other: ScalarColumn):
+        return self._true_div(other, right=True)
+
+    def _floor_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
+        _true_div = self._true_div(other, right=right, **kwargs)
+        return _true_div._clone(data=pac.floor(_true_div.data))
+
+    def __floordiv__(self, other: ScalarColumn):
+        return self._floor_div(other, right=False)
+
+    def __rfloordiv__(self, other: ScalarColumn):
+        return self._floor_div(other, right=True)
+
+    def __mod__(self, other: ScalarColumn):
+        raise NotImplementedError("Modulo is not supported by Arrow backend.")
+
+    def __rmod__(self, other: ScalarColumn):
+        raise NotImplementedError("Modulo is not supported by Arrow backend.")
+
+    def _dispatch_comparison_function(
+        self, other: ScalarColumn, compute_fn: str, **kwargs
+    ):
+        if isinstance(other, Column):
+            assert isinstance(other, ArrowScalarColumn)
+            other = other.data
+
+        compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
+        return self._clone(
+            data=getattr(pac, compute_fn)(self.data, other, **kwargs)
+        )

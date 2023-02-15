@@ -59,7 +59,11 @@ def test_mode(data: np.ndarray, backend: str):
 @product_parametrize({"backend": BACKENDS, "data": NUMERIC_COLUMNS})
 def test_median(data: np.ndarray, backend: str):
     col = ScalarColumn(data, backend=backend)
-    assert np.median(data) == col.median()
+    if backend == "arrow":
+        with pytest.warns(UserWarning):
+            assert np.median(data) == col.median()
+    else:
+        assert np.median(data) == col.median()
 
 
 @product_parametrize({"backend": BACKENDS, "data": NUMERIC_COLUMNS + BOOL_COLUMNS})
@@ -201,6 +205,156 @@ def test_truediv_scalar(backend: str, operands: Dict[str, np.array], right: bool
     else:
         out = col_a / operands["b"]
         correct = operands["a"] / operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_floordiv_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a // col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] // operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": BACKENDS, "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_floordiv_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] // col_a
+        correct = operands["b"] // operands["a"]
+    else:
+        out = col_a // operands["b"]
+        correct = operands["a"] // operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": ["pandas"], "operands": NUMERIC_COLUMN_OPERANDS})
+def test_mod_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a % col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] % operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": ["pandas"], "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_mod_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] % col_a
+        correct = operands["b"] % operands["a"]
+    else:
+        out = col_a % operands["b"]
+        correct = operands["a"] % operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_pow_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a ** col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] ** operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": BACKENDS, "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_pow_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] ** col_a
+        correct = operands["b"] ** operands["a"]
+    else:
+        out = col_a ** operands["b"]
+        correct = operands["a"] ** operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_eq_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a == col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] == operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": BACKENDS, "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_eq_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] == col_a
+        correct = operands["b"] == operands["a"]
+    else:
+        out = col_a == operands["b"]
+        correct = operands["a"] == operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_gt_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a > col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] > operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": BACKENDS, "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_gt_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] > col_a
+        correct = operands["b"] > operands["a"]
+    else:
+        out = col_a > operands["b"]
+        correct = operands["a"] > operands["b"]
+
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(correct, backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_lt_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    col_b = ScalarColumn(operands["b"], backend=backend)
+    out = col_a < col_b
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(operands["a"] < operands["b"], backend=backend))
+
+
+@product_parametrize(
+    {"backend": BACKENDS, "operands": NUMERIC_SCALAR_OPERANDS, "right": [True, False]}
+)
+def test_lt_scalar(backend: str, operands: Dict[str, np.array], right: bool):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    if right:
+        out = operands["b"] < col_a
+        correct = operands["b"] < operands["a"]
+    else:
+        out = col_a < operands["b"]
+        correct = operands["a"] < operands["b"]
 
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(correct, backend=backend))
