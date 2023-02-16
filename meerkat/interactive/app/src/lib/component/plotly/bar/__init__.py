@@ -9,6 +9,7 @@ class BarPlot(Component):
     df: DataFrame
     x: str
     y: str
+    title: str
     on_click: EndpointProperty = None
 
     def __init__(
@@ -17,9 +18,10 @@ class BarPlot(Component):
         *,
         x: str,
         y: str,
+        title: str = "",
         on_click: EndpointProperty = None,
     ):
-        super().__init__(df=df, x=x, y=y, on_click=on_click)
+        super().__init__(df=df, x=x, y=y, on_click=on_click, title=title)
 
     @classproperty
     def namespace(cls):

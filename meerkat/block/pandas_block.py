@@ -102,6 +102,10 @@ class PandasBlock(AbstractBlock):
 
         if isinstance(index, PandasScalarColumn):
             return index.data.values
+        
+        from meerkat.columns.scalar.arrow import ArrowScalarColumn
+        if isinstance(index, ArrowScalarColumn):
+            return index.to_numpy()
         return index
 
     def _get(

@@ -8,6 +8,7 @@
 	export let x: string;
 	export let y: string;
 	export let config: Record<string, any> = { displayModeBar: false };
+	export let title: string;
 	export let on_click: Endpoint;
 
 	$: data_promise = fetchChunk({
@@ -43,5 +44,6 @@
 </script>
 
 {#await data_promise then data}
+	{title}
 	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
 {/await}

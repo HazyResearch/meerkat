@@ -20,6 +20,7 @@ from meerkat.columns.deferred.base import DeferredColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
+from meerkat.columns.scalar.pandas import PandasScalarColumn
 from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
@@ -221,7 +222,8 @@ def test_row_index_single(testbed):
             pd.Series,
             torch.Tensor,
             NumPyTensorColumn,
-            ScalarColumn,
+            ArrowScalarColumn,
+            PandasScalarColumn,
             TorchTensorColumn,
             list,
         ]

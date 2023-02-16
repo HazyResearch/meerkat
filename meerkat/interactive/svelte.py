@@ -162,7 +162,7 @@ class SvelteWriter(metaclass=Singleton):
         """Remove all component wrappers from the app."""
         try:
             shutil.rmtree(f"{self.appdir}/src/lib/wrappers")
-        except FileNotFoundError:
+        except (FileNotFoundError, OSError):
             pass
 
     def remove_component_context(self):
@@ -337,6 +337,8 @@ if (
     or (MEERKAT_RUN_SUBPROCESS and MEERKAT_RUN_RELOAD_COUNT > 1)
 ) and not MEERKAT_INIT_PROCESS:
     logger.debug("Running SvelteWriter().run().")
+    import ray
+    print(ray.is_initialized())
     SvelteWriter().run()
 
 if MEERKAT_RUN_SUBPROCESS:

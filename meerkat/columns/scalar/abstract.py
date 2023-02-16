@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import pyarrow as pa
+from pandas.core.accessor import CachedAccessor
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
@@ -22,7 +23,25 @@ if TYPE_CHECKING:
 ScalarColumnTypes = Union[np.ndarray, "torch.TensorType", pd.Series, List]
 
 
+class StringMethods:
+    def __init__(self, data: Column):
+        self.column = data
+
+    def capitalize(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "capitalize", _namespace="str", **kwargs
+        )
+
+    def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "center", _namespace="str", width=width, fill_char=fillchar, **kwargs
+        )
+
+
 class ScalarColumn(Column):
+
+    str = CachedAccessor("str", StringMethods)
+
     def __new__(cls, data: ScalarColumnTypes = None, backend: str = None):
         from .arrow import ArrowScalarColumn
         from .pandas import PandasScalarColumn
@@ -54,6 +73,11 @@ class ScalarColumn(Column):
             raise ValueError(
                 f"Cannot create `ScalarColumn` from object of type {type(data)}."
             )
+
+    def _dispatch_unary_function(
+        self, compute_fn: str, _namespace: str = None, **kwargs
+    ):
+        raise NotImplementedError()
 
     # aggregation functions
     @abstractmethod
@@ -145,8 +169,6 @@ class ScalarColumn(Column):
     def _dispatch_comparison_function(self, other, compute_fn: str, **kwargs):
         raise NotImplementedError()
 
-    # FIXME: is there a right for comparison functions?
-
     def __eq__(self, other: ScalarColumn):
         return self._dispatch_comparison_function(other, "eq")
 
@@ -180,3 +202,13 @@ class ScalarColumn(Column):
 
     def __xor__(self, other: ScalarColumn):
         return self._dispatch_logical_function(other, "xor")
+
+    # containment functions
+    def isin(self, values: Union[List, Set], **kwargs) -> ScalarColumn:
+        raise NotImplementedError()
+
+    def isna(self, **kwargs) -> ScalarColumn:
+        return self._dispatch_unary_function("isna", **kwargs)
+
+    def isnull(self, **kwargs) -> ScalarColumn:
+        return self._dispatch_unary_function("isnull", **kwargs)

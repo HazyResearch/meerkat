@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import os
 import warnings
-from typing import TYPE_CHECKING, Sequence, Set
+from typing import TYPE_CHECKING, List, Sequence, Set, Union
 
 import pyarrow as pa
 import pyarrow.compute as pac
 from pyarrow.compute import equal
+from pandas.core.accessor import CachedAccessor
+
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
@@ -14,7 +16,7 @@ from meerkat.errors import ImmutableError
 from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
-from .abstract import ScalarColumn
+from .abstract import ScalarColumn, StringMethods
 
 if TYPE_CHECKING:
     from meerkat.interactive.formatter.base import Formatter
@@ -23,8 +25,15 @@ if TYPE_CHECKING:
 torch = LazyLoader("torch")
 
 
+class ArrowStringMethods(StringMethods):
+    def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
+        return pac.center(self.column.data, width=width, padding=fillchar, **kwargs)
+
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
+
+    str = CachedAccessor("str", ArrowStringMethods)
+
 
     def __init__(
         self,
@@ -155,6 +164,9 @@ class ArrowScalarColumn(ScalarColumn):
         "gt": "greater",
         "le": "less_equal",
         "ge": "greater_equal",
+        "isna": "is_nan",
+        "capitalize": "ascii_capitalize",
+        "center": "ascii_center",
     }
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
@@ -249,11 +261,11 @@ class ArrowScalarColumn(ScalarColumn):
             other = other.data
 
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
-        return self._clone(
-            data=getattr(pac, compute_fn)(self.data, other, **kwargs)
-        )
+        return self._clone(data=getattr(pac, compute_fn)(self.data, other, **kwargs))
 
-    def _dispatch_logical_function(self, other: ScalarColumn, compute_fn: str, **kwargs):
+    def _dispatch_logical_function(
+        self, other: ScalarColumn, compute_fn: str, **kwargs
+    ):
         if isinstance(other, Column):
             assert isinstance(other, ArrowScalarColumn)
             other = other.data
@@ -262,6 +274,16 @@ class ArrowScalarColumn(ScalarColumn):
 
         if other is None:
             return self._clone(data=getattr(pac, compute_fn)(self.data, **kwargs))
-        return self._clone(
-            data=getattr(pac, compute_fn)(self.data, other, **kwargs)
-        )
+        return self._clone(data=getattr(pac, compute_fn)(self.data, other, **kwargs))
+
+    def isin(self, values: Union[List, Set], **kwargs) -> ScalarColumn:
+        return self._clone(data=pac.is_in(self.data, pa.array(values), **kwargs))
+
+    def _dispatch_unary_function(
+        self, compute_fn: str, _namespace: str = None, **kwargs
+    ):
+        compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
+        return self._clone(data=getattr(pac, compute_fn)(self.data, **kwargs))
+
+    def isnull(self, **kwargs) -> ScalarColumn:
+        return self._clone(data=pac.is_null(self.data, nan_is_null=True, **kwargs))

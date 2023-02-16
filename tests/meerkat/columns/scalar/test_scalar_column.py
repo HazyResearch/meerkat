@@ -43,6 +43,12 @@ BOOL_COLUMNS = [
     np.array([True, False, True]),
     np.array([False, False, False]),
 ]
+NAN_COLUMNS = [
+    np.array([np.nan, 1, 2]),
+    np.array([1, 4, 3], dtype=float),
+    np.array([1, np.nan, 3], dtype=float),
+    np.array([np.nan, np.nan, np.nan]),
+]
 
 
 @product_parametrize({"backend": BACKENDS, "data": NUMERIC_COLUMNS + BOOL_COLUMNS})
@@ -378,12 +384,14 @@ def test_and_column(backend: str, operands: Dict[str, np.array]):
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] & operands["b"], backend=backend))
 
+
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_and_scalar(backend: str, operands: Dict[str, np.array]):
     col_a = ScalarColumn(operands["a"], backend=backend)
     out = col_a & operands["b"]
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] & operands["b"], backend=backend))
+
 
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_or_column(backend: str, operands: Dict[str, np.array]):
@@ -393,12 +401,14 @@ def test_or_column(backend: str, operands: Dict[str, np.array]):
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] | operands["b"], backend=backend))
 
+
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_or_scalar(backend: str, operands: Dict[str, np.array]):
     col_a = ScalarColumn(operands["a"], backend=backend)
     out = col_a | operands["b"]
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] | operands["b"], backend=backend))
+
 
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_xor_column(backend: str, operands: Dict[str, np.array]):
@@ -408,12 +418,14 @@ def test_xor_column(backend: str, operands: Dict[str, np.array]):
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] ^ operands["b"], backend=backend))
 
+
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_xor_scalar(backend: str, operands: Dict[str, np.array]):
     col_a = ScalarColumn(operands["a"], backend=backend)
     out = col_a ^ operands["b"]
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(operands["a"] ^ operands["b"], backend=backend))
+
 
 @product_parametrize({"backend": BACKENDS, "operands": BOOL_COLUMN_OPERANDS})
 def test_invert_column(backend: str, operands: Dict[str, np.array]):
@@ -422,3 +434,59 @@ def test_invert_column(backend: str, operands: Dict[str, np.array]):
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(~operands["a"], backend=backend))
 
+
+@product_parametrize({"backend": BACKENDS, "operands": NUMERIC_COLUMN_OPERANDS})
+def test_isin_column(backend: str, operands: Dict[str, np.array]):
+    col_a = ScalarColumn(operands["a"], backend=backend)
+    values = [operands["b"][0], operands["b"][1], operands["b"][2]]
+    out = col_a.isin(values)
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(np.isin(operands["a"], values), backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "column": NAN_COLUMNS})
+def test_isna(backend: str, column: np.array):
+    col = ScalarColumn(column, backend=backend)
+    out = col.isna()
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(np.isnan(column), backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "column": NAN_COLUMNS})
+def test_isnull(backend: str, column: np.array):
+    col = ScalarColumn(column, backend=backend)
+    out = col.isnull()
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(np.isnan(column), backend=backend))
+
+
+STRING_COLUMNS = [
+    pd.Series(
+        [
+            "a",
+            "bfdsdf",
+            "c asdasd dsd",
+            "d",
+            "efdsdf ",
+            "ffsdfs asdasd",
+            "g",
+            "h",
+            "i",
+            "j",
+        ]
+    ),
+]
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+        "compute_fn": ["capitalize", "center"],
+    }
+)
+def test_unary_str_methods(backend: str, column: np.array, compute_fn: str):
+    col = ScalarColumn(column, backend=backend)
+    out = getattr(col.str, compute_fn)()
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(getattr(column.str, compute_fn), backend=backend))

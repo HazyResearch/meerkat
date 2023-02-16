@@ -152,9 +152,9 @@ class PandasScalarColumn(
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number, str)
 
-    str = CachedAccessor("str", _MeerkatStringMethods)
     dt = CachedAccessor("dt", _MeerkatCombinedDatetimelikeProperties)
     cat = CachedAccessor("cat", _MeerkatCategoricalAccessor)
+    str = CachedAccessor("str", _MeerkatStringMethods)
     # plot = CachedAccessor("plot", pandas.plotting.PlotAccessor)
     # sparse = CachedAccessor("sparse", SparseAccessor)
 
@@ -436,13 +436,23 @@ class PandasScalarColumn(
             other = other.data
 
         if other is None:
-            return self._clone(
-                data=getattr(self.data, f"__{compute_fn}__")(**kwargs)
-            )
+            return self._clone(data=getattr(self.data, f"__{compute_fn}__")(**kwargs))
 
         return self._clone(
             data=getattr(self.data, f"__{compute_fn}__")(other, **kwargs)
         )
+
+    def isin(self, values: Sequence[Any]) -> "PandasScalarColumn":
+        return self._clone(data=self.data.isin(values))
+
+    def _dispatch_unary_function(
+        self, compute_fn: str, _namespace: str = None, **kwargs
+    ):
+        if _namespace is not None:
+            obj = getattr(self.data, _namespace)
+        else:
+            obj = self.data
+        return self._clone(data=getattr(obj, compute_fn)(**kwargs))
 
 
 PandasSeriesColumn = PandasScalarColumn
