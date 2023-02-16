@@ -209,7 +209,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __mod__(self, other):
         return super().__mod__(other)
 
-    @reactive()
+    @reactive(nested_return=False)
     def __divmod__(self, other):
         return super().__divmod__(other)
 
@@ -465,7 +465,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __contains__(self, value):
         return super().__contains__(value)
 
-    @reactive()
+    @reactive(nested_return=False)
     def __getitem__(self, key):
         return super().__getitem__(key)
 
@@ -486,7 +486,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         warnings.warn(f"{type(self).__name__}.__delitem__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @reactive()
+    @reactive(nested_return=False)
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
@@ -531,7 +531,7 @@ class _IteratorStore(Store):
             raise ValueError("wrapped object must be an Iterator.")
         super().__init__(wrapped, backend_only=backend_only)
 
-    @_wand
+    @reactive()
     def __next__(self):
         return next(self.__wrapped__)
 
