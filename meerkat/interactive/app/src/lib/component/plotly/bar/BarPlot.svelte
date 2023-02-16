@@ -27,7 +27,7 @@
 		];
 	});
 
-	const layout = { xaxis: { title: x }, yaxis: { title: y } };
+	const layout = { xaxis: { title: x }, yaxis: { title: y }, title: title };
 
 	async function on_endpoint(endpoint: Endpoint, e) {
 		let data = await data_promise;
@@ -44,6 +44,5 @@
 </script>
 
 {#await data_promise then data}
-	{title}
 	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
 {/await}
