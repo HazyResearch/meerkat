@@ -58,6 +58,7 @@ from meerkat.ops.cond import (
     _dict,
     _set,
     _range,
+    _abs,
     cand,
     cnot,
     cor,
@@ -116,6 +117,7 @@ sum = _sum
 dict = _dict
 set = _set
 range = _range
+abs = _abs
 
 # These statements needs to be after the imports above.
 # Do not move them.
@@ -181,6 +183,7 @@ __all__ = [
     "dict",
     "set",
     "range",
+    "abs",
     # <<<< I/O >>>>
     "from_csv",
     "from_json",

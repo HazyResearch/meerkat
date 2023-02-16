@@ -140,3 +140,7 @@ def _set(__iterable) -> set:
 @reactive()
 def _range(*args) -> range:
     return range(*args)
+
+@reactive()
+def _abs(__x) -> float:
+    return abs(__x)

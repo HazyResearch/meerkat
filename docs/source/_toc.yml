@@ -36,6 +36,15 @@ parts:
               - file: guide/dataframe/advanced/copying
               - file: guide/dataframe/advanced/blocks
       
+      - title: Reactivity
+        file: guide/reactive/getting-started
+        sections:
+          # - file: guide/reactive/concepts
+          # - file: guide/reactive/user-guide
+          # - file: guide/reactive/examples
+          # - file: guide/reactive/faq
+          - file: guide/reactive/inbuilts
+
       - title: Interactive
         file: guide/interactive/introduction
         sections: 
@@ -56,6 +65,8 @@ parts:
           - file: guide/interactive/examples/examples
             sections:
               - file: guide/interactive/examples/image_search
+
+
 
   - caption: Use Cases
     chapters:
