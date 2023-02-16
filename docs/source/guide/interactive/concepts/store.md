@@ -275,16 +275,35 @@ The `magic` context is not required at all, but it can make your code more succi
 #### Are there any caveats to using the `magic` context?
 There are some important edge cases when using the `magic` context that you should be aware of. You should see warnings when you encounter these edge cases, but it's still good to be aware of them.
 
-One major edge case is when using `and`, `or`, `not` and `is` operators. These operators are special tokens in Python, and cannot be intercepted by Meerkat. This means that the following statements will not be reactive:
+One major edge case is when using `and`, `or`, `not` and `is` operators. These operators are special tokens in Python, and cannot be intercepted by Meerkat. This means that the following statements will not be reactive, and should not be relied on.
 ```python
 x = mk.Store(1)
 y = mk.Store(2)
 with mk.magic():
-    # This will not be reactive
+    # None of these will be reactive
+    # and may return the wrong value!
     z = x and y
-    # This will not be reactive
     z = x is y
+    z = x or y
+    z = not x
+    # Use Meerkat's built-in overloads instead
+    mk.cand(x, y)
+    mk.cor(x, y)
+    mk.cnot(x)
+    # Or just wrap in a reactive lambda function!
+    z = mk.reactive(lambda x, y: x and y)(x, y)
 ```
+
+#### What's a quick way to debug the value of `Store` objects?
+The easiest way is to use the `mk.print` function. This is a reactive `print` function that will re-print the value of a `Store` object whenever it changes.
+```python
+x = mk.Store(1)
+mk.print(x) # prints 1
+# Will re-print the value of `x` whenever it changes
+```
+Underneath the hood, `mk.print` is just `mk.reactive(print)`, so you can also use it to print the value of any Python object.
+
+You can follow this pattern to create more advanced debugging tools.
 
 
 
