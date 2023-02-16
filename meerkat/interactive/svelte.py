@@ -20,6 +20,7 @@ from meerkat.constants import (
     write_file,
 )
 from meerkat.interactive import BaseComponent
+from meerkat.tools.filelock import FileLock
 from meerkat.tools.singleton import Singleton
 
 if TYPE_CHECKING:
@@ -44,6 +45,20 @@ def get_subclasses_recursive(cls: type) -> List[type]:
     return subclasses
 
 
+def write_file_if_changed(path: str, content: str):
+    """Write a file if the content has changed.
+
+    Args:
+        path (str): the path to write to.
+        content (str): the content to write.
+    """
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            if f.read() == content:
+                return
+    write_file(path, content)
+
+
 class SvelteWriter(metaclass=Singleton):
     """Class that handles writing Svelte components to a Meerkat app."""
 
@@ -61,9 +76,10 @@ class SvelteWriter(metaclass=Singleton):
     def run(self):
         """Write component wrappers and context at the start of a run."""
         self.import_app_components()
-        self.cleanup()
-        self.write_all_component_wrappers()  # src/lib/wrappers/
-        self.write_component_context()  # ComponentContext.svelte
+        with FileLock(os.path.join(self.appdir, "svelte_writer")):
+            self.cleanup()
+            self.write_all_component_wrappers()  # src/lib/wrappers/
+            self.write_component_context()  # ComponentContext.svelte
 
     def cleanup(self):
         """Cleanup the app."""
@@ -291,7 +307,7 @@ class SvelteWriter(metaclass=Singleton):
     def write_component_wrapper(self, component: Type[BaseComponent]):
         cwd = f"{self.appdir}/src/lib/wrappers/__{component.namespace}"
         os.makedirs(cwd, exist_ok=True)
-        write_file(
+        write_file_if_changed(
             f"{cwd}/{component.__name__}.svelte",
             self.render_component_wrapper(component),
         )
@@ -315,7 +331,7 @@ class SvelteWriter(metaclass=Singleton):
             self.write_component_wrapper(subclass)
 
     def write_component_context(self):
-        write_file(
+        write_file_if_changed(
             f"{self.appdir}/src/lib/ComponentContext.svelte",
             self.render_component_context(),
         )
@@ -337,8 +353,6 @@ if (
     or (MEERKAT_RUN_SUBPROCESS and MEERKAT_RUN_RELOAD_COUNT > 1)
 ) and not MEERKAT_INIT_PROCESS:
     logger.debug("Running SvelteWriter().run().")
-    import ray
-    print(ray.is_initialized())
     SvelteWriter().run()
 
 if MEERKAT_RUN_SUBPROCESS:
