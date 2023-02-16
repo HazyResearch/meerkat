@@ -32,7 +32,14 @@ from .app.src.lib.component.core.toggle import Toggle
 from .app.src.lib.shared.cell.website import Website
 from .edit import EditTarget
 from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
-from .graph import Store, is_unmarked_context, mark, reactive, unmarked  # noqa: F401
+from .graph import (  # noqa: F401
+    Store,
+    is_unmarked_context,
+    magic,
+    mark,
+    reactive,
+    unmarked,
+)
 from .modification import DataFrameModification, Modification
 from .page import Page, page
 from .startup import start
@@ -63,6 +70,7 @@ __all__ = [
     "unmarked",
     "is_unmarked_context",
     "mark",
+    "magic",
     # Modification Types
     "DataFrameModification",
     "Modification",

@@ -1,7 +1,7 @@
 import meerkat as mk
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_change(value):
     print("on_change", value, flush=True)
     select.labels.set([1, 2, 3, 4, 5])

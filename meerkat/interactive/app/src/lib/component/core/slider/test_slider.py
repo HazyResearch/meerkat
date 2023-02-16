@@ -1,7 +1,7 @@
 import meerkat as mk
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_change(value):
     print("on_change", value)
 

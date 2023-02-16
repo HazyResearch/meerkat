@@ -111,3 +111,32 @@ def _hex(__number: Any) -> str:
 @reactive()
 def _oct(__number: Any) -> str:
     return oct(__number)
+
+
+@reactive()
+def _str(__obj) -> str:
+    return str(__obj)
+
+@reactive(nested_return=False)
+def _list(__iterable) -> list:
+    return list(__iterable)
+
+@reactive(nested_return=False)
+def _tuple(__iterable) -> tuple:
+    return tuple(__iterable)
+
+@reactive()
+def _sum(__iterable) -> float:
+    return sum(__iterable)
+
+@reactive()
+def _dict(**kwargs) -> dict:
+    return dict(**kwargs)
+
+@reactive(nested_return=False)
+def _set(__iterable) -> set:
+    return set(__iterable)
+
+@reactive()
+def _range(*args) -> range:
+    return range(*args)

@@ -8,6 +8,7 @@ from wrapt import ObjectProxy
 
 from meerkat.interactive.graph.magic import _wand, is_magic_context
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
+from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable
@@ -144,31 +145,31 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __hash__(self):
         return hash(self.__wrapped__)
 
-    @_wand
+    @reactive()
     def __call__(self):
         return self.__wrapped__()
 
-    @_wand
+    @reactive()
     def __lt__(self, other):
         return super().__lt__(other)
 
-    @_wand
+    @reactive()
     def __le__(self, other):
         return super().__le__(other)
 
-    @_wand
+    @reactive()
     def __eq__(self, other):
         return super().__eq__(other)
 
-    @_wand
+    @reactive()
     def __ne__(self, other):
         return super().__ne__(other)
 
-    @_wand
+    @reactive()
     def __gt__(self, other):
         return super().__gt__(other)
 
-    @_wand
+    @reactive()
     def __ge__(self, other):
         return super().__ge__(other)
 
@@ -176,127 +177,127 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __nonzero__(self):
         return super().__nonzero__()
 
-    @_wand
-    def to_str(self):
-        return super().__str__()
+    # @reactive()
+    # def to_str(self):
+    #     return super().__str__()
 
-    @_wand
+    @reactive()
     def __add__(self, other):
         return super().__add__(other)
 
-    @_wand
+    @reactive()
     def __sub__(self, other):
         return super().__sub__(other)
 
-    @_wand
+    @reactive()
     def __mul__(self, other):
         return super().__mul__(other)
 
-    @_wand
+    @reactive()
     def __div__(self, other):
         return super().__div__(other)
 
-    @_wand
+    @reactive()
     def __truediv__(self, other):
         return super().__truediv__(other)
 
-    @_wand
+    @reactive()
     def __floordiv__(self, other):
         return super().__floordiv__(other)
 
-    @_wand
+    @reactive()
     def __mod__(self, other):
         return super().__mod__(other)
 
-    @_wand
+    @reactive(nested_return=False)
     def __divmod__(self, other):
         return super().__divmod__(other)
 
-    @_wand
+    @reactive()
     def __pow__(self, other, *args):
         return super().__pow__(other, *args)
 
-    @_wand
+    @reactive()
     def __lshift__(self, other):
         return super().__lshift__(other)
 
-    @_wand
+    @reactive()
     def __rshift__(self, other):
         return super().__rshift__(other)
 
-    @_wand
+    @reactive()
     def __and__(self, other):
         return super().__and__(other)
 
-    @_wand
+    @reactive()
     def __xor__(self, other):
         return super().__xor__(other)
 
-    @_wand
+    @reactive()
     def __or__(self, other):
         return super().__or__(other)
 
-    @_wand
+    @reactive()
     def __radd__(self, other):
         return super().__radd__(other)
 
-    @_wand
+    @reactive()
     def __rsub__(self, other):
         return super().__rsub__(other)
 
-    @_wand
+    @reactive()
     def __rmul__(self, other):
         return super().__rmul__(other)
 
-    @_wand
+    @reactive()
     def __rdiv__(self, other):
         return super().__rdiv__(other)
 
-    @_wand
+    @reactive()
     def __rtruediv__(self, other):
         return super().__rtruediv__(other)
 
-    @_wand
+    @reactive()
     def __rfloordiv__(self, other):
         return super().__rfloordiv__(other)
 
-    @_wand
+    @reactive()
     def __rmod__(self, other):
         return super().__rmod__(other)
 
-    @_wand
+    @reactive()
     def __rdivmod__(self, other):
         return super().__rdivmod__(other)
 
-    @_wand
+    @reactive()
     def __rpow__(self, other, *args):
         return super().__rpow__(other, *args)
 
-    @_wand
+    @reactive()
     def __rlshift__(self, other):
         return super().__rlshift__(other)
 
-    @_wand
+    @reactive()
     def __rrshift__(self, other):
         return super().__rrshift__(other)
 
-    @_wand
+    @reactive()
     def __rand__(self, other):
         return super().__rand__(other)
 
-    @_wand
+    @reactive()
     def __rxor__(self, other):
         return super().__rxor__(other)
 
-    @_wand
+    @reactive()
     def __ror__(self, other):
         return super().__ror__(other)
 
-    @_wand
+    @reactive()
     def __neg__(self):
         return super().__neg__()
 
-    @_wand
+    @reactive()
     def __pos__(self):
         return super().__pos__()
 
@@ -304,7 +305,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __abs__(self):
         return super().__abs__()
 
-    @_wand
+    @reactive()
     def __invert__(self):
         return super().__invert__()
 
@@ -464,7 +465,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __contains__(self, value):
         return super().__contains__(value)
 
-    @_wand
+    @reactive(nested_return=False)
     def __getitem__(self, key):
         return super().__getitem__(key)
 
@@ -485,16 +486,17 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         warnings.warn(f"{type(self).__name__}.__delitem__ is out-of-place.")
         return type(self)(obj, backend_only=self._self_backend_only)
 
-    @_wand
+    @reactive(nested_return=False)
     def __getslice__(self, i, j):
         return super().__getslice__(i, j)
 
-    @_wand
-    def __setslice__(self, i, j, value):
-        obj = self.__wrapped__.copy()
-        obj[i:j] = value
-        warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
-        return type(self)(obj, backend_only=self._self_backend_only)
+    # # TODO(Arjun): Check whether this needs to be reactive.
+    # @_wand
+    # def __setslice__(self, i, j, value):
+    #     obj = self.__wrapped__.copy()
+    #     obj[i:j] = value
+    #     warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
+    #     return type(self)(obj, backend_only=self._self_backend_only)
 
     @_wand
     def __delslice__(self, i, j):
@@ -516,7 +518,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
 
     # @_wand: __iter__ behaves like a @_wand method, but cannot be decorated due to
     # Pythonic limitations
-    @_wand
+    @reactive()
     def __iter__(self):
         return iter(self.__wrapped__)
 
@@ -529,7 +531,7 @@ class _IteratorStore(Store):
             raise ValueError("wrapped object must be an Iterator.")
         super().__init__(wrapped, backend_only=backend_only)
 
-    @_wand
+    @reactive()
     def __next__(self):
         return next(self.__wrapped__)
 

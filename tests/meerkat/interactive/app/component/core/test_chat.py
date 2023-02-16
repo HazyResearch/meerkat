@@ -12,7 +12,7 @@ def _default_df():
     )
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_send(df: mk.DataFrame, message: str):
     df.set(
         df.append(

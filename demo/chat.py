@@ -42,7 +42,7 @@ def _empty_df():
     return df
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_send(df: mk.DataFrame, message: str):
     message_time = datetime.now()
     new_df = mk.DataFrame(

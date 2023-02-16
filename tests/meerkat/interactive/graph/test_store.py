@@ -1,4 +1,4 @@
-from typing import Iterator, Tuple
+from typing import Tuple
 
 import pytest
 
@@ -61,7 +61,7 @@ def _is_out_unmagiced(out, input_store: mk.gui.Store):
     assert not isinstance(out, mk.gui.Store)
 
 
-@mk.gui.endpoint()
+@mk.endpoint()
 def _set_store(store: mk.gui.Store, value):
     store.set(value)
 
@@ -87,7 +87,8 @@ def test_store_reactive_math(is_magic: bool):
         "pow": 1,
         "neg": -1,
         "pos": 1,
-        "abs": 1,
+        # Abs is invoked with abs(store), so it is not reactive.
+        # "abs": 1,
         "lt": False,
         "le": True,
         "eq": True,
@@ -108,7 +109,8 @@ def test_store_reactive_math(is_magic: bool):
         out["pow"] = store**1
         out["neg"] = -store
         out["pos"] = +store
-        out["abs"] = abs(store)
+        # Abs is invoked with abs(store), so it is not reactive.
+        # out["abs"] = abs(store)
         out["lt"] = store < 1
         out["le"] = store <= 1
         out["eq"] = store == 1
@@ -116,25 +118,22 @@ def test_store_reactive_math(is_magic: bool):
         out["gt"] = store > 1
         out["ge"] = store >= 1
 
-    if is_magic:
-        assert len(store.inode.trigger_children) == len(expected)
-    else:
-        assert store.inode is None
-
+    # Regardless of if magic is on/off, math operations should always be
+    # reactive.
+    assert len(store.inode.trigger_children) == len(expected)
+    assert store.inode is not None
     for k, v in out.items():
-        if is_magic:
-            _is_out_magiced(v, store, op_name=f"__{k}__", op_num_children=1)
-        else:
-            _is_out_unmagiced(v, store)
-
+        _is_out_magiced(v, store, op_name=f"__{k}__", op_num_children=1)
         assert v == expected[k]
 
 
 @pytest.mark.parametrize("other", [1, 2])
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_store_imethod(other: int, is_magic: bool):
-    """Test traditional inplace methods are reactive, but return different
-    stores."""
+    """
+    Test traditional inplace methods are reactive,
+    but return different stores.
+    """
 
     def _get_expected():
         # TODO: Have a variable that chooses which one of these to run.
@@ -157,14 +156,17 @@ def test_store_imethod(other: int, is_magic: bool):
     store = mk.gui.Store(1)
     original = store
 
-    if is_magic:
-        with pytest.warns(UserWarning):
-            expected = _get_expected()
-    else:
+    with pytest.warns(UserWarning):
         expected = _get_expected()
 
+    # Get raw values
+    with mk.unmarked():
+        expected = _get_expected()
+
+    # Regardless of if magic is on/off, i-math operations
+    # should always be reactive.
     out = {}
-    with magic():
+    with magic(is_magic):
         for k in expected:
             with pytest.warns(UserWarning):
                 out[k] = getattr(store, k)(other)
@@ -187,13 +189,9 @@ def test_store_as_iterator(is_magic: bool):
         store_iter = iter(store)
 
     # Regardless of if magic is on, the iterator should be a Store.
-    # However, only when magic is on, should the store be added to the graph.
-    if is_magic:
-        assert isinstance(store_iter, _IteratorStore)
-        _is_out_magiced(store_iter, store, op_name="__iter__", op_num_children=1)
-    else:
-        assert isinstance(store_iter, Iterator)
-        _is_out_unmagiced(store_iter, store)
+    # The store should also be added to the graph.
+    assert isinstance(store_iter, _IteratorStore)
+    _is_out_magiced(store_iter, store, op_name="__iter__", op_num_children=1)
 
     # When we fetch things from the iterator, they should be stores.
     # Similar to the above, only when magic is on, should the store be added
@@ -202,10 +200,7 @@ def test_store_as_iterator(is_magic: bool):
         values = [v for v in store_iter]
 
     for v in values:
-        if is_magic:
-            isinstance(v, mk.gui.Store)
-        else:
-            not isinstance(v, mk.gui.Store)
+        assert isinstance(v, mk.gui.Store)
 
     if not is_magic:
         return
@@ -228,15 +223,10 @@ def test_tuple_unpack(is_magic: bool):
     with magic(is_magic):
         a, b = store
 
-    if is_magic:
-        assert isinstance(a, mk.gui.Store)
-        assert isinstance(b, mk.gui.Store)
-    else:
-        assert not isinstance(a, mk.gui.Store)
-        assert not isinstance(b, mk.gui.Store)
-
-    if not is_magic:
-        return
+    # Iterators and next are always are reactive, so these should
+    # always be stores.
+    assert isinstance(a, mk.gui.Store)
+    assert isinstance(b, mk.gui.Store)
 
     # Test the nodes get updated properly
     a_inode = a.inode
@@ -262,15 +252,10 @@ def test_tuple_unpack_return_value(is_magic: bool):
     assert a == 2
     assert b == 3
 
-    if is_magic:
-        assert isinstance(a, mk.gui.Store)
-        assert isinstance(b, mk.gui.Store)
-    else:
-        assert not isinstance(a, mk.gui.Store)
-        assert not isinstance(b, mk.gui.Store)
-
-    if not is_magic:
-        return
+    # Iterators and next are always are reactive, so these should
+    # always be stores.
+    assert isinstance(a, mk.gui.Store)
+    assert isinstance(b, mk.gui.Store)
 
     # Test the nodes get updated properly
     a_inode = a.inode

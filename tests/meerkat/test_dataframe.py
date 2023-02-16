@@ -1304,7 +1304,7 @@ def test_scalar_setitem(x):
         assert all(df["extra_column"] == x)
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def _set_store_or_df(store: mk.gui.Store, value):
     store.set(value)
 

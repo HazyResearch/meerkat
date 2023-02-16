@@ -1,6 +1,8 @@
 import pytest
 
 import meerkat as mk
+from meerkat.columns.abstract import Column
+from meerkat.dataframe import DataFrame
 from meerkat.interactive.node import NodeMixin
 
 
@@ -17,8 +19,7 @@ def test_boolean_operators_multiple_arguments(x, y, react, comp):
     elif comp == mk.cor:
         expected = x or y
 
-    with mk.gui.reactive():
-        out = comp(x_store, y_store)
+    out = comp(x_store, y_store)
 
     assert out == expected
     if react:
@@ -37,8 +38,7 @@ def test_boolean_operators_single_operator(x, react, comp):
     elif comp == mk.cnot:
         expected = not x
 
-    with mk.gui.reactive():
-        out = comp(x_store)
+    out = comp(x_store)
 
     assert out == expected
     if react:
@@ -46,13 +46,16 @@ def test_boolean_operators_single_operator(x, react, comp):
     assert isinstance(out, type(expected))
 
 
-def _invoker_helper(x, *, mk_func, base_func):
+def _invoker_helper(x, *, mk_func, base_func, should_warn: bool = True):
     if isinstance(x, NodeMixin):
-        x = mk.reactive(x)
+        x = mk.mark(x)
         # All custom classes that support __len__ should raise a warning
         # when invoked with `len(obj)`. Because NodeMixin classes are
         # custom classes in Meerkat, this is a check that we enforce.
-        with pytest.warns(UserWarning):
+        if should_warn:
+            with pytest.warns(UserWarning):
+                expected = base_func(x)
+        else:
             expected = base_func(x)
     else:
         expected = base_func(x)
@@ -120,7 +123,8 @@ def test_float(x):
 )
 def test_len(x):
     """Test mk.len works identically to len."""
-    _invoker_helper(x, mk_func=mk.len, base_func=len)
+    should_warn = not isinstance(x, Column)
+    _invoker_helper(x, mk_func=mk.len, base_func=len, should_warn=should_warn)
 
 
 @pytest.mark.parametrize("x", [False, True, -1, 0])
@@ -133,3 +137,21 @@ def test_hex(x):
 def test_oct(x):
     """Test mk.oct works identically to oct."""
     _invoker_helper(x, mk_func=mk.oct, base_func=oct)
+
+
+@pytest.mark.parametrize(
+    "x",
+    [
+        False,
+        True,
+        0,
+        1,
+        1.0,
+        mk.DataFrame({"a": [1, 2, 3]}),
+        mk.TensorColumn([1, 2, 3]),
+    ],
+)
+def test_str(x):
+    """Test mk.str works identically to str."""
+    should_warn = not isinstance(x, (DataFrame, Column))
+    _invoker_helper(x, mk_func=mk.str, base_func=str, should_warn=should_warn)

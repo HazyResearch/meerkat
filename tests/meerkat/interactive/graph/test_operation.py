@@ -12,7 +12,7 @@ def test_operation_with_skip():
     def fn(x: int, y: int):
         return x + y
 
-    @mk.gui.endpoint
+    @mk.endpoint()
     def set_xy(x: mk.gui.Store, y: mk.gui.Store, x_val, y_val):
         x.set(x_val)
         y.set(y_val)
@@ -46,7 +46,7 @@ def test_instance_method_with_skip():
         def fn(self, y):
             return self.x + y
 
-    @mk.gui.endpoint
+    @mk.endpoint()
     def set_xy(y: mk.gui.Store, y_val: int):
         y.set(y_val)
 

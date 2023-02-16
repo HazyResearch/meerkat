@@ -3,7 +3,7 @@ from meerkat.interactive import flowbite as fb
 from meerkat.interactive import html as html
 
 
-@mk.gui.endpoint
+@mk.endpoint()
 def on_click():
     print("Clicked!")
 
@@ -33,7 +33,8 @@ accordion = fb.Accordion(
                 html.span(slots="My Header 1"),
                 html.p(
                     slots=[
-                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo ab necessitatibus sint explicabo ...",
+                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. "
+                        "Illo ab necessitatibus sint explicabo ..."
                         "Check out this guide to learn how to ",
                         html.a(
                             slots="get started",
@@ -42,7 +43,8 @@ accordion = fb.Accordion(
                             rel="noreferrer",
                             classes="text-blue-600 dark:text-blue-500 hover:underline",
                         ),
-                        " and start developing websites even faster with components on top of Tailwind CSS.",
+                        " and start developing websites even faster with components "
+                        "on top of Tailwind CSS.",  # noqa: E501
                     ],
                     classes="mb-2 text-gray-500 dark:text-gray-400",
                 ),
@@ -53,8 +55,10 @@ accordion = fb.Accordion(
                 html.span(slots="My Header 2"),
                 html.p(
                     slots=[
-                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo ab necessitatibus sint explicabo ...",
-                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo ab necessitatibus sint explicabo ...",
+                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. "
+                        "Illo ab necessitatibus sint explicabo ...",
+                        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. "
+                        "Illo ab necessitatibus sint explicabo ...",
                         "Learn more about these technologies:",
                         html.ul(
                             slots=[
@@ -64,7 +68,7 @@ accordion = fb.Accordion(
                                         href="https://tailwindcss.com/docs",
                                         target="_blank",
                                         rel="noreferrer",
-                                        classes="text-blue-600 dark:text-blue-500 hover:underline",
+                                        classes="text-blue-600 dark:text-blue-500 hover:underline",  # noqa: E501
                                     )
                                 ),
                                 html.li(
@@ -73,7 +77,7 @@ accordion = fb.Accordion(
                                         href="https://tailwindui.com/",
                                         target="_blank",
                                         rel="noreferrer",
-                                        classes="text-blue-600 dark:text-blue-500 hover:underline",
+                                        classes="text-blue-600 dark:text-blue-500 hover:underline",  # noqa: E501
                                     )
                                 ),
                             ],
@@ -95,7 +99,7 @@ alert = fb.Alert(
                     slots=[
                         html.path(
                             fill_rule="evenodd",
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z",
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z",  # noqa: E501
                             clip_rule="evenodd",
                         )
                     ],
@@ -112,7 +116,9 @@ alert = fb.Alert(
             slots=[
                 html.div(
                     slots=[
-                        "More info about this info alert goes here. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.",
+                        "More info about this info alert goes here. This example text "
+                        "is going to run a bit longer so that you can see how spacing "
+                        "within an alert works with this kind of content.",
                     ],
                     classes="mt-2 mb-4 text-sm",
                 ),
@@ -124,7 +130,7 @@ alert = fb.Alert(
                                     slots=[
                                         html.path(d="M10 12a2 2 0 100-4 2 2 0 000 4z"),
                                         html.path(
-                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z",
+                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z",  # noqa: E501
                                             fill_rule="evenodd",
                                             clip_rule="evenodd",
                                         ),
@@ -243,7 +249,7 @@ toast = fb.Toast(
                         html.svg(
                             slots=[
                                 html.path(
-                                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",
+                                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",  # noqa: E501
                                     stroke_linecap="round",
                                     stroke_linejoin="round",
                                     stroke_width="1.5",
