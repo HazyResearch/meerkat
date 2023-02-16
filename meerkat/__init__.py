@@ -51,6 +51,13 @@ from meerkat.ops.cond import (
     _int,
     _len,
     _oct,
+    _str,
+    _list,
+    _tuple,
+    _sum,
+    _dict,
+    _set,
+    _range,
     cand,
     cnot,
     cor,
@@ -102,6 +109,13 @@ complex = _complex
 hex = _hex
 oct = _oct
 bool = _bool
+str = _str
+list = _list
+tuple = _tuple
+sum = _sum
+dict = _dict
+set = _set
+range = _range
 
 # These statements needs to be after the imports above.
 # Do not move them.
@@ -160,6 +174,13 @@ __all__ = [
     "complex",
     "hex",
     "oct",
+    "str",
+    "list",
+    "tuple",
+    "sum",
+    "dict",
+    "set",
+    "range",
     # <<<< I/O >>>>
     "from_csv",
     "from_json",

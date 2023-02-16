@@ -48,7 +48,7 @@ def test_boolean_operators_single_operator(x, react, comp):
 
 def _invoker_helper(x, *, mk_func, base_func):
     if isinstance(x, NodeMixin):
-        x = mk.reactive(x)
+        x = mk.mark(x)
         # All custom classes that support __len__ should raise a warning
         # when invoked with `len(obj)`. Because NodeMixin classes are
         # custom classes in Meerkat, this is a check that we enforce.
@@ -107,7 +107,6 @@ def test_float(x):
     """Test mk.float works identically to float."""
     _invoker_helper(x, mk_func=mk.float, base_func=float)
 
-
 @pytest.mark.parametrize(
     "x",
     [
@@ -133,3 +132,8 @@ def test_hex(x):
 def test_oct(x):
     """Test mk.oct works identically to oct."""
     _invoker_helper(x, mk_func=mk.oct, base_func=oct)
+
+@pytest.mark.parametrize("x", [False, True, 0, 1, 1.0, mk.DataFrame({"a": [1,2,3]})])
+def test_str(x):
+    """Test mk.str works identically to str."""
+    _invoker_helper(x, mk_func=mk.str, base_func=str)
