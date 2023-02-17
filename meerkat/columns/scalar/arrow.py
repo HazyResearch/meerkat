@@ -72,6 +72,10 @@ class ArrowStringMethods(StringMethods):
     ) -> "DataFrame":
         return self._split(pat=pat, n=n, reverse=True, regex=regex, **kwargs)
 
+    def startswith(self, pat: str, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "starts_with", pattern=pat, **kwargs
+        )
 
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock

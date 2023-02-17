@@ -110,6 +110,11 @@ class StringMethods:
         self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
     ) -> "DataFrame":
         raise NotImplementedError()
+    
+    def startswith(self, pat: str, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "startswith", _namespace="str", pat=pat, **kwargs
+        )
 
 
 class ScalarColumn(Column):

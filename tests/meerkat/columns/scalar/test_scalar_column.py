@@ -467,10 +467,12 @@ STRING_COLUMNS = [
             "a asdsd ",
             "bfdsdf.",
             "c asdasd dsd",
+            "1290_dij",
             "d",
             " efdsdf ",
             "Fasdd asdasd",
             "pppqqqqq",
+            "1290_dijaaa",
             "hl2orf83WIW",
             "22222",
             "1290_disdj",
@@ -568,3 +570,16 @@ def test_rsplit(backend: str, column: pd.Series, n: int):
     assert correct_df.columns == out.columns
     for name in correct_df.columns:
         assert correct_df[name].equals(out[name])
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+    }
+)
+def test_center(backend: str, column: pd.Series):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.startswith("1290")
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(column.str.startswith("1290"), backend=backend))
