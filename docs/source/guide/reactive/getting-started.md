@@ -30,35 +30,35 @@ To use `mk.reactive()`, use standard Python syntax for decorators. There are thr
 
 #### 1. Decorate a function with `mk.reactive()`
 ```python
-# Use decorator syntax to wrap `foo` in `mk.reactive()`
+# Use decorator syntax to wrap `add_by_1` in `mk.reactive()`
 @mk.reactive()
-def foo(a):
+def add_by_1(a):
     return a + 1
     
-# Now use `foo` in your code
-foo(...)
+# Now use `add_by_1` in your code
+add_by_1(...)
 ```
 
 #### 2. Call `mk.reactive()` on a function
 ```python
-def foo(a):
+def add_by_1(a):
     return a + 1
 
-foo = mk.reactive(foo)
+add_by_1 = mk.reactive(add_by_1)
 
 # Now use `foo` in your code
-foo(...)
+add_by_1(...)
 ```
 
 #### 3. Call `mk.reactive()` on a lambda function
 ```python
-foo = mk.reactive(lambda a: a + 1)
+add_by_1 = mk.reactive(lambda a: a + 1)
 
 # Now use `foo` in your code
-foo(...)
+add_by_1(...)
 ```
 
-All have the same effect, `foo` is now a reactive function that Meerkat knows about.
+All have the same effect, `add_by_1` is now a reactive function that Meerkat knows about.
 
 What does wrapping a function with `mk.reactive()` actually do? 
 At a high level, these functions will be re-run when their inputs change.
@@ -66,9 +66,9 @@ At a high level, these functions will be re-run when their inputs change.
 We'll look at this in more detail in a bit. First, though, we'll talk about `Store` objects, which are intertwined with reactive functions.
 
 ## Recap on Stores
-Before we proceed, we'll provide a brief recap on `Store` objects. You can read the full guide on `Store` objects at [XXXXXXXXXXXX]. 
+Before we proceed, we'll provide a brief recap on {py:class}`meerkat.Store` objects. You can read the full guide on `Store` objects at [XXXXXXXXXXXX]. 
 
-A `Store` is a special object provided by Meerkat that can be used to wrap arbitrary Python objects -- `int`, `str`, `list`, `dict`, `pd.DataFrame`, `pathlib.Path` are just a few examples of objects that can be wrapped by `Store`. 
+A `Store` is a special object provided by Meerkat that can be used to wrap arbitrary Python objects, such primitive types (e.g. `int`, `str`, `list`, `dict`), third-party objects (e.g. {py:class}`pandas.DataFrame`, `pathlib.Path`), and even your custom objects. 
 
 A major reason to use `Store` objects is that they make it possible for Meerkat to track changes to Python objects.
 
@@ -92,7 +92,7 @@ x = 4 # z is still 3
 ```
 You might think for a second that `z` should be updated to `6` because `x` changed and `add` is a reactive function. **This is not the case.**
 
-The reason is that `x` is just a variable here. By changing `x`, we aren't changing the object that `x` points to (i.e. the `int` `1`). Instead, we are just changing the variable `x` to point to a different object.
+This is because `x` is just an `int`. By changing `x`, we aren't changing the object that `x` points to (i.e. the `int` `1`). Instead, we are just changing the variable `x` to point to a different object.
 
 *What we need here is to update the object that `x` points to.* It's impossible to do this with a regular `int`. We can do this with a `Store` instead.
 
@@ -101,7 +101,8 @@ x = mk.Store(1)
 y = mk.Store(2)
 z = add(x, y) # z is Store(3), type(z) is Store
 
-x.set(4, triggers=True) 
+x.set(4, triggers=True)
+print(z)
 # z is now Store(6), type(z) is Store
 ```
 By calling `set()` on `x`, we are changing the object that `x` points to. This is what allows `z` to be updated. (Ignore the `triggers=True` argument.)
@@ -124,12 +125,10 @@ The takeaways are:
 - A `Store` will behave like the object it wraps.
 - A `Store` is necessary to track changes when passing an object to a reactive function.
 
-
-Let's go back to understanding how reactive functions work.
-
 ## How do reactive functions work?
 
-Let's take the `add` function again.
+Let's go back to understanding how reactive functions work.
+Consider the `add` function again.
 
 **What happens when you wrap `add` with `mk.reactive()`?**
     
@@ -249,12 +248,82 @@ selected_df = sorted_df[["b"]]
 > 
 > Alternately, you can also use the `magic` context manager if you want to "turn on" the same functionality for `pd.DataFrame` objects. We recommend reading the guide at XXXXXXX to learn more about this.
 
+
+## Marked Inputs and Reactivity
+So far, we gave a simple definition of reactive functions in Meerkat. This definition was almost but not quite complete.
+
+Rather than a reactive function being re-run whenever any of its inputs are updated, it is actually re-run whenever any of its **marked** inputs are updated. This is a subtle but important distinction.
+
+`Store` objects are **markable**, which means we can mark them for use with reactive functions. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
+
+This means that for a function to react to changes in its inputs, its inputs must be marked. Let's look at a few examples.
+
+```python
+import meerkat as mk
+
+@mk.reactive()
+def add(a, b):
+    return a + b
+
+# c1 is updated if either a or b changes
+a = mk.Store(1)
+b = mk.Store(2)
+c1 = add(a, b)
+
+# c2 is updated only if a changes as b is unmarked
+a = mk.Store(1)
+b = mk.Store(2).unmark()
+c2 = add(a, b)
+
+# c3 is updated only if a changes as b is not markable
+a = mk.Store(1)
+b = 2
+c3 = add(a, b)
+
+# c4 will never be updated because
+# neither a or b are markable objects
+a = 1
+b = 2
+c4 = add(a, b)
+```
+Most of the time, you won't need to worry about marking `Store` objects, since they are marked by default.
+
+However, other Meerkat objects like `DataFrame` and `Column` are unmarked by default. If you want reactive functions to react to changes in them, you must call `.mark()` on them prior to passing them to a reactive function.
+
+```python
+df = mk.DataFrame({"a": [1, 2, 3]})
+@mk.reactive()
+def foo(df):
+    return df["a"].sum()
+
+# c1 is not updated if df is updated as 
+# df is unmarked by default
+c1 = foo(df)
+
+# c2 is updated if df is updated as
+# df is marked
+df.mark()
+c2 = foo()
+```
+
+
+Takeaways:
+- Any inputs can be passed to reactive functions, but only marked inputs will be used to determine if the function should be re-run.
+- `Store` objects are marked by default, while other Meerkat objects are unmarked by default.
+
+
 ## Guidelines for Writing Reactive Functions
 Let's go over a few guidelines for writing reactive functions.
 
+**Write reactive functions like normal functions**
+Write reactive functions like any other Python function. There's no need to think of inputs to the function in any special way, since `Store` objects will be unwrapped by Meerkat to their underlying values automatically.
+
+The only case in which it doesn't make sense to wrap a normal function with the `@mk.reactive` decorator is for functions that take no arguments, since they can never be re-run.
+
+
 An important rule of thumb when using reactive functions is: **don't edit objects inside them without thinking very carefully about the consequences.**
 
-This isn't a hard rule, but it's a good guideline to follow. Let's look at an example that is particularly bad practice:
+This isn't a strict rule, but it's a good guideline to follow. Let's look at an example that is particularly bad practice:
 ```python
 @mk.reactive()
 def foo(df: mk.DataFrame):
@@ -282,7 +351,9 @@ This is a much better way to write `foo`, because it doesn't edit the original `
 
 The appropriate place to edit objects in-place in response to user input is inside a `@mk.endpoint()` function, which you can read more about in the guide at XXXXXXX.
 
-You can write reactive functions like any other Python function. Generally, we recommend that you type-hint the inputs without using `Store` objects, since they will be automatically unwrapped inside the function body.
+
+**On type hints**
+Generally, we recommend that you type-hint the inputs to a reactive function without using `Store` objects, since they will be automatically unwrapped inside the function body.
 
 ```python
 # Do this.
@@ -296,76 +367,118 @@ def add(a: mk.Store, b: mk.Store):
     return a + b
 ```
 
-
-
-
-
-
-## Using Marked Inputs with Reactive Functions
-If we look carefully at the code above, we can see the use a special object called a `Store` to wrap the integer values in `a` and `b`. `Store` objects are **markable** objects, which means we can mark them for use with reactive functions. Other types of objects in Meerkat (like DataFrames, Columns, etc.) are also markable.
-
-> :warning: Reactive functions only react to changes in *marked* inputs.
-
-When a marked object is passed to a reactive function, the function will be re-run if the marked object changes. If an unmarked object is passed to a reactive function, the function will not be re-run if the object changes.
-
-This means that for a function to react to changes in its inputs, the inputs must be marked. Let's look at a few examples
+For return values, type-hinting the return value as a `Store` object is better, since the return value will be wrapped into a `Store` automatically.
 
 ```python
-import meerkat as mk
-
 @mk.reactive()
-def add(a, b):
+def add(a: int, b: int) -> mk.Store[int]:
     return a + b
-
-# c1 will be updated if a or b changes.
-a = mk.Store(1)
-b = mk.Store(2)
-c = add(a, b)
-
-# c2 will be updated only if a changes
-# because b is unmarked
-a = mk.Store(1)
-b = mk.Store(2).unmark()
-c2 = add(a, b)
-
-# c3 will be updatd only if a changes
-# because b is not a markable object.
-a = mk.Store(1)
-b = 2
-c3 = add(a, b)
-
-# c4 will not ever be updated because
-# neither a or b are markable objects
-a = 1
-b = 2
-c4 = add(a, b)
 ```
 
-Takeaways:
-- Any inputs can be passed to reactive functions, but only marked inputs will be used to determine if the function should be re-run.
-- `Store` objects are marked by default.
-- Other meerkat objects (e.g. `DataFrame`, `Column`, etc.) are unmarked by default. Make sure to mark them prior to passing them to reactive functions
-- All Python objects can be wrapped in a `Store` object to make them markable. This is useful for passing Python objects to reactive functions.
+**Use reactive functions over shortcuts**
 
-  
-# Outline
+Another guideline we recommend is to actually write reactive functions rather than using shortcuts such as direct operations on `Store` objects, or overusing the `magic` context. If you do use shortcuts, we recommend you put them inside a `magic` context for readability.
 
-
-<!-- 
-## How do we make code reactive?
-
-The `mk.reactive()` decorator is used to designate a function is reactive.
-These functions will be re-run if the inputs change.
-For example, in the code below, if the value of `a` or `b` changes then value of `c` will be automatically updated:
-
+As an example,
 ```python
-import meerkat as mk
+a = mk.Store(1)
+
+# Method 1: best and should be preferred, overkill for this example
+@mk.reactive()
+def add_five(x: int):
+    return x + 5
+b = add_five(a)
+
+# Method 2: inlined reactive function is quite readable
+b = mk.reactive(lambda x: x + 5)(a)
+
+# Method 3: Store shortcut on + is convenient, but not readable
+b = a + 5
+
+# Method 4: same shortcut, but magic context makes it more readable
+with magic():
+    b = a + 5
+```
+
+**How to think about return values of reactive functions.**
+
+When you write a reactive function, the return value will automatically be wrapped in a **single** `Store` object that is created by the function, **regardless of what was returned**. This is different from how you might think about return values in a normal Python function, where the return value is just a reference to an existing object.
+
+Let's go over the consequences of this over a few different return value types.
+
+If you return a single object of any type, it will be wrapped in a `Store` object. The only exception is other Meerkat objects like `mk.DataFrame` and `mk.Column`, which never to be wrapped by `Store`. 
+
+To fix an example, we'll take the following snippet of code and think about what `a` will be for different return values of `foo`.
+```python
+@mk.reactive()
+def foo(...) -> ...:
+    return ...
+
+a = foo()
+```
+To be explicit, here are some examples:
+
+| Return Value | `a` |
+| --- | --- |
+| `1` | `Store(1)` |
+| `"hello"` | `Store("hello")` |
+| `(1, 2)` | `Store((1, 2))` |
+| `[1, 2]` | `Store([1, 2])` |
+| `{"a": 1}` | `Store({"a": 1})` |
+| `mk.DataFrame({"a": [1, 2, 3]})` | `mk.DataFrame({"a": [1, 2, 3]})` |
+
+In all cases, `a` will be a `Store`, except if the return value is a Meerkat object.
+
+**Notes on nested return values.**
+
+There are cases where you might wonder how to return nested `Store` objects. For example, you might wonder how to return a tuple of `Store` objects, rather than only a single `Store` object containing a tuple e.g. maybe you want to return a pair of `int` values, where each value is wrapped in a `Store` object.
+
+This is generally not something you will need to ever do explicitly. Let's look at a simple example where we chain two reactive functions to understand why.
+```python
+@mk.reactive()
+def foo():
+    return 1, 2 # Return a tuple of ints
 
 @mk.reactive()
-def add(a, b):
-    return a + b
+def bar(a):
+    return a + 1
 
-a = mk.Store(1)
-b = mk.Store(2)
-c = add(a, b)
-``` -->
+# Chain: foo()[0] -> bar()
+x = foo() # Store((1, 2))
+y = bar(x[0])
+```
+What happens when we pass `x[0]` to `bar`? Indexing into a `Store` is actually reactive, so `x[0]` will *itself* behave like a reactive function that takes `0` as input and returns `x[0]` as output _wrapped in a `Store`_. Passing this `Store` on to `bar` means that `y` will be re-run if `x` changes, which is exactly what we want.
+
+If indexing into a `Store` with `x[i]` was not reactive, it would actually _break the chain of reactivity_, and `bar` would not be re-run if `x` changed.
+
+The takeaway is that Meerkat obviates the need to explicitly wrap nested return values in `Store` objects, since indexing into a `Store` is itself reactive.
+
+However, keep in mind that when indexing into a `Store` to access nested values, a new `Store` object is created each time, even if you index into the same location. This means that if you want to access the same nested value multiple times, you should store it in a variable first.
+
+```python
+x = Store((1, 2))
+a = x[0]
+b = x[0]
+# `a` and `b` are different `Store` objects.
+# This can lead to subtle bugs e.g. setting `a` would not trigger
+# functions that depend on `b`.
+```
+The solution here is to just access the nested value once to define `a`, and then reuse the `a` variable.
+
+
+Finally, if you do want to explicitly control how return values of a reactive function are wrapped by `Store`, you have the option to wrap these values in a `Store` inside the function and return it yourself.
+```python
+@mk.reactive()
+def foo():
+    return mk.Store(1), mk.Store(2)
+
+a = foo()
+# `a` will be Store((Store(1), Store(2)))
+```
+In this case, the return value is a tuple of `Store` objects, and so `a` will be a `Store` object containing a tuple of `Store` objects.
+
+
+
+
+
+

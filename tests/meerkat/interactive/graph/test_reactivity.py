@@ -120,14 +120,16 @@ def test_default_nested_return():
     _s = mk.gui.Store("")
     with magic():
         out = _return_tuple(_s)
-    a, b = out
-    assert not isinstance(out, mk.gui.Store)
-    assert isinstance(a, mk.gui.Store)
-    assert isinstance(b, mk.gui.Store)
+    with mk.unmarked():
+        a, b = out
+    assert isinstance(out, mk.gui.Store)
+    assert not isinstance(a, mk.gui.Store)
+    assert not isinstance(b, mk.gui.Store)
 
     with magic():
         out = _return_list(_s)
-    a, b = out
+    with mk.unmarked():
+        a, b = out
     # Lists are not unpacked by default.
     assert isinstance(out, mk.gui.Store)
     assert not isinstance(a, mk.gui.Store)

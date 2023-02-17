@@ -2,6 +2,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.graph import Store, reactive
+from meerkat.interactive.graph.marking import mark
 
 
 @reactive()
@@ -21,7 +22,7 @@ def run_filter_code_cell(df: DataFrame, code: str):
     return eval("df[df.map(condition)]", {}, _locals)
 
 
-@endpoint
+@endpoint()
 def base_on_run(code: Store[str], new_code: str):
     # TODO: there is some checks we can do here,
     # before setting (e.g. empty string, syntax checks)
@@ -34,7 +35,7 @@ class CodeCell(Component):
     on_run: EndpointProperty = None
 
     def __init__(self, code: str = "df", on_run: Endpoint = None):
-        code = Store(code)
+        code = mark(code)
         if on_run is not None:
             on_run = base_on_run.partial(code=code).compose(on_run)
         else:

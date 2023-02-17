@@ -41,6 +41,7 @@ version = release = main_ns["__version__"]
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
@@ -94,6 +95,14 @@ panels_add_bootstrap_css = False
 
 # Don't show module names in front of class names.
 add_module_names = False
+
+# Intersphinx mappings
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "pandas": ("https://pandas.pydata.org/docs", None),
+    "pd": ("https://pandas.pydata.org/docs", None),
+}
 
 # Sort members by group
 autodoc_member_order = "bysource"

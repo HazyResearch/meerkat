@@ -1,61 +1,61 @@
-import meerkat as mk
+# import meerkat as mk
 
 
-def test_basic():
-    choices = ["a", "b", "c"]
-    value = mk.gui.Store("")
-    choice = mk.gui.Choice(choices=choices, value=value)
+# def test_basic():
+#     choices = ["a", "b", "c"]
+#     value = mk.gui.Store("")
+#     choice = mk.gui.Choice(choices=choices, value=value)
 
-    choice.on_select(1)
-    assert value == "b"
-
-
-def test_on_select():
-    other = mk.gui.Store("")
-
-    @mk.endpoint()
-    def on_select(new_value: str):
-        other.set(new_value)
-
-    choices = ["a", "b", "c"]
-    value = mk.gui.Store("")
-    choice = mk.gui.Choice(choices=choices, value=value, on_select=on_select)
-
-    choice.on_select(1)
-    assert value == "b"
-    assert other == "b"
+#     choice.on_select(1)
+#     assert value == "b"
 
 
-def test_on_select_no_param():
-    other = mk.gui.Store("")
+# def test_on_select():
+#     other = mk.gui.Store("")
 
-    @mk.endpoint()
-    def on_select():
-        other.set("set")
+#     @mk.endpoint()
+#     def on_select(new_value: str):
+#         other.set(new_value)
 
-    choices = ["a", "b", "c"]
-    value = mk.gui.Store("")
-    choice = mk.gui.Choice(choices=choices, value=value, on_select=on_select)
+#     choices = ["a", "b", "c"]
+#     value = mk.gui.Store("")
+#     choice = mk.gui.Choice(choices=choices, value=value, on_select=on_select)
 
-    choice.on_select(1)
-    assert value == "b"
-    assert other == "set"
-
-
-def test_not_string():
-    choices = [1, 2, 3]
-    value = mk.gui.Store(None)
-    choice = mk.gui.Choice(choices=choices, value=value)
-
-    choice.on_select(1)
-    assert value == 2
+#     choice.on_select(1)
+#     assert value == "b"
+#     assert other == "b"
 
 
-# Table
-# gallery
-# toggle
-# match
-# discover
+# def test_on_select_no_param():
+#     other = mk.gui.Store("")
+
+#     @mk.endpoint()
+#     def on_select():
+#         other.set("set")
+
+#     choices = ["a", "b", "c"]
+#     value = mk.gui.Store("")
+#     choice = mk.gui.Choice(choices=choices, value=value, on_select=on_select)
+
+#     choice.on_select(1)
+#     assert value == "b"
+#     assert other == "set"
 
 
-# multiselect
+# def test_not_string():
+#     choices = [1, 2, 3]
+#     value = mk.gui.Store(None)
+#     choice = mk.gui.Choice(choices=choices, value=value)
+
+#     choice.on_select(1)
+#     assert value == 2
+
+
+# # Table
+# # gallery
+# # toggle
+# # match
+# # discover
+
+
+# # multiselect

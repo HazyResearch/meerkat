@@ -98,7 +98,7 @@ def _format_criteria(
     ]
 
 
-@reactive
+@reactive()
 def filter(
     data: Union["DataFrame", "Column"],
     criteria: Sequence[Union[FilterCriterion, Dict[str, Any]]],

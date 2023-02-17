@@ -24,7 +24,7 @@ class ClusterBy(SliceBy):
         super().__init__(data=data, by=by, sets=sets)
 
 
-@reactive
+@reactive()
 def clusterby(
     data: DataFrame,
     by: Union[str, Sequence[str]],

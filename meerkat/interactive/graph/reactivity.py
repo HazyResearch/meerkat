@@ -36,7 +36,7 @@ def isclassmethod(method):
 
 def reactive(
     fn: Callable = None,
-    nested_return: bool = None,
+    nested_return: bool = False,
     skip_fn: Callable[..., bool] = None,
 ) -> Callable:
     """Internal decorator that is used to mark a function as reactive.
@@ -208,10 +208,6 @@ def reactive(
             # These objects will be parents of the Operation node
             # that is created for this function.
             nodeables = _get_nodeables(*args, **kwargs)
-
-            # By default, nested return is True when the output is a tuple.
-            if nested_return is None:
-                nested_return = isinstance(result, tuple)
 
             # Wrap the Result in NodeMixin objects
             if nested_return:

@@ -6,13 +6,14 @@ import cytoolz as tz
 from meerkat import DataFrame
 from meerkat.columns.abstract import Column
 from meerkat.errors import ConcatError
-from meerkat.provenance import capture_provenance
+from meerkat.interactive.graph.reactivity import reactive
 
 from .decorators import check_primary_key
 
 
+@reactive()
 @check_primary_key
-@capture_provenance(capture_args=["axis"])
+# @capture_provenance(capture_args=["axis"])
 def concat(
     objs: Union[Sequence[DataFrame], Sequence[Column]],
     axis: Union[str, int] = "rows",
