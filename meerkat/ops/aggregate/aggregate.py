@@ -7,7 +7,7 @@ from meerkat.interactive.graph.reactivity import reactive
 from ...mixins.aggregate import AggregationError
 
 
-@reactive
+@reactive()
 def aggregate(
     data: mk.DataFrame,
     function: Union[Callable, str],

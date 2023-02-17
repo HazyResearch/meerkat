@@ -6,6 +6,8 @@ scratch/
 
 docs/source/guide/dataframe/_data/art_ngoa_export.csv
 docs/source/guide/dataframe/_data/art_ngoa_export_arrow.csv
+# Ignore generated stubs from sphinx docs
+docs/source/**/generated
 
 
 # Jupyter notebooks

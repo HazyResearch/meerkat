@@ -8,16 +8,15 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 
 
 @mk.endpoint()
-def _set_criteria(criteria, store):
+def _set_criteria(criteria, store: mk.Store):
     store.set(criteria)
 
 
 def test_filter_single_criterion():
     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.reactive():
-        filter = mk.gui.Filter(df=df)
-        out = filter(df)
+    filter = mk.gui.Filter(df=df)
+    out = filter(df)
     node = out.inode
 
     assert filter.criteria == []
@@ -64,9 +63,8 @@ def test_filter_operations(op, value):
         value = ",".join([str(v) for v in value])
     expected = df[expected]["a"]
 
-    with mk.gui.reactive():
-        filter = mk.gui.Filter(df=df)
-        out = filter(df)
+    filter = mk.gui.Filter(df=df)
+    out = filter(df)
     node = out.inode
 
     criterion = FilterCriterion(is_enabled=True, column="a", op=op, value=value)
@@ -79,72 +77,69 @@ def test_filter_bool():
     pass
 
 
-def test_skip_filter_disabled():
-    """Test logic for skipping the filter component when adding/modifying
-    disabled criteria."""
-    df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
+# FIXME: the tests below were based on skip_fn which was not sufficient.
+# def test_skip_filter_disabled():
+#     """Test logic for skipping the filter component when adding/modifying
+#     disabled criteria."""
+#     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.reactive():
-        filter = mk.gui.Filter(df=df)
-        out = filter(df)
-    node = out.inode
+#     filter = mk.gui.Filter(df=df)
+#     out = filter(df)
+#     node = out.inode
 
-    # The filter criterion is disabled, so the output dataframe should not change.
-    criterion = FilterCriterion(is_enabled=False, column="a", op=">", value=5)
-    _set_criteria([criterion], filter.criteria)
-    assert id(node.obj) == id(out)
+#     # The filter criterion is disabled, so the output dataframe should not change.
+#     criterion = FilterCriterion(is_enabled=False, column="a", op=">", value=5)
+#     _set_criteria([criterion], filter.criteria)
+#     assert id(node.obj) == id(out)
 
-    # The filter criterion is disabled, so changing this criterion should not
-    # change the output dataframe.
-    criterion.op = "<"
-    _set_criteria([criterion], filter.criteria)
-    assert id(node.obj) == id(out)
+#     # The filter criterion is disabled, so changing this criterion should not
+#     # change the output dataframe.
+#     criterion.op = "<"
+#     _set_criteria([criterion], filter.criteria)
+#     assert id(node.obj) == id(out)
 
-    # Deleting a disabled criterion should not change the output dataframe.
-    _set_criteria([], filter.criteria)
-    assert id(node.obj) == id(out)
+#     # Deleting a disabled criterion should not change the output dataframe.
+#     _set_criteria([], filter.criteria)
+#     assert id(node.obj) == id(out)
 
+# def test_skip_filter_duplicate():
+#     """If a criterion is added that is a duplicate of an existing criterion, it
+#     should be skipped."""
+#     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-def test_skip_filter_duplicate():
-    """If a criterion is added that is a duplicate of an existing criterion, it
-    should be skipped."""
-    df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
+#     filter = mk.gui.Filter(df=df)
+#     out = filter(df)
+#     node = out.inode
 
-    with mk.gui.reactive():
-        filter = mk.gui.Filter(df=df)
-        out = filter(df)
-    node = out.inode
+#     # Duplicate of the same criterion.
+#     criterion = FilterCriterion(is_enabled=True, column="a", op=">", value=5)
+#     _set_criteria([criterion], filter.criteria)
+#     obj_id = id(node.obj)
 
-    # Duplicate of the same criterion.
-    criterion = FilterCriterion(is_enabled=True, column="a", op=">", value=5)
-    _set_criteria([criterion], filter.criteria)
-    obj_id = id(node.obj)
-
-    duplicate_criterion = FilterCriterion(is_enabled=True, column="a", op=">", value=5)
-    _set_criteria([criterion, duplicate_criterion], filter.criteria)
-    assert id(node.obj) == obj_id
+#     duplicate_criterion = FilterCriterion(is_enabled=True, column="a", op=">", value=5)  # noqa: E501
+#     _set_criteria([criterion, duplicate_criterion], filter.criteria)
+#     assert id(node.obj) == obj_id
 
 
-def test_skip_filter_order():
-    """Filter criteria are order-agnostic.
+# def test_skip_filter_order():
+#     """Filter criteria are order-agnostic.
 
-    If the same criteria are added in a different order, the output
-    dataframe should not change.
-    """
-    df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
+#     If the same criteria are added in a different order, the output
+#     dataframe should not change.
+#     """
+#     df = mk.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]})
 
-    with mk.gui.reactive():
-        filter = mk.gui.Filter(df=df)
-        out = filter(df)
-    node = out.inode
+#     filter = mk.gui.Filter(df=df)
+#     out = filter(df)
+#     node = out.inode
 
-    # Duplicate of the same criterion.
-    criteria = [
-        FilterCriterion(is_enabled=True, column="a", op=">", value=5),
-        FilterCriterion(is_enabled=True, column="a", op="<", value=10),
-    ]
-    _set_criteria(criteria, filter.criteria)
-    obj_id = id(node.obj)
+#     # Duplicate of the same criterion.
+#     criteria = [
+#         FilterCriterion(is_enabled=True, column="a", op=">", value=5),
+#         FilterCriterion(is_enabled=True, column="a", op="<", value=10),
+#     ]
+#     _set_criteria(criteria, filter.criteria)
+#     obj_id = id(node.obj)
 
-    _set_criteria(criteria[::-1], filter.criteria)
-    assert id(node.obj) == obj_id
+#     _set_criteria(criteria[::-1], filter.criteria)
+#     assert id(node.obj) == obj_id

@@ -306,6 +306,22 @@ Underneath the hood, `mk.print` is just `mk.reactive(print)`, so you can also us
 You can follow this pattern to create more advanced debugging tools.
 
 
+#### Why do I get different `Store` objects when I index into a `Store` repeatedly?
+
+This is a limitation of the `Store` object. When you index into a `Store` object (e.g. `store[0]`), you get a new `Store` object that wraps the value at that index. This means that if you index into a `Store` object multiple times, you will get different `Store` objects each time.
+
+```python
+x = mk.Store([1, 2, 3])
+s1 = x[0]
+s2 = x[0]
+s1 is s2   # This is False
+
+x = mk.Store({"a": 1, "b": 2})
+s1 = x["a"]
+s2 = x["a"]
+s1 is s2   # This is False
+```
+
 
 ## Faux Pas
 
@@ -330,31 +346,14 @@ You can follow this pattern to create more advanced debugging tools.
 ```python
 
     store = Store("")
-    with mk.gui.react():
-        # These will not return Stores
-        type(store or "default")  # str
-        type(store and "default")  # str
-        type(not store)  # bool
+    # These will not return Stores
+    type(store or "default")  # str
+    type(store and "default")  # str
+    type(not store)  # bool
 
-        # These will return Stores
-        type(mk.cor(store, "default"))  # Store
-        type(mk.cand(store, "default"))  # Store
-        type(mk.cnot(store))  # Store
+    # These will return Stores
+    type(mk.cor(store, "default"))  # Store
+    type(mk.cand(store, "default"))  # Store
+    type(mk.cnot(store))  # Store
 
-```
-
-- Unpacking store of tuples must be done in the ``mk.gui.react()`` to return stores
-
-```python
-
-    @mk.gui.react()
-    def add(seq: Tuple[int]):
-        return tuple(x + 1 for x in seq)
-
-    store = mk.gui.Store((1, 2))
-    # We need to use the `react` decorator here because tuple unpacking
-    # happens outside of the function `add`. Without the decorator, the
-    # tuple unpacking will not be reactive.
-    with mk.gui.react():
-        a, b = add(store)
 ```

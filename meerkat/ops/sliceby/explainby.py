@@ -25,7 +25,7 @@ class ExplainBy(SliceBy):
         super().__init__(data=data, by=by, sets=sets, scores=scores)
 
 
-@reactive
+@reactive()
 def explainby(
     data: DataFrame,
     by: Union[str, Sequence[str]],

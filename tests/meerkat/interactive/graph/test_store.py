@@ -6,19 +6,20 @@ import meerkat as mk
 from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.graph.operation import Operation
 from meerkat.interactive.graph.store import _IteratorStore
+from meerkat.mixins.reactifiable import MarkableMixin
 
 
-def _is_out_magiced(
+def _is_output_reactive(
     out,
     input_store: mk.gui.Store,
     *,
     op_name: str = None,
     op_num_children: int = None,
 ):
-    """Check if the output is magiced.
+    """Check if the output is reactive.
 
-    A store is magiced if:
-        1. It is a Store
+    The output is reactive if:
+        1. It is a Store / Markable object.
         2. It is marked
         3. out.inode is not None
         4. The input_store is the grandparent of out
@@ -29,7 +30,7 @@ def _is_out_magiced(
         op_name: The name of the operation. If None, all operations are checked.
         op_num_children: The number of children each operation should have.
     """
-    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, MarkableMixin)
     assert out.marked
     assert out.inode is not None
 
@@ -123,7 +124,7 @@ def test_store_reactive_math(is_magic: bool):
     assert len(store.inode.trigger_children) == len(expected)
     assert store.inode is not None
     for k, v in out.items():
-        _is_out_magiced(v, store, op_name=f"__{k}__", op_num_children=1)
+        _is_output_reactive(v, store, op_name=f"__{k}__", op_num_children=1)
         assert v == expected[k]
 
 
@@ -191,7 +192,7 @@ def test_store_as_iterator(is_magic: bool):
     # Regardless of if magic is on, the iterator should be a Store.
     # The store should also be added to the graph.
     assert isinstance(store_iter, _IteratorStore)
-    _is_out_magiced(store_iter, store, op_name="__iter__", op_num_children=1)
+    _is_output_reactive(store_iter, store, op_name="__iter__", op_num_children=1)
 
     # When we fetch things from the iterator, they should be stores.
     # Similar to the above, only when magic is on, should the store be added
@@ -282,3 +283,52 @@ def test_bool(is_magic: bool):
     # Store.__bool__ is not reactive.
     assert not isinstance(out_bool, mk.gui.Store)
     assert not isinstance(out_not, mk.gui.Store)
+
+
+@pytest.mark.parametrize("is_magic", [False, True])
+@pytest.mark.parametrize("obj", [[0, 1, 2], (0, 1, 2), {0: "a", 1: "b", 2: "c"}])
+@pytest.mark.parametrize("idx", [0, 1, 2])
+def test_store_getitem(is_magic: bool, obj, idx: int):
+    store = mk.gui.Store(obj)
+    with magic(is_magic):
+        out = store[idx]
+
+    assert isinstance(out, mk.gui.Store)
+    _is_output_reactive(out, store, op_name="__getitem__", op_num_children=1)
+
+
+def test_store_getitem_custom_obj():
+    """Test we can call getitem on a custom object."""
+
+    class Foo:
+        def __init__(self, x):
+            self.x = x
+
+        def __getitem__(self, key):
+            return self.x[key]
+
+    store = mk.gui.Store(Foo([0, 1, 2]))
+    out = store[0]
+    assert isinstance(out, mk.gui.Store)
+    _is_output_reactive(out, store, op_name="__getitem__", op_num_children=1)
+
+
+@pytest.mark.parametrize("is_magic", [False, True])
+@pytest.mark.parametrize("obj", [[0, 1, 2], (0, 1, 2), {0: "a", 1: "b", 2: "c"}])
+@pytest.mark.parametrize("idx", [0, 1, 2])
+def test_store_getitem_multi_access(is_magic: bool, obj, idx: int):
+    """
+    Test that when we access the same index multiple times, we get
+    unique stores.
+    """
+    store = mk.gui.Store(obj)
+    with magic(is_magic):
+        out1 = store[idx]
+        out2 = store[idx]
+
+    assert isinstance(out1, mk.gui.Store)
+    _is_output_reactive(out1, store)
+    assert isinstance(out2, mk.gui.Store)
+    _is_output_reactive(out2, store)
+
+    assert out1 is not out2

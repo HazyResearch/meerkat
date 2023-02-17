@@ -155,3 +155,10 @@ def test_str(x):
     """Test mk.str works identically to str."""
     should_warn = not isinstance(x, (DataFrame, Column))
     _invoker_helper(x, mk_func=mk.str, base_func=str, should_warn=should_warn)
+
+
+@pytest.mark.parametrize("x", [[3, 2, 1], ("hello", "world")])
+def test_min_max(x):
+    """Test mk.min and mk.max work identically to min and max."""
+    _invoker_helper(x, mk_func=mk.min, base_func=min)
+    _invoker_helper(x, mk_func=mk.max, base_func=max)

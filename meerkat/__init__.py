@@ -42,23 +42,25 @@ from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
 from meerkat.ops.cond import (
+    _abs,
     _all,
     _any,
     _bool,
     _complex,
+    _dict,
     _float,
     _hex,
     _int,
     _len,
-    _oct,
-    _str,
     _list,
-    _tuple,
-    _sum,
-    _dict,
-    _set,
+    _max,
+    _min,
+    _oct,
     _range,
-    _abs,
+    _set,
+    _str,
+    _sum,
+    _tuple,
     cand,
     cnot,
     cor,
@@ -118,6 +120,8 @@ dict = _dict
 set = _set
 range = _range
 abs = _abs
+min = _min
+max = _max
 
 # These statements needs to be after the imports above.
 # Do not move them.
