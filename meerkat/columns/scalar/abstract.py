@@ -18,6 +18,7 @@ from ..abstract import Column
 torch = LazyLoader("torch")
 
 if TYPE_CHECKING:
+    from meerkat.dataframe import DataFrame
     import torch
 
 ScalarColumnTypes = Union[np.ndarray, "torch.TensorType", pd.Series, List]
@@ -28,10 +29,9 @@ class StringMethods:
         self.column = data
 
     def len(self, **kwargs) -> ScalarColumn:
-        return self.column._dispatch_unary_function(
-            "len", _namespace="str", **kwargs
-        )
+        return self.column._dispatch_unary_function("len", _namespace="str", **kwargs)
 
+    # predicate str methods ScalarColumn of bools
     def isalnum(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "isalnum", _namespace="str", **kwargs
@@ -76,40 +76,40 @@ class StringMethods:
         return self.column._dispatch_unary_function(
             "istitle", _namespace="str", **kwargs
         )
-    
+
     def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "center", _namespace="str", width=width, fillchar=fillchar, **kwargs
         )
-    
+
     def capitalize(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "capitalize", _namespace="str", **kwargs
         )
-    
+
     def lower(self, **kwargs) -> ScalarColumn:
-        return self.column._dispatch_unary_function(
-            "lower", _namespace="str", **kwargs
-        )
-    
+        return self.column._dispatch_unary_function("lower", _namespace="str", **kwargs)
+
     def upper(self, **kwargs) -> ScalarColumn:
-        return self.column._dispatch_unary_function(
-            "upper", _namespace="str", **kwargs
-        )
-    
+        return self.column._dispatch_unary_function("upper", _namespace="str", **kwargs)
+
     def swapcase(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "swapcase", _namespace="str", **kwargs
         )
-    
-    def title(self, **kwargs) -> ScalarColumn:
-        return self.column._dispatch_unary_function(
-            "title", _namespace="str", **kwargs
-        )
-    
 
-    
-    
+    def title(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function("title", _namespace="str", **kwargs)
+
+    def split(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        raise NotImplementedError()
+
+    def rsplit(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        raise NotImplementedError()
 
 
 class ScalarColumn(Column):
