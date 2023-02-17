@@ -77,6 +77,52 @@ class ArrowStringMethods(StringMethods):
             "starts_with", pattern=pat, **kwargs
         )
 
+    def strip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        if to_strip is None:
+            return self.column._dispatch_unary_function(
+                "utf8_trim_whitespace", **kwargs
+            )
+        else:
+            return self.column._dispatch_unary_function(
+                "utf8_strip", characters=to_strip, **kwargs
+            )
+
+    def lstrip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        if to_strip is None:
+            return self.column._dispatch_unary_function(
+                "utf8_ltrim_whitespace", **kwargs
+            )
+        else:
+            return self.column._dispatch_unary_function(
+                "utf8_lstrip", characters=to_strip, **kwargs
+            )
+
+    def rstrip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        if to_strip is None:
+            return self.column._dispatch_unary_function(
+                "utf8_rtrim_whitespace", **kwargs
+            )
+        else:
+            return self.column._dispatch_unary_function(
+                "utf8_rstrip", characters=to_strip, **kwargs
+            )
+
+    def replace(
+        self, pat: str, repl: str, n: int = -1, regex: bool = False, **kwargs
+    ) -> ScalarColumn:
+
+        fn = pac.replace_substring_regex if regex else pac.replace_substring
+        return self.column._clone(
+            fn(
+                self.column.data,
+                pattern=pat,
+                replacement=repl,
+                max_replacements=n if n != -1 else None,
+                **kwargs,
+            )
+        )
+
+
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
 
@@ -192,10 +238,9 @@ class ArrowScalarColumn(ScalarColumn):
             return False
         return pac.all(pac.equal(self.data, other.data)).as_py()
 
-    """TODO(KG)
-    This column is missing a .dtype property that prevents
-    it from being used with the Filter component.
-    """
+    @property
+    def dtype(self) -> pa.DataType:
+        return self.data.type
 
     KWARG_MAPPING = {"skipna": "skip_nulls"}
     COMPUTE_FN_MAPPING = {
@@ -226,6 +271,9 @@ class ArrowScalarColumn(ScalarColumn):
         "lower": "utf8_lower",
         "upper": "utf8_upper",
         "len": "utf8_length",
+        "lstrip": "utf8_ltrim",
+        "rstrip": "utf8_rtrim",
+        "strip": "utf8_trim",
         "swapcase": "utf8_swapcase",
         "title": "utf8_title",
     }

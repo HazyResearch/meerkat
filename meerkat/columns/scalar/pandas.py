@@ -419,6 +419,10 @@ class PandasScalarColumn(
 
     def to_json(self) -> List[Any]:
         return self.data.tolist()
+    
+    @property
+    def dtype(self) -> Any:
+        return self.data.dtype
 
     def equals(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
