@@ -27,15 +27,89 @@ class StringMethods:
     def __init__(self, data: Column):
         self.column = data
 
+    def len(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "len", _namespace="str", **kwargs
+        )
+
+    def isalnum(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isalnum", _namespace="str", **kwargs
+        )
+
+    def isalpha(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isalpha", _namespace="str", **kwargs
+        )
+
+    def isdecimal(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isdecimal", _namespace="str", **kwargs
+        )
+
+    def isdigit(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isdigit", _namespace="str", **kwargs
+        )
+
+    def islower(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "islower", _namespace="str", **kwargs
+        )
+
+    def isupper(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isupper", _namespace="str", **kwargs
+        )
+
+    def isnumeric(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isnumeric", _namespace="str", **kwargs
+        )
+
+    def isspace(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "isspace", _namespace="str", **kwargs
+        )
+
+    def istitle(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "istitle", _namespace="str", **kwargs
+        )
+    
+    def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "center", _namespace="str", width=width, fillchar=fillchar, **kwargs
+        )
+    
     def capitalize(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "capitalize", _namespace="str", **kwargs
         )
-
-    def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
+    
+    def lower(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
-            "center", _namespace="str", width=width, fill_char=fillchar, **kwargs
+            "lower", _namespace="str", **kwargs
         )
+    
+    def upper(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "upper", _namespace="str", **kwargs
+        )
+    
+    def swapcase(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "swapcase", _namespace="str", **kwargs
+        )
+    
+    def title(self, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "title", _namespace="str", **kwargs
+        )
+    
+
+    
+    
 
 
 class ScalarColumn(Column):

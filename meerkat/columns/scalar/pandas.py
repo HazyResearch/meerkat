@@ -154,7 +154,7 @@ class PandasScalarColumn(
 
     dt = CachedAccessor("dt", _MeerkatCombinedDatetimelikeProperties)
     cat = CachedAccessor("cat", _MeerkatCategoricalAccessor)
-    str = CachedAccessor("str", _MeerkatStringMethods)
+    # str = CachedAccessor("str", _MeerkatStringMethods)
     # plot = CachedAccessor("plot", pandas.plotting.PlotAccessor)
     # sparse = CachedAccessor("sparse", SparseAccessor)
 

@@ -464,15 +464,15 @@ STRING_COLUMNS = [
     pd.Series(
         [
             "a",
-            "bfdsdf",
+            "bfdsdf.",
             "c asdasd dsd",
             "d",
             "efdsdf ",
-            "ffsdfs asdasd",
-            "g",
-            "h",
-            "i",
-            "j",
+            "Fasdd asdasd",
+            "pppqqqqq",
+            "hl2orf83WIW",
+            "22222",
+            "1290_disdj",
         ]
     ),
 ]
@@ -482,11 +482,42 @@ STRING_COLUMNS = [
     {
         "backend": BACKENDS,
         "column": STRING_COLUMNS,
-        "compute_fn": ["capitalize", "center"],
+        "compute_fn": [
+            "capitalize", 
+            "isalnum",
+            "isalpha",
+            "isdecimal",
+            "isdigit",
+            "islower",
+            "isnumeric",
+            "isspace",
+            "istitle",
+            "isupper",
+            "lower",
+            "upper",
+            "len",
+            "lower",
+            "swapcase",
+            "title",
+        ],
     }
 )
-def test_unary_str_methods(backend: str, column: np.array, compute_fn: str):
+def test_unary_str_methods(backend: str, column: pd.Series, compute_fn: str):
     col = ScalarColumn(column, backend=backend)
     out = getattr(col.str, compute_fn)()
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(getattr(column.str, compute_fn), backend=backend))
+    assert out.equals(ScalarColumn(getattr(column.str, compute_fn)(), backend=backend))
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+    }
+)
+def test_center(backend: str, column: pd.Series):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.center(20)
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(column.str.center(20), backend=backend))
+ 

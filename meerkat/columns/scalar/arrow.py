@@ -27,13 +27,15 @@ torch = LazyLoader("torch")
 
 class ArrowStringMethods(StringMethods):
     def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
-        return pac.center(self.column.data, width=width, padding=fillchar, **kwargs)
+        return self.column._dispatch_unary_function(
+            "utf8_center", width=width, padding=fillchar, **kwargs
+        )
+
 
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
 
     str = CachedAccessor("str", ArrowStringMethods)
-
 
     def __init__(
         self,
@@ -165,8 +167,23 @@ class ArrowScalarColumn(ScalarColumn):
         "le": "less_equal",
         "ge": "greater_equal",
         "isna": "is_nan",
-        "capitalize": "ascii_capitalize",
-        "center": "ascii_center",
+        "capitalize": "utf8_capitalize",
+        "center": "utf8_center",
+        "isalnum": "utf8_is_alnum",
+        "isalpha": "utf8_is_alpha",
+        "isdecimal": "utf8_is_decimal",
+        "isdigit": "utf8_is_digit",
+        "islower": "utf8_is_lower",
+        "isnumeric": "utf8_is_numeric",
+        "isspace": "utf8_is_space",
+        "istitle": "utf8_is_title",
+        "isupper": "utf8_is_upper",
+        "lower": "utf8_lower",
+        "upper": "utf8_upper",
+        "len": "utf8_length",
+        "swapcase": "utf8_swapcase",
+        "title": "utf8_title",
+        
     }
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):

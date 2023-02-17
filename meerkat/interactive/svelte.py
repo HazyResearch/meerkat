@@ -46,7 +46,7 @@ def get_subclasses_recursive(cls: type) -> List[type]:
 
 
 def write_file_if_changed(path: str, content: str):
-    """Write a file if the content has changed.
+    """Write a file if the content has changed. Note this is not atomic.
 
     Args:
         path (str): the path to write to.
