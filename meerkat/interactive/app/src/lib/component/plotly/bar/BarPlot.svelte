@@ -22,7 +22,7 @@
 				x: chunk.getColumn(x).data,
 				y: chunk.getColumn(y).data,
 				keyidx: chunk.getColumn(chunk.primaryKey).data,
-				type: 'bar'
+				type: 'bar',
 			}
 		];
 	});

@@ -26,7 +26,6 @@ from pandas.core.indexes.accessors import (
     PeriodProperties,
     TimedeltaProperties,
 )
-from pandas.core.strings import StringMethods
 from yaml.representer import Representer
 
 from meerkat.block.abstract import BlockView
@@ -36,7 +35,7 @@ from meerkat.interactive.formatter.base import Formatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.tools.lazy_loader import LazyLoader
 
-from .abstract import ScalarColumn
+from .abstract import ScalarColumn, StringMethods
 
 torch = LazyLoader("torch")
 
@@ -88,9 +87,41 @@ class _ReturnColumnMixin:
             raise AttributeError(f"object has no attribute '{name}'")
 
 
-class _MeerkatStringMethods(_ReturnColumnMixin, StringMethods):
-    def __init__(self, data: Column):
-        super().__init__(data.data)
+# class _MeerkatStringMethods(_ReturnColumnMixin, StringMethods):
+#     def __init__(self, data: Column):
+#         super().__init__(data.data)
+
+
+class PandasStringMethods(StringMethods):
+    def split(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        from meerkat import DataFrame
+
+        return DataFrame(
+            {
+                str(name): self.column._clone(data=col)
+                for name, col in self.column.data.str.split(
+                    " ", n=n, regex=regex, expand=True
+                ).items()
+            }
+        )
+
+    def rsplit(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        from meerkat import DataFrame
+        if regex is True:
+            raise NotImplementedError("regex=True is not supported for rsplit")
+
+        return DataFrame(
+            {
+                str(name): self.column._clone(data=col)
+                for name, col in self.column.data.str.rsplit(
+                    " ", n=n, expand=True
+                ).items()
+            }
+        )
 
 
 class _MeerkatDatetimeProperties(_ReturnColumnMixin, DatetimeProperties):
@@ -154,7 +185,9 @@ class PandasScalarColumn(
 
     dt = CachedAccessor("dt", _MeerkatCombinedDatetimelikeProperties)
     cat = CachedAccessor("cat", _MeerkatCategoricalAccessor)
-    str = CachedAccessor("str", _MeerkatStringMethods)
+    str = CachedAccessor("str", PandasStringMethods)
+
+    # str = CachedAccessor("str", _MeerkatStringMethods)
     # plot = CachedAccessor("plot", pandas.plotting.PlotAccessor)
     # sparse = CachedAccessor("sparse", SparseAccessor)
 

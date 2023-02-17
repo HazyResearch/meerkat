@@ -9,7 +9,6 @@ import pyarrow.compute as pac
 from pyarrow.compute import equal
 from pandas.core.accessor import CachedAccessor
 
-
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.errors import ImmutableError
@@ -20,6 +19,7 @@ from .abstract import ScalarColumn, StringMethods
 
 if TYPE_CHECKING:
     from meerkat.interactive.formatter.base import Formatter
+    from meerkat import DataFrame
 
 
 torch = LazyLoader("torch")
@@ -27,13 +27,56 @@ torch = LazyLoader("torch")
 
 class ArrowStringMethods(StringMethods):
     def center(self, width: int, fillchar: str = " ", **kwargs) -> ScalarColumn:
-        return pac.center(self.column.data, width=width, padding=fillchar, **kwargs)
+        return self.column._dispatch_unary_function(
+            "utf8_center", width=width, padding=fillchar, **kwargs
+        )
+
+    def _split(
+        self, pat=None, n=-1, reverse: bool = False, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        from meerkat import DataFrame
+
+        fn = pac.split_pattern_regex if regex else pac.split_pattern
+        list_array = fn(
+            self.column.data,
+            pattern=pat,
+            max_splits=n if n != -1 else None,
+            reverse=reverse,
+            **kwargs,
+        )
+
+        # need to find the max length of the list array
+        if n == -1:
+            n = pac.max(pac.list_value_length(list_array)).as_py() - 1
+
+        return DataFrame(
+            {
+                str(i): self.column._clone(
+                    data=pac.list_flatten(
+                        pac.list_slice(
+                            list_array, start=i, stop=i + 1, return_fixed_size_list=True
+                        )
+                    )
+                )
+                for i in range(n + 1)
+            }
+        )
+
+    def split(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        return self._split(pat=pat, n=n, reverse=False, regex=regex, **kwargs)
+
+    def rsplit(
+        self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
+    ) -> "DataFrame":
+        return self._split(pat=pat, n=n, reverse=True, regex=regex, **kwargs)
+
 
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
 
     str = CachedAccessor("str", ArrowStringMethods)
-
 
     def __init__(
         self,
@@ -165,8 +208,22 @@ class ArrowScalarColumn(ScalarColumn):
         "le": "less_equal",
         "ge": "greater_equal",
         "isna": "is_nan",
-        "capitalize": "ascii_capitalize",
-        "center": "ascii_center",
+        "capitalize": "utf8_capitalize",
+        "center": "utf8_center",
+        "isalnum": "utf8_is_alnum",
+        "isalpha": "utf8_is_alpha",
+        "isdecimal": "utf8_is_decimal",
+        "isdigit": "utf8_is_digit",
+        "islower": "utf8_is_lower",
+        "isnumeric": "utf8_is_numeric",
+        "isspace": "utf8_is_space",
+        "istitle": "utf8_is_title",
+        "isupper": "utf8_is_upper",
+        "lower": "utf8_lower",
+        "upper": "utf8_upper",
+        "len": "utf8_length",
+        "swapcase": "utf8_swapcase",
+        "title": "utf8_title",
     }
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):

@@ -8,6 +8,7 @@ import pytest
 import torch
 
 from meerkat import ScalarColumn
+from meerkat.dataframe import DataFrame
 from tests.utils import product_parametrize
 
 BACKENDS = ["arrow", "pandas"]
@@ -463,16 +464,16 @@ def test_isnull(backend: str, column: np.array):
 STRING_COLUMNS = [
     pd.Series(
         [
-            "a",
-            "bfdsdf",
+            "a asdsd ",
+            "bfdsdf.",
             "c asdasd dsd",
             "d",
-            "efdsdf ",
-            "ffsdfs asdasd",
-            "g",
-            "h",
-            "i",
-            "j",
+            " efdsdf ",
+            "Fasdd asdasd",
+            "pppqqqqq",
+            "hl2orf83WIW",
+            "22222",
+            "1290_disdj",
         ]
     ),
 ]
@@ -482,11 +483,88 @@ STRING_COLUMNS = [
     {
         "backend": BACKENDS,
         "column": STRING_COLUMNS,
-        "compute_fn": ["capitalize", "center"],
+        "compute_fn": [
+            "capitalize",
+            "isalnum",
+            "isalpha",
+            "isdecimal",
+            "isdigit",
+            "islower",
+            "isnumeric",
+            "isspace",
+            "istitle",
+            "isupper",
+            "lower",
+            "upper",
+            "len",
+            "lower",
+            "swapcase",
+            "title",
+        ],
     }
 )
-def test_unary_str_methods(backend: str, column: np.array, compute_fn: str):
+def test_unary_str_methods(backend: str, column: pd.Series, compute_fn: str):
     col = ScalarColumn(column, backend=backend)
     out = getattr(col.str, compute_fn)()
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(getattr(column.str, compute_fn), backend=backend))
+    assert out.equals(ScalarColumn(getattr(column.str, compute_fn)(), backend=backend))
+
+
+# @product_parameterize(
+#     {
+#         "backend": BACKENDS,
+#         "column": STRING_COLUMNS,
+#         "compute_fn": [
+#         ]
+#     }
+# )
+# def test_pattern_str_methods(backend: str, column: pd.Series, compute_fn: str):
+#     col = ScalarColumn(column, backend=backend)
+#     out = getattr(col.str, compute_fn)()
+#     assert isinstance(out, ScalarColumn)
+#     assert out.equals(ScalarColumn(getattr(column.str, compute_fn)(), backend=backend))
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+    }
+)
+def test_center(backend: str, column: pd.Series):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.center(20)
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(column.str.center(20), backend=backend))
+
+
+@product_parametrize({"backend": BACKENDS, "column": STRING_COLUMNS, "n": [-1, 1, 2]})
+def test_split(backend: str, column: pd.Series, n: int):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.split(" ", n=n)
+    assert isinstance(out, DataFrame)
+    correct_df = DataFrame(
+        {
+            str(name): ScalarColumn(col, backend=backend)
+            for name, col in column.str.split(" ", n=n, expand=True).items()
+        }
+    )
+    assert correct_df.columns == out.columns
+    for name in correct_df.columns:
+        assert correct_df[name].equals(out[name])
+
+
+@product_parametrize({"backend": BACKENDS, "column": STRING_COLUMNS, "n": [-1, 1, 2]})
+def test_rsplit(backend: str, column: pd.Series, n: int):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.rsplit(" ", n=n)
+    assert isinstance(out, DataFrame)
+    correct_df = DataFrame(
+        {
+            str(name): ScalarColumn(col, backend=backend)
+            for name, col in column.str.rsplit(" ", n=n, expand=True).items()
+        }
+    )
+    assert correct_df.columns == out.columns
+    for name in correct_df.columns:
+        assert correct_df[name].equals(out[name])
