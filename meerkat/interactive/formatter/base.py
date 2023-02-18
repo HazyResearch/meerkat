@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type
-import yaml
+from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
 
 from meerkat.columns.deferred.base import DeferredCell
 
@@ -114,8 +114,8 @@ class Formatter(ABC):
         return formatter
 
 
-yaml.add_multi_representer(Formatter, Formatter.to_yaml)
-yaml.add_constructor("!Formatter", Formatter.from_yaml)
+MeerkatDumper.add_multi_representer(Formatter, Formatter.to_yaml)
+MeerkatLoader.add_constructor("!Formatter", Formatter.from_yaml)
 
 
 class DeferredFormatter(Formatter):
@@ -175,5 +175,5 @@ class DeferredFormatter(Formatter):
         return formatter
 
 
-yaml.add_multi_representer(DeferredFormatter, DeferredFormatter.to_yaml)
-yaml.add_constructor("!DeferredFormatter", DeferredFormatter.from_yaml)
+MeerkatDumper.add_multi_representer(DeferredFormatter, DeferredFormatter.to_yaml)
+MeerkatLoader.add_constructor("!DeferredFormatter", DeferredFormatter.from_yaml)
