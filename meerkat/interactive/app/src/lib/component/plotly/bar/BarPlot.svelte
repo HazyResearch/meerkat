@@ -43,6 +43,9 @@
 	}
 </script>
 
-{#await data_promise then data}
+{#await data_promise}
+    <div class="bg-purple-50 text-center my-1">Loading Bar Plot...</div>
+    <Plot data={[]} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
+{:then data}
 	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
 {/await}

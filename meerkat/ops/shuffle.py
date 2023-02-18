@@ -6,7 +6,7 @@ from meerkat import Column, DataFrame
 from meerkat.interactive.graph.reactivity import reactive
 
 
-@reactive
+@reactive()
 def shuffle(data: Union[DataFrame, Column], seed=None) -> Union[DataFrame, Column]:
     """Shuffle the rows of a DataFrame or Column.
 

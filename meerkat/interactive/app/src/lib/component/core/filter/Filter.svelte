@@ -11,7 +11,10 @@
 	export let operations: string[];
 	export let title: string = '';
 
-	let criteria_frontend: FilterCriterion[] = [];
+	let criteriaFrontend: FilterCriterion[] = [];
+	$: criteriaFrontend = criteria;
+
+	$: console.log("Criteria", criteria);
 
 	let schemaPromise;
 	let itemsPromise;
@@ -33,7 +36,7 @@
 
 		// Need to reset the array to trigger.
 		console.log(criteria);
-		criteria = criteria_frontend;
+		criteria = criteriaFrontend;
 	};
 
 	const onInputChange = (criterion: FilterCriterion, input_id: string, value: any) => {
@@ -56,8 +59,8 @@
 
 	const addCriterion = () => {
 		// Add a new filter criteria.
-		criteria_frontend = [
-			...criteria_frontend,
+		criteriaFrontend = [
+			...criteriaFrontend,
 			{
 				is_enabled: false,
 				column: '',
@@ -72,17 +75,17 @@
 	const deleteCriterion = (index: number) => {
 		// Delete a filter criteria.
 		// Store should only update if we are removing a criterion that is enabled.
-		const is_enabled: boolean = criteria_frontend[index].is_enabled;
-		criteria_frontend = criteria_frontend.filter((_, i) => i !== index);
+		const is_enabled: boolean = criteriaFrontend[index].is_enabled;
+		criteriaFrontend = criteriaFrontend.filter((_, i) => i !== index);
 
 		if (is_enabled) {
-			criteria = criteria_frontend;
+			criteria = criteriaFrontend;
 		}
 	};
 
 	const handleClear = () => {
 		criteria = [];
-		criteria_frontend = [];
+		criteriaFrontend = [];
 	};
 </script>
 
@@ -110,7 +113,7 @@
 		</div>
 	</div>
 	<div class="form-control w-full z-21">
-		{#each criteria_frontend as criterion, i}
+		{#each criteriaFrontend as criterion, i}
 			<div class="py-2 input-group w-full flex items-center">
 				<div class="px-1">
 					<input
@@ -153,9 +156,10 @@
 					<input
 						type="text"
 						id="value"
-						bind:value={criterion.value}
+						value={criterion.value}
 						placeholder="...a value"
 						on:keypress={(e) => {
+							criterion.value = e.target.value;
 							if (e.charCode === 13 && !disableCheckbox(criterion)) {
 								criterion.is_enabled = true;
 								triggerFilter();

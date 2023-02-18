@@ -58,7 +58,7 @@
 		});
 	}
 
-	const trigger_sort = () => {
+	const triggerSort = () => {
 		// Need to reset the array to trigger.
 		criteria = criteriaFrontend;
 	};
@@ -70,20 +70,20 @@
 		criteriaFrontend = criteriaFrontend;
 		if (!is_same_value) {
 			criterion.is_enabled = true;
-			trigger_sort();
+			triggerSort();
 		}
 	};
 
-	const setCheckbox = (criterion: SortCriterion, value: boolean, ignore_check: boolean = false) => {
+	const setCheckbox = (criterion: SortCriterion, value: boolean, ignoreCheck: boolean = false) => {
 		// Setting to the same value, do nothing.fetchSchema
 		criterion.is_enabled = value;
-		trigger_sort();
+		triggerSort();
 	};
 
 	const setAscending = (criterion: SortCriterion, value: boolean) => {
 		criterion.ascending = value;
 		criterion.is_enabled = true;
-		trigger_sort();
+		triggerSort();
 	};
 
 	const cellDisabled = (criterion: SortCriterion) => {
@@ -120,7 +120,7 @@
 	}
 	function handleDndFinalize(e) {
 		criteriaFrontend = e.detail.items;
-		trigger_sort();
+		triggerSort();
 	}
 </script>
 

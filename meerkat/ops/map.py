@@ -244,7 +244,7 @@ def defer(
                     inputs = "row"
                     break
 
-        if inputs is "row":
+        if inputs == "row":
             args = []
             kwargs = {col_name: col for col_name, col in data.items()}
 

@@ -52,6 +52,7 @@ export interface DataFrameChunkRequest {
     keyidxs?: Array<string | number> | null
     keyColumn?: string | null
     variants?: Array<string> | null
+    shuffle?: boolean | null
 }
 
 export const fetchChunk = async ({
@@ -62,7 +63,8 @@ export const fetchChunk = async ({
     posidxs = null,
     keyidxs = null,
     keyColumn = null,
-    variants = null
+    variants = null,
+    shuffle = null
 }: DataFrameChunkRequest) => {
     const result = await post(`${get(API_URL)}/df/${df.refId}/rows`, {
         start: start,
@@ -71,7 +73,8 @@ export const fetchChunk = async ({
         key_column: keyColumn,
         keyidxs: keyidxs,
         columns: columns,
-        variants: variants
+        variants: variants,
+        shuffle: shuffle
     });
 
     return new DataFrameChunk(

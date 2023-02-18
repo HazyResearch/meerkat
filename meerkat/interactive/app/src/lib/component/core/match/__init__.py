@@ -1,5 +1,6 @@
 import ast
 from dataclasses import dataclass
+from typing import Tuple
 
 import numpy as np
 from fastapi import HTTPException
@@ -9,28 +10,6 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
-
-
-@endpoint
-def get_match_schema(df: DataFrame):
-    import meerkat as mk
-    from meerkat.interactive.api.routers.dataframe import (
-        SchemaResponse,
-        _get_column_infos,
-    )
-
-    columns = [
-        k
-        for k, v in df.items()
-        if isinstance(v, mk.TensorColumn) and len(v.shape) == 2
-        # TODO: We should know the provenance of embeddings and where they came from,
-        # to explicitly check whether the encoder will match it in size.
-    ]
-    return SchemaResponse(
-        id=df.id,
-        columns=_get_column_infos(df, columns),
-        nrows=len(df),
-    )
 
 
 _SUPPORTED_BIN_OPS = {
@@ -75,13 +54,35 @@ def _parse_query(
         raise ValueError(f"Unsupported query {node_repr}")
 
 
-@endpoint
+@endpoint()
+def get_match_schema(df: DataFrame):
+    import meerkat as mk
+    from meerkat.interactive.api.routers.dataframe import (
+        SchemaResponse,
+        _get_column_infos,
+    )
+
+    columns = [
+        k
+        for k, v in df.items()
+        if isinstance(v, mk.TensorColumn) and len(v.shape) == 2
+        # TODO: We should know the provenance of embeddings and where they came from,
+        # to explicitly check whether the encoder will match it in size.
+    ]
+    return SchemaResponse(
+        id=df.id,
+        columns=_get_column_infos(df, columns),
+        nrows=len(df),
+    )
+
+
+@endpoint()
 def set_criterion(
     df: DataFrame,
-    query: str = Endpoint.EmbeddedBody(),
-    against: str = Endpoint.EmbeddedBody(),
-    criterion: str = Endpoint.EmbeddedBody(),
-    encoder: str = Endpoint.EmbeddedBody(None),
+    query: str,
+    against: str,
+    criterion: Store,
+    encoder: str = None,
 ):
     """Match a query string against a DataFrame column.
 
@@ -102,6 +103,12 @@ def set_criterion(
             name=f"match({against}, {query})",
         )
         criterion.set(match_criterion)
+
+        if not (criterion.value is None or criterion.against is None):
+            data_embedding = df[criterion.against]
+            scores = (data_embedding @ criterion.query_embedding.T).squeeze()
+            df[criterion.name] = scores
+            df.set(df)
 
     except Exception as e:
         raise e
@@ -125,8 +132,21 @@ class OnMatchMatch(EventInterface):
     criterion: MatchCriterion
 
 
-@reactive()
-def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
+@reactive(nested_return=True)
+def compute_match_scores(
+    df: DataFrame, 
+    criterion: MatchCriterion,
+) -> Tuple[DataFrame, str]:
+    """Compute the match scores for a given criterion.
+
+    Args:
+        df (DataFrame): The DataFrame to match against.
+        criterion (MatchCriterion): The criterion to match against.
+
+    Returns:
+        Tuple[DataFrame, str]: The DataFrame with the match scores
+            added as a column, and the name of the column.
+    """
     df = df.view()
     if criterion == None or criterion.against is None:  # noqa: E711
         return df, None
@@ -137,6 +157,7 @@ def compute_match_scores(df: DataFrame, criterion: MatchCriterion):
 
     return df, criterion.name
 
+_get_match_schema = get_match_schema
 
 class Match(Component):
     df: DataFrame
@@ -175,10 +196,9 @@ class Match(Component):
         # want them to be maintained on the backend
         # if they are maintained on the backend, then a store update dispatch will
         # run on every key stroke
+        self.get_match_schema = _get_match_schema.partial(df=self.df)
 
-        self.get_match_schema = get_match_schema.partial(df=self.df)
-
-        self.criterion: MatchCriterion = Store(
+        self._criterion: MatchCriterion = Store(
             MatchCriterion(against=None, query=None, name=None),
             backend_only=True,
         )
@@ -186,12 +206,16 @@ class Match(Component):
         on_match = set_criterion.partial(
             df=self.df,
             encoder=self.encoder,
-            criterion=self.criterion,
+            criterion=self._criterion,
         )
         if self.on_match is not None:
             on_match = on_match.compose(self.on_match)
 
         self.on_match = on_match
+
+    @property
+    def criterion(self) -> MatchCriterion:
+        return self._criterion
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:

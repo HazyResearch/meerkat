@@ -474,11 +474,19 @@ class BaseComponent(
         # update the `values` dict. We need to make sure that
         # the values in `cls._cache` are updated as well.
         for k, v in cls._cache.items():
-            if isinstance(v, Store):
-                v.set(values[k])
+            if k in values:
+                if isinstance(v, Store):
+                    v.set(values[k])
+                else:
+                    cls._cache[k] = values[k]
+                # TODO: other types of objects that need to be updated
             else:
-                cls._cache[k] = values[k]
-            # TODO: other types of objects that need to be updated
+                # This has happened with a parameter that 
+                # - had no default value
+                # - was annotated without `Optional[...]`
+                # - was passed in as a `None` value
+                # TODO: There may be other cases where this happens.
+                pass
         return values
 
     @root_validator(pre=False)
@@ -539,6 +547,8 @@ class Component(BaseComponent):
         for name, value in values.items():
             if isinstance(value, Store):
                 values[name] = value.__wrapped__
+            else:
+                values[name] = value
 
         return values
 

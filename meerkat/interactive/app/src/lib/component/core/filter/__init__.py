@@ -144,7 +144,15 @@ def filter(
 
         # values should be split by "," when using in/not-in operators.
         if "in" in criterion.op:
-            value = [x.strip() for x in criterion.value.split(",")]
+            if isinstance(criterion.value, str):
+                value = [x.strip() for x in criterion.value.split(",")]
+            elif isinstance(criterion.value, list):
+                value = criterion.value
+            else:
+                raise ValueError(
+                    "Expected a list or comma-separated string "
+                    f"for value {criterion.value}."
+                )
         else:
             value = col.dtype.type(criterion.value)
 
@@ -166,14 +174,6 @@ def filter(
 
 
 class Filter(Component):
-    """This component handles filtering of a dataframe.
-
-    Filtering criteria are maintained in a Store. On change of values
-    in the store, the dataframe is filtered.
-
-    This component will return a Reference object, which can be used downstream.
-    """
-
     df: DataFrame = None
     criteria: Store[List[FilterCriterion]] = Field(
         default_factory=lambda: Store(list())
@@ -191,6 +191,12 @@ class Filter(Component):
         criteria: List[FilterCriterion] = [],
         operations: List[str] = list(_operator_str_to_func.keys()),
     ):
+        """
+        Filter a dataframe based on a list of filter criteria.
+
+        Filtering criteria are maintained in a Store. On change of values
+        in the store, the dataframe is filtered.
+        """
         super().__init__(
             df=df,
             criteria=criteria,

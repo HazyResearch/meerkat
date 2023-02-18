@@ -69,5 +69,5 @@
 {#if $PlotlyLib}
 	<div {id} use:plotlyAction={{ data, layout, config, reloadPlot }} {...$$restProps} />
 {:else}
-	<slot>Loading Plotly</slot>
+	<slot><div class="text-center bg-purple-50">Loading Plotly</div></slot>
 {/if}

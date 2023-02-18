@@ -1346,7 +1346,9 @@ class DataFrame(
         # URL
         if path.startswith("http://") or path.startswith("https://"):
             return download_df(path, overwrite=overwrite)
-        elif not os.path.exists(path):
+
+        path = os.path.abspath(os.path.expanduser(path))
+        if not os.path.exists(path):
             raise ValueError(f"Path does not exist: {path}")
 
         # Load the metadata

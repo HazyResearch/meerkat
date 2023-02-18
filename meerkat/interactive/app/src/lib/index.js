@@ -46,6 +46,7 @@ export { default as Vega } from './component/core/vega/Vega.svelte';
 /** Plotly Components */
 export { default as BarPlot } from './component/plotly/bar/BarPlot.svelte';
 export { default as Plot } from './component/plotly/plot/Plot.svelte';
+export { default as ScatterPlot } from './component/plotly/scatter/ScatterPlot.svelte';
 /** Utils */
 export { API_URL } from './constants.js';
 /** Shared Components */

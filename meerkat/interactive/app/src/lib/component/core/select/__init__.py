@@ -40,9 +40,24 @@ class Select(Component):
 
     on_change: Optional[Endpoint[OnChangeSelect]] = None
 
-    @validator("labels", pre=True, always=True)
-    def set_labels(cls, v, values):
-        """If labels are not provided, use the values as labels."""
-        if v is None:
-            return values["values"]
-        return v
+    def __init__(
+        self,
+        values: List[Any],
+        *,
+        labels: List[str] = None,
+        value: Any = None,
+        disabled: bool = False,
+        classes: str = "",
+        on_change: Optional[Endpoint[OnChangeSelect]] = None,
+    ):
+        if labels is None:
+            labels = values
+
+        super().__init__(
+            values=values,
+            labels=labels,
+            value=value,
+            disabled=disabled,
+            classes=classes,
+            on_change=on_change,
+        )

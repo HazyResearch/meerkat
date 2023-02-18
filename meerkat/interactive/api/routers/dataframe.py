@@ -90,11 +90,15 @@ def rows(
     keyidxs: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
     variants: List[str] = Endpoint.EmbeddedBody(None),
+    shuffle: bool = Endpoint.EmbeddedBody(False),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
 
     full_length = len(df)
     column_infos = _get_column_infos(df, columns, variants=variants)
+
+    if shuffle:
+        df = df.shuffle()
 
     df = df[[info.name for info in column_infos]]
 
