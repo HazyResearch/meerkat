@@ -82,6 +82,7 @@ class StringMethods:
             "center", _namespace="str", width=width, fillchar=fillchar, **kwargs
         )
 
+    # transform str methods
     def capitalize(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "capitalize", _namespace="str", **kwargs
@@ -98,6 +99,28 @@ class StringMethods:
             "swapcase", _namespace="str", **kwargs
         )
 
+    def strip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "strip", _namespace="str", to_strip=to_strip, **kwargs
+        )
+
+    def lstrip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "lstrip", _namespace="str", to_strip=to_strip, **kwargs
+        )
+
+    def rstrip(self, to_strip: str = None, **kwargs) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "rstrip", _namespace="str", to_strip=to_strip, **kwargs
+        )
+
+    def replace(
+        self, pat: str, repl: str, n: int = -1, regex: bool = False, **kwargs
+    ) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "replace", _namespace="str", pat=pat, repl=repl, n=n, regex=regex, **kwargs
+        )
+
     def title(self, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function("title", _namespace="str", **kwargs)
 
@@ -110,7 +133,7 @@ class StringMethods:
         self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
     ) -> "DataFrame":
         raise NotImplementedError()
-    
+
     def startswith(self, pat: str, **kwargs) -> ScalarColumn:
         return self.column._dispatch_unary_function(
             "startswith", _namespace="str", pat=pat, **kwargs
@@ -156,6 +179,10 @@ class ScalarColumn(Column):
     def _dispatch_unary_function(
         self, compute_fn: str, _namespace: str = None, **kwargs
     ):
+        raise NotImplementedError()
+
+    @property
+    def dtype(self, **kwargs) -> Union[pa.DataType, np.dtype]:
         raise NotImplementedError()
 
     # aggregation functions

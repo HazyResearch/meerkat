@@ -14,7 +14,7 @@ import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex
 from meerkat.columns.abstract import Column
 from meerkat.interactive.graph.marking import unmarked
-from meerkat.tools.utils import MeerkatLoader
+from meerkat.tools.utils import dump_yaml, load_yaml
 
 from .deferred_block import DeferredBlock
 from .ref import BlockRef
@@ -332,18 +332,20 @@ class BlockManager(MutableMapping):
 
             for name, column in block_ref.items():
                 column_dir = os.path.join(columns_dir, name)
-                os.makedirs(column_dir, exist_ok=True)
+                # os.makedirs(column_dir, exist_ok=True)
+
+                state = column._get_state()
 
                 # don't write the data, reference the block
                 meta["columns"][name] = {
                     **column._get_meta(),
+                    "state": state,
                     "block": {
                         "block_dir": os.path.relpath(block_dir, path),
                         "block_index": _serialize_block_index(column._block_index),
                         "mmap": block.is_mmap,
                     },
                 }
-                column._write_state(column_dir)
 
                 # add the written column to the inputs
                 written_inputs[id(column)] = os.path.relpath(column_dir, path)
@@ -360,7 +362,7 @@ class BlockManager(MutableMapping):
         # Save the metadata as a yaml file
         # sort_keys=Flase is required so that the columns are written in topological
         # order
-        yaml.dump(meta, open(meta_path, "w"), sort_keys=False)
+        dump_yaml(meta, meta_path, sort_keys=False)
 
     @classmethod
     def read(
@@ -372,9 +374,7 @@ class BlockManager(MutableMapping):
         """Load a DataFrame stored on disk."""
 
         # Load the metadata
-        meta = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
-        )
+        meta = dict(load_yaml(os.path.join(path, "meta.yaml")))
 
         # maintain a dictionary mapping from paths to columns
         # so that lambda blocks that depend on those columns don't load them again

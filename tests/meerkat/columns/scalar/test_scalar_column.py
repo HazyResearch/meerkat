@@ -465,7 +465,7 @@ STRING_COLUMNS = [
     pd.Series(
         [
             "a asdsd ",
-            "bfdsdf.",
+            "bfdidf.",
             "c asdasd dsd",
             "1290_dij",
             "d",
@@ -473,7 +473,7 @@ STRING_COLUMNS = [
             "Fasdd asdasd",
             "pppqqqqq",
             "1290_dijaaa",
-            "hl2orf83WIW",
+            "hl2dirf83WIW",
             "22222",
             "1290_disdj",
         ]
@@ -502,6 +502,9 @@ STRING_COLUMNS = [
             "lower",
             "swapcase",
             "title",
+            "strip",
+            "lstrip",
+            "rstrip",
         ],
     }
 )
@@ -583,3 +586,16 @@ def test_center(backend: str, column: pd.Series):
     out = col.str.startswith("1290")
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(column.str.startswith("1290"), backend=backend))
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+    }
+)
+def test_replace(backend: str, column: pd.Series):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.replace("di", "do")
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(column.str.replace("di", "do"), backend=backend))

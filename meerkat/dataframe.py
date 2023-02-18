@@ -26,7 +26,6 @@ import dill
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import yaml
 from pandas._libs import lib
 
 import meerkat
@@ -47,7 +46,7 @@ from meerkat.mixins.reactifiable import ReactifiableMixin
 from meerkat.provenance import ProvenanceMixin
 from meerkat.row import Row
 from meerkat.tools.lazy_loader import LazyLoader
-from meerkat.tools.utils import MeerkatLoader, convert_to_batch_fn
+from meerkat.tools.utils import convert_to_batch_fn, dump_yaml, load_yaml
 
 torch = LazyLoader("torch")
 
@@ -1351,11 +1350,13 @@ class DataFrame(
             raise ValueError(f"Path does not exist: {path}")
 
         # Load the metadata
-        metadata = dict(
-            yaml.load(open(os.path.join(path, "meta.yaml")), Loader=MeerkatLoader)
-        )
+        metadata = load_yaml(os.path.join(path, "meta.yaml"))
 
-        state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
+        if "state" in metadata:
+            state = metadata["state"]
+        else: 
+            # backwards compatability to dill dataframes
+            state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         df = cls.__new__(cls)
         df._set_id()  # TODO: consider if we want to persist this id
         df._set_inode()  # FIXME: this seems hacky
@@ -1393,19 +1394,16 @@ class DataFrame(
             "dtype": type(self),
             "column_dtypes": {name: type(col) for name, col in self.data.items()},
             "len": len(self),
+            "state": state,
         }
 
         # write the block manager
         mgr_dir = os.path.join(path, "mgr")
         self.data.write(mgr_dir)
 
-        # Write the state
-        state_path = os.path.join(path, "state.dill")
-        dill.dump(state, open(state_path, "wb"))
-
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
-        yaml.dump(metadata, open(metadata_path, "w"))
+        dump_yaml(metadata, metadata_path)
 
     @classmethod
     def _state_keys(cls) -> Set[str]:

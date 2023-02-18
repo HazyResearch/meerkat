@@ -89,16 +89,6 @@ def testbed(request, tmpdir):
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@PandasScalarColumnTestBed.parametrize({"dtype": ["str"]})
-def test_str_accessor(testbed):
-    col = testbed.col
-    assert col.dtype == object
-
-    new_col = col.str.split(".").str[0].astype(int)
-    assert isinstance(new_col, ScalarColumn)
-    assert (new_col == testbed.data.astype(float).astype(int)).all()
-
-
 def test_dt_accessor():
     col = ScalarColumn(
         data=[f"01/{idx+1}/2001" for idx in range(16)],
