@@ -13,7 +13,7 @@ from cytoolz import merge_with
 import meerkat as mk
 from meerkat.block.ref import BlockRef
 from meerkat.columns.abstract import Column
-from meerkat.tools.utils import MeerkatLoader, meerkat_dill_load, translate_index
+from meerkat.tools.utils import dump_yaml, load_yaml, meerkat_dill_load, translate_index
 
 from .abstract import AbstractBlock, BlockIndex, BlockView
 
@@ -154,10 +154,10 @@ class DeferredOp:
             "batch_size": self.batch_size,
             "materialize_inputs": self.materialize_inputs,
         }
-        state_path = os.path.join(path, "state.dill")
-        dill.dump(state, open(state_path, "wb"))
+        # state_path = os.path.join(path, "state.dill")
+        # dill.dump(state, open(state_path, "wb"))
 
-        meta = {"args": [], "kwargs": {}}
+        meta = {"args": [], "kwargs": {}, "state": state}
 
         args_dir = os.path.join(path, "args")
         os.makedirs(args_dir, exist_ok=True)
@@ -181,7 +181,7 @@ class DeferredOp:
 
         # Save the metadata as a yaml file
         meta_path = os.path.join(path, "meta.yaml")
-        yaml.dump(meta, open(meta_path, "w"))
+        dump_yaml(meta, meta_path)
 
     @classmethod
     def read(cls, path, read_inputs: Dict[str, Column] = None):
@@ -191,12 +191,8 @@ class DeferredOp:
         # Assert that the path exists
         assert os.path.exists(path), f"`path` {path} does not exist."
 
-        meta = dict(
-            yaml.load(
-                open(os.path.join(path, "meta.yaml")),
-                Loader=MeerkatLoader,
-            )
-        )
+        meta = dict(load_yaml(os.path.join(path, "meta.yaml")))
+
         args = [
             read_inputs[arg_path]
             if arg_path in read_inputs
@@ -210,7 +206,10 @@ class DeferredOp:
             for key, kwarg_path in meta["kwargs"]
         }
 
-        state = meerkat_dill_load(os.path.join(path, "state.dill"))
+        if "state" in meta:
+            state = meta["state"]
+        else:
+            state = meerkat_dill_load(os.path.join(path, "state.dill"))
 
         return cls(args=args, kwargs=kwargs, **state)
 

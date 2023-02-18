@@ -191,14 +191,54 @@ class FileLoader:
         # needs to be hasable for block signature
         return hash((self.loader, self.base_dir))
 
+    def _get_state(self):
+        return {
+            "loader": self.loader,
+            "base_dir": self.base_dir,
+            "downloader": self.downloader,
+            "fallback_downloader": self.fallback_downloader,
+            "cache_dir": self.cache_dir,
+        }
+
+    def _set_state(self, state):
+        self.__dict__.update(state)
+
     def __setstate__(self, state):
-        # need to add downloader if it is missing from state,
-        # for backwards compatibility
+        """Set state used by Pickle."""
         if "downloader" not in state:
             state["downloader"] = None
         if "fallback_downloader" not in state:
             state["fallback_downloader"] = None
-        self.__dict__.update(state)
+        self._set_state(state)
+
+    @staticmethod
+    def to_yaml(dumper: yaml.Dumper, data: FileLoader):
+        """This function is called by the YAML dumper to convert an
+        :class:`Formatter` object into a YAML node.
+
+        It should not be called directly.
+        """
+        data = {
+            "class": type(data),
+            "state": data._get_state(),
+        }
+        return dumper.represent_mapping("!FileLoader", data)
+
+    @staticmethod
+    def from_yaml(loader, node):
+        """This function is called by the YAML loader to convert a YAML node
+        into an :class:`Formatter` object.
+
+        It should not be called directly.
+        """
+        data = loader.construct_mapping(node, deep=True)
+        formatter = data["class"].__new__(data["class"])
+        formatter._set_state(data["state"])
+        return formatter
+
+
+yaml.add_multi_representer(FileLoader, FileLoader.to_yaml)
+yaml.add_constructor("!FileLoader", FileLoader.from_yaml)
 
 
 class FileCell(DeferredCell):

@@ -3,7 +3,7 @@ import os
 import dill
 import yaml
 
-from meerkat.tools.utils import MeerkatLoader, meerkat_dill_load
+from meerkat.tools.utils import dump_yaml, load_yaml, meerkat_dill_load
 
 
 class ColumnIOMixin:
@@ -16,13 +16,13 @@ class ColumnIOMixin:
         metadata = self._get_meta()
 
         # Write the state
-        self._write_state(path)
+        state = self._get_state()
+        metadata["state"] = state
         self._write_data(path, *args, **kwargs)
 
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
-        yaml.dump(metadata, open(metadata_path, "w"))
-
+        dump_yaml(metadata, metadata_path)
         return metadata
 
     def _get_meta(self):
@@ -45,24 +45,18 @@ class ColumnIOMixin:
     def read(
         cls, path: str, _data: object = None, _meta: object = None, *args, **kwargs
     ) -> object:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
         # Load in the metadata
         meta = (
-            dict(
-                yaml.load(
-                    open(os.path.join(path, "meta.yaml")),
-                    Loader=MeerkatLoader,
-                )
-            )
-            if _meta is None
-            else _meta
+            dict(load_yaml(os.path.join(path, "meta.yaml"))) if _meta is None else _meta
         )
 
         col_type = meta["dtype"]
         # Load states
-        state = col_type._read_state(path)
+        if "state" not in meta:
+            assert os.path.exists(path), f"`path` {path} does not exist."
+            state = col_type._read_state(path)
+        else:
+            state = meta["state"]
         data = col_type._read_data(path, *args, **kwargs) if _data is None else _data
 
         col = col_type.__new__(col_type)

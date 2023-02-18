@@ -129,7 +129,7 @@ def test_pickle(column_testbed):
 
     if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
-        new_col.data.fn = col.fn
+        new_col.data.fn = col.data.fn
     assert col.is_equal(new_col)
 
 
@@ -148,9 +148,9 @@ def test_io(tmp_path, column_testbed: AbstractColumnTestBed):
 
     if isinstance(new_col, DeferredColumn):
         # the lambda function isn't exactly the same after reading
-        new_col.data.fn = col.fn
-
+        new_col.data.fn = col.data.fn
     assert col.is_equal(new_col)
+
 
 
 def test_head(single_column_testbed: AbstractColumnTestBed):

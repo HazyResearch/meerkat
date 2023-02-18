@@ -1,4 +1,5 @@
 import inspect
+import types
 import weakref
 from collections import defaultdict
 from collections.abc import Mapping
@@ -136,6 +137,35 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
 ]
 
 
+class MeerkatDumper(yaml.Dumper):
+    @staticmethod
+    def _pickled_object_representer(dumper, data):
+
+        return dumper.represent_mapping(
+            "!PickledObject", {"class": data.__class__, "pickle": dill.dumps(data)}
+        )
+
+    @staticmethod
+    def _function_representer(dumper, data):
+        if data.__name__ == "<lambda>":
+            return dumper.represent_mapping(
+                "!Lambda",
+                {"code": inspect.getsource(data), "pickle": dill.dumps(data)},
+            )
+
+        if "<locals>" in data.__qualname__:
+            return dumper.represent_mapping(
+                "!NestedFunction",
+                {"code": inspect.getsource(data), "pickle": dill.dumps(data)},
+            )
+
+        return dumper.represent_name(data)
+
+
+MeerkatDumper.add_multi_representer(object, MeerkatDumper._pickled_object_representer)
+MeerkatDumper.add_representer(types.FunctionType, MeerkatDumper._function_representer)
+
+
 class MeerkatLoader(yaml.FullLoader):
     """PyYaml does not load unimported modules for safety reasons.
 
@@ -170,6 +200,32 @@ class MeerkatLoader(yaml.FullLoader):
             else:
                 raise e
             return super().find_python_name(name=name, mark=mark, unsafe=unsafe)
+
+    @staticmethod
+    def _pickled_object_constructor(loader, node):
+        data = loader.construct_mapping(node)
+        return dill.loads(data["pickle"])
+
+    @staticmethod
+    def _function_constructor(loader, node):
+        data = loader.construct_mapping(node)
+        return dill.loads(data["pickle"])
+
+
+MeerkatLoader.add_constructor(
+    "!PickledObject", MeerkatLoader._pickled_object_constructor
+)
+MeerkatLoader.add_constructor("!Lambda", MeerkatLoader._function_constructor)
+
+
+def dump_yaml(obj: Any, path: str, **kwargs):
+    with open(path, "w") as f:
+        yaml.dump(obj, f, Dumper=MeerkatDumper, **kwargs)
+
+
+def load_yaml(path: str, **kwargs):
+    with open(path, "r") as f:
+        return yaml.load(f, Loader=MeerkatLoader, **kwargs)
 
 
 class MeerkatUnpickler(dill.Unpickler):

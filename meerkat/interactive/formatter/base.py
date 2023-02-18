@@ -1,6 +1,8 @@
+from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type
+import yaml
 
 from meerkat.columns.deferred.base import DeferredCell
 
@@ -86,6 +88,35 @@ class Formatter(ABC):
         """
         return str(cell)
 
+    @staticmethod
+    def to_yaml(dumper: yaml.Dumper, data: Formatter):
+        """This function is called by the YAML dumper to convert an
+        :class:`Formatter` object into a YAML node.
+
+        It should not be called directly.
+        """
+        data = {
+            "class": type(data),
+            "_props": data._props,
+        }
+        return dumper.represent_mapping("!Formatter", data)
+
+    @staticmethod
+    def from_yaml(loader, node):
+        """This function is called by the YAML loader to convert a YAML node
+        into an :class:`Formatter` object.
+
+        It should not be called directly.
+        """
+        data = loader.construct_mapping(node)
+        formatter = data["class"].__new__(data["class"])
+        formatter._props = data["_props"]
+        return formatter
+
+
+yaml.add_multi_representer(Formatter, Formatter.to_yaml)
+yaml.add_constructor("!Formatter", Formatter.from_yaml)
+
 
 class DeferredFormatter(Formatter):
     def __init__(self, formatter: Formatter):
@@ -111,3 +142,38 @@ class DeferredFormatter(Formatter):
 
     def html(self, cell: DeferredCell):
         return self.wrapped.html(cell())
+
+    @staticmethod
+    def to_yaml(dumper: yaml.Dumper, data: Formatter):
+        """This function is called by the YAML dumper to convert an
+        :class:`Formatter` object into a YAML node.
+
+        It should not be called directly.
+        """
+        data = {
+            "class": type(data),
+            "wrapped": {
+                "class": type(data.wrapped),
+                "_props": data.wrapped._props,
+            },
+        }
+        return dumper.represent_mapping("!DeferredFormatter", data)
+
+    @staticmethod
+    def from_yaml(loader, node):
+        """This function is called by the YAML loader to convert a YAML node
+        into an :class:`Formatter` object.
+
+        It should not be called directly.
+        """
+        data = loader.construct_mapping(node, deep=True)
+        formatter = data["class"].__new__(data["class"])
+        wrapped_data = data["wrapped"]
+        wrapped = wrapped_data["class"].__new__(wrapped_data["class"])
+        wrapped._props = wrapped_data["_props"]
+        formatter.wrapped = wrapped
+        return formatter
+
+
+yaml.add_multi_representer(DeferredFormatter, DeferredFormatter.to_yaml)
+yaml.add_constructor("!DeferredFormatter", DeferredFormatter.from_yaml)
