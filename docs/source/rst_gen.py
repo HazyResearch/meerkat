@@ -61,7 +61,7 @@ def generate_inbuilt_reactive_fns():
         lines.append("-" * len(category))
         lines.append("")
         lines.append(".. autosummary::")
-        lines.append("   :toctree: generated")
+        lines.append("   :toctree: ../../apidocs/generated")
         lines.append("   :nosignatures:")
         lines.append("")
         for fn in fns:

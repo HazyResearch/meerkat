@@ -8,7 +8,7 @@ General
 -------
 
 .. autosummary::
-   :toctree: generated
+   :toctree: ../../apidocs/generated
    :nosignatures:
 
    meerkat.abs
@@ -33,7 +33,7 @@ Boolean Operations
 ------------------
 
 .. autosummary::
-   :toctree: generated
+   :toctree: ../../apidocs/generated
    :nosignatures:
 
    meerkat.cand
@@ -44,7 +44,7 @@ DataFrame Operations
 --------------------
 
 .. autosummary::
-   :toctree: generated
+   :toctree: ../../apidocs/generated
    :nosignatures:
 
    meerkat.aggregate

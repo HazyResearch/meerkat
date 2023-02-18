@@ -39,8 +39,8 @@ parts:
       - title: Reactivity
         file: guide/reactive/getting-started
         sections:
-          # - file: guide/reactive/concepts
-          # - file: guide/reactive/user-guide
+          - file: guide/reactive/concepts
+          - file: guide/reactive/user-guide
           # - file: guide/reactive/examples
           # - file: guide/reactive/faq
           - file: guide/reactive/inbuilts

@@ -57,6 +57,7 @@ extensions = [
     "sphinx_design",
     "sphinx_toolbox.collapse",
     "sphinx_copybutton",
+    "sphinx_remove_toctrees",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -103,6 +104,8 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/docs", None),
     "pd": ("https://pandas.pydata.org/docs", None),
 }
+
+remove_from_toctrees = ["apidocs/generated/*"]
 
 # Sort members by group
 autodoc_member_order = "bysource"

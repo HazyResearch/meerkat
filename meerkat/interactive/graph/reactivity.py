@@ -1,3 +1,4 @@
+import types
 from functools import partial, wraps
 from typing import Callable, Iterator
 
@@ -88,6 +89,15 @@ def reactive(
         # need to make passing args to the args optional
         # note: all of the args passed to the decorator MUST be optional
         return partial(reactive, nested_return=nested_return, skip_fn=skip_fn)
+
+    # Built-in functions cannot be wrapped in reactive.
+    # They have to be converted to a lambda function first and then run.
+    if isinstance(fn, types.BuiltinFunctionType):
+        raise ValueError(
+            "Cannot wrap built-in function in reactive. "
+            "Please convert to lambda function first:\n"
+            "    >>> reactive(lambda x: {}(x))".format(fn.__name__)
+        )
 
     def __reactive(fn: Callable):
         @wraps(fn)
