@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 
 import meerkat as mk
-from meerkat.interactive import endpoint, reactive, html, Store
+from meerkat.interactive import Store, endpoint, html, reactive
 
 
 def add_noise(img: Image) -> Image:
@@ -18,21 +18,21 @@ def add_noise(img: Image) -> Image:
     return Image.fromarray(img)
 
 
-@endpoint
-def on_label(index, df):
+@endpoint()
+def on_label(index, df: mk.DataFrame):
     """Add a label to the dataframe."""
     df["label"][row] = index
     row.set(row + 1)
     print("Dataframe", df["label"][: row.value].data)
 
 
-@endpoint
-def go_back(row, df):
+@endpoint()
+def go_back(row: mk.Store, df: mk.DataFrame):
     row.set(max(0, row - 1))
 
 
-@endpoint
-def go_forward(row, df):
+@endpoint()
+def go_forward(row: mk.Store, df: mk.DataFrame):
     row.set(min(row + 1, len(df) - 1))
 
 
@@ -72,7 +72,7 @@ anonymized_img_columns = ["img1", "img2"]
 # Initialize labels to empty strings.
 df["label"] = np.full(len(df), "")
 
-
+df = df.mark()
 row = Store(0)
 label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
 cell_size = mk.gui.Store(24)
@@ -99,7 +99,6 @@ label_buttons = [
 label_display = mk.gui.core.markdown.Markdown(body="## Label: " + label)
 
 display_df = select_row(df, row)
-cell_size = mk.gui.Store(24)
 galleries = [
     mk.gui.core.Gallery(df=display_df, main_column=main_column, cell_size=cell_size)
     for main_column in anonymized_img_columns
