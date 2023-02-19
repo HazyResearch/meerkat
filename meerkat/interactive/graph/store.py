@@ -6,7 +6,7 @@ from pydantic import BaseModel, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
 
-from meerkat.interactive.graph.magic import _wand, is_magic_context
+from meerkat.interactive.graph.magic import _magic, is_magic_context
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.modification import StoreModification
@@ -112,7 +112,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         # and calling it with `self` as the first argument.
         if is_magic_context():
 
-            @_wand
+            @_magic
             def wrapper(wrapped, name: str = name):
                 return getattr(wrapped, name)
 
@@ -173,7 +173,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __ge__(self, other):
         return super().__ge__(other)
 
-    @_wand
+    @_magic
     def __nonzero__(self):
         return super().__nonzero__()
 
@@ -301,7 +301,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def __pos__(self):
         return super().__pos__()
 
-    @_wand
+    @_magic
     def __abs__(self):
         return super().__abs__()
 
@@ -399,7 +399,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     # NOTE: This only works if __index__ is always called from wrapper methods
     # and the user/developer has a way of intercepting these methods or creating
     # recommended practices for avoiding this error.
-    @_wand
+    @_magic
     def __index__(self):
         return super().__index__()
 
@@ -461,7 +461,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         self._reactive_warning("bool")
         return super().__bool__()
 
-    @_wand
+    @_magic
     def __contains__(self, value):
         return super().__contains__(value)
 
@@ -479,7 +479,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     #     warnings.warn(f"{type(self).__name__}.__setitem__ is out-of-place.")
     #     return type(self)(obj, backend_only=self._self_backend_only)
 
-    @_wand
+    @_magic
     def __delitem__(self, key):
         obj = self.__wrapped__.copy()
         del obj[key]
@@ -498,7 +498,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     #     warnings.warn(f"{type(self).__name__}.__setslice__ is out-of-place.")
     #     return type(self)(obj, backend_only=self._self_backend_only)
 
-    @_wand
+    @_magic
     def __delslice__(self, i, j):
         obj = self.__wrapped__.copy()
         del obj[i:j]
