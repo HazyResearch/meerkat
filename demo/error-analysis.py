@@ -1,7 +1,8 @@
 from typing import List
+
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
 from meerkat.interactive import html
+from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterion
 
 # Data loading.
 imagenette = mk.get("imagenette", version="160px")
@@ -17,7 +18,7 @@ df_clip = mk.DataFrame.read(
 )
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
-df['correct'] = df.map(lambda label, pred: label in pred, batch_size=len(df), pbar=True)
+df["correct"] = df.map(lambda label, pred: label in pred, batch_size=len(df), pbar=True)
 df.create_primary_key(column="pkey")
 
 IMAGE_COLUMN = "img"
@@ -40,17 +41,15 @@ gallery = html.div(
 
 @mk.reactive()
 def get_options(df):
-    return [c for c in df.columns if "match" in c or c == "label" or c == "pred" or c == "correct"]
+    return [
+        c
+        for c in df.columns
+        if "match" in c or c == "label" or c == "pred" or c == "correct"
+    ]
 
 
-select_x = mk.gui.core.Select(
-    values=get_options(df),
-    value="label",
-)
-select_y = mk.gui.core.Select(
-    values=get_options(df),
-    value="pred",
-)
+select_x = mk.gui.core.Select(values=get_options(df), value="label")
+select_y = mk.gui.core.Select(values=get_options(df), value="pred")
 select_container = html.div(
     [
         html.div("x", classes="self-center"),
@@ -100,14 +99,12 @@ plot = mk.gui.plotly.ScatterPlot(
     title="Scatter Plot",
     on_select=set_filter_with_plot_selection.partial(criteria=filter.criteria),
 )
-mk.gui.print(filter.criteria)
-mk.gui.print(plot.selected)
 
 
 component = html.flex(
     [
-        html.flexcol([match, select_container, plot]),
-        html.flexcol([filter, gallery]),
+        html.flexcol([match, filter, gallery]),
+        html.flexcol([select_container, plot]),
     ],
     classes="gap-4",
 )
