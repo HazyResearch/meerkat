@@ -1,3 +1,5 @@
+(guide_interactive_concepts_store)=
+
 # Stores
 
 An interactive application needs some way of creating variables that capture
@@ -249,7 +251,7 @@ Of course, you can still create `Store` objects manually inside reactive functio
 #### Should I use the `magic` context?
 It depends. 
 
-The `magic` context is a special context in which all methods and attribute access for `Store` objects become reactive i.e. `Store.<blah>`-like statements (remember that `fn(...)` calls will not be reactive unless explicitly decorated with `mk.reactive()` though!). 
+The `magic` context is a special context in which all methods and attribute access for `Store` objects become reactive i.e. `store.<blah>`-like statements (remember that `fn(store)` calls will not be reactive unless `fn` is explicitly decorated with `mk.reactive()` though!). 
 
 This means that you can use `Store` objects in a more natural way, without having to worry about whether or not the statement you're writing is reactive.
 
@@ -275,10 +277,11 @@ The `magic` context is not required at all, but it can make your code more succi
 #### Are there any caveats to using the `magic` context?
 There are some important edge cases when using the `magic` context that you should be aware of. You should see warnings when you encounter these edge cases, but it's still good to be aware of them.
 
-One major edge case is when using `and`, `or`, `not` and `is` operators. These operators are special tokens in Python, and cannot be intercepted by Meerkat. This means that the following statements will not be reactive, and should not be relied on.
+One major edge case is when using `and`, `or`, `not`, `is`, and `in` operators. These operators are special tokens in Python, and cannot be intercepted by Meerkat. This means that the following statements will not be reactive, and should not be relied on.
 ```python
 x = mk.Store(1)
 y = mk.Store(2)
+w = mk.Store([1, 2, 3])
 with mk.magic():
     # None of these will be reactive
     # and may return the wrong value!
@@ -286,6 +289,7 @@ with mk.magic():
     z = x is y
     z = x or y
     z = not x
+    z = x in w
     # Use Meerkat's built-in overloads instead
     mk.cand(x, y)
     mk.cor(x, y)

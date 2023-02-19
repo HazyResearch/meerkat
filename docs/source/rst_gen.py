@@ -1,9 +1,11 @@
 """Functions to generate certain RST files."""
+# import math
 import os
 import pathlib
 from collections import defaultdict
 from typing import List, Union
 
+# import numpy as np
 import pandas as pd
 
 import meerkat as mk
@@ -17,8 +19,8 @@ def _replace_contents_in_file(fpath, *, key: str, contents: Union[str, List[str]
     Delimiters should be Markdown style comments formatted with the key.
     For example:
 
-        <!---Start: mk-store-reactive-operators-->
-        <!---End: mk-store-reactive-operators-->
+        <!---autogen-start: my-key-->
+        <!---autogen-end: my-key-->
     """
     if isinstance(contents, str):
         contents = [contents]
@@ -185,6 +187,55 @@ def generate_store_operators():
     )
 
 
+def generate_common_inplace_methods():
+    """Generate table of common inplace methods."""
+    fpath = _DIR / "guide" / "magic" / "limitations.md"
+
+    # Examples of common inplace methods include:
+    methods = [
+        # list
+        "list.append",
+        "list.extend",
+        "list.insert",
+        "list.remove",
+        "list.pop",
+        "list.clear",
+        "list.sort",
+        "list.reverse",
+        # dict
+        "dict.clear",
+        "dict.pop",
+        "dict.popitem",
+        "dict.setdefault",
+        "dict.update",
+        # set
+        "set.add",
+        "set.clear",
+        "set.discard",
+        "set.pop",
+        "set.remove",
+        "set.update",
+    ]
+
+    methods = sorted(methods)
+    # num_columns = range(1, 5)
+    # num_rows = [math.ceil(len(methods) / ncol) for ncol in num_columns]
+    # remainder = [
+    #     nrow * ncol - len(methods) for nrow, ncol in zip(num_rows, num_columns)
+    # ]
+    # min_remainder_loc = np.argmin(remainder)
+
+    # ncols = num_columns[min_remainder_loc]
+    # nrows = num_rows[min_remainder_loc]
+
+    # TODO: make a table
+
+    methods = ["- {py:meth}" + f"`{method}`" for method in methods]
+
+    _replace_contents_in_file(fpath, key="common-inplace-methods", contents=methods)
+
+
 if __name__ == "__main__":
     generate_inbuilt_reactive_fns()
     generate_store_operators()
+    generate_common_inplace_methods()
