@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Any, Callable, List, TypeVar, cast
 
-from meerkat.interactive.graph.marking import mark, unmarked
+from meerkat.interactive.graph.marking import unmarked
 from meerkat.interactive.graph.reactivity import reactive
 
 # Used for annotating decorator usage of 'react'.
@@ -16,7 +16,7 @@ _IS_MAGIC_CONTEXT: List[bool] = []
 _MAGIC_FN = "magic"
 
 
-def _wand(fn: Callable) -> Callable:
+def _magic(fn: Callable) -> Callable:
     """Internal decorator that is used to mark a function with a wand. Wand
     functions can be activated when the magic context is active (`with
     magic:`).

@@ -1,8 +1,36 @@
 # Stores
 
+In this section, we will discuss one of the core Markable objects in Meerkat: {py:class}`Store <meerkat.Store>`.
+
+## What is a `Store`?
+
 ```{important}
-A {py:class}`Store {meerkat.Store}` behaves like the object it wraps, with extra functionality for reactivity.
+A {py:class}`Store <meerkat.Store>` behaves like the object it wraps, with extra functionality for reactivity.
 ```
+
+A {py:class}`Store <meerkat.Store>` is a special object provided by Meerkat that can be used to wrap arbitrary Python objects, such primitive types (e.g. int, str, list, dict), third-party objects (e.g. pandas.DataFrame, pathlib.Path), and even your custom objects.
+
+**How do we interact with a `Store`?**
+
+All attributes and methods of the wrapped object are exposed through the store.
+For example, if we wrap a `dict` in a `Store`, we can access the keys and values of the `dict` through the `Store`:
+
+```python
+store = mk.Store({"a": 1, "b": 2})
+print(store.keys()) # ["a", "b"]
+print(store.values()) # [1, 2]
+```
+
+You shouldn't have to worry (too much) about being able to use `Stores`, because all `Stores` behave just like their wrapped objects.
+
+
+## Why do we need Stores?
+As we saw earlier, stores are essential for building interactive interfaces - i.e. {ref}`reactivity <reactivity_getting_started>` and {ref}`endpoints <endpoints_getting_started>`.
+
+### [Recap] Reactivity
+
+### [Recap] Endpoints
+
 
 ## Why do we need Stores?
 

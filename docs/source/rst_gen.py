@@ -1,7 +1,10 @@
 """Functions to generate certain RST files."""
 import os
 import pathlib
+from collections import defaultdict
 from typing import List, Union
+
+import pandas as pd
 
 import meerkat as mk
 
@@ -126,10 +129,59 @@ def generate_inbuilt_reactive_fns():
 def generate_store_operators():
     """Generate table of store operators that are reactive."""
     fpath = _DIR / "guide" / "store" / "user-guide.md"
-    contents = ["blah"]
+    operators = [
+        # Arthmetic
+        "Addition, +, x + y",
+        "Subtraction, -, x - y",
+        "Multiplication, *, x * y",
+        "Division, /, x / y",
+        "Floor Division, //, x // y",
+        "Modulo, %, x % y",
+        "Exponentiation, **, x ** y",
+        # Assignment
+        "Add & Assign, +=, x+=1",
+        "Subtract & Assign, -=, x-=1",
+        "Multiply & Assign, *=, x*=1",
+        "Divide & Assign, /=, x/=1",
+        "Floor Divide & Assign, //=, x//=1",
+        "Modulo & Assign, %=, x%=1",
+        "Exponentiate & Assign, **=, x**=1",
+        "Power & Assign, **=, x**=1",
+        "Bitwise Left Shift & Assign, <<=, x<<=1",
+        "Bitwise Right Shift & Assign, >>=, x>>=1",
+        "Bitwise AND & Assign, &=, x&=1",
+        "Bitwise XOR & Assign, ^=, x^=1",
+        "Bitwise OR & Assign, |=, x|=1",
+        # Bitwise
+        "Bitwise Left Shift, <<, x << y",
+        "Bitwise Right Shift, >>, x >> y",
+        "Bitwise AND, &, x & y",
+        "Bitwise XOR, ^, x ^ y",
+        "Bitwise OR, |, x | y",
+        "Bitwise Inversion, ~, ~x",
+        # Comparison
+        "Less Than, <, x < y",
+        "Less Than or Equal, <=, x <= y",
+        "Equal, ==, x == y",
+        "Not Equal, !=, x != y",
+        "Greater Than, >, x > y",
+        "Greater Than or Equal, >=, x >= y",
+        # Get item
+        "Get Item, [key], x[0]",
+        "Get Slice, [start:stop], x[0:10]",
+    ]
 
+    content = defaultdict(list)
+    for operator in operators:
+        name, symbol, example = [x.strip() for x in operator.split(",")]
+        content["name"].append(name)
+        content["symbol"].append(symbol)
+        content["example"].append(example)
+
+    df = pd.DataFrame(content)
+    content_markdown = df.to_markdown(index=False)
     _replace_contents_in_file(
-        fpath, key="mk-store-reactive-operators", contents=contents
+        fpath, key="mk-store-reactive-operators", contents=content_markdown
     )
 
 

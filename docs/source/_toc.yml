@@ -35,6 +35,11 @@ parts:
             sections:
               - file: guide/dataframe/advanced/copying
               - file: guide/dataframe/advanced/blocks
+
+      - title: Stores
+        file: guide/store/getting-started
+        sections:
+          - file: guide/store/user-guide
       
       - title: Reactivity
         file: guide/reactive/getting-started
