@@ -279,7 +279,7 @@ def generate_components_doc():
 
 
 if __name__ == "__main__":
-    # generate_inbuilt_reactive_fns()
-    # generate_store_operators()
-    # generate_common_inplace_methods()
+    generate_inbuilt_reactive_fns()
+    generate_store_operators()
+    generate_common_inplace_methods()
     generate_components_doc()
