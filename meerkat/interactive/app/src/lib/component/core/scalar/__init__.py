@@ -31,6 +31,7 @@ class ScalarFormatter(Formatter):
         self.precision = precision
         self.percentage = percentage
 
+    @property
     def props(self):
         return {
             "dtype": self.dtype,
