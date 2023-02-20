@@ -6,7 +6,6 @@ parts:
       - file: start/install
       - file: start/quickstart
       - file: start/walkthrough
-      - file: start/configure
       - file: start/test
 
   - caption: User Guide
@@ -79,7 +78,9 @@ parts:
             sections:
               - file: guide/interactive/examples/image_search
 
-
+  - caption: Advanced
+    chapters:
+      - file: start/configure
 
   - caption: Use Cases
     chapters:
@@ -90,6 +91,7 @@ parts:
     chapters:
       - file: datasets/datasets
       - file: datasets/contributing
+
 
   - caption: API Reference
     chapters:
