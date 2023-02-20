@@ -27,7 +27,7 @@ sys.setrecursionlimit(1500)
 # -- Project information -----------------------------------------------------
 
 project = "Meerkat"
-copyright = "2022 Meerkat"
+copyright = "2023 Meerkat"
 author = "The Meerkat Team"
 
 # The full version, including alpha/beta/rc tags
@@ -74,9 +74,10 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_book_theme"
+html_title = f"🔮 v{version}"
 html_logo = "../assets/meerkat_banner_padded.svg"
 html_favicon = "../assets/meerkat_logo.png"
-html_sidebars = {"**": ["sbt-sidebar-nav.html"]}
+# html_sidebars = {"**": ["sbt-sidebar-nav.html"]}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -128,17 +129,27 @@ source_suffix = {
 external_toc_path = "_toc.yml"
 
 html_theme_options = {
-    "repository_url": "https://github.com/robustness-gym/meerkat/",
+    "repository_url": "https://github.com/hazyresearch/meerkat/",
     "use_repository_button": True,
     "use_issues_button": True,
     "use_edit_page_button": True,
     "path_to_docs": "doc/source",
-    "home_page_in_toc": False,
+    "home_page_in_toc": True,
     "show_navbar_depth": 1,
+    "use_sidenotes": True,
+    "show_toc_level": 2,
     "launch_buttons": {
         "notebook_interface": "jupyterlab",
         "binderhub_url": "https://mybinder.org",
         "colab_url": "https://colab.research.google.com",
     },
     "announcement": "<div class='topnav'></div>",
+}
+
+html_context = {
+    "display_github": True,
+    "github_user": "hazyresearch",
+    "github_repo": "meerkat",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
 }

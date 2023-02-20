@@ -1,7 +1,21 @@
 html[data-theme="light"] {
-    /*****************************************************************************
+  /*****************************************************************************
     * main colors
     */
-    --pst-color-primary: rgb(19,7,83);
-    --pst-color-secondary: rgb(252,177,62);
+  --pst-color-primary: rgb(19, 7, 83);
+  --pst-color-secondary: rgb(252, 177, 62);
+}
+
+pre {
+  white-space: break-spaces;
+}
+
+@media (min-width: 1200px) {
+  .container,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl {
+    max-width: 2560px !important;
+  }
 }

@@ -1,20 +1,18 @@
 format: jb-book
 root: index
 parts:
-  - caption: Home
-    chapters:
-      - file: overview
   - caption: Getting started
     chapters:
       - file: start/install
       - file: start/quickstart
       - file: start/walkthrough
       - file: start/configure
+      - file: start/test
 
   - caption: User Guide
     chapters:
       - file: guide/dataframe/intro
-        title: "DataFrame"
+        title: DataFrame
         sections:
           - file: guide/dataframe/selection
           - file: guide/dataframe/columns/overview
@@ -56,6 +54,9 @@ parts:
         sections:
           - file: guide/magic/limitations
           # - file: guide/store/faq
+
+      - title: Components
+        file: guide/component/getting-started
 
       - title: Interactive
         file: guide/interactive/introduction
