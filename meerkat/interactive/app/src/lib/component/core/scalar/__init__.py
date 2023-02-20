@@ -67,6 +67,7 @@ class ScalarFormatter(Formatter):
         }
     
     def _set_state(self, state: Dict[str, Any]):
+        print(state)
         self.dtype = state["dtype"]
         self.precision = state["precision"]
         self.percentage = state["percentage"]

@@ -5,7 +5,7 @@ from copy import copy
 from dataclasses import dataclass
 import yaml
 
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Type, Union
 from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
 
 from meerkat.columns.deferred.base import DeferredCell
@@ -108,6 +108,36 @@ class FormatterGroup(collections.abc.Mapping):
 
     def __iter__(self) -> Iterator:
         return iter(self._dict)
+
+    
+    @staticmethod
+    def to_yaml(dumper: yaml.Dumper, data: Formatter):
+        """This function is called by the YAML dumper to convert a
+        :class:`Formatter` object into a YAML node.
+
+        It should not be called directly.
+        """
+        data = {
+            "class": type(data),
+            "dict": data._dict,
+        }
+        return dumper.represent_mapping("!FormatterGroup", data)
+
+    @staticmethod
+    def from_yaml(loader, node):
+        """This function is called by the YAML loader to convert a YAML node
+        into an :class:`Formatter` object.
+
+        It should not be called directly.
+        """
+        data = loader.construct_mapping(node)
+        formatter = data["class"].__new__(data["class"])
+        formatter._dict = data["dict"]
+        return formatter
+
+MeerkatDumper.add_multi_representer(FormatterGroup, FormatterGroup.to_yaml)
+MeerkatLoader.add_constructor("!FormatterGroup", FormatterGroup.from_yaml)
+
 
 
 def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
@@ -226,7 +256,7 @@ class Formatter(ABC):
 
         It should not be called directly.
         """
-        data = loader.construct_mapping(node)
+        data = loader.construct_mapping(node, deep=True)
         formatter = data["class"].__new__(data["class"])
         formatter._set_state(data["state"])
         return formatter
