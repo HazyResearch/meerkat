@@ -42,8 +42,7 @@ from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
     import torch
-
-    from meerkat.interactive.formatter.base import Formatter
+    from meerkat.interactive.formatter.base import FormatterGroup
 
 torch = LazyLoader("torch")  # noqa: F811
 
@@ -81,7 +80,7 @@ class Column(
         self,
         data: Sequence = None,
         collate_fn: Callable = None,
-        formatter: Callable = None,
+        formatters: FormatterGroup = None,
         *args,
         **kwargs,
     ):
@@ -101,8 +100,8 @@ class Column(
             **kwargs,
         )
 
-        self._formatter = (
-            formatter if formatter is not None else self._get_default_formatter()
+        self._formatters = (
+            formatters if formatters is not None else self._get_default_formatters()
         )
 
         # Log creation
@@ -110,7 +109,7 @@ class Column(
 
     @unmarked()
     def __repr__(self):
-        
+
         return f"column({reprlib.repr([x for x in self[:10]])}, backend={type(self).__name__}"
 
     @unmarked()
@@ -175,7 +174,7 @@ class Column(
     @classmethod
     def _state_keys(cls) -> set:
         """List of attributes that describe the state of the object."""
-        return {"_collate_fn", "_formatter"}
+        return {"_collate_fn", "_formatters"}
 
     def _get_cell(self, index: int, materialize: bool = True) -> Any:
         """Get a single cell from the column.
@@ -282,26 +281,26 @@ class Column(
     def _repr_cell_(self, index) -> object:
         raise NotImplementedError
 
-    def _get_default_formatter(self) -> "Formatter":
-        # can't implement this as a class level property because then it will treat
-        # the formatter as a method
+    def _get_default_formatters(self) -> "FormatterGroup":
         from meerkat.interactive.app.src.lib.component.core.scalar import (
             ScalarFormatter,
         )
+        from meerkat.interactive.formatter.base import FormatterGroup
 
-        return ScalarFormatter()
+        return FormatterGroup(base=ScalarFormatter())
 
     @property
-    def formatter(self) -> "Formatter":
-        return self._formatter
+    def formatters(self) -> "FormatterGroup":
+        return self._formatters
 
-    @formatter.setter
-    def formatter(self, formatter: "Formatter"):
-        self._formatter = formatter
+    @formatters.setter
+    def formatter(self, formatters: "FormatterGroup"):
+        self._formatters = formatters
 
-    def format(self, formatter: type):
+    def format(self, formatters: "FormatterGroup"):
         new_col = self.view()
-        new_col.formatter = formatter
+        new_col.formatters = copy(formatters)
+        new_col.formatters.update(formatters)
         return new_col
 
     @unmarked()
@@ -321,7 +320,12 @@ class Column(
         else:
             col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
 
-        return col, self.formatter if self.formatter is None else self.formatter.html
+        return (
+            col,
+            self.formatters["base"]
+            if self.formatters["base"] is None
+            else self.formatters["base"].html,
+        )
 
     @unmarked()
     def _repr_html_(self, max_rows: int = None):

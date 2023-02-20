@@ -1,10 +1,10 @@
 import base64
 from io import BytesIO
-from typing import Union
+from typing import Any, Dict, Tuple, Union
 
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.formatter.base import Formatter, Variant
+from meerkat.interactive.formatter.base import Formatter, FormatterGroup
 
 
 class Image(Component):
@@ -13,34 +13,48 @@ class Image(Component):
 
 
 class ImageFormatter(Formatter):
-    component_class: type = Image
+    component_class = Image
     data_prop: str = "data"
 
-    variants: dict = {
-        "gallery": Variant(
-            props={},
-            encode_kwargs={"thumbnail": True},
-        )
-    }
+    def __init__(self, max_size: Tuple[int] = None, classes: str = ""):
+        self.max_size = max_size
+        self.classes = classes
 
-    def __init__(self, classes: str = ""):
-        super().__init__(classes=classes)
-
-    def _encode(self, image: Union[str, Image], thumbnail: bool = False) -> str:
-        if isinstance(image, str):
-            return image
-
+    def encode(self, cell: Image) -> str:
         with BytesIO() as buffer:
-            if thumbnail:
-                image.thumbnail((256, 256))
-            image.save(buffer, "jpeg")
+            if self.max_size:
+                cell.thumbnail(self.max_size)
+            cell.save(buffer, "jpeg")
             return "data:image/jpeg;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 
+    @property
+    def props(self) -> Dict[str, Any]:
+        return {"classes": self.classes}
+
     def html(self, cell: Image) -> str:
         encoded = self.encode(cell, thumbnail=True)
         return f'<img src="{encoded}">'
+
+    def _get_state(self) -> Dict[str, Any]:
+        return {
+            "max_size": self.max_size,
+            "classes": self.classes,
+        }
+
+    def _set_state(self, state: Dict[str, Any]):
+        self.max_size = state["max_size"]
+        self.classes = state["classes"]
+
+
+class ImageFormatterGroup(FormatterGroup):
+    def __init__(self, classes: str = ""):
+        super().__init__(
+            base=ImageFormatter(classes=classes),
+            thumbnail=ImageFormatter(max_size=[256, 256], classes=classes),
+            full_screen=ImageFormatter(classes=classes),
+        )
 
 
 class DeferredImageFormatter(ImageFormatter):

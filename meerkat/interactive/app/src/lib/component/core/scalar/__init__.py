@@ -1,6 +1,6 @@
 import math
 import textwrap
-from typing import Any
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -27,9 +27,18 @@ class ScalarFormatter(Formatter):
         precision: int = 3,
         percentage: bool = False,
     ):
-        super().__init__(dtype=dtype, precision=precision, percentage=percentage)
+        self.dtype = dtype
+        self.precision = precision
+        self.percentage = percentage
 
-    def _encode(self, cell: Any):
+    def props(self):
+        return {
+            "dtype": self.dtype,
+            "precision": self.precision,
+            "percentage": self.percentage,
+        }
+
+    def encode(self, cell: Any):
         # check for native python nan
         if isinstance(cell, float) and math.isnan(cell):
             return "NaN"
@@ -48,3 +57,16 @@ class ScalarFormatter(Formatter):
         if isinstance(cell, str):
             cell = textwrap.shorten(cell, width=100, placeholder="...")
         return format_array(np.array([cell]), formatter=None)[0]
+
+    def _get_state(self) -> Dict[str, Any]:
+        return {
+            "dtype": self.dtype,
+            "precision": self.precision,
+            "percentage": self.percentage,
+        }
+    
+    def _set_state(self, state: Dict[str, Any]):
+        self.dtype = state["dtype"]
+        self.precision = state["precision"]
+        self.percentage = state["percentage"]
+        

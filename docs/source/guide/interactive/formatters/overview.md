@@ -6,7 +6,7 @@ kernelspec:
 
 (guide/interactive/formatters/overview)=
 # Formatters
-Meerkat GUIs can display data of many different types, from images to text to audio.  Formatters control how these data types are displayed and interacted with in Meerkat GUIs.
+Meerkat GUIs can display data of many different types, from images, to long-form text, to audio.  Formatters control how these data types are displayed and interacted with in Meerkat GUIs.
 
 For example, images can be displayed using the {class}`meerkat.format.ImageFormatter`. 
 Each formatter, specifies optional parameters that can be used to configure how the data is displayed. For example, the {class}`meerkat.format.ImageFormatter` has a `max_size` parameter that can be used to specify the maximum size of the image to display.
@@ -58,34 +58,33 @@ gallery = Gallery(
 
 ## Implementing a Formatter
 You can implement your own formatter for a custom data type. 
-A formatter implementation must specify three things: a `component_class`, an `encode` method, and a `props` method. 
+A formatter implementation must specify three things: a `component_class`, an `encode` method, a `props` method, a `_get_state` method, and a `_set_state` method. 
 
 Consider the following example of a formatter that encodes images as base64 strings and sends them to the frontend to be displayed using the `Image` component.
 
 ```python
 class ImageFormatter(Formatter):
-  component_class: Type[BaseComponent] = Image
+    component_class = Image
 
-  def __init__(self, max_size: Tuple[int]=None, classes: str, grayscale: str):
-    self.max_size = max_size
-    self.classes = classes
-    self.grayscale = grayscale
+    def __init__(
+        self, max_size: Tuple[int] = None, classes: str = "", grayscale: str = False
+    ):
+        self.max_size = max_size
+        self.classes = classes
+        self.grayscale = grayscale
 
-  def encode(self, cell: PIL.Image) -> str:
-    with BytesIO() as buffer:
-      if max_size:
-        image.thumbnail(max_size)
-      image.save(buffer, "jpeg")
-      return "data:image/jpeg;base64,{im_base_64}".format(
-        im_base_64=base64.b64encode(buffer.getvalue()).decode()
-      )
-  
-  @property
-  def props(self) -> Dict[str, Any]:
-    return {
-      "classes": self.classes,
-      "grayscale": self.grayscale
-    }
+    def encode(self, cell: Image) -> str:
+        with BytesIO() as buffer:
+            if self.max_size:
+                cell.thumbnail(self.max_size)
+            cell.save(buffer, "jpeg")
+            return "data:image/jpeg;base64,{im_base_64}".format(
+                im_base_64=base64.b64encode(buffer.getvalue()).decode()
+            )
+
+    @property
+    def props(self) -> Dict[str, Any]:
+        return {"classes": self.classes, "grayscale": self.grayscale}
 ```
 Let's break down what's happening here. 
 - `component_class` specifies the class of the frontend component that should be created to display the data. In this case, it is the `Image` component defined below.
@@ -98,6 +97,8 @@ class Image(Component):
 - `props` specifies the values of the properties passed when constructing the components. Notice that the keys in the returned dictionary match the names of the properties defined in the `Image` component above. 
 
 - `encode` specifies how a single cell from a column should be encoded on the Python side before being sent up to the frontend. In this case we are encoding an image as a base-64 string.
+
+It's also important to implement 
 
 ## Formatter Placeholders
 As we discussed above, components specify formatter placeholders when requesting data from a column. This allows them to be formatter-agnostic, while still being able to display data in different ways depending on the context.

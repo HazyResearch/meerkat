@@ -26,12 +26,12 @@ class SchemaResponse(BaseModel):
 def schema(
     df: DataFrame,
     columns: List[str] = None,
-    variants: List[str] = None,
+    formatter: str = "base",
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
     return SchemaResponse(
         id=df.id,
-        columns=_get_column_infos(df, columns, variants=variants),
+        columns=_get_column_infos(df, columns, formatter_placeholder=formatter),
         nrows=len(df),
         primaryKey=df.primary_key_name,
     )
@@ -40,7 +40,7 @@ def schema(
 def _get_column_infos(
     df: DataFrame,
     columns: List[str] = None,
-    variants: List[str] = None,
+    formatter_placeholder: str = "base",
 ):
 
     if columns is None:
@@ -63,9 +63,11 @@ def _get_column_infos(
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cellComponent=df[col].formatter.component_class.alias,
-            cellProps=df[col].formatter.get_props(variants=variants),
-            cellDataProp=df[col].formatter.data_prop,
+            cellComponent=df[col]
+            .formatters[formatter_placeholder]
+            .component_class.alias,
+            cellProps=df[col].formatters[formatter_placeholder].props,
+            cellDataProp=df[col].formatters[formatter_placeholder].data_prop,
         )
         for col in columns
     ]
@@ -89,13 +91,15 @@ def rows(
     key_column: str = Endpoint.EmbeddedBody(None),
     keyidxs: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
-    variants: List[str] = Endpoint.EmbeddedBody(None),
+    formatter: str = Endpoint.EmbeddedBody("base"),
     shuffle: bool = Endpoint.EmbeddedBody(False),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-
+    formatter_placeholder = formatter
     full_length = len(df)
-    column_infos = _get_column_infos(df, columns, variants=variants)
+    column_infos = _get_column_infos(
+        df, columns, formatter_placeholder=formatter_placeholder
+    )
 
     if shuffle:
         df = df.shuffle()
@@ -130,7 +134,7 @@ def rows(
     for row in df:
         rows.append(
             [
-                df[info.name].formatter.encode(row[info.name], variants=variants)
+                df[info.name].formatters[formatter_placeholder].encode(row[info.name])
                 for info in column_infos
             ]
         )

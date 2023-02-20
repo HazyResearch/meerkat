@@ -17,7 +17,7 @@
 	export let cardFlexGrow: boolean = false;
 	export let asModal: boolean = false;
 
-	$: schemaPromise = fetchSchema({ df: df, variants: ['small'] }).then((schema) => {
+	$: schemaPromise = fetchSchema({ df: df, formatter: 'small' }).then((schema) => {
 		if (mainColumn === undefined) {
 			mainColumn = schema.columns[0].name;
 		}
@@ -28,9 +28,9 @@
 		df: df,
 		posidxs: [posidx],
 		columns: [mainColumn],
-		variants: ['full_screen']
+		formatter: 'full_screen'
 	});
-	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
+	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'key_value'});
 
 	const increment = async () => {
 		let chunk = await chunkPromise;

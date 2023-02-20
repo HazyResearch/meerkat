@@ -24,7 +24,7 @@
 
 	$: schemaPromise = fetchSchema({
 		df: df,
-		variants: ['small']
+		formatter: 'small'
 	});
 
 	setContext('open_row_modal', (posidx: number) => {
@@ -40,7 +40,7 @@
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		columns: [mainColumn, ...tagColumns],
-		variants: ['gallery']
+		formatter: 'gallery'
 	});
 
 	let dropdownOpen: boolean = false;

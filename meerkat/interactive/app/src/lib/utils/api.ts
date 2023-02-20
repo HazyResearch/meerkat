@@ -30,16 +30,16 @@ export const dispatch = async (endpointId: string, payload: any = {}) => {
 export interface DataFrameChunkRequest {
     df: DataFrameRef
     columns?: Array<string> | null
-    variants?: Array<string> | null
+    formatter?: string | null
 }
 
 export const fetchSchema = async ({
     df,
     columns = null,
-    variants = null
+    formatter = null
 }: DataFrameChunkRequest) => {
     return await post(`${get(API_URL)}/df/${df.refId}/schema`, {
-        columns: columns, variants: variants
+        columns: columns, formatter_placeholder: formatter
     });
 }
 
@@ -51,7 +51,7 @@ export interface DataFrameChunkRequest {
     posidxs?: Array<number> | null
     keyidxs?: Array<string | number> | null
     keyColumn?: string | null
-    variants?: Array<string> | null
+    formatter?: string | null
     shuffle?: boolean | null
 }
 
@@ -63,7 +63,7 @@ export const fetchChunk = async ({
     posidxs = null,
     keyidxs = null,
     keyColumn = null,
-    variants = null,
+    formatter = null,
     shuffle = null
 }: DataFrameChunkRequest) => {
     const result = await post(`${get(API_URL)}/df/${df.refId}/rows`, {
@@ -73,7 +73,7 @@ export const fetchChunk = async ({
         key_column: keyColumn,
         keyidxs: keyidxs,
         columns: columns,
-        variants: variants,
+        formatter_placeholder: formatter,
         shuffle: shuffle
     });
 

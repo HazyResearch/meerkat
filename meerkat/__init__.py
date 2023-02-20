@@ -128,6 +128,11 @@ max = _max
 import meerkat.interactive.svelte
 from meerkat.interactive import Store, endpoint, mark, reactive, unmarked
 from meerkat.interactive.graph.magic import magic
+from meerkat.interactive.formatter.base import (
+    Formatter,
+    FormatterGroup,
+    FormatterPlaceholder,
+)
 
 __all__ = [
     "DataFrame",
@@ -197,6 +202,10 @@ __all__ = [
     "from_arrow",
     "from_huggingface",
     "read",
+    # <<<< Formatters >>>>
+    "Formatter",
+    "FormatterGroup",
+    "FormatterPlaceholder",
     # <<<< Misc >>>>
     "provenance",
     "config",
