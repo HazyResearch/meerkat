@@ -12,10 +12,9 @@
 [![codecov](https://codecov.io/gh/robustness-gym/meerkat/branch/main/graph/badge.svg?token=MOLQYUSYQU)](https://codecov.io/gh/robustness-gym/meerkat)
 
 
-Wrangle unstructured data, and build interactive applications that leverage foundation models on top.
+Meerkat is a Python library aimed at technical teams that want to interactively wrangle their unstructured data with foundation models.
 
-[**Getting Started**](⚡️-Quickstart)
-| [**What is Meerkat?**](💡-what-is-Meerkat)
+[**Quickstart**](⚡️-Quickstart)
 | [**Docs**](https://meerkat.readthedocs.io/en/dev/index.html)
 | [**Contributing**](CONTRIBUTING.md)
 | [**Blogpost**](https://www.notion.so/sabrieyuboglu/Meerkat-DataPanels-for-Machine-Learning-64891aca2c584f1889eb0129bb747863)
