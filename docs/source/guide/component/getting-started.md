@@ -72,15 +72,31 @@ print(slider.value) # Store(0.0)
 
 
 ## Composing Components
-Components can be composed together to create more complex user interfaces. For example, we can create a `Slider` component and pass it to a `Text` component to display the current value of the slider.
+Components can be composed together to create more complex user interfaces. For example, you can create a `Slider` component and pass it to a `Text` component to display the current value of the slider.
 
 ```python
 slider = Slider()
 text = Text(slider.value)
 ```
 
-However, this hasn't yet addressed the problem of laying out these components. Meerkat includes a subset of `html` tags that can be used to layout components. For example, we can use the `div` tag to create a `div` element that contains the `slider` and `text` components.
+Meerkat includes a subset of `html` tags that can be used to layout components. For example, you can use the `div` component to create a `div` element that contains the `slider` and `text` components.
 
 ```python
 layout = div([slider, text], classes="flex flex-col")
+```
+
+Notice here that you can directly pass a list of classes to the `classes` attribute of the `div` component. Whenever you see a component that accepts a `classes` attribute, you can pass a list of Tailwind CSS classes to the component to style it. If you're not familiar with Tailwind CSS, it's an incredibly simple way to style components without worrying about low-level CSS details. Tailwind is easy to use even if you've never used CSS in your life. You can read more about it [here](https://tailwindcss.com/).
+
+## Rendering Components
+To actually render and view components, you must create a `Page`.
+
+```python
+page = Page(component=layout, id="my-page")
+page.launch()
+```
+
+The `Page` class is the main entrypoint for creating interactive user interfaces with Meerkat. It takes a `component` argument which is the root component of the page, and an `id` argument which sets up a URL for the page.
+
+```{caution}
+As convention, ensure that the main page of your application is assigned to a variable called `page`.
 ```
