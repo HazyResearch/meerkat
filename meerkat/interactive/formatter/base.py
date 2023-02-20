@@ -1,9 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod, abstractproperty
+import collections
+from copy import copy
 from dataclasses import dataclass
 import yaml
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Type, Union
 from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
 
 from meerkat.columns.deferred.base import DeferredCell
@@ -17,7 +19,7 @@ class Variant:
         pass
 
 
-class FormatterGroup(dict):
+class FormatterGroup(collections.abc.Mapping):
     """A formatter group is a mapping from formatter placeholders to formatters.
 
     Data in a Meerkat column sometimes need to be displayed differently in different
@@ -41,9 +43,29 @@ class FormatterGroup(dict):
         **kwargs: The formatters to add to the formatter group.
     """
 
-    def __init__(self, base: Formatter, **kwargs):
+    def __init__(self, base: Formatter = None, **kwargs):
+        if base is None:
+            from meerkat.interactive.app.src.lib.component.core.scalar import (
+                ScalarFormatter,
+            )
+
+            base = ScalarFormatter()
+
+        if not isinstance(base, Formatter):
+            raise TypeError("base must be a Formatter")
+        for key, value in kwargs.items():
+            if key not in formatter_placeholders:
+                raise ValueError(
+                    f"The key {key} is not a registered formatter "
+                    "placeholder. Use `mk.register_formatter_placeholder`"
+                )
+            if not isinstance(value, Formatter):
+                raise TypeError(
+                    f"FormatterGroup values must be Formatters, not {type(value)}"
+                )
+
         # must provide a base formatter
-        super().__init__(base=base, **kwargs)
+        self._dict = dict(base=base, **kwargs)
 
     def __getitem__(self, key: Union[FormatterPlaceholder, str]) -> Formatter:
         """Get the formatter for the given formatter placeholder.
@@ -55,13 +77,37 @@ class FormatterGroup(dict):
             (Formatter) The formatter for the formatter placeholder.
         """
         if isinstance(key, str):
-            key = FormatterPlaceholder(key, [])
-        if key.name in self:
-            return super().__getitem__(key.name)
+            if key in formatter_placeholders:
+                key = formatter_placeholders[key]
+            else:
+                key = FormatterPlaceholder(key, [])
+
+        if key.name in self._dict:
+            return self._dict.__getitem__(key.name)
         for fallback in key.fallbacks:
-            if fallback in self:
-                return super().__getitem__(fallback)
-        return self["base"]
+            if fallback in self._dict:
+                return self.__getitem__(fallback)
+        return self._dict["base"]
+
+    def __setitem__(
+        self, key: Union[FormatterPlaceholder, str], value: Formatter
+    ) -> None:
+        if key not in formatter_placeholders:
+            raise ValueError(
+                f"The key {key} is not a registered formatter "
+                "placeholder. Use `mk.register_formatter_placeholder`"
+            )
+        if not isinstance(value, Formatter):
+            raise TypeError(
+                f"FormatterGroup values must be Formatters, not {type(value)}"
+            )
+        return self._dict.__setitem__(key, value)
+
+    def __len__(self) -> int:
+        return len(self._dict)
+
+    def __iter__(self) -> Iterator:
+        return iter(self._dict)
 
 
 def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
@@ -81,10 +127,57 @@ def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
 
 
 class FormatterPlaceholder:
-    def __init__(self, name: str, fallbacks: List[FormatterPlaceholder]):
+    def __init__(
+        self,
+        name: str,
+        fallbacks: List[Union[str, FormatterPlaceholder]],
+        description: str = "",
+    ):
+        global formatter_placeholders
         self.name = name
-        self.fallbacks = copy(fallbacks)
-        self.fallbacks.append("base")
+        self.fallbacks = [
+            fb if isinstance(fb, FormatterPlaceholder) else formatter_placeholders[fb]
+            for fb in fallbacks
+        ]
+
+        if name != "base":
+            self.fallbacks.append(FormatterPlaceholder("base", fallbacks=[]))
+
+        self.description = description
+
+
+formatter_placeholders = {
+    "base": FormatterPlaceholder("base", []),
+}
+
+
+def register_placeholder(
+    name: str, fallbacks: List[FormatterPlaceholder] = [], description: str = ""
+):
+    """Register a new formatter placeholder.
+
+    Args:
+        name (str): The name of the formatter placeholder.
+        fallbacks (List[FormatterPlaceholder]): The fallbacks for the formatter
+            placeholder.
+        description (str): A description of the formatter placeholder.
+    """
+    if name in formatter_placeholders:
+        raise ValueError(f"{name} is already a registered formatter placeholder")
+    formatter_placeholders[name] = FormatterPlaceholder(
+        name=name, fallbacks=fallbacks, description=description
+    )
+
+
+# register core formatter placeholders
+register_placeholder("small", fallbacks=[], description="A small version of the data.")
+register_placeholder("tiny", fallbacks=[], description="A tiny version of the data.")
+register_placeholder(
+    "thumbnail", fallbacks=["small"], description="A thumbnail of the data."
+)
+register_placeholder(
+    "icon", fallbacks=["tiny"], description="An icon representing the data."
+)
 
 
 class Formatter(ABC):
@@ -155,8 +248,8 @@ class DeferredFormatter(Formatter):
     def __init__(self, formatter: Formatter):
         self.wrapped = formatter
 
-    def encode(self, cell: DeferredCell, variants: List[str] = None, **kwargs):
-        return self.wrapped.encode(cell(), variants=variants, **kwargs)
+    def encode(self, cell: DeferredCell, **kwargs):
+        return self.wrapped.encode(cell(), **kwargs)
 
     @property
     def component_class(self):
@@ -176,10 +269,9 @@ class DeferredFormatter(Formatter):
     @staticmethod
     def _get_state(self):
         data = {
-            "class": type(self),
             "wrapped": {
-                "class": type(self.wrapped),
-                "_props": self.wrapped._props,
+                "class": self.wrapped.__class__,
+                "state": self.wrapped._get_state(),
             },
         }
         return data
@@ -189,7 +281,7 @@ class DeferredFormatter(Formatter):
         formatter = state["class"].__new__(state["class"])
         wrapped_state = state["wrapped"]
         wrapped = wrapped_state["class"].__new__(wrapped_state["class"])
-        wrapped._props = wrapped_state["_props"]
+        wrapped._set_state(wrapped_state["state"])
         formatter.wrapped = wrapped
         return formatter
 

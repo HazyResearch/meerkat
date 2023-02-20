@@ -3,4 +3,4 @@
 	export let classes: string = '';
 </script>
 
-<img class={'h-full w-full' + classes} src={data} alt="A Meerkat cell." />
+<img class={classes} src={data} alt="A Meerkat cell." />

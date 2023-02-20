@@ -25,8 +25,8 @@ class SchemaResponse(BaseModel):
 @endpoint(prefix="/df", route="/{df}/schema/")
 def schema(
     df: DataFrame,
-    columns: List[str] = None,
-    formatter: str = "base",
+    columns: List[str] = Endpoint.EmbeddedBody(None),
+    formatter: str = Endpoint.EmbeddedBody("base"),
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
     return SchemaResponse(
@@ -59,7 +59,7 @@ def _get_column_infos(
     columns = [column for column in columns if not column.startswith("_")]
     if df.primary_key_name is not None and df.primary_key_name not in columns:
         columns += [df.primary_key_name]
-    return [
+    out = [
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
@@ -71,6 +71,7 @@ def _get_column_infos(
         )
         for col in columns
     ]
+    return out
 
 
 class RowsResponse(BaseModel):
@@ -78,7 +79,6 @@ class RowsResponse(BaseModel):
     posidxs: List[int] = None
     rows: List[List[Any]]
     fullLength: int
-    # primary key
     primaryKey: Optional[str] = None
 
 

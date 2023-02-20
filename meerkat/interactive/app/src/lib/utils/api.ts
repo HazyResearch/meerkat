@@ -39,7 +39,7 @@ export const fetchSchema = async ({
     formatter = null
 }: DataFrameChunkRequest) => {
     return await post(`${get(API_URL)}/df/${df.refId}/schema`, {
-        columns: columns, formatter_placeholder: formatter
+        columns: columns, formatter: formatter
     });
 }
 
@@ -73,7 +73,7 @@ export const fetchChunk = async ({
         key_column: keyColumn,
         keyidxs: keyidxs,
         columns: columns,
-        formatter_placeholder: formatter,
+        formatter: formatter,
         shuffle: shuffle
     });
 

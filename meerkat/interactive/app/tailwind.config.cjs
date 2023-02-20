@@ -5,6 +5,7 @@ const colors = require('tailwindcss/colors')
 module.exports = {
   content: [
     './src/**/*.{html,js,svelte,ts}',
+    '../../../**/*.{py}',
     "./node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}",
   ],
   theme: {
@@ -16,5 +17,5 @@ module.exports = {
     require('@tailwindcss/typography'),
     require('flowbite/plugin'),
   ],
-  darkMode: 'class'
+  darkMode: 'class',
 }

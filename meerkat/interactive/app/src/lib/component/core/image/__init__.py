@@ -52,8 +52,12 @@ class ImageFormatterGroup(FormatterGroup):
     def __init__(self, classes: str = ""):
         super().__init__(
             base=ImageFormatter(classes=classes),
+            tiny=ImageFormatter(max_size=[32, 32], classes=classes),
+            small=ImageFormatter(max_size=[64, 64], classes=classes),
             thumbnail=ImageFormatter(max_size=[256, 256], classes=classes),
-            full_screen=ImageFormatter(classes=classes),
+            gallery=ImageFormatter(
+                max_size=[512, 512], classes="h-full w-full" + " " + classes
+            ),
         )
 
 

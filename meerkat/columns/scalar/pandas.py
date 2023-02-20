@@ -299,28 +299,28 @@ class PandasScalarColumn(
     def _repr_cell(self, index) -> object:
         return self[index]
 
-    def _get_default_formatter(self) -> Formatter:
+    def _get_default_formatters(self) -> Formatter:
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.app.src.lib.component.core.scalar import (
             ScalarFormatter,
         )
-        from meerkat.interactive.app.src.lib.component.core.text import TextFormatter
+        from meerkat.interactive.app.src.lib.component.core.text import TextFormatterGroup
 
         if len(self) == 0:
-            return ScalarFormatter()
+            return super()._get_default_formatters()
 
         if self.dtype == object:
-            return TextFormatter()
+            return TextFormatterGroup()
 
         if self.dtype == pd.StringDtype:
-            return TextFormatter()
+            return TextFormatterGroup()
 
-        cell = self[0]
-        if isinstance(cell, np.generic):
-            return ScalarFormatter(dtype=type(cell.item()).__name__)
+        # cell = self[0]
+        # if isinstance(cell, np.generic):
+        #     return ScalarFormatter(dtype=type(cell.item()).__name__)
 
-        return ScalarFormatter()
+        return super()._get_default_formatters()
 
     def _is_valid_primary_key(self):
         return self.data.is_unique

@@ -294,14 +294,14 @@ class Column(
         return self._formatters
 
     @formatters.setter
-    def formatter(self, formatters: "FormatterGroup"):
+    def formatters(self, formatters: "FormatterGroup"):
         self._formatters = formatters
 
-    def format(self, formatters: "FormatterGroup"):
-        new_col = self.view()
-        new_col.formatters = copy(formatters)
-        new_col.formatters.update(formatters)
-        return new_col
+    # def format(self, formatters: "FormatterGroup"):
+    #     new_col = self.view()
+    #     new_col.formatters = copy(formatters)
+    #     new_col.formatters.update(formatters)
+    #     return new_col
 
     @unmarked()
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
