@@ -1,5 +1,6 @@
 """Functions to generate certain RST files."""
 # import math
+import inspect
 import os
 import pathlib
 from collections import defaultdict
@@ -235,7 +236,50 @@ def generate_common_inplace_methods():
     _replace_contents_in_file(fpath, key="common-inplace-methods", contents=methods)
 
 
+def generate_components_doc():
+    """Generate autosummary doc for all components."""
+    fpath = _DIR / "guide" / "components" / "builtins.rst"
+
+    component_libs = ["core", "html", "plotly", "flowbite"]
+    _COMPONENTS = {}
+    for name in component_libs:
+        components = []
+        for klass_name in dir(getattr(mk.gui, name)):
+            klass = getattr(getattr(mk.gui, name), klass_name)
+            if inspect.isclass(klass) and issubclass(klass, mk.gui.Component):
+                components.append(f"meerkat.interactive.{name}.{klass_name}")
+        components = sorted(components)
+        _COMPONENTS[name] = components
+
+    lines = [
+        ".. _components_builtins:",
+        "",
+        "Meerkat Components",
+        "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "Meerkat provides some components out of the box.",
+    ]
+
+    # Add the reactive functions to the lines.
+    for category, components in _COMPONENTS.items():
+        lines.append("")
+        lines.append(category)
+        lines.append("-" * len(category))
+        lines.append("")
+        lines.append(".. autosummary::")
+        lines.append("   :toctree: ../../apidocs/generated")
+        lines.append("   :nosignatures:")
+        lines.append("")
+        for component in components:
+            lines.append(f"   {component}")
+
+    os.makedirs(os.path.dirname(fpath), exist_ok=True)
+    with open(fpath, "w+") as f:
+        for line in lines:
+            f.write(line + "\n")
+
+
 if __name__ == "__main__":
-    generate_inbuilt_reactive_fns()
-    generate_store_operators()
-    generate_common_inplace_methods()
+    # generate_inbuilt_reactive_fns()
+    # generate_store_operators()
+    # generate_common_inplace_methods()
+    generate_components_doc()
