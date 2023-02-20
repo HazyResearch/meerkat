@@ -75,7 +75,7 @@ So far, we gave a simple definition of reactive functions in Meerkat. This defin
 
 Rather than a reactive function being re-run whenever any of its inputs are updated, it is actually re-run whenever any of its **marked** inputs are updated. This is a subtle but important distinction.
 
-**What objects can be marked?:** By default, standard objects cannot be marked. However, they can be wrapped in a {py:class}`Store <meerkat.Store>`. `Store` objects are markable, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
+**What objects can be marked?:** By default, standard objects cannot be marked. However, they can be wrapped in a {py:class}`Store <meerkat.Store>`. `Store` objects are *markable*, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
 
 This means that for a function to react to changes in its inputs, its inputs must be marked. Let's look at a few examples.
 
