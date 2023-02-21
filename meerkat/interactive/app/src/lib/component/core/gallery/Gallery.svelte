@@ -4,10 +4,9 @@
 	import { fetchChunk, fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import { Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { setContext } from 'svelte';
+	import { setContext, getContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import { openModal } from 'svelte-modals';
-	import { identity } from 'underscore';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import Selected from './Selected.svelte';
@@ -22,7 +21,8 @@
 	export let cellSize: number = 24;
 
 	export let allowSelection: boolean = false;
-	export let componentId: string;
+
+	const componentId = getContext("componentId");
 
 	$: schemaPromise = fetchSchema({
 		df: df,

@@ -70,12 +70,13 @@ class NumberFormatter(Formatter):
             "percentage": self.percentage,
             "classes": self.classes,
         }
-    
+
     def _set_state(self, state: Dict[str, Any]):
         self.dtype = state["dtype"]
         self.precision = state["precision"]
         self.percentage = state["percentage"]
         self.classes = state["classes"]
+
 
 class NumberFormatterGroup(FormatterGroup):
     def __init__(self, **kwargs):

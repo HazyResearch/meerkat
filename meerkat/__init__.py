@@ -23,6 +23,7 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 import meerkat.interactive as gui
+import meerkat.interactive.formatter as format
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
@@ -210,6 +211,7 @@ __all__ = [
     "provenance",
     "config",
     "gui",
+    "format",
     "FileLoader",
     "get",
     "GlobalState",

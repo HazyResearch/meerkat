@@ -48,10 +48,10 @@ df["img"].formatter_group["thumbnail"] = ImageFormatter(max_size=(48, 48))
 ```python
 df.columns # ['img', 'text']
 gallery = Gallery(
-  formatters={
-    "img": {"icon": ImageFormatter(max_size=(48, 48))},
-    "path": {"icon": TextFormatter()},
-  }
+  df=df.format(
+    img={"thumbnail": ImageFormatter(max_size=(48, 48))},
+    text={"icon": TextFormatter()},
+  )
 )
 ```
 

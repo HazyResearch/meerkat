@@ -108,6 +108,14 @@ class FormatterGroup(collections.abc.Mapping):
 
     def __iter__(self) -> Iterator:
         return iter(self._dict)
+    
+    def update(self, other: Union[FormatterGroup, Dict]):
+        self._dict.update(other)
+    
+    def copy(self):
+        new = self.__class__.__new__(self.__class__)
+        new._dict = self._dict.copy()
+        return new
 
     @staticmethod
     def to_yaml(dumper: yaml.Dumper, data: Formatter):

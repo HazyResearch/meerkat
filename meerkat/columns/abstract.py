@@ -223,7 +223,6 @@ class Column(
                 _data = self._get_batch(index, materialize=materialize)
             return self._clone(data=_data)
 
-    # @capture_provenance()
     def __getitem__(self, index):
         return self._get(index, materialize=False)
 
@@ -295,14 +294,16 @@ class Column(
         return self._formatters
 
     @formatters.setter
-    def formatters(self, formatters: "FormatterGroup"):
+    def formatters(self, formatters: Union["FormatterGroup", Dict]):
+        if isinstance(formatters, dict):
+            formatters = FormatterGroup(**dict)
         self._formatters = formatters
 
-    # def format(self, formatters: "FormatterGroup"):
-    #     new_col = self.view()
-    #     new_col.formatters = copy(formatters)
-    #     new_col.formatters.update(formatters)
-    #     return new_col
+    def format(self, formatters: "FormatterGroup") -> Column:
+        new_col = self.view()
+        new_col.formatters = self.formatters.copy()
+        new_col.formatters.update(formatters)
+        return new_col
 
     @unmarked()
     def _repr_pandas_(self, max_rows: int = None) -> pd.Series:
