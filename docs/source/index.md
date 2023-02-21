@@ -18,7 +18,7 @@ We hope to make implementation decisions that prioritize simplicity, productivit
  -->
 #### About Us
 Meerkat is being built by Machine Learning PhD students in the [Hazy Research](https://hazyresearch.stanford.edu) lab at Stanford.
-We're excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds, and have done research that touches all parts of the machine learning process: we've created new model architectures, studied model robustness and evaluation, advanced applications ranging from audio generation to medical imaging, and directly contributed to the emergence of foundation models. 
+We're excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds, and have done research that touches all parts of the machine learning process: we've created new model architectures, studied model robustness and evaluation, advanced applications ranging from audio generation to medical imaging, and directly contributed to the emergence of foundation models.
 
 
 <div style="display: flex; gap: 2rem; align-items: center;">

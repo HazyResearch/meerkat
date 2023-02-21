@@ -10,7 +10,7 @@ parts:
 
   - caption: User Guide
     chapters:
-      - file: guide/cheat-sheet
+      
       - file: guide/dataframe/intro
         title: DataFrame
         sections:
@@ -56,7 +56,14 @@ parts:
           # - file: guide/store/faq
 
       - title: Components
-        file: guide/component/getting-started
+        file: guide/components/index
+        sections:
+          - file: guide/components/getting-started
+            title: Getting Started
+          - file: guide/components/builtins
+            title: Available Components
+          - file: guide/components/custom-components
+            title: Custom Components
 
       - title: Interactive
         file: guide/interactive/introduction
@@ -78,6 +85,9 @@ parts:
           - file: guide/interactive/examples/examples
             sections:
               - file: guide/interactive/examples/image_search
+
+      - title: Cheat Sheet
+        file: guide/cheat-sheet
 
   - caption: Advanced
     chapters:
