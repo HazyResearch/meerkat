@@ -10,6 +10,7 @@ parts:
 
   - caption: User Guide
     chapters:
+      - file: guide/cheat-sheet
       - file: guide/dataframe/intro
         title: DataFrame
         sections:

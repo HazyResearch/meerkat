@@ -15,7 +15,7 @@ Throughout, we'll be selecting data from the following DataFrame, which holds th
 
 ```{code-cell} ipython3
 import meerkat as mk
-df = mk.get("imagenette")
+df = mk.get("imagenette", version="160px")
 ```
 
 Below is an overview of the data selection methods discussed in this guide. 

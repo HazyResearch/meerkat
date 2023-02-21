@@ -2,7 +2,7 @@
 
 Meerkat's goal is to help technical teams work with *unstructured data* like images, text, audio etc, especially when using foundation models. We want to make foundation models a reliable software abstraction that can underlie applications that require reasoning about unstructured data.
 
-Read more about our motivation for building Meerkat in our [blog post](https://hazyresearch.github.io/blog/meerkat). Long story short: we realized that to use foundation models reliably, we needed something that that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data, and not on writing complicated, messy code.
+Read more about our motivation for building Meerkat in our [blog post](https://hazyresearch.github.io/blog/meerkat). Long story short: we realized that to use foundation models reliably, we needed something that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data, and not on writing complicated, messy code.
 
 Through our Python library and npm package, we offer tools to help you work with unstructured data and foundation models across many contexts,
 - a simple, full-stack framework to build interactive user interfaces purely in Python,
@@ -46,6 +46,6 @@ We're excited to build for a future where models will make it easier for teams t
 </div>
 
 #### Acknowledgements
-We would like to particularly acknowledge the following open-source projects that have made Meerkat possible to implement: [Pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/), [PyTorch](https://pytorch.org/), [Apache Arrow](https://arrow.apache.org/), [HuggingFace](https://huggingface.co/), [Scikit-Learn](https://scikit-learn.org/), [Pydantic](https://pydantic-docs.helpmanual.io/), [FastAPI](https://fastapi.tiangolo.com/), [SvelteKit](https://kit.svelte.dev/), [Svelte](https://svelte.dev/), [TailwindCSS](https://tailwindcss.com/), [Flowbite](https://flowbite.com/).
+We would like to particularly acknowledge the following open-source projects that have made Meerkat possible to implement: [Pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/), [PyTorch](https://pytorch.org/), [Apache Arrow](https://arrow.apache.org/), [HuggingFace](https://huggingface.co/), [Scikit-Learn](https://scikit-learn.org/), [Pydantic](https://pydantic-docs.helpmanual.io/), [FastAPI](https://fastapi.tiangolo.com/), [Typer](https://typer.tiangolo.com/), [SvelteKit](https://kit.svelte.dev/), [Svelte](https://svelte.dev/), [TailwindCSS](https://tailwindcss.com/), [Flowbite](https://flowbite.com/).
 
-We also want to acknowledge the following projects that have provided inspiration for our design decisions: [Gradio](https://gradio.app/), [Streamlit](https://streamlit.io/), [Pynecone.io](https://pynecone.io/), [Plotly Dash](https://plotly.com/dash/).
+We also want to acknowledge the following projects, which have provided inspiration for many of our design decisions: [Gradio](https://gradio.app/), [Streamlit](https://streamlit.io/), [Pynecone.io](https://pynecone.io/), [Plotly Dash](https://plotly.com/dash/).
