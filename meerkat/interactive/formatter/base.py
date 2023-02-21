@@ -45,11 +45,11 @@ class FormatterGroup(collections.abc.Mapping):
 
     def __init__(self, base: Formatter = None, **kwargs):
         if base is None:
-            from meerkat.interactive.app.src.lib.component.core.scalar import (
-                ScalarFormatter,
+            from meerkat.interactive.app.src.lib.component.core.text import (
+                TextFormatter,
             )
-
-            base = ScalarFormatter()
+            # everything has a str method so this is a safe default   
+            base = TextFormatter()
 
         if not isinstance(base, Formatter):
             raise TypeError("base must be a Formatter")
@@ -85,7 +85,7 @@ class FormatterGroup(collections.abc.Mapping):
         if key.name in self._dict:
             return self._dict.__getitem__(key.name)
         for fallback in key.fallbacks:
-            if fallback in self._dict:
+            if fallback.name in self._dict:
                 return self.__getitem__(fallback)
         return self._dict["base"]
 
@@ -109,7 +109,6 @@ class FormatterGroup(collections.abc.Mapping):
     def __iter__(self) -> Iterator:
         return iter(self._dict)
 
-    
     @staticmethod
     def to_yaml(dumper: yaml.Dumper, data: Formatter):
         """This function is called by the YAML dumper to convert a
@@ -135,9 +134,9 @@ class FormatterGroup(collections.abc.Mapping):
         formatter._dict = data["dict"]
         return formatter
 
+
 MeerkatDumper.add_multi_representer(FormatterGroup, FormatterGroup.to_yaml)
 MeerkatLoader.add_constructor("!FormatterGroup", FormatterGroup.from_yaml)
-
 
 
 def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
@@ -201,12 +200,17 @@ def register_placeholder(
 
 # register core formatter placeholders
 register_placeholder("small", fallbacks=[], description="A small version of the data.")
-register_placeholder("tiny", fallbacks=[], description="A tiny version of the data.")
+register_placeholder("tiny", fallbacks=["small"], description="A tiny version of the data.")
 register_placeholder(
     "thumbnail", fallbacks=["small"], description="A thumbnail of the data."
 )
 register_placeholder(
     "icon", fallbacks=["tiny"], description="An icon representing the data."
+)
+register_placeholder(
+    "tag",
+    fallbacks=["tiny"],
+    description="A small version of the data meant to go in a tag field.",
 )
 
 

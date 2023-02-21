@@ -3,6 +3,7 @@
 	export let dtype: string = "auto";
     export let precision: number = 3
     export let percentage: boolean = false
+    export let classes: string = ""
 
     if(dtype === "auto"){
         if(typeof data === "number") {
@@ -28,5 +29,6 @@
 
 
 </script>
-
-{data}
+<div class={classes}>
+    {data}
+</div>

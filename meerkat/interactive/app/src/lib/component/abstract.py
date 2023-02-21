@@ -137,6 +137,10 @@ class BaseComponent(
 
     def __getattribute__(self, name):
         value = super().__getattribute__(name)
+        if name == "component_id":
+            # need to wrap in a Store so component_id is passed through the wrapper 
+            return Store(self.id)
+
         if isinstance(value, Node):
             # because the validator converts dataframes to nodes, when the
             # dataframe is accessed we need to convert it back to the dataframe
@@ -296,7 +300,10 @@ class BaseComponent(
 
     @property
     def props(self):
-        return {k: self.__getattribute__(k) for k in self.prop_names}
+        return {
+            k: self.__getattribute__(k) for k in self.prop_names
+        }
+
 
     @property
     def virtual_props(self):

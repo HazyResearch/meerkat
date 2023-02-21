@@ -58,6 +58,7 @@ class ImageFormatterGroup(FormatterGroup):
             gallery=ImageFormatter(
                 max_size=[512, 512], classes="h-full w-full" + " " + classes
             ),
+
         )
 
 

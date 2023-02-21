@@ -26,12 +26,14 @@ class SchemaResponse(BaseModel):
 def schema(
     df: DataFrame,
     columns: List[str] = Endpoint.EmbeddedBody(None),
-    formatter: str = Endpoint.EmbeddedBody("base"),
+    formatter: Union[str, Dict[str, str]] = Endpoint.EmbeddedBody("base"),
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
+    if isinstance(formatter, str):
+        formatter = {column: formatter for column in columns}
     return SchemaResponse(
         id=df.id,
-        columns=_get_column_infos(df, columns, formatter_placeholder=formatter),
+        columns=_get_column_infos(df, columns, formatter_placeholders=formatter),
         nrows=len(df),
         primaryKey=df.primary_key_name,
     )
@@ -40,9 +42,8 @@ def schema(
 def _get_column_infos(
     df: DataFrame,
     columns: List[str] = None,
-    formatter_placeholder: str = "base",
+    formatter_placeholders: Dict[str, str] = "base",
 ):
-
     if columns is None:
         columns = df.columns
     else:
@@ -64,10 +65,12 @@ def _get_column_infos(
             name=col,
             type=type(df[col]).__name__,
             cellComponent=df[col]
-            .formatters[formatter_placeholder]
+            .formatters[formatter_placeholders.get(col, "base")]
             .component_class.alias,
-            cellProps=df[col].formatters[formatter_placeholder].props,
-            cellDataProp=df[col].formatters[formatter_placeholder].data_prop,
+            cellProps=df[col].formatters[formatter_placeholders.get(col, "base")].props,
+            cellDataProp=df[col]
+            .formatters[formatter_placeholders.get(col, "base")]
+            .data_prop,
         )
         for col in columns
     ]
@@ -91,15 +94,16 @@ def rows(
     key_column: str = Endpoint.EmbeddedBody(None),
     keyidxs: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
-    formatter: str = Endpoint.EmbeddedBody("base"),
+    formatter: Union[str, Dict[str, str]] = Endpoint.EmbeddedBody("base"),
     shuffle: bool = Endpoint.EmbeddedBody(False),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-    formatter_placeholder = formatter
+    if columns is None:
+        columns = df.columns
+    if isinstance(formatter, str):
+        formatter = {column: formatter for column in columns}
     full_length = len(df)
-    column_infos = _get_column_infos(
-        df, columns, formatter_placeholder=formatter_placeholder
-    )
+    column_infos = _get_column_infos(df, columns, formatter_placeholders=formatter)
 
     if shuffle:
         df = df.shuffle()
@@ -134,7 +138,9 @@ def rows(
     for row in df:
         rows.append(
             [
-                df[info.name].formatters[formatter_placeholder].encode(row[info.name])
+                df[info.name]
+                .formatters[formatter.get(info.name, "base")]
+                .encode(row[info.name])
                 for info in column_infos
             ]
         )

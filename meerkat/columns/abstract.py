@@ -282,12 +282,13 @@ class Column(
         raise NotImplementedError
 
     def _get_default_formatters(self) -> "FormatterGroup":
-        from meerkat.interactive.app.src.lib.component.core.scalar import (
-            ScalarFormatter,
+        from meerkat.interactive.app.src.lib.component.core.text import (
+            TextFormatter,
         )
         from meerkat.interactive.formatter.base import FormatterGroup
 
-        return FormatterGroup(base=ScalarFormatter())
+        # by default all object should have a `str` representation
+        return FormatterGroup(base=TextFormatter())
 
     @property
     def formatters(self) -> "FormatterGroup":

@@ -15,7 +15,7 @@ from .multiselect import MultiSelect
 from .put import Put
 from .radio import Radio, RadioGroup
 from .raw_html import RawHTML
-from .scalar import Scalar
+from .number import Number
 from .select import Select
 from .slicebycards import SliceByCards
 from .slider import Slider
@@ -49,7 +49,7 @@ __all__ = [
     "Radio",
     "RadioGroup",
     "RawHTML",
-    "Scalar",
+    "Number",
     "Select",
     "SliceByCards",
     "Slider",

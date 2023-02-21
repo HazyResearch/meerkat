@@ -7,6 +7,7 @@
 	import { setContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import { openModal } from 'svelte-modals';
+	import { identity } from 'underscore';
 	import Cards from './Cards.svelte';
 	import GallerySlider from './GallerySlider.svelte';
 	import Selected from './Selected.svelte';
@@ -21,6 +22,7 @@
 	export let cellSize: number = 24;
 
 	export let allowSelection: boolean = false;
+	export let componentId: string;
 
 	$: schemaPromise = fetchSchema({
 		df: df,
@@ -40,7 +42,10 @@
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		columns: [mainColumn, ...tagColumns],
-		formatter: 'gallery'
+		formatter: {
+			[mainColumn]: 'gallery',
+			...tagColumns.reduce((acc, col) => ({ ...acc, [col]: 'tag' }), {})
+		}
 	});
 
 	let dropdownOpen: boolean = false;

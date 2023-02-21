@@ -4,7 +4,6 @@
 	export let data: any;
 	export let editable: boolean = false;
 	export let classes: string = '';
-	console.log(classes)
 
 	const cellEdit: CallableFunction = getContext('cellEdit');
 </script>
@@ -19,7 +18,6 @@
 	/>
 {:else}
 	<div class={classes}>
-		{classes}
 		{data}
 	</div>
 

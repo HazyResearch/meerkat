@@ -7,18 +7,19 @@ import pandas as pd
 from pandas.io.formats.format import format_array
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.formatter.base import Formatter
+from meerkat.interactive.formatter.base import Formatter, FormatterGroup
 
 
-class Scalar(Component):
+class Number(Component):
     data: Any
     dtype: str = "auto"
     precision: int = 3
     percentage: bool = False
+    classes: str = ""
 
 
-class ScalarFormatter(Formatter):
-    component_class: type = Scalar
+class NumberFormatter(Formatter):
+    component_class: type = Number
     data_prop: str = "data"
 
     def __init__(
@@ -26,10 +27,12 @@ class ScalarFormatter(Formatter):
         dtype: str = "auto",
         precision: int = 3,
         percentage: bool = False,
+        classes: str = "",
     ):
         self.dtype = dtype
         self.precision = precision
         self.percentage = percentage
+        self.classes = classes
 
     @property
     def props(self):
@@ -37,6 +40,7 @@ class ScalarFormatter(Formatter):
             "dtype": self.dtype,
             "precision": self.precision,
             "percentage": self.percentage,
+            "classes": self.classes,
         }
 
     def encode(self, cell: Any):
@@ -64,11 +68,17 @@ class ScalarFormatter(Formatter):
             "dtype": self.dtype,
             "precision": self.precision,
             "percentage": self.percentage,
+            "classes": self.classes,
         }
     
     def _set_state(self, state: Dict[str, Any]):
-        print(state)
         self.dtype = state["dtype"]
         self.precision = state["precision"]
         self.percentage = state["percentage"]
-        
+        self.classes = state["classes"]
+
+class NumberFormatterGroup(FormatterGroup):
+    def __init__(self, **kwargs):
+        super().__init__(
+            base=NumberFormatter(**kwargs),
+        )

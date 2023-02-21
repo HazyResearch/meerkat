@@ -12,6 +12,7 @@ class Gallery(Component):
     selected: List[int] = []
     allow_selection: bool = False
     cell_size: int = 24
+    component_id: str = None
 
     def __init__(
         self,

@@ -30,7 +30,7 @@
 		columns: [mainColumn],
 		formatter: 'base'
 	});
-	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tiny'});
+	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tag'});
 
 	const increment = async () => {
 		let chunk = await chunkPromise;
@@ -80,7 +80,7 @@
 								{#each schema.columns as column}
 									<!-- Key-Value Pair -->
 									<button
-										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-3 py-1"
+										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-4 py-1"
 										class:bg-slate-200={mainColumn === column.name}
 										on:click={() => {
 											mainColumn = column.name;
@@ -88,14 +88,14 @@
 									>
 										<!-- Key -->
 										<span
-											class="text-bf text-slate-600 text-left font-mono"
+											class="text-bf text-slate-600 text-left font-mono hitespace-nowrap text-ellipsis overflow-hidden "
 											class:font-bold={mainColumn === column.name}
 										>
 											{column.name}
 										</span>
 										<!-- Value -->
 										<span
-											class="text-gray-600 text-right justify-self-end whitespace-nowrap overflow-hidden text-ellipsis justify-end"
+											class="text-gray-600 w-full flex justify-end"
 										>
 											{#await chunkPromise then chunk}
 												<Cell {...chunk.getCell(0, column.name)} />

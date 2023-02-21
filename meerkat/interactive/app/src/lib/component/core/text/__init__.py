@@ -78,6 +78,8 @@ class TextFormatterGroup(FormatterGroup):
             small=TextFormatter(classes=classes),
             thumbnail=TextFormatter(classes=classes),
             gallery=TextFormatter(
-                classes="aspect-video h-full p-2 bg-slate-700" + classes
+                classes="aspect-video h-full p-2" + classes
             ),
+            tag=TextFormatter(classes="whitespace-nowrap text-ellipsis overflow-hidden text-right " + classes)
         )
+# "whitespace-nowrap text-ellipsis overflow-hidden text-right "

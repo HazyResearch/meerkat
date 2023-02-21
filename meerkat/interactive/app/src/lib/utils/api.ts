@@ -30,7 +30,7 @@ export const dispatch = async (endpointId: string, payload: any = {}) => {
 export interface DataFrameChunkRequest {
     df: DataFrameRef
     columns?: Array<string> | null
-    formatter?: string | null
+    formatter?: string | object | null
 }
 
 export const fetchSchema = async ({
@@ -51,7 +51,7 @@ export interface DataFrameChunkRequest {
     posidxs?: Array<number> | null
     keyidxs?: Array<string | number> | null
     keyColumn?: string | null
-    formatter?: string | null
+    formatter?: string | object |  null
     shuffle?: boolean | null
 }
 
