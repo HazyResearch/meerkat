@@ -10,7 +10,7 @@
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
 	export let posidx: number;
-	export let mainColumn: string;
+	export let mainColumn: string = "";
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
@@ -18,7 +18,7 @@
 	export let asModal: boolean = false;
 
 	$: schemaPromise = fetchSchema({ df: df, formatter: 'tiny' }).then((schema) => {
-		if (mainColumn === undefined) {
+		if (mainColumn === "") {
 			mainColumn = schema.columns[0].name;
 		}
 		return schema;

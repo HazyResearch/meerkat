@@ -1,41 +1,46 @@
-from typing import Optional
-
-from pydantic import validator
+from typing import List
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.formatter.base import register_placeholder
 
 
 class Table(Component):
     df: DataFrame
-    per_page: int = 100
-    editable: bool = False
-    id_column: Optional[str] = None
-
-    on_edit: Optional[Endpoint] = None
+    selected: List[int] = []
+    allow_selection: bool = False
+    cell_size: int = 24
 
     def __init__(
         self,
         df: DataFrame,
         *,
-        per_page: int = 100,
-        editable: bool = False,
-        id_column: Optional[str] = None,
-        on_edit: Optional[Endpoint] = None,
+        selected: List[int] = [],
+        allow_selection: bool = False,
+        cell_size: int = 24,
     ):
+        """Gallery view of a DataFrame.
+
+        Args:
+            df (DataFrame): The DataFrame to display.
+            main_column (str): The column to display in the main gallery view.
+            tag_columns (List[str], optional): The columns to display as tags. \
+                Defaults to [].
+            selected (List[int], optional): The indices of the rows selected in the \
+                gallery. Useful for labeling and other tasks. Defaults to [].
+            allow_selection (bool, optional): Whether to allow the user to select \
+                rows. Defaults to False.
+        """
         super().__init__(
             df=df,
-            per_page=per_page,
-            editable=editable,
-            id_column=id_column,
-            on_edit=on_edit,
+            selected=selected,
+            allow_selection=allow_selection,
+            cell_size=cell_size,
         )
 
-    # Create a Pydantic validator to ensure that the id_column is in the df
-    # when editable is True
-    @validator("id_column")
-    def id_column_in_df(cls, v, values):
-        if v is None and values["editable"]:
-            raise ValueError("id_column must be specified when editable is True")
-        return v
+
+register_placeholder(
+    name="table",
+    fallbacks=["thumbnail"],
+    description="Formatter to be used in a gallery view.",
+)

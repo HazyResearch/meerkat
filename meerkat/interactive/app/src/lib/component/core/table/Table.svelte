@@ -1,66 +1,43 @@
 <script lang="ts">
+	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
-	import Table from '$lib/shared/table/Table.svelte';
 	import { fetchChunk, fetchSchema } from '$lib/utils/api';
-	import type { DataFrameChunk, DataFrameRef } from '$lib/utils/dataframe';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
+	import type { DataFrameRef } from '$lib/utils/dataframe';
+	import { Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { setContext, getContext } from 'svelte';
+	import { BarLoader } from 'svelte-loading-spinners';
+	import { openModal } from 'svelte-modals';
 
 	export let df: DataFrameRef;
+	export let selected: Array<string>;
 
 	export let page: number = 0;
-	export let perPage: number = 100;
-	export let editable: boolean = false;
-	export let idColumn: string | null = null;
+	export let perPage: number = 20;
+	export let cellSize: number = 24;
 
-	export let columnWidths: Array<number>;
+	export let allowSelection: boolean = false;
 
-	$: schemaPromise = fetchSchema({ df: df });
-	$: rowsPromise = fetchChunk({ df: df, start: page * perPage, end: (page + 1) * perPage });
+	const componentId = getContext("componentId");
 
-	$: schemaPromise.then((s: any) => {
-		if (columnWidths == null) {
-			columnWidths = Array.apply(null, Array(s.columns.length)).map((x, i) => 256);
-		}
+	$: schemaPromise = fetchSchema({
+		df: df,
+		formatter: 'small'
 	});
 
-	async function handle_edit(event: any) {
-		let rows: DataFrameChunk = await rowsPromise;
-
-		let { row, column, value } = event.detail;
-		let rowIdColumnIndex = rows.columnInfos.findIndex((c) => c.name === idColumn);
-		let rowIndex = rows.indices.indexOf(row);
-		let rowId = rows.rows[rowIndex][rowIdColumnIndex];
-
-		dispatch('edit', {
-			row: row,
-			row_id: rowId,
-			column: column,
-			value: event.detail.value
+	setContext('open_row_modal', (posidx: number) => {
+		openModal(RowModal, {
+			df: df,
+			posidx: posidx,
+			mainColumn: undefined
 		});
-	}
-</script>
+	});
 
-<div class="h-full flex-1 rounded-lg overflow-hidden bg-slate-50">
-	{#await schemaPromise}
-		waiting....
-	{:then schema}
-		<div class="relative h-full">
-			<div class="h-full overflow-y-scroll pb-28">
-				{#await rowsPromise}
-					<Table rows={null} {schema} {columnWidths} />
-				{:then rows}
-					<Table {rows} {schema} {columnWidths} {editable} {idColumn} on:edit={handle_edit} />
-				{:catch error}
-					{error}
-				{/await}
-			</div>
-			<div class="absolute z-10 bottom-0 w-[90%] left-[5%] mb-8">
-				<Pagination bind:page bind:perPage totalItems={schema.nrows} dropdownPlacement="top" />
-			</div>
-		</div>
-	{:catch error}
-		{error}
-	{/await}
-</div>
+	$: chunkPromise = fetchChunk({
+		df: df,
+		start: page * perPage,
+		end: (page + 1) * perPage,
+	});
+
+	let dropdownOpen: boolean = false;
+</script>
+TABLE
