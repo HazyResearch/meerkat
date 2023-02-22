@@ -516,6 +516,7 @@ def start(
     api_port: int = API_PORT,
     frontend_port: int = FRONTEND_PORT,
     dev: bool = True,
+    skip_build: bool = False,
 ) -> Tuple[APIInfo, FrontendInfo]:
     """Start a Meerkat interactive server.
 
@@ -565,6 +566,7 @@ def start(
         subdomain,
         api_info.url,
         PathHelper().appdir,
+        skip_build=skip_build,
     )
 
     # Store in global state

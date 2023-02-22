@@ -136,6 +136,7 @@ def run(
         "app", help="Subdomain to use for public sharing mode"
     ),
     debug: bool = typer.Option(False, help="Enable debug logging mode"),
+    skip_build: bool = typer.Option(False, help="Skip building the app."),
 ):
     """Launch a Meerkat app, given a path to a Python script."""
     _run(
@@ -148,6 +149,7 @@ def run(
         shareable=shareable,
         subdomain=subdomain,
         debug=debug,
+        skip_build=skip_build,
     )
 
 
@@ -161,6 +163,7 @@ def _run(
     shareable: bool = False,
     subdomain: str = "app",
     debug: bool = False,
+    skip_build: bool = False,
 ):
     # Pretty print information to console
     rich.print(f":rocket: Running [bold violet]{script_path}[/bold violet]")
@@ -185,6 +188,7 @@ def _run(
         subdomain=subdomain,
         apiurl=dummy_api_info.url,
         appdir=PathHelper().appdir,
+        skip_build=skip_build,
     )
 
     # Run the uvicorn server
