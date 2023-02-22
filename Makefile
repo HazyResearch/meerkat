@@ -24,12 +24,15 @@ test-interactive-install:
 	mk install --no-run-dev
 
 docs:
+	python docs/source/rst_gen.py
 	sphinx-build -b html docs/source/ docs/build/html/
 
 docs-check:
+	python docs/source/rst_gen.py
 	sphinx-build -b html docs/source/ docs/build/html/ -W
 
 livedocs:
+	python docs/source/rst_gen.py
 	sphinx-autobuild -b html docs/source/ docs/build/html/
 
 dev:

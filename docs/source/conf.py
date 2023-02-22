@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import subprocess
 import sys
 from distutils.util import convert_path
 
@@ -155,3 +156,10 @@ html_context = {
     "github_version": "main",
     "conf_py_path": "/docs/",
 }
+
+
+def setup(app):
+    """Generate the rst files you need."""
+    path = os.path.abspath(os.path.dirname(__file__))
+    path = os.path.join(path, "rst_gen.py")
+    subprocess.run(f"python {path}")
