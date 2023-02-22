@@ -1,5 +1,6 @@
-import meerkat as mk
 import rich
+
+import meerkat as mk
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
@@ -20,20 +21,24 @@ df_clip = mk.DataFrame.read(
 )
 df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
-
+df = df.mark()
 
 # Match
 match = mk.gui.Match(df=df, against=EMBED_COLUMN)
-examples_df = match(df)[0]
+# examples_df = match(df)[0]
+
+# Get the name of the match criterion in a reactive way.
+with mk.magic():
+    criterion_name = match.criterion.name
 
 # Sort
-df_sorted = mk.sort(data=examples_df, by=match.criterion.name, ascending=False)
+df_sorted = mk.sort(data=df, by=criterion_name, ascending=False)
 
 # Gallery
 gallery = mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN)
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol([match, gallery]), 
+    component=mk.gui.html.flexcol([match, gallery]),
     id="match",
 )
 page.launch()

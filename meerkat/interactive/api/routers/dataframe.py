@@ -42,7 +42,7 @@ def schema(
 def _get_column_infos(
     df: DataFrame,
     columns: List[str] = None,
-    formatter_placeholders: Dict[str, str] = "base",
+    formatter_placeholders: Dict[str, str] = None,
 ):
     if columns is None:
         columns = df.columns
@@ -60,6 +60,15 @@ def _get_column_infos(
     columns = [column for column in columns if not column.startswith("_")]
     if df.primary_key_name is not None and df.primary_key_name not in columns:
         columns += [df.primary_key_name]
+
+    # TODO: Check if this is the right fix.
+    if formatter_placeholders is None:
+        formatter_placeholders = {}
+    elif isinstance(formatter_placeholders, str):
+        formatter_placeholders = {
+            column: formatter_placeholders for column in df.columns
+        }
+
     out = [
         ColumnInfo(
             name=col,
