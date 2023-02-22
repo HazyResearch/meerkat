@@ -27,7 +27,7 @@ export const dispatch = async (endpointId: string, payload: any = {}) => {
     return result;
 };
 
-export interface DataFrameChunkRequest {
+export interface DataFrameSchemaRequest {
     df: DataFrameRef
     columns?: Array<string> | null
     variants?: Array<string> | null
@@ -37,7 +37,7 @@ export const fetchSchema = async ({
     df,
     columns = null,
     variants = null
-}: DataFrameChunkRequest) => {
+}: DataFrameSchemaRequest) => {
     return await post(`${get(API_URL)}/df/${df.refId}/schema`, {
         columns: columns, variants: variants
     });
