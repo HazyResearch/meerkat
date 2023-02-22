@@ -18,7 +18,7 @@ from ..abstract import Column
 from .abstract import ScalarColumn, StringMethods
 
 if TYPE_CHECKING:
-    from meerkat.interactive.formatter.base import Formatter
+    from meerkat.interactive.formatter.base import BaseFormatter
     from meerkat import DataFrame
 
 
@@ -170,7 +170,7 @@ class ArrowScalarColumn(ScalarColumn):
     def _repr_cell(self, index) -> object:
         return self.data[index]
 
-    def _get_default_formatter(self) -> "Formatter":
+    def _get_default_formatter(self) -> "BaseFormatter":
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.app.src.lib.component.core.scalar import (

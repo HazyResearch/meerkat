@@ -1,6 +1,7 @@
 from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
-class Image(Component):
-    data: str
-    classes: str = ""
+class Icon(Component):
+    data: str = ""
+    name: str = "Globe2"
+    

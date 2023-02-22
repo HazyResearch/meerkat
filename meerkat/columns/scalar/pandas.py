@@ -31,7 +31,7 @@ from yaml.representer import Representer
 from meerkat.block.abstract import BlockView
 from meerkat.block.pandas_block import PandasBlock
 from meerkat.columns.abstract import Column
-from meerkat.interactive.formatter.base import Formatter
+from meerkat.interactive.formatter.base import BaseFormatter
 from meerkat.mixins.aggregate import AggregationError
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -299,7 +299,7 @@ class PandasScalarColumn(
     def _repr_cell(self, index) -> object:
         return self[index]
 
-    def _get_default_formatters(self) -> Formatter:
+    def _get_default_formatters(self) -> BaseFormatter:
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.app.src.lib.component.core.number import (

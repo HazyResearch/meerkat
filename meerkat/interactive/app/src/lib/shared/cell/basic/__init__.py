@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.io.formats.format import format_array
 
 from meerkat.interactive.app.src.lib.component.abstract import BaseComponent
-from meerkat.interactive.formatter.base import Formatter
+from meerkat.interactive.formatter.base import BaseFormatter
 
 
 class Scalar(BaseComponent):
@@ -17,7 +17,7 @@ class Scalar(BaseComponent):
     percentage: bool = False
 
 
-class ScalarFormatter(Formatter):
+class ScalarFormatter(BaseFormatter):
     component_class: type = Scalar
     data_prop: str = "data"
 

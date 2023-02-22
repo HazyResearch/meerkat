@@ -130,7 +130,7 @@ import meerkat.interactive.svelte
 from meerkat.interactive import Store, endpoint, mark, reactive, unmarked
 from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.formatter.base import (
-    Formatter,
+    BaseFormatter,
     FormatterGroup,
     FormatterPlaceholder,
 )
@@ -204,7 +204,7 @@ __all__ = [
     "from_huggingface",
     "read",
     # <<<< Formatters >>>>
-    "Formatter",
+    "BaseFormatter",
     "FormatterGroup",
     "FormatterPlaceholder",
     # <<<< Misc >>>>

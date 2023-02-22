@@ -1,5 +1,5 @@
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.formatter.base import Formatter
+from meerkat.interactive.formatter.base import BaseFormatter
 
 
 class Website(Component):
@@ -7,7 +7,7 @@ class Website(Component):
     height: int
 
 
-class WebsiteFormatter(Formatter):
+class WebsiteFormatter(BaseFormatter):
     component_class: type = Website
     data_prop: str = "data"
 

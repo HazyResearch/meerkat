@@ -5,7 +5,7 @@ import numpy as np
 from pandas.io.formats.format import format_array
 
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.formatter.base import Formatter, FormatterGroup
+from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 
 
 class Text(Component):
@@ -33,7 +33,7 @@ class Text(Component):
         )
 
 
-class TextFormatter(Formatter):
+class TextFormatter(BaseFormatter):
     """Formatter for Text component.
 
     Args:

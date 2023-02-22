@@ -28,7 +28,7 @@
 		df: df,
 		posidxs: [posidx],
 		columns: [mainColumn],
-		formatter: 'base'
+		formatter: 'full'
 	});
 	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tag'});
 

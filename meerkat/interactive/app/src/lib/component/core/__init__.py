@@ -1,12 +1,12 @@
 from .button import Button
 from .chat import Chat
 from .checkbox import Checkbox
-from .code import Code
 from .code_cell import CodeCell
 from .document import Document
 from .fileupload import FileUpload
 from .filter import Filter
 from .gallery import Gallery
+from .icon import Icon
 from .image import Image
 from .json import Json
 from .markdown import Caption, Header, Markdown, Subheader, Title
@@ -27,6 +27,8 @@ from .text import Text
 from .textbox import Textbox
 from .toggle import Toggle
 from .vega import Vega
+from .code import Code
+
 
 __all__ = [
     "Button",

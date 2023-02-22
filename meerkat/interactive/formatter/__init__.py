@@ -1,10 +1,10 @@
 
 
-from .base import Formatter
-from ..app.src.lib.component.core.image import ImageFormatter, ImageFormatterGroup
 from ..app.src.lib.component.core.text import TextFormatter, TextFormatterGroup
 from ..app.src.lib.component.core.number import NumberFormatter, NumberFormatterGroup
 from ..app.src.lib.component.core.raw_html import HTMLFormatter, HTMLFormatterGroup
+from .image import ImageFormatter, ImageFormatterGroup
+from .code import CodeFormatter, CodeFormatterGroup
 
 
 __all__ = [
@@ -17,6 +17,8 @@ __all__ = [
     "NumberFormatterGroup",
     "HTMLFormatter",
     "HTMLFormatterGroup",
+    "CodeFormatter",
+    "CodeFormatterGroup"
 ]
 
 # # backwards compatibility
@@ -29,5 +31,5 @@ BasicFormatter = DeprecatedFormatter
 NumpyArrayFormatter = DeprecatedFormatter
 TensorFormatter = DeprecatedFormatter
 WebsiteFormatter = DeprecatedFormatter
-CodeFormatter = DeprecatedFormatter
+# CodeFormatter = DeprecatedFormatter
 PILImageFormatter = DeprecatedFormatter

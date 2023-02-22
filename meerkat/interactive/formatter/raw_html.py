@@ -1,12 +1,7 @@
 from typing import Any, Dict
-from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
-
-
-class RawHTML(Component):
-    html: str
-    view: str = "full"
-
+from ..app.src.lib.component.core.raw_html import RawHTML
+from .icon import IconFormatter
+from .base import BaseFormatter, FormatterGroup
 
 class HTMLFormatter(BaseFormatter):
     component_class: type = RawHTML
@@ -41,8 +36,8 @@ class HTMLFormatterGroup(FormatterGroup):
     def __init__(self):
         super().__init__(
             base=HTMLFormatter(view="full"),
-            icon=HTMLFormatter(view="icon"),
-            tag=HTMLFormatter(view="icon"),
+            icon=IconFormatter(name="Globe2"),
+            tag=IconFormatter(name="Globe2"),
             thumbnail=HTMLFormatter(view="thumbnail"),
             gallery=HTMLFormatter(view="thumbnail"),
         )

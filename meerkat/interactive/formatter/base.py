@@ -1,9 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod, abstractproperty
 import collections
-from copy import copy
-from dataclasses import dataclass
-import yaml
 
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Type, Union
 from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
@@ -43,15 +40,16 @@ class FormatterGroup(collections.abc.Mapping):
         **kwargs: The formatters to add to the formatter group.
     """
 
-    def __init__(self, base: Formatter = None, **kwargs):
+    def __init__(self, base: BaseFormatter = None, **kwargs):
         if base is None:
             from meerkat.interactive.app.src.lib.component.core.text import (
                 TextFormatter,
             )
-            # everything has a str method so this is a safe default   
+
+            # everything has a str method so this is a safe default
             base = TextFormatter()
 
-        if not isinstance(base, Formatter):
+        if not isinstance(base, BaseFormatter):
             raise TypeError("base must be a Formatter")
         for key, value in kwargs.items():
             if key not in formatter_placeholders:
@@ -59,7 +57,7 @@ class FormatterGroup(collections.abc.Mapping):
                     f"The key {key} is not a registered formatter "
                     "placeholder. Use `mk.register_formatter_placeholder`"
                 )
-            if not isinstance(value, Formatter):
+            if not isinstance(value, BaseFormatter):
                 raise TypeError(
                     f"FormatterGroup values must be Formatters, not {type(value)}"
                 )
@@ -67,7 +65,7 @@ class FormatterGroup(collections.abc.Mapping):
         # must provide a base formatter
         self._dict = dict(base=base, **kwargs)
 
-    def __getitem__(self, key: Union[FormatterPlaceholder, str]) -> Formatter:
+    def __getitem__(self, key: Union[FormatterPlaceholder, str]) -> BaseFormatter:
         """Get the formatter for the given formatter placeholder.
 
         Args:
@@ -90,14 +88,14 @@ class FormatterGroup(collections.abc.Mapping):
         return self._dict["base"]
 
     def __setitem__(
-        self, key: Union[FormatterPlaceholder, str], value: Formatter
+        self, key: Union[FormatterPlaceholder, str], value: BaseFormatter
     ) -> None:
         if key not in formatter_placeholders:
             raise ValueError(
                 f"The key {key} is not a registered formatter "
                 "placeholder. Use `mk.register_formatter_placeholder`"
             )
-        if not isinstance(value, Formatter):
+        if not isinstance(value, BaseFormatter):
             raise TypeError(
                 f"FormatterGroup values must be Formatters, not {type(value)}"
             )
@@ -108,17 +106,17 @@ class FormatterGroup(collections.abc.Mapping):
 
     def __iter__(self) -> Iterator:
         return iter(self._dict)
-    
+
     def update(self, other: Union[FormatterGroup, Dict]):
         self._dict.update(other)
-    
+
     def copy(self):
         new = self.__class__.__new__(self.__class__)
         new._dict = self._dict.copy()
         return new
 
     @staticmethod
-    def to_yaml(dumper: yaml.Dumper, data: Formatter):
+    def to_yaml(dumper: yaml.Dumper, data: BaseFormatter):
         """This function is called by the YAML dumper to convert a
         :class:`Formatter` object into a YAML node.
 
@@ -208,7 +206,9 @@ def register_placeholder(
 
 # register core formatter placeholders
 register_placeholder("small", fallbacks=[], description="A small version of the data.")
-register_placeholder("tiny", fallbacks=["small"], description="A tiny version of the data.")
+register_placeholder(
+    "tiny", fallbacks=["small"], description="A tiny version of the data."
+)
 register_placeholder(
     "thumbnail", fallbacks=["small"], description="A thumbnail of the data."
 )
@@ -220,9 +220,14 @@ register_placeholder(
     fallbacks=["tiny"],
     description="A small version of the data meant to go in a tag field.",
 )
+register_placeholder(
+    "full",
+    fallbacks=["base"],
+    description="A full version of the data.",
+)
 
 
-class Formatter(ABC):
+class BaseFormatter(ABC):
     component_class: Type["BaseComponent"]
     data_prop: str = "data"
 
@@ -249,7 +254,7 @@ class Formatter(ABC):
         pass
 
     @staticmethod
-    def to_yaml(dumper: yaml.Dumper, data: Formatter):
+    def to_yaml(dumper: yaml.Dumper, data: BaseFormatter):
         """This function is called by the YAML dumper to convert a
         :class:`Formatter` object into a YAML node.
 
@@ -282,12 +287,88 @@ class Formatter(ABC):
         return str(cell)
 
 
-MeerkatDumper.add_multi_representer(Formatter, Formatter.to_yaml)
-MeerkatLoader.add_constructor("!Formatter", Formatter.from_yaml)
+class Formatter(BaseFormatter):
+
+    # TODO: set the signature of the __init__ so it works with autocomplete and docs
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            if k not in self.component_class.prop_names:
+                raise ValueError(f"{k} is not a valid prop for {self.component_class}")
+
+        for prop_name, field in self.component_class.__fields__.items():
+            if field.name != self.data_prop and prop_name not in kwargs:
+                if field.required:
+                    raise ValueError("""Missing required argument.""")
+                kwargs[prop_name] = field.default
+        self._props = kwargs
+
+    def encode(self, cell: str):
+        return cell
+
+    @property
+    def props(self) -> Dict[str, Any]:
+        return self._props
+
+    def _get_state(self) -> Dict[str, Any]:
+        return {
+            "_props": self._props,
+        }
+
+    def _set_state(self, state: Dict[str, Any]):
+        self._props = state["_props"]
 
 
-class DeferredFormatter(Formatter):
-    def __init__(self, formatter: Formatter):
+def auto_formatter():
+    """Decorator that creates a"""
+
+    def _inner(cls: type):
+        class Wrapper(cls):
+            component_class = cls.component_class
+            data_prop = cls.data_prop
+
+            def __init__(self, **kwargs):
+                for k in kwargs:
+                    if k not in cls.component_class.prop_names:
+                        raise ValueError(
+                            f"{k} is not a valid prop for {cls.component_class}"
+                        )
+
+                for prop_name, field in cls.component_class.__fields__.items():
+                    if field.name != cls.data_prop and prop_name not in kwargs:
+                        if field.required:
+                            raise ValueError("""Missing required argument.""")
+                        kwargs[prop_name] = field.default
+
+                self._props = kwargs
+
+            @property
+            def props(self) -> Dict[str, Any]:
+                return self._props
+
+            def _get_state(self) -> Dict[str, Any]:
+                return {
+                    "_props": self._props,
+                }
+
+            def _set_state(self, state: Dict[str, Any]):
+                self._props = state["_props"]
+
+        Wrapper.__name__ = cls.__name__
+        Wrapper.__qualname__ = cls.__qualname__
+        Wrapper.__module__ = cls.__module__
+        Wrapper.__doc__ = cls.__doc__
+        Wrapper.__annotations__ = cls.__annotations__
+        return Wrapper
+
+    return _inner
+
+
+MeerkatDumper.add_multi_representer(BaseFormatter, BaseFormatter.to_yaml)
+MeerkatLoader.add_constructor("!Formatter", BaseFormatter.from_yaml)
+
+
+class DeferredFormatter(BaseFormatter):
+    def __init__(self, formatter: BaseFormatter):
         self.wrapped = formatter
 
     def encode(self, cell: DeferredCell, **kwargs):
