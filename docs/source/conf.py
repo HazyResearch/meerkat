@@ -162,4 +162,4 @@ def setup(app):
     """Generate the rst files you need."""
     path = os.path.abspath(os.path.dirname(__file__))
     path = os.path.join(path, "rst_gen.py")
-    subprocess.run(f"python {path}")
+    subprocess.run(["python", path])

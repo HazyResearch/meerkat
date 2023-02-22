@@ -11,26 +11,28 @@ core
    :toctree: ../../apidocs/generated
    :nosignatures:
 
-   meerkat.interactive.app.src.lib.component.Button
-   meerkat.interactive.app.src.lib.component.core.markdown.Caption
+   meerkat.interactive.core.Button
+   meerkat.interactive.core.Caption
    meerkat.interactive.core.Chat
    meerkat.interactive.core.Checkbox
    meerkat.interactive.core.Code
    meerkat.interactive.core.CodeCell
    meerkat.interactive.core.Document
+   meerkat.interactive.core.Editor
    meerkat.interactive.core.FileUpload
    meerkat.interactive.core.Filter
    meerkat.interactive.core.Gallery
    meerkat.interactive.core.Header
+   meerkat.interactive.core.Icon
    meerkat.interactive.core.Image
    meerkat.interactive.core.Json
    meerkat.interactive.core.Markdown
    meerkat.interactive.core.Match
+   meerkat.interactive.core.Number
    meerkat.interactive.core.Put
    meerkat.interactive.core.Radio
    meerkat.interactive.core.RadioGroup
    meerkat.interactive.core.RawHTML
-   meerkat.interactive.core.Scalar
    meerkat.interactive.core.Select
    meerkat.interactive.core.Slider
    meerkat.interactive.core.Sort
