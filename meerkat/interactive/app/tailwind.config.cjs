@@ -5,7 +5,7 @@ const colors = require('tailwindcss/colors')
 module.exports = {
   content: [
     './src/**/*.{html,js,svelte,ts,py}',
-    '../../../**/*.{py}',
+    '../../../**/*.py',
     "./node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}",
   ],
   theme: {
