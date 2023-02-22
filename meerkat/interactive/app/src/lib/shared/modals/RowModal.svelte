@@ -17,7 +17,7 @@
 	export let cardFlexGrow: boolean = false;
 	export let asModal: boolean = false;
 
-	$: schemaPromise = fetchSchema({ df: df, variants: ['small'] }).then((schema) => {
+	$: schemaPromise = fetchSchema({ df: df, formatter: 'tiny' }).then((schema) => {
 		if (mainColumn === undefined) {
 			mainColumn = schema.columns[0].name;
 		}
@@ -28,9 +28,9 @@
 		df: df,
 		posidxs: [posidx],
 		columns: [mainColumn],
-		variants: ['full_screen']
+		formatter: 'full'
 	});
-	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], variants: ['key_value'] });
+	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tag'});
 
 	const increment = async () => {
 		let chunk = await chunkPromise;
@@ -75,12 +75,12 @@
 					<div class="flex flex-col py-3 px-5 space-y-4">
 						<div class="text-center font-bold text-gray-600 text-xl">Columns</div>
 						<!-- Key-Value Pairs -->
-						<div class="flex-col flex space-y-1 ">
+						<div class="flex-col flex space-y-1">
 							{#await schemaPromise then schema}
 								{#each schema.columns as column}
 									<!-- Key-Value Pair -->
 									<button
-										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-3 py-1"
+										class="grid grid-cols-2 align-middle items-center rounded-md hover:bg-slate-200 px-4 py-1"
 										class:bg-slate-200={mainColumn === column.name}
 										on:click={() => {
 											mainColumn = column.name;
@@ -88,14 +88,14 @@
 									>
 										<!-- Key -->
 										<span
-											class="text-bf text-slate-600 text-left font-mono"
+											class="text-bf text-slate-600 text-left font-mono hitespace-nowrap text-ellipsis overflow-hidden "
 											class:font-bold={mainColumn === column.name}
 										>
 											{column.name}
 										</span>
 										<!-- Value -->
 										<span
-											class="text-gray-600 text-right whitespace-nowrap overflow-hidden text-ellipsis"
+											class="text-gray-600 w-full flex justify-end"
 										>
 											{#await chunkPromise then chunk}
 												<Cell {...chunk.getCell(0, column.name)} />

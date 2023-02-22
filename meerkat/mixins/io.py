@@ -65,12 +65,13 @@ class ColumnIOMixin:
 
         from meerkat.interactive.formatter import DeprecatedFormatter
 
-        if "_formatter" not in col.__dict__ or isinstance(
-            col.formatter, DeprecatedFormatter
+        if "_formatters" not in col.__dict__ or isinstance(
+            col.formatters, DeprecatedFormatter
         ):
+            # FIXME: make deprecated above work with new formatters
             # PATCH: backwards compatability patch for old dataframes
             # saved before v0.2.4
-            col.formatter = col._get_default_formatter()
+            col.formatters = col._get_default_formatters()
 
         return col
 

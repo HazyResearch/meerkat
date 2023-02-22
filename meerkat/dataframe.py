@@ -6,6 +6,7 @@ import os
 import pathlib
 import warnings
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Collection,
@@ -54,6 +55,10 @@ try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
+
+if TYPE_CHECKING:
+    from meerkat.interactive.formatter.base import FormatterGroup
+
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +130,40 @@ class DataFrame(
         from meerkat.interactive.gui import DataFrameGUI
 
         return DataFrameGUI(self)
+
+    @reactive
+    def format(self, formatters: Dict[str, FormatterGroup]) -> DataFrame:
+        """Create a view of the DataFrame with formatted columns.
+
+        Example
+
+        Args:
+            formatters (Dict[str, FormatterGroup]): A dictionary mapping column names to
+                FormatterGroups.
+
+        Returns:
+            DataFrame: A view of the DataFrame with formatted columns.
+
+        Examples
+        ---------
+
+        .. code-block:: python
+
+            # assume df is a DataFrame with columns "img", "text", "id"
+
+            gallery = mk.Gallery(
+                df=df.format(
+                    img={"thumbnail": ImageFormatter(max_size=(48, 48))},
+                    text={"icon": TextFormatter()},
+                )
+            )
+        """
+        df = self.view()
+        for k, v in formatters.items():
+            if k not in self.columns:
+                raise ValueError(f"Column {k} not found in DataFrame.")
+            df[k] = df[k].format(v)
+        return df
 
     @unmarked()
     def _repr_pandas_(self, max_rows: int = None):
@@ -1356,7 +1395,7 @@ class DataFrame(
 
         if "state" in metadata:
             state = metadata["state"]
-        else: 
+        else:
             # backwards compatability to dill dataframes
             state = dill.load(open(os.path.join(path, "state.dill"), "rb"))
         df = cls.__new__(cls)

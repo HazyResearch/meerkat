@@ -2,6 +2,7 @@ from typing import List
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.formatter.base import register_placeholder
 
 
 class Gallery(Component):
@@ -42,3 +43,10 @@ class Gallery(Component):
             allow_selection=allow_selection,
             cell_size=cell_size,
         )
+
+
+register_placeholder(
+    name="gallery",
+    fallbacks=["thumbnail"],
+    description="Formatter to be used in a gallery view.",
+)

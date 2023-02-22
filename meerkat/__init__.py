@@ -23,6 +23,7 @@ from meerkat.logging.utils import initialize_logging
 initialize_logging()
 
 import meerkat.interactive as gui
+import meerkat.interactive.formatter as format
 import meerkat.state as GlobalState
 from meerkat.cells.abstract import AbstractCell
 from meerkat.columns.abstract import Column, column
@@ -128,6 +129,11 @@ max = _max
 import meerkat.interactive.svelte
 from meerkat.interactive import Store, endpoint, mark, reactive, unmarked
 from meerkat.interactive.graph.magic import magic
+from meerkat.interactive.formatter.base import (
+    BaseFormatter,
+    FormatterGroup,
+    FormatterPlaceholder,
+)
 
 __all__ = [
     "DataFrame",
@@ -197,10 +203,15 @@ __all__ = [
     "from_arrow",
     "from_huggingface",
     "read",
+    # <<<< Formatters >>>>
+    "BaseFormatter",
+    "FormatterGroup",
+    "FormatterPlaceholder",
     # <<<< Misc >>>>
     "provenance",
     "config",
     "gui",
+    "format",
     "FileLoader",
     "get",
     "GlobalState",

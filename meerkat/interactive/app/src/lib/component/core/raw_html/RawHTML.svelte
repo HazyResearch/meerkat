@@ -8,7 +8,7 @@
 	$: sanitizedHtml = sanitizeHtml(html);
 </script>
 
-{#if view === 'logo'}
+{#if view === 'icon'}
 	<span><Globe2/></span>
 {:else if view === 'thumbnail'}
 	<div class="thumbnail h-full aspect-square rounded-md shadow-md border-black">

@@ -136,7 +136,12 @@ class BaseComponent(
         super().__init__(**kwargs)
 
     def __getattribute__(self, name):
+        if name == "component_id":
+            # need to wrap in a Store so component_id is passed through the wrapper
+            return Store(self.id)
+
         value = super().__getattribute__(name)
+
         if isinstance(value, Node):
             # because the validator converts dataframes to nodes, when the
             # dataframe is accessed we need to convert it back to the dataframe
@@ -281,7 +286,6 @@ class BaseComponent(
             _frontend,
             base_types=(Store),
         )
-
         return ComponentFrontend(
             component_id=self.id,
             path=os.path.join(
@@ -301,7 +305,7 @@ class BaseComponent(
     @property
     def virtual_props(self):
         """Props, and all events (as_*) as props."""
-        vprop_names = [k for k in self.__fields__ if "_self_id" != k]
+        vprop_names = [k for k in self.__fields__ if "_self_id" != k] + ["component_id"]
         return {k: self.__getattribute__(k) for k in vprop_names}
 
     @root_validator(pre=True)
@@ -481,7 +485,7 @@ class BaseComponent(
                     cls._cache[k] = values[k]
                 # TODO: other types of objects that need to be updated
             else:
-                # This has happened with a parameter that 
+                # This has happened with a parameter that
                 # - had no default value
                 # - was annotated without `Optional[...]`
                 # - was passed in as a `None` value

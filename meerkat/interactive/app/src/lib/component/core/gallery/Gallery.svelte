@@ -4,7 +4,7 @@
 	import { fetchChunk, fetchSchema } from '$lib/utils/api';
 	import type { DataFrameRef } from '$lib/utils/dataframe';
 	import { Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { setContext } from 'svelte';
+	import { setContext, getContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import { openModal } from 'svelte-modals';
 	import Cards from './Cards.svelte';
@@ -22,9 +22,11 @@
 
 	export let allowSelection: boolean = false;
 
+	const componentId = getContext("componentId");
+
 	$: schemaPromise = fetchSchema({
 		df: df,
-		variants: ['small']
+		formatter: 'small'
 	});
 
 	setContext('open_row_modal', (posidx: number) => {
@@ -40,7 +42,10 @@
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		columns: [mainColumn, ...tagColumns],
-		variants: ['gallery']
+		formatter: {
+			[mainColumn]: 'gallery',
+			...tagColumns.reduce((acc, col) => ({ ...acc, [col]: 'tag' }), {})
+		}
 	});
 
 	let dropdownOpen: boolean = false;

@@ -68,7 +68,7 @@ class imagenette(DatasetBuilder):
     def build(self):
         df = self._build_df()
         df = mk.DataFrame.from_pandas(df)
-        df["img"] = mk.ImageColumn.from_filepaths(
+        df["img"] = mk.image(
             df["img_path"], base_dir=self.data_dir
         )
         df.set_primary_key("img_id", inplace=True)

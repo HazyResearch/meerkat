@@ -1,7 +1,8 @@
 from __future__ import annotations
-from abc import ABC
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Type
+from abc import ABC, abstractmethod, abstractproperty
+import collections
+
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Type, Union
 from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
 
 from meerkat.columns.deferred.base import DeferredCell
@@ -10,96 +11,122 @@ if TYPE_CHECKING:
     from meerkat.interactive.app.src.lib.component.abstract import BaseComponent
 
 
-@dataclass
 class Variant:
-    props: Dict[str, Any]
-    encode_kwargs: Dict[str, Any]
+    def __init__(*args, **kwargs):
+        pass
 
 
-class Formatter(ABC):
-    component_class: Type["BaseComponent"]
-    data_prop: str = "data"
-    variants: Dict[str, Variant] = {}
+class FormatterGroup(collections.abc.Mapping):
+    """A formatter group is a mapping from formatter placeholders to formatters.
 
-    def __init__(self, encode: Optional[str] = None, **kwargs):
-        if encode is not None:
-            self._encode = encode
+    Data in a Meerkat column sometimes need to be displayed differently in different
+    GUI contexts. For example, in a table, we display thumbnails of images, but in a
+    carousel view, we display the full image.
 
-        default_props, required_props = self._get_props()
-        if not all(k in kwargs for k in required_props):
-            raise ValueError(
-                "Missing required properties "
-                f"{required_props} for {self.__class__.__name__}"
+    Because most components in Meerkat work on any data type, it is important that
+    they are implemented in a formatter-agnostic way. So, instead of specifying
+    formatters, components make requests for data specifying a *formatter placeholder*.
+    For example, the {class}`mk.gui.Gallery` component requests data using the
+    `thumbnail` formatter placeholder.
+
+    For a specific column of data, we specify which formatters to use for each
+    placeholder using a *formatter group*. A formatter group is a mapping from
+    formatter placeholders to formatters. Each column in Meerkat has a
+    `formatter_group` property. A column's formatter group controls how it will be
+    displayed in different contexts in Meerkat GUIs.
+
+    Args:
+        base (FormatterGroup): The base formatter group to use.
+        **kwargs: The formatters to add to the formatter group.
+    """
+
+    def __init__(self, base: BaseFormatter = None, **kwargs):
+        if base is None:
+            from meerkat.interactive.app.src.lib.component.core.text import (
+                TextFormatter,
             )
 
-        default_props.update(kwargs)
-        self._props = default_props
+            # everything has a str method so this is a safe default
+            base = TextFormatter()
 
-    def encode(self, cell: Any, variants: List[str] = None, **kwargs):
-        """Encode the cell on the backend before sending it to the frontend.
+        if not isinstance(base, BaseFormatter):
+            raise TypeError("base must be a Formatter")
+        for key, value in kwargs.items():
+            if key not in formatter_placeholders:
+                raise ValueError(
+                    f"The key {key} is not a registered formatter "
+                    "placeholder. Use `mk.register_formatter_placeholder`"
+                )
+            if not isinstance(value, BaseFormatter):
+                raise TypeError(
+                    f"FormatterGroup values must be Formatters, not {type(value)}"
+                )
 
-        The cell is lazily loaded, so when used on a LambdaColumn,
-        ``cell`` will be a ``LambdaCell``. This is important for
-        displays that don't actually need to apply the lambda in order
-        to display the value.
+        # must provide a base formatter
+        self._dict = dict(base=base, **kwargs)
+
+    def __getitem__(self, key: Union[FormatterPlaceholder, str]) -> BaseFormatter:
+        """Get the formatter for the given formatter placeholder.
+
+        Args:
+            key (FormatterPlaceholder): The formatter placeholder.
+
+        Returns:
+            (Formatter) The formatter for the formatter placeholder.
         """
-        if variants is not None:
-            for name in variants:
-                if name in self.variants:
-                    kwargs.update(self.variants[name].encode_kwargs)
-                    break
-        if self._encode is not None:
-            return self._encode(cell, **kwargs)
-        return cell
-
-    @property
-    def props(self):
-        return self._props
-
-    def get_props(self, variants: str = None):
-        if variants is None:
-            return self.props
-
-        props = self.props.copy()
-        for name in variants:
-            if name in self.variants:
-                props.update(self.variants[name].props)
-                break
-        return props
-
-    @classmethod
-    def _get_props(cls):
-        default_props = {}
-        required_props = []
-        for k, v in cls.component_class.__fields__.items():
-            if k == cls.data_prop:
-                continue
-            if v.required:
-                required_props.append(k)
+        if isinstance(key, str):
+            if key in formatter_placeholders:
+                key = formatter_placeholders[key]
             else:
-                default_props[k] = v.default
-        return default_props, required_props
+                key = FormatterPlaceholder(key, [])
 
-    def html(self, cell: Any):
-        """When not in interactive mode, objects are visualized using static
-        html.
+        if key.name in self._dict:
+            return self._dict.__getitem__(key.name)
+        for fallback in key.fallbacks:
+            if fallback.name in self._dict:
+                return self.__getitem__(fallback)
+        return self._dict["base"]
 
-        This method should produce that static html for the cell.
-        """
-        return str(cell)
+    def __setitem__(
+        self, key: Union[FormatterPlaceholder, str], value: BaseFormatter
+    ) -> None:
+        if key not in formatter_placeholders:
+            raise ValueError(
+                f"The key {key} is not a registered formatter "
+                "placeholder. Use `mk.register_formatter_placeholder`"
+            )
+        if not isinstance(value, BaseFormatter):
+            raise TypeError(
+                f"FormatterGroup values must be Formatters, not {type(value)}"
+            )
+        return self._dict.__setitem__(key, value)
+
+    def __len__(self) -> int:
+        return len(self._dict)
+
+    def __iter__(self) -> Iterator:
+        return iter(self._dict)
+
+    def update(self, other: Union[FormatterGroup, Dict]):
+        self._dict.update(other)
+
+    def copy(self):
+        new = self.__class__.__new__(self.__class__)
+        new._dict = self._dict.copy()
+        return new
 
     @staticmethod
-    def to_yaml(dumper: yaml.Dumper, data: Formatter):
-        """This function is called by the YAML dumper to convert an
+    def to_yaml(dumper: yaml.Dumper, data: BaseFormatter):
+        """This function is called by the YAML dumper to convert a
         :class:`Formatter` object into a YAML node.
 
         It should not be called directly.
         """
         data = {
             "class": type(data),
-            "_props": data._props,
+            "dict": data._dict,
         }
-        return dumper.represent_mapping("!Formatter", data)
+        return dumper.represent_mapping("!FormatterGroup", data)
 
     @staticmethod
     def from_yaml(loader, node):
@@ -110,54 +137,134 @@ class Formatter(ABC):
         """
         data = loader.construct_mapping(node)
         formatter = data["class"].__new__(data["class"])
-        formatter._props = data["_props"]
+        formatter._dict = data["dict"]
         return formatter
 
 
-MeerkatDumper.add_multi_representer(Formatter, Formatter.to_yaml)
-MeerkatLoader.add_constructor("!Formatter", Formatter.from_yaml)
+MeerkatDumper.add_multi_representer(FormatterGroup, FormatterGroup.to_yaml)
+MeerkatLoader.add_constructor("!FormatterGroup", FormatterGroup.from_yaml)
 
 
-class DeferredFormatter(Formatter):
-    def __init__(self, formatter: Formatter):
-        self.wrapped = formatter
+def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
+    """Wrap all formatters in a FormatterGroup with a DeferredFormatter.
 
-    def encode(self, cell: DeferredCell, variants: List[str] = None, **kwargs):
-        return self.wrapped.encode(cell(), variants=variants, **kwargs)
+    Args:
+        group (FormatterGroup): The FormatterGroup to wrap.
 
-    @property
-    def component_class(self):
-        return self.wrapped.component_class
+    Returns:
+        (FormatterGroup) A new FormatterGroup with all formatters wrapped in a
+            DeferredFormatter.
+    """
+    new_group = FormatterGroup(base=None)
+    for name, formatter in group.items():
+        new_group[name] = DeferredFormatter(formatter)
+    return new_group
 
-    @property
-    def data_prop(self):
-        return self.wrapped.data_prop
 
-    def get_props(self, variants: str = None):
-        return self.wrapped.get_props(variants=variants)
+class FormatterPlaceholder:
+    def __init__(
+        self,
+        name: str,
+        fallbacks: List[Union[str, FormatterPlaceholder]],
+        description: str = "",
+    ):
+        global formatter_placeholders
+        self.name = name
+        self.fallbacks = [
+            fb if isinstance(fb, FormatterPlaceholder) else formatter_placeholders[fb]
+            for fb in fallbacks
+        ]
 
-    @property
+        if name != "base":
+            self.fallbacks.append(FormatterPlaceholder("base", fallbacks=[]))
+
+        self.description = description
+
+
+formatter_placeholders = {
+    "base": FormatterPlaceholder("base", []),
+}
+
+
+def register_placeholder(
+    name: str, fallbacks: List[FormatterPlaceholder] = [], description: str = ""
+):
+    """Register a new formatter placeholder.
+
+    Args:
+        name (str): The name of the formatter placeholder.
+        fallbacks (List[FormatterPlaceholder]): The fallbacks for the formatter
+            placeholder.
+        description (str): A description of the formatter placeholder.
+    """
+    if name in formatter_placeholders:
+        raise ValueError(f"{name} is already a registered formatter placeholder")
+    formatter_placeholders[name] = FormatterPlaceholder(
+        name=name, fallbacks=fallbacks, description=description
+    )
+
+
+# register core formatter placeholders
+register_placeholder("small", fallbacks=[], description="A small version of the data.")
+register_placeholder(
+    "tiny", fallbacks=["small"], description="A tiny version of the data."
+)
+register_placeholder(
+    "thumbnail", fallbacks=["small"], description="A thumbnail of the data."
+)
+register_placeholder(
+    "icon", fallbacks=["tiny"], description="An icon representing the data."
+)
+register_placeholder(
+    "tag",
+    fallbacks=["tiny"],
+    description="A small version of the data meant to go in a tag field.",
+)
+register_placeholder(
+    "full",
+    fallbacks=["base"],
+    description="A full version of the data.",
+)
+
+
+class BaseFormatter(ABC):
+    component_class: Type["BaseComponent"]
+    data_prop: str = "data"
+
+    def encode(self, cell: Any, **kwargs):
+        """Encode the cell on the backend before sending it to the frontend.
+
+        The cell is lazily loaded, so when used on a LambdaColumn,
+        ``cell`` will be a ``LambdaCell``. This is important for
+        displays that don't actually need to apply the lambda in order
+        to display the value.
+        """
+        return cell
+
+    @abstractproperty
     def props(self):
-        return self.wrapped.props
+        return self._props
 
-    def html(self, cell: DeferredCell):
-        return self.wrapped.html(cell())
+    @abstractmethod
+    def _get_state(self) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def _set_state(self, state: Dict[str, Any]):
+        pass
 
     @staticmethod
-    def to_yaml(dumper: yaml.Dumper, data: Formatter):
-        """This function is called by the YAML dumper to convert an
+    def to_yaml(dumper: yaml.Dumper, data: BaseFormatter):
+        """This function is called by the YAML dumper to convert a
         :class:`Formatter` object into a YAML node.
 
         It should not be called directly.
         """
         data = {
             "class": type(data),
-            "wrapped": {
-                "class": type(data.wrapped),
-                "_props": data.wrapped._props,
-            },
+            "state": data._get_state(),
         }
-        return dumper.represent_mapping("!DeferredFormatter", data)
+        return dumper.represent_mapping("!Formatter", data)
 
     @staticmethod
     def from_yaml(loader, node):
@@ -168,9 +275,136 @@ class DeferredFormatter(Formatter):
         """
         data = loader.construct_mapping(node, deep=True)
         formatter = data["class"].__new__(data["class"])
-        wrapped_data = data["wrapped"]
-        wrapped = wrapped_data["class"].__new__(wrapped_data["class"])
-        wrapped._props = wrapped_data["_props"]
+        formatter._set_state(data["state"])
+        return formatter
+
+    def html(self, cell: Any):
+        """When not in interactive mode, objects are visualized using static
+        html.
+
+        This method should produce that static html for the cell.
+        """
+        return str(cell)
+
+
+class Formatter(BaseFormatter):
+
+    # TODO: set the signature of the __init__ so it works with autocomplete and docs
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            if k not in self.component_class.prop_names:
+                raise ValueError(f"{k} is not a valid prop for {self.component_class}")
+
+        for prop_name, field in self.component_class.__fields__.items():
+            if field.name != self.data_prop and prop_name not in kwargs:
+                if field.required:
+                    raise ValueError("""Missing required argument.""")
+                kwargs[prop_name] = field.default
+        self._props = kwargs
+
+    def encode(self, cell: str):
+        return cell
+
+    @property
+    def props(self) -> Dict[str, Any]:
+        return self._props
+
+    def _get_state(self) -> Dict[str, Any]:
+        return {
+            "_props": self._props,
+        }
+
+    def _set_state(self, state: Dict[str, Any]):
+        self._props = state["_props"]
+
+
+def auto_formatter():
+    """Decorator that creates a"""
+
+    def _inner(cls: type):
+        class Wrapper(cls):
+            component_class = cls.component_class
+            data_prop = cls.data_prop
+
+            def __init__(self, **kwargs):
+                for k in kwargs:
+                    if k not in cls.component_class.prop_names:
+                        raise ValueError(
+                            f"{k} is not a valid prop for {cls.component_class}"
+                        )
+
+                for prop_name, field in cls.component_class.__fields__.items():
+                    if field.name != cls.data_prop and prop_name not in kwargs:
+                        if field.required:
+                            raise ValueError("""Missing required argument.""")
+                        kwargs[prop_name] = field.default
+
+                self._props = kwargs
+
+            @property
+            def props(self) -> Dict[str, Any]:
+                return self._props
+
+            def _get_state(self) -> Dict[str, Any]:
+                return {
+                    "_props": self._props,
+                }
+
+            def _set_state(self, state: Dict[str, Any]):
+                self._props = state["_props"]
+
+        Wrapper.__name__ = cls.__name__
+        Wrapper.__qualname__ = cls.__qualname__
+        Wrapper.__module__ = cls.__module__
+        Wrapper.__doc__ = cls.__doc__
+        Wrapper.__annotations__ = cls.__annotations__
+        return Wrapper
+
+    return _inner
+
+
+MeerkatDumper.add_multi_representer(BaseFormatter, BaseFormatter.to_yaml)
+MeerkatLoader.add_constructor("!Formatter", BaseFormatter.from_yaml)
+
+
+class DeferredFormatter(BaseFormatter):
+    def __init__(self, formatter: BaseFormatter):
+        self.wrapped = formatter
+
+    def encode(self, cell: DeferredCell, **kwargs):
+        return self.wrapped.encode(cell(), **kwargs)
+
+    @property
+    def component_class(self):
+        return self.wrapped.component_class
+
+    @property
+    def data_prop(self):
+        return self.wrapped.data_prop
+
+    @property
+    def props(self):
+        return self.wrapped.props
+
+    def html(self, cell: DeferredCell):
+        return self.wrapped.html(cell())
+
+    @staticmethod
+    def _get_state(self):
+        data = {
+            "wrapped": {
+                "class": self.wrapped.__class__,
+                "state": self.wrapped._get_state(),
+            },
+        }
+        return data
+
+    @staticmethod
+    def _set_state(state: Dict[str, Any]):
+        formatter = state["class"].__new__(state["class"])
+        wrapped_state = state["wrapped"]
+        wrapped = wrapped_state["class"].__new__(wrapped_state["class"])
+        wrapped._set_state(wrapped_state["state"])
         formatter.wrapped = wrapped
         return formatter
 

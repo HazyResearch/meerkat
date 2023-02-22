@@ -12,6 +12,7 @@
     import { dispatch } from '$lib/utils/api';
     {% endif -%}
     {% endif -%}
+    import { setContext } from 'svelte';
 
     {% for prop in prop_names -%}
     export let {{ prop }};
@@ -19,6 +20,14 @@
     {% for event in event_names -%}
     export let on_{{ event }};
     {% endfor -%}
+
+    export let component_id;
+    if (component_id) {
+        // some components do not have a component_id, e.g.Cells, because they are 
+        // not created on the Python side. These should not overrride the context
+        // of the parent component.
+        setContext('componentId', $component_id);
+    }
 </script>
 
 <{{ component_name }} 

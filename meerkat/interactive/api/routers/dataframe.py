@@ -25,13 +25,15 @@ class SchemaResponse(BaseModel):
 @endpoint(prefix="/df", route="/{df}/schema/")
 def schema(
     df: DataFrame,
-    columns: List[str] = None,
-    variants: List[str] = None,
+    columns: List[str] = Endpoint.EmbeddedBody(None),
+    formatter: Union[str, Dict[str, str]] = Endpoint.EmbeddedBody("base"),
 ) -> SchemaResponse:
     columns = df.columns if columns is None else columns
+    if isinstance(formatter, str):
+        formatter = {column: formatter for column in columns}
     return SchemaResponse(
         id=df.id,
-        columns=_get_column_infos(df, columns, variants=variants),
+        columns=_get_column_infos(df, columns, formatter_placeholders=formatter),
         nrows=len(df),
         primaryKey=df.primary_key_name,
     )
@@ -40,9 +42,8 @@ def schema(
 def _get_column_infos(
     df: DataFrame,
     columns: List[str] = None,
-    variants: List[str] = None,
+    formatter_placeholders: Dict[str, str] = "base",
 ):
-
     if columns is None:
         columns = df.columns
     else:
@@ -59,16 +60,21 @@ def _get_column_infos(
     columns = [column for column in columns if not column.startswith("_")]
     if df.primary_key_name is not None and df.primary_key_name not in columns:
         columns += [df.primary_key_name]
-    return [
+    out = [
         ColumnInfo(
             name=col,
             type=type(df[col]).__name__,
-            cellComponent=df[col].formatter.component_class.alias,
-            cellProps=df[col].formatter.get_props(variants=variants),
-            cellDataProp=df[col].formatter.data_prop,
+            cellComponent=df[col]
+            .formatters[formatter_placeholders.get(col, "base")]
+            .component_class.alias,
+            cellProps=df[col].formatters[formatter_placeholders.get(col, "base")].props,
+            cellDataProp=df[col]
+            .formatters[formatter_placeholders.get(col, "base")]
+            .data_prop,
         )
         for col in columns
     ]
+    return out
 
 
 class RowsResponse(BaseModel):
@@ -76,7 +82,6 @@ class RowsResponse(BaseModel):
     posidxs: List[int] = None
     rows: List[List[Any]]
     fullLength: int
-    # primary key
     primaryKey: Optional[str] = None
 
 
@@ -89,13 +94,16 @@ def rows(
     key_column: str = Endpoint.EmbeddedBody(None),
     keyidxs: List[Union[StrictInt, StrictStr]] = Endpoint.EmbeddedBody(None),
     columns: List[str] = Endpoint.EmbeddedBody(None),
-    variants: List[str] = Endpoint.EmbeddedBody(None),
+    formatter: Union[str, Dict[str, str]] = Endpoint.EmbeddedBody("base"),
     shuffle: bool = Endpoint.EmbeddedBody(False),
 ) -> RowsResponse:
     """Get rows from a DataFrame as a JSON object."""
-
+    if columns is None:
+        columns = df.columns
+    if isinstance(formatter, str):
+        formatter = {column: formatter for column in columns}
     full_length = len(df)
-    column_infos = _get_column_infos(df, columns, variants=variants)
+    column_infos = _get_column_infos(df, columns, formatter_placeholders=formatter)
 
     if shuffle:
         df = df.shuffle()
@@ -130,7 +138,9 @@ def rows(
     for row in df:
         rows.append(
             [
-                df[info.name].formatter.encode(row[info.name], variants=variants)
+                df[info.name]
+                .formatters[formatter.get(info.name, "base")]
+                .encode(row[info.name])
                 for info in column_infos
             ]
         )
