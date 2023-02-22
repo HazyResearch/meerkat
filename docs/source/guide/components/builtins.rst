@@ -11,8 +11,8 @@ core
    :toctree: ../../apidocs/generated
    :nosignatures:
 
-   meerkat.interactive.core.Button
-   meerkat.interactive.core.Caption
+   meerkat.interactive.app.src.lib.component.Button
+   meerkat.interactive.app.src.lib.component.core.markdown.Caption
    meerkat.interactive.core.Chat
    meerkat.interactive.core.Checkbox
    meerkat.interactive.core.Code

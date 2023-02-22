@@ -59,6 +59,8 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_remove_toctrees",
 ]
+autosummary_generate = True
+autosummary_imported_members = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
