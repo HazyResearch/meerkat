@@ -8,7 +8,7 @@ If you're familiar with other web frameworks like React, Svelte should be easy t
 This page assumes some familiarity with Svelte. If you're new to Svelte, you can read the [Svelte tutorial](https://svelte.dev/tutorial/basics) to get started. Svelte is not very difficult to learn even if you're new to web development.
 
 ```{margin}
-The `@meerkat-ml/meerkat` [npm package](https://www.npmjs.com/package/@meerkat-ml/meerkat) has convenient utilities to interact with the Meerkat backend. 
+The `@meerkat-ml/meerkat` [npm package](https://www.npmjs.com/package/@meerkat-ml/meerkat) has convenient utilities to interact with the Meerkat backend e.g. support for fetching data from data frames.
 This is installed automatically when you create a Meerkat app, and you can import it in your Svelte components.
 ```
 
@@ -213,4 +213,123 @@ counter = Counter(
 # Launch the Meerkat GUI
 page = mk.gui.Page(component=counter, id="counter")
 page.launch()
+```
+
+And that's it!
+
+## Components with Slots
+```{margin}
+_We are working to expand support for named slots in Python components._
+```
+Svelte components can have slots that allow you to pass in other components. Meerkat currently provides a rudimentary way to use slots in Python.
+
+Suppose we have a component called `Card` that has a slot for content. This can look like something like this in Svelte.
+
+```html
+<!-- app/src/lib/components/Card.svelte -->
+...
+<div class="card">
+    <slot />
+</div>
+```
+
+To use this slot in Python, we can take advantage of the `Slottable` mixin. This mixin injects a `slots` attribute into the component that can be used to pass in other components. For example, we can create a `Card` component in Python as follows:
+
+```python
+# app/src/lib/components/__init__.py
+
+class Card(LibraryMixin, Slottable, Component):
+    ...
+```
+
+And then to use this,
+
+```python
+# Create a card with a Counter and Text in the slot
+card = Card(slots=[Text("Counter"), counter])
+```
+
+## Components with Data Frames
+
+Meerkat makes it easy for you to use data frames in your component props. One of the design patterns that we particularly like is to design Python components that are initialized with one or more data frames, a set of column names and other optional parameters.
+
+For example,
+```{margin}
+This declarative component design pattern is particularly inspired by [Seaborn](https://seaborn.pydata.org/).
+```
+```
+component = Component(
+    df=...,
+    main_column=...,
+    another_column=...,
+    yet_another_column=...,
+    optional_param=...,
+    optional_param_2=...,
+)
+```
+
+Let's go over how to actually support data frames in your component.
+
+#### The Svelte Component
+
+Let's suppose you're designing a component that visualizes a data frame in some way. You'll need to 
+pass a data frame prop to the component, and then fetch the data frame from the Python side. You can do this using the `DataFrameRef` type and the `fetchSchema` and `fetchChunk` functions, provided in the `@meerkat-ml/meerkat` npm package that is automatically installed in every Meerkat app.
+
+```html
+<script>
+    import type { DataFrameRef } from "@meerkat-ml/meerkat/utils/dataframe";
+
+    // DataFrameRef is a type that represents a reference to a data frame on the
+    // Python side.
+    export let df: DataFrameRef;
+
+    // Fetch the data frame schema from the Python side.
+    $: schemaPromise = fetchSchema({
+		df: df,
+        // ... other arguments
+	}: DataFrameSchemaRequest);
+
+
+    // Fetch a chunk of the data frame from the Python side.
+    $: chunkPromise: DataFrameChunk = fetchChunk({
+        df: df,
+        start: 0,
+        end: 1000,
+        columns: ["column1", "column2", "column3"],
+        // ... other arguments include posidxs, keyidxs, keyColumn, variants, shuffle
+    }: DataFrameChunkRequest);
+</script>
+
+{#await schemaPromise then schema}
+    <!-- schema is an object with keys 
+            `id`, `columns`, `nrows`, `primaryKey`  
+        
+        `columns` is itself an array of objects with keys 
+            `name`, `type`, `cellComponent`, `cellProps`, `cellDataProp`
+    -->
+    ...
+{/await}
+{#await chunkPromise then chunk}
+    <!-- chunk is a DataFrameChunk object with keys 
+            `columnInfos`, `columns`, `posidxs`, `keyidxs`, `rows`, `fullLength`, `primaryKey`
+        and methods
+            `getCell(row, column)`, `getColumn(column)`, `length()`
+    -->
+    ...
+{/await}
+```
+Refer to the definition of `DataFrameSchemaRequest` and `DataFrameChunkRequest` in `@meerkat-ml/meerkat/utils/dataframe` for more details.
+
+#### The Python Component
+Once you've defined the Svelte component, you can define the Python component, which will be quite simple.
+
+```python
+def MyComponent(LibraryMixin, Component):
+    df: DataFrame
+    # ...
+```
+and then use it normally.
+
+```python
+component = MyComponent(df=df, ...)
 ```

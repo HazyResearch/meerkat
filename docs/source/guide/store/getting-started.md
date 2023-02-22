@@ -1,3 +1,5 @@
+(guide_store_getting_started)=
+
 # Stores
 
 <!-- In this section, we will discuss one of the core Markable objects in Meerkat: {py:class}`Store <meerkat.Store>`. -->

@@ -1,3 +1,4 @@
+.. _install:
 
 Installation
 ~~~~~~~~~~~~
@@ -116,7 +117,7 @@ Installation
     You will additionally need the following programs if you would like to 
     use Meerkat to build interactive applications. 
 
-    - Node.js (``node``) version ``>=16.0.0``
+    - Node.js (``node``) version ``>=18.0.0``
     - Node Package Manager (``npm``) version ``>=8.0.0``
 
     Once you have installed Node.js and npm, you can use the Meerkat CLI to

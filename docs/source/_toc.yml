@@ -4,15 +4,17 @@ parts:
   - caption: Getting started
     chapters:
       - file: start/install
-      - file: start/quickstart
-      - file: start/walkthrough
-      - file: start/test
+      - file: start/quickstart-df
+      - file: start/quickstart-interactive
 
   - caption: User Guide
     chapters:
+
+      - file: guide/overview
+        title: Overview
       
       - file: guide/dataframe/intro
-        title: DataFrame
+        title: Data Frames
         sections:
           - file: guide/dataframe/selection
           - file: guide/dataframe/columns/overview
@@ -34,10 +36,13 @@ parts:
               - file: guide/dataframe/advanced/copying
               - file: guide/dataframe/advanced/blocks
 
-      - title: Reactivity
-        file: guide/reactive/getting-started
+      - title: Reactive Functions
+        file: guide/reactive/index
         sections:
-          - file: guide/reactive/concepts
+          - title: Getting Started
+            file: guide/reactive/getting-started
+          - title: Concepts
+            file: guide/reactive/concepts
           - file: guide/reactive/user-guide
           # - file: guide/reactive/examples
           # - file: guide/reactive/faq
@@ -49,21 +54,21 @@ parts:
           # - file: guide/store/user-guide
           - file: guide/store/faq
 
-      - title: Magic
-        file: guide/magic/getting-started
-        sections:
-          - file: guide/magic/limitations
-          # - file: guide/store/faq
-
       - title: Components
         file: guide/components/index
         sections:
           - file: guide/components/getting-started
             title: Getting Started
           - file: guide/components/builtins
-            title: Available Components
+            title: Components in Meerkat
           - file: guide/components/custom-components
             title: Custom Components
+
+      - title: Endpoints
+        file: guide/endpoints/index
+        sections:
+          - file: guide/endpoints/getting-started
+            title: Getting Started
 
       - title: Interactive
         file: guide/interactive/introduction
@@ -86,23 +91,42 @@ parts:
             sections:
               - file: guide/interactive/examples/image_search
 
+      - title: Formatters
+        file: guide/formatters/index
+        sections:
+          - file: guide/formatters/getting-started
+            title: Getting Started
+
       - title: Cheat Sheet
         file: guide/cheat-sheet
 
   - caption: Advanced
     chapters:
-      - file: start/configure
+      - title: Magic
+        file: guide/magic/getting-started
+        sections:
+          - file: guide/magic/limitations
 
-  - caption: Use Cases
+      - title: Configuration
+        file: start/configure
+
+  # - caption: Use Cases
+  #   chapters:
+  #     - file: use_cases/error_analysis
+  #       title: Error Analysis
+
+  - caption: Ecosystem
+
     chapters:
-      - file: use_cases/error_analysis
-        title: Error Analysis
+      - title: Datasets
+        file: datasets/index
+        sections:
+          - file: datasets/datasets
+          - file: datasets/contributing
 
-  - caption: Datasets
-    chapters:
-      - file: datasets/datasets
-      - file: datasets/contributing
+      # - title: Components
 
+  # - caption: Integrations
 
   - caption: API Reference
     chapters:

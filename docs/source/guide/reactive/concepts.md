@@ -6,7 +6,7 @@ If you haven't already, please read [](#reactivity) {ref}`Getting Started <react
 
 (reactivity_concepts_stores)=
 
-## [Recap] Stores
+## Recap: Stores
 Recall, a core principle of reactivity is that Meerkat only tracks `marked` inputs into functions.
 If an input is not marked, Meerkat will not track it and will not re-run the function if it changes.
 

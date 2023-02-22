@@ -1,3 +1,5 @@
+(guide_components_getting_started)=
+
 # Getting Started
 
 Components are the main abstraction for building user interfaces in Meerkat. 

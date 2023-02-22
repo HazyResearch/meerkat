@@ -1,6 +1,6 @@
 (reactivity_getting_started)=
 
-# Reactivity
+# Getting Started with Reactive Functions
 
 In any interactive application, certain functions will need to be rerun when states of variables in the application change. 
 Meerkat provides a mechanism for this through the concept of *reactivity*, implemented using the {py:func}`@mk.reactive() <meerkat.reactive()>` decorator.
@@ -31,7 +31,7 @@ Meerkat provides the `@mk.reactive()` decorator to designate a function as react
 
 To use `mk.reactive()`, use standard Python syntax for decorators. There are three ways to do this:
 
-##### 1. Decorate a function with `mk.reactive()`
+**1. Decorate a function with `mk.reactive()`**
 ```python
 # Use decorator syntax to wrap `add_by_1` in `mk.reactive()`
 @mk.reactive()
@@ -42,7 +42,7 @@ def add_by_1(a):
 add_by_1(...)
 ```
 
-##### 2. Call `mk.reactive()` on a function
+**2. Call `mk.reactive()` on a function**
 ```python
 def add_by_1(a):
     return a + 1
@@ -53,7 +53,7 @@ add_by_1 = mk.reactive(add_by_1)
 add_by_1(...)
 ```
 
-##### 3. Call `mk.reactive()` on a lambda function
+**3. Call `mk.reactive()` on a lambda function**
 ```python
 add_by_1 = mk.reactive(lambda a: a + 1)
 
