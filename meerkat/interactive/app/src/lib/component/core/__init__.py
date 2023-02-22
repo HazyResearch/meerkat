@@ -1,8 +1,10 @@
 from .button import Button
 from .chat import Chat
 from .checkbox import Checkbox
+from .code import Code
 from .code_cell import CodeCell
 from .document import Document
+from .editor import Editor
 from .fileupload import FileUpload
 from .filter import Filter
 from .gallery import Gallery
@@ -12,10 +14,10 @@ from .json import Json
 from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
 from .multiselect import MultiSelect
+from .number import Number
 from .put import Put
 from .radio import Radio, RadioGroup
 from .raw_html import RawHTML
-from .number import Number
 from .select import Select
 from .slicebycards import SliceByCards
 from .slider import Slider
@@ -27,8 +29,6 @@ from .text import Text
 from .textbox import Textbox
 from .toggle import Toggle
 from .vega import Vega
-from .code import Code
-
 
 __all__ = [
     "Button",
@@ -38,11 +38,13 @@ __all__ = [
     "Code",
     "CodeCell",
     "Document",
+    "Editor",
     "FileUpload",
     "Filter",
     "Gallery",
     "Header",
     "Image",
+    "Icon",
     "Json",
     "Markdown",
     "Match",
