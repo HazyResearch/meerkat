@@ -1,14 +1,20 @@
 import pathlib
 
-from .app.src.lib.component import contrib, core, flowbite, html, plotly
-from .app.src.lib.component.abstract import BaseComponent, Component
-from .app.src.lib.component.contrib.fm_filter import FMFilter
-from .app.src.lib.component.contrib.mocha import ChangeList
-from meerkat.interactive.app.src.lib.component.core import *
-from .app.src.lib.shared.cell.website import Website
-from .edit import EditTarget
-from .endpoint import Endpoint, endpoint, endpoints, make_endpoint
-from .graph import (  # noqa: F401
+from meerkat.interactive.app.src.lib.component import (
+    contrib,
+    core,
+    flowbite,
+    html,
+    plotly,
+)
+from meerkat.interactive.app.src.lib.component.abstract import BaseComponent, Component
+from meerkat.interactive.app.src.lib.component.contrib.fm_filter import FMFilter
+from meerkat.interactive.app.src.lib.component.contrib.mocha import ChangeList
+from meerkat.interactive.app.src.lib.component.core import *  # noqa: F401, F403
+from meerkat.interactive.app.src.lib.shared.cell.website import Website
+from meerkat.interactive.edit import EditTarget  # noqa: F401
+from meerkat.interactive.endpoint import Endpoint, endpoint, endpoints, make_endpoint
+from meerkat.interactive.graph import (  # noqa: F401
     Store,
     is_unmarked_context,
     magic,
@@ -16,11 +22,11 @@ from .graph import (  # noqa: F401
     reactive,
     unmarked,
 )
-from .modification import DataFrameModification, Modification
-from .page import Page, page
-from .startup import start
-from .state import State
-from .utils import print
+from meerkat.interactive.modification import DataFrameModification, Modification
+from meerkat.interactive.page import Page, page
+from meerkat.interactive.startup import start
+from meerkat.interactive.state import State
+from meerkat.interactive.utils import print
 
 INTERACTIVE_LIB_PATH = pathlib.Path(__file__).parent.resolve()
 
