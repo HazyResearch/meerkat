@@ -78,6 +78,21 @@ export class DataFrameChunk {
             column: column
         }
     }
+    getRow(rowIdx: number) {
+        let result: any = {};
+        for (let i = 0; i < this.columns.length; i++) {
+            result[this.columns[i]] = this.rows[rowIdx][i]
+        }
+        return result
+
+    }
+    getRows() {
+        let result: Array<any> = [];
+        for (let i = 0; i < this.rows.length; i++) {
+            result.push(this.getRow(i));
+        }
+        return result
+    }
 
     length() {
         return this.rows.length;
