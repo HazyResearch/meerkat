@@ -344,6 +344,8 @@ def run_frontend_prod(
                 break
     else:
         logger.debug("Skipping build step.")
+        assert (libpath / "build").exists(), \
+            "libpath must exist if skip_build is True."
 
     # File find replacement for the VITE_API_URL_PLACEHOLDER
     # Replace VITE_API_URL||"http://some.url.here:port" with
