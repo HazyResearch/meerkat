@@ -15,11 +15,14 @@
 			text = v;
 		}, debounceTimer);
 	};
+
+	const initialText = text;
 </script>
 
 <input
 	type="text"
 	{placeholder}
+	value={initialText}
 	class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
 	on:keyup={({ target: { value } }) => debounce(value)}
 	on:keypress

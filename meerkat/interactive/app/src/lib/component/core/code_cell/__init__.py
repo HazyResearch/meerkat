@@ -1,6 +1,7 @@
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 from meerkat.interactive.graph.marking import mark
 
@@ -30,9 +31,13 @@ def base_on_run(code: Store[str], new_code: str):
     return code
 
 
+class OnRunCodeCell(EventInterface):
+    new_code: str
+
+
 class CodeCell(Component):
     code: str = ""
-    on_run: EndpointProperty = None
+    on_run: EndpointProperty[OnRunCodeCell] = None
 
     def __init__(self, code: str = "df", on_run: Endpoint = None):
         code = mark(code)
