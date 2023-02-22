@@ -191,11 +191,10 @@ class Filter(Component):
         criteria: List[FilterCriterion] = [],
         operations: List[str] = list(_operator_str_to_func.keys()),
     ):
-        """
-        Filter a dataframe based on a list of filter criteria.
+        """Filter a dataframe based on a list of filter criteria.
 
-        Filtering criteria are maintained in a Store. On change of values
-        in the store, the dataframe is filtered.
+        Filtering criteria are maintained in a Store. On change of
+        values in the store, the dataframe is filtered.
         """
         super().__init__(
             df=df,

@@ -18,8 +18,9 @@ from ..abstract import Column
 torch = LazyLoader("torch")
 
 if TYPE_CHECKING:
-    from meerkat.dataframe import DataFrame
     import torch
+
+    from meerkat.dataframe import DataFrame
 
 ScalarColumnTypes = Union[np.ndarray, "torch.TensorType", pd.Series, List]
 
@@ -141,7 +142,6 @@ class StringMethods:
 
 
 class ScalarColumn(Column):
-
     str = CachedAccessor("str", StringMethods)
 
     def __new__(cls, data: ScalarColumnTypes = None, backend: str = None):

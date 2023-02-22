@@ -42,6 +42,7 @@ from meerkat.tools.utils import convert_to_batch_column_fn, translate_index
 
 if TYPE_CHECKING:
     import torch
+
     from meerkat.interactive.formatter.base import FormatterGroup
 
 torch = LazyLoader("torch")  # noqa: F811
@@ -109,7 +110,6 @@ class Column(
 
     @unmarked()
     def __repr__(self):
-
         return f"column({reprlib.repr([x for x in self[:10]])}, backend={type(self).__name__}"
 
     @unmarked()
@@ -281,9 +281,7 @@ class Column(
         raise NotImplementedError
 
     def _get_default_formatters(self) -> "FormatterGroup":
-        from meerkat.interactive.app.src.lib.component.core.text import (
-            TextFormatter,
-        )
+        from meerkat.interactive.app.src.lib.component.core.text import TextFormatter
         from meerkat.interactive.formatter.base import FormatterGroup
 
         # by default all object should have a `str` representation

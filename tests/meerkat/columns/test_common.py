@@ -152,7 +152,6 @@ def test_io(tmp_path, column_testbed: AbstractColumnTestBed):
     assert col.is_equal(new_col)
 
 
-
 def test_head(single_column_testbed: AbstractColumnTestBed):
     testbed = single_column_testbed
     length = 10

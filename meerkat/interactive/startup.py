@@ -295,6 +295,47 @@ file an issue on GitHub):
     return process
 
 
+def run_frontend_build(
+    package_manager: Literal["npm", "bun"] = "npm",
+    env: dict = {},
+):
+    env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
+    build_process = subprocess.Popen(
+        [
+            package_manager,
+            "run",
+            "build",
+        ],
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    # Print a progress bar with rich, show the time elapsed
+    start_time = time.time()
+    while build_process.poll() is None:
+        output = build_process.stdout.readline().decode("utf-8").strip()
+        # Pad output to 100 characters
+        output = output.ljust(100)
+        if "node_modules/" in output or "unused" in output:
+            continue
+        # Remove any symbols that would mess up the progress bar
+        stmt = f"Building (may take up to a minute)... {time.time() - start_time:.2f}s"
+        if is_notebook():
+            print(stmt, end="\r", flush=True)
+        else:
+            rich.print(stmt, end="\r", flush=True)
+
+        # Put a sleep to make the progress smoother
+        time.sleep(0.1)
+
+        if 'Wrote site to "build"' in output:
+            rich.print(
+                f"Build completed in {time.time() - start_time:.2f}s." + " " * 140
+            )
+            break
+
+
 def run_frontend_prod(
     port: int,
     api_url: str,
@@ -305,47 +346,10 @@ def run_frontend_prod(
 ) -> subprocess.Popen:
 
     if not skip_build:
-        env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
-        build_process = subprocess.Popen(
-            [
-                package_manager,
-                "run",
-                "build",
-            ],
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-
-        # Print a progress bar with rich, show the time elapsed
-        start_time = time.time()
-        while build_process.poll() is None:
-            output = build_process.stdout.readline().decode("utf-8").strip()
-            # Pad output to 100 characters
-            output = output.ljust(100)
-            if "node_modules/" in output or "unused" in output:
-                continue
-            # Remove any symbols that would mess up the progress bar
-            stmt = (
-                f"Building (may take up to a minute)... {time.time() - start_time:.2f}s"
-            )
-            if is_notebook():
-                print(stmt, end="\r", flush=True)
-            else:
-                rich.print(stmt, end="\r", flush=True)
-
-            # Put a sleep to make the progress smoother
-            time.sleep(0.1)
-
-            if 'Wrote site to "build"' in output:
-                rich.print(
-                    f"Build completed in {time.time() - start_time:.2f}s." + " " * 140
-                )
-                break
+        run_frontend_build(package_manager, env)
     else:
         logger.debug("Skipping build step.")
-        assert (libpath / "build").exists(), \
-            "libpath must exist if skip_build is True."
+        assert (libpath / "build").exists(), "libpath must exist if skip_build is True."
 
     # File find replacement for the VITE_API_URL_PLACEHOLDER
     # Replace VITE_API_URL||"http://some.url.here:port" with

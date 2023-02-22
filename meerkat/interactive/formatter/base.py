@@ -1,11 +1,11 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod, abstractproperty
-import collections
 
+import collections
+from abc import ABC, abstractmethod, abstractproperty
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Type, Union
-from meerkat.tools.utils import MeerkatLoader, MeerkatDumper
 
 from meerkat.columns.deferred.base import DeferredCell
+from meerkat.tools.utils import MeerkatDumper, MeerkatLoader
 
 if TYPE_CHECKING:
     from meerkat.interactive.app.src.lib.component.abstract import BaseComponent
@@ -17,7 +17,8 @@ class Variant:
 
 
 class FormatterGroup(collections.abc.Mapping):
-    """A formatter group is a mapping from formatter placeholders to formatters.
+    """A formatter group is a mapping from formatter placeholders to
+    formatters.
 
     Data in a Meerkat column sometimes need to be displayed differently in different
     GUI contexts. For example, in a table, we display thumbnails of images, but in a
@@ -288,7 +289,6 @@ class BaseFormatter(ABC):
 
 
 class Formatter(BaseFormatter):
-
     # TODO: set the signature of the __init__ so it works with autocomplete and docs
     def __init__(self, **kwargs):
         for k in kwargs:
@@ -319,7 +319,7 @@ class Formatter(BaseFormatter):
 
 
 def auto_formatter():
-    """Decorator that creates a"""
+    """Decorator that creates a."""
 
     def _inner(cls: type):
         class Wrapper(cls):

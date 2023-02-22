@@ -2,7 +2,6 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Textbox(Component):
-
     text: str = ""
     placeholder: str = "Write some text..."
     debounce_timer: int = 150

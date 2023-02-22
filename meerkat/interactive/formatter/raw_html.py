@@ -1,7 +1,9 @@
 from typing import Any, Dict
+
 from ..app.src.lib.component.core.raw_html import RawHTML
-from .icon import IconFormatter
 from .base import BaseFormatter, FormatterGroup
+from .icon import IconFormatter
+
 
 class HTMLFormatter(BaseFormatter):
     component_class: type = RawHTML
@@ -9,7 +11,7 @@ class HTMLFormatter(BaseFormatter):
 
     def __init__(self, view: str = "full"):
         self.view = view
-    
+
     @property
     def props(self) -> dict:
         return dict(view=self.view)
@@ -41,4 +43,3 @@ class HTMLFormatterGroup(FormatterGroup):
             thumbnail=HTMLFormatter(view="thumbnail"),
             gallery=HTMLFormatter(view="thumbnail"),
         )
-    

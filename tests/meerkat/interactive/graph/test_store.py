@@ -131,10 +131,8 @@ def test_store_reactive_math(is_magic: bool):
 @pytest.mark.parametrize("other", [1, 2])
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_store_imethod(other: int, is_magic: bool):
-    """
-    Test traditional inplace methods are reactive,
-    but return different stores.
-    """
+    """Test traditional inplace methods are reactive, but return different
+    stores."""
 
     def _get_expected():
         # TODO: Have a variable that chooses which one of these to run.
@@ -317,10 +315,8 @@ def test_store_getitem_custom_obj():
 @pytest.mark.parametrize("obj", [[0, 1, 2], (0, 1, 2), {0: "a", 1: "b", 2: "c"}])
 @pytest.mark.parametrize("idx", [0, 1, 2])
 def test_store_getitem_multi_access(is_magic: bool, obj, idx: int):
-    """
-    Test that when we access the same index multiple times, we get
-    unique stores.
-    """
+    """Test that when we access the same index multiple times, we get unique
+    stores."""
     store = mk.gui.Store(obj)
     with magic(is_magic):
         out1 = store[idx]

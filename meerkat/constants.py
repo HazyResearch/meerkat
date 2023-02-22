@@ -82,7 +82,6 @@ JINJA_ENV = Environment(loader=FileSystemLoader(MEERKAT_TEMPLATES_DIR))
 
 
 def write_file(path: str, content: str) -> None:
-
     with open(path, "w") as f:
         f.write(content)
 

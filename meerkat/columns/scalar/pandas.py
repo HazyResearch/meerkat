@@ -111,6 +111,7 @@ class PandasStringMethods(StringMethods):
         self, pat: str = None, n: int = -1, regex: bool = False, **kwargs
     ) -> "DataFrame":
         from meerkat import DataFrame
+
         if regex is True:
             raise NotImplementedError("regex=True is not supported for rsplit")
 
@@ -305,7 +306,9 @@ class PandasScalarColumn(
         from meerkat.interactive.app.src.lib.component.core.number import (
             NumberFormatterGroup,
         )
-        from meerkat.interactive.app.src.lib.component.core.text import TextFormatterGroup
+        from meerkat.interactive.app.src.lib.component.core.text import (
+            TextFormatterGroup,
+        )
 
         if len(self) == 0:
             return super()._get_default_formatters()
@@ -318,9 +321,7 @@ class PandasScalarColumn(
 
         cell = self[0]
         if isinstance(cell, np.generic):
-            return NumberFormatterGroup(
-                dtype=type(cell.item()).__name__
-            )
+            return NumberFormatterGroup(dtype=type(cell.item()).__name__)
 
         return super()._get_default_formatters()
 
@@ -421,7 +422,7 @@ class PandasScalarColumn(
 
     def to_json(self) -> List[Any]:
         return self.data.tolist()
-    
+
     @property
     def dtype(self) -> Any:
         return self.data.dtype

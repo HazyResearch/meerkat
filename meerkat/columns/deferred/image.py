@@ -9,8 +9,8 @@ from PIL import Image
 
 import meerkat.tools.docs as docs
 from meerkat.columns.deferred.file import FILE_SHARED_DOCS, FileColumn
-from meerkat.interactive.formatter.base import deferred_formatter_group
 from meerkat.interactive.formatter import ImageFormatterGroup
+from meerkat.interactive.formatter.base import deferred_formatter_group
 
 logger = logging.getLogger(__name__)
 

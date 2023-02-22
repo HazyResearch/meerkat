@@ -128,12 +128,12 @@ max = _max
 # Do not move them.
 import meerkat.interactive.svelte
 from meerkat.interactive import Store, endpoint, mark, reactive, unmarked
-from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.formatter.base import (
     BaseFormatter,
     FormatterGroup,
     FormatterPlaceholder,
 )
+from meerkat.interactive.graph.magic import magic
 
 __all__ = [
     "DataFrame",

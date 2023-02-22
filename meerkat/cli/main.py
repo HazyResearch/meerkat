@@ -285,8 +285,8 @@ def demo(
     # Optional: Run the demo script.
     if run:
         _run(
-            script_path=script_path, 
-            api_port=api_port, 
+            script_path=script_path,
+            api_port=api_port,
             frontend_port=frontend_port,
             dev=dev,
         )
