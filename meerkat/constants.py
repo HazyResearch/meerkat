@@ -23,11 +23,12 @@ logger = logging.getLogger(__name__)
 
 # This file is meerkat/meerkat/constants.py
 # Assert that the path to this file ends with "meerkat/meerkat/constants.py"
-assert os.path.abspath(__file__).endswith(
-    "meerkat/meerkat/constants.py"
-), "This file should be meerkat/meerkat/constants.py. "
-"If it was moved, update the assert"
-" and the path to the MEERKAT_BASE_DIR below."
+assert os.path.abspath(__file__).endswith("meerkat/meerkat/constants.py"), (
+    "This file should end with 'meerkat/meerkat/constants.py'. "
+    f"Got {__file__}. "
+    "If it was moved, update the assert"
+    " and the path to the MEERKAT_BASE_DIR below."
+)
 
 # Base directory is meerkat/ (two levels up)
 MEERKAT_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
