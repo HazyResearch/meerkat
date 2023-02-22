@@ -18,6 +18,10 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.tools.utils import classproperty, has_var_kwargs, is_subclass, nested_apply
 
+try:
+    collections_abc = collections.abc
+except AttributeError:
+    collections_abc = collections
 
 class ComponentFrontend(BaseModel):
     component_id: str
@@ -86,7 +90,7 @@ class Slottable:
 
 
 def iterable(arg):
-    return isinstance(arg, collections.Iterable) and not isinstance(arg, str)
+    return isinstance(arg, collections_abc.Iterable) and not isinstance(arg, str)
 
 
 class SlotsMixin:
