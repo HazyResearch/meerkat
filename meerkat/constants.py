@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 # This file is meerkat/meerkat/constants.py
 # Assert that the path to this file ends with "meerkat/meerkat/constants.py"
-assert os.path.abspath(__file__).endswith("meerkat/meerkat/constants.py"), (
+assert os.path.abspath(__file__).endswith("meerkat/constants.py"), (
     "This file should end with 'meerkat/meerkat/constants.py'. "
     f"Got {__file__}. "
     "If it was moved, update the assert"
