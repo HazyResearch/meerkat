@@ -5,7 +5,15 @@ import { API_URL } from "../constants.js";
 import { DataFrameChunk, type DataFrameRef } from './dataframe.js';
 
 export const updateStore = async (storeId: string, value: any) => {
-    const modifications = await modify(`${get(API_URL)}/store/${storeId}/update/`, { value: value });
+    const promise = modify(`${get(API_URL)}/store/${storeId}/update/`, { value: value }).catch(
+        (error) => {
+            console.log(error);
+            toast.error(error.message);
+            // Pass the error along.
+            throw error;
+        }
+    );
+    const modifications = await promise;
     return modifications;
 };
 
@@ -38,9 +46,17 @@ export const fetchSchema = async ({
     columns = null,
     formatter = null
 }: DataFrameSchemaRequest) => {
-    return await post(`${get(API_URL)}/df/${df.refId}/schema/`, {
+    const promise = post(`${get(API_URL)}/df/${df.refId}/schema/`, {
         columns: columns, formatter: formatter
-    });
+    }).catch(
+        (error) => {
+            console.log(error);
+            toast.error(error.message);
+            // Pass the error along.
+            throw error;
+        }
+    );
+    return await promise;
 }
 
 export interface DataFrameChunkRequest {
@@ -66,7 +82,7 @@ export const fetchChunk = async ({
     formatter = null,
     shuffle = null
 }: DataFrameChunkRequest) => {
-    const result = await post(`${get(API_URL)}/df/${df.refId}/rows/`, {
+    const promise = post(`${get(API_URL)}/df/${df.refId}/rows/`, {
         start: start,
         end: end,
         posidxs: posidxs,
@@ -75,7 +91,15 @@ export const fetchChunk = async ({
         columns: columns,
         formatter: formatter,
         shuffle: shuffle
-    });
+    }).catch(
+        (error) => {
+            console.log(error);
+            toast.error(error.message);
+            // Pass the error along.
+            throw error;
+        }
+    );
+    const result = await promise;
 
     return new DataFrameChunk(
         result.columnInfos,
