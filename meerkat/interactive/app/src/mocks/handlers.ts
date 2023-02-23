@@ -59,11 +59,11 @@ const schema = {
 
 // Define handlers that catch the corresponding requests and return the mock data.
 export const handlers = [
-    rest.post(`http://test.app/df/mock/rows`, (req, res, ctx) => {
+    rest.post(`http://test.app/df/mock/rows/`, (req, res, ctx) => {
         return res(ctx.status(200), ctx.json(messages))
     }),
 
-    rest.post(`http://test.app/df/mock/schema`, (req, res, ctx) => {
+    rest.post(`http://test.app/df/mock/schema/`, (req, res, ctx) => {
         return res(ctx.status(200), ctx.json(schema))
     }),
 
