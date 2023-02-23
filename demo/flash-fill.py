@@ -31,13 +31,21 @@ df = mk.DataFrame(
         ],
         "hometown": ["London", "Stockholm", "Bath", "New York", "Paris"],
         "relationship": ["father", "aunt", "cousin", "teacher", "brother"],
-        "_status": ["train", "train", "train", "fill", "fill"],
+        "note": ["", "", "", "", ""],
+        # "_status": ["train", "train", "train", "fill", "fill"],
     }
 )
 df["note"] = ""
 
 df = df.mark()
 
+
+@mk.reactive()
+def check_example_template(example_template: str, output_col: str):
+    if not output_col:
+        return
+    if not example_template.endswith("{" + output_col + "}"):
+        raise ValueError("The example template must end with '{" + output_col + "}'")
 
 
 @mk.endpoint()
@@ -51,6 +59,9 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
 
     if output_col == "":
         raise ValueError("Please enter an output column")
+
+    # Verify the example template ends with {output_col}.
+    check_example_template(example_template, output_col)
 
     # Concat all of the in-context examples.
     train_df = df[df["_status"] == "train"]
@@ -92,19 +103,8 @@ def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     return df
 
 
-@mk.endpoint()
-def add_column(df: mk.DataFrame, text: str):
-    """Add a column to the dataframe."""
-    print("adding a column", text)
-    df = df.view()
-    df[text] = ""
-    df.set(df)
-
-
-output_col_area = mk.gui.Textbox(
-    "", placeholder="Column name here...", on_blur=add_column.partial(df=df)
-)
-output_col = output_col_area.text
+output_col_area = mk.gui.Select(values=df.columns)
+output_col = output_col_area.value
 
 # show_prompts = mk.gui.Markdown("")
 
@@ -124,6 +124,9 @@ instruction_cmd = instruction_editor.code
 # mk.gui.print("Example template:", example_template_editor.code)
 
 example_template = example_template_editor.code
+
+# Reactively check the value of the example template.
+check_example_template(example_template, output_col)
 
 df_view = update_df_with_example_template(df, example_template)
 
