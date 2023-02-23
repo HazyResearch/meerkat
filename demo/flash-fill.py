@@ -44,6 +44,9 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
 
+    if output_col == "":
+        raise ValueError("Please enter an output column")
+
     # Concat all of the in-context examples.
     train_df = df[df["_status"] == "train"]
     in_context_examples = "\n".join(train_df["example"]())
@@ -107,7 +110,8 @@ mk.gui.print("Example template:", example_template_editor.code)
 example_template = example_template_editor.code
 
 df_view = update_df_with_example_template(df, example_template)
-table = mk.gui.Gallery(df_view, main_column="guest")
+# mk.gui.Gallery(df_view, main_column="guest")
+table = mk.gui.Table(df_view)
 
 run_manifest_button = mk.gui.Button(
     title="Run Manifest",
@@ -155,4 +159,6 @@ page = mk.gui.Page(
     ),
     id="flash-fill",
 )
+
+page = mk.gui.Page(component=table, id="flash-fill")
 page.launch()
