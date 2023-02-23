@@ -393,13 +393,15 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         )
         return self.__or__(other)
 
-    # While __index__ must return an integer, we decorate it with @_wand
-    # to make sure that wrapper methods calling __index__ handle non-integer values
-    # appropriately.
+    # While __index__ must return an integer, we decorate it with @reactive().
+    # This means that any calls to __index__ when the store is marked will
+    # return a Store, which will raise a TypeError.
+    # We do this to make sure that wrapper methods calling __index__
+    # handle non-integer values appropriately.
     # NOTE: This only works if __index__ is always called from wrapper methods
     # and the user/developer has a way of intercepting these methods or creating
     # recommended practices for avoiding this error.
-    @_magic
+    @reactive()
     def __index__(self):
         return super().__index__()
 
@@ -605,6 +607,16 @@ def _unpack_stores_from_object(
                 stores.append(obj)
 
             return _type(unpacked), stores
+        elif isinstance(obj, slice):
+            stores = []
+            # TODO: Figure out if we should do unpack nested here.
+            start, start_store = _unpack_stores_from_object(obj.start)
+            stop, stop_store = _unpack_stores_from_object(obj.stop)
+            step, step_store = _unpack_stores_from_object(obj.step)
+            stores.extend(start_store)
+            stores.extend(stop_store)
+            stores.extend(step_store)
+            return _type(start, stop, step), stores
         elif isinstance(obj, Store):
             return obj.value, [obj]
         else:

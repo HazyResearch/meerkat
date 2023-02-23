@@ -328,3 +328,10 @@ def test_store_getitem_multi_access(is_magic: bool, obj, idx: int):
     _is_output_reactive(out2, store)
 
     assert out1 is not out2
+
+
+def test_index():
+    store = mk.gui.Store([0, 1, 2])
+    out = store.index(1)
+    assert isinstance(out, mk.gui.Store)
+    _is_output_reactive(out, store, op_name="index", op_num_children=1)

@@ -171,3 +171,9 @@ def _max(__iterable, *, key=None) -> Any:
 def _min(__iterable, *, key=None) -> Any:
     """Overloaded ``min`` operator."""
     return min(__iterable, key=key)
+
+
+@reactive()
+def _slice(*args):
+    """Overloaded ``slice`` class."""
+    return slice(*args)

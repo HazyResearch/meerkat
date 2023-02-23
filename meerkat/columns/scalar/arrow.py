@@ -230,9 +230,6 @@ class ArrowScalarColumn(ScalarColumn):
     def to_arrow(self) -> pa.Array:
         return self.data
 
-    def dtype(self):
-        pass
-
     def equals(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False

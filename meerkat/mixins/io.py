@@ -1,7 +1,6 @@
 import os
 
 import dill
-import yaml
 
 from meerkat.tools.utils import dump_yaml, load_yaml, meerkat_dill_load
 

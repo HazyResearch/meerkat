@@ -12,7 +12,6 @@ class Table(Component):
     allow_selection: bool = False
     on_edit: EndpointProperty = None
 
-
     def __init__(
         self,
         df: DataFrame,
@@ -35,10 +34,7 @@ class Table(Component):
                 rows. Defaults to False.
         """
         super().__init__(
-            df=df,
-            selected=selected,
-            allow_selection=allow_selection,
-            on_edit=on_edit
+            df=df, selected=selected, allow_selection=allow_selection, on_edit=on_edit
         )
 
 

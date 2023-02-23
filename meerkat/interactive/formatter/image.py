@@ -1,6 +1,6 @@
 import base64
 from io import BytesIO
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Tuple
 
 from meerkat.columns.deferred.base import DeferredCell
 

@@ -91,46 +91,64 @@ def test_attributes(react: bool, attr: str):
 
 
 @pytest.mark.parametrize("react", [True, False])
+@pytest.mark.parametrize("unmark_store", [True, False])
 @pytest.mark.parametrize("method", ["add", "add_dec_no_parenthesis"])
-def test_instance_method_decorated(react: bool, method: str):
+def test_instance_method_decorated(react: bool, unmark_store: bool, method: str):
     y = mk.gui.Store(4)
 
     foo = Foo(1)
     if react:
         foo = foo.mark()
+    if unmark_store:
+        y = y.unmark()
+    is_one_arg_marked = foo.marked or y.marked
 
-    x = getattr(foo, method)(y)
+    fn = getattr(foo, method)
+    x = fn(y)
     assert x == 5
     assert isinstance(x, int)
-    assert (not react) ^ isinstance(x, mk.gui.Store)
+    assert (not is_one_arg_marked) ^ isinstance(x, mk.gui.Store)
 
-    if react:
+    if y.marked:
         assert len(y.inode.trigger_children) == 1
         assert y.inode.trigger_children[0].obj.fn.__name__ == method
-    else:
+
+    if not is_one_arg_marked:
+        # When none of the inputs are marked when the function is run,
+        # no inodes should be created.
         assert y.inode is None
+    else:
+        # If any of the inputs were marked when the function was run,
+        # inodes should be created for all arguments.
+        assert y.inode is not None
+        if not y.marked:
+            assert len(y.inode.trigger_children) == 0
 
 
 @pytest.mark.parametrize("react", [True, False])
-@pytest.mark.parametrize("y_as_store", [False, True])
-def test_magic_method_react_shortcut_accessor(react: bool, y_as_store: bool):
-    y = 1
-    if y_as_store:
-        y = mk.gui.Store(y)
-
+@pytest.mark.parametrize("unmark_store", [True, False])
+def test_magic_method_react_shortcut_getitem_accessor(react: bool, unmark_store: bool):
+    y = mk.Store(1)
     foo = Foo(1)
+
     if react:
         foo = foo.mark()
+    if unmark_store:
+        y = y.unmark()
+    is_one_arg_marked = foo.marked or y.marked
 
     x = foo[y]
+
     assert x == 1
     assert isinstance(x, int)
-    assert (not react) ^ isinstance(x, mk.gui.Store)
-    if react and isinstance(y, mk.gui.Store):
+    assert (not is_one_arg_marked) ^ isinstance(x, mk.gui.Store)
+    if y.marked:
         assert len(y.inode.trigger_children) == 1
         assert y.inode.trigger_children[0].obj.fn.__name__ == "__getitem__"
-    elif isinstance(y, mk.gui.Store):
-        assert y.inode is None
+    elif foo.marked:
+        # foo is marked by y is not.
+        assert y.inode is not None
+        assert len(y.inode.trigger_children) == 0
 
 
 @pytest.mark.parametrize("react", [True, False])

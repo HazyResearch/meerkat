@@ -1,7 +1,5 @@
 from typing import Any, List, Optional, Union
 
-from pydantic import validator
-
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.event import EventInterface

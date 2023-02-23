@@ -56,6 +56,7 @@ def select_row(df, row):
 df = mk.get("imagenette", version="160px")
 df["noisy_img"] = mk.defer(df["img"], add_noise)
 img_columns = ["img", "noisy_img"]
+df["noisy_img"].formatters = df["img"].formatters
 
 # Shuffle the dataset.
 df = df.shuffle(seed=20)
@@ -67,6 +68,8 @@ df["index"] = np.asarray(
 )
 df["img1"] = mk.defer(df, lambda df: df[df["index"][0]])
 df["img2"] = mk.defer(df, lambda df: df[df["index"][1]])
+df["img1"].formatters = df["img"].formatters
+df["img2"].formatters = df["img"].formatters
 anonymized_img_columns = ["img1", "img2"]
 
 # Initialize labels to empty strings.

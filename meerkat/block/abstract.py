@@ -4,8 +4,6 @@ import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, Hashable, List, Mapping, Sequence, Tuple, Union
 
-import yaml
-
 from meerkat.errors import ConsolidationError
 from meerkat.tools.utils import dump_yaml, load_yaml
 

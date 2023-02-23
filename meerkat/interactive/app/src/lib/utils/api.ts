@@ -5,7 +5,7 @@ import { API_URL } from "../constants.js";
 import { DataFrameChunk, type DataFrameRef } from './dataframe.js';
 
 export const updateStore = async (storeId: string, value: any) => {
-    const modifications = await modify(`${get(API_URL)}/store/${storeId}/update`, { value: value });
+    const modifications = await modify(`${get(API_URL)}/store/${storeId}/update/`, { value: value });
     return modifications;
 };
 
@@ -13,7 +13,7 @@ export const dispatch = async (endpointId: string, payload: any = {}) => {
     if (endpointId === null) {
         return;
     }
-    const promise = post(`${get(API_URL)}/endpoint/${endpointId}/dispatch`, payload).catch(
+    const promise = post(`${get(API_URL)}/endpoint/${endpointId}/dispatch/`, payload).catch(
         (error) => {
             console.log(error);
             toast.error(error.message);
@@ -38,7 +38,7 @@ export const fetchSchema = async ({
     columns = null,
     formatter = null
 }: DataFrameSchemaRequest) => {
-    return await post(`${get(API_URL)}/df/${df.refId}/schema`, {
+    return await post(`${get(API_URL)}/df/${df.refId}/schema/`, {
         columns: columns, formatter: formatter
     });
 }
@@ -66,7 +66,7 @@ export const fetchChunk = async ({
     formatter = null,
     shuffle = null
 }: DataFrameChunkRequest) => {
-    const result = await post(`${get(API_URL)}/df/${df.refId}/rows`, {
+    const result = await post(`${get(API_URL)}/df/${df.refId}/rows/`, {
         start: start,
         end: end,
         posidxs: posidxs,

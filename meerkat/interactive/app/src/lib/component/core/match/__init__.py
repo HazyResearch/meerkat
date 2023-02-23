@@ -7,7 +7,7 @@ from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
+from meerkat.interactive.endpoint import EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
@@ -133,7 +133,7 @@ class OnMatchMatch(EventInterface):
 
 @reactive(nested_return=True)
 def compute_match_scores(
-    df: DataFrame, 
+    df: DataFrame,
     criterion: MatchCriterion,
 ) -> Tuple[DataFrame, str]:
     """Compute the match scores for a given criterion.
@@ -156,7 +156,9 @@ def compute_match_scores(
 
     return df, criterion.name
 
+
 _get_match_schema = get_match_schema
+
 
 class Match(Component):
     df: DataFrame

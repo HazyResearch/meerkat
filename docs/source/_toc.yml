@@ -6,6 +6,10 @@ parts:
       - file: start/install
       - file: start/quickstart-df
       - file: start/quickstart-interactive
+      - title: Tutorials
+        file: start/tutorials/index
+        sections:
+          - file: start/tutorials/tutorial-2
 
   - caption: User Guide
     chapters:
@@ -100,12 +104,12 @@ parts:
       - title: Cheat Sheet
         file: guide/cheat-sheet
 
-  - caption: Advanced
-    chapters:
-      - title: Magic
-        file: guide/magic/getting-started
-        sections:
-          - file: guide/magic/limitations
+  # - caption: Advanced
+  #   chapters:
+  #     - title: Magic
+  #       file: guide/magic/getting-started
+  #       sections:
+  #         - file: guide/magic/limitations
 
       - title: Configuration
         file: start/configure
