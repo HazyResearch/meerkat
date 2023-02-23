@@ -166,6 +166,10 @@ class ScalarColumn(Column):
                 return super().__new__(PandasScalarColumn)
             elif isinstance(data.block, ArrowBlock):
                 return super().__new__(ArrowScalarColumn)
+            else:
+                raise ValueError(
+                    f"Cannot create `ScalarColumn` from object of type {type(data)}."
+                )
 
         if isinstance(data, (np.ndarray, torch.TensorType, pd.Series, List, Tuple)):
             return super().__new__(PandasScalarColumn)

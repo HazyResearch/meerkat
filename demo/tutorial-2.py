@@ -1,21 +1,20 @@
-"""Write a question answering interface."""
-import os
-
-from manifest import Manifest
-
 import meerkat as mk
-from meerkat.interactive.startup import file_find_replace
 
 df = mk.get("imagenette", version="160px")
 IMAGE_COL = "img"
 LABEL_COL = "label"
 
 
+# df.mark()
+
+
 @mk.reactive()
 def random_images(df: mk.DataFrame):
     images = df.sample(16)[IMAGE_COL]
     formatter = images.formatters["base"]
+    # formatter = images.formatters['tiny']
     return [formatter.encode(img) for img in images]
+
 
 labels = list(df[LABEL_COL].unique())
 class_selector = mk.gui.Select(
@@ -23,20 +22,41 @@ class_selector = mk.gui.Select(
     value=labels[0],
 )
 
+# This won't work!
+# filtered_df = df[df[LABEL_COL] == class_selector.value]
+# This won't work!
+# filtered_df = mk.reactive(lambda df: df[df[LABEL_COL] == class_selector.value])(df)
+
 filtered_df = mk.reactive(lambda df, label: df[df[LABEL_COL] == label])(
     df, class_selector.value
 )
 
 images = random_images(filtered_df)
 
+# This won't work with a simple reactive fn like a random_images that only has df.sample
+# as the encoding needs to be done in the reactive fn
+# grid = mk.gui.html.gridcols2([mk.gui.Image(data=images.formatters["base"].encode(img)) for img in images])
+
+# Basic layout
+# grid = mk.gui.html.gridcols2([mk.gui.Image(data=img) for img in images])
+
+# Better layout
 grid = mk.gui.html.gridcols4(
     [
+        # Make the image square
         mk.gui.html.div(mk.gui.Image(data=img), style="aspect-ratio: 1 / 1")
         for img in images
     ],
     classes="gap-2",
 )
 
+
+# layout = mk.gui.html.flexcol(
+#     [
+#         class_selector,
+#         grid,
+#     ]
+# )
 
 layout = mk.gui.html.flexcol(
     [
@@ -47,25 +67,6 @@ layout = mk.gui.html.flexcol(
         grid,
     ]
 )
+
 page = mk.gui.Page(component=layout, id="tutorial-1")
-import os
-from fastapi.staticfiles import StaticFiles
-# print(os.getcwd())
-# print(os.path.abspath("./meerkat/interactive/app/build/"))
-# libpath = os.path.abspath("./meerkat/interactive/app/")
-# api_url = "http://localhost:5000"
-# file_find_replace(
-#     libpath + "build",
-#     r"(VITE_API_URL\|\|\".*?\")",
-#     f'VITE_API_URL||"{api_url}"',
-#     "*.js",
-# )
-# file_find_replace(
-#     libpath + ".svelte-kit/output/client/_app/",
-#     r"(VITE_API_URL\|\|\".*?\")",
-#     f'VITE_API_URL||"{api_url}"',
-#     "*.js",
-# )
-page().mount("/", StaticFiles(directory=os.path.abspath("./meerkat/interactive/app/build/"), html=True), "test")
-# page().mount("/static", StaticFiles(directory=os.path.abspath("./temp/"),html = True), "test")
 page.launch()

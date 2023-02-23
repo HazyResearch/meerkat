@@ -4,12 +4,13 @@ parts:
   - caption: Getting started
     chapters:
       - file: start/install
-      - file: start/quickstart-df
       - file: start/quickstart-interactive
       - title: Tutorials
         file: start/tutorials/index
         sections:
+          - file: start/tutorials/tutorial-0
           - file: start/tutorials/tutorial-2
+          - file: start/tutorials/tutorial-4
 
   - caption: User Guide
     chapters:

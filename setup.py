@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Note: To use the 'upload' functionality of this file, you must:
-#   $ pipenv install twine --dev
-
 import io
 import os
+
+# Note: To use the 'upload' functionality of this file, you must:
+#   $ pipenv install twine --dev
+import shutil
 import subprocess
 import sys
 from distutils.util import convert_path
@@ -158,6 +159,7 @@ class UploadCommand(Command):
             pass
 
         # Build static components
+        self.status("Building static components…")
         env = os.environ.copy()
         env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
         build_process = subprocess.run(
@@ -172,15 +174,27 @@ class UploadCommand(Command):
             print(build_process.stdout.decode("utf-8"))
             sys.exit(1)
 
+        # Package static components to a tar file.
+        self.status("Packaging static component build...")
+        shutil.make_archive(
+            base_name=f"static-build-{VERSION}",
+            format="gztar",
+            root_dir="./meerkat/interactive/app/build",
+        )
+        sys.exit()
+
+        # Push to huggingface
+        self.status("Uploading static build to huggingface...")
+
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
 
-        self.status("Uploading the package to PyPI via Twine…")
-        os.system("twine upload dist/*")
+        # self.status("Uploading the package to PyPI via Twine…")
+        # os.system("twine upload dist/*")
 
-        self.status("Pushing git tags…")
-        os.system("git tag v{0}".format(about["__version__"]))
-        os.system("git push --tags")
+        # self.status("Pushing git tags…")
+        # os.system("git tag v{0}".format(about["__version__"]))
+        # os.system("git push --tags")
 
         sys.exit()
 

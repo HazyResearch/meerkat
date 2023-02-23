@@ -1,7 +1,9 @@
 import logging
+import traceback
 
 import numpy as np
 import pandas as pd
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from meerkat.columns.abstract import Column
@@ -46,7 +48,11 @@ def update(store: Store, value=Endpoint.EmbeddedBody()):
     store.set(value)
 
     # Trigger on the store modification: leads to modifications on the graph
-    modifications = trigger()
+    try:
+        modifications = trigger()
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     # Only return modifications that are not backend_only
     modifications = [

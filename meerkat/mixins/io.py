@@ -53,14 +53,23 @@ class ColumnIOMixin:
         # Load states
         if "state" not in meta:
             assert os.path.exists(path), f"`path` {path} does not exist."
-            state = col_type._read_state(path)
+            try:
+                state = col_type._read_state(path)
+            except Exception as e:
+                state = None
         else:
             state = meta["state"]
         data = col_type._read_data(path, *args, **kwargs) if _data is None else _data
 
-        col = col_type.__new__(col_type)
-        col._set_state(state)
-        col._set_data(data)
+        if state is None:
+            # KG, Sabri: need to remove this `if-else` in the future, 
+            # this is only for backwards compatibility.
+            # this if statement will not be required.
+            col = col_type(data)
+        else:
+            col = col_type.__new__(col_type)
+            col._set_state(state)
+            col._set_data(data)
 
         from meerkat.interactive.formatter import DeprecatedFormatter
 
