@@ -38,17 +38,13 @@
 		});
 	});
 
-	let dropdownOpen: boolean = false;
-
 	const data = writable([]);
 
-	$: fetchChunk({
+	$: chunkPromise = fetchChunk({
 		df: df,
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
-	}).then((chunk: DataFrameChunk) => {
-		data.set(chunk.getRows());
 	});
 
 	const buildTable = (columns: any) => {
@@ -84,34 +80,30 @@
 		);
 		return { table: table, columns: columns };
 	};
-	const buildFullTable = async (schema: DataFrameSchema) => {
+	const buildInitialTable = async (schema: DataFrameSchema) => {
 		const { table, columns } = buildTable(schema.columns);
-		return table.createViewModel(
-			columns,
-			{
-				
-			}
-		   
-
-		);
+		return table.createViewModel(columns);
 	};
-	$: initialModelPromise = schemaPromise.then(buildFullTable);
+	const buildFullTable = async (chunk: DataFrameChunk) => {
+		data.set(chunk.getRows());
+		const { table, columns } = buildTable(chunk.columnInfos);
+		return table.createViewModel(columns, {
+			rowDataId: (item, index) => {
+				return item[chunk.primaryKey];
+			}
+		});
+	};
+	$: initialModelPromise = schemaPromise.then(buildInitialTable);
 
-	let fullModelPromise: Promise<any>;
-	$: fullModelPromise: Promise<any> = schemaPromise.then(buildFullTable);
-
+	$: fullModelPromise = chunkPromise.then(buildFullTable);
 </script>
 
-<div class="">
-	{#await schemaPromise}
-		pass
-	{:then schema}
-		<div class="flex self-center justify-self-end items-center">
-			<Pagination bind:page bind:perPage totalItems={schema.nrows} />
-		</div>
+
+{#await schemaPromise then schema}
+	<div class="bg-slate-50 w-fit rounded-md py-1">
 		{#await initialModelPromise then { headerRows, tableAttrs }}
-			<table {...get(tableAttrs)}>
-				<thead>
+			<table {...get(tableAttrs)} class="bg-white border-solid border-spacing-0">
+				<thead class="bg-slate-50 text-slate-800">
 					{#each get(headerRows) as headerRow (headerRow.id)}
 						<Subscribe
 							rowAttrs={headerRow.attrs()}
@@ -122,9 +114,9 @@
 							<tr {...rowAttrs}>
 								{#each headerRow.cells as cell (cell.id)}
 									<Subscribe attrs={cell.attrs()} props={cell.props()} let:attrs let:props>
-										<th {...attrs} use:props.resize>
+										<th {...attrs} use:props.resize class="text-left font-mono">
+											<div class="resizer bg-slate-50" use:props.resize.drag />
 											<Render of={cell.render()} />
-											<div class="resizer" use:props.resize.drag />
 										</th>
 									</Subscribe>
 								{/each}
@@ -132,25 +124,33 @@
 						</Subscribe>
 					{/each}
 				</thead>
-				<tbody {...get(tableBodyAttrs)}>
-					{#each get(rows) as row (row.id)}
-						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<tr {...rowAttrs}>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs>
-										<td {...attrs}>
-											<Render of={cell.render()} />
-										</td>
-									</Subscribe>
-								{/each}
-							</tr>
-						</Subscribe>
-					{/each}
-				</tbody>
+				{#await fullModelPromise then { rows, tableBodyAttrs }}
+					<tbody {...get(tableBodyAttrs)}>
+						{#each get(rows) as row (row.id)}
+							<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+								<tr {...rowAttrs}>
+									{#each row.cells as cell (cell.id)}
+										<Subscribe attrs={cell.attrs()} let:attrs>
+											<td
+												{...attrs}
+												class="border-slate-200 border-2 border-solid border-spacing-0"
+											>
+												<Render of={cell.render()} />
+											</td>
+										</Subscribe>
+									{/each}
+								</tr>
+							</Subscribe>
+						{/each}
+					</tbody>
+				{/await}
 			</table>
 		{/await}
-	{/await}
-</div>
+		<div class="flex self-center justify-self-end items-center">
+			<Pagination bind:page bind:perPage totalItems={schema.nrows} />
+		</div>
+	</div>
+{/await}
 
 <style>
 	th {
@@ -161,9 +161,8 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		right: -4px;
-		width: 8px;
-		background: lightgray;
+		width: 2px;
+		right: -1;
 		cursor: col-resize;
 		z-index: 1;
 	}
