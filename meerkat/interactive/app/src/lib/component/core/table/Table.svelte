@@ -1,12 +1,13 @@
 <script lang="ts">
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
-	import { fetchChunk, fetchSchema } from '$lib/utils/api';
+	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
 	import type { DataFrameChunk, DataFrameRef, DataFrameSchema } from '$lib/utils/dataframe';
 	import { Dropdown, DropdownItem } from 'flowbite-svelte';
 	import { setContext, getContext } from 'svelte';
 	import { BarLoader } from 'svelte-loading-spinners';
 	import { openModal } from 'svelte-modals';
+	import type { Endpoint } from '$lib/utils/types';
 	import { get, readable, writable } from 'svelte/store';
 
 	import { Render, Subscribe, createTable, createRender } from 'svelte-headless-table';
@@ -19,12 +20,9 @@
 
 	export let page: number = 0;
 	export let perPage: number = 20;
-	export let cellSize: number = 24;
 
 	export let allowSelection: boolean = false;
-
-	const components: { [key: string]: ComponentType } = getContext('Components');
-	const componentId = getContext('componentId');
+	export let onEdit: Endpoint | null = null;
 
 	$: schemaPromise = fetchSchema({
 		df: df,
@@ -62,26 +60,41 @@
 					plugins: {
 						resize: {}
 					},
-					cell: ({ value, id }) =>
+					// here!!
+					cell: (item) =>
 						createRender(Cell, {
-							data: value,
+							data: item.value,
 							cellComponent: column.cellComponent,
 							cellProps: column.cellProps,
 							cellDataProp: column.cellDataProp,
 							editable: true
-						}).on("edit", () => {console.log("editterr", id, cellId)})
+						}).on('edit', (e) => {
+							dispatch(onEdit.endpointId, {
+								detail: {
+									column: item.id,
+									keyidx: item.row.dataId,
+									value: e.detail.value
+								}
+							});
+						})
 				});
 			})
 		);
-		return table.createViewModel(columns);
+		return { table: table, columns: columns };
 	};
 	const buildInitialTable = async (schema: DataFrameSchema) => {
-		return buildTable(schema.columns);
+		const { table, columns } = buildTable(schema.columns);
+		return table.createViewModel(columns);
 	};
 	$: initialModelPromise = schemaPromise.then(buildInitialTable);
 	const buildFullTable = async (chunk: DataFrameChunk) => {
 		$data = chunk.getRows();
-		return buildTable(chunk.columnInfos);
+		const { table, columns } = buildTable(chunk.columnInfos);
+		return table.createViewModel(columns, {
+			rowDataId: (item, index) => {
+				return item[chunk.primaryKey];
+			}
+		});
 	};
 	$: fullModelPromise = chunkPromise.then(buildFullTable);
 </script>
@@ -93,7 +106,7 @@
 		<div class="flex self-center justify-self-end items-center">
 			<Pagination bind:page bind:perPage totalItems={schema.nrows} />
 		</div>
-		{#await initialModelPromise then { headerRows, rows, tableAttrs, tableBodyAttrs }}
+		{#await initialModelPromise then { headerRows, tableAttrs }}
 			<table {...get(tableAttrs)}>
 				<thead>
 					{#each get(headerRows) as headerRow (headerRow.id)}
@@ -116,7 +129,7 @@
 						</Subscribe>
 					{/each}
 				</thead>
-				{#await fullModelPromise then { headerRows, rows, tableAttrs, tableBodyAttrs }}
+				{#await fullModelPromise then { rows, tableBodyAttrs }}
 					<tbody {...get(tableBodyAttrs)}>
 						{#each get(rows) as row (row.id)}
 							<Subscribe rowAttrs={row.attrs()} let:rowAttrs>

@@ -2,6 +2,7 @@ from typing import List
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.endpoint import EndpointProperty
 from meerkat.interactive.formatter.base import register_placeholder
 
 
@@ -9,7 +10,8 @@ class Table(Component):
     df: DataFrame
     selected: List[int] = []
     allow_selection: bool = False
-    cell_size: int = 24
+    on_edit: EndpointProperty = None
+
 
     def __init__(
         self,
@@ -18,6 +20,7 @@ class Table(Component):
         selected: List[int] = [],
         allow_selection: bool = False,
         cell_size: int = 24,
+        on_edit: EndpointProperty = None
     ):
         """Gallery view of a DataFrame.
 
@@ -35,7 +38,7 @@ class Table(Component):
             df=df,
             selected=selected,
             allow_selection=allow_selection,
-            cell_size=cell_size,
+            on_edit=on_edit
         )
 
 

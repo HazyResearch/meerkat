@@ -442,6 +442,24 @@ class DataFrame(
             row = self.data.apply("_get", index=posidx, materialize=materialize)
             return {k: row[k] for k in self.columns}
 
+    def _set_loc(self, keyidx: Union[str, int], column: str, value: any):
+        if self.primary_key is None:
+            raise ValueError(
+                "Cannot use `loc` without a primary key. Set a primary key using "
+                "`set_primary_key`."
+            )
+
+        if isinstance(
+            keyidx, (np.ndarray, list, tuple, pd.Series, torch.Tensor, Column)
+        ):
+            raise NotImplementedError("")
+        else:
+            posidx = self.primary_key._keyidx_to_posidx(keyidx)
+            self[column][posidx] = value
+            if self.has_inode():
+                mod = DataFrameModification(id=self.inode.id, scope=self.columns)
+                mod.add_to_queue()
+
     def _get(self, posidx, materialize: bool = False):
         if isinstance(posidx, str):
             # str index => column selection (AbstractColumn)
