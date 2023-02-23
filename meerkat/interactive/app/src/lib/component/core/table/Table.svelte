@@ -24,6 +24,7 @@
 	export let allowSelection: boolean = false;
 	export let onEdit: Endpoint | null = null;
 
+	let schemaPromise: Promise<DataFrameSchema>;
 	$: schemaPromise = fetchSchema({
 		df: df,
 		formatter: 'small'
@@ -37,16 +38,18 @@
 		});
 	});
 
-	$: chunkPromise = fetchChunk({
+	let dropdownOpen: boolean = false;
+
+	const data = writable([]);
+
+	$: fetchChunk({
 		df: df,
 		start: page * perPage,
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
+	}).then((chunk: DataFrameChunk) => {
+		data.set(chunk.getRows());
 	});
-
-	let dropdownOpen: boolean = false;
-
-	const data = writable([]);
 
 	const buildTable = (columns: any) => {
 		const table = createTable(data, {
@@ -60,7 +63,6 @@
 					plugins: {
 						resize: {}
 					},
-					// here!!
 					cell: (item) =>
 						createRender(Cell, {
 							data: item.value,
@@ -82,21 +84,22 @@
 		);
 		return { table: table, columns: columns };
 	};
-	const buildInitialTable = async (schema: DataFrameSchema) => {
+	const buildFullTable = async (schema: DataFrameSchema) => {
 		const { table, columns } = buildTable(schema.columns);
-		return table.createViewModel(columns);
-	};
-	$: initialModelPromise = schemaPromise.then(buildInitialTable);
-	const buildFullTable = async (chunk: DataFrameChunk) => {
-		$data = chunk.getRows();
-		const { table, columns } = buildTable(chunk.columnInfos);
-		return table.createViewModel(columns, {
-			rowDataId: (item, index) => {
-				return item[chunk.primaryKey];
+		return table.createViewModel(
+			columns,
+			{
+				
 			}
-		});
+		   
+
+		);
 	};
-	$: fullModelPromise = chunkPromise.then(buildFullTable);
+	$: initialModelPromise = schemaPromise.then(buildFullTable);
+
+	let fullModelPromise: Promise<any>;
+	$: fullModelPromise: Promise<any> = schemaPromise.then(buildFullTable);
+
 </script>
 
 <div class="">
@@ -129,23 +132,21 @@
 						</Subscribe>
 					{/each}
 				</thead>
-				{#await fullModelPromise then { rows, tableBodyAttrs }}
-					<tbody {...get(tableBodyAttrs)}>
-						{#each get(rows) as row (row.id)}
-							<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-								<tr {...rowAttrs}>
-									{#each row.cells as cell (cell.id)}
-										<Subscribe attrs={cell.attrs()} let:attrs>
-											<td {...attrs}>
-												<Render of={cell.render()} />
-											</td>
-										</Subscribe>
-									{/each}
-								</tr>
-							</Subscribe>
-						{/each}
-					</tbody>
-				{/await}
+				<tbody {...get(tableBodyAttrs)}>
+					{#each get(rows) as row (row.id)}
+						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+							<tr {...rowAttrs}>
+								{#each row.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} let:attrs>
+										<td {...attrs}>
+											<Render of={cell.render()} />
+										</td>
+									</Subscribe>
+								{/each}
+							</tr>
+						</Subscribe>
+					{/each}
+				</tbody>
 			</table>
 		{/await}
 	{/await}
