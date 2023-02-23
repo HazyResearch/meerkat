@@ -4,6 +4,10 @@
 	import Modals from '$lib/shared/common/Modals.svelte';
 </script>
 
+<svelte:head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</svelte:head>
+
 <ComponentContext>
 	<slot />
 	<Modals />
