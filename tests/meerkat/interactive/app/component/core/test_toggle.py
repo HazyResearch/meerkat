@@ -2,7 +2,7 @@ import meerkat as mk
 
 
 @mk.endpoint()
-def _change_value(value: mk.Store[bool], new_value: bool):
+def _change_value(value: mk.Store, new_value: bool):
     value.set(new_value)
 
 
