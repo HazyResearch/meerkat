@@ -7,7 +7,6 @@ from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from meerkat.columns.abstract import Column
-from meerkat.dataframe import DataFrame
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.tools.lazy_loader import LazyLoader
 

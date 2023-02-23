@@ -8,7 +8,7 @@
 	let config: PageType | null = null;
 	onMount(async () => {
 		const id = new URLSearchParams(window.location.search).get('id');
-		config = await (await fetch(`${$API_URL}/page/${id}/config`)).json();
+		config = await (await fetch(`${$API_URL}/page/${id}/config/`)).json();
 		document.title = config?.name ? config.name : 'Meerkat';
 	});
 </script>

@@ -160,6 +160,9 @@ html_context = {
 
 def setup(app):
     """Generate the rst files you need."""
-    path = os.path.abspath(os.path.dirname(__file__))
-    path = os.path.join(path, "rst_gen.py")
-    subprocess.run(["python", path])
+    # Only run the generation when we are not in livedocs.
+    # this codeblock causes livedocs to unnecessarily retrigger
+    if os.environ.get("SPHINX_LIVEDOCS", "false") != "true":
+        path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(path, "rst_gen.py")
+        subprocess.run(["python", path])

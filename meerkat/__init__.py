@@ -59,6 +59,7 @@ from meerkat.ops.cond import (
     _oct,
     _range,
     _set,
+    _slice,
     _str,
     _sum,
     _tuple,
@@ -123,6 +124,7 @@ range = _range
 abs = _abs
 min = _min
 max = _max
+slice = _slice
 
 # These statements needs to be after the imports above.
 # Do not move them.
@@ -189,6 +191,7 @@ __all__ = [
     "str",
     "list",
     "tuple",
+    "slice",
     "sum",
     "dict",
     "set",

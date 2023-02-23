@@ -40,9 +40,7 @@ class _LocIndexer:
     ):
         if isinstance(index, tuple):
             keyidx, column = index
-            self.obj._set_loc(
-                keyidx=keyidx, column=column, value=value
-            )
+            self.obj._set_loc(keyidx=keyidx, column=column, value=value)
         else:
             if isinstance(value, Mapping):
                 raise ValueError(

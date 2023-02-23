@@ -31,7 +31,7 @@
 	$: onChange(perPage);
 
 	async function onChange(per_page: any) {
-		page = 0;
+		// page = 0;
 		startItem = page * per_page + 1; // why doesn't this happen automatically?!
 		endItem = Math.min(page * per_page + per_page, totalItems);
 	}

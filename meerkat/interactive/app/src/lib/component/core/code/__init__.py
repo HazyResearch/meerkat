@@ -7,4 +7,3 @@ class Code(Component):
     background: str = "bg-slate-800"
     language: str = "python"
     classes: str = ""
-

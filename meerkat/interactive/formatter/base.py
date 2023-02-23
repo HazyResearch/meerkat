@@ -4,6 +4,8 @@ import collections
 from abc import ABC, abstractmethod, abstractproperty
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Type, Union
 
+import yaml
+
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.tools.utils import MeerkatDumper, MeerkatLoader
 

@@ -1,3 +1,5 @@
+port ?= "8000"
+
 autoformat:
 	black meerkat/ tests/
 	isort --atomic meerkat/ tests/
@@ -32,8 +34,9 @@ docs-check:
 	sphinx-build -b html docs/source/ docs/build/html/ -W
 
 livedocs:
+	set -e
 	python docs/source/rst_gen.py
-	sphinx-autobuild -b html docs/source/ docs/build/html/
+	SPHINX_LIVEDOCS=true sphinx-autobuild -b html docs/source/ docs/build/html/ --port=${port}
 
 dev:
 	pip install black==22.12.0 isort flake8 docformatter pytest-cov sphinx-rtd-theme nbsphinx recommonmark pre-commit sphinx-panels jupyter-sphinx pydata-sphinx-theme sphinx-autobuild sphinx-toolbox sphinx-copybutton sphinx_design

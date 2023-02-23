@@ -8,7 +8,6 @@ from typing import Dict, List, Mapping, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
-import yaml
 
 import meerkat.config
 from meerkat.block.abstract import AbstractBlock, BlockIndex

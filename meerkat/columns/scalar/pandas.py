@@ -42,6 +42,8 @@ torch = LazyLoader("torch")
 if TYPE_CHECKING:
     import torch
 
+    from meerkat.dataframe import DataFrame
+
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
 logger = logging.getLogger(__name__)

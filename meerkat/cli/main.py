@@ -127,6 +127,7 @@ def run(
     dev: bool = typer.Option(False, "--dev/--prod", help="Run in development mode"),
     api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
     frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
+    host: str = typer.Option("127.0.0.1", help="Host to run on"),
     target: str = typer.Option("page", help="Target to run in script"),
     package_manager: PackageManager = typer.Option(
         "npm", show_choices=True, help="Package manager to use"
@@ -142,6 +143,7 @@ def run(
     _run(
         script_path=script_path,
         dev=dev,
+        host=host,
         api_port=api_port,
         frontend_port=frontend_port,
         target=target,
@@ -156,6 +158,7 @@ def run(
 def _run(
     script_path: str,
     dev: bool = False,
+    host: str = "127.0.0.1",
     api_port: int = API_PORT,
     frontend_port: int = FRONTEND_PORT,
     target: str = "page",
@@ -195,6 +198,7 @@ def _run(
     # Set the logging level to debug if debug is enabled
     api_info = run_script(
         script_path,
+        server_name=host,
         port=api_port,
         dev=dev,
         target=target,

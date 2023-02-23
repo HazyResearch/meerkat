@@ -46,6 +46,8 @@ def _get_nodeables(*args, **kwargs) -> List[NodeMixin]:
             nodeables.extend(_get_nodeables(*arg))
         elif isinstance(arg, dict):
             nodeables.extend(_get_nodeables(**arg))
+        elif isinstance(arg, slice):
+            nodeables.extend(_get_nodeables(arg.start, arg.stop, arg.step))
 
     for _, v in kwargs.items():
         if isinstance(v, NodeMixin):
@@ -54,4 +56,7 @@ def _get_nodeables(*args, **kwargs) -> List[NodeMixin]:
             nodeables.extend(_get_nodeables(*v))
         elif isinstance(v, dict):
             nodeables.extend(_get_nodeables(**v))
+        elif isinstance(arg, slice):
+            nodeables.extend(_get_nodeables(arg.start, arg.stop, arg.step))
+
     return nodeables

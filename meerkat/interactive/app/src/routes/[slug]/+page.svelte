@@ -8,7 +8,7 @@
 
 	let config: PageType | null = null;
 	onMount(async () => {
-		config = await (await fetch(`${$API_URL}/page/${$page.params.slug}/config`)).json();
+		config = await (await fetch(`${$API_URL}/page/${$page.params.slug}/config/`)).json();
 		document.title = config?.name ? config.name : 'Meerkat';
 	});
 </script>
