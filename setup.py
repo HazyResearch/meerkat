@@ -157,18 +157,19 @@ class UploadCommand(Command):
             pass
 
         # Build static components
-        # env = os.environ.copy()
-        # env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
-        # build_process = subprocess.run("npm run build",
-        #     env=env,
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.STDOUT,
-        #     shell=True,
-        #     cwd="./meerkat/interactive/app"
-        # )
-        # if build_process.returncode != 0:
-        #     print(build_process.stdout.decode("utf-8"))
-        #     sys.exit(1)
+        env = os.environ.copy()
+        env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
+        build_process = subprocess.run(
+            "npm run build",
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            cwd="./meerkat/interactive/app",
+        )
+        if build_process.returncode != 0:
+            print(build_process.stdout.decode("utf-8"))
+            sys.exit(1)
 
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))

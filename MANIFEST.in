@@ -6,3 +6,4 @@ prune */__pycache__
 global-exclude *.buildprint
 global-exclude *.pyc
 global-exclude *.DS_Store
+graft meerkat/interactive/app/build
