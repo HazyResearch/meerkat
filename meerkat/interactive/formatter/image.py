@@ -3,6 +3,7 @@ from io import BytesIO
 from typing import Any, Dict, Tuple
 
 from meerkat.columns.deferred.base import DeferredCell
+from meerkat.interactive.formatter.icon import IconFormatter
 
 from ..app.src.lib.component.core.image import Image
 from .base import BaseFormatter, FormatterGroup
@@ -47,6 +48,7 @@ class ImageFormatter(BaseFormatter):
 class ImageFormatterGroup(FormatterGroup):
     def __init__(self, classes: str = ""):
         super().__init__(
+            icon=IconFormatter(name="Image"),
             base=ImageFormatter(classes=classes),
             tiny=ImageFormatter(max_size=[32, 32], classes=classes),
             small=ImageFormatter(max_size=[64, 64], classes=classes),

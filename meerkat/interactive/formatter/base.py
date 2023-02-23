@@ -45,9 +45,7 @@ class FormatterGroup(collections.abc.Mapping):
 
     def __init__(self, base: BaseFormatter = None, **kwargs):
         if base is None:
-            from meerkat.interactive.app.src.lib.component.core.text import (
-                TextFormatter,
-            )
+            from meerkat.interactive.formatter import TextFormatter
 
             # everything has a str method so this is a safe default
             base = TextFormatter()
