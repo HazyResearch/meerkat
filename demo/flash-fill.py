@@ -49,7 +49,7 @@ def check_example_template(example_template: str, output_col: str):
 
 
 @mk.endpoint()
-def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
+def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
         return ["Response test"] * len(example)
@@ -63,14 +63,15 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     # Verify the example template ends with {output_col}.
     check_example_template(example_template, output_col)
 
+    selected_idxs = df.primary_key.isin(selected)
+
     # Concat all of the in-context examples.
-    train_df = df[df["_status"] == "train"]
+    train_df = df.loc[~selected_idxs]
     in_context_examples = "\n".join(train_df["example"]())
 
     print("in_context_examples", in_context_examples)
 
-    fill_df_index = df["_status"] == "fill"
-    fill_df = df[fill_df_index]
+    fill_df = df.loc[selected_idxs]
 
     # Filter based on train/abstain/fill
     # Only fill in the blanks.
@@ -85,7 +86,7 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     if col not in df.columns:
         df[col] = ""
 
-    df[col][fill_df_index] = flash_fill
+    df[col][selected_idxs] = flash_fill
     df.set(df)
 
 
