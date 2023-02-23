@@ -23,6 +23,7 @@ try:
 except AttributeError:
     collections_abc = collections
 
+
 class ComponentFrontend(BaseModel):
     component_id: str
     path: str

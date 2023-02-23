@@ -18,8 +18,8 @@ __all__ = [
     "CodeFormatterGroup",
 ]
 
-# # backwards compatibility
-class DeprecatedFormatter:
+# backwards compatibility
+class DeprecatedFormatter:  # noqa: E302
     pass
 
 

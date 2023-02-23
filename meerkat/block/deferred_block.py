@@ -5,9 +5,7 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Dict, Hashable, List, Sequence, Tuple, Union
 
-import dill
 import numpy as np
-import yaml
 from cytoolz import merge_with
 
 import meerkat as mk

@@ -15,7 +15,7 @@ class HTMLFormatter(BaseFormatter):
 
     def __init__(self, view: str = "full"):
         self.view = view
-    
+
     @property
     def props(self) -> dict:
         return dict(view=self.view)

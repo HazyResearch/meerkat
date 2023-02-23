@@ -527,7 +527,9 @@ def test_unary_str_methods(backend: str, column: pd.Series, compute_fn: str):
 #     col = ScalarColumn(column, backend=backend)
 #     out = getattr(col.str, compute_fn)()
 #     assert isinstance(out, ScalarColumn)
-#     assert out.equals(ScalarColumn(getattr(column.str, compute_fn)(), backend=backend))
+#     assert out.equals(
+#         ScalarColumn(getattr(column.str, compute_fn)(), backend=backend)
+#     )
 
 
 @product_parametrize(
