@@ -169,8 +169,8 @@ class Match(Component):
 
     # TODO: Revisit this, how to deal with endpoint interfaces when there is composition
     # and positional arguments
-    on_match: EndpointProperty = None
-    get_match_schema: EndpointProperty = None
+    on_match: EndpointProperty[OnMatchMatch] = None
+    get_match_schema: EndpointProperty[OnGetMatchSchemaMatch] = None
 
     def __init__(
         self,
