@@ -1,1 +1,8 @@
 include README.md LICENSE
+prune meerkat/interactive/app/.svelte-kit
+prune meerkat/interactive/app/src/lib/wrappers
+prune */node_modules
+prune */__pycache__
+global-exclude *.buildprint
+global-exclude *.pyc
+global-exclude *.DS_Store

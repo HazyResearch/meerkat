@@ -6,6 +6,7 @@
 
 import io
 import os
+import subprocess
 import sys
 from distutils.util import convert_path
 from shutil import rmtree
@@ -151,18 +152,33 @@ class UploadCommand(Command):
         try:
             self.status("Removing previous builds…")
             rmtree(os.path.join(here, "dist"))
+            rmtree(os.path.join(here, "build"))
         except OSError:
             pass
+
+        # Build static components
+        # env = os.environ.copy()
+        # env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
+        # build_process = subprocess.run("npm run build",
+        #     env=env,
+        #     stdout=subprocess.PIPE,
+        #     stderr=subprocess.STDOUT,
+        #     shell=True,
+        #     cwd="./meerkat/interactive/app"
+        # )
+        # if build_process.returncode != 0:
+        #     print(build_process.stdout.decode("utf-8"))
+        #     sys.exit(1)
 
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
 
-        self.status("Uploading the package to PyPI via Twine…")
-        os.system("twine upload dist/*")
+        # self.status("Uploading the package to PyPI via Twine…")
+        # os.system("twine upload dist/*")
 
-        self.status("Pushing git tags…")
-        os.system("git tag v{0}".format(about["__version__"]))
-        os.system("git push --tags")
+        # self.status("Pushing git tags…")
+        # os.system("git tag v{0}".format(about["__version__"]))
+        # os.system("git push --tags")
 
         sys.exit()
 
