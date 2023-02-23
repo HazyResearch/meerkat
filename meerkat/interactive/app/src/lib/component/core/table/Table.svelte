@@ -47,7 +47,7 @@
 
 	$: fetchSchema({
 		df: df,
-		formatter: 'small'
+		formatter: 'icon'
 	}).then((newSchema) => {
 		schema.set(newSchema);
 	});
@@ -128,11 +128,17 @@
 				<div class="table-cell border border-slate-300 font-mono text-slate-800 " />
 				{#each $schema.columns as column, col_index}
 					<div
-						class="table-cell border border-slate-300 font-mono text-slate-800"
+						class="table-cell border border-slate-300 font-mono text-slate-800 pl-1"
 						style="width:{columnWidths[col_index]}{columnUnit}"
 					>
 						<slot id="header-cell">
-							<div class="flex flex-col items-center">
+							<div class="flex items-center">
+								<Cell
+									data={''}
+									cellComponent={column.cellComponent}
+									cellProps={column.cellProps}
+									cellDataProp={column.cellDataProp}
+								/>
 								<div class="">{column.name}</div>
 							</div>
 						</slot>
