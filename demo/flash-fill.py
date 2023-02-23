@@ -6,10 +6,10 @@ from manifest import Manifest
 import meerkat as mk
 from meerkat.dataframe import Batch
 
-manifest = Manifest(
-    client_name="huggingface",
-    client_connection="http://127.0.0.1:8010",
-)
+# manifest = Manifest(
+#     client_name="huggingface",
+#     client_connection="http://127.0.0.1:8010",
+# )
 
 
 def complete_prompt(row, example_template: mk.Store[str]):
@@ -40,6 +40,7 @@ df = mk.DataFrame(
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
+        return "Response test"
         return manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
@@ -153,12 +154,11 @@ page = mk.gui.Page(
                 classes="w-full gap-4 mx-4",
             ),
             run_manifest_button,
-            table,
+            mk.gui.html.div([table], classes="h-full w-screen"),
         ],
-        classes="gap-4",
+        classes="gap-4 h-screen",
     ),
     id="flash-fill",
 )
 
-page = mk.gui.Page(component=table, id="flash-fill")
 page.launch()

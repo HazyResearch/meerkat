@@ -54,7 +54,11 @@ class FileLock(object):
                         "Could not acquire lock on {}".format(self.file_name)
                     )
                 if (time.time() - start_time) >= self.timeout:
-                    raise FileLockException("Timeout occured.")
+                    raise FileLockException(
+                        "Timeout occured: could not acquire lock on {}".format(
+                            self.lockfile
+                        )
+                    )
                 time.sleep(self.delay)
 
     def release(self):

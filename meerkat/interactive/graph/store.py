@@ -401,7 +401,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     # NOTE: This only works if __index__ is always called from wrapper methods
     # and the user/developer has a way of intercepting these methods or creating
     # recommended practices for avoiding this error.
-    @reactive()
+    @_magic
     def __index__(self):
         return super().__index__()
 

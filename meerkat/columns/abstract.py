@@ -284,7 +284,7 @@ class Column(
         raise NotImplementedError
 
     def _get_default_formatters(self) -> "FormatterGroup":
-        from meerkat.interactive.app.src.lib.component.core.text import TextFormatter
+        from meerkat.interactive.formatter import TextFormatter
         from meerkat.interactive.formatter.base import FormatterGroup
 
         # by default all object should have a `str` representation

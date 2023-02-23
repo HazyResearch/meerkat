@@ -120,7 +120,7 @@
 	}
 </script>
 
-<div class="w-fit">
+<div class="w-full h-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md">
 	<div class="auto-table table-fixed overflow-x-scroll text-sm border-collapse">
 		<div class="table-header-group">
 			<div class="table-row bg-slate-100">
@@ -178,7 +178,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="grid grid-cols-3 h-8 z-10 bg-slate-100 px-5 rounded-b-sm">
+	<div class="grid grid-cols-3 h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300">
 		<!-- Left header section -->
 		<div class="flex justify-self-start items-center">
 			<!-- <span class="font-semibold">

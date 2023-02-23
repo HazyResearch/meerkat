@@ -76,7 +76,7 @@
 </script>
 
 <div
-	class="table pl-4 pr-4 table-fixed overflow-x-scroll text-sm w-fit dark:text-gray-300 dark:bg-gray-700"
+	class="table pl-4 pr-4 table-fixed overflow-x-scroll text-sm w-full h-full bg-slate-200"
 >
 	<div class="table-header-group">
 		<div class="table-row" bind:clientWidth={tableWidth}>
