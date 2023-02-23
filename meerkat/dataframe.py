@@ -32,6 +32,7 @@ from pandas._libs import lib
 import meerkat
 from meerkat.block.manager import BlockManager
 from meerkat.columns.abstract import Column
+from meerkat.columns.scalar.abstract import ScalarColumn
 from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
@@ -269,7 +270,7 @@ class DataFrame(
         return list(self.data.keys())
 
     @property
-    def primary_key(self) -> Column:
+    def primary_key(self) -> ScalarColumn:
         """The column acting as the primary key."""
         if self._primary_key is None:
             return None
