@@ -34,6 +34,10 @@ df = mk.DataFrame(
         "_status": ["train", "train", "train", "fill", "fill"],
     }
 )
+df["note"] = ""
+
+df = df.mark()
+
 
 
 @mk.endpoint()
@@ -122,8 +126,16 @@ instruction_cmd = instruction_editor.code
 example_template = example_template_editor.code
 
 df_view = update_df_with_example_template(df, example_template)
+
+
+@mk.endpoint
+def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any):
+    df.loc[keyidx, column] = value
+    print("updating")
+
+
 # mk.gui.Gallery(df_view, main_column="guest")
-table = mk.gui.Table(df_view)
+table = mk.gui.Table(df_view, on_edit=on_edit.partial(df=df))
 
 run_manifest_button = mk.gui.Button(
     title="Run Manifest",

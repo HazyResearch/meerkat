@@ -12,7 +12,7 @@
 
 {#if editable}
 	<input
-		class="input input-bordered h-7 px-3 grow"
+		class="input px-2 w-full"
 		on:change={() => {cellEdit(data);}}
 		bind:value={data}
 	/>

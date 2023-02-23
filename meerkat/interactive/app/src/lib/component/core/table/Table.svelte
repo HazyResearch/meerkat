@@ -10,7 +10,6 @@
 	} from '$lib/utils/dataframe';
 	import { setContext, getContext } from 'svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { BarLoader } from 'svelte-loading-spinners';
 	import { openModal } from 'svelte-modals';
 	import type { Endpoint } from '$lib/utils/types';
 	import { zip } from 'underscore';
@@ -58,6 +57,7 @@
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
 	}).then((newChunk) => {
+		console.log("fetching")
 		chunk.set(newChunk);
 	});
 
@@ -156,8 +156,8 @@
 							{posidx}
 						</div>
 					</div>
-					{#each $schema.columns as col}
-						<div class="table-cell border border-slate-200">
+					{#each $chunk.columnInfos as col}
+						<div class="table-cell border border-slate-200 hover:opacity-80">
 							<Cell
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}

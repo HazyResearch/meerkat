@@ -58,6 +58,9 @@ export class DataFrameChunk {
 
     getCell(row: number, column: string) {
         let columnIdx = this.columns.indexOf(column);
+        if (columnIdx === -1) {
+            throw new Error(`Column ${column} does not exist in this DataFrame`);
+        }
         let columnInfo = this.columnInfos[columnIdx];
         return {
             data: this.rows[row][this.columns.indexOf(column)],
