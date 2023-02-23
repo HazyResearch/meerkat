@@ -475,6 +475,7 @@ def _materialize(
 
     import numpy as np
     import pandas as pd
+    import pyarrow as pa
     import torch
     from tqdm import tqdm
 
@@ -499,38 +500,38 @@ def _materialize(
             # kwargs
             if curr.data.args:
                 if len(curr.data.args) > 1:
-                    raise ValueError("Multiple args not supported.")
+                    raise ValueError("Multiple args not supported with `use_ray=True`.")
                 curr = curr.data.args[0]
             elif curr.data.kwargs:
                 if len(curr.data.kwargs) > 1:
-                    raise ValueError("Multiple kwargs not supported.")
+                    raise ValueError("Multiple kwargs not supported with `use_ray=True`.")
                 curr = curr.data.kwargs[next(iter(curr.data.kwargs))]
             else:
                 raise ValueError("No args or kwargs.")
 
         # Step 2: Create the ray dataset from the base column
+        # TODO (dean): test added_dim on other data types
+        added_dim = False
         if isinstance(curr, mk.ScalarColumn):
             ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
             fns.append(lambda x: x["0"])
         elif isinstance(curr, mk.NumPyTensorColumn):
-            ds = ray.data.from_numpy(curr).repartition(num_blocks)
+            ndarrays = curr.data
+            if ndarrays.ndim == 1:
+                added_dim = True
+                ndarrays = np.expand_dims(ndarrays, 1)
+            ds = ray.data.from_numpy(ndarrays).repartition(num_blocks)
         elif isinstance(curr, mk.TorchTensorColumn):
             ds = ray.data.from_torch(curr).repartition(num_blocks)
         elif isinstance(curr, mk.ObjectColumn):
             ds = ray.data.from_items(curr).repartition(num_blocks)
         elif isinstance(curr, mk.DataFrame):
-            print("hi")
-            ds = ray.data.from_pandas(
-                pd.DataFrame(
-                    {
-                        str(idx): arg.to_pandas()
-                        for idx, arg in enumerate(curr.data.args)
-                    }
-                )
-            )
-            fns.append(lambda row: row.values())
+            raise ValueError(f"Multiple outputs (fan-out) not supported with `use_ray=True`.")
+            # TODO (dean): Support fan-out (would have to create multiple pipelines)
+            # ds = ray.data.from_pandas(curr.data._repr_pandas_()[0])
+            # fns.append(lambda row: row.values())
         else:
-            raise ValueError(f"Base column is of unsupported type {type(curr)}.")
+            raise ValueError(f"Base column is of unsupported type {type(curr)} with `use_ray=True`.")
 
         # Step 3: Build the pipeline by walking backwards through fns
         pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
@@ -545,7 +546,11 @@ def _materialize(
         result = []
         if data._output_type == mk.NumPyTensorColumn:
             for partition in result_ds.to_numpy_refs():
-                result.append(ray.get(partition))
+                res = ray.get(partition)
+                if len(res):
+                    result.append(res[0][0] if added_dim else res[0])
+            if added_dim:
+                return mk.NumPyTensorColumn.from_array(result)
             return column(np.stack(result))
         elif data._output_type == mk.TorchTensorColumn:
             for partition in result_ds.to_torch():
@@ -556,21 +561,15 @@ def _materialize(
                 result.append(ray.get(partition))
             return column(pd.concat(result)["value"])
         elif data._output_type == mk.ArrowScalarColumn:
-            print("Using to_arrow_refs()")
             for partition in result_ds.to_arrow_refs():
                 result.append(ray.get(partition)["value"].combine_chunks())
-            # from meerkat.columns.abstract import infer_column_type
-            # return infer_column_type(result)
-            return result
-            import pyarrow as pa
-
             return column(pa.concat_arrays(result))
         elif data._output_type == mk.ObjectColumn:
             for partition in result_ds.iter_batches():
                 result.extend(partition)
             return column(result)
         else:
-            raise ValueError(f"Unsupported output type {data._output_type}.")
+            raise ValueError(f"Unsupported output type {data._output_type} with `use_ray=True`.")
 
     else:
         result = []

@@ -30,9 +30,18 @@ def column_testbed(request, tmpdir):
     return testbed_class(**config, tmpdir=tmpdir)
 
 
-@product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
+@product_parametrize(
+    params={
+        "batched": [True, False],
+        "materialize": [True, False],
+        "use_ray": [True, False],
+    }
+)
 def test_map_return_single(
-    column_testbed: AbstractColumnTestBed, batched: bool, materialize: bool
+    column_testbed: AbstractColumnTestBed,
+    batched: bool,
+    materialize: bool,
+    use_ray: bool,
 ):
     """`map`, single return,"""
     if not (isinstance(column_testbed.col, DeferredColumn) or materialize):
@@ -53,6 +62,7 @@ def test_map_return_single(
         is_batched_fn=batched,
         materialize=materialize,
         output_type=map_spec.get("output_type", None),
+        use_ray=use_ray,
     )
     assert result.is_equal(map_spec["expected_result"])
 
@@ -87,9 +97,18 @@ def test_map_return_single(
 #     assert result.is_equal(map_spec["expected_result"])
 
 
-@product_parametrize(params={"batched": [True, False], "materialize": [True, False]})
+@product_parametrize(
+    params={
+        "batched": [True, False],
+        "materialize": [True, False],
+        "use_ray": [False], # TODO (dean): Multiple outputs not supported.
+    }
+)
 def test_map_return_multiple(
-    column_testbed: AbstractColumnTestBed, batched: bool, materialize: bool
+    column_testbed: AbstractColumnTestBed,
+    batched: bool,
+    materialize: bool,
+    use_ray: bool,
 ):
     """`map`, single return,"""
     if not (isinstance(column_testbed.col, DeferredColumn) or materialize):
@@ -116,6 +135,7 @@ def test_map_return_multiple(
         is_batched_fn=batched,
         materialize=materialize,
         output_type={k: v.get("output_type", None) for k, v in map_specs.items()},
+        use_ray=use_ray,
     )
     assert isinstance(result, DataFrame)
     for key, map_spec in map_specs.items():

@@ -62,6 +62,7 @@ REQUIRED = [
     "nbformat",
     "sse-starlette",
     "tabulate",
+    "pyparsing",
 ]
 
 # Read in docs/requirements.txt
