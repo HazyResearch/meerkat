@@ -9,7 +9,7 @@ class Gallery(Component):
     df: DataFrame
     main_column: str
     tag_columns: List[str] = []
-    selected: List[int] = []
+    selected: List[str] = []
     allow_selection: bool = False
     cell_size: int = 24
 

@@ -8,32 +8,34 @@
 		type DataFrameRef,
 		type DataFrameSchema
 	} from '$lib/utils/dataframe';
+	import { without } from 'underscore';
 	import { setContext, getContext } from 'svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import type { Endpoint } from '$lib/utils/types';
 	import { zip } from 'underscore';
 	import { get, readable, writable, type Writable } from 'svelte/store';
+	import Selected from './Selected.svelte';
 	import Cell from '$lib/shared/cell/Cell.svelte';
+	import { CheckAll } from 'svelte-bootstrap-icons';
 
 	export let df: DataFrameRef;
-	export let selected: Array<string>;
 
 	export let page: number = 0;
 	export let perPage: number = 20;
-
+	
+	export let selected: Array<string> = [];
 	export let allowSelection: boolean = false;
 	export let onEdit: Endpoint;
 
 	// Setup row modal
-	setContext('open_row_modal', (posidx: number) => {
+	const open_row_modal = (posidx: number) => {
 		openModal(RowModal, {
 			df: df,
 			posidx: posidx,
 			mainColumn: undefined
 		});
-	});
-	console.log('here');
+	};
 
 	// Create placeholder variables for table data.
 	let schema: Writable<DataFrameSchema> = writable({
@@ -57,7 +59,6 @@
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
 	}).then((newChunk) => {
-		console.log("fetching")
 		chunk.set(newChunk);
 	});
 
@@ -114,10 +115,6 @@
 		columnUnit = 'px';
 	});
 
-	$: {
-		console.log($chunk);
-		console.log($schema);
-	}
 </script>
 
 <div class="w-full h-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md">
@@ -152,9 +149,51 @@
 			{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 				<div class="table-row items-center">
 					<div class="table-cell border border-slate-300 font-mono text-slate-800 bg-slate-100">
-						<div class="w-7 text-center">
+						<button 
+							class="w-7 text-center"
+							class:text-violet-600={selected.includes(keyidx)}
+							class:bg-slate-200={selected.includes(keyidx)}
+							on:dblclick={(e) => {
+								open_row_modal(posidx);
+							}}
+							on:click={(e) => {
+								console.log("the detail", e)
+								if (e.shiftKey) {
+									if (selected.length === 0) {
+										selected.push(keyidx);
+									} else {
+										let lastIdx = selected[selected.length - 1];
+										let lasti = $chunk.keyidxs.indexOf(lastIdx);
+										let i = $chunk.keyidxs.indexOf(keyidx);
+										if (i > lasti) {
+											for (let j = lasti; j <= i; j++) {
+												if (!selected.includes($chunk.keyidxs[j])) {
+													selected.push($chunk.keyidxs[j]);
+												}
+											}
+										} else {
+											for (let j = lasti; j >= i; j--) {
+												if (!selected.includes($chunk.keyidxs[j])) {
+													selected.push($chunk.keyidxs[j]);
+												}
+											}
+										}
+									}
+								} else if (e.altKey) {
+									selected = [];
+									selected.push(keyidx);
+								} else {
+									if (selected.includes(keyidx)) {
+										selected = without(selected, keyidx);
+									} else if (!selected.includes(keyidx)) {
+										selected.push(keyidx);
+									}
+								}
+								selected = selected;
+							}}
+						>
 							{posidx}
-						</div>
+						</button>
 					</div>
 					{#each $chunk.columnInfos as col}
 						<div class="table-cell border border-slate-200 hover:opacity-80">
@@ -183,13 +222,13 @@
 		<div class="flex justify-self-start items-center">
 			<!-- <span class="font-semibold">
 				<GallerySlider bind:size={cellSize} />
-			</span>
-			<div class="font-semibold self-center px-10 flex space-x-2">
+			</span> -->
+			<div class="self-center px-2 flex space-x-1 items-center">
 				{#if selected.length > 0}
-					<Selected />
-					<div class="text-violet-600">{selected.length}</div>
+					<CheckAll class="text-violet-600"/>
+					<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
 				{/if}
-			</div> -->
+			</div>
 		</div>
 
 		<!-- Middle header section -->
