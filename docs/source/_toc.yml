@@ -6,6 +6,10 @@ parts:
       - file: start/install
       - file: start/quickstart-df
       - file: start/quickstart-interactive
+      - title: Tutorials
+        file: guide/tutorials/index
+        sections:
+          - file: guide/tutorials/tutorial-2
 
   - caption: User Guide
     chapters:
