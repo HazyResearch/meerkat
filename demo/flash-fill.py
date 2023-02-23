@@ -40,7 +40,7 @@ df = mk.DataFrame(
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
-        return "Response test"
+        return ["Response test"] * len(example)
         return manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
@@ -88,7 +88,18 @@ def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     return df
 
 
-output_col_area = mk.gui.Textbox("", placeholder="Column name here...")
+@mk.endpoint()
+def add_column(df: mk.DataFrame, text: str):
+    """Add a column to the dataframe."""
+    print("adding a column", text)
+    df = df.view()
+    df[text] = ""
+    df.set(df)
+
+
+output_col_area = mk.gui.Textbox(
+    "", placeholder="Column name here...", on_blur=add_column.partial(df=df)
+)
 output_col = output_col_area.text
 
 # show_prompts = mk.gui.Markdown("")
@@ -105,8 +116,8 @@ example_template_editor = mk.gui.Editor(
 )
 # prompt_editor = mk.gui.Editor(code="Write the prompt here.")
 instruction_cmd = instruction_editor.code
-mk.gui.print("Instruction commmand:", instruction_cmd)
-mk.gui.print("Example template:", example_template_editor.code)
+# mk.gui.print("Instruction commmand:", instruction_cmd)
+# mk.gui.print("Example template:", example_template_editor.code)
 
 example_template = example_template_editor.code
 

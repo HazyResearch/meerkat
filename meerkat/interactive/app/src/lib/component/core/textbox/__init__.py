@@ -1,4 +1,12 @@
+from typing import Optional
+
 from meerkat.interactive.app.src.lib.component.abstract import Component
+from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.event import EventInterface
+
+
+class OnBlurTextbox(EventInterface):
+    text: int
 
 
 class Textbox(Component):
@@ -6,11 +14,14 @@ class Textbox(Component):
     placeholder: str = "Write some text..."
     debounce_timer: int = 150
 
+    on_blur: Optional[Endpoint[OnBlurTextbox]] = None
+
     def __init__(
         self,
         text: str = "",
         placeholder: str = "Write some text...",
         debounce_timer: int = 150,
+        on_blur: Optional[Endpoint[OnBlurTextbox]] = None,
     ):
         """A textbox that can be used to get user input.
 
@@ -21,5 +32,8 @@ class Textbox(Component):
         """
 
         super().__init__(
-            text=text, placeholder=placeholder, debounce_timer=debounce_timer
+            text=text,
+            placeholder=placeholder,
+            debounce_timer=debounce_timer,
+            on_blur=on_blur,
         )

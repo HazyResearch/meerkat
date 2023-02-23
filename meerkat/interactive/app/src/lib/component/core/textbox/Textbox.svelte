@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+
 	/** Text in the textbox. */
 	export let text: string;
 
@@ -17,6 +19,8 @@
 	};
 
 	const initialText = text;
+
+	const dispatch = createEventDispatcher();
 </script>
 
 <input
@@ -26,4 +30,5 @@
 	class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
 	on:keyup={({ target: { value } }) => debounce(value)}
 	on:keypress
+	on:blur={(e) => {dispatch('blur', { text: text })}}
 />
