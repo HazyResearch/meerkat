@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, List, Sequence, Set, Union
 
 import pyarrow as pa
 import pyarrow.compute as pac
-from pyarrow.compute import equal
 from pandas.core.accessor import CachedAccessor
+from pyarrow.compute import equal
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
@@ -18,8 +18,8 @@ from ..abstract import Column
 from .abstract import ScalarColumn, StringMethods
 
 if TYPE_CHECKING:
-    from meerkat.interactive.formatter.base import BaseFormatter
     from meerkat import DataFrame
+    from meerkat.interactive.formatter.base import BaseFormatter
 
 
 torch = LazyLoader("torch")
@@ -323,7 +323,6 @@ class ArrowScalarColumn(ScalarColumn):
             )
 
     def _true_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
-
         if isinstance(other, Column):
             assert isinstance(other, ArrowScalarColumn)
             other = other.data

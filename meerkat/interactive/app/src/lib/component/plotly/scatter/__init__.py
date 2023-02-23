@@ -1,4 +1,5 @@
 from typing import List
+
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty

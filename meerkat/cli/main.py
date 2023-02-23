@@ -124,7 +124,7 @@ def run(
     script_path: str = typer.Argument(
         ..., help="Path to a Python script to run in Meerkat"
     ),
-    dev: bool = typer.Option(True, "--dev/--prod", help="Run in development mode"),
+    dev: bool = typer.Option(False, "--dev/--prod", help="Run in development mode"),
     api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
     frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
     target: str = typer.Option("page", help="Target to run in script"),
@@ -136,7 +136,7 @@ def run(
         "app", help="Subdomain to use for public sharing mode"
     ),
     debug: bool = typer.Option(False, help="Enable debug logging mode"),
-    skip_build: bool = typer.Option(False, help="Skip building the app."),
+    skip_build: bool = typer.Option(True, help="Skip building the app."),
 ):
     """Launch a Meerkat app, given a path to a Python script."""
     _run(
@@ -155,7 +155,7 @@ def run(
 
 def _run(
     script_path: str,
-    dev: bool = True,
+    dev: bool = False,
     api_port: int = API_PORT,
     frontend_port: int = FRONTEND_PORT,
     target: str = "page",
@@ -163,7 +163,7 @@ def _run(
     shareable: bool = False,
     subdomain: str = "app",
     debug: bool = False,
-    skip_build: bool = False,
+    skip_build: bool = True,
 ):
     # Pretty print information to console
     rich.print(f":rocket: Running [bold violet]{script_path}[/bold violet]")
@@ -266,6 +266,7 @@ def demo(
     run: bool = typer.Option(True, help="Run the demo script"),
     api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
     frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
+    dev: bool = typer.Option(False, "--dev/--prod", help="Run in development mode"),
     copy: bool = typer.Option(
         False, help="Copy the demo script to the current directory"
     ),
@@ -283,7 +284,12 @@ def demo(
 
     # Optional: Run the demo script.
     if run:
-        _run(script_path=script_path, api_port=api_port, frontend_port=frontend_port)
+        _run(
+            script_path=script_path,
+            api_port=api_port,
+            frontend_port=frontend_port,
+            dev=dev,
+        )
 
 
 @cli.command()

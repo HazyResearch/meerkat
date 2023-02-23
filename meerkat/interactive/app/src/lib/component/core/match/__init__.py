@@ -11,7 +11,6 @@ from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
-
 _SUPPORTED_BIN_OPS = {
     "Add": lambda x, y: x + y,
     "Sub": lambda x, y: x - y,

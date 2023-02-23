@@ -15,4 +15,4 @@ src/routes/*
 !/src/routes/*.ts
 !/src/routes/*slug*
 !/build/
-!.buildprint
+.buildprint

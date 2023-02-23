@@ -1,11 +1,8 @@
-
-
-from ..app.src.lib.component.core.text import TextFormatter, TextFormatterGroup
 from ..app.src.lib.component.core.number import NumberFormatter, NumberFormatterGroup
 from ..app.src.lib.component.core.raw_html import HTMLFormatter, HTMLFormatterGroup
-from .image import ImageFormatter, ImageFormatterGroup
+from ..app.src.lib.component.core.text import TextFormatter, TextFormatterGroup
 from .code import CodeFormatter, CodeFormatterGroup
-
+from .image import ImageFormatter, ImageFormatterGroup
 
 __all__ = [
     "Formatter",
@@ -18,7 +15,7 @@ __all__ = [
     "HTMLFormatter",
     "HTMLFormatterGroup",
     "CodeFormatter",
-    "CodeFormatterGroup"
+    "CodeFormatterGroup",
 ]
 
 # # backwards compatibility

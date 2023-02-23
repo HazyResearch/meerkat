@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 
@@ -46,4 +47,3 @@ class HTMLFormatterGroup(FormatterGroup):
             thumbnail=HTMLFormatter(view="thumbnail"),
             gallery=HTMLFormatter(view="thumbnail"),
         )
-    

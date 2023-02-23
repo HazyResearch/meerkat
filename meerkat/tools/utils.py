@@ -140,7 +140,6 @@ BACKWARDS_COMPAT_REPLACEMENTS = [
 class MeerkatDumper(yaml.Dumper):
     @staticmethod
     def _pickled_object_representer(dumper, data):
-
         return dumper.represent_mapping(
             "!PickledObject", {"class": data.__class__, "pickle": dill.dumps(data)}
         )

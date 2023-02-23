@@ -2,8 +2,9 @@ import base64
 from io import BytesIO
 from typing import Any, Dict, Tuple, Union
 
-from ..app.src.lib.component.core.image import Image
 from meerkat.columns.deferred.base import DeferredCell
+
+from ..app.src.lib.component.core.image import Image
 from .base import BaseFormatter, FormatterGroup
 
 
