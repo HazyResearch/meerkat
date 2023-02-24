@@ -25,7 +25,7 @@
 </script>
 
 <div
-	class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 {color.textColor} {color.bgColor} rounded-lg dark:bg-red-800 dark:text-red-200"
+	class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 {color.textColor} {color.bgColor} rounded-lg"
 >
 	{#if status === 'success'}
 		<svg
@@ -58,7 +58,7 @@
 	{:else if status === 'working'}
 		<svg
 			aria-hidden="true"
-			class="w-6 h-6 text-gray-300 animate-spin dark:text-gray-600 fill-violet-600"
+			class="w-6 h-6 text-gray-300 animate-spin fill-violet-600"
 			viewBox="0 0 100 101"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
