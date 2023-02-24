@@ -52,6 +52,7 @@ df_clip = mk.DataFrame.read(
 ```
 
 ```{code-cell} ipython3
+:tags: [remove-output]
 df = df.merge(df_clip[["img_id", "img_clip"]], on="img_id")
 ```
 
