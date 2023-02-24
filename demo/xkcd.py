@@ -1,24 +1,26 @@
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
 from meerkat.interactive.app.src.lib.shared.cell.website import WebsiteFormatter
+from meerkat.interactive.formatter.image import ImageFormatter
 
 df = mk.get("olivierdehaene/xkcd", registry="huggingface")["train"]
 
 for col in df.columns:
     df[col] = df[col].to_numpy()
 
-df["image_url"].formatter = ImageFormatter()
-df["url"].formatter = WebsiteFormatter(height=30)
-df["explained_url"].formatter = WebsiteFormatter(height=30)
-
 filter = mk.gui.Filter(df)
 filtered_df = filter(df)
 
-# Make the gallery occupy only 50% of the screen height
 gallery = mk.gui.html.div(
     [
         filter,
-        mk.gui.Gallery(filtered_df, main_column="image_url"),
+        mk.gui.Gallery(
+            filtered_df.format({
+                "image_url": ImageFormatter(max_size=(300, 300)),
+                "url": WebsiteFormatter(height=30),
+                "explained_url": WebsiteFormatter(height=30),
+            }), 
+            main_column="image_url",
+        ),
     ],
     classes="flex flex-col h-[80vh]",
 )
