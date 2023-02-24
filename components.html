@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="./favicon.png" />
+		<meta name="viewport" content="width=device-width" />
+		<meta http-equiv="content-security-policy" content="">
+		<link href="./_app/immutable/assets/_layout-5bd5b5fb.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_page-8bf76ce1.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/start-6d73dc26.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-f8c1caff.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-d64b6db8.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-39fcfd13.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/shared-23917130.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-2e47624b.js">
+		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/components/_page.svelte-bb5ab802.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-5c469a1f.js"><!-- HEAD_svelte-1dsodst_START --><link href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-okaidia.min.css" rel="stylesheet"><!-- HEAD_svelte-1dsodst_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">
+
+
+<div class="flex flex-col h-screen"><header class="fixed w-full top-0 z-50"><nav class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-100 dark:border-gray-700 font-rubik px-2 sm:px-4 py-2.5 border-b border-b-2 bg-gradient-to-r from-violet-300 via-red-200 to-orange-100"><div class="mx-auto flex flex-wrap justify-between items-center  container"><a href="/" class="flex items-center"><img src="favicon.png" class="mr-3 h-10" alt="Meerkat Logo">
+		<span class="text-violet-700 self-center whitespace-nowrap text-2xl font-light dark:text-white">Meerkat
+		</span></a>
+	<div class="flex md:order-2"><button type="button" class="bg-gradient-to-r from-violet-400 via-red-400 to-orange-400 hover:from-violet-500 hover:via-red-500 hover:to-orange-500 text-white focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-violet-600 dark:hover:bg-violet-700 dark:focus:ring-violet-800">Get started
+		</button>
+		<button type="button" class="focus:outline-none whitespace-normal rounded-lg focus:ring-2 p-1.5 hover:text-gray-900 hover:bg-gray-100 text-gray-500 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 ml-3 md:hidden" aria-label="Open main menu"><span class="sr-only">Open main menu</span>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="h-6 w-6 shrink-0" aria-label="bars 3" fill="none" viewBox="0 0 24 24" stroke-width="2"><!-- HTML_TAG_START --><path d="M3.75 6.75H20.25M3.75 12H20.25M3.75 17.25H20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <!-- HTML_TAG_END --></svg></button></div>
+	<div class="w-full md:block md:w-auto" hidden><ul class="flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium"><li><a href="/" class="block py-2 pr-4 pl-3 md:p-0 rounded md:border-0 text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"><span class="hover:text-purple-800">Home </span></a></li>
+		<li><a href="/blog" class="block py-2 pr-4 pl-3 md:p-0 rounded md:border-0 text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"><span class="text-purple-500 hover:text-purple-800">Blog
+			</span></a></li>
+		<li><a href="/docs/index.html" class="block py-2 pr-4 pl-3 md:p-0 rounded md:border-0 text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"><span class="text-purple-500 hover:text-purple-800">Documentation
+			</span></a></li></ul></div></div></nav></header>
+	<main class="mt-20 relative grow">
+		<div class="flex flex-row"><aside class="w-64" aria-label="Sidebar"><div class="overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800">
+					<ul class="space-y-2"><li><button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="sidebar-dropdown">
+    <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>The Basics</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-label="chevron down" fill="none" viewBox="0 0 24 24" stroke-width="2"><!-- HTML_TAG_START --><path d="M19.5 8.25L12 15.75L4.5 8.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <!-- HTML_TAG_END --></svg></button>
+  </li>
+						<li><button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="sidebar-dropdown">
+    <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>Dataframe Components</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-label="chevron down" fill="none" viewBox="0 0 24 24" stroke-width="2"><!-- HTML_TAG_START --><path d="M19.5 8.25L12 15.75L4.5 8.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <!-- HTML_TAG_END --></svg></button>
+  </li>
+						<li><a href="" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+    <span class="ml-3">Flowbite Components</span>
+    </a></li>
+						<li><a href="" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+    <span class="ml-3">HTML Tags</span>
+    </a></li></ul></div></aside>
+
+			<div><div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Button</label></div>
+					<div class="w-20"><div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col hover:bg-slate-200"><button>Hello</button></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Checkbox</label></div>
+					<div class="w-fit"><div class="bg-violet-50 p-2 rounded-lg">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"><input type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 rounded text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600" checked></label></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Text</label></div>
+					<div class="w-fit"><div class="text-ellipsis whitespace-nowrap overflow-hidden">A quick brown fox jumped over a lazy dog.</div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Textbox</label></div>
+					<div class="w-fit"><input type="text" placeholder="Write some text..." class="grow h-10 px-3 rounded-md shadow-md"></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Slider</label></div>
+					<div class="w-fit"><div class="bg-violet-50 p-2 rounded-lg w-fit"><div class="flex flex-col">
+        <div class="-ml-2 px-2 w-full"><p class="text-sm text-purple-500" style="margin-left: 0%">0</p></div>
+		<input type="range" min="0" max="10" step="1" class="accent-purple-500" value="0">
+		<div class="flex"><div class="flex-1 text-sm text-purple-400">0</div>
+			<div class="flex-1 text-sm text-purple-400 text-right">10</div></div></div></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Radio</label></div>
+					<div class="w-fit"><div class="bg-violet-50 p-2 rounded-lg w-fit">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"><input type="radio" value="" name="" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600" checked></label></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">RawHTML</label></div>
+					<div class="w-fit"><div class="h-full w-full rounded-md shadow-md border-black"><iframe srcdoc="
+<div>
+    <h1>Hello</h1>
+    <p>World</p>
+</div>
+" title="title" class="rounded-md" frameborder="0" style="height: 100%; width: 100%;"></iframe></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">RadioGroup</label></div>
+					<div class="w-fit"><div class="bg-violet-50 p-2 rounded-lg w-fit flex flex-row space-x-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"><input type="radio" value="1" name="radio-group" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600">1
+		</label>
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"><input type="radio" value="2" name="radio-group" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600">2
+		</label>
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center text-purple-500"><input type="radio" value="3" name="radio-group" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600">3
+		</label></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">FileUpload</label></div>
+					<div class="w-fit">
+  <input type="file" webkitdirectory="false" directory="false" class="block w-full disabled:cursor-not-allowed disabled:opacity-50 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500 bg-gray-50 text-gray-900 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 border-gray-300 dark:border-gray-600 p-2.5 text-sm rounded-lg border !p-0 dark:text-gray-400">
+  </div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Stats</label></div>
+					<div class="w-fit"><div class="m-2 flex flex-wrap justify-center gap-x-2 gap-y-2"><div class="bg-slate-100 rounded-md flex flex-col shadow-sm py-0.5"><div class="text-slate-400 text-md px-2 self-center">Temperature (°C)</div>
+			<div class="font-bold text-xl self-center">13</div>
+		</div><div class="bg-slate-100 rounded-md flex flex-col shadow-sm py-0.5"><div class="text-slate-400 text-md px-2 self-center">Altitude (ft)</div>
+			<div class="font-bold text-xl self-center">12.35K</div>
+		</div></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Toggle</label></div>
+					<div class="w-fit"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" >
+	<div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+	<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"></span></label></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Code</label></div>
+					
+
+<div class="whitespace-pre overflow-auto h-full max-h-[50vh] my-1 rounded-lg py-2 px-4 bg-black"><pre><code class="language-python"><!-- HTML_TAG_START --><span class="token keyword">import</span> meerkat <span class="token keyword">as</span> mk<!-- HTML_TAG_END --></code></pre></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Image</label></div>
+					<div class="w-fit"><img class="h-full w-full" src="http://placekitten.com/200/200" alt="A Meerkat cell."></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Markdown</label></div>
+					<div class="w-fit"><div class="prose "><!-- HTML_TAG_START --><h1 id="github-flavored-markdown">Github Flavored Markdown</h1>
+<h2 id="hello-from-meerkat">Hello from Meerkat</h2>
+<h3 id="table">Table</h3>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody></table>
+<!-- HTML_TAG_END --></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Json</label></div>
+					<div class="w-fit"><div class="font-mono text-sm text-gray-800 bg-purple-50 rounded-lg p-2 " style="--jsonPaddingLeft: 2rem;"><span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;columnInfos&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;name&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"id"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;type&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"number"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellComponent&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"Cell"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellProps&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt empty svelte-d5rr90">{}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellDataProp&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"data"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;name&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"message"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;type&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"string"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellComponent&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"Cell"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellProps&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt empty svelte-d5rr90">{}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellDataProp&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"data"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;name&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"name"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;type&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"string"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellComponent&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"Cell"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellProps&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt empty svelte-d5rr90">{}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellDataProp&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"data"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;name&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"time"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;type&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"string"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellComponent&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"Cell"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellProps&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt empty svelte-d5rr90">{}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellDataProp&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"data"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">{</span>
+  <ul class="_jsonList svelte-d5rr90"><li><span class="_jsonKey svelte-d5rr90">&quot;name&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"sender"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;type&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"string"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellComponent&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"Cell"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellProps&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt empty svelte-d5rr90">{}</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;cellDataProp&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"data"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;posidxs&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonVal number svelte-d5rr90">0</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal number svelte-d5rr90">1</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal number svelte-d5rr90">2</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal number svelte-d5rr90">3</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;rows&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonVal number svelte-d5rr90">0</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"hello"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"chatbot"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"2021-01-01 00:00:00"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonVal number svelte-d5rr90">1</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"hi"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"user"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"2021-01-01 00:00:00"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonVal number svelte-d5rr90">2</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"how can i help"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"chatbot"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"2021-01-01 00:00:00"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">[</span>
+  <ul class="_jsonList svelte-d5rr90"><li>
+        <span class="_jsonVal number svelte-d5rr90">3</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"im good thanks"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"user"</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li>
+        <span class="_jsonVal string svelte-d5rr90">"2021-01-01 00:00:00"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">]</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;fullLength&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal number svelte-d5rr90">4</span><span class="_jsonSep svelte-d5rr90">,</span>
+      </li><li><span class="_jsonKey svelte-d5rr90">&quot;primaryKey&quot;</span><span class="_jsonSep svelte-d5rr90">:</span>
+        <span class="_jsonVal string svelte-d5rr90">"id"</span>
+      </li></ul>
+  <span class="_jsonBkt svelte-d5rr90" role="button" tabindex="0">}</span></div></div></div>
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Tabs</label></div>
+					<div class="w-fit"><div class="flex mb-2"><div class="flex-grow flex justify-center"><button class="active inline-block py-1 px-4 text-lg font-medium text-center text-white bg-violet-600 rounded-lg">Tab 1
+			</button><button class="inline-block py-1 px-4 text-lg font-medium text-center text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">Tab 2
+			</button><button class="inline-block py-1 px-4 text-lg font-medium text-center text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">Tab 3
+			</button></div></div>
+
+
+	<div class="text-ellipsis whitespace-nowrap overflow-hidden">This is a component in Tab 1</div></div></div>
+
+				
+
+				
+
+				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Select</label></div>
+					<div class=""><select class="block w-full bg-purple-200 border-purple-500 ring-purple-200 ring-offset-0 ring-0 focus:border-purple-500 focus:ring-purple-200 focus:ring-offset-0 focus:ring-0 p-2 rounded-lg w-fit text-sm p-2.5"><option disabled selected value="">Choose option ...</option><option value="1">Option 1</option><option value="2">Option 2</option><option value="3">Option 3</option><option value="4">Option 4</option></select></div></div>
+
+				<div class="flex flex-col items-center mb-4 h-64"><div class="flex flex-col items-center mt-4 mb-4">
+  <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Chat</label></div>
+					<div class="h-full bg-violet-100 p-4 rounded-lg flex flex-col justify-between shadow-md"><div class="flex flex-col-reverse overflow-y-scroll"></div>
+	<div class="flex mt-4">
+  <textarea rows="5" placeholder="Your message..." class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:placeholder-gray-400 dark:text-white  border border-gray-200 dark:border-gray-600 mx-4 resize-none p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
+  
+		<button type="button" class="text-center font-medium focus:ring-4 focus:outline-none inline-flex items-center justify-center px-5 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 rounded-lg text-violet-600 dark:text-violet-500"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"></path></svg></button></div></div></div></div></div></main>
+	<footer class="sticky bottom-0 z-50">
+<div class="font-rubik text-center py-4 bg-gradient-to-r from-violet-200 via-red-200 to-orange-100 bottom-0 sticky dark:bg-gray-900 border-t border-gray-200 dark:border-gray-600"><a href="https://github.com/robustness-gym/meerkat" class="text-gray-700 dark:text-gray-200 bg-purple-50 hover:bg-purple-200 border border-purple-200 rounded-lg p-2 shadow-lg shadow-purple-900 "><span class="text-md">🌟 star us on GitHub!</span></a></div></footer></div>
+
+
+		<script type="module" data-sveltekit-hydrate="1bqzc4t">
+			import { start } from "./_app/immutable/start-6d73dc26.js";
+
+			start({
+				env: {},
+				paths: {"assets":"","base":""},
+				target: document.querySelector('[data-sveltekit-hydrate="1bqzc4t"]').parentNode,
+				version: "1677278567502",
+				hydrate: {
+					node_ids: [0, 4],
+					data: [null,null],
+					form: null,
+					error: null
+				}
+			});
+		</script>
+	</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.js"></script>
+	</body>
+</html>

@@ -1,0 +1,1205 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tutorial 2: Reactive Image Viewer &#8212; 🔮 v0.2.5</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial 3: Query a Large Language Model" href="tutorial-3.html" />
+    <link rel="prev" title="Tutorial 0: Data Frames for Unstructured Data" href="tutorial-0.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.5</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="index.html">
+   Tutorials
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/dataframe/intro.html">
+   Data Frames
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/columns/overview.html">
+     Column Types
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/scalar.html">
+       Scalar Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/tensor.html">
+       Tensor Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/deferred.html">
+       Deferred Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/object.html">
+       Object Columns
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/ops/overview.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/advanced/overview.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/reactive/index.html">
+   Reactive Functions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/concepts.html">
+     Concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/user-guide.html">
+     User Guide
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/inbuilts.html">
+     Reactive Functions in Meerkat
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/store/getting-started.html">
+   Stores
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/components/index.html">
+   Components
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/builtins.html">
+     Components in Meerkat
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/custom-components.html">
+     Custom Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/endpoints/index.html">
+   Endpoints
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/reactive-vs-endpoints.html">
+     Endpoints vs. Reactive Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/interactive/introduction.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/concepts/core-concepts-nutshell.html">
+     Core Concepts in a Nutshell
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+    <label for="toctree-checkbox-10">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/store.html">
+       Stores
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/dataframe.html">
+       DataFrame
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/reactive.html">
+       Reactivity in Meerkat
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/component.html">
+       Components
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/interactive/environments/running-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/components/component.html">
+     Component
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/display.html">
+       Displaying dataframes
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/match.html">
+       <code class="xref py py-class docutils literal notranslate">
+        <span class="pre">
+         mk.gui.Match
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/examples/examples.html">
+     Interactive Examples
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+    <label for="toctree-checkbox-12">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/examples/image_search.html">
+       Building image search
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/formatters/getting-started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/magic/getting-started.html">
+   Magic
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/magic/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../configure.html">
+   Configuration
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-2.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-2.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-2.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-2.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-2.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-2.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Tutorial 2: Reactive Image Viewer</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="tutorial-2-reactive-image-viewer">
+<h1>Tutorial 2: Reactive Image Viewer<a class="headerlink" href="#tutorial-2-reactive-image-viewer" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will build a simple image viewer that shows a random subset of images from
+a class in an image dataset.</p>
+<p>Through this tutorial, you will learn about:</p>
+<ul class="simple">
+<li><p>the concept of <strong>reactive functions</strong> in Meerkat</p></li>
+<li><p>how <strong>chaining reactive functions</strong> together can be used to build complex applications</p></li>
+<li><p>a few more components that you can use in Meerkat</p></li>
+</ul>
+<p>To get started, run the tutorial demo script.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-2
+</pre></div>
+</div>
+<p>You should see the tutorial app when you open the link in your browser.</p>
+<p>Let’s break down the code in the demo script.</p>
+<p><strong>Data loading</strong></p>
+<p>The first few lines just load in the <code class="docutils literal notranslate"><span class="pre">imagenette</span></code> dataset, a small 10-class subset of ImageNet.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p><code class="docutils literal notranslate"><span class="pre">df</span></code> is an <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code>, which behaves quite similarly to a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>.</p>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<span class="kn">import</span> <span class="nn">rich</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
+<span class="n">IMAGE_COL</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
+<span class="n">LABEL_COL</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">rich</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">IMAGE_COL</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">LABEL_COL</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/__init__.py:78,</span> in <span class="ni">get</span><span class="nt">(name, dataset_dir, version, download_mode, registry, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">76</span> <span class="k">if</span> <span class="n">registry</span> <span class="o">==</span> <span class="s2">&quot;meerkat&quot;</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span>     <span class="k">try</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">78</span>         <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span>             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">80</span>             <span class="n">dataset_dir</span><span class="o">=</span><span class="n">dataset_dir</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span>             <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">82</span>             <span class="n">download_mode</span><span class="o">=</span><span class="n">download_mode</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">83</span>             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">84</span>         <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">85</span>         <span class="k">return</span> <span class="n">dataset</span>
+<span class="g g-Whitespace">     </span><span class="mi">86</span>     <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/registry.py:27,</span> in <span class="ni">Registry.get</span><span class="nt">(self, name, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span>     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+<span class="nn">     24         &quot;No object named &#39;{}&#39; found</span> in <span class="ni">&#39;{}&#39; registry!&quot;.format</span><span class="nt">(name, self._name)</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span>     <span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">27</span> <span class="k">return</span> <span class="n">ret</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)()</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/abstract.py:65,</span> in <span class="ni">DatasetBuilder.__call__</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_downloaded</span><span class="p">():</span>
+<span class="g g-Whitespace">     </span><span class="mi">61</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">62</span>         <span class="sa">f</span><span class="s2">&quot;Dataset </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not downloaded to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_dir</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">63</span>     <span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">65</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:69,</span> in <span class="ni">imagenette.build</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">     </span><span class="mi">68</span> <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">69</span>     <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_df</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">70</span>     <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">71</span>     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;img_path&quot;</span><span class="p">],</span> <span class="n">base_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:85,</span> in <span class="ni">imagenette._build_df</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">     </span><span class="mi">80</span> <span class="k">def</span> <span class="nf">_build_df</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">82</span> <span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">83</span>     <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;noisy_imagenette.csv&quot;</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">85</span>     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">86</span>     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;noisy_labels_0&quot;</span><span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">87</span>     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ID_TO_WORDS</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:211,</span> in <span class="ni">deprecate_kwarg.&lt;locals&gt;._deprecate_kwarg.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>         <span class="n">kwargs</span><span class="p">[</span><span class="n">new_arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_arg_value</span>
+<span class="ne">--&gt; </span><span class="mi">211</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:331,</span> in <span class="ni">deprecate_nonkeyword_arguments.&lt;locals&gt;.decorate.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_allow_args</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arguments</span><span class="o">=</span><span class="n">_format_argument_list</span><span class="p">(</span><span class="n">allow_args</span><span class="p">)),</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="ne">FutureWarning</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>         <span class="n">stacklevel</span><span class="o">=</span><span class="n">find_stack_level</span><span class="p">(),</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">331</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:950,</span> in <span class="ni">read_csv</span><span class="nt">(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, squeeze, prefix, mangle_dupe_cols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, error_bad_lines, warn_bad_lines, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options)</span>
+<span class="g g-Whitespace">    </span><span class="mi">935</span> <span class="n">kwds_defaults</span> <span class="o">=</span> <span class="n">_refine_defaults_read</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">936</span>     <span class="n">dialect</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">937</span>     <span class="n">delimiter</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">946</span>     <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="p">},</span>
+<span class="g g-Whitespace">    </span><span class="mi">947</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">948</span> <span class="n">kwds</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds_defaults</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">950</span> <span class="k">return</span> <span class="n">_read</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:605,</span> in <span class="ni">_read</span><span class="nt">(filepath_or_buffer, kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">602</span> <span class="n">_validate_names</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">604</span> <span class="c1"># Create the parser.</span>
+<span class="ne">--&gt; </span><span class="mi">605</span> <span class="n">parser</span> <span class="o">=</span> <span class="n">TextFileReader</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">607</span> <span class="k">if</span> <span class="n">chunksize</span> <span class="ow">or</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">608</span>     <span class="k">return</span> <span class="n">parser</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1442,</span> in <span class="ni">TextFileReader.__init__</span><span class="nt">(self, f, engine, **kwds)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1439</span>     <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;has_index_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwds</span><span class="p">[</span><span class="s2">&quot;has_index_names&quot;</span><span class="p">]</span>
+<span class="g g-Whitespace">   </span><span class="mi">1441</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">:</span> <span class="n">IOHandles</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="ne">-&gt; </span><span class="mi">1442</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_engine</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1735,</span> in <span class="ni">TextFileReader._make_engine</span><span class="nt">(self, f, engine)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1733</span>     <span class="k">if</span> <span class="s2">&quot;b&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1734</span>         <span class="n">mode</span> <span class="o">+=</span> <span class="s2">&quot;b&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1735</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span> <span class="o">=</span> <span class="n">get_handle</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1736</span>     <span class="n">f</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1737</span>     <span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1738</span>     <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">1739</span>     <span class="n">compression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compression&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">1740</span>     <span class="n">memory_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;memory_map&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">1741</span>     <span class="n">is_text</span><span class="o">=</span><span class="n">is_text</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1742</span>     <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;encoding_errors&quot;</span><span class="p">,</span> <span class="s2">&quot;strict&quot;</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">1743</span>     <span class="n">storage_options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;storage_options&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">1744</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1745</span> <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<span class="g g-Whitespace">   </span><span class="mi">1746</span> <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="o">.</span><span class="n">handle</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/common.py:856,</span> in <span class="ni">get_handle</span><span class="nt">(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)</span>
+<span class="g g-Whitespace">    </span><span class="mi">851</span> <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">852</span>     <span class="c1"># Check whether the filename is to be opened in binary mode.</span>
+<span class="g g-Whitespace">    </span><span class="mi">853</span>     <span class="c1"># Binary mode does not support &#39;encoding&#39; and &#39;newline&#39;.</span>
+<span class="g g-Whitespace">    </span><span class="mi">854</span>     <span class="k">if</span> <span class="n">ioargs</span><span class="o">.</span><span class="n">encoding</span> <span class="ow">and</span> <span class="s2">&quot;b&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ioargs</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">855</span>         <span class="c1"># Encoding</span>
+<span class="ne">--&gt; </span><span class="mi">856</span>         <span class="n">handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span>             <span class="n">handle</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">858</span>             <span class="n">ioargs</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span>             <span class="n">encoding</span><span class="o">=</span><span class="n">ioargs</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">860</span>             <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">861</span>             <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">862</span>         <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">863</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">864</span>         <span class="c1"># Binary mode</span>
+<span class="g g-Whitespace">    </span><span class="mi">865</span>         <span class="n">handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">ioargs</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/noisy_imagenette.csv&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<!-- Show the dataset and hide the input cell. --><div class="cell tag_remove-input docutils container">
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unique classes in the dataset.</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p><strong>Selecting a class</strong></p>
+<p>Next, let’s create a <a class="reference internal" href="../../apidocs/interactive.html#meerkat.gui.Select" title="meerkat.gui.Select"><code class="xref py py-class docutils literal notranslate"><span class="pre">Select</span></code></a> component that allows the user to select a class. Once a user picks the class, we’ll then show a random subset of images from that class.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>A list of the components in Meerkat can be found in the
+<a class="reference internal" href="../../guide/components/builtins.html"><span class="doc std std-doc">component guide</span></a>.</p>
+</aside>
+<p>Meerkat provides many components like <code class="docutils literal notranslate"><span class="pre">Select</span></code> that can be used to build useful
+apps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Give the user a way to select a class.</span>
+<span class="n">class_selector</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+    <span class="n">values</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>Notice here that <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> is a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object and not a <code class="docutils literal notranslate"><span class="pre">str</span></code>! A <code class="docutils literal notranslate"><span class="pre">Store</span></code> is a special object in Meerkat that serves as a thin wrapper around any Python object. It’s incredibly useful to connect different components to each other, and we’ll see more about how it plays a role in the next section.</p>
+<p>You can access the value of a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">.value</span></code> attribute e.g.</p>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>We can also look at the <code class="docutils literal notranslate"><span class="pre">class_selector</span></code> component itself.</p>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>Notice that all of the attributes of the <code class="docutils literal notranslate"><span class="pre">Select</span></code> component are also <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects. This is done automatically by all classes that subclass <code class="docutils literal notranslate"><span class="pre">Component</span></code> in Meerkat, of which <code class="docutils literal notranslate"><span class="pre">Select</span></code> is one. This is very useful because as <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects all of these attributes are synchronized between the frontend interface and the backend Python code.</p>
+<p><strong>Filtering the dataset by class</strong></p>
+<p>Once the user selects a class, the dataset should be filtered to that class.
+<strong>Importantly, we want this to happen every time the user selects a new class.</strong></p>
+<p>Let’s think about what would happen if we did the obvious thing and just filtered the dataset once.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Do it normally.</span>
+<span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>The problem that will arise is that this filter uses the class label in <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> <strong>at the time of script execution. Once the user chooses a different class, there’s no way to go back to this line of code and rerun it.</strong></p>
+<p>This is where <strong>reactive functions</strong> come in. A reactive function is a function that is automatically re-executed whenever one of its inputs updates.</p>
+<p>In this example, we would want to re-execute the filter whenever the user selects a class and <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> changes. Let’s write a simple reactive function that filters the dataset to the selected class, using the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.reactive" title="meerkat.reactive"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;reactive()</span></code></a> decorator.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Use a reactive function.</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note a couple of things here:</p>
+<ul class="simple">
+<li><p>The function <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>. This is what makes it reactive.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is written as a normal Python function. This is true in general for reactive functions: there’s no special syntax or anything.</p></li>
+</ul>
+<p>Let’s now call this reactive function on the dataset and the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_df</span> <span class="o">=</span> <span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>In Meerkat, only <code class="docutils literal notranslate"><span class="pre">marked</span></code> objects can cause a reactive function to re-execute when they are updated. All Meerkat objects have <code class="docutils literal notranslate"><span class="pre">.mark()</span></code> and <code class="docutils literal notranslate"><span class="pre">.unmark()</span></code> methods, and only <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects are marked by default. You can read more about how this works in the <a class="reference internal" href="../../guide/reactive/concepts.html"><span class="doc std std-doc">user guide on reactive functions</span></a>.</p>
+</aside>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code>, we pass it the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and <strong>the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>, and not the actual string value of the class!</strong>
+This is critical to understand: in order for an argument to trigger re-execution of a reactive function, it must be a Meerkat object like a <code class="docutils literal notranslate"><span class="pre">Store</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, and not a Python object like <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
+<p>Of course, reactive functions can be used like normal Python functions, e.g. it would be perfectly fine to pass in <code class="docutils literal notranslate"><span class="pre">str</span></code> objects to <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> instead of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;cassette player&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s also note a couple of other ways in which we could create reactive functions that wouldn’t quite have worked.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here, we’ve forgotten to create an argument for the class label, so using this reactive function would not work. It would never re-run when the user selects a new class!</p>
+<p>So far so good. We’ve created and used a reactive function that filters the dataset to the selected class.</p>
+<p><strong>Selecting a random subset of images</strong></p>
+<p>Let’s now create another reactive function that selects a random subset of images from the filtered dataset. Then, we’ll chain together the two reactive functions we’ve created so far to get the final result.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Select a random subset of images from the filtered dataset.&quot;&quot;&quot;</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">random_images</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="c1"># Sample 16 images from the filtered dataset.</span>
+    <span class="c1"># `images` will be a `Column` object.</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">16</span><span class="p">)[</span><span class="n">IMAGE_COL</span><span class="p">]</span>
+
+    <span class="c1"># Encode the images as base64 strings.</span>
+    <span class="c1"># Use a `Formatter` object to do this.</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">formatters</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span>
+
+    <span class="c1"># All Formatter objects have an `encode` method that</span>
+    <span class="c1"># can be used to take a data object and encode it in some way.</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">formatter</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">random_images</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and returns a list of base64-encoded images. It’s decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code> so that it will be re-executed whenever the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is updated.</p>
+<p>Let’s pass the output of <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> to <code class="docutils literal notranslate"><span class="pre">random_images</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="n">random_images</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>This sets up a chain of reactive functions that will be re-executed whenever the user selects a new class.</p>
+<p><strong>Displaying the images</strong>
+Finally, let’s show the user the images using a grid of <code class="docutils literal notranslate"><span class="pre">Image</span></code> components.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make a grid with 4 columns</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">gridcols4</span><span class="p">([</span>
+    <span class="c1"># Use equal-sized square boxes in the grid</span>
+    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+        <span class="c1"># Wrap the image in a `mk.gui.Image` component</span>
+        <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">img</span><span class="p">),</span> 
+        <span class="n">style</span><span class="o">=</span><span class="s2">&quot;aspect-ratio: 1 / 1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span>
+<span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;gap-2&quot;</span><span class="p">)</span> <span class="c1"># Add some spacing in the grid.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Many components in Meerkat accept</p>
+<ul class="simple">
+<li><p>a <code class="docutils literal notranslate"><span class="pre">classes</span></code> attribute that can be used to add Tailwind CSS classes to the component, and</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">style</span></code> attribute that can be used to add inline CSS styles to the component.</p></li>
+</ul>
+<p>Finally, let’s use the <code class="docutils literal notranslate"><span class="pre">flexcol</span></code> component to stack the class selector and the grid of images vertically.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span>
+    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Caption</span><span class="p">(</span><span class="s2">&quot;Choose a class:&quot;</span><span class="p">),</span> <span class="n">class_selector</span><span class="p">],</span> 
+        <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;flex justify-center items-center mb-2 gap-4&quot;</span>
+    <span class="p">),</span>
+    <span class="n">grid</span><span class="p">,</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can pass everything into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> component to render the app.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-2&quot;</span><span class="p">)</span>
+<span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>That’s it!</p>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="tutorial-0.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Tutorial 0: Data Frames for Unstructured Data</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="tutorial-3.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial 3: Query a Large Language Model</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

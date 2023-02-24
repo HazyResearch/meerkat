@@ -1,0 +1,1102 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tutorial 3: Query a Large Language Model &#8212; 🔮 v0.2.5</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial 4: Search Engine over a Dataset" href="tutorial-4.html" />
+    <link rel="prev" title="Tutorial 2: Reactive Image Viewer" href="tutorial-2.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.5</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="index.html">
+   Tutorials
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/dataframe/intro.html">
+   Data Frames
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/columns/overview.html">
+     Column Types
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/scalar.html">
+       Scalar Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/tensor.html">
+       Tensor Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/deferred.html">
+       Deferred Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/object.html">
+       Object Columns
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/ops/overview.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/advanced/overview.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/reactive/index.html">
+   Reactive Functions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/concepts.html">
+     Concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/user-guide.html">
+     User Guide
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/inbuilts.html">
+     Reactive Functions in Meerkat
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/store/getting-started.html">
+   Stores
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/components/index.html">
+   Components
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/builtins.html">
+     Components in Meerkat
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/custom-components.html">
+     Custom Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/endpoints/index.html">
+   Endpoints
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/reactive-vs-endpoints.html">
+     Endpoints vs. Reactive Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/interactive/introduction.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/concepts/core-concepts-nutshell.html">
+     Core Concepts in a Nutshell
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+    <label for="toctree-checkbox-10">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/store.html">
+       Stores
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/dataframe.html">
+       DataFrame
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/reactive.html">
+       Reactivity in Meerkat
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/component.html">
+       Components
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/interactive/environments/running-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/components/component.html">
+     Component
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/display.html">
+       Displaying dataframes
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/match.html">
+       <code class="xref py py-class docutils literal notranslate">
+        <span class="pre">
+         mk.gui.Match
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/examples/examples.html">
+     Interactive Examples
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+    <label for="toctree-checkbox-12">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/examples/image_search.html">
+       Building image search
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/formatters/getting-started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/magic/getting-started.html">
+   Magic
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/magic/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../configure.html">
+   Configuration
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-3.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-3.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-3.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-3.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-3.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-3.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overview">
+   Overview
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
+   (Aside) Setting up LLMs with Manifest
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
+   Adding an Input TextField Component
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#endpoints">
+   Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
+   Running Endpoints with Component Events
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Tutorial 3: Query a Large Language Model</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overview">
+   Overview
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
+   (Aside) Setting up LLMs with Manifest
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
+   Adding an Input TextField Component
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#endpoints">
+   Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
+   Running Endpoints with Component Events
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="tutorial-3-query-a-large-language-model">
+<h1>Tutorial 3: Query a Large Language Model<a class="headerlink" href="#tutorial-3-query-a-large-language-model" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.</p>
+<p>Through this tutorial, you will learn about:</p>
+<ul class="simple">
+<li><p>the concept of <strong>endpoints</strong></p></li>
+<li><p>how to pass <strong>endpoints</strong> to components to run on events</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> and <code class="docutils literal notranslate"><span class="pre">Button</span></code> components</p></li>
+<li><p>Advanced: Using <a class="reference external" href="https://github.com/hazyresearch/manifest"><code class="docutils literal notranslate"><span class="pre">manifest</span></code></a>, a server-client manager for running LLMs</p></li>
+</ul>
+<hr class="docutils" />
+<div class="tip admonition">
+<p class="admonition-title">Prerequisites</p>
+<p>You will need to install <code class="docutils literal notranslate"><span class="pre">manifest</span></code> and set up your OPENAI API key:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install manifest</span>
+pip<span class="w"> </span>install<span class="w"> </span>manifest-ml
+
+<span class="c1"># Set up your OpenAI key.</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;your-api-key&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>To get started, run the tutorial demo script</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-qa
+</pre></div>
+</div>
+<p>You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>In this interface, we want to ask the LLM for an answer to our question when we press a button.</p>
+<p>This requires having</p>
+<ol class="arabic simple">
+<li><p>An LLM to return answers to our questions</p></li>
+<li><p>An input text field to ask our question</p></li>
+<li><p>A Python API that runs the LLM</p></li>
+<li><p>A button to call the Python API on click</p></li>
+</ol>
+</section>
+<section id="aside-setting-up-llms-with-manifest">
+<h2>(Aside) Setting up LLMs with Manifest<a class="headerlink" href="#aside-setting-up-llms-with-manifest" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/hazyresearch/manifest">Manifest</a> is a Python library that provides a convenient interface to call foundation model APIs, e.g. large language models from OpenAI, Cohere, Together, etc.</p>
+<p>Let’s set up manifest to connect to OpenAI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+  <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+  <span class="n">client_connection</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">),</span>
+  <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Running a prompt through manifest will be easy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;What is the meaning of life?&quot;</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s it! You can refer to the Manifest codebase to learn more about how to use it. Let’s now move on to the rest of the application.</p>
+</section>
+<section id="adding-an-input-textfield-component">
+<h2>Adding an Input TextField Component<a class="headerlink" href="#adding-an-input-textfield-component" title="Permalink to this headline">¶</a></h2>
+<p>Let’s add a text field where a user can type out their questions.
+Meerkat provides a <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> component that we can use.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">textbox</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Textbox</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This component will do a few things:</p>
+<ul class="simple">
+<li><p>create a text field on the frontend that the user can type into</p></li>
+<li><p>synchronize the value of this text field with a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object on the Python backend</p></li>
+</ul>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, a Meerkat data object that is synchronized with the value of the text field on the frontend. This will be important when we want to pass the value of the text field to our LLM API.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">textbox.text</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080">:</span> 
+        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'meerkat.interactive.graph.store.Store'</span><span style="font-weight: bold">&gt;</span>
+</pre>
+</div></div>
+</div>
+</section>
+<section id="endpoints">
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have our LLM and our input field, we want to write a Python function that will run the LLM on the input.</p>
+<p>This function has to be special in a few ways:</p>
+<ol class="arabic simple">
+<li><p>It should be able to take in the value of the input field</p></li>
+<li><p>It should run when an event on the frontend happens, e.g. a button is clicked</p></li>
+</ol>
+<p>To do this, we can use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.endpoint" title="meerkat.endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">&#64;mk.endpoint</span></code></a> decorator. This decorator will convert a Python function into an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, which is a special type of Python function that can be passed to components to run on events.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">answer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answer</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you print this endpoint out, you’ll see that it the decorator has converted the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> function into an <code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code> object.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">get_answer:</span> 
+        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Endpoint</span><span style="font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">id</span>=<span style="color: #800080; text-decoration-color: #800080">a2cb0520d25740e488be9db184d83b30</span>, <span style="color: #808000; text-decoration-color: #808000">name</span>=<span style="color: #800080; text-decoration-color: #800080">get_answer</span>, <span style="color: #808000; text-decoration-color: #808000">prefix</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>, <span style="color: #808000; text-decoration-color: #808000">route</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span><span style="font-weight: bold">)</span>
+</pre>
+</div></div>
+</div>
+<p>Notice that in addition to the <code class="docutils literal notranslate"><span class="pre">question</span></code>, we also pass in an <code class="docutils literal notranslate"><span class="pre">answer</span></code> argument. This allows us to update the <code class="docutils literal notranslate"><span class="pre">answer</span></code> store with the response from the LLM. When the store is updated, it will tell all frontend components that depend on this store to also update their values.</p>
+</section>
+<section id="running-endpoints-with-component-events">
+<h2>Running Endpoints with Component Events<a class="headerlink" href="#running-endpoints-with-component-events" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have our endpoint, we want to run it when a button is clicked.</p>
+<p>We can do this by passing the endpoint to the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> argument of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The store to keep track of the LLM answer.</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ask&quot;</span><span class="p">,</span>
+  <span class="n">on_click</span><span class="o">=</span><span class="n">get_answer</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="n">textbox</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="n">answer</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>When the button is clicked, the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> endpoint will be called with the value of the <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> store as the <code class="docutils literal notranslate"><span class="pre">question</span></code> argument.</p>
+<p>We can simulate this button click by running the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> endpoint directly. Since it’s an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, we can call it with the <code class="docutils literal notranslate"><span class="pre">.run()</span></code> method.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="o">.</span><span class="n">on_click</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>Different components expose different events that can be tied to endpoints. All endpoints start with <code class="docutils literal notranslate"><span class="pre">on_</span></code> and are followed by the name of the event. For example, the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> event is tied to the <code class="docutils literal notranslate"><span class="pre">click</span></code> event of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
+</section>
+<section id="putting-it-all-together">
+<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<p>Now we display these different components on the frontend.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span><span class="n">textbox</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">answer</span><span class="p">)]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-query-llm&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>When you run the app, you should see the following interface:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="tutorial-2.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Tutorial 2: Reactive Image Viewer</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="tutorial-4.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial 4: Search Engine over a Dataset</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,1895 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>meerkat.interactive.app.src.lib.component.flowbite &#8212; 🔮 v0.2.5</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../../../../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../../../../../" id="documentation_options" src="../../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../../_static/doctools.js"></script>
+    <script src="../../../../../../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../../../../../../_static/clipboard.min.js"></script>
+    <script src="../../../../../../../_static/copybutton.js"></script>
+    <script src="../../../../../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../../../../../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../../../../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../../../../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.5</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../../../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../../../../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../start/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../start/quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../start/tutorials/index.html">
+   Tutorials
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../start/tutorials/tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../start/tutorials/tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../start/tutorials/tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../start/tutorials/tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../guide/overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/dataframe/intro.html">
+   Data Frames
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/dataframe/columns/overview.html">
+     Column Types
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/columns/scalar.html">
+       Scalar Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/columns/tensor.html">
+       Tensor Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/columns/deferred.html">
+       Deferred Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/columns/object.html">
+       Object Columns
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/dataframe/ops/overview.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/dataframe/advanced/overview.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/reactive/index.html">
+   Reactive Functions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/reactive/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/reactive/concepts.html">
+     Concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/reactive/user-guide.html">
+     User Guide
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/reactive/inbuilts.html">
+     Reactive Functions in Meerkat
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../guide/store/getting-started.html">
+   Stores
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/components/index.html">
+   Components
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/components/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/components/builtins.html">
+     Components in Meerkat
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/components/custom-components.html">
+     Custom Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/endpoints/index.html">
+   Endpoints
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/endpoints/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/endpoints/reactive-vs-endpoints.html">
+     Endpoints vs. Reactive Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/interactive/introduction.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/interactive/concepts/core-concepts-nutshell.html">
+     Core Concepts in a Nutshell
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+    <label for="toctree-checkbox-10">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/concepts/store.html">
+       Stores
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/concepts/dataframe.html">
+       DataFrame
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/concepts/reactive.html">
+       Reactivity in Meerkat
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/concepts/component.html">
+       Components
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/interactive/environments/running-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/interactive/components/component.html">
+     Component
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/components/display.html">
+       Displaying dataframes
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/components/match.html">
+       <code class="xref py py-class docutils literal notranslate">
+        <span class="pre">
+         mk.gui.Match
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../../../../../guide/interactive/examples/examples.html">
+     Interactive Examples
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+    <label for="toctree-checkbox-12">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../../../../../guide/interactive/examples/image_search.html">
+       Building image search
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../guide/formatters/getting-started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../guide/cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../guide/magic/getting-started.html">
+   Magic
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../guide/magic/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../../../../../start/configure.html">
+   Configuration
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../../../../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../../../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2F_modules/meerkat/interactive/app/src/lib/component/flowbite.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1></h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <h1>Source code for meerkat.interactive.app.src.lib.component.flowbite</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Slottable</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">classproperty</span>
+
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ActivityType</span><span class="p">,</span>
+    <span class="n">Buttonshadows</span><span class="p">,</span>
+    <span class="n">ButtonType</span><span class="p">,</span>
+    <span class="n">DrawerTransitionTypes</span><span class="p">,</span>
+    <span class="n">FormColorType</span><span class="p">,</span>
+    <span class="n">GroupTimelineType</span><span class="p">,</span>
+    <span class="n">LinkType</span><span class="p">,</span>
+    <span class="n">Placement</span><span class="p">,</span>
+    <span class="n">ReviewType</span><span class="p">,</span>
+    <span class="n">SiteType</span><span class="p">,</span>
+    <span class="n">SizeType</span><span class="p">,</span>
+    <span class="n">TransitionTypes</span><span class="p">,</span>
+    <span class="n">number</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">FlowbiteSvelteMixin</span><span class="p">:</span>
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">library</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;flowbite-svelte&quot;</span>
+
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">namespace</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;flowbite&quot;</span>
+
+
+<div class="viewcode-block" id="Accordion"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Accordion.html#meerkat.interactive.app.src.lib.component.flowbite.Accordion">[docs]</a><span class="k">class</span> <span class="nc">Accordion</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">multiple</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">flush</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">activeClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-gray-100 dark:bg-gray-800 text-gray-900 &quot;</span>
+    <span class="s2">&quot;dark:text-white focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800&quot;</span>
+    <span class="n">inactiveClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:dark:bg-gray-800&quot;</span>
+    <span class="p">)</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 dark:text-gray-400&quot;</span></div>
+
+
+<div class="viewcode-block" id="AccordionItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.AccordionItem.html#meerkat.interactive.app.src.lib.component.flowbite.AccordionItem">[docs]</a><span class="k">class</span> <span class="nc">AccordionItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">activeClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inactiveClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center justify-between w-full font-medium &quot;</span>
+    <span class="s2">&quot;text-left group-first:rounded-t-xl&quot;</span>
+    <span class="n">transitionType</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;slide&quot;</span><span class="p">,</span> <span class="s2">&quot;fade&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;slide&quot;</span>
+    <span class="n">transitionParams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="Alert"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Alert.html#meerkat.interactive.app.src.lib.component.flowbite.Alert">[docs]</a><span class="k">class</span> <span class="nc">Alert</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">dismissable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">accent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;indigo&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span></div>
+
+
+<div class="viewcode-block" id="Avatar"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Avatar.html#meerkat.interactive.app.src.lib.component.flowbite.Avatar">[docs]</a><span class="k">class</span> <span class="nc">Avatar</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">src</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rounded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">stacked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dot</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">alt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Badge"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Badge.html#meerkat.interactive.app.src.lib.component.flowbite.Badge">[docs]</a><span class="k">class</span> <span class="nc">Badge</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;indigo&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">large</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rounded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dismissable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Breadcrumb"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Breadcrumb.html#meerkat.interactive.app.src.lib.component.flowbite.Breadcrumb">[docs]</a><span class="k">class</span> <span class="nc">Breadcrumb</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">solid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">navClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex&quot;</span>
+    <span class="n">solidClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex px-5 py-3 text-gray-700 border border-gray-200 &quot;</span>
+    <span class="s2">&quot;rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700&quot;</span>
+    <span class="n">olClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex items-center space-x-1 md:space-x-3&quot;</span></div>
+
+
+<div class="viewcode-block" id="BreadcrumbItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.BreadcrumbItem.html#meerkat.interactive.app.src.lib.component.flowbite.BreadcrumbItem">[docs]</a><span class="k">class</span> <span class="nc">BreadcrumbItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">home</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">linkClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 &quot;</span>
+    <span class="s2">&quot;md:ml-2 dark:text-gray-400 dark:hover:text-white&quot;</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ml-1 text-sm font-medium text-gray-500 md:ml-2 &quot;</span>
+    <span class="s2">&quot;dark:text-gray-400&quot;</span>
+    <span class="n">homeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex items-center text-sm font-medium &quot;</span>
+    <span class="s2">&quot;text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white&quot;</span></div>
+
+
+<div class="viewcode-block" id="Button"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Button.html#meerkat.interactive.app.src.lib.component.flowbite.Button">[docs]</a><span class="k">class</span> <span class="nc">Button</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">pill</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">outline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">gradient</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">btnClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ButtonType</span> <span class="o">=</span> <span class="s2">&quot;button&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;alternative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cyan&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;teal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purpleToBlue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cyanToBlue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;greenToBlue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purpleToPink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pinkToOrange&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tealToLime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;redToYellow&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">shadow</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Buttonshadows</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ButtonGroup"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ButtonGroup.html#meerkat.interactive.app.src.lib.component.flowbite.ButtonGroup">[docs]</a><span class="k">class</span> <span class="nc">ButtonGroup</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex rounded-lg shadow-sm&quot;</span>
+
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Card"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Card.html#meerkat.interactive.app.src.lib.component.flowbite.Card">[docs]</a><span class="k">class</span> <span class="nc">Card</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">horizontal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">img</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;sm&quot;</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span> <span class="s2">&quot;lg&quot;</span><span class="p">,</span> <span class="s2">&quot;xl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;lg&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;sm&quot;</span>
+
+    <span class="c1"># Frame options, passed as $$restProps</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;div&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dropdown&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbar&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbarUl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;form&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+    <span class="n">rounded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">shadow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Carousel"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Carousel.html#meerkat.interactive.app.src.lib.component.flowbite.Carousel">[docs]</a><span class="k">class</span> <span class="nc">Carousel</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">showIndicators</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">showCaptions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">showThumbs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">slideControls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2000</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;overflow-hidden relative h-56 rounded-lg sm:h-64 xl:h-80 2xl:h-96&quot;</span>
+    <span class="n">indicatorDivClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;flex absolute bottom-5 left-1/2 z-30 space-x-3 -translate-x-1/2&quot;</span>
+    <span class="p">)</span>
+    <span class="n">captionClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;h-10 bg-gray-300 dark:bg-gray-700 dark:text-white p-2 my-2 text-center&quot;</span>
+    <span class="p">)</span>
+    <span class="n">indicatorClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;w-3 h-3 rounded-full bg-gray-100 hover:bg-gray-300 opacity-60&quot;</span>
+    <span class="p">)</span>
+    <span class="n">slideClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="CarouselTransition"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.CarouselTransition.html#meerkat.interactive.app.src.lib.component.flowbite.CarouselTransition">[docs]</a><span class="k">class</span> <span class="nc">CarouselTransition</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">showIndicators</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">showCaptions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">showThumbs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">slideControls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">transitionType</span><span class="p">:</span> <span class="n">TransitionTypes</span> <span class="o">=</span> <span class="s2">&quot;fade&quot;</span>
+    <span class="n">transitionParams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># TransitionParamTypes</span>
+    <span class="n">loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2000</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;overflow-hidden relative h-56 rounded-lg sm:h-64 xl:h-80 2xl:h-96&quot;</span>
+    <span class="n">indicatorDivClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;flex absolute bottom-5 left-1/2 z-30 space-x-3 -translate-x-1/2&quot;</span>
+    <span class="p">)</span>
+    <span class="n">captionClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;h-10 bg-gray-300 dark:bg-gray-700 dark:text-white p-2 my-2 text-center&quot;</span>
+    <span class="p">)</span>
+    <span class="n">indicatorClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;w-3 h-3 rounded-full bg-gray-100 hover:bg-gray-300 opacity-60&quot;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DarkMode"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.DarkMode.html#meerkat.interactive.app.src.lib.component.flowbite.DarkMode">[docs]</a><span class="k">class</span> <span class="nc">DarkMode</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">btnClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 &quot;</span>
+        <span class="s2">&quot;focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 &quot;</span>
+        <span class="s2">&quot;rounded-lg text-sm p-2.5&quot;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Drawer"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Drawer.html#meerkat.interactive.app.src.lib.component.flowbite.Drawer">[docs]</a><span class="k">class</span> <span class="nc">Drawer</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">activateClickOutside</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">position</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span> <span class="s2">&quot;absolute&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;fixed&quot;</span>
+    <span class="n">leftOffset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inset-y-0 left-0&quot;</span>
+    <span class="n">rightOffset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inset-y-0 right-0&quot;</span>
+    <span class="n">topOffset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inset-x-0 top-0&quot;</span>
+    <span class="n">bottomOffset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inset-x-0 bottom-0&quot;</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-80&quot;</span>
+    <span class="n">backdrop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">bgColor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-gray-900&quot;</span>
+    <span class="n">bgOpacity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-opacity-75&quot;</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+    <span class="c1"># id: str = &quot;drawer-example&quot;</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;overflow-y-auto z-50 p-4 bg-white dark:bg-gray-800&quot;</span>
+    <span class="n">transitionParams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># DrawerTransitionParamTypes</span>
+    <span class="n">transitionType</span><span class="p">:</span> <span class="n">DrawerTransitionTypes</span> <span class="o">=</span> <span class="s2">&quot;fly&quot;</span></div>
+
+
+<div class="viewcode-block" id="Dropdown"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Dropdown.html#meerkat.interactive.app.src.lib.component.flowbite.Dropdown">[docs]</a><span class="k">class</span> <span class="nc">Dropdown</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">frameClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+    <span class="c1"># Configure slots for header and footer</span>
+
+
+<div class="viewcode-block" id="DropdownItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.DropdownItem.html#meerkat.interactive.app.src.lib.component.flowbite.DropdownItem">[docs]</a><span class="k">class</span> <span class="nc">DropdownItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;font-medium py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600&quot;</span>
+    <span class="p">)</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Events</span>
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DropdownDivider"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.DropdownDivider.html#meerkat.interactive.app.src.lib.component.flowbite.DropdownDivider">[docs]</a><span class="k">class</span> <span class="nc">DropdownDivider</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;my-1 h-px bg-gray-100 dark:bg-gray-600&quot;</span></div>
+
+
+<div class="viewcode-block" id="DropdownHeader"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.DropdownHeader.html#meerkat.interactive.app.src.lib.component.flowbite.DropdownHeader">[docs]</a><span class="k">class</span> <span class="nc">DropdownHeader</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;py-2 px-4 text-gray-700 dark:text-white&quot;</span>
+    <span class="n">divider</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Footer"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Footer.html#meerkat.interactive.app.src.lib.component.flowbite.Footer">[docs]</a><span class="k">class</span> <span class="nc">Footer</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">customClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">footerType</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="s2">&quot;sitemap&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;logo&quot;</span><span class="p">,</span> <span class="s2">&quot;socialmedia&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span></div>
+
+
+<div class="viewcode-block" id="FooterBrand"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FooterBrand.html#meerkat.interactive.app.src.lib.component.flowbite.FooterBrand">[docs]</a><span class="k">class</span> <span class="nc">FooterBrand</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center&quot;</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;self-center text-2xl font-semibold whitespace-nowrap dark:text-white&quot;</span>
+    <span class="p">)</span>
+    <span class="n">imgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mr-3 h-8&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">src</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">alt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FooterCopyright"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FooterCopyright.html#meerkat.interactive.app.src.lib.component.flowbite.FooterCopyright">[docs]</a><span class="k">class</span> <span class="nc">FooterCopyright</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;block text-sm text-gray-500 sm:text-center dark:text-gray-400&quot;</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hover:underline&quot;</span>
+    <span class="n">year</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y&quot;</span><span class="p">))</span>  <span class="c1"># current year</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FooterIcon"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FooterIcon.html#meerkat.interactive.app.src.lib.component.flowbite.FooterIcon">[docs]</a><span class="k">class</span> <span class="nc">FooterIcon</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">ariaLabel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 hover:text-gray-900 dark:hover:text-white&quot;</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FooterLink"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FooterLink.html#meerkat.interactive.app.src.lib.component.flowbite.FooterLink">[docs]</a><span class="k">class</span> <span class="nc">FooterLink</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">liClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mr-4 last:mr-0 md:mr-6&quot;</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hover:underline&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FooterLinkGroup"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FooterLinkGroup.html#meerkat.interactive.app.src.lib.component.flowbite.FooterLinkGroup">[docs]</a><span class="k">class</span> <span class="nc">FooterLinkGroup</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-600 dark:text-gray-400&quot;</span></div>
+
+
+<div class="viewcode-block" id="Indicator"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Indicator.html#meerkat.interactive.app.src.lib.component.flowbite.Indicator">[docs]</a><span class="k">class</span> <span class="nc">Indicator</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;teal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+    <span class="n">rounded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;top-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top-center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-right&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Kbd"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Kbd.html#meerkat.interactive.app.src.lib.component.flowbite.Kbd">[docs]</a><span class="k">class</span> <span class="nc">Kbd</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">kbdClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-xs font-semibold text-gray-800 bg-gray-100 &quot;</span>
+    <span class="s2">&quot;border border-gray-200 rounded-lg dark:bg-gray-600 &quot;</span>
+    <span class="s2">&quot;dark:text-gray-100 dark:border-gray-500&quot;</span></div>
+
+
+<div class="viewcode-block" id="ArrowKeyDown"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyDown.html#meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyDown">[docs]</a><span class="k">class</span> <span class="nc">ArrowKeyDown</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">svgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-4 h-4&quot;</span></div>
+
+
+<div class="viewcode-block" id="ArrowKeyLeft"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyLeft.html#meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyLeft">[docs]</a><span class="k">class</span> <span class="nc">ArrowKeyLeft</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">svgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-4 h-4&quot;</span></div>
+
+
+<div class="viewcode-block" id="ArrowKeyRight"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyRight.html#meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyRight">[docs]</a><span class="k">class</span> <span class="nc">ArrowKeyRight</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">svgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-4 h-4&quot;</span></div>
+
+
+<div class="viewcode-block" id="ArrowKeyUp"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyUp.html#meerkat.interactive.app.src.lib.component.flowbite.ArrowKeyUp">[docs]</a><span class="k">class</span> <span class="nc">ArrowKeyUp</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">svgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-4 h-4&quot;</span></div>
+
+
+<span class="c1"># class ListGroup(Slottable, FlowbiteSvelteMixin, Component):</span>
+
+<span class="c1">#     items: List[ListGroupItemType] = []</span>
+<span class="c1">#     active: bool = False</span>
+<span class="c1">#     classes: str = &quot;&quot;</span>
+
+
+<span class="c1"># class ListGroupItem(Slottable, FlowbiteSvelteMixin, Component):</span>
+
+<span class="c1">#     classes: str = &quot;&quot;</span>
+
+<span class="c1">#     # Events</span>
+<span class="c1">#     on_blur: Endpoint = None</span>
+<span class="c1">#     on_change: Endpoint = None</span>
+<span class="c1">#     on_click: Endpoint = None</span>
+<span class="c1">#     on_focus: Endpoint = None</span>
+<span class="c1">#     on_keydown: Endpoint = None</span>
+<span class="c1">#     on_keypress: Endpoint = None</span>
+<span class="c1">#     on_keyup: Endpoint = None</span>
+<span class="c1">#     on_mouseenter: Endpoint = None</span>
+<span class="c1">#     on_mouseleave: Endpoint = None</span>
+<span class="c1">#     on_mouseover: Endpoint = None</span>
+
+
+<div class="viewcode-block" id="MegaMenu"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.MegaMenu.html#meerkat.interactive.app.src.lib.component.flowbite.MegaMenu">[docs]</a><span class="k">class</span> <span class="nc">MegaMenu</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LinkType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">full</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Modal"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Modal.html#meerkat.interactive.app.src.lib.component.flowbite.Modal">[docs]</a><span class="k">class</span> <span class="nc">Modal</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">SizeType</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;top-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top-center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;center-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-center&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottom-right&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
+    <span class="n">autoclose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">permanent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">backdropClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-gray-900 bg-opacity-50 dark:bg-opacity-80&quot;</span>
+
+    <span class="n">on_hide</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_open</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Navbar"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Navbar.html#meerkat.interactive.app.src.lib.component.flowbite.Navbar">[docs]</a><span class="k">class</span> <span class="nc">Navbar</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">navClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;px-2 sm:px-4 py-2.5 w-full&quot;</span>
+    <span class="n">navDivClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mx-auto flex flex-wrap justify-between items-center &quot;</span>
+    <span class="n">fluid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dropdown&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbar&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbarUl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;form&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;navbar&quot;</span></div>
+
+
+<div class="viewcode-block" id="NavBrand"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.NavBrand.html#meerkat.interactive.app.src.lib.component.flowbite.NavBrand">[docs]</a><span class="k">class</span> <span class="nc">NavBrand</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NavLi"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.NavLi.html#meerkat.interactive.app.src.lib.component.flowbite.NavLi">[docs]</a><span class="k">class</span> <span class="nc">NavLi</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">activeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-white bg-blue-700 md:bg-transparent &quot;</span>
+    <span class="s2">&quot;md:text-blue-700 md:dark:text-white dark:bg-blue-600 md:dark:bg-transparent&quot;</span>
+    <span class="n">nonActiveClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-700 hover:bg-gray-100 md:hover:bg-transparent &quot;</span>
+    <span class="s2">&quot;md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white &quot;</span>
+    <span class="s2">&quot;dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent&quot;</span></div>
+
+
+<div class="viewcode-block" id="NavUl"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.NavUl.html#meerkat.interactive.app.src.lib.component.flowbite.NavUl">[docs]</a><span class="k">class</span> <span class="nc">NavUl</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-full md:block md:w-auto&quot;</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex flex-col p-4 mt-4 md:flex-row md:space-x-8 md:mt-0 &quot;</span>
+    <span class="s2">&quot;md:text-sm md:font-medium&quot;</span>
+    <span class="n">hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+    <span class="c1"># slideParams: SlideParams = {delay: 250, duration: 500, easing: quintOut}</span>
+
+
+<div class="viewcode-block" id="Pagination"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Pagination.html#meerkat.interactive.app.src.lib.component.flowbite.Pagination">[docs]</a><span class="k">class</span> <span class="nc">Pagination</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">pages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LinkType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">activeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-blue-600 border border-gray-300 bg-blue-50 &quot;</span>
+    <span class="s2">&quot;hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 &quot;</span>
+    <span class="s2">&quot;dark:bg-gray-700 dark:text-white&quot;</span>
+    <span class="n">normalClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 bg-white hover:bg-gray-100 &quot;</span>
+    <span class="s2">&quot;hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 &quot;</span>
+    <span class="s2">&quot;dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white&quot;</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex -space-x-px items-center&quot;</span>
+    <span class="n">table</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="PaginationItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.PaginationItem.html#meerkat.interactive.app.src.lib.component.flowbite.PaginationItem">[docs]</a><span class="k">class</span> <span class="nc">PaginationItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">activeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">normalClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 bg-white hover:bg-gray-100 &quot;</span>
+    <span class="s2">&quot;hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 &quot;</span>
+    <span class="s2">&quot;dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white&quot;</span></div>
+
+
+<div class="viewcode-block" id="Popover"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Popover.html#meerkat.interactive.app.src.lib.component.flowbite.Popover">[docs]</a><span class="k">class</span> <span class="nc">Popover</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;py-2 px-3&quot;</span></div>
+
+
+<span class="c1"># class Popper(Slottable, FlowbiteSvelteMixin, Component):</span>
+
+<span class="c1">#     activeContent: bool = False</span>
+<span class="c1">#     arrow: bool = True</span>
+<span class="c1">#     offset: number = 8</span>
+<span class="c1">#     placement: Placement = &quot;top&quot;</span>
+<span class="c1">#     trigger: Literal[&quot;hover&quot;, &quot;click&quot;] = &quot;hover&quot;</span>
+<span class="c1">#     triggeredBy: str = None</span>
+<span class="c1">#     strategy: Literal[&quot;absolute&quot;, &quot;fixed&quot;] = &quot;absolute&quot;</span>
+<span class="c1">#     open: bool = False</span>
+<span class="c1">#     yOnly: bool = False</span>
+
+
+<span class="c1"># class Frame(Slottable, FlowbiteSvelteMixin, Component):</span>
+
+<span class="c1">#     tag: str = &quot;div&quot;</span>
+<span class="c1">#     color: Literal[</span>
+<span class="c1">#         &quot;gray&quot;,</span>
+<span class="c1">#         &quot;red&quot;,</span>
+<span class="c1">#         &quot;yellow&quot;,</span>
+<span class="c1">#         &quot;green&quot;,</span>
+<span class="c1">#         &quot;indigo&quot;,</span>
+<span class="c1">#         &quot;default&quot;,</span>
+<span class="c1">#         &quot;purple&quot;,</span>
+<span class="c1">#         &quot;pink&quot;,</span>
+<span class="c1">#         &quot;blue&quot;,</span>
+<span class="c1">#         &quot;light&quot;,</span>
+<span class="c1">#         &quot;dark&quot;,</span>
+<span class="c1">#         &quot;dropdown&quot;,</span>
+<span class="c1">#         &quot;navbar&quot;,</span>
+<span class="c1">#         &quot;navbarUl&quot;,</span>
+<span class="c1">#         &quot;form&quot;,</span>
+<span class="c1">#         &quot;none&quot;,</span>
+<span class="c1">#     ] = &quot;default&quot;</span>
+<span class="c1">#     rounded: bool = False</span>
+<span class="c1">#     border: bool = False</span>
+<span class="c1">#     shadow: bool = False</span>
+<span class="c1">#     # transition: TransitionFunc = None</span>
+<span class="c1">#     params: object = {}</span>
+<span class="c1">#     # node: HTMLElement = None</span>
+<span class="c1">#     # use: Action = noop</span>
+<span class="c1">#     options: object = {}</span>
+
+
+<div class="viewcode-block" id="Progressbar"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Progressbar.html#meerkat.interactive.app.src.lib.component.flowbite.Progressbar">[docs]</a><span class="k">class</span> <span class="nc">Progressbar</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">45</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;h-2.5&quot;</span><span class="p">,</span> <span class="s2">&quot;h-3&quot;</span><span class="p">,</span> <span class="s2">&quot;h-4&quot;</span><span class="p">,</span> <span class="s2">&quot;h-5&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;h-2.5&quot;</span>
+    <span class="n">labelInside</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">labelOutside</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;indigo&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">labelInsideClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;text-blue-100 text-xs font-medium text-center p-0.5 leading-none &quot;</span>
+        <span class="s2">&quot;rounded-full&quot;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Rating"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Rating.html#meerkat.interactive.app.src.lib.component.flowbite.Rating">[docs]</a><span class="k">class</span> <span class="nc">Rating</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;24&quot;</span>
+    <span class="n">total</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">rating</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">ceil</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="AdvancedRating"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.AdvancedRating.html#meerkat.interactive.app.src.lib.component.flowbite.AdvancedRating">[docs]</a><span class="k">class</span> <span class="nc">AdvancedRating</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center mt-4&quot;</span>
+    <span class="n">labelClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-sm font-medium text-blue-600 dark:text-blue-500&quot;</span>
+    <span class="n">ratingDivClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mx-4 w-2/4 h-5 bg-gray-200 rounded dark:bg-gray-700&quot;</span>
+    <span class="n">ratingClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;h-5 bg-yellow-400 rounded&quot;</span>
+    <span class="n">rightLabelClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-sm font-medium text-blue-600 dark:text-blue-500&quot;</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%&quot;</span></div>
+
+
+<div class="viewcode-block" id="ScoreRating"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ScoreRating.html#meerkat.interactive.app.src.lib.component.flowbite.ScoreRating">[docs]</a><span class="k">class</span> <span class="nc">ScoreRating</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">desc1Class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-blue-100 w-8 text-blue-800 text-sm font-semibold &quot;</span>
+    <span class="s2">&quot;inline-flex items-center p-1.5 rounded dark:bg-blue-200 dark:text-blue-800&quot;</span>
+    <span class="n">desc2Class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ml-2 w-24 font-medium text-gray-900 dark:text-white&quot;</span>
+    <span class="n">desc3spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mx-2 w-1 h-1 bg-gray-900 rounded-full dark:bg-gray-500&quot;</span>
+    <span class="n">desc3pClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-sm w-24 font-medium text-gray-500 dark:text-gray-400&quot;</span></div>
+
+
+<div class="viewcode-block" id="RatingComment"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.RatingComment.html#meerkat.interactive.app.src.lib.component.flowbite.RatingComment">[docs]</a><span class="k">class</span> <span class="nc">RatingComment</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">ceil</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">helpfullink</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">abuselink</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Review"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Review.html#meerkat.interactive.app.src.lib.component.flowbite.Review">[docs]</a><span class="k">class</span> <span class="nc">Review</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">review</span><span class="p">:</span> <span class="n">ReviewType</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">articleClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;md:gap-8 md:grid md:grid-cols-3&quot;</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center mb-6 space-x-4&quot;</span>
+    <span class="n">imgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-10 h-10 rounded-full&quot;</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;space-y-4 text-sm text-gray-500 dark:text-gray-400&quot;</span>
+    <span class="n">liClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center&quot;</span></div>
+
+
+<div class="viewcode-block" id="Sidebar"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Sidebar.html#meerkat.interactive.app.src.lib.component.flowbite.Sidebar">[docs]</a><span class="k">class</span> <span class="nc">Sidebar</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">asideClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-64&quot;</span></div>
+
+
+<div class="viewcode-block" id="SidebarBrand"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarBrand.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarBrand">[docs]</a><span class="k">class</span> <span class="nc">SidebarBrand</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">site</span><span class="p">:</span> <span class="n">SiteType</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SidebarCta"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarCta.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarCta">[docs]</a><span class="k">class</span> <span class="nc">SidebarCta</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divWrapperClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;p-4 mt-6 bg-blue-50 rounded-lg dark:bg-blue-900&quot;</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center mb-3&quot;</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-orange-100 text-orange-800 text-sm font-semibold &quot;</span>
+    <span class="s2">&quot;mr-2 px-2.5 py-0.5 rounded dark:bg-orange-200 dark:text-orange-900&quot;</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SidebarDropdownItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarDropdownItem.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarDropdownItem">[docs]</a><span class="k">class</span> <span class="nc">SidebarDropdownItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center p-2 pl-11 w-full text-base font-normal &quot;</span>
+    <span class="s2">&quot;text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 &quot;</span>
+    <span class="s2">&quot;dark:text-white dark:hover:bg-gray-700&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">activeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center p-2 pl-11 text-base font-normal &quot;</span>
+    <span class="s2">&quot;text-gray-900 bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white &quot;</span>
+    <span class="s2">&quot;hover:bg-gray-100 dark:hover:bg-gray-700&quot;</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Events</span>
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SidebarDropdownWrapper"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarDropdownWrapper.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarDropdownWrapper">[docs]</a><span class="k">class</span> <span class="nc">SidebarDropdownWrapper</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">btnClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center p-2 w-full text-base font-normal &quot;</span>
+    <span class="s2">&quot;text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 &quot;</span>
+    <span class="s2">&quot;dark:text-white dark:hover:bg-gray-700&quot;</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex-1 ml-3 text-left whitespace-nowrap&quot;</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;py-2 space-y-2&quot;</span>
+    <span class="n">isOpen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SidebarGroup"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarGroup.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarGroup">[docs]</a><span class="k">class</span> <span class="nc">SidebarGroup</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;space-y-2&quot;</span>
+    <span class="n">borderClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pt-4 mt-4 border-t border-gray-200 dark:border-gray-700&quot;</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SidebarItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarItem.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarItem">[docs]</a><span class="k">class</span> <span class="nc">SidebarItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center p-2 text-base font-normal text-gray-900 &quot;</span>
+    <span class="s2">&quot;rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700&quot;</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">spanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ml-3&quot;</span>
+    <span class="n">activeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex items-center p-2 text-base font-normal text-gray-900 &quot;</span>
+    <span class="s2">&quot;bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white hover:bg-gray-100 &quot;</span>
+    <span class="s2">&quot;dark:hover:bg-gray-700&quot;</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Events</span>
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SidebarWrapper"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SidebarWrapper.html#meerkat.interactive.app.src.lib.component.flowbite.SidebarWrapper">[docs]</a><span class="k">class</span> <span class="nc">SidebarWrapper</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;overflow-y-auto py-4 px-3 bg-gray-50 rounded dark:bg-gray-800&quot;</span>
+    <span class="n">asideClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-64&quot;</span></div>
+
+
+<div class="viewcode-block" id="SpeedDial"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SpeedDial.html#meerkat.interactive.app.src.lib.component.flowbite.SpeedDial">[docs]</a><span class="k">class</span> <span class="nc">SpeedDial</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fixed right-6 bottom-6&quot;</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span> <span class="o">=</span> <span class="s2">&quot;top&quot;</span>
+    <span class="n">pill</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">tooltip</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Placement</span><span class="p">,</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+    <span class="n">trigger</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span> <span class="s2">&quot;click&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hover&quot;</span>
+    <span class="n">textOutside</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># id: str = str(uuid.uuid4())</span>
+
+    <span class="c1"># Events</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SpeedDialButton"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.SpeedDialButton.html#meerkat.interactive.app.src.lib.component.flowbite.SpeedDialButton">[docs]</a><span class="k">class</span> <span class="nc">SpeedDialButton</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Spinner"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Spinner.html#meerkat.interactive.app.src.lib.component.flowbite.Spinner">[docs]</a><span class="k">class</span> <span class="nc">Spinner</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">bg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-300&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;8&quot;</span>
+    <span class="n">currentFill</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;currentFill&quot;</span>
+    <span class="n">currentColor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;currentColor&quot;</span></div>
+
+
+<div class="viewcode-block" id="Tabs"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Tabs.html#meerkat.interactive.app.src.lib.component.flowbite.Tabs">[docs]</a><span class="k">class</span> <span class="nc">Tabs</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;full&quot;</span><span class="p">,</span> <span class="s2">&quot;pill&quot;</span><span class="p">,</span> <span class="s2">&quot;underline&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;flex flex-wrap space-x-2&quot;</span>
+    <span class="n">contentClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;p-4 bg-gray-50 rounded-lg dark:bg-gray-800 mt-4&quot;</span>
+    <span class="n">divider</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">activeClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;p-4 text-blue-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 &quot;</span>
+        <span class="s2">&quot;dark:text-blue-500&quot;</span>
+    <span class="p">)</span>
+    <span class="n">inactiveClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;p-4 text-gray-500 rounded-t-lg hover:text-gray-600 &quot;</span>
+    <span class="s2">&quot;hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 &quot;</span>
+    <span class="s2">&quot;dark:hover:text-gray-300&quot;</span></div>
+
+
+<div class="viewcode-block" id="TabItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TabItem.html#meerkat.interactive.app.src.lib.component.flowbite.TabItem">[docs]</a><span class="k">class</span> <span class="nc">TabItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Tab title&quot;</span>
+    <span class="n">activeClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">inactiveClasses</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;inline-block text-sm font-medium text-center disabled:cursor-not-allowed&quot;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Table.html#meerkat.interactive.app.src.lib.component.flowbite.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relative overflow-x-auto&quot;</span>
+    <span class="n">striped</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">hoverable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">noborder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">shadow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;custom&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span></div>
+
+
+<div class="viewcode-block" id="TableBodyCell"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TableBodyCell.html#meerkat.interactive.app.src.lib.component.flowbite.TableBodyCell">[docs]</a><span class="k">class</span> <span class="nc">TableBodyCell</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">tdClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;px-6 py-4 whitespace-nowrap font-medium &quot;</span></div>
+
+
+<div class="viewcode-block" id="TableBodyRow"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TableBodyRow.html#meerkat.interactive.app.src.lib.component.flowbite.TableBodyRow">[docs]</a><span class="k">class</span> <span class="nc">TableBodyRow</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="c1"># TODO: figure out how to get context</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;purple&quot;</span>  <span class="c1"># getContext(&quot;color&quot;)</span></div>
+
+
+<div class="viewcode-block" id="TableSearch"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TableSearch.html#meerkat.interactive.app.src.lib.component.flowbite.TableSearch">[docs]</a><span class="k">class</span> <span class="nc">TableSearch</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relative overflow-x-auto shadow-md sm:rounded-lg&quot;</span>
+    <span class="n">inputValue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">striped</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">hoverable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Search&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span></div>
+
+
+<div class="viewcode-block" id="TableHead"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TableHead.html#meerkat.interactive.app.src.lib.component.flowbite.TableHead">[docs]</a><span class="k">class</span> <span class="nc">TableHead</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">theadClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-xs uppercase&quot;</span>
+    <span class="n">defaultRow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Timeline"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Timeline.html#meerkat.interactive.app.src.lib.component.flowbite.Timeline">[docs]</a><span class="k">class</span> <span class="nc">Timeline</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">customClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;vertical&quot;</span><span class="p">,</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">,</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span></div>
+
+
+<div class="viewcode-block" id="TimelineItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TimelineItem.html#meerkat.interactive.app.src.lib.component.flowbite.TimelineItem">[docs]</a><span class="k">class</span> <span class="nc">TimelineItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">customDiv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">customTimeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Checkbox"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Checkbox.html#meerkat.interactive.app.src.lib.component.flowbite.Checkbox">[docs]</a><span class="k">class</span> <span class="nc">Checkbox</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">FormColorType</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="TimelineHorizontal"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TimelineHorizontal.html#meerkat.interactive.app.src.lib.component.flowbite.TimelineHorizontal">[docs]</a><span class="k">class</span> <span class="nc">TimelineHorizontal</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">olClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;items-center sm:flex&quot;</span></div>
+
+
+<div class="viewcode-block" id="TimelineItemHorizontal"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.TimelineItemHorizontal.html#meerkat.interactive.app.src.lib.component.flowbite.TimelineItemHorizontal">[docs]</a><span class="k">class</span> <span class="nc">TimelineItemHorizontal</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Toast"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Toast.html#meerkat.interactive.app.src.lib.component.flowbite.Toast">[docs]</a><span class="k">class</span> <span class="nc">Toast</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dropdown&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbar&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;navbarUl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;form&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">simple</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">position</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;top-left&quot;</span><span class="p">,</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom-right&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="nb">open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-full max-w-xs p-4&quot;</span>
+
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Tooltip"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Tooltip.html#meerkat.interactive.app.src.lib.component.flowbite.Tooltip">[docs]</a><span class="k">class</span> <span class="nc">Tooltip</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">,</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dark&quot;</span>
+    <span class="n">defaultClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;py-2 px-3 text-sm font-medium&quot;</span></div>
+
+
+<div class="viewcode-block" id="Activity"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Activity.html#meerkat.interactive.app.src.lib.component.flowbite.Activity">[docs]</a><span class="k">class</span> <span class="nc">Activity</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">olClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relative border-l border-gray-200 dark:border-gray-700&quot;</span></div>
+
+
+<div class="viewcode-block" id="ActivityItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.ActivityItem.html#meerkat.interactive.app.src.lib.component.flowbite.ActivityItem">[docs]</a><span class="k">class</span> <span class="nc">ActivityItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">activities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActivityType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Group.html#meerkat.interactive.app.src.lib.component.flowbite.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;p-5 mb-4 bg-gray-50 rounded-lg border border-gray-100 &quot;</span>
+    <span class="s2">&quot;dark:bg-gray-800 dark:border-gray-700&quot;</span>
+    <span class="n">timeClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-lg font-semibold text-gray-900 dark:text-white&quot;</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># date: Union[Date, str] = &quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GroupItem"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.GroupItem.html#meerkat.interactive.app.src.lib.component.flowbite.GroupItem">[docs]</a><span class="k">class</span> <span class="nc">GroupItem</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">timelines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GroupTimelineType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1">#     &quot;blue&quot;, &quot;red&quot;, &quot;green&quot;, &quot;yellow&quot;, &quot;indigo&quot;, &quot;purple&quot;, &quot;pink&quot;</span>
+    <span class="c1"># ] = &quot;blue&quot;  # TODO: check that these are the right colors</span>
+    <span class="n">custom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_paste</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FloatingLabelInput"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.FloatingLabelInput.html#meerkat.interactive.app.src.lib.component.flowbite.FloatingLabelInput">[docs]</a><span class="k">class</span> <span class="nc">FloatingLabelInput</span><span class="p">(</span><span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="c1"># id: str = &quot;&quot;  #  determine if this should be uuid</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;filled&quot;</span><span class="p">,</span> <span class="s2">&quot;outlined&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span>  <span class="c1"># TODO: add more input types</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;small&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;base&quot;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_paste</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Radio"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Radio.html#meerkat.interactive.app.src.lib.component.flowbite.Radio">[docs]</a><span class="k">class</span> <span class="nc">Radio</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;indigo&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;pink&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">custom</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">inline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_paste</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Range"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Range.html#meerkat.interactive.app.src.lib.component.flowbite.Range">[docs]</a><span class="k">class</span> <span class="nc">Range</span><span class="p">(</span><span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">number</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sm&quot;</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span> <span class="s2">&quot;lg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+    <span class="nb">min</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="nb">max</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">step</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Search"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Search.html#meerkat.interactive.app.src.lib.component.flowbite.Search">[docs]</a><span class="k">class</span> <span class="nc">Search</span><span class="p">(</span><span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sm&quot;</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span> <span class="s2">&quot;lg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;lg&quot;</span>
+    <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Search&quot;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_paste</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Select"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Select.html#meerkat.interactive.app.src.lib.component.flowbite.Select">[docs]</a><span class="k">class</span> <span class="nc">Select</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">items</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span>
+    <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Choose option ...&quot;</span>
+    <span class="n">underline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sm&quot;</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">,</span> <span class="s2">&quot;lg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;md&quot;</span>
+
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_input</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Textarea"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Textarea.html#meerkat.interactive.app.src.lib.component.flowbite.Textarea">[docs]</a><span class="k">class</span> <span class="nc">Textarea</span><span class="p">(</span><span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">on_blur</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_focus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_input</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keydown</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keypress</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_keyup</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseenter</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseleave</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_mouseover</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_paste</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Toggle"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Toggle.html#meerkat.interactive.app.src.lib.component.flowbite.Toggle">[docs]</a><span class="k">class</span> <span class="nc">Toggle</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;small&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;large&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+    <span class="n">group</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">number</span><span class="p">]]</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">checked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">on_change</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;Typography.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="A"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.A.html#meerkat.interactive.app.src.lib.component.flowbite.A">[docs]</a><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-blue-600 dark:text-blue-500&quot;</span>
+    <span class="n">aClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex items-center hover:underline&quot;</span></div>
+
+
+<div class="viewcode-block" id="Blockquote"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Blockquote.html#meerkat.interactive.app.src.lib.component.flowbite.Blockquote">[docs]</a><span class="k">class</span> <span class="nc">Blockquote</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">border</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">italic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">borderClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;border-l-4 border-gray-300 dark:border-gray-500&quot;</span>
+    <span class="n">bgClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-gray-50 dark:bg-gray-800&quot;</span>
+    <span class="n">bg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">baseClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;font-semibold text-gray-900 dark:text-white&quot;</span>
+    <span class="n">alignment</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;xs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;4xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;5xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;6xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;7xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;8xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;9xl&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;lg&quot;</span></div>
+
+
+<div class="viewcode-block" id="DescriptionList"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.DescriptionList.html#meerkat.interactive.app.src.lib.component.flowbite.DescriptionList">[docs]</a><span class="k">class</span> <span class="nc">DescriptionList</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">,</span> <span class="s2">&quot;dd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">dtClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 md:text-lg dark:text-gray-400&quot;</span>
+    <span class="n">ddClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-lg font-semibold&quot;</span></div>
+
+
+<div class="viewcode-block" id="Heading"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Heading.html#meerkat.interactive.app.src.lib.component.flowbite.Heading">[docs]</a><span class="k">class</span> <span class="nc">Heading</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;h1&quot;</span><span class="p">,</span> <span class="s2">&quot;h2&quot;</span><span class="p">,</span> <span class="s2">&quot;h3&quot;</span><span class="p">,</span> <span class="s2">&quot;h4&quot;</span><span class="p">,</span> <span class="s2">&quot;h5&quot;</span><span class="p">,</span> <span class="s2">&quot;h6&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;h1&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-900 dark:text-white&quot;</span>
+    <span class="n">customSize</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Hr"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Hr.html#meerkat.interactive.app.src.lib.component.flowbite.Hr">[docs]</a><span class="k">class</span> <span class="nc">Hr</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">icon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w-full&quot;</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;h-px&quot;</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inline-flex justify-center items-center w-full&quot;</span>
+    <span class="n">hrClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-gray-200 rounded border-0 dark:bg-gray-700&quot;</span>
+    <span class="n">iconDivClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;absolute left-1/2 px-4 bg-white -translate-x-1/2 &quot;</span>
+    <span class="n">textSpanClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;absolute left-1/2 px-3 font-medium text-gray-900 &quot;</span>
+    <span class="s2">&quot;bg-white -translate-x-1/2 dark:text-white &quot;</span>
+    <span class="n">middleBgColor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dark:bg-gray-900&quot;</span></div>
+
+
+<div class="viewcode-block" id="Layout"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Layout.html#meerkat.interactive.app.src.lib.component.flowbite.Layout">[docs]</a><span class="k">class</span> <span class="nc">Layout</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">divClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;grid&quot;</span>
+    <span class="n">cols</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;grid-cols-1 sm:grid-cols-2&quot;</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+
+<div class="viewcode-block" id="Li"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Li.html#meerkat.interactive.app.src.lib.component.flowbite.Li">[docs]</a><span class="k">class</span> <span class="nc">Li</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">icon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">liClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="List"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.List.html#meerkat.interactive.app.src.lib.component.flowbite.List">[docs]</a><span class="k">class</span> <span class="nc">List</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">tag</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ul&quot;</span><span class="p">,</span> <span class="s2">&quot;ol&quot;</span><span class="p">,</span> <span class="s2">&quot;dl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ul&quot;</span>
+    <span class="nb">list</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;disc&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;decimal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;disc&quot;</span>
+    <span class="n">position</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="s2">&quot;outside&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;inside&quot;</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 dark:text-gray-400&quot;</span>
+    <span class="n">olClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;list-decimal list-inside&quot;</span>
+    <span class="n">ulClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;max-w-md&quot;</span>
+    <span class="n">dlClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;max-w-md divide-y divide-gray-200 dark:divide-gray-700&quot;</span></div>
+
+
+<div class="viewcode-block" id="Mark"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Mark.html#meerkat.interactive.app.src.lib.component.flowbite.Mark">[docs]</a><span class="k">class</span> <span class="nc">Mark</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-white dark:bg-blue-500&quot;</span>
+    <span class="n">bgColor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bg-blue-600&quot;</span>
+    <span class="n">markClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;px-2 rounded&quot;</span></div>
+
+
+<div class="viewcode-block" id="P"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.P.html#meerkat.interactive.app.src.lib.component.flowbite.P">[docs]</a><span class="k">class</span> <span class="nc">P</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-900 dark:text-white&quot;</span>
+    <span class="n">height</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;relaxed&quot;</span><span class="p">,</span> <span class="s2">&quot;loose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+    <span class="n">align</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+    <span class="n">justify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">italic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">firstupper</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">upperClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;first-line:uppercase first-line:tracking-widest &quot;</span>
+    <span class="s2">&quot;first-letter:text-7xl first-letter:font-bold first-letter:text-gray-900 &quot;</span>
+    <span class="s2">&quot;dark:first-letter:text-gray-100 first-letter:mr-3 first-letter:float-left&quot;</span>
+    <span class="n">opacity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">number</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">whitespace</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;normal&quot;</span><span class="p">,</span> <span class="s2">&quot;nowrap&quot;</span><span class="p">,</span> <span class="s2">&quot;pre&quot;</span><span class="p">,</span> <span class="s2">&quot;preline&quot;</span><span class="p">,</span> <span class="s2">&quot;prewrap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;xs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;base&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;4xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;5xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;6xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;7xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;8xl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;9xl&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;base&quot;</span>
+    <span class="n">space</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;tighter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tight&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wide&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;wider&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;widest&quot;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">weight</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;thin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extralight&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;semibold&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bold&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;extrabold&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span></div>
+
+
+<div class="viewcode-block" id="Secondary"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Secondary.html#meerkat.interactive.app.src.lib.component.flowbite.Secondary">[docs]</a><span class="k">class</span> <span class="nc">Secondary</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-gray-500 dark:text-gray-400&quot;</span>
+    <span class="n">secondaryClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;font-semibold&quot;</span></div>
+
+
+<div class="viewcode-block" id="Span"><a class="viewcode-back" href="../../../../../../../apidocs/generated/meerkat.interactive.app.src.lib.component.flowbite.Span.html#meerkat.interactive.app.src.lib.component.flowbite.Span">[docs]</a><span class="k">class</span> <span class="nc">Span</span><span class="p">(</span><span class="n">Slottable</span><span class="p">,</span> <span class="n">FlowbiteSvelteMixin</span><span class="p">,</span> <span class="n">Component</span><span class="p">):</span>
+    <span class="n">italic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">underline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">linethrough</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">uppercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">gradient</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">highlightClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text-blue-600 dark:text-blue-500&quot;</span>
+    <span class="n">decorationClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;decoration-2 decoration-blue-400 &quot;</span>
+    <span class="s2">&quot;dark:decoration-blue-600&quot;</span>
+    <span class="n">gradientClass</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 &quot;</span>
+        <span class="s2">&quot;from-sky-400&quot;</span>
+    <span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Accordion&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AccordionItem&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Button&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Card&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Dropdown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DropdownItem&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DropdownDivider&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DropdownHeader&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

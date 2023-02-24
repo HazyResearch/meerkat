@@ -1,0 +1,1445 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>meerkat.interactive.endpoint &#8212; 🔮 v0.2.5</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.5</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../start/tutorials/index.html">
+   Tutorials
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../guide/overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/dataframe/intro.html">
+   Data Frames
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/dataframe/columns/overview.html">
+     Column Types
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/columns/scalar.html">
+       Scalar Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/columns/tensor.html">
+       Tensor Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/columns/deferred.html">
+       Deferred Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/columns/object.html">
+       Object Columns
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/dataframe/ops/overview.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/dataframe/advanced/overview.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/reactive/index.html">
+   Reactive Functions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/reactive/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/reactive/concepts.html">
+     Concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/reactive/user-guide.html">
+     User Guide
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/reactive/inbuilts.html">
+     Reactive Functions in Meerkat
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../guide/store/getting-started.html">
+   Stores
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/components/index.html">
+   Components
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/components/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/components/builtins.html">
+     Components in Meerkat
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/components/custom-components.html">
+     Custom Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/endpoints/index.html">
+   Endpoints
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/endpoints/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/endpoints/reactive-vs-endpoints.html">
+     Endpoints vs. Reactive Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/interactive/introduction.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/interactive/concepts/core-concepts-nutshell.html">
+     Core Concepts in a Nutshell
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+    <label for="toctree-checkbox-10">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/concepts/store.html">
+       Stores
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/concepts/dataframe.html">
+       DataFrame
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/concepts/reactive.html">
+       Reactivity in Meerkat
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/concepts/component.html">
+       Components
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/interactive/environments/running-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/interactive/components/component.html">
+     Component
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/components/display.html">
+       Displaying dataframes
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/components/match.html">
+       <code class="xref py py-class docutils literal notranslate">
+        <span class="pre">
+         mk.gui.Match
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../guide/interactive/examples/examples.html">
+     Interactive Examples
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+    <label for="toctree-checkbox-12">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../../guide/interactive/examples/image_search.html">
+       Building image search
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../guide/formatters/getting-started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../guide/cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../guide/magic/getting-started.html">
+   Magic
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../guide/magic/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/configure.html">
+   Configuration
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2F_modules/meerkat/interactive/endpoint.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1></h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <h1>Source code for meerkat.interactive.endpoint</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Body</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">create_model</span>
+
+<span class="kn">from</span> <span class="nn">meerkat.interactive.graph</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">unmarked</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.graph.store</span> <span class="kn">import</span> <span class="n">_unpack_stores_from_object</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.node</span> <span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeMixin</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.types</span> <span class="kn">import</span> <span class="n">T</span>
+<span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span>
+<span class="kn">from</span> <span class="nn">meerkat.state</span> <span class="kn">import</span> <span class="n">state</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">has_var_args</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># KG: must declare this dynamically defined model here,</span>
+<span class="c1"># otherwise we get a FastAPI error</span>
+<span class="c1"># when only declaring this inside the Endpoint class.</span>
+<span class="n">FnPydanticModel</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">SingletonRouter</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A metaclass that ensures that only one instance of a router is created,</span>
+
+<span class="sd">    *for a given prefix*.</span>
+
+<span class="sd">    A prefix is a string that is used to identify a router. For example,</span>
+<span class="sd">    the prefix for the router that handles endpoints is &quot;/endpoint&quot;. We</span>
+<span class="sd">    want to ensure that only one router is created for each prefix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_instances</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+        <span class="c1"># Look up if this (cls, prefix) pair has been created before</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">:</span>
+            <span class="c1"># If not, we let a new instance be created</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">[(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SingletonRouter</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instances</span><span class="p">[(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)]</span>
+
+
+<span class="k">class</span> <span class="nc">SimpleRouter</span><span class="p">(</span><span class="n">IdentifiableMixin</span><span class="p">,</span> <span class="n">APIRouter</span><span class="p">):</span>  <span class="c1"># , metaclass=SingletonRouter):</span>
+    <span class="c1"># KG: using the SingletonRouter metaclass causes a bug.</span>
+    <span class="c1"># app.include_router() inside Endpoint is called multiple times</span>
+    <span class="c1"># for the same router. This causes an error because some</span>
+    <span class="c1"># endpoints are registered multiple times because the FastAPI</span>
+    <span class="c1"># class doesn&#39;t check if an endpoint is already registered.</span>
+    <span class="c1"># As a patch, we&#39;re generating one router per Endpoint object</span>
+    <span class="c1"># (this could generate multiple routers for the same prefix, but</span>
+    <span class="c1"># that&#39;s not been a problem).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A very simple FastAPI router.</span>
+
+<span class="sd">    This router allows you to pass in arbitrary keyword arguments that are</span>
+<span class="sd">    passed to the FastAPI router, and sets sensible defaults for the</span>
+<span class="sd">    prefix, tags, and responses.</span>
+
+<span class="sd">    Note that if you create two routers with the same prefix, they will</span>
+<span class="sd">    not be the same object.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        prefix (str): The prefix for this router.</span>
+<span class="sd">        **kwargs: Arbitrary keyword arguments that are passed to the FastAPI</span>
+<span class="sd">            router.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_self_identifiable_group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;routers&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)],</span>
+            <span class="n">responses</span><span class="o">=</span><span class="p">{</span><span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Not found&quot;</span><span class="p">}},</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">EndpointFrontend</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A schema for sending an endpoint to the frontend.&quot;&quot;&quot;</span>
+
+    <span class="n">endpointId</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<span class="c1"># TODO: technically Endpoint doesn&#39;t need to be NodeMixin (probably)</span>
+<span class="k">class</span> <span class="nc">Endpoint</span><span class="p">(</span><span class="n">IdentifiableMixin</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="n">EmbeddedBody</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">Body</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_self_identifiable_group</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;endpoints&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">APIRouter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">route</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an endpoint from a function in Meerkat.</span>
+
+<span class="sd">        Typically, you will not need to call this class directly, but</span>
+<span class="sd">        instead use the `endpoint` decorator.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            fn (Callable): The function to create an endpoint from.</span>
+<span class="sd">            prefix (str): The prefix for this endpoint.</span>
+<span class="sd">            route (str): The route for this endpoint.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">        All endpoints can be hit with a POST request at</span>
+<span class="sd">        /{endpoint_id}/dispatch/</span>
+<span class="sd">        The request needs a JSON body with the following keys:</span>
+<span class="sd">            - kwargs: a dictionary of keyword arguments to be</span>
+<span class="sd">                passed to the endpoint function `fn`</span>
+<span class="sd">            - payload: additional payload, if any</span>
+
+<span class="sd">        Optionally, the user can customize how endpoints are</span>
+<span class="sd">        organized by specifying a prefix and a route. The prefix</span>
+<span class="sd">        is a string that is used to identify a router. For example,</span>
+<span class="sd">        the prefix for the router that handles endpoints is &quot;/endpoint&quot;.</span>
+<span class="sd">        The route is a string that is used to identify an endpoint</span>
+<span class="sd">        within a router. For example, the route for the endpoint</span>
+<span class="sd">        that handles the `get` function could be &quot;/get&quot;.</span>
+
+<span class="sd">        If only a prefix is specified, then the route will be the</span>
+<span class="sd">        name of the function e.g. &quot;my_endpoint&quot;. If both a prefix</span>
+<span class="sd">        and a route are specified, then the route will be the</span>
+<span class="sd">        specified route e.g. &quot;/specific/route/&quot;.</span>
+
+<span class="sd">        Refer to the FastAPI documentation for more information</span>
+<span class="sd">        on how to create routers and endpoints.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_fn</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No prefix, no router</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Make the router</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">APIRouter</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">prefix</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">SimpleRouter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">=</span> <span class="n">route</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Endpoint(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, name=</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, prefix=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;route=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">route</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the function `fn`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Endpoint function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="si">}</span><span class="s2"> is not callable.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Disallow *args</span>
+        <span class="k">if</span> <span class="n">has_var_args</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Endpoint function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="si">}</span><span class="s2"> has a `*args` parameter.&quot;</span>
+                <span class="s2">&quot; Please use keyword arguments instead.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Do we allow lambdas?</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">frontend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">EndpointFrontend</span><span class="p">(</span>
+            <span class="n">endpointId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Actually run the endpoint function `fn`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Positional arguments to pass to `fn`.</span>
+<span class="sd">            **kwargs: Keyword arguments to pass to `fn`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The return value of `fn`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running endpoint </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Apply a partial function to ingest the additional arguments</span>
+        <span class="c1"># that are passed in</span>
+        <span class="n">partial_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Check if the partial_fn has any arguments left to be filled</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">partial_fn</span><span class="p">)</span>
+        <span class="c1"># Check if spec has no args: if it does have args,</span>
+        <span class="c1"># it means that we can&#39;t call the function without filling them in</span>
+        <span class="n">no_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="c1"># Check if all the kwonlyargs are in the keywords: if yes, we&#39;ve</span>
+        <span class="c1"># bound all the keyword arguments</span>
+        <span class="n">no_kwonlyargs</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">arg</span> <span class="ow">in</span> <span class="n">partial_fn</span><span class="o">.</span><span class="n">keywords</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">kwonlyargs</span><span class="p">])</span>
+
+        <span class="c1"># Get the signature</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">partial_fn</span><span class="p">)</span>
+        <span class="c1"># Check if any parameters are unfilled args</span>
+        <span class="n">no_unfilled_args</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">empty</span>
+                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">no_args</span> <span class="ow">and</span> <span class="n">no_kwonlyargs</span> <span class="ow">and</span> <span class="n">no_unfilled_args</span><span class="p">):</span>
+
+            <span class="c1"># Find the missing keyword arguments</span>
+            <span class="n">missing_args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">kwonlyargs</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partial_fn</span><span class="o">.</span><span class="n">keywords</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="o">==</span> <span class="n">param</span><span class="o">.</span><span class="n">empty</span>
+            <span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Endpoint </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> still has arguments left to be </span><span class="se">\</span>
+<span class="s2">                filled (args: </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">args</span><span class="si">}</span><span class="s2">, kwargs: </span><span class="si">{</span><span class="n">missing_args</span><span class="si">}</span><span class="s2">). </span><span class="se">\</span>
+<span class="s2">                    Ensure that all keyword arguments </span><span class="se">\</span>
+<span class="s2">                    are passed in when calling `.run()` on this endpoint.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Clear the modification queue before running the function</span>
+        <span class="c1"># This is an invariant: there should be no pending modifications</span>
+        <span class="c1"># when running an endpoint, so that only the modifications</span>
+        <span class="c1"># that are made by the endpoint are applied</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">modification_queue</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Ready the ModificationQueue so that it can be used to track</span>
+        <span class="c1"># modifications made by the endpoint</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">modification_queue</span><span class="o">.</span><span class="n">ready</span><span class="p">()</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">progress_queue</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="n">partial</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># The function should not add any operations to the graph.</span>
+            <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">partial_fn</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Unready the modification queue</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">modification_queue</span><span class="o">.</span><span class="n">unready</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+            <span class="n">modifications</span> <span class="o">=</span> <span class="n">trigger</span><span class="p">()</span>
+
+        <span class="c1"># End the progress bar</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">progress_queue</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">modifications</span>
+
+    <span class="k">def</span> <span class="nf">partial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+        <span class="c1"># Any NodeMixin objects that are passed in as arguments</span>
+        <span class="c1"># should have this Endpoint as a non-triggering child</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_inode</span><span class="p">():</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_inode</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attach_to_inode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">has_inode</span><span class="p">():</span>
+                    <span class="n">inode_id</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Store</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span><span class="o">.</span><span class="n">id</span>
+                    <span class="n">node</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">create_inode</span><span class="p">(</span><span class="n">inode_id</span><span class="o">=</span><span class="n">inode_id</span><span class="p">)</span>
+                    <span class="n">arg</span><span class="o">.</span><span class="n">attach_to_inode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+                <span class="n">arg</span><span class="o">.</span><span class="n">inode</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inode</span><span class="p">,</span> <span class="n">triggers</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># TODO (sabri): make this work for derived dataframes</span>
+        <span class="c1"># There&#39;s a subtle issue with partial that we should figure out. I spent an</span>
+        <span class="c1"># hour or so on it, but am gonna table it til after the deadline tomorrow</span>
+        <span class="c1"># because I have a hacky workaround. Basically, if we create an endpoint</span>
+        <span class="c1"># partial passing a &quot;derived&quot; dataframe, when the endpoint is called, we</span>
+        <span class="c1"># should expect that the current value of the dataframe will be passed.</span>
+        <span class="c1"># Currently, the original value of the dataframe is passed. It makes sense to</span>
+        <span class="c1"># me why this is happening, but the right fix is eluding me.</span>
+
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">return</span> <span class="n">Endpoint</span><span class="p">(</span>
+            <span class="n">fn</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">route</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new Endpoint that applies `fn` to the return value of this</span>
+<span class="sd">        Endpoint. Effectively equivalent to `fn(self.fn(*args, **kwargs))`.</span>
+
+<span class="sd">        If the return value is None and `fn` doesn&#39;t take any inputs, then</span>
+<span class="sd">        `fn` will be called with no arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fn (Endpoint, callable): An Endpoint or a callable function that accepts</span>
+<span class="sd">                a single argument of the same type as the return of this Endpoint</span>
+<span class="sd">                (i.e. self).</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            Endpoint: The new composed Endpoint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">):</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">fn</span><span class="p">)</span>
+
+        <span class="c1"># `fn` may not take any inputs.</span>
+        <span class="c1"># FIXME: Should this logic be in ``compose``? or some other function?</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">get_signature</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="n">pipe_return</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">composed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fn</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="k">if</span> <span class="n">pipe_return</span> <span class="k">else</span> <span class="n">fn</span><span class="o">.</span><span class="n">fn</span><span class="p">()</span>
+
+        <span class="n">composed</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;composed(</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="k">return</span> <span class="n">Endpoint</span><span class="p">(</span>
+            <span class="n">fn</span><span class="o">=</span><span class="n">composed</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">route</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">route</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a FastAPI route for this endpoint to the router. This function</span>
+<span class="sd">        will not do anything if the router is None (i.e. no prefix was</span>
+<span class="sd">        specified).</span>
+
+<span class="sd">        This function is called automatically when the endpoint is</span>
+<span class="sd">        created using the `endpoint` decorator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># The route will be postfixed with the fn name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">/&quot;</span>
+
+            <span class="c1"># Analyze the function signature of `fn` to</span>
+            <span class="c1"># construct a dictionary, mapping argument names</span>
+            <span class="c1"># to their types and default values for creating a</span>
+            <span class="c1"># Pydantic model.</span>
+
+            <span class="c1"># During this we also</span>
+            <span class="c1"># - make sure that args are either type-hinted or</span>
+            <span class="c1">#   annotated with a default value (can&#39;t create</span>
+            <span class="c1">#  a Pydantic model without a type hint or default)</span>
+            <span class="c1"># - replace arguments that have type-hints which</span>
+            <span class="c1">#   are subclasses of `IdentifiableMixin` with</span>
+            <span class="c1">#   strings (i.e. the id of the Identifiable)</span>
+            <span class="c1">#   (e.g. `Store` -&gt; `str`)</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">)</span>
+
+            <span class="n">pydantic_model_params</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="n">annot</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+                <span class="n">has_default</span> <span class="o">=</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span>
+
+                <span class="k">if</span> <span class="n">annot</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span>
+                        <span class="c1"># Allow arbitrary keyword arguments</span>
+                        <span class="n">pydantic_model_params</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_default</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> must have a type annotation or &quot;</span>
+                            <span class="s2">&quot;a default value.&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
+                    <span class="c1"># e.g. Stores must be referred to by str ids when</span>
+                    <span class="c1"># passed into the API</span>
+                    <span class="n">pydantic_model_params</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pydantic_model_params</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_default</span> <span class="k">else</span> <span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Allow arbitrary types in the Pydantic model</span>
+            <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+                <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Create the Pydantic model, named `{fn_name}Model`</span>
+            <span class="k">global</span> <span class="n">FnPydanticModel</span>
+            <span class="n">FnPydanticModel</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">Model&quot;</span><span class="p">,</span>  <span class="c1"># noqa: E501</span>
+                <span class="n">__config__</span><span class="o">=</span><span class="n">Config</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">pydantic_model_params</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create a wrapper function, with kwargs that conform to the</span>
+            <span class="c1"># Pydantic model, and a return annotation that matches `fn`</span>
+            <span class="k">def</span> <span class="nf">_fn</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="p">:</span> <span class="n">FnPydanticModel</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="o">.</span><span class="n">EmbeddedBody</span><span class="p">(),</span>
+            <span class="p">):</span>  <span class="c1"># -&gt; signature.return_annotation:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
+
+            <span class="c1"># from inspect import Parameter, Signature</span>
+            <span class="c1"># params = []</span>
+            <span class="c1"># for p, (annot, default) in pydantic_model_params.items():</span>
+            <span class="c1">#     params.append(</span>
+            <span class="c1">#         Parameter(</span>
+            <span class="c1">#             p,</span>
+            <span class="c1">#             kind=Parameter.POSITIONAL_OR_KEYWORD,</span>
+            <span class="c1">#             annotation=annot,</span>
+            <span class="c1">#             default=default,</span>
+            <span class="c1">#         )</span>
+            <span class="c1">#     )</span>
+            <span class="c1"># _fn.__signature__ = Signature(params)</span>
+
+            <span class="c1"># Name the wrapper function the same as `fn`, so it looks nice</span>
+            <span class="c1"># in the docs</span>
+            <span class="n">_fn</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the user specifies a route manually, then they&#39;re responsible for</span>
+            <span class="c1"># everything, including type-hints and default values.</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="n">annot</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span>
+
+                <span class="c1"># If annot is a subclass of `IdentifiableMixin`, replace</span>
+                <span class="c1"># it with the `str` type (i.e. the id of the Identifiable)</span>
+                <span class="c1"># (e.g. `Store` -&gt; `str`)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
+
+            <span class="n">_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span>
+
+        <span class="c1"># Make FastAPI endpoint for POST requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_api_route</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">route</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">route</span><span class="p">,</span>
+            <span class="n">_fn</span><span class="p">,</span>
+            <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="n">method</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Must add the router to the app again, everytime a new route is added</span>
+        <span class="c1"># otherwise, the new route does not show up in the docs</span>
+        <span class="kn">from</span> <span class="nn">meerkat.interactive.api.main</span> <span class="kn">import</span> <span class="n">app</span>
+
+        <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">router</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">__fn_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calling the endpoint will just call .run(...) by default.</span>
+
+<span class="sd">        If `__fn_only=True` is specified, it will call the raw function</span>
+<span class="sd">        underlying this endpoint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">__fn_only</span><span class="p">:</span>
+            <span class="c1"># FIXME(Sabri): This isn&#39;t working for some reason. The &#39;__fn_only&#39; arg</span>
+            <span class="c1"># is for some reason being put in the kwargs dict. Workaround is to just</span>
+            <span class="c1"># use self.fn directly.</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__get_validators__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">cls</span><span class="o">.</span><span class="n">validate</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">make_endpoint</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+
+<span class="k">class</span> <span class="nc">EndpointProperty</span><span class="p">(</span><span class="n">Endpoint</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">make_endpoint</span><span class="p">(</span><span class="n">endpoint_or_fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make an Endpoint.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">endpoint_or_fn</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endpoint_or_fn</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">Endpoint</span><span class="p">(</span><span class="n">endpoint_or_fn</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="endpoint"><a class="viewcode-back" href="../../../apidocs/dataframe.html#meerkat.endpoint">[docs]</a><span class="k">def</span> <span class="nf">endpoint</span><span class="p">(</span>
+    <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">APIRouter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">route</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to mark a function as an endpoint.</span>
+
+<span class="sd">    An endpoint is a function that can be called to</span>
+<span class="sd">        - update the value of a Store (e.g. incrementing a counter)</span>
+<span class="sd">        - update a DataFrame (e.g. adding a new row)</span>
+<span class="sd">        - run a computation and return its result to the frontend</span>
+<span class="sd">        - run a function in response to a frontend event (e.g. button</span>
+<span class="sd">            click)</span>
+
+<span class="sd">    Endpoints differ from reactive functions in that they are not</span>
+<span class="sd">    automatically triggered by changes in their inputs. Instead,</span>
+<span class="sd">    they are triggered by explicit calls to the endpoint function.</span>
+
+<span class="sd">    The Store and DataFrame objects that are modified inside the endpoint</span>
+<span class="sd">    function will automatically trigger reactive functions that</span>
+<span class="sd">    depend on them.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @endpoint</span>
+<span class="sd">        def increment(count: Store, step: int = 1):</span>
+<span class="sd">            count.set(count + step)</span>
+<span class="sd">            # ^ update the count Store, which will trigger operations</span>
+<span class="sd">            #   that depend on it</span>
+
+<span class="sd">        # Create a button that calls the increment endpoint</span>
+<span class="sd">        counter = Store(0)</span>
+<span class="sd">        button = Button(on_click=increment(counter))</span>
+<span class="sd">        # ^ read this as: call the increment endpoint with the `counter`</span>
+<span class="sd">        # Store when the button is clicked</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fn: The function to decorate.</span>
+<span class="sd">        prefix: The prefix to add to the route. If a string, it will be</span>
+<span class="sd">            prepended to the route. If an APIRouter, the route will be</span>
+<span class="sd">            added to the router.</span>
+<span class="sd">        route: The route to add to the endpoint. If not specified, the</span>
+<span class="sd">            route will be the name of the function.</span>
+<span class="sd">        method: The HTTP method to use for the endpoint. Defaults to</span>
+<span class="sd">            &quot;POST&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The decorated function, as an Endpoint object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_endpoint</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="c1"># Gather up</span>
+        <span class="c1"># 1. all the arguments that are hinted as Stores</span>
+        <span class="c1"># 2. the hinted arguments that subclass IdentifiableMixin</span>
+        <span class="c1">#    e.g. Store, Endpoint, Page, etc.</span>
+        <span class="n">stores</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">identifiables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+                <span class="n">stores</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
+                <span class="c1"># This will also include `Store`, so it will be a superset</span>
+                <span class="c1"># of `stores`</span>
+                <span class="n">identifiables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># Keep the arguments that were not annotated to be `Stores`</span>
+            <span class="n">fn_signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+            <span class="n">fn_bound_arguments</span> <span class="o">=</span> <span class="n">fn_signature</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">arguments</span>
+
+            <span class="c1"># `Identifiables` that are passed into the function</span>
+            <span class="c1"># may be passed in as a string id, or as the object itself</span>
+            <span class="c1"># If they are passed in as a string id, we need to get the object</span>
+            <span class="c1"># from the registry</span>
+            <span class="n">_args</span><span class="p">,</span> <span class="n">_kwargs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fn_bound_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">identifiables</span><span class="p">:</span>
+                    <span class="c1"># Dereference the argument if it was passed in as a string id</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="c1"># Not a string id, so just use the object</span>
+                        <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
+                            <span class="c1"># v is a string, but it is also an IdentifiableMixin</span>
+                            <span class="c1"># e.g. Store(&quot;foo&quot;), so just use v as is</span>
+                            <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># v is a string id</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="c1"># Directly try to look up the string id in the</span>
+                                <span class="c1"># registry of the annotated type</span>
+                                <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">identifiables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                <span class="c1"># If that fails, try to look up the string id in</span>
+                                <span class="c1"># the Node registry, and then get the object</span>
+                                <span class="c1"># from the Node</span>
+                                <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">obj</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span>
+                        <span class="c1"># These are *args under the `args` key</span>
+                        <span class="c1"># These are the only arguments that will be passed in as</span>
+                        <span class="c1"># *args to the fn</span>
+                        <span class="n">_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span>
+                        <span class="c1"># These are **kwargs under the `kwargs` key</span>
+                        <span class="n">v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># All other positional arguments that were not *args were</span>
+                        <span class="c1"># bound, so they become kwargs</span>
+                        <span class="n">v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+                    <span class="c1"># Run the function</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># If the function raises an exception, log it and return</span>
+                <span class="c1"># the exception</span>
+                <span class="c1"># In case the exception is about .set() being missing, add</span>
+                <span class="c1"># a more helpful error message</span>
+                <span class="k">if</span> <span class="s2">&quot;no attribute &#39;set&#39;&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+                    <span class="c1"># Get the name of the object that was passed in</span>
+                    <span class="c1"># as a Store, but did not have a .set() method</span>
+                    <span class="n">obj_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+                    <span class="c1"># Update the error message to be more helpful</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Exception raised in endpoint `</span><span class="si">{</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">`. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;The object of type `</span><span class="si">{</span><span class="n">obj_name</span><span class="si">}</span><span class="s2">` that you called to &quot;</span>
+                        <span class="s2">&quot;update with `.set()` &quot;</span>
+                        <span class="s2">&quot;is not a `Store`. You probably forgot to &quot;</span>
+                        <span class="s2">&quot;annotate this object&#39;s typehint in the signature of &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` as a `Store` i.e. </span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;@endpoint</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;def </span><span class="si">{</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(..., parameter: Store, ...):</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;Remember that without this type annotation, the object &quot;</span>
+                        <span class="s2">&quot;will be automatically unpacked by Meerkat inside the endpoint &quot;</span>
+                        <span class="s2">&quot;if it is a `Store`.&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+            <span class="c1"># Return the result of the function</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="c1"># Register the endpoint and return it</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="n">Endpoint</span><span class="p">(</span>
+            <span class="n">fn</span><span class="o">=</span><span class="n">wrapper</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">route</span><span class="o">=</span><span class="n">route</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">endpoint</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">endpoint</span>
+
+    <span class="k">return</span> <span class="n">_endpoint</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">endpoints</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to mark a class as containing a collection of endpoints. All</span>
+<span class="sd">    instance methods in the marked class will be converted to endpoints.</span>
+
+<span class="sd">    This decorator is useful when you want to create a class that</span>
+<span class="sd">    contains some logical state variables (e.g. a Counter class), along</span>
+<span class="sd">    with methods to manipulate the values of those variables (e.g.</span>
+<span class="sd">    increment or decrement the counter).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+    <span class="n">_ids</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_max_ids</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_ids</span><span class="p">:</span>
+        <span class="n">_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">_max_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_endpoints</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">EndpointClass</span><span class="p">:</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="c1"># Access all the user-defined attributes of the instance</span>
+                <span class="c1"># to create endpoints</span>
+                <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">attrib</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span><span class="p">(</span>
+                                <span class="n">obj</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="bp">self</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+            <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">]:</span>
+                    <span class="n">_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">][</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">_max_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span>
+                    <span class="n">_max_ids</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">obj</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">attrib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">obj</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">obj</span>
+
+        <span class="k">return</span> <span class="n">EndpointClass</span>
+
+    <span class="k">return</span> <span class="n">_endpoints</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_signature</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Signature</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the signature of a function or endpoint.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fn: The function or endpoint to get the signature of.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The signature of the function or endpoint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fn</span>
+    <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+</pre></div>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

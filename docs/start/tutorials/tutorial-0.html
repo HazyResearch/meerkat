@@ -1,0 +1,1604 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.5</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tutorial 2: Reactive Image Viewer" href="tutorial-2.html" />
+    <link rel="prev" title="Tutorials" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.5</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="index.html">
+   Tutorials
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/dataframe/intro.html">
+   Data Frames
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/columns/overview.html">
+     Column Types
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/scalar.html">
+       Scalar Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/tensor.html">
+       Tensor Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/deferred.html">
+       Deferred Columns
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/columns/object.html">
+       Object Columns
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/ops/overview.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/dataframe/advanced/overview.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/reactive/index.html">
+   Reactive Functions
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/concepts.html">
+     Concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/user-guide.html">
+     User Guide
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/reactive/inbuilts.html">
+     Reactive Functions in Meerkat
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/store/getting-started.html">
+   Stores
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/components/index.html">
+   Components
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/builtins.html">
+     Components in Meerkat
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/components/custom-components.html">
+     Custom Components
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/endpoints/index.html">
+   Endpoints
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/getting-started.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/endpoints/reactive-vs-endpoints.html">
+     Endpoints vs. Reactive Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/interactive/introduction.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/concepts/core-concepts-nutshell.html">
+     Core Concepts in a Nutshell
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+    <label for="toctree-checkbox-10">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/store.html">
+       Stores
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/dataframe.html">
+       DataFrame
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/reactive.html">
+       Reactivity in Meerkat
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/concepts/component.html">
+       Components
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/interactive/environments/running-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/components/component.html">
+     Component
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/display.html">
+       Displaying dataframes
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/components/match.html">
+       <code class="xref py py-class docutils literal notranslate">
+        <span class="pre">
+         mk.gui.Match
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../guide/interactive/examples/examples.html">
+     Interactive Examples
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+    <label for="toctree-checkbox-12">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../guide/interactive/examples/image_search.html">
+       Building image search
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/formatters/getting-started.html">
+   Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../guide/cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../guide/magic/getting-started.html">
+   Magic
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../guide/magic/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../configure.html">
+   Configuration
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-0.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-0.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-0.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-0.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-0.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-0.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-meerkat">
+   🔮 Importing Meerkat
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#downloading-the-data">
+   💾 Downloading the data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-an-image-dataframe">
+   📸 Creating an image
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DataFrame
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#selecting-data">
+   🗂 Selecting data
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aside-imagecolumn-under-the-hood-deferredcolumn">
+     📎
+     <em>
+      Aside
+     </em>
+     :
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       ImageColumn
+      </span>
+     </code>
+     under the hood,
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DeferredColumn
+      </span>
+     </code>
+     .
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#applying-operations-over-the-dataframe">
+   🛠 Applying operations over the DataFrame.
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-dataframe-map-to-compute-average-intensity-of-the-blue-color-channel-in-the-images">
+     🫐  Using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DataFrame.map
+      </span>
+     </code>
+     to compute average intensity of the blue color channel in the images.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vs">
+     🪂 vs. ⛳️
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ml-with-images-in-meerkat">
+   📉 ML with images in
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     meerkat
+    </span>
+   </code>
+   .
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#applying-a-transform-to-the-images">
+     💈  Applying a transform to the images.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-model-predictions-and-activations">
+     💫 Computing model predictions and activations.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-metrics-and-analyzing-performance">
+     🎯  Computing metrics and analyzing performance.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exploring-model-activations">
+     🔎  Exploring model activations.
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#writing-a-dataframe-to-disk">
+   💾  Writing a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DataFrame
+    </span>
+   </code>
+   to disk.
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Tutorial 0: Data Frames for Unstructured Data</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-meerkat">
+   🔮 Importing Meerkat
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#downloading-the-data">
+   💾 Downloading the data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-an-image-dataframe">
+   📸 Creating an image
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DataFrame
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#selecting-data">
+   🗂 Selecting data
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aside-imagecolumn-under-the-hood-deferredcolumn">
+     📎
+     <em>
+      Aside
+     </em>
+     :
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       ImageColumn
+      </span>
+     </code>
+     under the hood,
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DeferredColumn
+      </span>
+     </code>
+     .
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#applying-operations-over-the-dataframe">
+   🛠 Applying operations over the DataFrame.
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-dataframe-map-to-compute-average-intensity-of-the-blue-color-channel-in-the-images">
+     🫐  Using
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DataFrame.map
+      </span>
+     </code>
+     to compute average intensity of the blue color channel in the images.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#vs">
+     🪂 vs. ⛳️
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ml-with-images-in-meerkat">
+   📉 ML with images in
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     meerkat
+    </span>
+   </code>
+   .
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#applying-a-transform-to-the-images">
+     💈  Applying a transform to the images.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-model-predictions-and-activations">
+     💫 Computing model predictions and activations.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#computing-metrics-and-analyzing-performance">
+     🎯  Computing metrics and analyzing performance.
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exploring-model-activations">
+     🔎  Exploring model activations.
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#writing-a-dataframe-to-disk">
+   💾  Writing a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DataFrame
+    </span>
+   </code>
+   to disk.
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="tutorial-0-data-frames-for-unstructured-data">
+<h1>Tutorial 0: Data Frames for Unstructured Data<a class="headerlink" href="#tutorial-0-data-frames-for-unstructured-data" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we’ll learn how to use Meerkat to explore a dataset of images. We’ll use the <code class="docutils literal notranslate"><span class="pre">imagenette</span></code> dataset, a small 10-class subset of ImageNet.</p>
+<p>Through this tutorial, you will learn about:</p>
+<ul class="simple">
+<li><p>the concept of <strong>data frames</strong> in Meerkat</p></li>
+<li><p>the different types of data that you can store in a Meerkat data frame</p></li>
+<li><p>how to use <strong>data frames</strong> to explore unstructured data</p></li>
+</ul>
+<p>The content of this tutorial is provided in the <code class="docutils literal notranslate"><span class="pre">tutorial-0.ipynb</span></code> Jupyter notebook.</p>
+<section id="importing-meerkat">
+<h2>🔮 Importing Meerkat<a class="headerlink" href="#importing-meerkat" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start by importing Meerkat.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>The first time you import Meerkat after installation may take upto a minute, due to dependencies like <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, and <code class="docutils literal notranslate"><span class="pre">torch</span></code>.</p>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="downloading-the-data">
+<h2>💾 Downloading the data<a class="headerlink" href="#downloading-the-data" title="Permalink to this headline">¶</a></h2>
+<p>First, we’ll download some data to explore. We’re going to use the <a class="reference external" href="https://github.com/fastai/imagenette#image%E7%BD%91">Imagenette dataset</a>, a small subset of the original <a class="reference external" href="https://www.image-net.org/update-mar-11-2021.php">ImageNet</a>.
+This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”, “golf ball”).</p>
+<ul class="simple">
+<li><p>Download time: &lt;1 minute</p></li>
+<li><p>Download size: 130M</p></li>
+</ul>
+<p>In addition to downloading the data, <code class="docutils literal notranslate"><span class="pre">download_imagnette</span></code> prepares a CSV, <code class="docutils literal notranslate"><span class="pre">imagenette.csv</span></code>, with a row for each image.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>Meerkat lets you load in any dataset from <a class="reference external" href="https://huggingface.co/docs/datasets/index">Huggingface Datasets</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="s2">&quot;huggingface&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">meerkat.datasets.imagenette</span> <span class="kn">import</span> <span class="n">download_imagenette</span>
+
+<span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "531f618cc278489cbabc3e5a6dbf49ed"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:132,</span> in <span class="ni">download_imagenette</span><span class="nt">(download_dir, version, overwrite, return_df)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tar archive, this may take a few minutes...&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>     <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">cached_tar_path</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>     <span class="c1"># os.remove(tar_path)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="k">else</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2028,</span> in <span class="ni">TarFile.extractall</span><span class="nt">(self, path, members, numeric_owner)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2026</span>         <span class="n">tarinfo</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="mo">0o700</span>
+<span class="g g-Whitespace">   </span><span class="mi">2027</span>     <span class="c1"># Do not set_attrs directories, as we will do that further down</span>
+<span class="ne">-&gt; </span><span class="mi">2028</span>     <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">set_attrs</span><span class="o">=</span><span class="ow">not</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">(),</span>
+<span class="g g-Whitespace">   </span><span class="mi">2029</span>                  <span class="n">numeric_owner</span><span class="o">=</span><span class="n">numeric_owner</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2031</span> <span class="c1"># Reverse sort directories.</span>
+<span class="g g-Whitespace">   </span><span class="mi">2032</span> <span class="n">directories</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2069,</span> in <span class="ni">TarFile.extract</span><span class="nt">(self, member, path, set_attrs, numeric_owner)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2066</span>     <span class="n">tarinfo</span><span class="o">.</span><span class="n">_link_target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">linkname</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2068</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2069</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_extract_member</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">2070</span>                          <span class="n">set_attrs</span><span class="o">=</span><span class="n">set_attrs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">2071</span>                          <span class="n">numeric_owner</span><span class="o">=</span><span class="n">numeric_owner</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2072</span> <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2073</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorlevel</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2141,</span> in <span class="ni">TarFile._extract_member</span><span class="nt">(self, tarinfo, targetpath, set_attrs, numeric_owner)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2138</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dbg</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2140</span> <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+<span class="ne">-&gt; </span><span class="mi">2141</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2142</span> <span class="k">elif</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+<span class="g g-Whitespace">   </span><span class="mi">2143</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2182,</span> in <span class="ni">TarFile.makefile</span><span class="nt">(self, tarinfo, targetpath)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2180</span> <span class="n">source</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">offset_data</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2181</span> <span class="n">bufsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copybufsize</span>
+<span class="ne">-&gt; </span><span class="mi">2182</span> <span class="k">with</span> <span class="n">bltn_open</span><span class="p">(</span><span class="n">targetpath</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2183</span>     <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2184</span>         <span class="k">for</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s take a look at the CSV.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>downloads/imagenette2-160/imagenette.csv
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we’ll load it into a Meerkat <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
+</section>
+<section id="creating-an-image-dataframe">
+<h2>📸 Creating an image <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code><a class="headerlink" href="#creating-an-image-dataframe" title="Permalink to this headline">¶</a></h2>
+<p><em>For more information on creating DataFrames from various data sources, see the user guide section on <a class="reference internal" href="../../guide/dataframe/io.html#guide-dataframe-io"><span class="std std-ref">I/O</span></a>.</em></p>
+<p>Meerkat’s core contribution is the DataFrame, a simple columnar data abstraction. The Meerkat DataFrame can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs.</p>
+<p>We’re going to build a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> out of the <code class="docutils literal notranslate"><span class="pre">imagenette.csv</span></code> file from the download above.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a `DataFrame`</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s2">&quot;./downloads/imagenette2-160/imagenette.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create an `ImageColumn`` and add it to the `DataFrame`</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img_path&quot;</span><span class="p">],</span> 
+    <span class="n">base_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;imagenette2-160&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The call to <code class="docutils literal notranslate"><span class="pre">head</span></code> shows the first few rows in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. You can see that there are a few metadata columns, as well as the “img” column we added in.</p>
+</section>
+<section id="selecting-data">
+<h2>🗂 Selecting data<a class="headerlink" href="#selecting-data" title="Permalink to this headline">¶</a></h2>
+<p><em>For more information see the user guide section on <a class="reference internal" href="../../guide/dataframe/selection.html#guide-dataframe-selection"><span class="std std-ref">Data Selection</span></a>.</em></p>
+<p>When we create an <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> we don’t load the images into memory. Instead, <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> keeps track of all those filepaths we passed in and only loads the images when they are needed.</p>
+<p>When we select a row of the <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code>, we get an instance <code class="docutils literal notranslate"><span class="pre">FileCell</span></code> back. A <code class="docutils literal notranslate"><span class="pre">FileCell</span></code> is an object that holds everything we need to materialize the cell (e.g. the filepath to the image and the loading function), but stops just short of doing so.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img_cell</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Indexing the `ImageColumn` returns an object of type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">img_cell</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To actually materialize the image, we simply call the cell.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">img_cell</span><span class="p">()</span>
+<span class="n">img</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can subselect a <strong>batch</strong> of images by indexing with a slice.  Notice that this returns a smaller <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame" title="meerkat.DataFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Indexing a slice of the `ImageColumn` returns a: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="n">imgs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The whole batch of images can be loaded together by calling the column.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imgs</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>One can load multiple rows using any one of following indexing schemes:</p>
+<ul class="simple">
+<li><p><strong>Slice indexing</strong>: <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">column[4:10]</span></code></p></li>
+<li><p><strong>Integer array indexing</strong>: <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">column[[0,</span> <span class="pre">4,</span> <span class="pre">6,</span> <span class="pre">11]]</span></code></p></li>
+<li><p><strong>Boolean array indexing</strong>: <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">column[np.array([True,</span> <span class="pre">False,</span> <span class="pre">False</span> <span class="pre">...,</span> <span class="pre">True,</span> <span class="pre">False])]</span></code></p></li>
+</ul>
+<section id="aside-imagecolumn-under-the-hood-deferredcolumn">
+<h3>📎 <em>Aside</em>: <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> under the hood, <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.<a class="headerlink" href="#aside-imagecolumn-under-the-hood-deferredcolumn" title="Permalink to this headline">¶</a></h3>
+<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
+<p><em>What’s a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>?</em>
+In <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>, high-dimensional data types like images and videos are typically stored in a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>. A  <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> wraps around another column and lazily applies a function to it’s content as it is indexed. Consider the following example, where we create a simple <code class="docutils literal notranslate"><span class="pre">meerkat</span></code> column…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>  <span class="n">col</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">column</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>…and wrap it in a deferred column.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">dcol</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="n">dcol</span><span class="p">[</span><span class="mi">1</span><span class="p">]()</span>  <span class="c1"># the function is only called at this point!</span>
+</pre></div>
+</div>
+<p>Critically, the function inside a lambda column is only called at the time the column is called! This is very useful for columns with large data types that we don’t want to load all into memory at once. For example, we could create a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> that lazily loads images…</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">&gt;&gt;&gt;</span> <span class="n">filepath_col</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">PandasSeriesColumn</span><span class="p">([</span><span class="s2">&quot;path/to/image0.jpg&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+  <span class="o">&gt;&gt;&gt;</span> <span class="n">img_col</span> <span class="o">=</span> <span class="n">filepath</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">load_image</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>An <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> is a just a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> like this one, with a few more bells and whistles!</p>
+</section>
+</section>
+<section id="applying-operations-over-the-dataframe">
+<h2>🛠 Applying operations over the DataFrame.<a class="headerlink" href="#applying-operations-over-the-dataframe" title="Permalink to this headline">¶</a></h2>
+<p>When analyzing data, we often perform operations on each example in our dataset (e.g. compute a model’s prediction on each example, tokenize each sentence, compute a model’s embedding for each example) and store them. The <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> makes it easy to perform these operations:</p>
+<ul class="simple">
+<li><p>Produce new columns (via <code class="docutils literal notranslate"><span class="pre">DataFrame.map</span></code>)</p></li>
+<li><p>Produce new columns and store the columns alongside the original data (via <code class="docutils literal notranslate"><span class="pre">DataFrame.update</span></code>)</p></li>
+<li><p>Extract an important subset of the datset (via <code class="docutils literal notranslate"><span class="pre">DataFrame.filter</span></code>).</p></li>
+</ul>
+<p>Under the hood, dataloading is multiprocessed so that costly I/O doesn’t bottleneck our computation.</p>
+<p>Let’s start by filtering the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> down to the examples in the validation set.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">split</span><span class="p">:</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;valid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="using-dataframe-map-to-compute-average-intensity-of-the-blue-color-channel-in-the-images">
+<h3>🫐  Using <code class="docutils literal notranslate"><span class="pre">DataFrame.map</span></code> to compute average intensity of the blue color channel in the images.<a class="headerlink" href="#using-dataframe-map-to-compute-average-intensity-of-the-blue-color-channel-in-the-images" title="Permalink to this headline">¶</a></h3>
+<p>To demonstrate the utility of the <code class="docutils literal notranslate"><span class="pre">map</span></code> operation, we’ll explore the relationship between the “blueness” of an image and the class of the image.</p>
+<p>We’ll quantify the “blueness” of each image by simply computing the mean intensity of the blue color channel. This can be accomplished with a simple <code class="docutils literal notranslate"><span class="pre">map</span></code> operation over the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">blue_col</span> <span class="o">=</span> <span class="n">valid_df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> 
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="c1"># Add the intensities as a new column in the `DataFrame` </span>
+<span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">blue_col</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vs">
+<h3>🪂 vs. ⛳️<a class="headerlink" href="#vs" title="Permalink to this headline">¶</a></h3>
+<p>Next, we’ll explore the relationship between blueness and the class label of the image. To do so, we’ll compare the blue intensity distribution of images labeled “parachute” to the distribution of of images labeled “golf ball”.
+Using the <a class="reference external" href="https://seaborn.pydata.org/installing.html"><code class="docutils literal notranslate"><span class="pre">seaborn</span></code></a> plotting package and our <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, this can be accomplished in one line:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html </span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">plot_df</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;golf ball&quot;</span><span class="p">,</span> <span class="s2">&quot;parachute&quot;</span><span class="p">])]</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">plot_df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span> 
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">,</span> 
+    <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> 
+    <span class="n">height</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> 
+    <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">]))]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="ml-with-images-in-meerkat">
+<h2>📉 ML with images in <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>.<a class="headerlink" href="#ml-with-images-in-meerkat" title="Permalink to this headline">¶</a></h2>
+<p>Let’s do some machine learning on our Imagenette <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.
+We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inference on the validation set, and analyze the model’s predictions and activations.</p>
+<p>The cell below downloads the model..</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torchvision.models</span> <span class="kn">import</span> <span class="n">resnet18</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="applying-a-transform-to-the-images">
+<h3>💈  Applying a transform to the images.<a class="headerlink" href="#applying-a-transform-to-the-images" title="Permalink to this headline">¶</a></h3>
+<p>In order to do inference, we’ll need to create a <em>new</em> <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> we defined above (<em>i.e.</em> <code class="docutils literal notranslate"><span class="pre">&quot;img_path&quot;</span></code>), does not apply any transforms after loading and simply returns a PIL image. Before passing the images through the model, we need to convert the PIL image to a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> and normalize the color channels (along with a few other transformations).</p>
+<p>Note: the transforms defined below are the same as the ones used by torchvision, see <a class="reference external" href="https://github.com/pytorch/examples/blob/cbb760d5e50a03df667cdc32a61f75ac28e11cbf/imagenet/main.py#L225">here</a>.</p>
+<p>In the cell below, we specify a transform when creating the <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define transform</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+        <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>
+        <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">]),</span>
+<span class="p">])</span>
+
+<span class="c1"># Create new column with transform </span>
+<span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that indexing this new column returns a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, not a PIL image…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">img</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Indexing the `ImageColumn` returns an object of type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>… and that indexing a slice of this new column returns a <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.TensorColumn" title="meerkat.TensorColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorColumn</span></code></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">col</span> <span class="o">=</span> <span class="n">img</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Indexing a slice of the `ImageColumn` returns an object of type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="n">col</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see what the full <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> looks like now.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="computing-model-predictions-and-activations">
+<h3>💫 Computing model predictions and activations.<a class="headerlink" href="#computing-model-predictions-and-activations" title="Permalink to this headline">¶</a></h3>
+<p>We’d like to perform inference and extract:</p>
+<ol class="arabic simple">
+<li><p>Output predictions</p></li>
+<li><p>Output class probabilities</p></li>
+<li><p>Model activations</p></li>
+</ol>
+<p>Note: in order to extract model activations, we’ll need to use a <a class="reference external" href="https://pytorch.org/tutorials/beginner/former_torchies/nnft_tutorial.html#forward-and-backward-function-hooks">PyTorch forward hook</a> and register it on the final layer of the ResNet. Forward hooks are just functions that get executed on the forward pass of a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define forward hook in ActivationExtractor class</span>
+<span class="k">class</span> <span class="nc">ActivationExtractor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracting activations a targetted intermediate layer&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">forward_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">output</span>
+
+<span class="c1"># Register forward hook</span>
+<span class="n">extractor</span> <span class="o">=</span> <span class="n">ActivationExtractor</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">layer4</span><span class="o">.</span><span class="n">register_forward_hook</span><span class="p">(</span><span class="n">extractor</span><span class="o">.</span><span class="n">forward_hook</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We want to apply a forward pass to each image in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and store the outputs as new columns: <code class="docutils literal notranslate"><span class="pre">DataFrame.map</span></code> is perfectly suited for this task.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Move the model to GPU, if available</span>
+<span class="c1"># device = 0</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="c1"># 2. Define a function that runs a forward pass over a batch </span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">TensorColumn</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># We get the underlying torch tensor with `data` and move to GPU </span>
+    <span class="n">out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># Run forward pass</span>
+
+    <span class="c1"># Return a dictionary with one key for each of the new columns. Each value in the</span>
+    <span class="c1"># dictionary should have the same length as the batch. </span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;pred&quot;</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+        <span class="s2">&quot;probs&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+        <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="n">extractor</span><span class="o">.</span><span class="n">activation</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="c1"># 3. Apply the update. Note that the `predict` function operates on batches, so we set </span>
+<span class="c1"># `batched=True`. Also, the `predict` function only accesses the &quot;input&quot; column, by </span>
+<span class="c1"># specifying that here we instruct update to only load that one column and skip others </span>
+<span class="n">pred_df</span> <span class="o">=</span> <span class="n">valid_df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span> <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">valid_df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">valid_df</span><span class="p">,</span> <span class="n">pred_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The predictions, output probabilities, and activations are now stored alongside the examples in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[[</span><span class="s2">&quot;label_id&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;pred&quot;</span><span class="p">,</span> <span class="s2">&quot;probs&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="computing-metrics-and-analyzing-performance">
+<h3>🎯  Computing metrics and analyzing performance.<a class="headerlink" href="#computing-metrics-and-analyzing-performance" title="Permalink to this headline">¶</a></h3>
+<p>Computing statistics on Meerkat <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> is straightforward because standard NumPy operators and functions can be applied directly to a <code class="docutils literal notranslate"><span class="pre">NumpyArrayColumn</span></code>. We take advantage of this below to compute the accuracy of the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;pred&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;label_idx&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Micro accuracy across the ten Imagenette classes: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">0.3</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Furthermore, since the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is naturally converted to a Pandas DataFrame, it’s easy to use data visualization tools that interface with Pandas (<em>e.g.</em> seaborn, bokeh).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html </span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">valid_df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;correct&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exploring-model-activations">
+<h3>🔎  Exploring model activations.<a class="headerlink" href="#exploring-model-activations" title="Permalink to this headline">¶</a></h3>
+<p>To better understand the behavior of our model, we’ll explore the activations of the final convolutional layer of the ResNet. Recall that when we performed our forward pass, we extracted these activations and stored them in a new column called <code class="docutils literal notranslate"><span class="pre">&quot;activation&quot;</span></code>.</p>
+<p>Unlike the the <code class="docutils literal notranslate"><span class="pre">NumpyArrayColumn</span></code>s we’ve been working with so far, the activation column has an additional dimension of size 512.</p>
+<p>To visualize the activations, we’ll use a dimensionality reduction technique (<a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a>) to embed the activations in two dimensions. We’ll store these embeddings in two new columns “umap_0” and “umap_1”.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## OPTIONAL: this cell requires the umap dependency: https://umap-learn.readthedocs.io/en/latest/</span>
+<span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>umap-learn
+<span class="kn">from</span> <span class="nn">umap</span> <span class="kn">import</span> <span class="n">UMAP</span>
+
+<span class="c1"># 1. Compute UMAP embedding</span>
+<span class="n">reducer</span> <span class="o">=</span> <span class="n">UMAP</span><span class="p">()</span>
+<span class="n">embs</span> <span class="o">=</span> <span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;activation&quot;</span><span class="p">])</span>
+
+<span class="c1"># 2. Add the embedding to the DataFrame as two new columns </span>
+<span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;umap_0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">embs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;umap_1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">embs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="c1">## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html </span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">valid_df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;umap_0&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;umap_1&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="writing-a-dataframe-to-disk">
+<h2>💾  Writing a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> to disk.<a class="headerlink" href="#writing-a-dataframe-to-disk" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can write the updated <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, with all the activations and predictions included, to disk for later use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> size on disk: 25MB</p>
+<p>On disk, the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is stored in a directory at the path passed to <code class="docutils literal notranslate"><span class="pre">DataFrame.write</span></code>. Within that directory, each column is stored separately. This allows us to read only a subset of columns from DataFrame on disk. Use the file explorer to the left to further expore the file structure of the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span>
+<span class="o">|</span>  <span class="o">+--</span> <span class="n">meta</span><span class="o">.</span><span class="n">yml</span>   
+<span class="o">|</span>  <span class="o">+--</span> <span class="n">state</span><span class="o">.</span><span class="n">dill</span>  
+<span class="o">|</span>  <span class="o">+--</span> <span class="n">columns</span>
+   <span class="o">|</span>   <span class="o">+--</span> <span class="n">activation</span>
+   <span class="o">|</span>   <span class="o">+--</span> <span class="n">avg_blue</span>
+   <span class="o">|</span>   <span class="o">+--</span> <span class="n">correct</span>
+   <span class="o">|</span>   <span class="o">...</span>
+   <span class="o">|</span>   <span class="o">+--</span> <span class="n">umap_1</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;valid_df&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;valid_df&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Tutorials</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="tutorial-2.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial 2: Reactive Image Viewer</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
