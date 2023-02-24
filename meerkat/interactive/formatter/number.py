@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 from pandas.io.formats.format import format_array
 
-from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 from meerkat.interactive.app.src.lib.component.core.number import Number
+from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 from meerkat.interactive.formatter.icon import IconFormatter
 
 
@@ -74,6 +74,5 @@ class NumberFormatter(BaseFormatter):
 class NumberFormatterGroup(FormatterGroup):
     def __init__(self, **kwargs):
         super().__init__(
-            base=NumberFormatter(**kwargs),
-            icon=IconFormatter(name="Hash")
+            base=NumberFormatter(**kwargs), icon=IconFormatter(name="Hash")
         )

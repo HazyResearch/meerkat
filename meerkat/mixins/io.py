@@ -62,7 +62,7 @@ class ColumnIOMixin:
         data = col_type._read_data(path, *args, **kwargs) if _data is None else _data
 
         if state is None:
-            # KG, Sabri: need to remove this `if-else` in the future, 
+            # KG, Sabri: need to remove this `if-else` in the future,
             # this is only for backwards compatibility.
             # this if statement will not be required.
             col = col_type(data)

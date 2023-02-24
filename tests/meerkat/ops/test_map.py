@@ -101,7 +101,7 @@ def test_map_return_single(
     params={
         "batched": [True, False],
         "materialize": [True, False],
-        "use_ray": [False], # TODO (dean): Multiple outputs not supported.
+        "use_ray": [False],  # TODO (dean): Multiple outputs not supported.
     }
 )
 def test_map_return_multiple(

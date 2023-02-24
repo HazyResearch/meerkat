@@ -101,7 +101,7 @@ class FormatterGroup(collections.abc.Mapping):
                 f"FormatterGroup values must be Formatters, not {type(value)}"
             )
         return self._dict.__setitem__(key, value)
-    
+
     def defer(self):
         return deferred_formatter_group(self)
 

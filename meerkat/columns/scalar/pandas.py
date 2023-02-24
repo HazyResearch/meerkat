@@ -306,7 +306,8 @@ class PandasScalarColumn(
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.formatter import (
-            NumberFormatterGroup, TextFormatterGroup
+            NumberFormatterGroup,
+            TextFormatterGroup,
         )
 
         if len(self) == 0:

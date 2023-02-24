@@ -1,16 +1,14 @@
+from .base import Formatter, deferred_formatter_group
 from .code import CodeFormatter, CodeFormatterGroup
 from .image import ImageFormatter, ImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
-from .text import TextFormatter, TextFormatterGroup
-from .raw_html import HTMLFormatter, HTMLFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
-from .base import Formatter, deferred_formatter_group
-
-
+from .raw_html import HTMLFormatter, HTMLFormatterGroup
+from .text import TextFormatter, TextFormatterGroup
 
 __all__ = [
     "Formatter",
-    "deferred_formatter_group", 
+    "deferred_formatter_group",
     "ImageFormatter",
     "ImageFormatterGroup",
     "TextFormatter",

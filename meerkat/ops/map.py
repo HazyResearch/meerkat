@@ -504,7 +504,9 @@ def _materialize(
                 curr = curr.data.args[0]
             elif curr.data.kwargs:
                 if len(curr.data.kwargs) > 1:
-                    raise ValueError("Multiple kwargs not supported with `use_ray=True`.")
+                    raise ValueError(
+                        "Multiple kwargs not supported with `use_ray=True`."
+                    )
                 curr = curr.data.kwargs[next(iter(curr.data.kwargs))]
             else:
                 raise ValueError("No args or kwargs.")
@@ -526,12 +528,16 @@ def _materialize(
         elif isinstance(curr, mk.ObjectColumn):
             ds = ray.data.from_items(curr).repartition(num_blocks)
         elif isinstance(curr, mk.DataFrame):
-            raise ValueError(f"Multiple outputs (fan-out) not supported with `use_ray=True`.")
+            raise ValueError(
+                f"Multiple outputs (fan-out) not supported with `use_ray=True`."
+            )
             # TODO (dean): Support fan-out (would have to create multiple pipelines)
             # ds = ray.data.from_pandas(curr.data._repr_pandas_()[0])
             # fns.append(lambda row: row.values())
         else:
-            raise ValueError(f"Base column is of unsupported type {type(curr)} with `use_ray=True`.")
+            raise ValueError(
+                f"Base column is of unsupported type {type(curr)} with `use_ray=True`."
+            )
 
         # Step 3: Build the pipeline by walking backwards through fns
         pipe: ray.data.DatasetPipeline = ds.window(blocks_per_window=blocks_per_window)
@@ -569,7 +575,9 @@ def _materialize(
                 result.extend(partition)
             return column(result)
         else:
-            raise ValueError(f"Unsupported output type {data._output_type} with `use_ray=True`.")
+            raise ValueError(
+                f"Unsupported output type {data._output_type} with `use_ray=True`."
+            )
 
     else:
         result = []

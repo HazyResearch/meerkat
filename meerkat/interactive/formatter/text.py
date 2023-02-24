@@ -4,8 +4,8 @@ from typing import Any, Dict
 import numpy as np
 from pandas.io.formats.format import format_array
 
-from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 from meerkat.interactive.app.src.lib.component.core.text import Text
+from meerkat.interactive.formatter.base import BaseFormatter, FormatterGroup
 from meerkat.interactive.formatter.icon import IconFormatter
 
 
