@@ -37,9 +37,9 @@ Let's create our frontend components. Meerkat has numerous components for use ou
 gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["path", "label"])
 ```
 
-For the final step, we'll stick our `gallery` into a `Page` component, specifying an `id` of `"page"`, and we'll call `launch()` on our `page`.
+For the final step, we'll stick our `gallery` into a `Page` component, specifying an `id` of `"gallery"`. Every Meerkat app must have a `Page` component as its root. The `id` is used to uniquely identify the page, and the `Page` is the only comment with the special `launch()` method.
 ```python
-page = mk.gui.Page(component=gallery, id="page")
+page = mk.gui.Page(component=gallery, id="gallery")
 page.launch()
 ```
 
@@ -54,7 +54,7 @@ mk.gui.start(api_port=3000)
 
 gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["path", "label"])
 
-page = mk.gui.Page(component=gallery, id="page")
+page = mk.gui.Page(component=gallery, id="gallery")
 page.launch()
 ```
 

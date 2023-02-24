@@ -389,7 +389,6 @@ class DeferredFormatter(BaseFormatter):
     def html(self, cell: DeferredCell):
         return self.wrapped.html(cell())
 
-    @staticmethod
     def _get_state(self):
         data = {
             "wrapped": {
@@ -399,14 +398,11 @@ class DeferredFormatter(BaseFormatter):
         }
         return data
 
-    @staticmethod
-    def _set_state(state: Dict[str, Any]):
-        formatter = state["class"].__new__(state["class"])
+    def _set_state(self, state: Dict[str, Any]):
         wrapped_state = state["wrapped"]
         wrapped = wrapped_state["class"].__new__(wrapped_state["class"])
         wrapped._set_state(wrapped_state["state"])
-        formatter.wrapped = wrapped
-        return formatter
+        self.wrapped = wrapped
 
 
 MeerkatDumper.add_multi_representer(DeferredFormatter, DeferredFormatter.to_yaml)
