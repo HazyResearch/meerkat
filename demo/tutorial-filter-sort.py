@@ -13,6 +13,10 @@ gallery = mk.gui.Gallery(df=df, main_column="img")
 
 mk.gui.start()
 page = mk.gui.Page(
-    component=mk.gui.RowLayout(slots=[filter, sort, gallery]), id="filter-sort"
+    component=mk.gui.html.div(
+        slots=[filter, sort, gallery],
+        classes="flex flex-row",
+    ),
+    id="filter-sort",
 )
 page.launch()
