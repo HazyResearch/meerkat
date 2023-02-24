@@ -19,7 +19,7 @@ def complete_prompt(row, example_template: mk.Store[str]):
     print(output)
     return output
 
-
+num_copies = 10
 df = mk.DataFrame(
     {
         "guest": [
@@ -28,10 +28,10 @@ df = mk.DataFrame(
             "Mr. Green",
             "Mrs. Peacock",
             "Prof. Plum",
-        ],
-        "hometown": ["London", "Stockholm", "Bath", "New York", "Paris"],
-        "relationship": ["father", "aunt", "cousin", "teacher", "brother"],
-        "note": ["", "", "", "", ""],
+        ] * num_copies,
+        "hometown": ["London", "Stockholm", "Bath", "New York", "Paris"] * num_copies,
+        "relationship": ["father", "aunt", "cousin", "teacher", "brother"] * num_copies,
+        "note": ["", "", "", "", ""] * num_copies,
         # "_status": ["train", "train", "train", "fill", "fill"],
     }
 )
@@ -66,12 +66,12 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
     selected_idxs = df.primary_key.isin(selected)
 
     # Concat all of the in-context examples.
-    train_df = df.loc[~selected_idxs]
+    train_df = df[~selected_idxs]
     in_context_examples = "\n".join(train_df["example"]())
 
     print("in_context_examples", in_context_examples)
 
-    fill_df = df.loc[selected_idxs]
+    fill_df = df[selected_idxs]
 
     # Filter based on train/abstain/fill
     # Only fill in the blanks.
@@ -115,9 +115,9 @@ def set_code(code: mk.Store[str], new_code: str):
     code.set(new_code)
 
 
-instruction_editor = mk.gui.Editor(code="give me the name of my guest")
+instruction_editor = mk.gui.Editor(code="Write a note for my guest.")
 example_template_editor = mk.gui.Editor(
-    code="Guest name: {guest}, hometown: {hometown}; Result: {guest}"
+    code="Guest name: {guest}, hometown: {hometown}; Note: {note}"
 )
 # prompt_editor = mk.gui.Editor(code="Write the prompt here.")
 instruction_cmd = instruction_editor.code
@@ -144,14 +144,14 @@ table = mk.gui.Table(df_view, on_edit=on_edit.partial(df=df))
 run_manifest_button = mk.gui.Button(
     title="Run Manifest",
     on_click=run_manifest.partial(
-        instruct_cmd=instruction_cmd, df=df_view, output_col=output_col
+        instruct_cmd=instruction_cmd, df=df_view, output_col=output_col, selected=table.selected
     ),
 )
 
 # mk.gui.print("Prompt template here:", prompt_template)
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(
+    component=mk.gui.html.div(
         [
             mk.gui.html.flex(
                 [
@@ -183,9 +183,10 @@ page = mk.gui.Page(
             run_manifest_button,
             mk.gui.html.div([table], classes="h-full w-screen"),
         ],
-        classes="gap-4 h-screen",
+        classes="gap-4 h-screen grid grid-rows-[auto_auto_auto_1fr]",
     ),
     id="flash-fill",
+    progress=False
 )
 
 page.launch()

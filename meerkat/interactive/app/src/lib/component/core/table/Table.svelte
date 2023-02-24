@@ -4,28 +4,24 @@
 	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
 	import {
 		DataFrameChunk,
-		type ColumnInfo,
-		type DataFrameRef,
+ 		type DataFrameRef,
 		type DataFrameSchema
 	} from '$lib/utils/dataframe';
 	import { without } from 'underscore';
-	import { setContext, getContext } from 'svelte';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { openModal } from 'svelte-modals';
 	import type { Endpoint } from '$lib/utils/types';
 	import { zip } from 'underscore';
-	import { get, readable, writable, type Writable } from 'svelte/store';
-	import Selected from './Selected.svelte';
+	import { writable, type Writable } from 'svelte/store';
 	import Cell from '$lib/shared/cell/Cell.svelte';
-	import { CheckAll } from 'svelte-bootstrap-icons';
+	import { Check, CheckAll, KeyFill } from 'svelte-bootstrap-icons';
 
 	export let df: DataFrameRef;
 
 	export let page: number = 0;
-	export let perPage: number = 20;
-	
+	export let perPage: number = 50;
+
 	export let selected: Array<string> = [];
-	export let allowSelection: boolean = false;
 	export let onEdit: Endpoint;
 
 	// Setup row modal
@@ -114,13 +110,13 @@
 		);
 		columnUnit = 'px';
 	});
-
 </script>
 
-<div class="w-full h-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md">
-	<div class="auto-table table-fixed overflow-x-scroll text-sm border-collapse">
+<!-- FIXME: Figure out how to do h-full -->
+<div class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden">
+	<div class="auto-table table-fixed overflow-x-scroll text-sm border-collapse h-full">
 		<div class="table-header-group">
-			<div class="table-row bg-slate-100">
+			<div class="table-row sticky top-0 bg-slate-100">
 				<!-- bind:clientWidth={tableWidth} -->
 				<div class="table-cell border border-slate-300 font-mono text-slate-800 " />
 				{#each $schema.columns as column, col_index}
@@ -130,12 +126,18 @@
 					>
 						<slot id="header-cell">
 							<div class="flex items-center">
-								<Cell
-									data={''}
-									cellComponent={column.cellComponent}
-									cellProps={column.cellProps}
-									cellDataProp={column.cellDataProp}
-								/>
+								{#if column.name === $schema.primaryKey}
+									<!-- Show a key icon for the primary key-->
+									<KeyFill class="text-violet-600" />
+								{:else}
+									<Cell
+										data={''}
+										cellComponent={column.cellComponent}
+										cellProps={column.cellProps}
+										cellDataProp={column.cellDataProp}
+									/>
+								{/if}
+
 								<div class="">{column.name}</div>
 							</div>
 						</slot>
@@ -149,7 +151,7 @@
 			{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 				<div class="table-row items-center">
 					<div class="table-cell border border-slate-300 font-mono text-slate-800 bg-slate-100">
-						<button 
+						<button
 							class="w-7 text-center"
 							class:text-violet-600={selected.includes(keyidx)}
 							class:bg-slate-200={selected.includes(keyidx)}
@@ -157,7 +159,6 @@
 								open_row_modal(posidx);
 							}}
 							on:click={(e) => {
-								console.log("the detail", e)
 								if (e.shiftKey) {
 									if (selected.length === 0) {
 										selected.push(keyidx);
@@ -196,7 +197,7 @@
 						</button>
 					</div>
 					{#each $chunk.columnInfos as col}
-						<div class="table-cell border border-slate-200 hover:opacity-80">
+						<div class="table-cell border border-slate-200 hover:opacity-80 bg-white">
 							<Cell
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}
@@ -220,12 +221,13 @@
 	<div class="grid grid-cols-3 h-8 z-10 bg-slate-100 px-5 rounded-b-sm border-t border-t-slate-300">
 		<!-- Left header section -->
 		<div class="flex justify-self-start items-center">
-			<!-- <span class="font-semibold">
-				<GallerySlider bind:size={cellSize} />
-			</span> -->
 			<div class="self-center px-2 flex space-x-1 items-center">
 				{#if selected.length > 0}
-					<CheckAll class="text-violet-600"/>
+					{#if selected.length === 1}
+						<Check class="text-violet-600" />
+					{:else}
+						<CheckAll class="text-violet-600" />
+					{/if}
 					<div class="text-violet-600 font-mono text-sm ">{selected.length} Selected</div>
 				{/if}
 			</div>
@@ -259,7 +261,7 @@
 
 		<!-- Right header section -->
 		<div class="flex self-center justify-self-end items-center">
-			<Pagination bind:page bind:perPage totalItems={$schema.nrows} />
+			<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={"top"} />
 		</div>
 	</div>
 </div>

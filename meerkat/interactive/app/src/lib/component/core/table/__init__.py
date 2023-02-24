@@ -9,7 +9,6 @@ from meerkat.interactive.formatter.base import register_placeholder
 class Table(Component):
     df: DataFrame
     selected: List[str] = []
-    allow_selection: bool = False
     on_edit: EndpointProperty = None
 
     def __init__(
@@ -17,7 +16,6 @@ class Table(Component):
         df: DataFrame,
         *,
         selected: List[int] = [],
-        allow_selection: bool = False,
         on_edit: EndpointProperty = None
     ):
         """Gallery view of a DataFrame.
@@ -33,7 +31,7 @@ class Table(Component):
                 rows. Defaults to False.
         """
         super().__init__(
-            df=df, selected=selected, allow_selection=allow_selection, on_edit=on_edit
+            df=df, selected=selected, on_edit=on_edit
         )
 
 
