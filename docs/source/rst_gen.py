@@ -247,7 +247,9 @@ def generate_components_doc():
         for klass_name in dir(getattr(mk.gui, name)):
             klass = getattr(getattr(mk.gui, name), klass_name)
             if inspect.isclass(klass) and issubclass(klass, mk.gui.Component):
-                components.append(f"meerkat.interactive.{name}.{klass_name}")
+                components.append(
+                    f"meerkat.interactive.app.src.lib.component.{name}.{klass_name}"
+                )
         components = sorted(components)
         _COMPONENTS[name] = components
 
