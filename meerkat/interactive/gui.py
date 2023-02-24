@@ -28,6 +28,7 @@ class DataFrameGUI(GUI):
                 **kwargs,
             ),
             id="table",
+            progress=False,
         ).launch()
 
     def gallery(self, main_column: str = None, tag_columns: List[str] = None, **kwargs):
@@ -44,6 +45,7 @@ class DataFrameGUI(GUI):
                 **kwargs,
             ),
             id="gallery",
+            progress=False,
         ).launch()
 
 

@@ -379,6 +379,8 @@ class FileColumn(DeferredColumn):
 
     @classmethod
     def default_loader(cls, path, *args, **kwargs):
+        if isinstance(path, io.BytesIO):
+            return path.read().decode("utf-8")
         with open(path, "r") as f:
             return f.read()
 

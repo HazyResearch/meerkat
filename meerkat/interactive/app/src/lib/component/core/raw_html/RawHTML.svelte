@@ -4,6 +4,7 @@
 
 	export let html: string;
 	export let view: string = 'full';
+	console.log(html)
 
 	$: sanitizedHtml = sanitizeHtml(html);
 </script>
