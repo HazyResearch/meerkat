@@ -139,7 +139,11 @@ class StringMethods:
         return self.column._dispatch_unary_function(
             "startswith", _namespace="str", pat=pat, **kwargs
         )
-
+    
+    def contains(self, pat: str, case: bool=True, regex: bool=True) -> ScalarColumn:
+        return self.column._dispatch_unary_function(
+            "contains", _namespace="str", pat=pat, case=case, regex=regex
+        )
 
 class ScalarColumn(Column):
     str = CachedAccessor("str", StringMethods)
@@ -226,6 +230,9 @@ class ScalarColumn(Column):
 
     def all(self, skipna: bool = True, **kwargs) -> Any:
         return self._dispatch_aggregation_function("all", skipna=skipna, **kwargs)
+    
+    def unique(self, **kwargs) -> ScalarColumn:
+        return self._dispatch_unary_function("unique", **kwargs)
 
     # arithmetic functions
     def _dispatch_arithmetic_function(

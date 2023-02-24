@@ -15,6 +15,7 @@ from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
 from .multiselect import MultiSelect
 from .number import Number
+from .pdf import PDF
 from .put import Put
 from .radio import Radio, RadioGroup
 from .raw_html import RawHTML
@@ -49,6 +50,7 @@ __all__ = [
     "Markdown",
     "Match",
     "MultiSelect",
+    "PDF", 
     "Put",
     "Radio",
     "RadioGroup",

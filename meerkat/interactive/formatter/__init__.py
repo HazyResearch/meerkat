@@ -3,6 +3,7 @@ from .image import ImageFormatter, ImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .text import TextFormatter, TextFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
+from .pdf import PDFFormatter, PDFFormatterGroup
 from .base import Formatter, deferred_formatter_group
 
 
@@ -20,6 +21,8 @@ __all__ = [
     "HTMLFormatterGroup",
     "CodeFormatter",
     "CodeFormatterGroup",
+    "PDFFormatter",
+    "PDFFormatterGroup",
 ]
 
 # backwards compatibility

@@ -601,3 +601,16 @@ def test_replace(backend: str, column: pd.Series):
     out = col.str.replace("di", "do")
     assert isinstance(out, ScalarColumn)
     assert out.equals(ScalarColumn(column.str.replace("di", "do"), backend=backend))
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "column": STRING_COLUMNS,
+    }
+)
+def test_contains(backend: str, column: pd.Series):
+    col = ScalarColumn(column, backend=backend)
+    out = col.str.contains("di")
+    assert isinstance(out, ScalarColumn)
+    assert out.equals(ScalarColumn(column.str.contains("di"), backend=backend))

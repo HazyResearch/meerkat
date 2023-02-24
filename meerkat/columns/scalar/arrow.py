@@ -122,6 +122,16 @@ class ArrowStringMethods(StringMethods):
             )
         )
 
+    def contains(self, pat: str, case: bool = True, regex: bool = True) -> ScalarColumn:
+        fn = pac.match_substring_regex if regex else pac.match_substring
+        return self.column._clone(
+            fn(
+                self.column.data,
+                pattern=pat,
+                ignore_case=not case,
+            )
+        )
+
 
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
@@ -170,12 +180,12 @@ class ArrowScalarColumn(ScalarColumn):
     def _repr_cell(self, index) -> object:
         return self.data[index]
 
-
     def _get_default_formatters(self) -> BaseFormatter:
         # can't implement this as a class level property because then it will treat
         # the formatter as a method
         from meerkat.interactive.formatter import (
-            NumberFormatterGroup, TextFormatterGroup
+            NumberFormatterGroup,
+            TextFormatterGroup,
         )
 
         if len(self) == 0:

@@ -80,6 +80,7 @@
         "layercake": "^7.0.0",
         "marked": "^4.2.12",
         "monaco-editor": "^0.34.1",
+        "pdfjs-dist": "^3.3.122",
         "prismjs": "^1.28.0",
         "sanitize-html": "^2.8.1",
         "svelte": "^3.54.0",
