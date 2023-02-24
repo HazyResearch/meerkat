@@ -5,6 +5,7 @@
 
     /** The code to display in the editor. */
 	export let code: string;
+	export let title: string = 'Code';
 
 	/** Live update. */
 	export let live: boolean = false;
@@ -29,7 +30,7 @@
 
 		editor = monaco.editor.create(divEl as HTMLDivElement, {
 			value: code,
-			language: 'python',
+			language: 'text',
 			minimap: { enabled: false }
 		});
 		editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
@@ -52,10 +53,12 @@
 	}
 </script>
 
-<div class="h-32 w-full rounded-md border-slate-400 bg-slate-100 pt-2 pb-1 px-1">
+<div class="h-20 grid grid-rows-[auto_1fr] w-full border-slate-400 pb-1 rounded-sm shadow-md overflow-hidden">
+	<div class="w-full pl-4 text-sm text-slate-400">{title}</div>
 	<div 
 		id="editor" 
 		bind:this={divEl} 
-		class="h-full w-full" 
+		class="w-full -ml-4 -mr-10" 
 	/>
 </div>
+

@@ -2,6 +2,7 @@
 from functools import partial
 
 from manifest import Manifest
+import re
 
 import meerkat as mk
 from meerkat.dataframe import Batch
@@ -14,10 +15,9 @@ from meerkat.dataframe import Batch
 
 def complete_prompt(row, example_template: mk.Store[str]):
     assert isinstance(row, dict)
-    print("prompt template", example_template)
     output = example_template.format(**row)
-    print(output)
     return output
+
 
 num_copies = 10
 df = mk.DataFrame(
@@ -28,7 +28,8 @@ df = mk.DataFrame(
             "Mr. Green",
             "Mrs. Peacock",
             "Prof. Plum",
-        ] * num_copies,
+        ]
+        * num_copies,
         "hometown": ["London", "Stockholm", "Bath", "New York", "Paris"] * num_copies,
         "relationship": ["father", "aunt", "cousin", "teacher", "brother"] * num_copies,
         "note": ["", "", "", "", ""] * num_copies,
@@ -41,11 +42,25 @@ df = df.mark()
 
 
 @mk.reactive()
-def check_example_template(example_template: str, output_col: str):
-    if not output_col:
-        return
-    if not example_template.endswith("{" + output_col + "}"):
-        raise ValueError("The example template must end with '{" + output_col + "}'")
+def check_example_template(example_template: str, df: mk.DataFrame):
+    example_template = example_template.strip()
+    # check if example_template ends with {.*} using a regex and extract the content
+    # between the brackets
+    # Define the regular expression pattern
+    pattern = r"\{([^}]+)\}$"
+
+    # Use re.search to find the match in the example_template string
+    match = re.search(pattern, example_template)
+
+    if match:
+        # Extract the content between the curly braces using the group() method
+        content = match.group(1)
+
+        if content not in df.columns:
+            raise ValueError(f"The column '{content}' does not exist in the dataframe.")
+    else:
+        raise ValueError("The example template must end with '{" + content + "}'")
+    return content
 
 
 @mk.endpoint()
@@ -57,19 +72,11 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
 
-    if output_col == "":
-        raise ValueError("Please enter an output column")
-
-    # Verify the example template ends with {output_col}.
-    check_example_template(example_template, output_col)
-
     selected_idxs = df.primary_key.isin(selected)
 
     # Concat all of the in-context examples.
     train_df = df[~selected_idxs]
     in_context_examples = "\n".join(train_df["example"]())
-
-    print("in_context_examples", in_context_examples)
 
     fill_df = df[selected_idxs]
 
@@ -79,8 +86,6 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
     flash_fill = mk.map(
         fill_df, function=_run_manifest, is_batched_fn=True, batch_size=4
     )
-
-    print("flash fill", flash_fill)
 
     # If the dataframe does not have the column, add it.
     if col not in df.columns:
@@ -104,30 +109,22 @@ def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     return df
 
 
-output_col_area = mk.gui.Select(values=df.columns)
-output_col = output_col_area.value
-
-# show_prompts = mk.gui.Markdown("")
-
-
 @mk.endpoint()
 def set_code(code: mk.Store[str], new_code: str):
     code.set(new_code)
 
 
-instruction_editor = mk.gui.Editor(code="Write a note for my guest.")
-example_template_editor = mk.gui.Editor(
-    code="Guest name: {guest}, hometown: {hometown}; Note: {note}"
+instruction_editor = mk.gui.Editor(
+    code="Write a note for my guest.", title="Instruction Editor"
 )
-# prompt_editor = mk.gui.Editor(code="Write the prompt here.")
-instruction_cmd = instruction_editor.code
-# mk.gui.print("Instruction commmand:", instruction_cmd)
-# mk.gui.print("Example template:", example_template_editor.code)
+example_template_editor = mk.gui.Editor(
+    code="Guest name: {guest}, hometown: {hometown}; Note: {note}",
+    title="Training Template Editor",
+)
 
 example_template = example_template_editor.code
 
-# Reactively check the value of the example template.
-check_example_template(example_template, output_col)
+output_col = check_example_template(example_template=example_template, df=df)
 
 df_view = update_df_with_example_template(df, example_template)
 
@@ -135,58 +132,70 @@ df_view = update_df_with_example_template(df, example_template)
 @mk.endpoint
 def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any):
     df.loc[keyidx, column] = value
-    print("updating")
 
 
 # mk.gui.Gallery(df_view, main_column="guest")
 table = mk.gui.Table(df_view, on_edit=on_edit.partial(df=df))
 
+mk.gui.html.button()
 run_manifest_button = mk.gui.Button(
-    title="Run Manifest",
+    title="Flash Fill",
+    icon="Magic",
     on_click=run_manifest.partial(
-        instruct_cmd=instruction_cmd, df=df_view, output_col=output_col, selected=table.selected
+        instruct_cmd=instruction_editor.code,
+        df=df_view,
+        output_col=output_col,
+        selected=table.selected,
     ),
 )
 
-# mk.gui.print("Prompt template here:", prompt_template)
+
+overview_panel = mk.gui.html.flexcol(
+    [
+        mk.gui.Text(
+            "Infer selected rows using in-context learning.",
+            classes="font-bold text-slate-600 text-sm",
+        ),
+          mk.gui.Text(
+            "Specify the instruction and a template for in-context examples.",
+            classes="text-slate-600 text-sm",
+        ),
+        mk.gui.html.flex(
+            [
+                mk.gui.Text("Target column: ", classes="text-slate-600 text-sm"),
+                mk.gui.Text(
+                    output_col,
+                    classes="font-mono text-violet-600 font-bold bg-slate-200 rounded-md px-2",
+                ),
+            ],
+            classes="gap-3 align-middle",
+        ),
+        run_manifest_button,
+    ],
+    classes="items-left mx-4 gap-1",
+)
+prompt_editor = mk.gui.html.flexcol(
+    [
+        instruction_editor,
+        example_template_editor,
+    ],
+    classes="flex-1 gap-1",
+)
+
 
 page = mk.gui.Page(
     component=mk.gui.html.div(
         [
-            mk.gui.html.flex(
-                [
-                    mk.gui.Caption("Output Column"),
-                    output_col_area,
-                ],
-                classes="items-center gap-4 mx-4",
+            mk.gui.html.grid(
+                [overview_panel, prompt_editor],
+                classes="grid grid-cols-[1fr_3fr] space-x-5",
             ),
-            mk.gui.html.flex(
-                [
-                    # Make the items fill out the space.
-                    mk.gui.html.flexcol(
-                        [
-                            mk.gui.Caption("Instruction Template"),
-                            instruction_editor,
-                        ],
-                        classes="flex-1 gap-1",
-                    ),
-                    mk.gui.html.flexcol(
-                        [
-                            mk.gui.Caption("Example Template"),
-                            example_template_editor,
-                        ],
-                        classes="flex-1 gap-1",
-                    ),
-                ],
-                classes="w-full gap-4 mx-4",
-            ),
-            run_manifest_button,
             mk.gui.html.div([table], classes="h-full w-screen"),
         ],
-        classes="gap-4 h-screen grid grid-rows-[auto_auto_auto_1fr]",
+        classes="gap-4 h-screen grid grid-rows-[auto_1fr]",
     ),
     id="flash-fill",
-    progress=False
+    progress=False,
 )
 
 page.launch()

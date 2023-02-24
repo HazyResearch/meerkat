@@ -9,4 +9,5 @@ class OnRunEditor(EventInterface):
 
 class Editor(Component):
     code: str = ""
+    title: str = "Code Editor"
     on_run: EndpointProperty[OnRunEditor] = None

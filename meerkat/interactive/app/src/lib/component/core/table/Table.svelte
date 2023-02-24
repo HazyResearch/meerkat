@@ -113,12 +113,12 @@
 </script>
 
 <!-- FIXME: Figure out how to do h-full -->
-<div class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden">
-	<div class="auto-table table-fixed overflow-x-scroll text-sm border-collapse h-full">
+<div class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300">
+	<div class="auto-table table-fixed overflow-x-scroll text-sm h-full">
 		<div class="table-header-group">
 			<div class="table-row sticky top-0 bg-slate-100">
 				<!-- bind:clientWidth={tableWidth} -->
-				<div class="table-cell border border-slate-300 font-mono text-slate-800 " />
+				<div class="table-cell border border-slate-300 font-mono text-slate-800" />
 				{#each $schema.columns as column, col_index}
 					<div
 						class="table-cell border border-slate-300 font-mono text-slate-800 pl-1"
@@ -147,7 +147,7 @@
 			</div>
 		</div>
 
-		<div class="table-row-group">
+		<div class="table-row-group border-collapse">
 			{#each zip($chunk.keyidxs, $chunk.posidxs) as [keyidx, posidx], rowi}
 				<div class="table-row items-center">
 					<div class="table-cell border border-slate-300 font-mono text-slate-800 bg-slate-100">
@@ -197,7 +197,7 @@
 						</button>
 					</div>
 					{#each $chunk.columnInfos as col}
-						<div class="table-cell border border-slate-200 hover:opacity-80 bg-white">
+						<div class="table-cell border-t border-l border-slate-200 hover:opacity-80 bg-white">
 							<Cell
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}
@@ -266,11 +266,7 @@
 	</div>
 </div>
 
-<!-- {#if !rows}
-	<div class="flex justify-center items-center h-full">
-		<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
-	</div>
-{/if} -->
+
 <style>
 	.table-header-group .table-cell {
 		@apply sticky top-0; /* sticky-top */
