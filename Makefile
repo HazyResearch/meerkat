@@ -26,15 +26,18 @@ test-interactive-install:
 	mk install --no-run-dev
 
 docs:
+	set -e
+	rm -rf docs/source/apidocs/generated
 	python docs/source/rst_gen.py
 	sphinx-build -b html docs/source/ docs/build/html/
 
 docs-check:
 	python docs/source/rst_gen.py
+	rm -rf docs/source/apidocs/generated
 	sphinx-build -b html docs/source/ docs/build/html/ -W
 
 livedocs:
-	set -e
+	rm -rf docs/source/apidocs/generated
 	python docs/source/rst_gen.py
 	SPHINX_LIVEDOCS=true sphinx-autobuild -b html docs/source/ docs/build/html/ --port=${port}
 
