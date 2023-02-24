@@ -9,6 +9,7 @@ from meerkat.interactive.graph import is_unmarked_context, reactive, trigger
 from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.modification import DataFrameModification
+from meerkat.mixins.reactifiable import MarkableMixin
 from meerkat.state import state
 
 
@@ -250,3 +251,68 @@ def test_instance_methods():
     set_val(val)
     assert out_add == 1
     assert not out_eq
+
+
+@pytest.mark.parametrize(
+    "x",
+    [
+        [1, 2, 3, 4],
+        mk.Store([1, 2, 3, 4]),
+        mk.DataFrame({"a": [1, 2, 3, 4]}),
+    ],
+)
+@pytest.mark.parametrize("mark", [True, False])
+def test_slicing(x, mark: bool):
+    @mk.endpoint()
+    def update_store(store: mk.Store, value: int):
+        store.set(value)
+
+    @mk.unmarked()
+    def _compare_objs(x_sl, expected):
+        if isinstance(x_sl, mk.DataFrame):
+            assert x_sl.columns == expected.columns
+            for col in x_sl.columns:
+                assert np.all(x_sl[col] == expected[col])
+        else:
+            assert x_sl == expected
+
+    if mark:
+        if not isinstance(x, MarkableMixin):
+            x = mk.Store(x)
+        x.mark()
+    elif isinstance(x, MarkableMixin):
+        x.unmark()
+
+    start = mk.Store(0)
+    stop = mk.Store(4)
+    step = mk.Store(1)
+
+    # Using store slices with non-markable objects should raise an error.
+    # This is because __index__ is reactive, which raises an error.
+    if not isinstance(x, MarkableMixin):
+        with pytest.raises(TypeError):
+            x_sl = x[start:stop]
+        return
+
+    x_sl = x[start:stop:step]
+    _compare_objs(x_sl, x[0:4])
+
+    if not x.marked:
+        assert x.inode is None
+        return
+
+    inode = x_sl.inode
+
+    # Update the start value.
+    update_store.run(start, 1)
+    _compare_objs(inode.obj, x[1:4])
+
+    # Update the stop value.
+    update_store.run(stop, 3)
+    _compare_objs(inode.obj, x[1:3])
+
+    # Update the step value.
+    update_store.run(start, 0)
+    update_store.run(stop, 4)
+    update_store.run(step, 2)
+    _compare_objs(inode.obj, x[0:4:2])
