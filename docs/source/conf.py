@@ -109,6 +109,9 @@ intersphinx_mapping = {
     "pd": ("https://pandas.pydata.org/docs", None),
 }
 
+# Set a longer nb execution timeout
+nb_execution_timeout = 5
+
 remove_from_toctrees = ["apidocs/generated/*"]
 
 # Sort members by group

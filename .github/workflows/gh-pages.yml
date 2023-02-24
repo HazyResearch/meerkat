@@ -47,6 +47,7 @@ jobs:
           python3 -m pip install -e '.[dev]'
           python3 -m pip install -r docs/requirements.txt
           make dev
+          make website-install
 
       - name: Build website
         run: |

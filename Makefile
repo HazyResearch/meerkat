@@ -41,6 +41,8 @@ livedocs:
 	python docs/source/rst_gen.py
 	SPHINX_LIVEDOCS=true sphinx-autobuild -b html docs/source/ docs/build/html/ --port=${port}
 
+website-install:
+	cd website && npm install && cd ..
 
 website:
 	set -e
