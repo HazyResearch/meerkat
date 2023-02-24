@@ -359,13 +359,13 @@ def run_frontend_prod(
         libpath / "build",
         r"(VITE_API_URL\|\|\".*?\")",
         f'VITE_API_URL||"{api_url}"',
-        "*.js",
+        "*js",
     )
     file_find_replace(
         libpath / ".svelte-kit/output/client/_app/",
         r"(VITE_API_URL\|\|\".*?\")",
         f'VITE_API_URL||"{api_url}"',
-        "*.js",
+        "*js",
     )
 
     # Run the statically built app with preview mode
