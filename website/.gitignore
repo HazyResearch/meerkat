@@ -7,9 +7,4 @@ node_modules
 .env.*
 !.env.example
 !/src/lib
-src/routes/*
-!/src/routes/*.svelte
-!/src/routes/*.js
-!/src/routes/*.ts
-!/src/routes/*slug*
 static/docs
