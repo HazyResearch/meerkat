@@ -41,6 +41,17 @@ livedocs:
 	python docs/source/rst_gen.py
 	SPHINX_LIVEDOCS=true sphinx-autobuild -b html docs/source/ docs/build/html/ --port=${port}
 
+
+website:
+	set -e
+	make docs -B
+	rm -rf website/static/docs
+	mkdir -p website/static/docs
+	cp -r docs/build/html/* website/static/docs/
+	python website/reroute.py
+	cd website && npm run build
+
+
 dev:
 	pip install black==22.12.0 isort flake8 docformatter pytest-cov sphinx-rtd-theme nbsphinx recommonmark pre-commit sphinx-panels jupyter-sphinx pydata-sphinx-theme sphinx-autobuild sphinx-toolbox sphinx-copybutton sphinx_design
 
