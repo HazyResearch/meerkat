@@ -33,7 +33,6 @@ export { default as Put } from './component/core/put/Put.svelte';
 export { default as Radio } from './component/core/radio/Radio.svelte';
 export { default as RadioGroup } from './component/core/radio/RadioGroup.svelte';
 export { default as RawHTML } from './component/core/raw_html/RawHTML.svelte';
-export { default as Scalar } from './component/core/number/Scalar.svelte';
 export { default as Select } from './component/core/select/Select.svelte';
 export { default as SliceByCards } from './component/core/slicebycards/SliceByCards.svelte';
 export { default as Slider } from './component/core/slider/Slider.svelte';

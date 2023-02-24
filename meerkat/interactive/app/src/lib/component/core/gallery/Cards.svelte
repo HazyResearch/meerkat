@@ -26,7 +26,7 @@
 </script>
 
 <div
-	class="dark:bg-slate-600 h-fit"
+	class="h-fit"
 	class:panel-masonry={layout === 'masonry'}
 	class:panel-gimages={layout === 'gimages'}
 	style:columns={layout === 'gimages' ? null : numColumns}
