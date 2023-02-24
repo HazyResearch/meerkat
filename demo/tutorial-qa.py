@@ -10,6 +10,7 @@ manifest = Manifest(
     client_connection="http://127.0.0.1:8010",
 )
 
+
 @mk.endpoint()
 def get_answer(answer_store: mk.Store, question: str):
     return answer_store.set(manifest.run(question, stop_token=""))
