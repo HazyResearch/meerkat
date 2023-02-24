@@ -156,6 +156,10 @@ def filter(
         else:
             value = col.dtype.type(criterion.value)
 
+        # Remove trailing and leading "" if the value is a string.
+        if isinstance(value, str):
+            value = value.strip('"').strip("'")
+
         # TODO: this logic will fail when the column is a boolean column
         # beacuse all values will be rendered as strings. If the string
         # is not empty, col.dtype will cast the string to True.

@@ -11,8 +11,8 @@ gallery = mk.gui.Gallery(
     main_column="img",
 )
 
-interface = mk.gui.Page(
+page = mk.gui.Page(
     component=mk.gui.html.flexcol(slots=[filter, gallery]),
     id="filter",
 )
-interface.launch()
+page.launch()
