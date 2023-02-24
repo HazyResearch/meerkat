@@ -74,6 +74,7 @@ parts:
         sections:
           - file: guide/endpoints/getting-started
             title: Getting Started
+          - file: guide/endpoints/reactive-vs-endpoints
 
       - title: Interactive
         file: guide/interactive/introduction
@@ -86,7 +87,7 @@ parts:
               - file: guide/interactive/concepts/reactive
               - file: guide/interactive/concepts/component
               - file: guide/interactive/concepts/state
-          - file: guide/interactive/details/why-reactive
+          # - file: guide/interactive/details/why-reactive
           - file: guide/interactive/environments/running-interfaces
           - file: guide/interactive/components/component
             sections:
@@ -105,12 +106,12 @@ parts:
       - title: Cheat Sheet
         file: guide/cheat-sheet
 
-  # - caption: Advanced
-  #   chapters:
-  #     - title: Magic
-  #       file: guide/magic/getting-started
-  #       sections:
-  #         - file: guide/magic/limitations
+  - caption: Advanced
+    chapters:
+      - title: Magic
+        file: guide/magic/getting-started
+        sections:
+          - file: guide/magic/limitations
 
       - title: Configuration
         file: start/configure
