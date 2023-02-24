@@ -2,6 +2,7 @@ import os
 
 from gpt_index import GPTSimpleVectorIndex, SimpleDirectoryReader
 
+import meerkat as mk
 from meerkat.interactive import (
     Button,
     Caption,
@@ -17,8 +18,8 @@ from meerkat.interactive import (
 )
 
 
-# Decorate with @react so that this fn is reactive when called with inputs
-# that are reactive. Otherwise, the function is defined as any normal function.
+# Decorate with @reactive so that this fn is reactive.
+# When its inputs change, it will be re-run.
 @reactive
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
     """
@@ -53,30 +54,28 @@ def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
     return index
 
 
-# Start off with a default directory
+# Start off with a default directory.
+#   Make `dir` a `Store` to create a variable that can be used in reactive functions.
+#   A `Store` is a thin wrapper that behaves like the object it wraps.
+dir = mk.Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
 
-# Use `react` to create a reactive variable that can be used in reactive functions.
-# Anything passed to `react` will have its methods made reactive e.g. passing in a
-# `str` will make the `str`'s methods reactive.
-# `react` returns a `Store` object, which is a thin wrapper around the object passed
-# to `react` that (almost always) behaves like the object passed to `react`.
-dir: Store = reactive("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
-# This is the same as
-# dir = Store("/Users/krandiash/Desktop/workspace/projects/gpt_index_data/")
-
-# Create the index, and assign it to a variable.
-# We can pass in `dir` here directly, as if it were a `str`.
+# Create the index.
+# Pass `dir` directly as if it were a `str`.
 index = load_index(dir=dir, savefilename="gpt_index")
 
 # Create a variable that will be used to store the response from the index
 # for the last query. We will display this in the UI.
-last_response: Store = reactive("The response will appear here.")
+last_response = mk.Store("The response will appear here.")
 
 
-@endpoint
-def query_gpt_index(index: GPTSimpleVectorIndex, query: str, last_response: Store):
+@endpoint()
+def query_gpt_index(
+    index: GPTSimpleVectorIndex, 
+    query: str, 
+    last_response: Store,
+):
     """
-    A function that given an index and query, will return the response from the index.
+    Given an index and query, return a response from the index.
 
     Args:
         index (GPTSimpleVectorIndex): The index.
@@ -95,11 +94,6 @@ def query_gpt_index(index: GPTSimpleVectorIndex, query: str, last_response: Stor
     # functions that depend on them! The special `set` method helps with this.
     last_response.set(response.response)
     return response
-
-
-# FileUpload component, which can be used to upload files.
-# fileupload_component = FileUpload()
-
 
 # Create a Textbox for the user to provide a query.
 query_component = Textbox()

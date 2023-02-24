@@ -1,6 +1,6 @@
 (guide_endpoints_getting_started)=
 
-# Getting Started wtih Endpoints
+# Getting Started with Endpoints
 
 Endpoints in Meerkat allow users to define functions that 
 

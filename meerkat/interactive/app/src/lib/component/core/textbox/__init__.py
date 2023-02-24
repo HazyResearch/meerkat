@@ -29,6 +29,7 @@ class Textbox(Component):
             text: The text in the textbox.
             placeholder: The placeholder text.
             debounce_timer: The debounce timer in milliseconds.
+            on_blur: The endpoint to call when the textbox loses focus.
         """
 
         super().__init__(
