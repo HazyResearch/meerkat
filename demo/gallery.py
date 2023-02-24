@@ -1,12 +1,7 @@
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
-assert isinstance(df, mk.DataFrame)
+gallery = mk.gui.Gallery(df, main_column="img")
 
-gallery = mk.gui.Gallery(
-    df=df,
-    main_column="img",
-)
-
-page = mk.gui.Page(component=mk.gui.html.flexcol(gallery), id="gallery")
+page = mk.gui.Page(mk.gui.html.div(gallery, classes="h-[600px]"), id="gallery")
 page.launch()
