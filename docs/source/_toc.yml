@@ -10,6 +10,7 @@ parts:
         sections:
           - file: start/tutorials/tutorial-0
           - file: start/tutorials/tutorial-2
+          - file: start/tutorials/tutorial-3
           - file: start/tutorials/tutorial-4
 
   - caption: User Guide

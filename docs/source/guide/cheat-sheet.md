@@ -2,8 +2,8 @@
 
 This page serves as a complete reference for the main concepts in Meerkat. You can use this cheat sheet to point you to the right documentation as you learn more about the library.
 
-| Concept | Description | Links |
-| --- | --- | --- |
+| Concept | Description |
+| --- | --- |
 | `mk` | The Meerkat CLI, which is used to create and run Meerkat apps. Automatically installed when you install Meerkat. | [CLI](/guide/cli/getting-started) |
 | `DataFrame` | A Meerkat data frame. Holds structured and unstructured data in a single table. | [DataFrames](/guide/dataframe/getting-started) |
 | `Column` | A column of data in a Meerkat DataFrame. Columns are of 4 main types: `ScalarColumn`, `TensorColumn`, `DeferredColumn` and `ObjectColumn`.  | [Columns](/guide/column/getting-started) |
