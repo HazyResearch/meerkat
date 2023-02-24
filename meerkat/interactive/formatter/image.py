@@ -31,7 +31,7 @@ class ImageFormatter(BaseFormatter):
         return {"classes": self.classes}
 
     def html(self, cell: Image) -> str:
-        encoded = self.encode(cell, thumbnail=True)
+        encoded = self.encode(cell)
         return f'<img src="{encoded}">'
 
     def _get_state(self) -> Dict[str, Any]:
