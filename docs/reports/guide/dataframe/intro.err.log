@@ -17,27 +17,21 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# Create a `DataFrame`
-df = mk.from_csv("./downloads/imagenette2-160/imagenette.csv")
-
-# Create an `ImageColumn`` and add it to the `DataFrame`
-df["img"] = mk.image(
-    df["img_path"], 
-    base_dir=os.path.join(dataset_dir, "imagenette2-160")
+img_col = mk.image(
+    ["img_0.jpg", "img_1.jpg", "img_2.jpg"], 
+    base_dir=abs_path_to_img_dir
 )
-df
+img_col
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mValueError[0m                                Traceback (most recent call last)
-Cell [0;32mIn[4], line 5[0m
-[1;32m      2[0m df [38;5;241m=[39m mk[38;5;241m.[39mfrom_csv([38;5;124m"[39m[38;5;124m./downloads/imagenette2-160/imagenette.csv[39m[38;5;124m"[39m)
-[1;32m      4[0m [38;5;66;03m# Create an `ImageColumn`` and add it to the `DataFrame`[39;00m
-[0;32m----> 5[0m df[[38;5;124m"[39m[38;5;124mimg[39m[38;5;124m"[39m] [38;5;241m=[39m [43mmk[49m[38;5;241;43m.[39;49m[43mimage[49m[43m([49m
-[1;32m      6[0m [43m    [49m[43mdf[49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43mimg_path[39;49m[38;5;124;43m"[39;49m[43m][49m[43m,[49m[43m [49m
-[1;32m      7[0m [43m    [49m[43mbase_dir[49m[38;5;241;43m=[39;49m[43mos[49m[38;5;241;43m.[39;49m[43mpath[49m[38;5;241;43m.[39;49m[43mjoin[49m[43m([49m[43mdataset_dir[49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mimagenette2-160[39;49m[38;5;124;43m"[39;49m[43m)[49m
-[1;32m      8[0m [43m)[49m
-[1;32m      9[0m df
+Cell [0;32mIn[2], line 1[0m
+[0;32m----> 1[0m img_col [38;5;241m=[39m [43mmk[49m[38;5;241;43m.[39;49m[43mimage[49m[43m([49m
+[1;32m      2[0m [43m    [49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43mimg_0.jpg[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mimg_1.jpg[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mimg_2.jpg[39;49m[38;5;124;43m"[39;49m[43m][49m[43m,[49m[43m [49m
+[1;32m      3[0m [43m    [49m[43mbase_dir[49m[38;5;241;43m=[39;49m[43mabs_path_to_img_dir[49m
+[1;32m      4[0m [43m)[49m
+[1;32m      5[0m img_col
 
 File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/image.py:43[0m, in [0;36mimage[0;34m(filepaths, base_dir, downloader, loader, cache_dir)[0m
 [1;32m     23[0m [38;5;129m@docs[39m[38;5;241m.[39mdoc(source[38;5;241m=[39mFILE_SHARED_DOCS)

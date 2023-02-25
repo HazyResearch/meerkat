@@ -682,21 +682,35 @@ title="Open an issue"
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">import</span> <span class="nn">dill</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">DeferredImageFormatter</span><span class="p">,</span> <span class="n">DeferredImageFormatterGroup</span>
 
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
 <span class="kn">from</span> <span class="nn">meerkat.block.deferred_block</span> <span class="kn">import</span> <span class="n">DeferredOp</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">Column</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.base</span> <span class="kn">import</span> <span class="n">DeferredCell</span><span class="p">,</span> <span class="n">DeferredColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.scalar</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ImageFormatterGroup</span><span class="p">,</span>
+    <span class="n">HTMLFormatterGroup</span><span class="p">,</span>
+    <span class="n">TextFormatterGroup</span><span class="p">,</span>
+    <span class="n">TextFormatterGroup</span><span class="p">,</span>
+    <span class="n">PDFFormatterGroup</span><span class="p">,</span>
+    <span class="n">CodeFormatterGroup</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
+
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -936,7 +950,8 @@ title="Open an issue"
         <span class="k">return</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="FileColumn"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.FileColumn">[docs]</a><span class="k">class</span> <span class="nc">FileColumn</span><span class="p">(</span><span class="n">DeferredColumn</span><span class="p">):</span>
+<div class="viewcode-block" id="FileColumn"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.FileColumn">[docs]</a><span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">FILE_SHARED_DOCS</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">FileColumn</span><span class="p">(</span><span class="n">DeferredColumn</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A column where each cell represents an file stored on disk or the web.</span>
 <span class="sd">    The underlying data is a `PandasSeriesColumn` of strings, where each string</span>
 <span class="sd">    is the path to a file. The column materializes the files into memory when</span>
@@ -956,16 +971,33 @@ title="Open an issue"
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">loader</span><span class="p">:</span> <span class="n">callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">downloader</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">callable</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">base_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">formatters</span><span class="p">:</span> <span class="n">FormatterGroup</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ScalarColumn</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">ScalarColumn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">formatters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># infer the type from the file extension</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">_infer_file_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file type </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;loader&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">loader</span>
+        <span class="n">formatters</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;formatters&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;defer&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;formatters&quot;</span><span class="p">]()</span>
+            <span class="k">if</span> <span class="n">formatters</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">formatters</span>
+        <span class="p">)</span>
 
         <span class="c1"># if base_dir is not provided and all paths are absolute, then</span>
         <span class="c1"># we can infer the base_dir</span>
@@ -1006,7 +1038,7 @@ title="Open an issue"
             <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">FileColumn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileColumn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">formatters</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">loader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1028,19 +1060,6 @@ title="Open an issue"
         <span class="k">return</span> <span class="n">FileCell</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_filepaths</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">filepaths</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">loader</span><span class="p">:</span> <span class="n">callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">base_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">filepaths</span><span class="p">,</span>
-            <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span>
-            <span class="n">base_dir</span><span class="o">=</span><span class="n">base_dir</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_urls</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">urls</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -1058,7 +1077,8 @@ title="Open an issue"
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">default_loader</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -1103,6 +1123,82 @@ title="Open an issue"
 
 <div class="viewcode-block" id="FileColumn.is_equal"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.FileColumn.is_equal">[docs]</a>    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Column</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">is_equal</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_infer_file_type</span><span class="p">(</span><span class="n">filepaths</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Infer the type of a file from its extension.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): The path to the file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The type of the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NUM_SAMPLES</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="n">filepaths</span><span class="p">[:</span><span class="n">NUM_SAMPLES</span><span class="p">]</span>
+    <span class="c1"># extract the extension, taking into account that it may not exist</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">filepaths</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.[^\.]+)$&quot;</span><span class="p">)[</span><span class="s2">&quot;0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># if the extension is not present, then we assume it is a text file</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
+
+    <span class="k">for</span> <span class="nb">type</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exts&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">type</span>
+    <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">load_bytes</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">load_text</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="n">FILE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_image</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">DeferredImageFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.heic&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;defer&quot;</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;pdf&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_bytes</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">PDFFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.pdf&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;html&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_text</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">HTMLFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="s2">&quot;.htm&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_text</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">TextFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.txt&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_text</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">CodeFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.py&quot;</span><span class="p">,</span> <span class="s2">&quot;.js&quot;</span><span class="p">,</span> <span class="s2">&quot;.css&quot;</span><span class="p">,</span> <span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.java&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.h&quot;</span><span class="p">,</span> <span class="s2">&quot;.hpp&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">]):</span>

@@ -804,6 +804,18 @@ title="Open an issue"
             <span class="p">}</span>
         <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pat</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataFrame&quot;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">meerkat</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span>
+                    <span class="n">pat</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">_MeerkatDatetimeProperties</span><span class="p">(</span><span class="n">_ReturnColumnMixin</span><span class="p">,</span> <span class="n">DatetimeProperties</span><span class="p">):</span>
     <span class="k">pass</span>

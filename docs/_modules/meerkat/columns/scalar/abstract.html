@@ -823,6 +823,12 @@ title="Open an issue"
             <span class="s2">&quot;contains&quot;</span><span class="p">,</span> <span class="n">_namespace</span><span class="o">=</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="n">pat</span><span class="o">=</span><span class="n">pat</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="n">case</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">regex</span>
         <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pat</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataFrame&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">_dispatch_unary_function</span><span class="p">(</span>
+            <span class="s2">&quot;extract&quot;</span><span class="p">,</span> <span class="n">_namespace</span><span class="o">=</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="n">pat</span><span class="o">=</span><span class="n">pat</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    
+
 
 <div class="viewcode-block" id="ScalarColumn"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.ScalarColumn">[docs]</a><span class="k">class</span> <span class="nc">ScalarColumn</span><span class="p">(</span><span class="n">Column</span><span class="p">):</span>
     <span class="nb">str</span> <span class="o">=</span> <span class="n">CachedAccessor</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="n">StringMethods</span><span class="p">)</span>

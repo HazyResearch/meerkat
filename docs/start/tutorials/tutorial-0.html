@@ -1116,80 +1116,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "be86e68858b348b6b2cf7093c3c8f42f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:132,</span> in <span class="ni">download_imagenette</span><span class="nt">(download_dir, version, overwrite, return_df)</span>
-<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tar archive, this may take a few minutes...&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">131</span>     <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">cached_tar_path</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">134</span>     <span class="c1"># os.remove(tar_path)</span>
-<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="k">else</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2028,</span> in <span class="ni">TarFile.extractall</span><span class="nt">(self, path, members, numeric_owner)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2026</span>         <span class="n">tarinfo</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="mo">0o700</span>
-<span class="g g-Whitespace">   </span><span class="mi">2027</span>     <span class="c1"># Do not set_attrs directories, as we will do that further down</span>
-<span class="ne">-&gt; </span><span class="mi">2028</span>     <span class="bp">self</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">set_attrs</span><span class="o">=</span><span class="ow">not</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">(),</span>
-<span class="g g-Whitespace">   </span><span class="mi">2029</span>                  <span class="n">numeric_owner</span><span class="o">=</span><span class="n">numeric_owner</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2031</span> <span class="c1"># Reverse sort directories.</span>
-<span class="g g-Whitespace">   </span><span class="mi">2032</span> <span class="n">directories</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2069,</span> in <span class="ni">TarFile.extract</span><span class="nt">(self, member, path, set_attrs, numeric_owner)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2066</span>     <span class="n">tarinfo</span><span class="o">.</span><span class="n">_link_target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">linkname</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2068</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">2069</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_extract_member</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-<span class="g g-Whitespace">   </span><span class="mi">2070</span>                          <span class="n">set_attrs</span><span class="o">=</span><span class="n">set_attrs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">2071</span>                          <span class="n">numeric_owner</span><span class="o">=</span><span class="n">numeric_owner</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2072</span> <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2073</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorlevel</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2141,</span> in <span class="ni">TarFile._extract_member</span><span class="nt">(self, tarinfo, targetpath, set_attrs, numeric_owner)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2138</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dbg</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2140</span> <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
-<span class="ne">-&gt; </span><span class="mi">2141</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2142</span> <span class="k">elif</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
-<span class="g g-Whitespace">   </span><span class="mi">2143</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2190,</span> in <span class="ni">TarFile.makefile</span><span class="nt">(self, tarinfo, targetpath)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2188</span>     <span class="n">target</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">2189</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">2190</span>     <span class="n">copyfileobj</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">ReadError</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:253,</span> in <span class="ni">copyfileobj</span><span class="nt">(src, dst, length, exception, bufsize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">250</span>     <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span> <span class="k">if</span> <span class="n">remainder</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">253</span>     <span class="n">buf</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">remainder</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">254</span>     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">remainder</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">255</span>         <span class="k">raise</span> <span class="n">exception</span><span class="p">(</span><span class="s2">&quot;unexpected end of data&quot;</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/gzip.py:292,</span> in <span class="ni">GzipFile.read</span><span class="nt">(self, size)</span>
-<span class="g g-Whitespace">    </span><span class="mi">290</span>     <span class="kn">import</span> <span class="nn">errno</span>
-<span class="g g-Whitespace">    </span><span class="mi">291</span>     <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EBADF</span><span class="p">,</span> <span class="s2">&quot;read() on write-only GzipFile object&quot;</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">292</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/_compression.py:68,</span> in <span class="ni">DecompressReader.readinto</span><span class="nt">(self, b)</span>
-<span class="g g-Whitespace">     </span><span class="mi">66</span> <span class="k">def</span> <span class="nf">readinto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">67</span>     <span class="k">with</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">as</span> <span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">byte_view</span><span class="p">:</span>
-<span class="ne">---&gt; </span><span class="mi">68</span>         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">byte_view</span><span class="p">))</span>
-<span class="g g-Whitespace">     </span><span class="mi">69</span>         <span class="n">byte_view</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data</span>
-<span class="g g-Whitespace">     </span><span class="mi">70</span>     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/gzip.py:487,</span> in <span class="ni">_GzipReader.read</span><span class="nt">(self, size)</span>
-<span class="g g-Whitespace">    </span><span class="mi">484</span> <span class="c1"># Read a chunk of data from the file</span>
-<span class="g g-Whitespace">    </span><span class="mi">485</span> <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">DEFAULT_BUFFER_SIZE</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">487</span> <span class="n">uncompress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decompressor</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">488</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decompressor</span><span class="o">.</span><span class="n">unconsumed_tail</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">489</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_fp</span><span class="o">.</span><span class="n">prepend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_decompressor</span><span class="o">.</span><span class="n">unconsumed_tail</span><span class="p">)</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "cfee953419d246479461a4bd6049366c"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -1198,6 +1125,15 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 <div class="cell tag_output_scroll docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>downloads/imagenette2-160/imagenette.csv
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>label,split,img_path
+cassette player,train,train/n02979186/n02979186_9036.JPEG
+cassette player,train,train/n02979186/n02979186_11957.JPEG
+cassette player,train,train/n02979186/n02979186_9715.JPEG
+cassette player,train,train/n02979186/n02979186_21736.JPEG
 </pre></div>
 </div>
 </div>
@@ -1220,6 +1156,51 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
     <span class="n">base_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;imagenette2-160&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s2">&quot;./downloads/imagenette2-160/imagenette.csv&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># Create an `ImageColumn`` and add it to the `DataFrame`</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img_path&quot;</span><span class="p">],</span> 
+<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">base_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;imagenette2-160&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">df</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/image.py:43,</span> in <span class="ni">image</span><span class="nt">(filepaths, base_dir, downloader, loader, cache_dir)</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">FILE_SHARED_DOCS</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">24</span> <span class="k">def</span> <span class="nf">image</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span>     <span class="n">filepaths</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">29</span>     <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">30</span> <span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">31</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Create a :class:`FileColumn` where each cell represents an image stored</span>
+<span class="g g-Whitespace">     </span><span class="mi">32</span><span class="sd">     on disk. The underlying data is a :class:`ScalarColumn` of strings, where</span>
+<span class="g g-Whitespace">     </span><span class="mi">33</span><span class="sd">     each string is the path to an image.</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">41</span><span class="sd">         ${cache_dir}</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">43</span>     <span class="k">return</span> <span class="n">FileColumn</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">44</span>         <span class="n">filepaths</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">45</span>         <span class="n">base_dir</span><span class="o">=</span><span class="n">base_dir</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">46</span>         <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span>         <span class="n">downloader</span><span class="o">=</span><span class="n">downloader</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span>         <span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>         <span class="n">formatters</span><span class="o">=</span><span class="n">deferred_formatter_group</span><span class="p">(</span><span class="n">ImageFormatterGroup</span><span class="p">()),</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span>     <span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/file.py:314,</span> in <span class="ni">FileColumn.__init__</span><span class="nt">(self, data, type, loader, downloader, base_dir, cache_dir, formatters, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">311</span>     <span class="nb">type</span> <span class="o">=</span> <span class="n">_infer_file_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">313</span> <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">314</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file type </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">316</span> <span class="n">spec</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">317</span> <span class="n">loader</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;loader&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">loader</span>
+
+<span class="ne">ValueError</span>: Invalid file type None.
 </pre></div>
 </div>
 </div>
