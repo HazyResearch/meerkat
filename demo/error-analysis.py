@@ -50,12 +50,15 @@ def get_options(df):
 
 select_x = mk.gui.core.Select(values=get_options(df), value="label")
 select_y = mk.gui.core.Select(values=get_options(df), value="pred")
+select_hue = mk.gui.core.Select(values=get_options(df), value="correct")
 select_container = html.div(
     [
         html.div("x", classes="self-center"),
         select_x,
         html.div("y", classes="self-center"),
         select_y,
+        html.div("hue", classes="self-center"),
+        select_hue,
     ],
     classes="flex flex-row justify-center gap-4",
 )
@@ -96,6 +99,7 @@ plot = mk.gui.plotly.ScatterPlot(
     df,
     x=select_x.value,
     y=select_y.value,
+    hue=select_hue.value,
     title="Scatter Plot",
     on_select=set_filter_with_plot_selection.partial(criteria=filter.criteria),
 )

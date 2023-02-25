@@ -10,6 +10,7 @@
 	export let df: DataFrameRef;
 	export let x: string;
 	export let y: string;
+	export let hue: string | null = null;
 	export let config: Record<string, any> = { displayModeBar: false };
 	export let title: string;
 	export let selected: Array<number> = [];
@@ -20,19 +21,39 @@
 		df: df,
 		start: 0,
 		end: buffer ? 1000 : null,
-		columns: [x, y],
+		columns: [x, y].concat(hue ? [hue] : []),
 		variants: ['small'],
 		shuffle: buffer
 	}).then((chunk) => {
-		return [
-			{
-				x: chunk.getColumn(x).data,
-				y: chunk.getColumn(y).data,
-				keyidx: chunk.getColumn(chunk.primaryKey).data,
-				type: 'scatter',
-				mode: 'markers'
-			}
-		];
+
+		let categories = null;
+		if (hue !== null) {
+			// Get the unique categories from the hue column
+			categories = [...new Set(chunk.getColumn(hue).data)];
+			const booleanCategory = categories.every((c) => typeof c === 'boolean');
+			console.log(categories);
+			return categories.map((category) => {
+				return {
+					x: chunk.getColumn(x).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
+					y: chunk.getColumn(y).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
+					keyidx: chunk.getColumn(chunk.primaryKey).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
+					type: 'scatter',
+					mode: 'markers',
+					name: booleanCategory ? category === true ? hue : `not ${hue}` : category,
+				};
+			});
+		} else {
+			return [
+				{
+					x: chunk.getColumn(x).data,
+					y: chunk.getColumn(y).data,
+					keyidx: chunk.getColumn(chunk.primaryKey).data,
+					type: 'scatter',
+					mode: 'markers'
+				}
+			];
+		}
+
 	});
 
 	$: layout = { xaxis: { title: x }, yaxis: { title: y }, title: title, dragmode: 'select' };
@@ -56,7 +77,7 @@
 		<div class="bg-purple-50 text-center my-1">Loading Scatter Plot...</div>
 		<Plot data={[]} {layout} {config} on:click={(e) => onEndpoint(onClick, e)} />
 	{:else}
-		<svelte:self {df} {x} {y} {config} {title} on_click={onClick} buffer={true} on:select />
+		<svelte:self {df} {x} {y} {hue} {config} {title} on_click={onClick} buffer={true} on:select />
 	{/if}
 {:then data}
 	<!-- <div class="flex flex-row align-middle justify-center mb-4 bg-transparent">

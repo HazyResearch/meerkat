@@ -10,7 +10,8 @@ class ScatterPlot(Component):
     df: DataFrame
     x: str
     y: str
-    title: str
+    hue: str = None
+    title: str = ""
     selected: List[str] = []
 
     on_click: EndpointProperty = None
@@ -22,6 +23,7 @@ class ScatterPlot(Component):
         *,
         x: str,
         y: str,
+        hue: str = None,
         title: str = "",
         selected: List[str] = [],
         on_click: EndpointProperty = None,
@@ -31,6 +33,7 @@ class ScatterPlot(Component):
             df=df,
             x=x,
             y=y,
+            hue=hue,
             title=title,
             selected=selected,
             on_click=on_click,
