@@ -30,6 +30,15 @@ class ArrowStringMethods(StringMethods):
         return self.column._dispatch_unary_function(
             "utf8_center", width=width, padding=fillchar, **kwargs
         )
+    
+    def extract(self, pat: str, **kwargs) -> Union[ScalarColumn, DataFrame]:
+        struct_array = pac.extract(
+            self.column.data,
+            pattern=pat,
+        )
+        return self.column._clone(data=struct_array)
+
+       
 
     def _split(
         self, pat=None, n=-1, reverse: bool = False, regex: bool = False, **kwargs

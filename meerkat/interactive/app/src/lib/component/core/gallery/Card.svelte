@@ -39,7 +39,6 @@
 				open_row_modal(posidx);
 			}}
 			on:click={(e) => {
-				console.log(e)
 				dispatch('click', e);
 			}}
 		>

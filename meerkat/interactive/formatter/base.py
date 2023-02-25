@@ -234,6 +234,7 @@ register_placeholder(
 class BaseFormatter(ABC):
     component_class: Type["BaseComponent"]
     data_prop: str = "data"
+    static_encode: bool = False
 
     def encode(self, cell: Any, **kwargs):
         """Encode the cell on the backend before sending it to the frontend.
@@ -321,50 +322,6 @@ class Formatter(BaseFormatter):
         self._props = state["_props"]
 
 
-def auto_formatter():
-    """Decorator that creates a."""
-
-    def _inner(cls: type):
-        class Wrapper(cls):
-            component_class = cls.component_class
-            data_prop = cls.data_prop
-
-            def __init__(self, **kwargs):
-                for k in kwargs:
-                    if k not in cls.component_class.prop_names:
-                        raise ValueError(
-                            f"{k} is not a valid prop for {cls.component_class}"
-                        )
-
-                for prop_name, field in cls.component_class.__fields__.items():
-                    if field.name != cls.data_prop and prop_name not in kwargs:
-                        if field.required:
-                            raise ValueError("""Missing required argument.""")
-                        kwargs[prop_name] = field.default
-
-                self._props = kwargs
-
-            @property
-            def props(self) -> Dict[str, Any]:
-                return self._props
-
-            def _get_state(self) -> Dict[str, Any]:
-                return {
-                    "_props": self._props,
-                }
-
-            def _set_state(self, state: Dict[str, Any]):
-                self._props = state["_props"]
-
-        Wrapper.__name__ = cls.__name__
-        Wrapper.__qualname__ = cls.__qualname__
-        Wrapper.__module__ = cls.__module__
-        Wrapper.__doc__ = cls.__doc__
-        Wrapper.__annotations__ = cls.__annotations__
-        return Wrapper
-
-    return _inner
-
 
 MeerkatDumper.add_multi_representer(BaseFormatter, BaseFormatter.to_yaml)
 MeerkatLoader.add_constructor("!Formatter", BaseFormatter.from_yaml)
@@ -375,6 +332,8 @@ class DeferredFormatter(BaseFormatter):
         self.wrapped = formatter
 
     def encode(self, cell: DeferredCell, **kwargs):
+        if self.wrapped.static_encode:
+            return self.wrapped.encode(None, **kwargs)
         return self.wrapped.encode(cell(), **kwargs)
 
     @property

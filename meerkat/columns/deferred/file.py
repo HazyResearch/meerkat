@@ -4,21 +4,33 @@ import functools
 import io
 import logging
 import os
+from pathlib import Path
 import urllib.request
 import warnings
 from ctypes import Union
 from string import Template
 from typing import IO, Any, Callable, Sequence
 from urllib.parse import urlparse
+from datasets import Image
 
 import dill
 import yaml
+from meerkat.interactive.formatter.base import FormatterGroup
 
 import meerkat.tools.docs as docs
 from meerkat.block.deferred_block import DeferredOp
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
+from meerkat.interactive.formatter import (
+    ImageFormatterGroup,
+    HTMLFormatterGroup,
+    TextFormatterGroup,
+    TextFormatterGroup,
+    PDFFormatterGroup,
+    CodeFormatterGroup,
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -258,6 +270,7 @@ class FileCell(DeferredCell):
         return (other.__class__ == self.__class__) and other.data.is_equal(self.data)
 
 
+@docs.doc(source=FILE_SHARED_DOCS)
 class FileColumn(DeferredColumn):
     """A column where each cell represents an file stored on disk or the web.
     The underlying data is a `PandasSeriesColumn` of strings, where each string
@@ -278,16 +291,32 @@ class FileColumn(DeferredColumn):
     def __init__(
         self,
         data: Sequence[str] = None,
+        type: str = None,
         loader: callable = None,
         downloader: Union[callable | str] = None,
         base_dir: str = None,
         cache_dir: str = None,
+        formatters: FormatterGroup = None,
         *args,
         **kwargs,
     ):
 
         if not isinstance(data, ScalarColumn):
             data = ScalarColumn(data)
+
+        if type is None and (loader is None or formatters is None):
+            # infer the type from the file extension
+            type = _infer_file_type(data)
+
+        if type not in FILE_TYPES:
+            raise ValueError(f"Invalid file type {type}.")
+
+        loader = FILE_TYPES[type]["loader"] if loader is None else loader
+        formatters = (
+            FILE_TYPES[type]["formatters"]().defer()
+            if formatters is None
+            else formatters
+        )
 
         # if base_dir is not provided and all paths are absolute, then
         # we can infer the base_dir
@@ -380,7 +409,8 @@ class FileColumn(DeferredColumn):
     @classmethod
     def default_loader(cls, path, *args, **kwargs):
         if isinstance(path, io.BytesIO):
-            return path.read()
+            return path.read().decode("utf-8")
+
         with open(path, "r") as f:
             return f.read()
 
@@ -425,6 +455,81 @@ class FileColumn(DeferredColumn):
 
     def is_equal(self, other: Column) -> bool:
         return (other.__class__ == self.__class__) and self.data.is_equal(other.data)
+
+
+def _infer_file_type(filepaths: ScalarColumn):
+    """Infer the type of a file from its extension.
+
+    Args:
+        filepath (str): The path to the file.
+
+    Returns:
+        str: The type of the file.
+    """
+
+    NUM_SAMPLES = 100
+    filepaths = filepaths[:NUM_SAMPLES]
+    # extract the extension, taking into account that it may not exist
+    ext = filepaths.str.extract(r"(\.[^\.]+)$", expand=False).str.lower()
+
+    # if the extension is not present, then we assume it is a text file
+    if ext.isna().all():
+        return "text"
+
+    for type, info in FILE_TYPES.items():
+        if ext.isin(info["exts"]).any():
+            return type
+    return "text"
+
+
+def load_image(f: Union[str, io.BytesIO, Path]):
+    img = Image.open(f)
+    return img.convert("RGB")
+
+
+def load_bytes(path: Union[str, io.BytesIO]):
+    if isinstance(path, io.BytesIO):
+        return path.read()
+
+    with open(path, "rb") as f:
+        return f.read()
+
+
+def load_text(path: Union[str, io.BytesIO]):
+    if isinstance(path, io.BytesIO):
+        return path.read().decode("utf-8")
+
+    with open(path, "r") as f:
+        return f.read()
+
+
+FILE_TYPES = {
+    "image": {
+        "loader": load_image,
+        "formatters": ImageFormatterGroup,
+        "exts": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff"],
+    },
+    "pdf": {
+        "loader": load_bytes,
+        "formatters": PDFFormatterGroup,
+        "exts": [".pdf"],
+    },
+    "html": {
+        "loader": load_text,
+        "formatters": HTMLFormatterGroup,
+        "exts": [".html", ".htm"],
+    },
+    "text": {
+        "loader": load_text,
+        "formatters": TextFormatterGroup,
+        "exts": [".txt"],
+    },
+    "code": {
+        "loader": load_text,
+        "formatters": CodeFormatterGroup,
+        "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
+    },
+}
 
 
 def download_url(url: str, dst: Union[str, io.BytesIO]):

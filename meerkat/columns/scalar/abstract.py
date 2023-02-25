@@ -145,6 +145,11 @@ class StringMethods:
             "contains", _namespace="str", pat=pat, case=case, regex=regex
         )
 
+    def extract(self, pat: str, **kwargs) -> "DataFrame":
+        return self.column._dispatch_unary_function(
+            "extract", _namespace="str", pat=pat, **kwargs
+        )
+
 
 class ScalarColumn(Column):
     str = CachedAccessor("str", StringMethods)
