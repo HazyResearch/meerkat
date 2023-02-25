@@ -29,6 +29,7 @@ export { default as Json } from './component/core/json/Json.svelte';
 export { default as Markdown } from './component/core/markdown/Markdown.svelte';
 export { default as Match } from './component/core/match/Match.svelte';
 export { default as MultiSelect } from './component/core/multiselect/MultiSelect.svelte';
+export { default as PDF } from './component/core/pdf/PDF.svelte';
 export { default as Put } from './component/core/put/Put.svelte';
 export { default as Radio } from './component/core/radio/Radio.svelte';
 export { default as RadioGroup } from './component/core/radio/RadioGroup.svelte';
