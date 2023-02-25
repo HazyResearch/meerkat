@@ -7,3 +7,5 @@ global-exclude *.buildprint
 global-exclude *.pyc
 global-exclude *.DS_Store
 graft meerkat/interactive/app/build
+graft meerkat/interactive/templates
+recursive-include meerkat/interactive/app/src/lib/component *.svelte

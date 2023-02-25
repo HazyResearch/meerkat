@@ -258,7 +258,9 @@ DemoScript = Enum(
     {
         k: k
         for k in [x.split(".py")[0] for x in os.listdir(_DEMO_DIR) if x.endswith(".py")]
-    },
+    }
+    if os.path.exists(_DEMO_DIR)
+    else {},
 )
 
 
