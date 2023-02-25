@@ -7,11 +7,13 @@ import numpy as np
 import pytest
 from PIL import Image
 
+import meerkat as mk
 from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
 from meerkat.columns.deferred.base import DeferredCell
-from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader
+from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader, FILE_TYPES
 from meerkat.columns.scalar import ScalarColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
+from tests.utils import product_parametrize
 
 
 def load_json(path):
@@ -60,7 +62,7 @@ class FileColumnTestBed(AbstractColumnTestBed):
 
         self.data = np.arange(length)
 
-        self.col = FileColumn.from_filepaths(
+        self.col = mk.files(
             self.paths,
             loader=load_json,
             base_dir=self.base_dir,
@@ -128,6 +130,55 @@ def test_change_base_dir(testbed):
 
     assert (col[[1, 3, 5]]().data == testbed.get_data([1, 3, 5])).all()
 
+
+BUCKET_URL = "https://storage.googleapis.com/meerkat-ml/tests/file_types"
+
+TEST_FILES = {
+    "image": [
+        os.path.join(BUCKET_URL, "image/test-img-01.jpg"),
+        os.path.join(BUCKET_URL, "image/test-img-02.jpg"),
+        os.path.join(BUCKET_URL, "image/test-img-01.png"),
+        os.path.join(BUCKET_URL, "image/test-img-02.png"),
+        os.path.join(BUCKET_URL, "image/test-img-01.jpeg"),
+        os.path.join(BUCKET_URL, "image/test-img-02.jpeg"),
+    ], 
+    "pdf": [
+        os.path.join(BUCKET_URL, "pdf/test-pdf-01.pdf"),
+        os.path.join(BUCKET_URL, "pdf/test-pdf-02.pdf"),
+        os.path.join(BUCKET_URL, "pdf/test-pdf-03.pdf"),
+    ],
+    "text": [
+        os.path.join(BUCKET_URL, "text/test-txt-01.txt"),
+        os.path.join(BUCKET_URL, "text/test-txt-02.txt"),
+        os.path.join(BUCKET_URL, "text/test-txt-03.txt"),
+    ],
+    "html": [
+        os.path.join(BUCKET_URL, "html/test-html-01.html"),
+        os.path.join(BUCKET_URL, "html/test-html-02.html"),
+        os.path.join(BUCKET_URL, "html/test-html-03.html"),
+    ],
+    "code": [
+        os.path.join(BUCKET_URL, "code/test-code-01.py"),
+        os.path.join(BUCKET_URL, "code/test-code-02.py"),
+        os.path.join(BUCKET_URL, "code/test-code-03.py"),
+    ]
+}
+
+@product_parametrize(
+    {"file_type": list(TEST_FILES.keys())}
+)
+def test_file_types(file_type: str, tmpdir):
+    files = TEST_FILES[file_type]
+
+    col = mk.files(files)
+
+    assert isinstance(col, FileColumn)
+
+    assert isinstance(col.formatters, FILE_TYPES[file_type]["formatters"])
+
+    col.formatters["base"].encode(col[0])
+
+    
 
 def test_downloader(monkeypatch, tmpdir):
     import urllib

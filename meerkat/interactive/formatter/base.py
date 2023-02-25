@@ -159,7 +159,7 @@ def deferred_formatter_group(group: FormatterGroup) -> FormatterGroup:
         (FormatterGroup) A new FormatterGroup with all formatters wrapped in a
             DeferredFormatter.
     """
-    new_group = FormatterGroup(base=None)
+    new_group = group.copy()
     for name, formatter in group.items():
         new_group[name] = DeferredFormatter(formatter)
     return new_group

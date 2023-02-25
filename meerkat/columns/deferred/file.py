@@ -11,11 +11,12 @@ from ctypes import Union
 from string import Template
 from typing import IO, Any, Callable, Sequence
 from urllib.parse import urlparse
-from datasets import Image
+from PIL import Image
 
 import dill
 import yaml
 from meerkat.interactive.formatter.base import FormatterGroup
+from meerkat.interactive.formatter.image import DeferredImageFormatter, DeferredImageFormatterGroup
 
 import meerkat.tools.docs as docs
 from meerkat.block.deferred_block import DeferredOp
@@ -30,6 +31,7 @@ from meerkat.interactive.formatter import (
     PDFFormatterGroup,
     CodeFormatterGroup,
 )
+from meerkat.tools.utils import deprecated
 
 
 logger = logging.getLogger(__name__)
@@ -311,9 +313,10 @@ class FileColumn(DeferredColumn):
         if type not in FILE_TYPES:
             raise ValueError(f"Invalid file type {type}.")
 
-        loader = FILE_TYPES[type]["loader"] if loader is None else loader
+        spec = FILE_TYPES[type]
+        loader = spec["loader"] if loader is None else loader
         formatters = (
-            FILE_TYPES[type]["formatters"]().defer()
+            spec["formatters"]().defer() if spec.get("defer", False) else spec["formatters"]()
             if formatters is None
             else formatters
         )
@@ -357,7 +360,7 @@ class FileColumn(DeferredColumn):
             is_batched_fn=False,
         )
 
-        super(FileColumn, self).__init__(data, *args, **kwargs)
+        super(FileColumn, self).__init__(data, formatters=formatters, *args, **kwargs)
 
     @property
     def loader(self):
@@ -377,19 +380,6 @@ class FileColumn(DeferredColumn):
 
     def _create_cell(self, data: object) -> DeferredCell:
         return FileCell(data=data)
-
-    @classmethod
-    def from_filepaths(
-        cls,
-        filepaths: Sequence[str],
-        loader: callable = None,
-        base_dir: str = None,
-    ):
-        return cls(
-            data=filepaths,
-            loader=loader,
-            base_dir=base_dir,
-        )
 
     @classmethod
     def from_urls(
@@ -470,7 +460,7 @@ def _infer_file_type(filepaths: ScalarColumn):
     NUM_SAMPLES = 100
     filepaths = filepaths[:NUM_SAMPLES]
     # extract the extension, taking into account that it may not exist
-    ext = filepaths.str.extract(r"(\.[^\.]+)$", expand=False).str.lower()
+    ext = filepaths.str.extract(r"(\.[^\.]+)$")["0"].str.lower()
 
     # if the extension is not present, then we assume it is a text file
     if ext.isna().all():
@@ -506,8 +496,9 @@ def load_text(path: Union[str, io.BytesIO]):
 FILE_TYPES = {
     "image": {
         "loader": load_image,
-        "formatters": ImageFormatterGroup,
-        "exts": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff"],
+        "formatters": DeferredImageFormatterGroup,
+        "exts": [".jpg", ".jpeg", ".png", ".heic"],
+        "defer": False
     },
     "pdf": {
         "loader": load_bytes,
