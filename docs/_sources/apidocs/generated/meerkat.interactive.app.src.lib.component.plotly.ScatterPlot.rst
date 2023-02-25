@@ -59,6 +59,7 @@
       ~ScatterPlot.df
       ~ScatterPlot.x
       ~ScatterPlot.y
+      ~ScatterPlot.hue
       ~ScatterPlot.title
       ~ScatterPlot.selected
       ~ScatterPlot.on_click

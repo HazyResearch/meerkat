@@ -1082,7 +1082,17 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "590b5ebf014c477f8588646fa3c7a1a2"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "d571ad5eb0dd4461a117e08639ad4725"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
 </div>
 </div>
@@ -1091,15 +1101,6 @@ title="Print to PDF"
 <div class="cell tag_output_scroll docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>downloads/imagenette2-160/imagenette.csv
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>label,split,img_path
-cassette player,train,train/n02979186/n02979186_9036.JPEG
-cassette player,train,train/n02979186/n02979186_11957.JPEG
-cassette player,train,train/n02979186/n02979186_9715.JPEG
-cassette player,train,train/n02979186/n02979186_21736.JPEG
 </pre></div>
 </div>
 </div>
@@ -1122,51 +1123,6 @@ cassette player,train,train/n02979186/n02979186_21736.JPEG
     <span class="n">base_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;imagenette2-160&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">df</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s2">&quot;./downloads/imagenette2-160/imagenette.csv&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># Create an `ImageColumn`` and add it to the `DataFrame`</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img_path&quot;</span><span class="p">],</span> 
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">base_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="s2">&quot;imagenette2-160&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">df</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/image.py:43,</span> in <span class="ni">image</span><span class="nt">(filepaths, base_dir, downloader, loader, cache_dir)</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">FILE_SHARED_DOCS</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">24</span> <span class="k">def</span> <span class="nf">image</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span>     <span class="n">filepaths</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">29</span>     <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">30</span> <span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">31</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Create a :class:`FileColumn` where each cell represents an image stored</span>
-<span class="g g-Whitespace">     </span><span class="mi">32</span><span class="sd">     on disk. The underlying data is a :class:`ScalarColumn` of strings, where</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span><span class="sd">     each string is the path to an image.</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span><span class="sd">         ${cache_dir}</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">43</span>     <span class="k">return</span> <span class="n">FileColumn</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">44</span>         <span class="n">filepaths</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">45</span>         <span class="n">base_dir</span><span class="o">=</span><span class="n">base_dir</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">46</span>         <span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">47</span>         <span class="n">downloader</span><span class="o">=</span><span class="n">downloader</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">48</span>         <span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">49</span>         <span class="n">formatters</span><span class="o">=</span><span class="n">deferred_formatter_group</span><span class="p">(</span><span class="n">ImageFormatterGroup</span><span class="p">()),</span>
-<span class="g g-Whitespace">     </span><span class="mi">50</span>     <span class="p">)</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/file.py:314,</span> in <span class="ni">FileColumn.__init__</span><span class="nt">(self, data, type, loader, downloader, base_dir, cache_dir, formatters, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">311</span>     <span class="nb">type</span> <span class="o">=</span> <span class="n">_infer_file_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">313</span> <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">314</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file type </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">316</span> <span class="n">spec</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">317</span> <span class="n">loader</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;loader&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">loader</span>
-
-<span class="ne">ValueError</span>: Invalid file type None.
 </pre></div>
 </div>
 </div>
