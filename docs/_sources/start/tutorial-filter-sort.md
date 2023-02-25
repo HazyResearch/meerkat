@@ -10,56 +10,48 @@ Through this tutorial, you will learn about:
 - `mk.gui.Store` objects
 - composing components together to create more complex layouts
 
-Below is code from [Tutorial 1](./tutorial-0.md) that we'll use as a starting point. It loads the `"imagenette"` dataset and creates a `Gallery` component to display the images.
+As in [Tutorial 1](./tutorial-0.md), we'll use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91). However, before creating a `Gallery` component, we'll need to first define our `Filter` and `Sort` components.
 
 ```python
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
-
-gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["label"])
 ```
 
-## 📋 Filter
+## ⛙ Combining components
 
-This only requires three lines of code, but each one has a very specific purpose. The first line creates a `Store` object, which is a special Meerkat object that wraps any type of data to make it accessible to reactive components. The second line creates a `Filter` component, which takes this `filter_criteria` as a parameter. The third line applies the filter to the `df` DataFrame reactively, so that whenever the `filter_criteria` changes, the `df` will be updated. The `filter` function is reactive because it is a `mk.gui.Component`, and all Meerkat components are reactive by definition.
+First, we'll create a `Filter` component, passing in our original `df`, which will tell the component what to filter on. The returned object is a `mk.gui.Component`, which can be rendered on our page. At the same time, it is a callable function that can be invoked on our `df` to filter it. We'll see this later when creating the `Gallery`.
 
-TODO: make explanation better
+<!-- TODO: is this true? This is a common pattern in Meerkat, where components are both callable functions and `mk.gui.Component` objects. -->
+
 ```python
-filter_criteria = mk.gui.Store([])
-filter = mk.gui.Filter(df=df, criteria=filter_criteria)
-df = filter(df)
+filter = mk.gui.Filter(df=df)
 ```
 
-## 📋 Sort
+The `Sort` component works in nearly the identical way.
 
-The `Sort` component works in nearly the identical way. Note that we have to create an additional `Store` object that will be tied to the `Sort` component. Again, the `sort` function is reactive because it is a `mk.gui.Component`, meaning it will automatically be invoked whenever there is a change to `sort_criteria`.
-
-TODO: make explanation better
 ```python
-sort_criteria = mk.gui.Store([])
-sort = mk.gui.Sort(df=df, criteria=sort_criteria)
-df = sort(df)
+sort = mk.gui.Sort(df=df)
+```
+
+Lastly, we can create a `Gallery` component, but instead of directly passing in the `df` object, we'll first call the `sort` and `filter` components on it. These functions will automatically be triggered anytime the filters or sorts are changed, and our `Gallery` will be updated accordingly in a reactive manner.
+
+```python
+gallery = mk.gui.Gallery(df=sort(filter(df)), main_column="img", tag_columns=["label"])
 ```
 
 ## 🤲 Putting it all together
 
-To combine all our components, we will stick them into a `Page` using the `mk.gui.html.grid` component. The complete code is shown below.
+To render our components, we will stick all three into a `Page` using the `mk.gui.html.grid` component. The complete code is shown below.
 
 ```python
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
 
-gallery = mk.gui.Gallery(df=df, main_column="img", tag_columns=["label"])
-
-filter_criteria = mk.gui.Store([])
-filter = mk.gui.Filter(df=df, criteria=filter_criteria)
-df = filter(df)
-
-sort_criteria = mk.gui.Store([])
-sort = mk.gui.Sort(df=df, criteria=sort_criteria)
-df = sort(df)
+filter = mk.gui.Filter(df=df)
+sort = mk.gui.Sort(df=df)
+gallery = mk.gui.Gallery(df=sort(filter(df)), main_column="img", tag_columns=["label"])
 
 mk.gui.start()
 page = mk.gui.Page(
@@ -69,6 +61,12 @@ page = mk.gui.Page(
     id="filter-sort",
 )
 page.launch()
+```
+
+We can run this app with the following command (or in Jupyter Notebook, simply run the code cell):
+
+```bash
+mk run filter-sort.py --dev
 ```
 
 ## 🎉 Conclusion

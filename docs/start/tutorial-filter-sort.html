@@ -738,13 +738,8 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#filter">
-   📋 Filter
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#sort">
-   📋 Sort
+  <a class="reference internal nav-link" href="#combining-components">
+   ⛙ Combining components
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -777,13 +772,8 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#filter">
-   📋 Filter
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#sort">
-   📋 Sort
+  <a class="reference internal nav-link" href="#combining-components">
+   ⛙ Combining components
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -816,50 +806,38 @@ title="Print to PDF"
 <li><p><code class="docutils literal notranslate"><span class="pre">mk.gui.Store</span></code> objects</p></li>
 <li><p>composing components together to create more complex layouts</p></li>
 </ul>
-<p>Below is code from <a class="reference internal" href="tutorial-0.html"><span class="doc std std-doc">Tutorial 1</span></a> that we’ll use as a starting point. It loads the <code class="docutils literal notranslate"><span class="pre">&quot;imagenette&quot;</span></code> dataset and creates a <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> component to display the images.</p>
+<p>As in <a class="reference internal" href="tutorial-0.html"><span class="doc std std-doc">Tutorial 1</span></a>, we’ll use the <a class="reference external" href="https://github.com/fastai/imagenette#image%E7%BD%91">Imagenette dataset</a>. However, before creating a <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> component, we’ll need to first define our <code class="docutils literal notranslate"><span class="pre">Filter</span></code> and <code class="docutils literal notranslate"><span class="pre">Sort</span></code> components.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
-
-<span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<section id="filter">
-<h2>📋 Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
-<p>This only requires three lines of code, but each one has a very specific purpose. The first line creates a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object, which is a special Meerkat object that wraps any type of data to make it accessible to reactive components. The second line creates a <code class="docutils literal notranslate"><span class="pre">Filter</span></code> component, which takes this <code class="docutils literal notranslate"><span class="pre">filter_criteria</span></code> as a parameter. The third line applies the filter to the <code class="docutils literal notranslate"><span class="pre">df</span></code> DataFrame reactively, so that whenever the <code class="docutils literal notranslate"><span class="pre">filter_criteria</span></code> changes, the <code class="docutils literal notranslate"><span class="pre">df</span></code> will be updated. The <code class="docutils literal notranslate"><span class="pre">filter</span></code> function is reactive because it is a <code class="docutils literal notranslate"><span class="pre">mk.gui.Component</span></code>, and all Meerkat components are reactive by definition.</p>
-<p>TODO: make explanation better</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filter_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
-<span class="nb">filter</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">filter_criteria</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<section id="combining-components">
+<h2>⛙ Combining components<a class="headerlink" href="#combining-components" title="Permalink to this headline">¶</a></h2>
+<p>First, we’ll create a <code class="docutils literal notranslate"><span class="pre">Filter</span></code> component, passing in our original <code class="docutils literal notranslate"><span class="pre">df</span></code>, which will tell the component what to filter on. The returned object is a <code class="docutils literal notranslate"><span class="pre">mk.gui.Component</span></code>, which can be rendered on our page. At the same time, it is a callable function that can be invoked on our <code class="docutils literal notranslate"><span class="pre">df</span></code> to filter it. We’ll see this later when creating the <code class="docutils literal notranslate"><span class="pre">Gallery</span></code>.</p>
+<!-- TODO: is this true? This is a common pattern in Meerkat, where components are both callable functions and `mk.gui.Component` objects. -->
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">filter</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="sort">
-<h2>📋 Sort<a class="headerlink" href="#sort" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">Sort</span></code> component works in nearly the identical way. Note that we have to create an additional <code class="docutils literal notranslate"><span class="pre">Store</span></code> object that will be tied to the <code class="docutils literal notranslate"><span class="pre">Sort</span></code> component. Again, the <code class="docutils literal notranslate"><span class="pre">sort</span></code> function is reactive because it is a <code class="docutils literal notranslate"><span class="pre">mk.gui.Component</span></code>, meaning it will automatically be invoked whenever there is a change to <code class="docutils literal notranslate"><span class="pre">sort_criteria</span></code>.</p>
-<p>TODO: make explanation better</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sort_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
-<span class="n">sort</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Sort</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">sort_criteria</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<p>The <code class="docutils literal notranslate"><span class="pre">Sort</span></code> component works in nearly the identical way.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sort</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Sort</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Lastly, we can create a <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> component, but instead of directly passing in the <code class="docutils literal notranslate"><span class="pre">df</span></code> object, we’ll first call the <code class="docutils literal notranslate"><span class="pre">sort</span></code> and <code class="docutils literal notranslate"><span class="pre">filter</span></code> components on it. These functions will automatically be triggered anytime the filters or sorts are changed, and our <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> will be updated accordingly in a reactive manner.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">sort</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </section>
 <section id="putting-it-all-together">
 <h2>🤲 Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
-<p>To combine all our components, we will stick them into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> using the <code class="docutils literal notranslate"><span class="pre">mk.gui.html.grid</span></code> component. The complete code is shown below.</p>
+<p>To render our components, we will stick all three into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> using the <code class="docutils literal notranslate"><span class="pre">mk.gui.html.grid</span></code> component. The complete code is shown below.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
 
-<span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
-
-<span class="n">filter_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
-<span class="nb">filter</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">filter_criteria</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-<span class="n">sort_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
-<span class="n">sort</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Sort</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">sort_criteria</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Filter</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+<span class="n">sort</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Sort</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+<span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">sort</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">df</span><span class="p">)),</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
 
 <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 <span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
@@ -869,6 +847,10 @@ title="Print to PDF"
     <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;filter-sort&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We can run this app with the following command (or in Jupyter Notebook, simply run the code cell):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>run<span class="w"> </span>filter-sort.py<span class="w"> </span>--dev
 </pre></div>
 </div>
 </section>

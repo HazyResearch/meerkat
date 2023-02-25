@@ -72,6 +72,6 @@ page = mk.gui.Page(component=gallery, id="gallery")
 page.launch()
 ```
 
-That's it! You can run this code either in a standalone `.py` file or directly in a Jupyter notebook. If running a `.py` file, follow the link in the terminal to view your app in the browser. If running in a Jupyter notebook, the app should show up in the cell's output.
+That's it! You can run this code either in a standalone `.py` file or directly in a Jupyter notebook. If running a `.py` file, use the command `mk run gallery.py --dev` and follow the link in the terminal to view your app in the browser. Any changes you make to the code will cause the page to automatically refresh. If running in a Jupyter notebook, the app should show up in the cell's output.
 
 🥳 Congratulations on building your first Meerkat GUI.
