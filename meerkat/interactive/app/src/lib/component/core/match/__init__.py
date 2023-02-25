@@ -24,6 +24,42 @@ _SUPPORTED_CALLS = {
 }
 
 
+@endpoint()
+def refine_match(
+    df: DataFrame, 
+    against: str,
+    match_column: str,
+    label_column: str,
+):
+    """
+    Refine a match, using feedback from the user.
+
+    Labels are +1 for a match, -1 for a non-match, and 0 for unlabeled.
+    """
+    # Train a logistic regression model to predict the label.
+    from sklearn.linear_model import LogisticRegression
+
+    # Mask for positive and negative labels.
+    mask_p = df[label_column] == 1
+    mask_n = df[label_column] == -1
+
+    # Embeddings
+    X = df[against][mask_p | mask_n]
+    y = df[label_column][mask_p | mask_n]
+
+    # Train a logistic regression model to predict the label.
+    model = LogisticRegression()
+    model.fit(X, y)
+
+    # Predict the label for all rows.
+    y_pred = model.predict(df[against])
+
+    # Update the match column.
+    df[f'{match_column}_refined'] = y_pred
+    df.set(df)
+
+
+
 def parse_query(query: str):
     return _parse_query(ast.parse(query, mode="eval").body)
 

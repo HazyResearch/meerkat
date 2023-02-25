@@ -175,12 +175,12 @@ class UploadCommand(Command):
             sys.exit(1)
 
         # Package static components to a tar file.
-        # self.status("Packaging static component build...")
-        # shutil.make_archive(
-        #     base_name=f"static-build-{VERSION}",
-        #     format="gztar",
-        #     root_dir="./meerkat/interactive/app/build",
-        # )
+        self.status("Packaging static component build...")
+        shutil.make_archive(
+            base_name=f"static-build-{VERSION}",
+            format="gztar",
+            root_dir="./meerkat/interactive/app/build",
+        )
 
         # # Push to huggingface
         # self.status("Uploading static build to huggingface...")

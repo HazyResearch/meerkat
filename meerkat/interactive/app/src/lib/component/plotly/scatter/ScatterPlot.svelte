@@ -59,8 +59,8 @@
 		<svelte:self {df} {x} {y} {config} {title} on_click={onClick} buffer={true} on:select />
 	{/if}
 {:then data}
-	<div class="flex flex-row align-middle justify-center mb-4 bg-transparent">
-		<div>
+	<!-- <div class="flex flex-row align-middle justify-center mb-4 bg-transparent">
+		<div> -->
 			<Plot
 				{data}
 				{layout}
@@ -75,6 +75,6 @@
 					eventDispatcher('select', { selected: selected });
 				}}
 			/>
-		</div>
-	</div>
+		<!-- </div>
+	</div> -->
 {/await}
