@@ -2,8 +2,9 @@ import inspect
 import types
 import weakref
 from collections import defaultdict
+import warnings
 from collections.abc import Mapping
-from functools import reduce
+from functools import reduce, wraps
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import dill
@@ -66,6 +67,29 @@ class classproperty(property):
 
     def __get__(self, owner_self, owner_cls):
         return self.fget(owner_cls)
+
+
+def deprecated(replacement: Optional[str] = None):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+
+    def _decorator(func):
+        @wraps(func)
+        def new_func(*args, **kwargs):
+            warnings.simplefilter("always", DeprecationWarning)  # turn off filter
+            warnings.warn(
+                "Call to deprecated function {}.".format(func.__name__) + ""
+                if new_func is None
+                else " Use {} instead.".format(replacement),
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
+            warnings.simplefilter("default", DeprecationWarning)  # reset filter
+            return func(*args, **kwargs)
+        return new_func
+
+    return _decorator
 
 
 class WeakMapping(Mapping):

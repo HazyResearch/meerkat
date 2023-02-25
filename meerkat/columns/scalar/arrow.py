@@ -3,9 +3,10 @@ from __future__ import annotations
 import os
 import warnings
 from typing import TYPE_CHECKING, List, Sequence, Set, Union
+import re
 
 import pyarrow as pa
-import pyarrow.compute as pac
+import pyarrow.compute as pc
 from pandas.core.accessor import CachedAccessor
 from pyarrow.compute import equal
 
@@ -31,12 +32,31 @@ class ArrowStringMethods(StringMethods):
             "utf8_center", width=width, padding=fillchar, **kwargs
         )
 
+    def extract(self, pat: str, **kwargs) -> "DataFrame":
+        from meerkat import DataFrame
+
+        # Pandas raises a value error if the pattern does not include a group
+        # but pyarrow does not. We check for this case and raise a value error.
+        if not re.search(r"\(\?P<\w+>", pat):
+            raise ValueError(
+                "Pattern does not contain capture group. Use '(?P<name>...)' instead"
+            )
+
+        struct_array = pc.extract_regex(self.column.data, pattern=pat, **kwargs)
+
+        result = {}
+        for field_index in range(struct_array.type.num_fields):
+            field = struct_array.type.field(field_index)
+            result[field.name] = self.column._clone(pc.struct_field(struct_array, field.name))
+
+        return DataFrame(result)
+
     def _split(
         self, pat=None, n=-1, reverse: bool = False, regex: bool = False, **kwargs
     ) -> "DataFrame":
         from meerkat import DataFrame
 
-        fn = pac.split_pattern_regex if regex else pac.split_pattern
+        fn = pc.split_pattern_regex if regex else pc.split_pattern
         list_array = fn(
             self.column.data,
             pattern=pat,
@@ -47,13 +67,13 @@ class ArrowStringMethods(StringMethods):
 
         # need to find the max length of the list array
         if n == -1:
-            n = pac.max(pac.list_value_length(list_array)).as_py() - 1
+            n = pc.max(pc.list_value_length(list_array)).as_py() - 1
 
         return DataFrame(
             {
                 str(i): self.column._clone(
-                    data=pac.list_flatten(
-                        pac.list_slice(
+                    data=pc.list_flatten(
+                        pc.list_slice(
                             list_array, start=i, stop=i + 1, return_fixed_size_list=True
                         )
                     )
@@ -111,7 +131,7 @@ class ArrowStringMethods(StringMethods):
         self, pat: str, repl: str, n: int = -1, regex: bool = False, **kwargs
     ) -> ScalarColumn:
 
-        fn = pac.replace_substring_regex if regex else pac.replace_substring
+        fn = pc.replace_substring_regex if regex else pc.replace_substring
         return self.column._clone(
             fn(
                 self.column.data,
@@ -123,7 +143,7 @@ class ArrowStringMethods(StringMethods):
         )
 
     def contains(self, pat: str, case: bool = True, regex: bool = True) -> ScalarColumn:
-        fn = pac.match_substring_regex if regex else pac.match_substring
+        fn = pc.match_substring_regex if regex else pc.match_substring
         return self.column._clone(
             fn(
                 self.column.data,
@@ -200,7 +220,7 @@ class ArrowScalarColumn(ScalarColumn):
     def is_equal(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
-        return pac.all(pac.equal(self.data, other.data)).as_py()
+        return pc.all(pc.equal(self.data, other.data)).as_py()
 
     @classmethod
     def _state_keys(cls) -> Set:
@@ -243,7 +263,7 @@ class ArrowScalarColumn(ScalarColumn):
     def equals(self, other: Column) -> bool:
         if other.__class__ != self.__class__:
             return False
-        return pac.all(pac.equal(self.data, other.data)).as_py()
+        return pc.all(pc.equal(self.data, other.data)).as_py()
 
     @property
     def dtype(self) -> pa.DataType:
@@ -287,7 +307,7 @@ class ArrowScalarColumn(ScalarColumn):
 
     def _dispatch_aggregation_function(self, compute_fn: str, **kwargs):
         kwargs = {self.KWARG_MAPPING.get(k, k): v for k, v in kwargs.items()}
-        out = getattr(pac, self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn))(
+        out = getattr(pc, self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn))(
             self.data, **kwargs
         )
         return out.as_py()
@@ -300,7 +320,7 @@ class ArrowScalarColumn(ScalarColumn):
             )
 
         # matching behavior of Pandas, get all counts, but only return top modes
-        struct_array = pac.mode(self.data, n=len(self), **kwargs)
+        struct_array = pc.mode(self.data, n=len(self), **kwargs)
         modes = []
         count = struct_array[0]["count"]
         for mode in struct_array:
@@ -311,7 +331,7 @@ class ArrowScalarColumn(ScalarColumn):
 
     def median(self, skipna: bool = True, **kwargs) -> any:
         warnings.warn("Arrow backend computes an approximate median.")
-        return pac.approximate_median(self.data, skip_nulls=skipna).as_py()
+        return pc.approximate_median(self.data, skip_nulls=skipna).as_py()
 
     def _dispatch_arithmetic_function(
         self, other: ScalarColumn, compute_fn: str, right: bool, **kwargs
@@ -322,12 +342,10 @@ class ArrowScalarColumn(ScalarColumn):
 
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
         if right:
-            out = self._clone(data=getattr(pac, compute_fn)(other, self.data, **kwargs))
+            out = self._clone(data=getattr(pc, compute_fn)(other, self.data, **kwargs))
             return out
         else:
-            return self._clone(
-                data=getattr(pac, compute_fn)(self.data, other, **kwargs)
-            )
+            return self._clone(data=getattr(pc, compute_fn)(self.data, other, **kwargs))
 
     def _true_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
         if isinstance(other, Column):
@@ -342,9 +360,9 @@ class ArrowScalarColumn(ScalarColumn):
             other = pa.scalar(other, type=pa.float64())
 
         if right:
-            return self._clone(pac.divide(other, self.data), **kwargs)
+            return self._clone(pc.divide(other, self.data), **kwargs)
         else:
-            return self._clone(pac.divide(self.data, other), **kwargs)
+            return self._clone(pc.divide(self.data, other), **kwargs)
 
     def __truediv__(self, other: ScalarColumn):
         return self._true_div(other, right=False)
@@ -354,7 +372,7 @@ class ArrowScalarColumn(ScalarColumn):
 
     def _floor_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
         _true_div = self._true_div(other, right=right, **kwargs)
-        return _true_div._clone(data=pac.floor(_true_div.data))
+        return _true_div._clone(data=pc.floor(_true_div.data))
 
     def __floordiv__(self, other: ScalarColumn):
         return self._floor_div(other, right=False)
@@ -376,7 +394,7 @@ class ArrowScalarColumn(ScalarColumn):
             other = other.data
 
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
-        return self._clone(data=getattr(pac, compute_fn)(self.data, other, **kwargs))
+        return self._clone(data=getattr(pc, compute_fn)(self.data, other, **kwargs))
 
     def _dispatch_logical_function(
         self, other: ScalarColumn, compute_fn: str, **kwargs
@@ -388,17 +406,17 @@ class ArrowScalarColumn(ScalarColumn):
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
 
         if other is None:
-            return self._clone(data=getattr(pac, compute_fn)(self.data, **kwargs))
-        return self._clone(data=getattr(pac, compute_fn)(self.data, other, **kwargs))
+            return self._clone(data=getattr(pc, compute_fn)(self.data, **kwargs))
+        return self._clone(data=getattr(pc, compute_fn)(self.data, other, **kwargs))
 
     def isin(self, values: Union[List, Set], **kwargs) -> ScalarColumn:
-        return self._clone(data=pac.is_in(self.data, pa.array(values), **kwargs))
+        return self._clone(data=pc.is_in(self.data, pa.array(values), **kwargs))
 
     def _dispatch_unary_function(
         self, compute_fn: str, _namespace: str = None, **kwargs
     ):
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
-        return self._clone(data=getattr(pac, compute_fn)(self.data, **kwargs))
+        return self._clone(data=getattr(pc, compute_fn)(self.data, **kwargs))
 
     def isnull(self, **kwargs) -> ScalarColumn:
-        return self._clone(data=pac.is_null(self.data, nan_is_null=True, **kwargs))
+        return self._clone(data=pc.is_null(self.data, nan_is_null=True, **kwargs))

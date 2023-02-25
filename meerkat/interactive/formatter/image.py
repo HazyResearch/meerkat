@@ -46,14 +46,15 @@ class ImageFormatter(BaseFormatter):
 
 
 class ImageFormatterGroup(FormatterGroup):
+    formatter_class: type = ImageFormatter
     def __init__(self, classes: str = ""):
         super().__init__(
             icon=IconFormatter(name="Image"),
-            base=ImageFormatter(classes=classes),
-            tiny=ImageFormatter(max_size=[32, 32], classes=classes),
-            small=ImageFormatter(max_size=[64, 64], classes=classes),
-            thumbnail=ImageFormatter(max_size=[256, 256], classes=classes),
-            gallery=ImageFormatter(
+            base=self.formatter_class(classes=classes),
+            tiny=self.formatter_class(max_size=[32, 32], classes=classes),
+            small=self.formatter_class(max_size=[64, 64], classes=classes),
+            thumbnail=self.formatter_class(max_size=[256, 256], classes=classes),
+            gallery=self.formatter_class(
                 max_size=[512, 512], classes="h-full w-full" + " " + classes
             ),
         )
@@ -69,3 +70,7 @@ class DeferredImageFormatter(ImageFormatter):
         else:
             image = image()
             return super()._encode(image, thumbnail=thumbnail)
+
+
+class DeferredImageFormatterGroup(ImageFormatterGroup):
+    formatter_class: type = DeferredImageFormatter

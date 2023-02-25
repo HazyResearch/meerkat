@@ -9,7 +9,7 @@ class PDFFormatter(Formatter):
     component_class: type = PDF
     data_prop: str = "data"
 
-    def encode(self, data: str) -> str:
+    def encode(self, data: bytes) -> str:
         return data
 
 

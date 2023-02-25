@@ -7,7 +7,7 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 # Data loading.
 imagenette = mk.get("imagenette", version="160px")
 df = mk.DataFrame.read(
-    "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz"
+    "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",
 )
 df = imagenette.merge(df[["img_id", "logits", "pred"]], on="img_id")
 
@@ -101,17 +101,14 @@ plot = mk.gui.plotly.ScatterPlot(
 )
 
 
-component = html.flex(
+component = html.div(
     [
-        html.flexcol([match, filter, gallery]),
-        html.flexcol([select_container, plot]),
+        html.flexcol([match, filter, select_container, plot], classes="h-full"),
+        html.div([gallery], classes="h-full"),
     ],
-    classes="gap-4",
+    # Make a grid with two equal sized columns.
+    classes="h-full grid grid-cols-2 gap-4",
 )
 
-page = mk.gui.Page(
-    component=component,
-    id="error-analysis",
-    progress=False,
-)
+page = mk.gui.Page(component, id="error-analysis", progress=False)
 page.launch()
