@@ -24,7 +24,7 @@ def infer_modality(col: mk.Column):
         return "image"
     elif isinstance(col, (mk.ScalarColumn, str)):
         return "text"
-    elif isinstance(col, mk.ArrowArrayColumn):
+    elif isinstance(col, mk.ArrowScalarColumn):
         import pyarrow
 
         if isinstance(col[0], pyarrow.lib.StringScalar):

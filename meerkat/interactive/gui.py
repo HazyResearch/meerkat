@@ -47,6 +47,23 @@ class DataFrameGUI(GUI):
             id="gallery",
             progress=False,
         ).launch()
+    
+    def match(
+        self,
+        against: str,
+        main_column: str = None,
+        **kwargs,
+    ) -> IFrame:
+        _match = mk.gui.Match(self.df, against=against, **kwargs)
+        with mk.magic():
+            df = mk.sort(self.df, by=_match.criterion.name, ascending=False)
+        gallery = mk.gui.Gallery(df, main_column=main_column)
+
+        return mk.gui.Page(
+            mk.gui.html.div([_match, gallery]),
+            id="match",
+            progress=False,
+        ).launch()
 
 
 class SliceByGUI(GUI):
