@@ -11,7 +11,7 @@
 	let:toggle
 >
 	<NavBrand href="{base}/">
-		<img src="favicon.png" class="mr-3 h-10" alt="Meerkat Logo" />
+		<img src="{base}/favicon.png" class="mr-3 h-10" alt="Meerkat Logo" />
 		<span class="text-violet-700 self-center whitespace-nowrap text-2xl font-light dark:text-white">
 			Meerkat
 		</span>

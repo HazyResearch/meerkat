@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
 	import Card from './Card.svelte';
 </script>
 
@@ -253,7 +254,7 @@
 				>
 					<a href="https://cs.stanford.edu">
 						<img
-							src="SUSig_2color_Stree_StnfrdOnly_Left.png"
+							src="{base}/SUSig_2color_Stree_StnfrdOnly_Left.png"
 							alt="Stanford University Logo"
 							class="w-full h-full"
 						/>
