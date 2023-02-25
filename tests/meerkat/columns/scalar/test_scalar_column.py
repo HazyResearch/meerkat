@@ -484,7 +484,7 @@ STRING_COLUMNS = [
 @product_parametrize(
     {
         "backend": BACKENDS,
-        "column": STRING_COLUMNS,
+        "series": STRING_COLUMNS,
         "compute_fn": [
             "capitalize",
             "isalnum",
@@ -508,52 +508,52 @@ STRING_COLUMNS = [
         ],
     }
 )
-def test_unary_str_methods(backend: str, column: pd.Series, compute_fn: str):
-    col = ScalarColumn(column, backend=backend)
+def test_unary_str_methods(backend: str, series: pd.Series, compute_fn: str):
+    col = ScalarColumn(series, backend=backend)
     out = getattr(col.str, compute_fn)()
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(getattr(column.str, compute_fn)(), backend=backend))
+    assert out.equals(ScalarColumn(getattr(series.str, compute_fn)(), backend=backend))
 
 
 # @product_parameterize(
 #     {
 #         "backend": BACKENDS,
-#         "column": STRING_COLUMNS,
+#         "series": STRING_COLUMNS,
 #         "compute_fn": [
 #         ]
 #     }
 # )
-# def test_pattern_str_methods(backend: str, column: pd.Series, compute_fn: str):
-#     col = ScalarColumn(column, backend=backend)
+# def test_pattern_str_methods(backend: str, series: pd.Series, compute_fn: str):
+#     col = ScalarColumn(series, backend=backend)
 #     out = getattr(col.str, compute_fn)()
 #     assert isinstance(out, ScalarColumn)
 #     assert out.equals(
-#         ScalarColumn(getattr(column.str, compute_fn)(), backend=backend)
+#         ScalarColumn(getattr(series.str, compute_fn)(), backend=backend)
 #     )
 
 
 @product_parametrize(
     {
         "backend": BACKENDS,
-        "column": STRING_COLUMNS,
+        "series": STRING_COLUMNS,
     }
 )
-def test_center(backend: str, column: pd.Series):
-    col = ScalarColumn(column, backend=backend)
+def test_center(backend: str, series: pd.Series):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.center(20)
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(column.str.center(20), backend=backend))
+    assert out.equals(ScalarColumn(series.str.center(20), backend=backend))
 
 
-@product_parametrize({"backend": BACKENDS, "column": STRING_COLUMNS, "n": [-1, 1, 2]})
-def test_split(backend: str, column: pd.Series, n: int):
-    col = ScalarColumn(column, backend=backend)
+@product_parametrize({"backend": BACKENDS, "series": STRING_COLUMNS, "n": [-1, 1, 2]})
+def test_split(backend: str, series: pd.Series, n: int):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.split(" ", n=n)
     assert isinstance(out, DataFrame)
     correct_df = DataFrame(
         {
             str(name): ScalarColumn(col, backend=backend)
-            for name, col in column.str.split(" ", n=n, expand=True).items()
+            for name, col in series.str.split(" ", n=n, expand=True).items()
         }
     )
     assert correct_df.columns == out.columns
@@ -561,15 +561,15 @@ def test_split(backend: str, column: pd.Series, n: int):
         assert correct_df[name].equals(out[name])
 
 
-@product_parametrize({"backend": BACKENDS, "column": STRING_COLUMNS, "n": [-1, 1, 2]})
-def test_rsplit(backend: str, column: pd.Series, n: int):
-    col = ScalarColumn(column, backend=backend)
+@product_parametrize({"backend": BACKENDS, "series": STRING_COLUMNS, "n": [-1, 1, 2]})
+def test_rsplit(backend: str, series: pd.Series, n: int):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.rsplit(" ", n=n)
     assert isinstance(out, DataFrame)
     correct_df = DataFrame(
         {
             str(name): ScalarColumn(col, backend=backend)
-            for name, col in column.str.rsplit(" ", n=n, expand=True).items()
+            for name, col in series.str.rsplit(" ", n=n, expand=True).items()
         }
     )
     assert correct_df.columns == out.columns
@@ -580,37 +580,63 @@ def test_rsplit(backend: str, column: pd.Series, n: int):
 @product_parametrize(
     {
         "backend": BACKENDS,
-        "column": STRING_COLUMNS,
+        "series": STRING_COLUMNS,
     }
 )
-def test_center(backend: str, column: pd.Series):
-    col = ScalarColumn(column, backend=backend)
+def test_center(backend: str, series: pd.Series):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.startswith("1290")
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(column.str.startswith("1290"), backend=backend))
+    assert out.equals(ScalarColumn(series.str.startswith("1290"), backend=backend))
 
 
 @product_parametrize(
     {
         "backend": BACKENDS,
-        "column": STRING_COLUMNS,
+        "series": STRING_COLUMNS,
     }
 )
-def test_replace(backend: str, column: pd.Series):
-    col = ScalarColumn(column, backend=backend)
+def test_replace(backend: str, series: pd.Series):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.replace("di", "do")
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(column.str.replace("di", "do"), backend=backend))
+    assert out.equals(ScalarColumn(series.str.replace("di", "do"), backend=backend))
 
 
 @product_parametrize(
     {
         "backend": BACKENDS,
-        "column": STRING_COLUMNS,
+        "series": STRING_COLUMNS,
     }
 )
-def test_contains(backend: str, column: pd.Series):
-    col = ScalarColumn(column, backend=backend)
+def test_contains(backend: str, series: pd.Series):
+    col = ScalarColumn(series, backend=backend)
     out = col.str.contains("di")
     assert isinstance(out, ScalarColumn)
-    assert out.equals(ScalarColumn(column.str.contains("di"), backend=backend))
+    assert out.equals(ScalarColumn(series.str.contains("di"), backend=backend))
+
+
+@product_parametrize(
+    {
+        "backend": BACKENDS,
+        "series": STRING_COLUMNS,
+        "pat": ["[0-9]+", "(?P<group1>[0-9])(?P<group2>2)"],
+    }
+)
+def test_extract(backend: str, pat: str, series: pd.Series):
+    col = ScalarColumn(series, backend=backend)
+    contains_groups = True
+    try:
+        correct_df = series.str.extract(pat, expand=True)
+        
+    except ValueError:
+        contains_groups = False
+
+    if contains_groups:
+        out = col.str.extract(pat)
+        assert isinstance(out, DataFrame)
+        for name in correct_df.columns:
+            assert out[name].equals(ScalarColumn(correct_df[name], backend=backend))
+    else:
+        with pytest.raises(ValueError):     
+            out = col.str.extract(pat)

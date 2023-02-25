@@ -126,6 +126,18 @@ class PandasStringMethods(StringMethods):
             }
         )
 
+    def extract(self, pat: str, **kwargs) -> "DataFrame":
+        from meerkat import DataFrame
+
+        return DataFrame(
+            {
+                str(name): self.column._clone(data=col)
+                for name, col in self.column.data.str.extract(
+                    pat, expand=True, **kwargs
+                ).items()
+            }
+        )
+
 
 class _MeerkatDatetimeProperties(_ReturnColumnMixin, DatetimeProperties):
     pass

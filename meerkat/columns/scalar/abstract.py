@@ -149,6 +149,7 @@ class StringMethods:
         return self.column._dispatch_unary_function(
             "extract", _namespace="str", pat=pat, **kwargs
         )
+    
 
 
 class ScalarColumn(Column):
