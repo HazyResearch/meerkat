@@ -702,6 +702,42 @@ title="Open an issue"
 <span class="p">}</span>
 
 
+<span class="nd">@endpoint</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">refine_match</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
+    <span class="n">against</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">match_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">label_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Refine a match, using feedback from the user.</span>
+
+<span class="sd">    Labels are +1 for a match, -1 for a non-match, and 0 for unlabeled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Train a logistic regression model to predict the label.</span>
+    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+    <span class="c1"># Mask for positive and negative labels.</span>
+    <span class="n">mask_p</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">label_column</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">mask_n</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">label_column</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="c1"># Embeddings</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">against</span><span class="p">][</span><span class="n">mask_p</span> <span class="o">|</span> <span class="n">mask_n</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">label_column</span><span class="p">][</span><span class="n">mask_p</span> <span class="o">|</span> <span class="n">mask_n</span><span class="p">]</span>
+
+    <span class="c1"># Train a logistic regression model to predict the label.</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># Predict the label for all rows.</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">against</span><span class="p">])</span>
+
+    <span class="c1"># Update the match column.</span>
+    <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">match_column</span><span class="si">}</span><span class="s1">_refined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_pred</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+
+
 <span class="k">def</span> <span class="nf">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_parse_query</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;eval&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
 

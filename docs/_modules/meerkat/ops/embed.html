@@ -702,7 +702,7 @@ title="Open an issue"
         <span class="k">return</span> <span class="s2">&quot;image&quot;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="p">(</span><span class="n">mk</span><span class="o">.</span><span class="n">ScalarColumn</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
         <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">ArrowArrayColumn</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">ArrowScalarColumn</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">pyarrow</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">StringScalar</span><span class="p">):</span>
