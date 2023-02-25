@@ -32,6 +32,10 @@ nbclient.exceptions.CellTimeoutError: A cell timed out while it was being execut
 The message was: Cell execution timed out.
 Here is a preview of the cell contents:
 -------------------
-valid_df = df.filter(lambda split: split == "valid")
+from meerkat.datasets.imagenette import download_imagenette
+
+dataset_dir = "./downloads"
+os.makedirs(dataset_dir, exist_ok=True)
+download_imagenette(dataset_dir, overwrite=True);
 -------------------
 
