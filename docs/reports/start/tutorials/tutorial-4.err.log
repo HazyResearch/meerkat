@@ -17,22 +17,15 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import meerkat as mk
-import rich
-
+IMAGE_COLUMN = "img"
 df = mk.get("imagenette", version="160px")
-IMAGE_COL = "img"
-LABEL_COL = "label"
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mFileNotFoundError[0m                         Traceback (most recent call last)
-Cell [0;32mIn[1], line 4[0m
-[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mmeerkat[39;00m [38;5;28;01mas[39;00m [38;5;21;01mmk[39;00m
-[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mrich[39;00m
-[0;32m----> 4[0m df [38;5;241m=[39m [43mmk[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mimagenette[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mversion[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m160px[39;49m[38;5;124;43m"[39;49m[43m)[49m
-[1;32m      5[0m IMAGE_COL [38;5;241m=[39m [38;5;124m"[39m[38;5;124mimg[39m[38;5;124m"[39m
-[1;32m      6[0m LABEL_COL [38;5;241m=[39m [38;5;124m"[39m[38;5;124mlabel[39m[38;5;124m"[39m
+Cell [0;32mIn[2], line 2[0m
+[1;32m      1[0m IMAGE_COLUMN [38;5;241m=[39m [38;5;124m"[39m[38;5;124mimg[39m[38;5;124m"[39m
+[0;32m----> 2[0m df [38;5;241m=[39m [43mmk[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mimagenette[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mversion[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m160px[39;49m[38;5;124;43m"[39;49m[43m)[49m
 
 File [0;32m~/work/meerkat/meerkat/meerkat/datasets/__init__.py:78[0m, in [0;36mget[0;34m(name, dataset_dir, version, download_mode, registry, **kwargs)[0m
 [1;32m     76[0m [38;5;28;01mif[39;00m registry [38;5;241m==[39m [38;5;124m"[39m[38;5;124mmeerkat[39m[38;5;124m"[39m:

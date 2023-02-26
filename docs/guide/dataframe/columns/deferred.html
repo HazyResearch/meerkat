@@ -802,9 +802,7 @@ title="Print to PDF"
 </div>
 <p>Unlike other columns, deferred columns are <strong>callable</strong>. When we call a deferred column, we apply the function to the underlying column.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [6]: </span><span class="n">small_dcol</span><span class="p">()</span>
-<span class="go">&gt; /home/runner/work/meerkat/meerkat/meerkat/columns/deferred/base.py(71)__call__()</span>
-<span class="go">-&gt; return _materialize(</span>
-<span class="go">(Pdb) </span>
+<span class="gh">Out[6]: </span><span class="go">column([10, 11, 12, 13, 14], backend=PandasScalarColumn</span>
 </pre></div>
 </div>
 <p>Critically, the function inside a deferred column is called neither on creation or selection, but only later once the column is called! This is very useful for columns with large data types that we don’t want to load all into memory at once. For example, we could create a <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a> that lazily loads images…</p>

@@ -178,10 +178,10 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[
 [1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
 [0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:170[0m, in [0;36mDeferredColumn._get_default_formatters[0;34m(self)[0m
-[1;32m    167[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01minteractive[39;00m[38;5;21;01m.[39;00m[38;5;21;01mformatter[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m [38;5;28;01mimport[39;00m deferred_formatter_group
-[1;32m    169[0m col [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_get(index[38;5;241m=[39m[38;5;28mslice[39m([38;5;241m0[39m, [38;5;241m1[39m, [38;5;241m1[39m), materialize[38;5;241m=[39m[38;5;28;01mTrue[39;00m)
-[0;32m--> 170[0m [38;5;28;01mreturn[39;00m deferred_formatter_group([43mcol[49m[38;5;241;43m.[39;49m[43mformatters[49m)
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:169[0m, in [0;36mDeferredColumn._get_default_formatters[0;34m(self)[0m
+[1;32m    166[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01minteractive[39;00m[38;5;21;01m.[39;00m[38;5;21;01mformatter[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m [38;5;28;01mimport[39;00m deferred_formatter_group
+[1;32m    168[0m col [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_get(index[38;5;241m=[39m[38;5;28mslice[39m([38;5;241m0[39m, [38;5;241m1[39m, [38;5;241m1[39m), materialize[38;5;241m=[39m[38;5;28;01mTrue[39;00m)
+[0;32m--> 169[0m [38;5;28;01mreturn[39;00m deferred_formatter_group([43mcol[49m[38;5;241;43m.[39;49m[43mformatters[49m)
 
 [0;31mAttributeError[0m: 'numpy.ndarray' object has no attribute 'formatters'
 AttributeError: 'numpy.ndarray' object has no attribute 'formatters'

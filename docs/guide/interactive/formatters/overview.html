@@ -900,7 +900,7 @@ Each formatter, specifies optional parameters that can be used to configure how 
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "a8c6f56257a845799f115b466bf85d4e"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "19b7ccd397214eada403706300f04676"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
@@ -969,58 +969,22 @@ Each formatter, specifies optional parameters that can be used to configure how 
 <span class="g g-Whitespace">    </span><span class="mi">586</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;storing </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> in cache at </span><span class="si">{</span><span class="n">cache_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">    </span><span class="mi">587</span> <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">temp_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/datasets/utils/file_utils.py:379,</span> in <span class="ni">http_get</span><span class="nt">(url, temp_file, proxies, resume_size, headers, cookies, timeout, max_retries, desc)</span>
-<span class="g g-Whitespace">    </span><span class="mi">370</span> <span class="n">total</span> <span class="o">=</span> <span class="n">resume_size</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">content_length</span><span class="p">)</span> <span class="k">if</span> <span class="n">content_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/datasets/utils/file_utils.py:380,</span> in <span class="ni">http_get</span><span class="nt">(url, temp_file, proxies, resume_size, headers, cookies, timeout, max_retries, desc)</span>
 <span class="g g-Whitespace">    </span><span class="mi">371</span> <span class="k">with</span> <span class="n">logging</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
 <span class="g g-Whitespace">    </span><span class="mi">372</span>     <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
 <span class="g g-Whitespace">    </span><span class="mi">373</span>     <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="g g-Whitespace">    </span><span class="mi">377</span>     <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">logging</span><span class="o">.</span><span class="n">is_progress_bar_enabled</span><span class="p">(),</span>
 <span class="g g-Whitespace">    </span><span class="mi">378</span> <span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">379</span>     <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span>         <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">380</span>         <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>
 <span class="g g-Whitespace">    </span><span class="mi">381</span>         <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/requests/models.py:816,</span> in <span class="ni">Response.iter_content.&lt;locals&gt;.generate</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">814</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span> <span class="s2">&quot;stream&quot;</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">815</span>     <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">816</span>         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">decode_content</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">817</span>     <span class="k">except</span> <span class="n">ProtocolError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">818</span>         <span class="k">raise</span> <span class="n">ChunkedEncodingError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:628,</span> in <span class="ni">HTTPResponse.stream</span><span class="nt">(self, amt, decode_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">626</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">627</span>     <span class="k">while</span> <span class="ow">not</span> <span class="n">is_fp_closed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fp</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">628</span>         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">amt</span><span class="o">=</span><span class="n">amt</span><span class="p">,</span> <span class="n">decode_content</span><span class="o">=</span><span class="n">decode_content</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">630</span>         <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">631</span>             <span class="k">yield</span> <span class="n">data</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:556,</span> in <span class="ni">HTTPResponse.read</span><span class="nt">(self, amt, decode_content, cache_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">535</span> <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decode_content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_content</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">536</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">537</span><span class="sd">     Similar to :meth:`http.client.HTTPResponse.read`, but with two additional</span>
-<span class="g g-Whitespace">    </span><span class="mi">538</span><span class="sd">     parameters: ``decode_content`` and ``cache_content``.</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">554</span><span class="sd">         set.)</span>
-<span class="g g-Whitespace">    </span><span class="mi">555</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">556</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_init_decoder</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">557</span>     <span class="k">if</span> <span class="n">decode_content</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">558</span>         <span class="n">decode_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_content</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:381,</span> in <span class="ni">HTTPResponse._init_decoder</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">376</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">377</span><span class="sd"> Set-up the _decoder attribute if necessary.</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span> <span class="c1"># Note: content-encoding value should be case-insensitive, per RFC 7230</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span> <span class="c1"># Section 3.2</span>
-<span class="ne">--&gt; </span><span class="mi">381</span> <span class="n">content_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">382</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">383</span>     <span class="k">if</span> <span class="n">content_encoding</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONTENT_DECODERS</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/_collections_abc.py:662,</span> in <span class="ni">Mapping.get</span><span class="nt">(self, key, default)</span>
-<span class="g g-Whitespace">    </span><span class="mi">660</span>     <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">661</span> <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">662</span>     <span class="k">return</span> <span class="n">default</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/notebook.py:270,</span> in <span class="ni">tqdm_notebook.update</span><span class="nt">(self, n)</span>
+<span class="g g-Whitespace">    </span><span class="mi">269</span> <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">270</span>     <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">271</span>         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">tqdm_notebook</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">272</span>     <span class="c1"># NB: except ... [ as ...] breaks IPython async KeyboardInterrupt</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>

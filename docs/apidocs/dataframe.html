@@ -2787,9 +2787,7 @@ which each person lives.</p>
 </div>
 <p>We can materialize the deferred map (<em>i.e.</em> run it) by calling the column.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [6]: </span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]()</span>
-<span class="go">&gt; /home/runner/work/meerkat/meerkat/meerkat/columns/deferred/base.py(71)__call__()</span>
-<span class="go">-&gt; return _materialize(</span>
-<span class="go">(Pdb) </span>
+<span class="gh">Out[6]: </span><span class="go">column([56, 30, 13, 38, 16, 33, ...], backend=PandasScalarColumn</span>
 </pre></div>
 </div>
 <p><strong>Multiple input columns.</strong> Lazily create a column of birth years to a column of
@@ -2800,9 +2798,7 @@ ages.</p>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [8]: </span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">]()</span>
-<span class="go">&gt; /home/runner/work/meerkat/meerkat/meerkat/columns/deferred/base.py(71)__call__()</span>
-<span class="go">-&gt; return _materialize(</span>
-<span class="go">(Pdb) </span>
+<span class="gh">Out[8]: </span><span class="go">column([True, False, False, False, False, True, ...], backend=PandasScalarColumn</span>
 </pre></div>
 </div>
 </dd></dl>
