@@ -8,9 +8,9 @@ Components are the main abstraction for building user interfaces in Meerkat.
 ## Creating a Component
 To use a component in Meerkat, just import and initialize it. For example, the `Slider` component allows you to create a slider that can be used to select a value from a range of values.
 
-````{margin}
+```{margin}
 `on_change` is an endpoint that will be run when the slider value changes. All endpoint component attributes have the form `on_<event>` in Meerkat.
-````
+```
 
 ```python
 slider = Slider(
@@ -22,17 +22,17 @@ slider = Slider(
 )
 ```
 
-````{margin}
+```{margin}
 *If you have ideas for new components you would like to be able to use within Meerkat, let us know on [Github](https://github.com/hazyresearch/meerkat/issues) or [Discord](https://discord.gg/pw8E4Q26Tq)!*
-````
+```
 
 Meerkat ships with a variety of components that you can use out-of-the-box, ranging from low-level HTML elements like `div` and `p`, to basic widgets like `Slider` and `Textbox`, to complex components like `Gallery`. A list of the components available in Meerkat can be found [here](builtins.rst).
 
 
 ## Understanding Components
-````{margin}
+```{margin}
 The base class for all components is the `BaseComponent` class. `Component` inherits from `BaseComponent` with sensible defaults. In rare circumstances, you may need to subclass `BaseComponent` instead of `Component`.
-````
+```
 Components are defined as subclasses of the `Component` class, which takes care of most of the boilerplate for you.
 Let's take a look at how the `Slider` component is implemented to understand how components work in Meerkat. 
 
@@ -105,7 +105,7 @@ text = Text(slider.value)
 ```
 Here, you simply pass the `Store` object `slider.value` to the `Text` component. The `Text` component will automatically update whenever the value of the `slider.value` store changes.
 
-````{margin}
+```{margin}
 If you're curious, this layout will end up looking something like this on the frontend.
 ```html
 <div class="flex flex-col">
@@ -114,7 +114,7 @@ If you're curious, this layout will end up looking something like this on the fr
 </div>
 ```
 Meerkat will do this automatically, so don't worry about it.
-````
+```
 
 Meerkat includes a subset of `html` tags that are quite useful when you want to layout components. For example, you can use the `div` component to create a `div` element that contains the `slider` and `text` components we just created.
 

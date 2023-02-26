@@ -1,3 +1,5 @@
+(components_index)=
+
 # Components
 
 Components are the building blocks of interactive user interfaces in Meerkat.

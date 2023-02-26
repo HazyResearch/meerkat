@@ -1,10 +1,10 @@
-Displaying dataframes
+Displaying data frames
 =====================
 
 :class:`mk.gui.Gallery`
 -----------------------
 
-:class:`mk.gui.Gallery` is is view-only component that allows you to visualize your dataframe in a gallery.
+:class:`mk.gui.Gallery` is is view-only component that allows you to visualize your data frame in a gallery.
 You can visualize your data along with your metadata for fast visual inspection.
 
 Each example displayed in the gallery can be expanded as a modal by double clicking on the example.
@@ -14,7 +14,7 @@ The modal displays the data and metadata for the example.
 :class:`mk.gui.Table`
 ---------------------
 
-:class:`mk.gui.Table` is also a view-only component that displays the dataframe as a table.
+:class:`mk.gui.Table` is also a view-only component that displays the data frame as a table.
 
 Example
 -------

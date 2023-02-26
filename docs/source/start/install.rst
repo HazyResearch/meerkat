@@ -34,8 +34,7 @@ Installation
             
                 pip install meerkat-ml[all] 
                 
-            You can also install specific
-            groups optional of dependencies using something like: 
+            You can also install specific groups of optional of dependencies using something like: 
 
             .. code-block:: bash
             
@@ -50,7 +49,7 @@ Installation
 
         .. code-block:: bash
 
-            pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@main"
+            pip install "meerkat-ml @ git+https://github.com/HazyResearch/meerkat@main"
 
         .. dropdown:: Optional Dependencies
         
@@ -59,13 +58,13 @@ Installation
 
             .. code-block:: bash
 
-                pip install "meerkat-ml[all] @ git+https://github.com/robustness-gym/meerkat@main"
+                pip install "meerkat-ml[all] @ git+https://github.com/HazyResearch/meerkat@main"
             
-            You can also install specific groups optional of dependencies using something like: 
+            You can also install specific groups of optional of dependencies using something like: 
 
             .. code-block:: bash
 
-                pip install "meerkat-ml[vision,text] @ git+https://github.com/robustness-gym/meerkat@main"
+                pip install "meerkat-ml[vision,text] @ git+https://github.com/HazyResearch/meerkat@main"
                 
             See `setup.py` for a full list of optional dependencies.   
 
@@ -76,7 +75,7 @@ Installation
 
         .. code-block:: bash
 
-            git clone https://github.com/hazyresearch/meerkat.git
+            git clone https://github.com/HazyResearch/meerkat.git
             cd meerkat
             pip install -e .
 
@@ -89,7 +88,7 @@ Installation
 
                 pip install -e .[dev]
             
-            You can also install specific groups optional of dependencies using something like: 
+            You can also install specific groups of optional of dependencies using something like: 
 
             .. code-block:: bash
 

@@ -6,8 +6,8 @@ kernelspec:
 
 # Introduction to DataFrames 
 
-Meerkat provides two data structures, the column and the dataframe, that together help 
-you build, manage, and explore machine learning datasets . Everything you do with Meerkat will 
+Meerkat provides two data structures, the column and the data frame, that together help 
+you build, manage, and explore machine learning datasets. Everything you do with Meerkat will 
 involve one or both of these data structures, so we begin this user guide with their
 high-level introduction. 
 

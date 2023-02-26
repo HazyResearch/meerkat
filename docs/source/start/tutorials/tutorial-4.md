@@ -15,7 +15,7 @@ To get started, run the tutorial demo script.
 mk demo match
 ```
 
-You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.
+You should see the tutorial app when you open the link in your browser. Let's break down the code in the demo script.
 
 ## Installing dependencies
 This tutorial has additional dependencies that you need to install. Run the following command to install them.

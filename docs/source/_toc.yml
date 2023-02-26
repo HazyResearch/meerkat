@@ -51,14 +51,14 @@ parts:
             file: guide/reactive/concepts
           - file: guide/reactive/user-guide
           # - file: guide/reactive/examples
-          # - file: guide/reactive/faq
+          # - file: guide/reactive/faqs
           - file: guide/reactive/inbuilts
 
       - title: Stores
         file: guide/store/getting-started
         sections:
           # - file: guide/store/user-guide
-          - file: guide/store/faq
+          - file: guide/store/faqs
 
       - title: Components
         file: guide/components/index
