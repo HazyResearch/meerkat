@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a7</title>
+    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a12</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -87,7 +87,7 @@
       <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.2.6a7</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a12</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -1116,7 +1116,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "6bbf6cf24c024ce2b109994b3166f7dc"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "b94b20a52b054649bdaf12954a5b7945"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -1598,12 +1598,13 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:57,</span> in <span class="ni">CloneableMixin._clone</span><span class="nt">(self, data, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">54</span>     <span class="n">obj</span><span class="o">.</span><span class="n">_init_node</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
-<span class="ne">---&gt; </span><span class="mi">57</span>     <span class="n">obj</span><span class="o">.</span><span class="n">_set_id</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>     <span class="n">obj</span><span class="o">.</span><span class="n">_set_inode</span><span class="p">()</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:49,</span> in <span class="ni">CloneableMixin._clone</span><span class="nt">(self, data, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">46</span> <span class="n">state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">49</span> <span class="n">obj</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> <span class="n">obj</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ProvenanceMixin</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="c1"># need to create a node for the object</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -1627,18 +1628,16 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/identifiable.py:39,</span> in <span class="ni">IdentifiableMixin._set_id</span><span class="nt">(self, id)</span>
-<span class="g g-Whitespace">     </span><span class="mi">36</span> <span class="k">def</span> <span class="nf">_set_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span>     <span class="c1"># get uuid as str</span>
-<span class="g g-Whitespace">     </span><span class="mi">38</span>     <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="ne">---&gt; </span><span class="mi">39</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_self_id</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_self_id</span> <span class="o">=</span> <span class="nb">id</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:78,</span> in <span class="ni">CloneableMixin._set_state</span><span class="nt">(self, state)</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span> <span class="k">def</span> <span class="nf">_set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">78</span>     <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/uuid.py:782,</span> in <span class="ni">uuid4</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">780</span> <span class="k">def</span> <span class="nf">uuid4</span><span class="p">():</span>
-<span class="g g-Whitespace">    </span><span class="mi">781</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Generate a random UUID.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">782</span>     <span class="k">return</span> <span class="n">UUID</span><span class="p">(</span><span class="nb">bytes</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="n">version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/reactifiable.py:60,</span> in <span class="ni">ReactifiableMixin.__getattribute__</span><span class="nt">(self, name)</span>
+<span class="g g-Whitespace">     </span><span class="mi">58</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="g g-Whitespace">     </span><span class="mi">59</span>     <span class="n">is_self_marked</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;_self_marked&quot;</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">60</span>     <span class="n">attr</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">61</span>     <span class="n">is_method_or_fn</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">62</span>     <span class="n">attr_is_reactive_fn</span> <span class="o">=</span> <span class="n">is_method_or_fn</span> <span class="ow">and</span> <span class="n">is_reactive_fn</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>

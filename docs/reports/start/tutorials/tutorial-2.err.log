@@ -1,0 +1,87 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+images = random_images(filtered_df)
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+Cell [0;32mIn[16], line 1[0m
+[0;32m----> 1[0m images [38;5;241m=[39m [43mrandom_images[49m[43m([49m[43mfiltered_df[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    202[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
+[1;32m    203[0m [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 204[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
+[1;32m    206[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
+[1;32m    207[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
+[1;32m    209[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
+[1;32m    210[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
+[1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
+[1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
+
+Cell [0;32mIn[15], line 14[0m, in [0;36mrandom_images[0;34m(df)[0m
+[1;32m     10[0m formatter [38;5;241m=[39m images[38;5;241m.[39mformatters[[38;5;124m'[39m[38;5;124mbase[39m[38;5;124m'[39m]
+[1;32m     12[0m [38;5;66;03m# All Formatter objects have an `encode` method that[39;00m
+[1;32m     13[0m [38;5;66;03m# can be used to take a data object and encode it in some way.[39;00m
+[0;32m---> 14[0m [38;5;28;01mreturn[39;00m [formatter[38;5;241m.[39mencode(img) [38;5;28;01mfor[39;00m img [38;5;129;01min[39;00m images]
+
+Cell [0;32mIn[15], line 14[0m, in [0;36m<listcomp>[0;34m(.0)[0m
+[1;32m     10[0m formatter [38;5;241m=[39m images[38;5;241m.[39mformatters[[38;5;124m'[39m[38;5;124mbase[39m[38;5;124m'[39m]
+[1;32m     12[0m [38;5;66;03m# All Formatter objects have an `encode` method that[39;00m
+[1;32m     13[0m [38;5;66;03m# can be used to take a data object and encode it in some way.[39;00m
+[0;32m---> 14[0m [38;5;28;01mreturn[39;00m [[43mformatter[49m[38;5;241;43m.[39;49m[43mencode[49m[43m([49m[43mimg[49m[43m)[49m [38;5;28;01mfor[39;00m img [38;5;129;01min[39;00m images]
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/formatter/base.py:337[0m, in [0;36mDeferredFormatter.encode[0;34m(self, cell, **kwargs)[0m
+[1;32m    335[0m [38;5;28;01mif[39;00m [38;5;28mself[39m[38;5;241m.[39mwrapped[38;5;241m.[39mstatic_encode:
+[1;32m    336[0m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m[38;5;241m.[39mwrapped[38;5;241m.[39mencode([38;5;28;01mNone[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m--> 337[0m [38;5;28;01mreturn[39;00m [38;5;28mself[39m[38;5;241m.[39mwrapped[38;5;241m.[39mencode([43mcell[49m[43m([49m[43m)[49m, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:45[0m, in [0;36mDeferredCell.__call__[0;34m(self)[0m
+[1;32m     44[0m [38;5;28;01mdef[39;00m [38;5;21m__call__[39m([38;5;28mself[39m):
+[0;32m---> 45[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mdata[49m[38;5;241;43m.[39;49m[43m_get[49m[43m([49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/block/deferred_block.py:40[0m, in [0;36mDeferredCellOp._get[0;34m(self)[0m
+[1;32m     38[0m args [38;5;241m=[39m [[38;5;28mself[39m[38;5;241m.[39mprepare_arg(arg) [38;5;28;01mfor[39;00m arg [38;5;129;01min[39;00m [38;5;28mself[39m[38;5;241m.[39margs]
+[1;32m     39[0m kwargs [38;5;241m=[39m {kw: [38;5;28mself[39m[38;5;241m.[39mprepare_arg(arg) [38;5;28;01mfor[39;00m kw, arg [38;5;129;01min[39;00m [38;5;28mself[39m[38;5;241m.[39mkwargs[38;5;241m.[39mitems()}
+[0;32m---> 40[0m out [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m     42[0m [38;5;28;01mif[39;00m [38;5;28mself[39m[38;5;241m.[39mreturn_index [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+[1;32m     43[0m     [38;5;28;01mreturn[39;00m out[[38;5;28mself[39m[38;5;241m.[39mreturn_index]
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/file.py:193[0m, in [0;36mFileLoader.__call__[0;34m(self, filepath)[0m
+[1;32m    189[0m                 [38;5;28;01mraise[39;00m e
+[1;32m    191[0m     filepath [38;5;241m=[39m dst
+[0;32m--> 193[0m data [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mloader[49m[43m([49m[43mfilepath[49m[43m)[49m
+[1;32m    195[0m [38;5;28;01mreturn[39;00m data
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/image.py:19[0m, in [0;36mload_image[0;34m(f)[0m
+[1;32m     18[0m [38;5;28;01mdef[39;00m [38;5;21mload_image[39m(f: Union[[38;5;28mstr[39m, BytesIO, Path]):
+[0;32m---> 19[0m     img [38;5;241m=[39m [43mImage[49m[38;5;241;43m.[39;49m[43mopen[49m[43m([49m[43mf[49m[43m)[49m
+[1;32m     20[0m     [38;5;28;01mreturn[39;00m img[38;5;241m.[39mconvert([38;5;124m"[39m[38;5;124mRGB[39m[38;5;124m"[39m)
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/PIL/Image.py:3227[0m, in [0;36mopen[0;34m(fp, mode, formats)[0m
+[1;32m   3224[0m     filename [38;5;241m=[39m fp
+[1;32m   3226[0m [38;5;28;01mif[39;00m filename:
+[0;32m-> 3227[0m     fp [38;5;241m=[39m [43mbuiltins[49m[38;5;241;43m.[39;49m[43mopen[49m[43m([49m[43mfilename[49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mrb[39;49m[38;5;124;43m"[39;49m[43m)[49m
+[1;32m   3228[0m     exclusive_fp [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+[1;32m   3230[0m [38;5;28;01mtry[39;00m:
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_11243.JPEG'
+FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_11243.JPEG'
+
