@@ -353,9 +353,7 @@ class PandasScalarColumn(
 
     def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
         # FIXME: this implementation is very slow. This should be done with indices
-        return np.array([
-            self._keyidx_to_posidx(keyidx) for keyidx in keyidxs
-        ])
+        return np.array([self._keyidx_to_posidx(keyidx) for keyidx in keyidxs])
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
