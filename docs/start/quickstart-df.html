@@ -1082,7 +1082,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "9e0e6d7320dd40f78b399639d18f96c2"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "d61533c82341473ea9d4d7957b4d00ce"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -1479,40 +1479,33 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
 <span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:200,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">196</span> <span class="c1"># We need to check the arguments to see if they are reactive.</span>
-<span class="g g-Whitespace">    </span><span class="mi">197</span> <span class="c1"># If any of the inputs into fn are reactive, we need to add fn</span>
-<span class="g g-Whitespace">    </span><span class="mi">198</span> <span class="c1"># to the graph.</span>
-<span class="g g-Whitespace">    </span><span class="mi">199</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">--&gt; </span><span class="mi">200</span>     <span class="n">any_inputs_marked</span> <span class="o">=</span> <span class="n">_any_inputs_marked</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
-<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:158,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">153</span>     <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">155</span> <span class="c1"># Unpack the stores from the args and kwargs because</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span> <span class="c1"># args has changed!</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="c1"># TODO: make this all nicer</span>
+<span class="ne">--&gt; </span><span class="mi">158</span> <span class="n">unpacked_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="n">unpacked_kwargs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">161</span> <span class="c1"># The method bound to the class.</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:369,</span> in <span class="ni">_any_inputs_marked</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">366</span> <span class="k">def</span> <span class="nf">_is_marked</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">367</span>     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MarkableMixin</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">marked</span>
-<span class="ne">--&gt; </span><span class="mi">369</span> <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">_is_marked</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
-<span class="nn">    370     _is_marked(arg) for arg</span> in <span class="ni">kwargs.values</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">371</span> <span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/store.py:588,</span> in <span class="ni">_unpack_stores_from_object</span><span class="nt">(obj, unpack_nested)</span>
+<span class="g g-Whitespace">    </span><span class="mi">586</span> <span class="n">unpacked</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="g g-Whitespace">    </span><span class="mi">587</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">588</span>     <span class="n">x</span><span class="p">,</span> <span class="n">stores_i</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unpack_nested</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">589</span>     <span class="n">unpacked</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">590</span>     <span class="n">stores</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">stores_i</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:369,</span> in <span class="ni">&lt;genexpr&gt;</span><span class="nt">(.0)</span>
-<span class="g g-Whitespace">    </span><span class="mi">366</span> <span class="k">def</span> <span class="nf">_is_marked</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">367</span>     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MarkableMixin</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">marked</span>
-<span class="ne">--&gt; </span><span class="mi">369</span> <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">_is_marked</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
-<span class="nn">    370     _is_marked(arg) for arg</span> in <span class="ni">kwargs.values</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">371</span> <span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/store.py:620,</span> in <span class="ni">_unpack_stores_from_object</span><span class="nt">(obj, unpack_nested)</span>
+<span class="g g-Whitespace">    </span><span class="mi">618</span>     <span class="n">stores</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">step_store</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">619</span>     <span class="k">return</span> <span class="n">_type</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">),</span> <span class="n">stores</span>
+<span class="ne">--&gt; </span><span class="mi">620</span> <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">621</span>     <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="p">[</span><span class="n">obj</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">622</span> <span class="k">else</span><span class="p">:</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:367,</span> in <span class="ni">_any_inputs_marked.&lt;locals&gt;._is_marked</span><span class="nt">(obj)</span>
-<span class="g g-Whitespace">    </span><span class="mi">366</span> <span class="k">def</span> <span class="nf">_is_marked</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">367</span>     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">MarkableMixin</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">marked</span>
-
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/reactifiable.py:59,</span> in <span class="ni">ReactifiableMixin.__getattribute__</span><span class="nt">(self, name)</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span> <span class="c1"># We assume accessing the attribute twice will not result in different values.</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span> <span class="c1"># We dont explicitly check for this because it is expensive.</span>
-<span class="g g-Whitespace">     </span><span class="mi">58</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
-<span class="ne">---&gt; </span><span class="mi">59</span>     <span class="n">is_self_marked</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;_self_marked&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>     <span class="n">attr</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span>     <span class="n">is_method_or_fn</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/abc.py:98,</span> in <span class="ni">ABCMeta.__instancecheck__</span><span class="nt">(cls, instance)</span>
+<span class="g g-Whitespace">     </span><span class="mi">96</span> <span class="k">def</span> <span class="fm">__instancecheck__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">97</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Override for isinstance(instance, cls).&quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">98</span>     <span class="k">return</span> <span class="n">_abc_instancecheck</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
