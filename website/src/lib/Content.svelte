@@ -5,18 +5,16 @@
 
 <!-- Top Content Part, should remain below the navbar -->
 <section
-	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-white"
+	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-orange-100"
 >
-	<div class="container px-6 mx-auto py-32">
+	<div class="container px-6 mx-auto pt-48 pb-32">
 		<div class="flex flex-col items-center justify-between md:flex-row">
 			<div class="max-w-xl mb-8 md:mb-0">
 				<h1 class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white">
-					Foundation Models meet Data and Apps.
+					Foundation Models meet Unstructured Data.
 				</h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
-					Meerkat is an open-source Python library to wrangle unstructured and structured data using dataframes,
-					connect data to foundation models, and build full scale web apps on top (or just run
-					interfaces in a notebook).
+					Meerkat is an open-source Python library, designed for technical teams to interactively wrangle unstructured data with foundation models.
 				</p>
 			</div>
 			<!-- Insert Demo Video here -->
@@ -27,7 +25,7 @@
 
 <!-- Add a section to show code for installing the Meerkat package. -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-white"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="flex flex-col items-center">
@@ -46,8 +44,8 @@
 4. Interactive Web Interfaces with Scripting
 5. Interfaces in Notebooks
 -->
-<section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-white"
+<!-- <section
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-orange-100"
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
@@ -111,106 +109,47 @@
 			</Card>
 		</div>
 	</div>
-</section>
+</section> -->
 
 
 <!-- Add a section with cards for different user personas: Researchers, Data Scientists, Developers, etc. -->
+<!-- <section
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
+> -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-white"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
-			<h1 class="mb-2 text-4xl text-gray-800 dark:text-white">For Everyone</h1>
-			<!-- <p class="text-gray-600 dark:text-gray-400">
-				Whether you're a researcher, data scientist, or developer, Meerkat is for you.
-			</p> -->
-			<!-- <div class="flex flex-row items-stretch flex-wrap mt-2"> -->
+			<h1 class="mb-4 text-4xl text-gray-800 dark:text-white">Built for technical teams</h1>
 			<div class="grid grid-cols-3 justify-items-center gap-4 mt-2">
 				<Card 
-					title="Foundation Model Researchers 👨‍🔬️" 
-					description="Create interfaces to interact with models, collect usage data and analyze it, all in Python." 
-					byline="Python + Dataframes"
+					title="🤖️ Machine Learning Teams " 
+					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting." 
+					byline=""
 				/>
 				<Card 
-					title="AI Auditors 🕵" 
-					description="Create auditing workflows that can be used by non-technical users, including for data exploration and labeling." 
-					byline="Python"
+					title="🧪️ Data Science Teams " 
+					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python." 
+					byline=""
 				/>
 				<Card 
-					title="Data Scientists 🔬" 
-					description="Create data visualizations and interfaces for exploratory data analysis over unstructured data, which run directly in Jupyter Notebooks, and on dashboards." 
-					byline="Python + Jupyter"
+					title="👨‍💻️ Software Engineering Teams " 
+					description="Fully custom applications in SvelteKit that seamlessly connect to unstructured data and model APIs in Python."
+					byline=""
 				/>
-				<Card 
-					title="Full-Stack Developers 👨‍💻️" 
-					description="Build fully custom applications in SvelteKit that seamlessly connect to unstructured data and model APIs in Python." 
-					byline="Python + SvelteKit"
-				/>
-				<Card 
-					title="Hackers 🤓" 
-					description="Build quickly without the constraints of a rigid framework: Meerkat will integrate with any Python library, or Svelte or Javascript package with no effort." 
-					byline="Python + SvelteKit"
-				/>
-				<Card 
-				title="Front-End Developers 👨‍💻️" 
-				description="Build and share (coming soon) beautiful components in Svelte for anyone to use in Python, and take advantage of our JavaScript API to interact with unstructured data backends easily." 
-				byline="SvelteKit"
-			/>
 			</div>
 		</div>
 	</div>	
 </section>
-
-
-
-<!-- Use Cases -->
-<section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-white"
->
-	<div class="container px-6 py-16 mx-auto md:py-8">
-		<div class="mb-8 flex flex-col items-center">
-			<h1 class="mb-2 text-4xl text-gray-800 dark:text-white">Use Cases</h1>
-			<div class="grid grid-cols-3 justify-items-center gap-4 mt-2">
-				<Card 
-					title="Model Demos" 
-					description="" 
-					byline="From simple to complex"
-				/>
-				<Card 
-					title="Exploratory Data Analysis" 
-					description="" 
-					byline="Python"
-				/>
-				<Card 
-					title="AI Auditing" 
-					description="" 
-					byline="Python + Jupyter"
-				/>
-				<Card 
-					title="Internal Tools" 
-					description="Build fully custom applications in SvelteKit that seamlessly connect to unstructured data and model APIs in Python." 
-					byline="Python + SvelteKit"
-				/>
-				<Card 
-					title="Data Visualizations" 
-					description="Build quickly without the constraints of a rigid framework: Meerkat will integrate with any Python library, or Svelte or Javascript package with no effort." 
-					byline="Python + SvelteKit"
-				/>
-				<Card 
-				title="" 
-				description="Build and share (coming soon) beautiful components in Svelte for anyone to use in Python, and take advantage of our JavaScript API to interact with unstructured data backends easily." 
-				byline="SvelteKit"
-			/>
-			</div>
-		</div>
-	</div>	
-</section>
-
 
 
 <!-- Section on who built this -->
+<!-- <section
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
+> -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-white"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
@@ -242,8 +181,11 @@
 	</div>
 </section>
 
-<section
+<!-- <section
 	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200"
+> -->
+<section
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
