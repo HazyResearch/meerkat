@@ -83,7 +83,7 @@ def reactive(
         See :func:`react`.
     """
     # TODO: Remove nested_return argument. With the addition of __iter__ and __next__
-    # to mk.gui.Store, we no longer need to support nested return values.
+    # to mk.Store, we no longer need to support nested return values.
     # This will require looking through current use of reactive and patching them.
     if fn is None:
         # need to make passing args to the args optional

@@ -28,7 +28,7 @@ def _add(a, b):
 
 
 # @endpoint()
-# def _set_store(store: mk.gui.Store, value, _check_equality=False):
+# def _set_store(store: mk.Store, value, _check_equality=False):
 #     # We have to explicitly check ifthe value is the same.
 #     if _check_equality and store == value:
 #         return
@@ -36,7 +36,7 @@ def _add(a, b):
 
 
 @endpoint()
-def _set_store(store: mk.gui.Store, value):
+def _set_store(store: mk.Store, value):
     # We have to explicitly check ifthe value is the same.
     store.set(value)
 
@@ -81,8 +81,8 @@ def test_trigger_hybrid_marked_unmarked_inputs(check_equality: bool, toggle_mark
     """Test trigger functionality when some inputs are marked and some are
     not."""
 
-    a = mk.gui.Store(1)
-    b = mk.gui.Store(2).unmark()
+    a = mk.Store(1)
+    b = mk.Store(2).unmark()
 
     c = _add(a, b)
 
@@ -135,8 +135,8 @@ def test_trigger_hybrid_marked_unmarked_inputs(check_equality: bool, toggle_mark
 
 
 def test_trigger_unmarked_inputs():
-    a = mk.gui.Store(1).unmark()
-    b = mk.gui.Store(2).unmark()
+    a = mk.Store(1).unmark()
+    b = mk.Store(2).unmark()
 
     c = _add(a, b)
     assert c == 3

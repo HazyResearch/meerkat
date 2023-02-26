@@ -78,7 +78,7 @@ df["label"] = np.full(len(df), "")
 df = df.mark()
 row = Store(0)
 label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
-cell_size = mk.gui.Store(24)
+cell_size = mk.Store(24)
 
 back = mk.gui.core.Button(
     title="<",

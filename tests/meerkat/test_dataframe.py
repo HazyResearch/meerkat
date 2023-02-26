@@ -1345,7 +1345,7 @@ def test_reactivity_attributes_and_properties(name: str):
 
     if name.startswith("_"):
         # Private attributes should not be reactive.
-        assert not isinstance(out, mk.gui.Store)
+        assert not isinstance(out, mk.Store)
         assert df.inode is None
         return
 
@@ -1362,7 +1362,7 @@ def test_reactivity_attributes_and_properties(name: str):
     # it can be other NodeMixIns, because these are classes built into meerkat.
     with mk.unmarked():
         out = getattr(df, name)
-    assert not isinstance(out, mk.gui.Store)
+    assert not isinstance(out, mk.Store)
 
 
 def test_reactivity_len():
@@ -1374,7 +1374,7 @@ def test_reactivity_len():
     with pytest.warns(UserWarning):
         length = len(df)
     assert length == 10
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
 
     # Warnings should not be raised if we are not in a reactive context.
     df = df.mark()
@@ -1384,7 +1384,7 @@ def test_reactivity_len():
             warnings.simplefilter("error")
             length = len(df)
     assert length == 10
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
 
     # Warnings should not be raised when the df is not reactive.
     df = df.unmark()
@@ -1393,7 +1393,7 @@ def test_reactivity_len():
         warnings.simplefilter("error")
         length = len(df)
     assert length == 10
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
 
     # Calling df.__len__ directly should also raise the warning.
     # __len__ will always return a primitive, even when called in
@@ -1402,20 +1402,20 @@ def test_reactivity_len():
         warnings.simplefilter("error")
         length = df.__len__()
     assert length == 10
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
 
     # mk.len should follow standard reactive protocols.
     df = df.mark()
     assert not is_unmarked_context() and df.marked
     length = mk.len(df)
-    assert isinstance(length, mk.gui.Store)
+    assert isinstance(length, mk.Store)
     assert length == 10
     assert length.inode is not None
 
     df = df.unmark()
     assert not is_unmarked_context() and not df.marked
     length = mk.len(df)
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
     assert length == 10
 
 
@@ -1429,7 +1429,7 @@ def test_reactivity_contains():
     assert not is_unmarked_context() and df.marked
     with pytest.warns(UserWarning):
         out = item in df
-    assert not isinstance(out, mk.gui.Store)
+    assert not isinstance(out, mk.Store)
     assert out
 
     # Warnings should not be raised if we are not in a reactive context.
@@ -1439,7 +1439,7 @@ def test_reactivity_contains():
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             out = item in df
-    assert not isinstance(out, mk.gui.Store)
+    assert not isinstance(out, mk.Store)
     assert out
 
     # Warnings should not be raised when the df is not reactive.
@@ -1448,7 +1448,7 @@ def test_reactivity_contains():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         out = item in df
-    assert not isinstance(out, mk.gui.Store)
+    assert not isinstance(out, mk.Store)
     assert out
 
     # Calling df.__contains__ directly should also raise the warning.
@@ -1458,7 +1458,7 @@ def test_reactivity_contains():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         length = df.__contains__(item)
-    assert not isinstance(length, mk.gui.Store)
+    assert not isinstance(length, mk.Store)
     assert out
 
 
@@ -1468,18 +1468,18 @@ def test_reactivity_contains_alternate():
     i.e. df.contains(item)
     """
     df = DataFrame({"a": np.arange(10), "b": torch.arange(10)})
-    item = mk.gui.Store("a")
+    item = mk.Store("a")
 
     df = df.mark()
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         a_contains = df.contains(item)
-    assert isinstance(a_contains, mk.gui.Store)
+    assert isinstance(a_contains, mk.Store)
     assert a_contains.inode is not None
     inode = a_contains.inode
 
     assert a_contains
-    assert isinstance(a_contains, mk.gui.Store)
+    assert isinstance(a_contains, mk.Store)
     assert isinstance(a_contains, bool)
     assert df.inode.has_trigger_children()
     assert len(df.inode.trigger_children) == 1
@@ -1502,7 +1502,7 @@ def test_reactivity_size():
     inode = shape.inode
 
     assert shape == (10, 2)
-    assert isinstance(shape, mk.gui.Store)
+    assert isinstance(shape, mk.Store)
     assert isinstance(shape, tuple)
     assert df.inode.has_trigger_children()
     assert len(df.inode.trigger_children) == 1
@@ -1597,7 +1597,7 @@ def test_reactivity_getitem_multiple_columns():
 def test_reactivity_getitem_slicing():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)})
     df.mark()
-    store = mk.gui.Store(slice(0, 5))
+    store = mk.Store(slice(0, 5))
 
     df_slice = df[store]
     inode = df_slice.inode
@@ -1621,7 +1621,7 @@ def test_reactivity_getitem_single_column():
         {"a": np.arange(10), "b": torch.arange(20, 30), "c": torch.arange(40, 50)}
     )
     df.mark()
-    store = mk.gui.Store("b")
+    store = mk.Store("b")
 
     df_col = df[store]
     df_inode = df.inode
@@ -1650,7 +1650,7 @@ def test_reactivity_getitem_single_column():
 def test_reactivity_merge():
     df1 = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)}).mark()
     df2 = DataFrame({"a": np.arange(10), "d": torch.arange(20, 30)}).mark()
-    on = mk.gui.Store("a")
+    on = mk.Store("a")
     df_merge = df1.merge(df2, on=on)
     inode = df_merge.inode
 
@@ -1674,7 +1674,7 @@ def test_reactivity_sort():
     np.random.shuffle(b)
 
     df = DataFrame({"a": a, "b": b}).mark()
-    store = mk.gui.Store("a")
+    store = mk.Store("a")
     df_sort = df.sort(by=store)
     inode = df_sort.inode
 
@@ -1686,7 +1686,7 @@ def test_reactivity_sort():
 
 def test_reactivity_sample():
     df = DataFrame({"a": np.arange(100)}).mark()
-    frac = mk.gui.Store(0.1)
+    frac = mk.Store(0.1)
     df_sample = df.sample(frac=frac)
     inode = df_sample.inode
     assert len(inode.obj) == 10
@@ -1702,7 +1702,7 @@ def test_reactivity_sample():
 
 def test_reactivity_rename():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)}).mark()
-    store = mk.gui.Store({"a": "c"})
+    store = mk.Store({"a": "c"})
     df_rename = df.rename(mapper=store)
     inode = df_rename.inode
 
@@ -1718,7 +1718,7 @@ def test_reactivity_rename():
 
 def test_reactivity_drop():
     df = DataFrame({"a": np.arange(10), "b": torch.arange(20, 30)}).mark()
-    store = mk.gui.Store(["a"])
+    store = mk.Store(["a"])
     df_drop = df.drop(columns=store)
     inode = df_drop.inode
 

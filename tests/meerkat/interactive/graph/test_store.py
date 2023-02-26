@@ -11,7 +11,7 @@ from meerkat.mixins.reactifiable import MarkableMixin
 
 def _is_output_reactive(
     out,
-    input_store: mk.gui.Store,
+    input_store: mk.Store,
     *,
     op_name: str = None,
     op_num_children: int = None,
@@ -51,7 +51,7 @@ def _is_output_reactive(
     assert out.inode in grandchildren
 
 
-def _is_out_unmagiced(out, input_store: mk.gui.Store):
+def _is_out_unmagiced(out, input_store: mk.Store):
     """Check if the output is unmagiced.
 
     A store is unmagiced if:
@@ -59,11 +59,11 @@ def _is_out_unmagiced(out, input_store: mk.gui.Store):
         2. It is marked
         3. out.inode is None
     """
-    assert not isinstance(out, mk.gui.Store)
+    assert not isinstance(out, mk.Store)
 
 
 @mk.endpoint()
-def _set_store(store: mk.gui.Store, value):
+def _set_store(store: mk.Store, value):
     store.set(value)
 
 
@@ -75,7 +75,7 @@ def test_store_reactive_math(is_magic: bool):
         1. Returns a Store
         2. Creates a connection based on the op.
     """
-    store = mk.gui.Store(1)
+    store = mk.Store(1)
 
     expected = {
         "add": 2,
@@ -152,7 +152,7 @@ def test_store_imethod(other: int, is_magic: bool):
             "__ior__": store | other,
         }
 
-    store = mk.gui.Store(1)
+    store = mk.Store(1)
     original = store
 
     with pytest.warns(UserWarning):
@@ -171,10 +171,8 @@ def test_store_imethod(other: int, is_magic: bool):
                 out[k] = getattr(store, k)(other)
 
     for k, v in out.items():
-        assert not isinstance(
-            expected[k], mk.gui.Store
-        ), f"Expected: {k} returned a Store."
-        assert isinstance(v, mk.gui.Store), f"{k} did not return a Store."
+        assert not isinstance(expected[k], mk.Store), f"Expected: {k} returned a Store."
+        assert isinstance(v, mk.Store), f"{k} did not return a Store."
         assert v.marked
         assert id(v) != id(original), f"{k} did not return a new Store."
         assert v == expected[k], f"{k} did not return the correct value."
@@ -182,7 +180,7 @@ def test_store_imethod(other: int, is_magic: bool):
 
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_store_as_iterator(is_magic: bool):
-    store = mk.gui.Store((1, 2))
+    store = mk.Store((1, 2))
 
     with magic(is_magic):
         store_iter = iter(store)
@@ -199,7 +197,7 @@ def test_store_as_iterator(is_magic: bool):
         values = [v for v in store_iter]
 
     for v in values:
-        assert isinstance(v, mk.gui.Store)
+        assert isinstance(v, mk.Store)
 
     if not is_magic:
         return
@@ -217,15 +215,15 @@ def test_store_as_iterator(is_magic: bool):
 
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_tuple_unpack(is_magic: bool):
-    store = mk.gui.Store((1, 2))
+    store = mk.Store((1, 2))
 
     with magic(is_magic):
         a, b = store
 
     # Iterators and next are always are reactive, so these should
     # always be stores.
-    assert isinstance(a, mk.gui.Store)
-    assert isinstance(b, mk.gui.Store)
+    assert isinstance(a, mk.Store)
+    assert isinstance(b, mk.Store)
 
     # Test the nodes get updated properly
     a_inode = a.inode
@@ -242,7 +240,7 @@ def test_tuple_unpack_return_value(is_magic: bool):
     def add(seq: Tuple[int]):
         return tuple(x + 1 for x in seq)
 
-    store = mk.gui.Store((1, 2))
+    store = mk.Store((1, 2))
     # We need to use the `magic` decorator here because tuple unpacking
     # happens outside of the function `add`. Without the decorator, the
     # tuple unpacking will not be added to the graph.
@@ -253,8 +251,8 @@ def test_tuple_unpack_return_value(is_magic: bool):
 
     # Iterators and next are always are reactive, so these should
     # always be stores.
-    assert isinstance(a, mk.gui.Store)
-    assert isinstance(b, mk.gui.Store)
+    assert isinstance(a, mk.Store)
+    assert isinstance(b, mk.Store)
 
     # Test the nodes get updated properly
     a_inode = a.inode
@@ -267,7 +265,7 @@ def test_tuple_unpack_return_value(is_magic: bool):
 
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_bool(is_magic: bool):
-    store = mk.gui.Store(0)
+    store = mk.Store(0)
     with magic(is_magic):
         if is_magic:
             with pytest.warns(UserWarning):
@@ -279,19 +277,19 @@ def test_bool(is_magic: bool):
             out_not = not store
 
     # Store.__bool__ is not reactive.
-    assert not isinstance(out_bool, mk.gui.Store)
-    assert not isinstance(out_not, mk.gui.Store)
+    assert not isinstance(out_bool, mk.Store)
+    assert not isinstance(out_not, mk.Store)
 
 
 @pytest.mark.parametrize("is_magic", [False, True])
 @pytest.mark.parametrize("obj", [[0, 1, 2], (0, 1, 2), {0: "a", 1: "b", 2: "c"}])
 @pytest.mark.parametrize("idx", [0, 1, 2])
 def test_store_getitem(is_magic: bool, obj, idx: int):
-    store = mk.gui.Store(obj)
+    store = mk.Store(obj)
     with magic(is_magic):
         out = store[idx]
 
-    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, mk.Store)
     _is_output_reactive(out, store, op_name="__getitem__", op_num_children=1)
 
 
@@ -305,9 +303,9 @@ def test_store_getitem_custom_obj():
         def __getitem__(self, key):
             return self.x[key]
 
-    store = mk.gui.Store(Foo([0, 1, 2]))
+    store = mk.Store(Foo([0, 1, 2]))
     out = store[0]
-    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, mk.Store)
     _is_output_reactive(out, store, op_name="__getitem__", op_num_children=1)
 
 
@@ -317,21 +315,21 @@ def test_store_getitem_custom_obj():
 def test_store_getitem_multi_access(is_magic: bool, obj, idx: int):
     """Test that when we access the same index multiple times, we get unique
     stores."""
-    store = mk.gui.Store(obj)
+    store = mk.Store(obj)
     with magic(is_magic):
         out1 = store[idx]
         out2 = store[idx]
 
-    assert isinstance(out1, mk.gui.Store)
+    assert isinstance(out1, mk.Store)
     _is_output_reactive(out1, store)
-    assert isinstance(out2, mk.gui.Store)
+    assert isinstance(out2, mk.Store)
     _is_output_reactive(out2, store)
 
     assert out1 is not out2
 
 
 def test_index():
-    store = mk.gui.Store([0, 1, 2])
+    store = mk.Store([0, 1, 2])
     out = store.index(1)
-    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, mk.Store)
     _is_output_reactive(out, store, op_name="index", op_num_children=1)

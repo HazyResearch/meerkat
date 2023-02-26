@@ -16,7 +16,7 @@ We will see how we can combine components like :class:`~meerkat.gui.Match`, :cla
 
 
         @mk.gui.endpoint
-        def append_to_sort(match_criterion, criteria: mk.gui.Store):
+        def append_to_sort(match_criterion, criteria: mk.Store):
             """Add match criterion to the sort criteria.
 
             Args:
@@ -45,7 +45,7 @@ We will see how we can combine components like :class:`~meerkat.gui.Match`, :cla
 
         with mk.gui.react():
             # Match
-            sort_criteria = mk.gui.Store([])
+            sort_criteria = mk.Store([])
             match = mk.gui.Match(
                 df=df,
                 against=EMBED_COLUMN,

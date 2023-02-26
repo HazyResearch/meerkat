@@ -13,12 +13,12 @@ def test_operation_with_skip():
         return x + y
 
     @mk.endpoint()
-    def set_xy(x: mk.gui.Store, y: mk.gui.Store, x_val, y_val):
+    def set_xy(x: mk.Store, y: mk.Store, x_val, y_val):
         x.set(x_val)
         y.set(y_val)
 
-    x = mk.gui.Store(1)
-    y = mk.gui.Store(1)
+    x = mk.Store(1)
+    y = mk.Store(1)
     result = fn(x, y)
     assert result == 2
 
@@ -47,11 +47,11 @@ def test_instance_method_with_skip():
             return self.x + y
 
     @mk.endpoint()
-    def set_xy(y: mk.gui.Store, y_val: int):
+    def set_xy(y: mk.Store, y_val: int):
         y.set(y_val)
 
     foo = Foo(1)
-    y = mk.gui.Store(1)
+    y = mk.Store(1)
     result = foo.fn(y)
     assert result == 2
 
