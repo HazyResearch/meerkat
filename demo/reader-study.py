@@ -1,7 +1,7 @@
 """A head-to-head reader study.
 
-In a head-to-head reader study, the user inspects all variants of an image
-and selects the best one.
+In a head-to-head reader study, the user inspects all variants of an
+image and selects the best one.
 """
 import numpy as np
 from PIL import Image

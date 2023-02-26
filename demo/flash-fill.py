@@ -1,4 +1,4 @@
-"""Flash-fill"""
+"""Flash-fill."""
 import re
 from functools import partial
 
@@ -98,6 +98,7 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
 @mk.reactive()
 def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     """Update the df with the new prompt template.
+
     This is as simple as returning a view.
     """
     print("here")
