@@ -1272,9 +1272,7 @@ title="Open an issue"
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fn_bound_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">identifiables</span><span class="p">:</span>
                     <span class="c1"># Dereference the argument if it was passed in as a string id</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_meerkat_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                    <span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                         <span class="c1"># Not a string id, so just use the object</span>
                         <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1292,7 +1290,22 @@ title="Open an issue"
                                 <span class="c1"># If that fails, try to look up the string id in</span>
                                 <span class="c1"># the Node registry, and then get the object</span>
                                 <span class="c1"># from the Node</span>
-                                <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">obj</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">obj</span>
+                                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                    <span class="c1"># If that fails and the object is a non-id string,</span>
+                                    <span class="c1"># then just use the string as is.</span>
+                                    <span class="c1"># We have to do this check here rather than above</span>
+                                    <span class="c1"># because we want to make sure we check for all</span>
+                                    <span class="c1"># identifiable and nodes before checking if the</span>
+                                    <span class="c1"># string is just a string.</span>
+                                    <span class="c1"># this is required for compatibility with</span>
+                                    <span class="c1"># IdentifiableMixin objects that do not start with</span>
+                                    <span class="c1"># the meerkat id prefix.</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_meerkat_id</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                                        <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">raise</span> <span class="n">e</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span>
                         <span class="c1"># These are *args under the `args` key</span>
