@@ -680,8 +680,9 @@ title="Open an issue"
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
 <span class="kn">import</span> <span class="nn">pyarrow.compute</span> <span class="k">as</span> <span class="nn">pc</span>
@@ -876,6 +877,30 @@ title="Open an issue"
 
     <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ImmutableError</span><span class="p">(</span><span class="s2">&quot;ArrowArrayColumn is immutable.&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_is_valid_primary_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_keyidx_to_posidx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyidx</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the posidx of the first occurrence of the given keyidx. Raise a</span>
+<span class="sd">        key error if the keyidx is not found.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyidx: The keyidx to search for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The posidx of the first occurrence of the given keyidx.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">posidx</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">keyidx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">posidx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;keyidx not found in column.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">posidx</span><span class="o">.</span><span class="n">as_py</span><span class="p">()</span>
+        
+
+    <span class="k">def</span> <span class="nf">_keyidxs_to_posidxs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyidxs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="c1"># FIXME: this implementation is very slow. This should be done with indices</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyidx_to_posidx</span><span class="p">(</span><span class="n">keyidx</span><span class="p">)</span> <span class="k">for</span> <span class="n">keyidx</span> <span class="ow">in</span> <span class="n">keyidxs</span><span class="p">])</span>
+
 
     <span class="k">def</span> <span class="nf">_repr_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -1014,7 +1039,7 @@ title="Open an issue"
         <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">approximate_median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">skip_nulls</span><span class="o">=</span><span class="n">skipna</span><span class="p">)</span><span class="o">.</span><span class="n">as_py</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_dispatch_arithmetic_function</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Column</span><span class="p">):</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ArrowScalarColumn</span><span class="p">)</span>
@@ -1022,10 +1047,14 @@ title="Open an issue"
 
         <span class="n">compute_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPUTE_FN_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">compute_fn</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">)(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">)(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">compute_fn</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_true_div</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarColumn</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Column</span><span class="p">):</span>
@@ -1043,6 +1072,23 @@ title="Open an issue"
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">():</span>
+            <span class="c1"># pyarrow expects a final str used as the spearator</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_arithmetic_function</span><span class="p">(</span>
+                <span class="n">other</span><span class="p">,</span> <span class="s2">&quot;binary_join_element_wise&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_arithmetic_function</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">pa</span><span class="o">.</span><span class="n">string</span><span class="p">():</span>
+             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_arithmetic_function</span><span class="p">(</span>
+                <span class="n">other</span><span class="p">,</span> <span class="s2">&quot;binary_join_element_wise&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatch_arithmetic_function</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;radd&quot;</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">ScalarColumn</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_true_div</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
