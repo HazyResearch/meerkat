@@ -768,9 +768,10 @@ title="Open an issue"
 
 
 <span class="k">def</span> <span class="nf">deprecated</span><span class="p">(</span><span class="n">replacement</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is a decorator which can be used to mark functions</span>
-<span class="sd">    as deprecated. It will result in a warning being emitted</span>
-<span class="sd">    when the function is used.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is a decorator which can be used to mark functions as deprecated.</span>
+
+<span class="sd">    It will result in a warning being emitted when the function is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>

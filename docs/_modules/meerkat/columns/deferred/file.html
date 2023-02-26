@@ -682,21 +682,17 @@ title="Open an issue"
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Template</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">import</span> <span class="nn">dill</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
-<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DeferredImageFormatterGroup</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
 <span class="kn">from</span> <span class="nn">meerkat.block.deferred_block</span> <span class="kn">import</span> <span class="n">DeferredOp</span>
@@ -704,14 +700,13 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.base</span> <span class="kn">import</span> <span class="n">DeferredCell</span><span class="p">,</span> <span class="n">DeferredColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.scalar</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">HTMLFormatterGroup</span><span class="p">,</span>
-    <span class="n">TextFormatterGroup</span><span class="p">,</span>
-    <span class="n">TextFormatterGroup</span><span class="p">,</span>
-    <span class="n">PDFFormatterGroup</span><span class="p">,</span>
     <span class="n">CodeFormatterGroup</span><span class="p">,</span>
+    <span class="n">HTMLFormatterGroup</span><span class="p">,</span>
+    <span class="n">PDFFormatterGroup</span><span class="p">,</span>
+    <span class="n">TextFormatterGroup</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
-
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">DeferredImageFormatterGroup</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 

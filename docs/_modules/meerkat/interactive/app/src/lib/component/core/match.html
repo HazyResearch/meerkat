@@ -704,13 +704,12 @@ title="Open an issue"
 
 <span class="nd">@endpoint</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">refine_match</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
+    <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">against</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">match_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">label_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Refine a match, using feedback from the user.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refine a match, using feedback from the user.</span>
 
 <span class="sd">    Labels are +1 for a match, -1 for a non-match, and 0 for unlabeled.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -733,9 +732,8 @@ title="Open an issue"
     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">against</span><span class="p">])</span>
 
     <span class="c1"># Update the match column.</span>
-    <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">match_column</span><span class="si">}</span><span class="s1">_refined&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_pred</span>
+    <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">match_column</span><span class="si">}</span><span class="s2">_refined&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_pred</span>
     <span class="n">df</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
 
 
 <span class="k">def</span> <span class="nf">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
