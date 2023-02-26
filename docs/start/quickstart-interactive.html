@@ -444,7 +444,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="../guide/interactive/components/display.html">
-       Displaying dataframes
+       Displaying data frames
       </a>
      </li>
      <li class="toctree-l3">
@@ -762,8 +762,8 @@ title="Print to PDF"
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reactivity">
-   Reactivity
+  <a class="reference internal nav-link" href="#reactive-functions">
+   Reactive Functions
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -776,6 +776,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#endpoints">
    Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
   </a>
  </li>
 </ul>
@@ -820,8 +825,8 @@ title="Print to PDF"
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#reactivity">
-   Reactivity
+  <a class="reference internal nav-link" href="#reactive-functions">
+   Reactive Functions
   </a>
   <ul class="visible nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -834,6 +839,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#endpoints">
    Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
   </a>
  </li>
 </ul>
@@ -849,9 +859,9 @@ title="Print to PDF"
   <section id="quickstart-interactive-apps">
 <span id="quickstart-interactive"></span><h1>Quickstart: Interactive Apps<a class="headerlink" href="#quickstart-interactive-apps" title="Permalink to this headline">¶</a></h1>
 <p>We’ll do a quick tour of one of the main features of Meerkat - how to build interactive applications.</p>
-<p>One of the main reasons for this functionality is because working with unstructured data frequently involves playing with it.
-There’s no better way to do that than through a simple, interactive application.
-These applications can range from simple forms to gather user input inside Jupyter notebooks, to full-blown dashboards and web applications that are deployed to the cloud.</p>
+<p>The motivation for this functionality is that working with unstructured data frequently involves playing with it.
+There’s no better way to do that than through an interactive application.
+These applications can range from simple user input forms inside Jupyter notebooks to full-blown dashboards and web applications that are deployed to the cloud.</p>
 <p>Make sure you have Meerkat <a class="reference internal" href="install.html#install"><span class="std std-ref">installed and running</span></a> before you go through this quickstart.</p>
 <section id="components">
 <h2>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h2>
@@ -860,186 +870,222 @@ This functionality can range from quite simple, such as a slider that allows a u
 <p>Let’s look at an example with a <code class="xref py py-class docutils literal notranslate"><span class="pre">Slider</span></code> component. This code below creates a slider with an initial value of <code class="docutils literal notranslate"><span class="pre">2.0</span></code>.</p>
 <aside class="margin sidebar">
 <p class="sidebar-title"></p>
-<p>Meerkat offers many components out-of-the-box.</p>
 </aside>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 
-<span class="n">slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once, we have our component, we want to render it. We can do this by passing the component to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Page</span></code>, giving it an <code class="docutils literal notranslate"><span class="pre">id</span></code>, and launching it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">slider</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;slider&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">input_slider</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;quickstart&quot;</span><span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>If you are in a Jupyter notebook, <code class="docutils literal notranslate"><span class="pre">page.launch()</span></code> will render the component directly in the notebook. If you are using a script, Meerkat will give you a link where you can navigate to see the page.</p>
-<p>Now you have a slider! When you move the slider, the value will automatically be updated in the Python program for you to use.</p>
+<p>If you are in a Jupyter notebook, <code class="docutils literal notranslate"><span class="pre">page.launch()</span></code> will render the component directly in the notebook. If you are using a script, Meerkat will give you a link where you can navigate to see the page in a browser.</p>
+<p>Now we have a slider! When we move the slider, the value will automatically be updated in the Python program for us to use.</p>
 <section id="data-components">
 <h3>Data Components<a class="headerlink" href="#data-components" title="Permalink to this headline">¶</a></h3>
-<p>Meerkat also includes components that allow you to visualize and interact with DataFrames (see our documentation on DataFrames if you’re not familiar). Let’s take a look at an example.</p>
+<p>Meerkat also includes components that allow us to visualize and interact with DataFrames (see our documentation on DataFrames if you’re not familiar). Let’s take a look at an example.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">)</span>
 <span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Gallery</span></code> component takes in a <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code> as input and visualizes it in a paginated, interactive table. You can see a full list of our components <a class="reference internal" href="../guide/components/builtins.html#components-builtins"><span class="std std-ref">here</span></a>.</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">Gallery</span></code> component takes in a <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code> as input and visualizes it in a paginated, interactive table. A full list of our components is available <a class="reference internal" href="../guide/components/builtins.html#components-builtins"><span class="std std-ref">here</span></a>.</p>
 <aside class="margin sidebar">
 <p class="sidebar-title"></p>
 <div class="important admonition">
 <p class="admonition-title">Declarative</p>
 <p>One of Meerkat’s goals is to provide a consistent interface when working with DataFrame components.</p>
-<p>For example, we generally implement our DataFrame components so you can call them with MyComponent(df, kwarg1=value1, kwarg2=value2, …). This is reminiscent of using seaborn’s plotting library with pandas.</p>
+<p>For example, we generally implement our DataFrame components so they can be called with <code class="docutils literal notranslate"><span class="pre">MyComponent(df,</span> <span class="pre">kwarg1=value1,</span> <span class="pre">kwarg2=value2,</span> <span class="pre">...)</span></code>. This is reminiscent of how DataFrames in Pandas can be used with Seaborn’s plotting library.</p>
 </div>
 </aside>
 </section>
 <section id="composing-components">
 <h3>Composing Components<a class="headerlink" href="#composing-components" title="Permalink to this headline">¶</a></h3>
-<p>Components are composable, so you can take multiple components and put them together to build an application.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="n">input_field</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>  <span class="c1">#FIXME</span>
+<p>Components are composable, so we can take multiple components and put them together to build an application. For example, let’s say we have the following two components.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">input_field</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="c1">#FIXME</span>
 </pre></div>
 </div>
-<p>Let’s put these together.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">component</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">input_field</span><span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;text-bold&quot;</span><span class="p">)</span>
-<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;compose&quot;</span><span class="p">)</span>
+<p>We can put them together like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">input_slider</span><span class="p">,</span> <span class="n">input_field</span><span class="p">]),</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;quickstart&quot;</span>
+<span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>We just used a div to stack up the two components and lay them out.
-In fact, you can use html tags like <code class="docutils literal notranslate"><span class="pre">span</span></code>, <code class="docutils literal notranslate"><span class="pre">div</span></code>, <code class="docutils literal notranslate"><span class="pre">p</span></code> as components in Meerkat.
-You can find a list of supported html components <span class="xref std std-ref">here</span>.</p>
+<p>We just used a <code class="docutils literal notranslate"><span class="pre">div</span></code> to stack up the two components and lay them out.
+In fact, we can use HTML tags like <code class="docutils literal notranslate"><span class="pre">span</span></code>, <code class="docutils literal notranslate"><span class="pre">div</span></code>, <code class="docutils literal notranslate"><span class="pre">p</span></code> as components in Meerkat.
+A full list of supported HTML components is available <span class="xref std std-ref">here</span>.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>More on components</p>
-<p>There’s a lot more to components in Meerkat that you can learn about in the [guide to components].</p>
-<p>We go over other components you can use in Meerkat from the flowbite library, how to add components from any Svelte component library without writing any frontend code whatsoever, and how to write custom Meerkat components in Svelte (it’s not that hard, even if you haven’t written a line of HTML/CSS/Javascript)!</p>
+<p><strong>More on components.</strong> There’s a lot more to components in Meerkat that you can learn about in the <a class="reference internal" href="../guide/components/index.html#components-index"><span class="std std-ref">Components</span></a> guide. We go over other components in Meerkat from the <a class="reference external" href="https://flowbite.com/docs/getting-started/introduction/">flowbite library</a>, how to add components from any Svelte component library without writing any frontend code whatsoever, and how to write custom Meerkat components in Svelte.</p>
 </div>
 </section>
 <section id="connecting-components">
 <h3>Connecting Components<a class="headerlink" href="#connecting-components" title="Permalink to this headline">¶</a></h3>
-<p>We might like to tie the values of the the slider and the input field, so that they stay in-sync. This can be done by simply passing slider.value to the input field.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="n">input_field</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span> <span class="c1">#FIXME</span>
+<p>We might like to tie the values of the the slider and the input, so that they stay in-sync. This can be done by simply passing <code class="docutils literal notranslate"><span class="pre">input_slider.value</span></code> to the input component.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">input_field</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="c1">#FIXME</span>
 </pre></div>
 </div>
 </section>
 </section>
-<section id="reactivity">
-<h2>Reactivity<a class="headerlink" href="#reactivity" title="Permalink to this headline">¶</a></h2>
-<p>In the app created above, moving the slider will not affect the displayed value. But, we would like to display the square of the current value - not the original.</p>
-<p>To do so, we can simply wrap the square method with the <code class="docutils literal notranslate"><span class="pre">mk.reactive()</span></code> decorator.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-
-<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<section id="reactive-functions">
+<h2>Reactive Functions<a class="headerlink" href="#reactive-functions" title="Permalink to this headline">¶</a></h2>
+<p>In the app created above, moving the slider in the UI will affect the displayed value. Let’s upgrade our app by displaying the square of the current value, not the original. This will require writing a function that runs every time the slider value changes. Introducing <em>reactive functions</em>!</p>
+<div class="admonition-definition-reactive-function admonition">
+<p class="admonition-title">Definition - <em>reactive function</em></p>
+<p>A function that reruns when any of its parameters change.</p>
+</div>
+<p>Reactive functions in Meerkat are created with the <code class="docutils literal notranslate"><span class="pre">mk.reactive()</span></code> decorator.</p>
+<p>Let’s create a reactive function called <code class="docutils literal notranslate"><span class="pre">square</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-	<span class="k">return</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
-<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;square&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">input_slider</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;quickstart&quot;</span><span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
 <p><em>How does this work?</em></p>
-<p>Our decorator makes the <code class="docutils literal notranslate"><span class="pre">square</span></code> function <em>reactive,</em> meaning that when one of its input parameters (e.g., <code class="docutils literal notranslate"><span class="pre">slider.value</span></code>) changes, the function reruns.</p>
+<p>Since we invoke <code class="docutils literal notranslate"><span class="pre">square</span></code> by passing in <code class="docutils literal notranslate"><span class="pre">input_slider.value</span></code>, whenever that value changes, the function reruns.</p>
 <p>Let’s be precise about how this happens.</p>
-<ol class="arabic simple">
-<li><p>The value of the slider is a floating point number, but when we check the type of <code class="docutils literal notranslate"><span class="pre">slider.value</span></code> , we’ll see it is actually a special Meerkat object called a <code class="docutils literal notranslate"><span class="pre">Store</span></code>.</p></li>
-</ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<ol class="arabic">
+<li><p>The value of the <code class="docutils literal notranslate"><span class="pre">input_slider</span></code> is a floating point number, but when we check the type of <code class="docutils literal notranslate"><span class="pre">input_slider.value</span></code>, we’ll see it is actually a special Meerkat object called a <code class="docutils literal notranslate"><span class="pre">Store</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="c1">#FIXME runable</span>
 </pre></div>
 </div>
-<p>Stores can wrap around arbitrary Python objects, while still exposing all of their methods and properties. In almost all cases, you can use a store as if it were unwrapped.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+<p>A <code class="docutils literal notranslate"><span class="pre">Store</span></code> can wrap around arbitrary Python objects, while still exposing all of their functions and properties. In almost all cases, we can use a <code class="docutils literal notranslate"><span class="pre">Store</span></code> as if it were unwrapped.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="c1">#FIXME runable</span>
 </pre></div>
 </div>
-<p>By any Python object, we mean <em><strong>any</strong></em>, so you could even do this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}))</span>
+<p>By any Python object, we mean <strong><em>any</em></strong>, so we can even do this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#FIXME runable</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}))</span>
 <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+</li>
+</ol>
 <aside class="margin sidebar">
 <p class="sidebar-title"></p>
-<p>Stores do have some gotchas with certain objects that you can read more about <span class="xref myst">here</span> e.g. <code class="docutils literal notranslate"><span class="pre">Store(None)</span> <span class="pre">is</span> <span class="pre">None</span></code> will return <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Store</span></code> object does have some gotchas with certain objects that you can read more about <a class="reference internal" href="../guide/interactive/concepts/store.html#guide-interactive-concepts-store-gotchas"><span class="std std-ref">here</span></a> (e.g., <code class="docutils literal notranslate"><span class="pre">Store(None)</span> <span class="pre">is</span> <span class="pre">None</span></code> will return <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p>
 </aside>
-<ol class="arabic simple" start="2">
-<li><p>Passing this store to <code class="docutils literal notranslate"><span class="pre">square</span></code> tells Meerkat to watch <code class="docutils literal notranslate"><span class="pre">slider.value</span></code> and rerun <code class="docutils literal notranslate"><span class="pre">square</span></code> when it changes. Remember that this only works when <code class="docutils literal notranslate"><span class="pre">square</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>.</p></li>
-</ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<ol class="arabic" start="2">
+<li><p>Passing this <code class="docutils literal notranslate"><span class="pre">Store</span></code> to <code class="docutils literal notranslate"><span class="pre">square</span></code> tells Meerkat to watch <code class="docutils literal notranslate"><span class="pre">input_slider.value</span></code> and rerun <code class="docutils literal notranslate"><span class="pre">square</span></code> when it changes. Remember that this only works because <code class="docutils literal notranslate"><span class="pre">square</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">squared_value</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 </div>
+</li>
+</ol>
 <section id="chaining-reactive-functions">
 <h3>Chaining Reactive Functions<a class="headerlink" href="#chaining-reactive-functions" title="Permalink to this headline">¶</a></h3>
-<p>The result of <code class="docutils literal notranslate"><span class="pre">squared</span></code> is a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, so we can pass it into other reactive functions and create a chain! Let’s write a function <code class="docutils literal notranslate"><span class="pre">multiply</span></code> that takes the result of <code class="docutils literal notranslate"><span class="pre">square</span></code> and a coefficient and multiplies the two.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<p>Because it is a reactive function, the result of <code class="docutils literal notranslate"><span class="pre">square</span></code> is a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, so we can pass it into other reactive functions and create a chain! Let’s write a function <code class="docutils literal notranslate"><span class="pre">multiply</span></code> that takes as input a coefficient and the result of <code class="docutils literal notranslate"><span class="pre">square</span></code> and returns the product of the two.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">a</span>
+
+
+<span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 <span class="n">coef_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
-<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-	<span class="k">return</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="n">squared_value</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">coef_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">squared_value</span><span class="p">)</span>
 
-<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-	<span class="k">return</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">a</span>
-
-<span class="n">intermediate</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">intermediate</span><span class="p">,</span> <span class="n">coef_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-
-<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;square&quot;</span><span class="p">)</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">input_slider</span><span class="p">,</span> <span class="n">coef_slider</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;quickstart&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Moving the <code class="docutils literal notranslate"><span class="pre">input_slider</span></code> sets off a chain reaction!</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">square</span></code> function is rerun, which changes the value of the <code class="docutils literal notranslate"><span class="pre">intermediate</span></code> store, which in turn triggers the <code class="docutils literal notranslate"><span class="pre">multiply</span></code> function. At the end we get a new <code class="docutils literal notranslate"><span class="pre">result</span></code> that is displayed to the user.</p>
-<p>Now, if we we instead move the <code class="docutils literal notranslate"><span class="pre">coef_slider</span></code>, <em>only</em> the <code class="docutils literal notranslate"><span class="pre">multiply</span></code> function will rerun. Meerkat will save the cost of running <code class="docutils literal notranslate"><span class="pre">square</span></code> again, since its input was not changed using the <code class="docutils literal notranslate"><span class="pre">input_slider</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">square</span></code> function is rerun, which changes the value of the <code class="docutils literal notranslate"><span class="pre">squared_value</span></code> <code class="docutils literal notranslate"><span class="pre">Store</span></code>, which in turn triggers the <code class="docutils literal notranslate"><span class="pre">multiply</span></code> function. At the end we get a new <code class="docutils literal notranslate"><span class="pre">result</span></code> that is displayed to the user.</p>
+<p>Now, if we we instead move the <code class="docutils literal notranslate"><span class="pre">coef_slider</span></code>, <em>only</em> the <code class="docutils literal notranslate"><span class="pre">multiply</span></code> function will rerun. Meerkat will save the cost of running <code class="docutils literal notranslate"><span class="pre">square</span></code> again, since its input (<code class="docutils literal notranslate"><span class="pre">input_slider.value</span></code>) was not changed.</p>
 <aside class="margin sidebar">
 <p class="sidebar-title"></p>
 <p>📌 <strong>Return values of reactive functions.</strong>
-To help you chain reactive functions, remember that reactive functions will always wrap their return values in <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects before returning them. This is handled automatically by Meerkat when you decorate a function with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>.</p>
-<p>You can read more about this in the <a class="reference internal" href="../guide/reactive/faq.html"><span class="doc std std-doc">guide to writing reactive functions</span></a>.</p>
+An important concept to remember when chaining reactive functions is that reactive functions will always wrap their return values in <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects before returning them. This is handled automatically by Meerkat on any function decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>.</p>
+<p>You can read more about this in the <a class="reference internal" href="../guide/reactive/faq.html#reactivity-faqs"><span class="std std-ref">Reactive FAQs</span></a>.</p>
 </aside>
-<p>We’ll see that this issue shows up all the time in applications that we’ll want to build, and reactivity will help us address it.</p>
+<p>The paradigm of reactivity shows up all the time in our applications, so it is important to understand how it works. Here are some examples of when you might want to use reactivity:</p>
 <ul class="simple">
-<li><p>Say you have a DataFrame, and you create a view of that DataFrame by filtering it. When you edit the DataFrame, you will want the view that depends on the DataFrame to update automatically.</p></li>
-<li><p>More generally, you have a set of inputs that define some output, and if any of the inputs change, you will want the output to be updated automatically.</p></li>
-<li><p>Even more generally, you have a graph that has many sets of inputs and outputs, and you want that if some input is changed, all the outputs that depend directly or indirectly on that input are updated automatically.</p></li>
+<li><p>Say you have a DataFrame, and you create a view of that DataFrame by filtering it. When you edit the DataFrame, you will want the view to update automatically.</p></li>
+<li><p>More generally, say you have a set of inputs that define some output. If any of the inputs change, you will want the output to update automatically.</p></li>
+<li><p>Even more generally, say you have a graph that has many sets of inputs and outputs. If some input is changed, you will want all the outputs that depend directly or indirectly on that input to update automatically.</p></li>
 </ul>
 </section>
 </section>
 <section id="endpoints">
 <h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
-<p>Often, you want the frontend to send a signal to run a function on the backend. For example, maybe you may want a button that increases <code class="docutils literal notranslate"><span class="pre">slider.value</span></code> by 1.</p>
-<p>You can do this with <em><strong>endpoints</strong></em>! Endpoints are functions that get run when an event occurs on the frontend - for example, when a button is clicked. Inside an endpoint, you can update a value of a store by calling <code class="docutils literal notranslate"><span class="pre">store.set(new_value)</span></code>.</p>
-<p>Endpoints in Meerkat are created with the <code class="docutils literal notranslate"><span class="pre">&#64;mk.endpoint()</span></code> decorator.</p>
+<p>Often, we want the frontend to trigger a function on the backend. This is exactly what <em>endpoints</em> are for.</p>
+<div class="admonition-definition-endpoint admonition">
+<p class="admonition-title">Definition - <em>endpoint</em></p>
+<p>A function that is run when an event occurs on the frontend.</p>
+</div>
+<p>Similar to reactive functions, endpoitns in Meerkat are created with the <code class="docutils literal notranslate"><span class="pre">&#64;mk.endpoint()</span></code> decorator. Inside an endpoint, you can update a value of a <code class="docutils literal notranslate"><span class="pre">Store</span></code> by calling <code class="docutils literal notranslate"><span class="pre">.set(new_value)</span></code> on it.</p>
+<p>To demonstrate this, let’s add a button that increments <code class="docutils literal notranslate"><span class="pre">slider.value</span></code> when clicked on. We’ll need to define an endpoint called <code class="docutils literal notranslate"><span class="pre">increment</span></code> that takes as input a <code class="docutils literal notranslate"><span class="pre">Store</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
-	<span class="n">value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Remember, we want to increase <code class="docutils literal notranslate"><span class="pre">slider.value</span></code> by 1.
-We can use <code class="docutils literal notranslate"><span class="pre">endpoint.partial</span></code> to bind the endpoint to <code class="docutils literal notranslate"><span class="pre">slider.value</span></code>.
-We can pass the partialed endpoint to the button’s <code class="docutils literal notranslate"><span class="pre">on_click</span></code>,
-which tells the button to run this endpoint when the button is clicked.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">increment</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">on_click</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span>
+<p>Next, we’ll use <code class="docutils literal notranslate"><span class="pre">endpoint.partial</span></code> to bind the endpoint to <code class="docutils literal notranslate"><span class="pre">slider.value</span></code>.</p>
+<!-- TODO: explain `endpoint.partial` -->
+<p>We can create a new <code class="docutils literal notranslate"><span class="pre">Button</span></code> component and pass the partialed endpoint to its <code class="docutils literal notranslate"><span class="pre">on_click</span></code> argument, which tells the button to run this endpoint when clicked on.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Increment&quot;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">increment</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>Let’s put it all together.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+</section>
+<section id="putting-it-all-together">
+<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+
+
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-	<span class="k">return</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">**</span><span class="mi">2</span>
+
+
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">a</span>
+
 
 <span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
-	<span class="n">value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="n">slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-<span class="n">endpoint</span> <span class="o">=</span> <span class="n">increment</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">on_click</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span>
+<span class="n">input_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">coef_slider</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
-<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;square&quot;</span><span class="p">)</span>
+<span class="n">squared_value</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">coef_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">squared_value</span><span class="p">)</span>
+
+<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Increment&quot;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">increment</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">input_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">input_slider</span><span class="p">,</span> <span class="n">coef_slider</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">result</span><span class="p">)]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;quickstart&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>

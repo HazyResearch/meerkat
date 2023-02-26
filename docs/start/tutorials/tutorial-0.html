@@ -444,7 +444,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="../../guide/interactive/components/display.html">
-       Displaying dataframes
+       Displaying data frames
       </a>
      </li>
      <li class="toctree-l3">
@@ -1116,7 +1116,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "1b88a581969746d9a479f2af66f9797e"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "e02437c8ccfb424fbe00c3f95409df62"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
@@ -1149,19 +1149,40 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 <span class="g g-Whitespace">   </span><span class="mi">2435</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">tarinfo</span><span class="p">:</span>
 <span class="g g-Whitespace">   </span><span class="mi">2436</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2309,</span> in <span class="ni">TarFile.next</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2306</span>     <span class="k">return</span> <span class="n">m</span>
-<span class="g g-Whitespace">   </span><span class="mi">2308</span> <span class="c1"># Advance the file pointer.</span>
-<span class="ne">-&gt; </span><span class="mi">2309</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">tell</span><span class="p">():</span>
-<span class="g g-Whitespace">   </span><span class="mi">2310</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2311</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2318,</span> in <span class="ni">TarFile.next</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2316</span> <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2317</span>     <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2318</span>         <span class="n">tarinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">fromtarfile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2319</span>     <span class="k">except</span> <span class="n">EOFHeaderError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2320</span>         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_zeros</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/gzip.py:382,</span> in <span class="ni">GzipFile.seek</span><span class="nt">(self, offset, whence)</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span>         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="mi">1024</span><span class="p">))</span>
-<span class="ne">--&gt; </span><span class="mi">382</span> <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">READ</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">383</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_check_not_closed</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">384</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:1105,</span> in <span class="ni">TarInfo.fromtarfile</span><span class="nt">(cls, tarfile)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1101</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Return the next TarInfo object from TarFile object</span>
+<span class="g g-Whitespace">   </span><span class="mi">1102</span><span class="sd">    tarfile.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1103</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1104</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">BLOCKSIZE</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1105</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">frombuf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1106</span> <span class="n">obj</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">BLOCKSIZE</span>
+<span class="g g-Whitespace">   </span><span class="mi">1107</span> <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">_proc_member</span><span class="p">(</span><span class="n">tarfile</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:1053,</span> in <span class="ni">TarInfo.frombuf</span><span class="nt">(cls, buf, encoding, errors)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1051</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1052</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">nts</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">100</span><span class="p">],</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1053</span> <span class="n">obj</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">nti</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">108</span><span class="p">])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1054</span> <span class="n">obj</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">nti</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">108</span><span class="p">:</span><span class="mi">116</span><span class="p">])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1055</span> <span class="n">obj</span><span class="o">.</span><span class="n">gid</span> <span class="o">=</span> <span class="n">nti</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">116</span><span class="p">:</span><span class="mi">124</span><span class="p">])</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:186,</span> in <span class="ni">nti</span><span class="nt">(s)</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">185</span>     <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">186</span>         <span class="n">s</span> <span class="o">=</span> <span class="n">nts</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&quot;ascii&quot;</span><span class="p">,</span> <span class="s2">&quot;strict&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">187</span>         <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">188</span>     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:170,</span> in <span class="ni">nts</span><span class="nt">(s, encoding, errors)</span>
+<span class="g g-Whitespace">    </span><span class="mi">168</span> <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">169</span>     <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="n">p</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">170</span> <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
@@ -1244,7 +1265,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </ul>
 <section id="aside-imagecolumn-under-the-hood-deferredcolumn">
 <h3>📎 <em>Aside</em>: <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> under the hood, <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.<a class="headerlink" href="#aside-imagecolumn-under-the-hood-deferredcolumn" title="Permalink to this headline">¶</a></h3>
-<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
+<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/HazyResearch/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
 <p><em>What’s a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>?</em>
 In <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>, high-dimensional data types like images and videos are typically stored in a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>. A  <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> wraps around another column and lazily applies a function to it’s content as it is indexed. Consider the following example, where we create a simple <code class="docutils literal notranslate"><span class="pre">meerkat</span></code> column…</p>
 <div class="cell docutils container">

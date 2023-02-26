@@ -133,6 +133,8 @@ One situation we want to call out in particular is the use of common Python buil
 
 As a convenience, we provide the `mk.int`, `mk.float`, `mk.str`, `mk.bool`, `mk.list`, `mk.tuple`, `mk.dict`, `mk.set` functions, which are all reactive functions that return `Store` objects. A full list of reactive functions provided by Meerkat can be found [XXXXXXXXXXXXX](XXXXX).
 
+(guide_interactive_concepts_store_gotchas)=
+
 ## Common Gotchas with `Store` objects
 
 

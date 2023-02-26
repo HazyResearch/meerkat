@@ -25,7 +25,7 @@ Below is an overview of the data selection methods discussed in this guide.
 
 ## Selecting Columns
 The columns in a DataFrame are uniquely identified by `str` names. The code
-below displays the column names in the Imagenette dataframe we loaded above: 
+below displays the column names in the Imagenette data frame we loaded above: 
 
 
 ```{code-cell} ipython3
@@ -42,10 +42,10 @@ Using these column names, we can pull out an individual column or a subset of th
 
 To select a single column, we simply pass it's name to the index operator. For example,
 
-````{code-cell} ipython3
+```{code-cell} ipython3
    col = df["img"]
    col.head()
-````
+```
 Passing a ``str`` that isn't among the column names will raise a ``KeyError``.  
 
 It may be helpful to think of a DataFrame as a dictionary mapping column names to columns. 

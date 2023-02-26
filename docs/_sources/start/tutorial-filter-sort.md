@@ -71,4 +71,4 @@ mk run filter-sort.py --dev
 
 ## 🎉 Conclusion
 
-In just a few lines of code, we have a working app that allows users to filter and sort the image gallery. This is thanks to the powerful built-in components of Meerkat. You can browse the complete list of components [here](). In a later tutorial, you'll also learn how to make your own custom components that can be just as powerful.
+In just a few lines of code, we have a working app that allows users to filter and sort the image gallery. This is thanks to the powerful built-in components of Meerkat. You can browse the complete list of components {ref}`here <components_builtins>`. In a later tutorial, you'll also learn how to make your own custom components that can be just as powerful.

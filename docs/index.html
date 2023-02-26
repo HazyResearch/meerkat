@@ -443,7 +443,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="guide/interactive/components/display.html">
-       Displaying dataframes
+       Displaying data frames
       </a>
      </li>
      <li class="toctree-l3">
@@ -789,25 +789,24 @@ title="Print to PDF"
                 
   <section id="welcome-to-meerkat">
 <h1>Welcome to Meerkat 🔮<a class="headerlink" href="#welcome-to-meerkat" title="Permalink to this headline">¶</a></h1>
-<p>Meerkat’s goal is to help technical teams work with <em>unstructured data</em> like images, text, audio etc, especially when using foundation models. We want to make foundation models a reliable software abstraction that can underlie applications that require reasoning about unstructured data.</p>
-<p>Read more about our motivation for building Meerkat in our <a class="reference external" href="https://hazyresearch.github.io/blog/meerkat">blog post</a>. Long story short: we realized that to use foundation models reliably, we needed something that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data, and not on writing complicated, messy code.</p>
-<p>Through our Python library and npm package, we offer tools to help you work with unstructured data and foundation models across many contexts,</p>
+<p>Meerkat’s goal is to help technical teams work with <em>unstructured data</em> like images, text, audio etc., especially when using foundation models. We want to make foundation models a reliable software abstraction that can underlie applications that require reasoning about unstructured data.</p>
+<p>Read more about our motivation for building Meerkat in our <a class="reference external" href="https://hazyresearch.github.io/blog/meerkat">blog post</a>. Long story short: we realized that to use foundation models reliably, we needed something that would make interactively working with unstructured data and models simple. We built Meerkat so users can focus on their problems and data and not on writing complicated, messy code.</p>
+<p>Through our Python library and npm package, we offer tools to help you work with unstructured data and foundation models across many contexts:</p>
 <ul class="simple">
 <li><p>a simple, full-stack framework to build interactive user interfaces purely in Python,</p></li>
-<li><p>a data frame that is designed for use with unstructured data, and underlies all interactivity in Meerkat,</p></li>
+<li><p>a data frame that is designed for use with unstructured data and that underlies all interactivity in Meerkat,</p></li>
 <li><p>support for notebooks, standalone scripts and even full scale web applications through integration with <a class="reference external" href="https://kit.svelte.dev/">SvelteKit</a>,</p></li>
 <li><p>out-of-the-box components and workflows in Python for common use cases,</p></li>
 <li><p>careful support for extending Meerkat to your needs, such as integrating custom components with minimal overhead.</p></li>
 </ul>
-<p>As a young project, Meerkat is under active development and is actively looking for contributors and collaborators. <strong>Join our <a class="reference external" href="https://discord.gg/pw8E4Q26Tq">Discord</a>.</strong>  We’re excited to be hands on, and help you build with Meerkat.</p>
+<p>As a young project, Meerkat is under active development and is actively looking for contributors and collaborators. <strong>Join our <a class="reference external" href="https://discord.gg/pw8E4Q26Tq">Discord</a>.</strong>  We’re excited to be hands on and to help you build with Meerkat.</p>
 <!-- 
 **Philosophy.** Our design philosophy is to give technically minded users the opportunity to extend and tinker to customize Meerkat to your liking, while giving most users the ability to use Meerkat without worrying about the details. 
 We hope to make implementation decisions that prioritize simplicity, productivity and ergonomics over technical pyrotechnics and bloat.
  -->
 <section id="about-us">
 <h2>About Us<a class="headerlink" href="#about-us" title="Permalink to this headline">¶</a></h2>
-<p>Meerkat is being built by Machine Learning PhD students in the <a class="reference external" href="https://hazyresearch.stanford.edu">Hazy Research</a> lab at Stanford.
-We’re excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds, and have done research that touches all parts of the machine learning process: we’ve created new model architectures, studied model robustness and evaluation, advanced applications ranging from audio generation to medical imaging, and directly contributed to the emergence of foundation models.</p>
+<p>Meerkat is being built by Machine Learning PhD students in the <a class="reference external" href="https://hazyresearch.stanford.edu">Hazy Research</a> lab at Stanford. We’re excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds and have done research that touches all parts of the machine learning process: we’ve created new model architectures, studied model robustness and evaluation, worked on advanced applications ranging from audio generation to medical imaging, and contributed directly to the emergence of foundation models.</p>
 <div style="display: flex; gap: 2rem; align-items: center;">
     <a href="https://hazyresearch.github.io/">
         <img
@@ -834,8 +833,8 @@ We’re excited to build for a future where models will make it easier for teams
 </section>
 <section id="acknowledgements">
 <h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
-<p>We would like to particularly acknowledge the following open-source projects that have made Meerkat possible to implement: <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://pytorch.org/">PyTorch</a>, <a class="reference external" href="https://arrow.apache.org/">Apache Arrow</a>, <a class="reference external" href="https://huggingface.co/">HuggingFace</a>, <a class="reference external" href="https://scikit-learn.org/">Scikit-Learn</a>, <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a>, <a class="reference external" href="https://fastapi.tiangolo.com/">FastAPI</a>, <a class="reference external" href="https://typer.tiangolo.com/">Typer</a>, <a class="reference external" href="https://kit.svelte.dev/">SvelteKit</a>, <a class="reference external" href="https://svelte.dev/">Svelte</a>, <a class="reference external" href="https://tailwindcss.com/">TailwindCSS</a>, <a class="reference external" href="https://flowbite.com/">Flowbite</a>.</p>
-<p>We also want to acknowledge the following projects, which have provided inspiration for many of our design decisions: <a class="reference external" href="https://gradio.app/">Gradio</a>, <a class="reference external" href="https://streamlit.io/">Streamlit</a>, <a class="reference external" href="https://pynecone.io/">Pynecone.io</a>, <a class="reference external" href="https://plotly.com/dash/">Plotly Dash</a>, <a class="reference external" href="https://github.com/rstudio/py-shiny">Shiny</a>.</p>
+<p>We would like to particularly acknowledge the following open-source projects that have made Meerkat possible to implement: <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>, <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://pytorch.org/">PyTorch</a>, <a class="reference external" href="https://arrow.apache.org/">Apache Arrow</a>, <a class="reference external" href="https://huggingface.co/">HuggingFace</a>, <a class="reference external" href="https://scikit-learn.org/">Scikit-Learn</a>, <a class="reference external" href="https://pydantic-docs.helpmanual.io/">Pydantic</a>, <a class="reference external" href="https://fastapi.tiangolo.com/">FastAPI</a>, <a class="reference external" href="https://typer.tiangolo.com/">Typer</a>, <a class="reference external" href="https://kit.svelte.dev/">SvelteKit</a>, <a class="reference external" href="https://svelte.dev/">Svelte</a>, <a class="reference external" href="https://tailwindcss.com/">TailwindCSS</a>, and <a class="reference external" href="https://flowbite.com/">Flowbite</a>.</p>
+<p>We also want to acknowledge the following projects, which have provided inspiration for many of our design decisions: <a class="reference external" href="https://gradio.app/">Gradio</a>, <a class="reference external" href="https://streamlit.io/">Streamlit</a>, <a class="reference external" href="https://pynecone.io/">Pynecone.io</a>, <a class="reference external" href="https://plotly.com/dash/">Plotly Dash</a>, and <a class="reference external" href="https://github.com/rstudio/py-shiny">Shiny</a>.</p>
 </section>
 <div class="toctree-wrapper compound">
 </div>

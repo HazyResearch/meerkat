@@ -442,7 +442,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="../guide/interactive/components/display.html">
-       Displaying dataframes
+       Displaying data frames
       </a>
      </li>
      <li class="toctree-l3">
@@ -1082,7 +1082,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "ee95b2223cc34646b5748a141e4c8020"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "465815234ec64becbb862fd3eb91b24f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
@@ -1124,10 +1124,12 @@ title="Print to PDF"
 <span class="g g-Whitespace">   </span><span class="mi">2142</span> <span class="k">elif</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
 <span class="g g-Whitespace">   </span><span class="mi">2143</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2190,</span> in <span class="ni">TarFile.makefile</span><span class="nt">(self, tarinfo, targetpath)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2188</span>     <span class="n">target</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">2189</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">2190</span>     <span class="n">copyfileobj</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">ReadError</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2182,</span> in <span class="ni">TarFile.makefile</span><span class="nt">(self, tarinfo, targetpath)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2180</span> <span class="n">source</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">offset_data</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2181</span> <span class="n">bufsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copybufsize</span>
+<span class="ne">-&gt; </span><span class="mi">2182</span> <span class="k">with</span> <span class="n">bltn_open</span><span class="p">(</span><span class="n">targetpath</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">target</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2183</span>     <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">sparse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2184</span>         <span class="k">for</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">sparse</span><span class="p">:</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
@@ -1210,7 +1212,7 @@ title="Print to PDF"
 </ul>
 <section id="aside-imagecolumn-under-the-hood-deferredcolumn">
 <h3>📎 <em>Aside</em>: <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> under the hood, <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.<a class="headerlink" href="#aside-imagecolumn-under-the-hood-deferredcolumn" title="Permalink to this headline">¶</a></h3>
-<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
+<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/HazyResearch/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
 <p><em>What’s a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>?</em>
 In <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>, high-dimensional data types like images and videos are typically stored in a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>. A  <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> wraps around another column and lazily applies a function to it’s content as it is indexed. Consider the following example, where we create a simple <code class="docutils literal notranslate"><span class="pre">meerkat</span></code> column…</p>
 <div class="cell docutils container">

@@ -444,7 +444,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="../interactive/components/display.html">
-       Displaying dataframes
+       Displaying data frames
       </a>
      </li>
      <li class="toctree-l3">
@@ -922,10 +922,13 @@ Let’s take a look at how the <code class="docutils literal notranslate"><span 
 &lt;/div&gt;
 </pre></div>
 </div>
-<p>Meerkat will do this automatically, so don’t worry about it.</p>
 </aside>
-<p>Meerkat includes a subset of <code class="docutils literal notranslate"><span class="pre">html</span></code> tags that are quite useful when you want to layout components. For example, you can use the <code class="docutils literal notranslate"><span class="pre">div</span></code> component to create a <code class="docutils literal notranslate"><span class="pre">div</span></code> element that contains the <code class="docutils literal notranslate"><span class="pre">slider</span></code> and <code class="docutils literal notranslate"><span class="pre">text</span></code> components we just created.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">div</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">text</span><span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;flex flex-col&quot;</span><span class="p">)</span>
+<p>Meerkat will do this automatically, so don’t worry about it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+Meerkat includes a subset of `html` tags that are quite useful when you want to layout components. For example, you can use the `div` component to create a `div` element that contains the `slider` and `text` components we just created.
+
+```python
+layout = div([slider, text], classes=&quot;flex flex-col&quot;)
 </pre></div>
 </div>
 <p>As its first argument, <code class="docutils literal notranslate"><span class="pre">div</span></code> accepts <code class="docutils literal notranslate"><span class="pre">slots</span></code>, which is a list of components that will be rendered inside the <code class="docutils literal notranslate"><span class="pre">div</span></code> element. You’ll see that many other components in Meerkat have this special <code class="docutils literal notranslate"><span class="pre">slots</span></code> argument: all of them inherit from a mixin class called <code class="docutils literal notranslate"><span class="pre">Slottable</span></code> in addition to <code class="docutils literal notranslate"><span class="pre">Component</span></code>.</p>
