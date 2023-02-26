@@ -21,6 +21,7 @@ def complete_prompt(row, example_template: mk.Store[str]):
 
 filepath = "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json"
 df = mk.from_json(filepath=filepath, lines=True, backend="arrow")
+df = mk.from_pandas(df.to_pandas(), primary_key="id")
 df["url"] = "https://arxiv.org/pdf/" + df["id"]
 df["pdf"] = mk.files(
     df["url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
@@ -32,10 +33,9 @@ df = df[df["categories"].str.contains("stat.ML")]
 df = df[
     ["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "url"]
 ]
-df["note"] = mk.scalar([""] * len(df), backend="arrow")
+df["note"] = ""
 
-
-
+df = df[:100]
 df = df.mark()
 
 
@@ -65,17 +65,15 @@ def check_example_template(example_template: str, df: mk.DataFrame):
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
-        return ["test" for x in example]
-        print("before")
+        return ["test"] * len(example)
         out = manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
-        print("after")
         return out
     selected_idxs = df.primary_key.isin(selected)
 
     # Concat all of the in-context examples.
-    train_df = df[~selected_idxs & df[output_col] != ""]
+    train_df = df[(~selected_idxs) & (df[output_col] != "")]
     in_context_examples = "\n".join(train_df["example"]())
 
     fill_df = df[selected_idxs]
@@ -93,6 +91,7 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
 
     df[col][selected_idxs] = flash_fill
     df.set(df)
+    print("done with manifest")
 
 
 @mk.reactive()
@@ -100,6 +99,7 @@ def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     """Update the df with the new prompt template.
     This is as simple as returning a view.
     """
+    print("here")
     df = df.view()
 
     # Extract out the example template from the prompt template.
@@ -128,6 +128,7 @@ output_col = check_example_template(example_template=example_template, df=df)
 
 df_view = update_df_with_example_template(df, example_template)
 
+mk.gui.print(df_view)
 
 @mk.endpoint
 def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any):
@@ -136,7 +137,7 @@ def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any)
 
 # mk.gui.Gallery(df_view, main_column="guest")
 table = mk.gui.Table(
-    df_view[["id", "authors", "title", "abstract", "categories", "pdf", "note", "example"]],
+    df_view,
     on_edit=on_edit.partial(df=df),
 )
 
