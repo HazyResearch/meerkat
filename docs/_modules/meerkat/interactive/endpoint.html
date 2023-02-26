@@ -680,6 +680,7 @@ title="Open an issue"
 
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -692,7 +693,7 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.types</span> <span class="kn">import</span> <span class="n">T</span>
 <span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span><span class="p">,</span> <span class="n">is_meerkat_id</span>
 <span class="kn">from</span> <span class="nn">meerkat.state</span> <span class="kn">import</span> <span class="n">state</span>
-<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">has_var_args</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">get_type_hint_args</span><span class="p">,</span> <span class="n">get_type_hint_origin</span><span class="p">,</span> <span class="n">has_var_args</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1245,12 +1246,14 @@ title="Open an issue"
         <span class="n">stores</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">identifiables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
-                <span class="c1"># This is a non-generic type hinted Store, e.g. `Store`</span>
+            <span class="n">is_annotation_store</span> <span class="o">=</span> <span class="n">_is_annotation_store</span><span class="p">(</span><span class="n">annot</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_annotation_store</span><span class="p">:</span>
                 <span class="n">stores</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
             <span class="c1"># TODO: See if we can remove this in the future.</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">is_annotation_store</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="c1"># This will also include `Store`, so it will be a superset</span>
                 <span class="c1"># of `stores`</span>
                 <span class="n">identifiables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
@@ -1269,7 +1272,9 @@ title="Open an issue"
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fn_bound_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">identifiables</span><span class="p">:</span>
                     <span class="c1"># Dereference the argument if it was passed in as a string id</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_meerkat_id</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="p">):</span>
                         <span class="c1"># Not a string id, so just use the object</span>
                         <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1433,6 +1438,29 @@ title="Open an issue"
         <span class="c1"># so look it up.</span>
         <span class="k">return</span> <span class="n">Node</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">obj</span>
     <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">_is_annotation_store</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a type hint is a Store or a Union of Stores.</span>
+
+<span class="sd">    Returns True if:</span>
+<span class="sd">        - The type hint is a Store</span>
+<span class="sd">        - The type hint is a Union of Store and other non-Store values.</span>
+<span class="sd">        - The type hint is a generic store Store[T] or Union[Store[T], ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_hint</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">type_hint</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_hint</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">_GenericAlias</span><span class="p">):</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">get_type_hint_origin</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">get_type_hint_args</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">origin</span> <span class="o">==</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">_is_annotation_store</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
               </div>

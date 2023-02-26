@@ -83,6 +83,6 @@ File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/P
 [1;32m   3228[0m     exclusive_fp [38;5;241m=[39m [38;5;28;01mTrue[39;00m
 [1;32m   3230[0m [38;5;28;01mtry[39;00m:
 
-[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_3896.JPEG'
-FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_3896.JPEG'
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_26829.JPEG'
+FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/train/n02979186/n02979186_26829.JPEG'
 
