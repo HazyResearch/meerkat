@@ -55,7 +55,7 @@ class ColumnIOMixin:
             assert os.path.exists(path), f"`path` {path} does not exist."
             try:
                 state = col_type._read_state(path)
-            except Exception as e:
+            except Exception:
                 state = None
         else:
             state = meta["state"]
