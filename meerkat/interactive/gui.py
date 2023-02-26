@@ -47,7 +47,7 @@ class DataFrameGUI(GUI):
             id="gallery",
             progress=False,
         ).launch()
-    
+
     def match(
         self,
         against: str,

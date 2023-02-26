@@ -44,8 +44,7 @@ def test_endpoint_wrapping_reactive_fn(fn_decorator):
 def test_endpoint_with_reactive_output(
     x,
 ):
-    """
-    Test that we can add endpoints to reactive outputs.
+    """Test that we can add endpoints to reactive outputs.
 
     The graph for this test looks like
 
@@ -111,9 +110,7 @@ def test_endpoint_with_reactive_output(
 @pytest.mark.parametrize("endpoint_id", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize("partial", [True, False])
 def test_endpoint_type_hints(endpoint_id: int, partial: bool):
-    """
-    Test that endpoints with different type hints will work.
-    """
+    """Test that endpoints with different type hints will work."""
 
     @mk.endpoint()
     def endpoint1(x: mk.Store):
@@ -156,10 +153,11 @@ def test_endpoint_type_hints(endpoint_id: int, partial: bool):
 @pytest.mark.parametrize("endpoint_id", [1, 2, 3])
 @pytest.mark.parametrize("partial", [True, False])
 def test_endpoint_with_string(x_input, endpoint_id: int, partial: bool):
-    """
-    Endpoints resolve variables based on their ids, which are strings.
-    This may cause problems when the input is actually as string.
-    These tests are to check that endpoints can work properly with non-id strings.
+    """Endpoints resolve variables based on their ids, which are strings.
+
+    This may cause problems when the input is actually as string. These
+    tests are to check that endpoints can work properly with non-id
+    strings.
     """
 
     @mk.endpoint()

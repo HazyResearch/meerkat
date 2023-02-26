@@ -322,7 +322,6 @@ class Formatter(BaseFormatter):
         self._props = state["_props"]
 
 
-
 MeerkatDumper.add_multi_representer(BaseFormatter, BaseFormatter.to_yaml)
 MeerkatLoader.add_constructor("!Formatter", BaseFormatter.from_yaml)
 
