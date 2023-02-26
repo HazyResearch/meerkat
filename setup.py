@@ -175,12 +175,12 @@ class UploadCommand(Command):
             sys.exit(1)
 
         # Package static components to a tar file.
-        self.status("Packaging static component build...")
-        shutil.make_archive(
-            base_name=f"static-build-{VERSION}",
-            format="gztar",
-            root_dir="./meerkat/interactive/app/build",
-        )
+        # self.status("Packaging static component build...")
+        # shutil.make_archive(
+        #     base_name=f"static-build-{VERSION}",
+        #     format="gztar",
+        #     root_dir="./meerkat/interactive/app/build",
+        # )
 
         # # Push to huggingface
         # self.status("Uploading static build to huggingface...")
@@ -209,7 +209,9 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "demo"])
+    + ["meerkat-demo"],
+    package_dir={"meerkat-demo": "demo"},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
     entry_points={
