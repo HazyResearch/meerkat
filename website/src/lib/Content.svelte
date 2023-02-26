@@ -160,7 +160,7 @@
 						<img
 							src="https://hazyresearch.stanford.edu/hazy-logo.png"
 							alt="Hazy Research Logo"
-							class="rounded-md"
+							class="h-full rounded-md"
 						/>
 						<span class="ml-2 text-2xl font-bold text-red-800 align-middle self-center"
 							>Hazy Research</span
