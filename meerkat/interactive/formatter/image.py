@@ -70,7 +70,7 @@ class DeferredImageFormatter(ImageFormatter):
             return image.absolute_path
         else:
             image = image()
-            return super()._encode(image, thumbnail=thumbnail)
+            return super().encode(image, thumbnail=thumbnail)
 
 
 class DeferredImageFormatterGroup(ImageFormatterGroup):

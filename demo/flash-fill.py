@@ -7,10 +7,10 @@ import re
 import meerkat as mk
 from meerkat.dataframe import Batch
 
-# manifest = Manifest(
-#     client_name="huggingface",
-#     client_connection="http://127.0.0.1:8010",
-# )
+manifest = Manifest(
+    client_name="huggingface",
+    client_connection="http://127.0.0.1:8010",
+)
 
 
 def complete_prompt(row, example_template: mk.Store[str]):
