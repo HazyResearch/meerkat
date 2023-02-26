@@ -679,7 +679,12 @@ class DataFrame(
     @classmethod
     # @capture_provenance(capture_args=["filepath"])
     def from_csv(
-        cls, filepath: str, primary_key: str = None, *args, **kwargs
+        cls,
+        filepath: str,
+        primary_key: str = None,
+        backend: str = "pandas",
+        *args,
+        **kwargs,
     ) -> DataFrame:
         """Create a DataFrame from a csv file. All of the columns will be
         :class:`meerkat.ScalarColumn` with backend Pandas.
@@ -693,7 +698,10 @@ class DataFrame(
         Returns:
             DataFrame: The constructed dataframe.
         """
-        df = cls.from_pandas(pd.read_csv(filepath, *args, **kwargs), index=False)
+        if backend == "pandas":
+            df = cls.from_pandas(pd.read_csv(filepath, *args, **kwargs), index=False)
+        elif backend == "arrow":
+            df = cls.from_arrow(pa.csv.read_csv(filepath, *args, **kwargs))
         if primary_key is not None:
             df.set_primary_key(primary_key, inplace=True)
         return df
@@ -767,13 +775,13 @@ class DataFrame(
         return df
 
     @classmethod
-    # @capture_provenance()
     def from_json(
         cls,
         filepath: str,
         primary_key: str = None,
         orient: str = "records",
         lines: bool = False,
+        backend: str = "pandas",
         **kwargs,
     ) -> DataFrame:
         """Load a DataFrame from a json file.
@@ -791,14 +799,25 @@ class DataFrame(
                 Same as :func:`pandas.read_json`.
             lines (bool): Whether the json file is a jsonl file.
                 Same as :func:`pandas.read_json`.
+            backend (str): The backend to use for the loading and reuslting columns.
             **kwargs: Keyword arguments forwarded to :func:`pandas.read_json`.
 
         Returns:
             DataFrame: The constructed dataframe.
         """
-        df = cls.from_pandas(
-            pd.read_json(filepath, orient=orient, lines=lines, **kwargs), index=False
-        )
+        from pyarrow import json
+
+        if backend == "arrow":
+            if lines == False:
+                raise ValueError("Arrow backend only supports lines=True.")
+            df = cls.from_arrow(
+                json.read_json(filepath, **kwargs)
+            )
+        elif backend == "pandas":
+            df = cls.from_pandas(
+                pd.read_json(filepath, orient=orient, lines=lines, **kwargs),
+                index=False,
+            )
         if primary_key is not None:
             df.set_primary_key(primary_key, inplace=True)
         return df

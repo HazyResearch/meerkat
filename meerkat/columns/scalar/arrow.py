@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import os
 import warnings
-from typing import TYPE_CHECKING, List, Sequence, Set, Union
+from typing import TYPE_CHECKING, Any, List, Sequence, Set, Union
 import re
+import numpy as np
 
 import pyarrow as pa
 import pyarrow.compute as pc
@@ -198,6 +199,30 @@ class ArrowScalarColumn(ScalarColumn):
 
     def _set(self, index, value):
         raise ImmutableError("ArrowArrayColumn is immutable.")
+    
+    def _is_valid_primary_key(self):
+        return len(self.unique()) == len(self)
+    
+    def _keyidx_to_posidx(self, keyidx: Any) -> int:
+        """Get the posidx of the first occurrence of the given keyidx. Raise a
+        key error if the keyidx is not found.
+
+        Args:
+            keyidx: The keyidx to search for.
+
+        Returns:
+            The posidx of the first occurrence of the given keyidx.
+        """
+        posidx = pc.index(self.data, keyidx)
+        if posidx == -1:
+            raise KeyError(f"keyidx not found in column.")
+        return posidx.as_py()
+        
+
+    def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
+        # FIXME: this implementation is very slow. This should be done with indices
+        return np.array([self._keyidx_to_posidx(keyidx) for keyidx in keyidxs])
+
 
     def _repr_cell(self, index) -> object:
         return self.data[index]
@@ -336,7 +361,7 @@ class ArrowScalarColumn(ScalarColumn):
         return pc.approximate_median(self.data, skip_nulls=skipna).as_py()
 
     def _dispatch_arithmetic_function(
-        self, other: ScalarColumn, compute_fn: str, right: bool, **kwargs
+        self, other: ScalarColumn, compute_fn: str, right: bool, *args, **kwargs
     ):
         if isinstance(other, Column):
             assert isinstance(other, ArrowScalarColumn)
@@ -344,10 +369,14 @@ class ArrowScalarColumn(ScalarColumn):
 
         compute_fn = self.COMPUTE_FN_MAPPING.get(compute_fn, compute_fn)
         if right:
-            out = self._clone(data=getattr(pc, compute_fn)(other, self.data, **kwargs))
+            out = self._clone(
+                data=getattr(pc, compute_fn)(other, self.data, *args, **kwargs)
+            )
             return out
         else:
-            return self._clone(data=getattr(pc, compute_fn)(self.data, other, **kwargs))
+            return self._clone(
+                data=getattr(pc, compute_fn)(self.data, other, *args, **kwargs)
+            )
 
     def _true_div(self, other, right: bool = False, **kwargs) -> ScalarColumn:
         if isinstance(other, Column):
@@ -365,6 +394,23 @@ class ArrowScalarColumn(ScalarColumn):
             return self._clone(pc.divide(other, self.data), **kwargs)
         else:
             return self._clone(pc.divide(self.data, other), **kwargs)
+
+    def __add__(self, other: ScalarColumn):
+        if self.dtype == pa.string():
+            # pyarrow expects a final str used as the spearator
+            return self._dispatch_arithmetic_function(
+                other, "binary_join_element_wise", False, ""
+            )
+
+        return self._dispatch_arithmetic_function(other, "add", right=False)
+
+    def __radd__(self, other: ScalarColumn):
+        if self.dtype == pa.string():
+             return self._dispatch_arithmetic_function(
+                other, "binary_join_element_wise", True, ""
+            )
+
+        return self._dispatch_arithmetic_function(other, "radd", right=False)
 
     def __truediv__(self, other: ScalarColumn):
         return self._true_div(other, right=False)

@@ -1194,12 +1194,14 @@ def test_repr_pandas(testbed, max_rows: int):
     assert len(df) == min(len(df), max_rows + 1)
 
 
-@product_parametrize(params={"column_type": [ScalarColumn, NumPyTensorColumn]})
+@product_parametrize(
+    params={"column_type": [PandasScalarColumn, ArrowScalarColumn, NumPyTensorColumn]}
+)
 def test_loc_single(testbed, column_type: type):
     df = testbed.df
     # int index => single row (dict)
     index = 2
-    df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
+    df["pk"] = column_type((np.arange(len(df)) + 10).astype(str))
     df = df.set_primary_key("pk")
 
     row = df.loc[str(index + 10)]
@@ -1214,12 +1216,14 @@ def test_loc_single(testbed, column_type: type):
         )
 
 
-@product_parametrize(params={"column_type": [ScalarColumn, NumPyTensorColumn]})
+@product_parametrize(
+    params={"column_type": [ScalarColumn, ArrowScalarColumn, NumPyTensorColumn]}
+)
 def test_loc_multiple(testbed, column_type):
     df = testbed.df
     # int index => single row (dict)
     indices = np.array([2, 3])
-    df["pk"] = column_type(np.arange(len(df)) + 10).astype(str)
+    df["pk"] = column_type((np.arange(len(df)) + 10).astype(str))
     df = df.set_primary_key("pk")
 
     loc_index = (indices + 10).astype(str)

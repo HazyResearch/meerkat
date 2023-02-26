@@ -58,9 +58,24 @@ class DeferredColumn(Column):
         self._output_type = output_type
         super(DeferredColumn, self).__init__(data, *args, **kwargs)
 
-    def __call__(self):
-        # TODO(Sabri): Make this a more efficient call
-        return self._get(index=np.arange(len(self)), materialize=True)
+    def __call__(
+        self,
+        use_ray: bool = False,
+        pbar: bool = False,
+        num_blocks: int = None,
+        blocks_per_window: int = None,
+        batch_size: int = 1,
+    ):
+        from meerkat.ops.map import _materialize
+
+        return _materialize(
+            self,
+            use_ray=use_ray,
+            pbar=pbar,
+            num_blocks=num_blocks,
+            blocks_per_window=blocks_per_window,
+            batch_size=batch_size,
+        )
 
     def _set(self, index, value):
         raise ImmutableError("LambdaColumn is immutable.")

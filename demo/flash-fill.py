@@ -9,7 +9,7 @@ from meerkat.dataframe import Batch
 
 manifest = Manifest(
     client_name="huggingface",
-    client_connection="http://127.0.0.1:8010",
+    client_connection="http://127.0.0.1:7861",
 )
 
 
@@ -19,18 +19,18 @@ def complete_prompt(row, example_template: mk.Store[str]):
     return output
 
 
-num_copies = 10
-df = mk.from_json(
-    "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json",
-    lines=True,
-    nrows=1000,
-    dtype={"id": str},
-)
-df["pdf_url"] = df.map(lambda id: f"https://arxiv.org/pdf/{id}")
+filepath = "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json"
+df = mk.from_json(filepath=filepath, lines=True, backend="arrow")
+df = df[df["categories"].str.contains("stat.ML")]
+df["url"] = "https://arxiv.org/pdf/" + df["id"]
 df["pdf"] = mk.files(
-    df["pdf_url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
+    df["url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
 )
-df = df[["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "pdf_url"]]
+
+
+df = df[
+    ["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "url"]
+]
 df["note"] = ""
 
 
@@ -63,7 +63,6 @@ def check_example_template(example_template: str, df: mk.DataFrame):
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
-        return ["Response test"] * len(example)
         return manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
@@ -131,7 +130,10 @@ def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any)
 
 
 # mk.gui.Gallery(df_view, main_column="guest")
-table = mk.gui.Table(df_view, on_edit=on_edit.partial(df=df))
+table = mk.gui.Table(
+    df_view[["id", "authors", "title", "abstract", "categories", "pdf", "note", "example"]],
+    on_edit=on_edit.partial(df=df),
+)
 
 mk.gui.html.button()
 run_manifest_button = mk.gui.Button(

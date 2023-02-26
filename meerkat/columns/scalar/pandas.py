@@ -352,13 +352,10 @@ class PandasScalarColumn(
         return int(posidx)
 
     def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
-        posidxs = np.where(np.isin(self.data, keyidxs))[0]
-
-        diff = np.setdiff1d(keyidxs, self.data[posidxs])
-        if len(diff) > 0:
-            raise KeyError(f"Key indexes {diff} not found in column.")
-
-        return posidxs
+        # FIXME: this implementation is very slow. This should be done with indices
+        return np.array([
+            self._keyidx_to_posidx(keyidx) for keyidx in keyidxs
+        ])
 
     def sort(
         self, ascending: Union[bool, List[bool]] = True, kind: str = "quicksort"
