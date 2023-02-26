@@ -50,6 +50,13 @@ MEERKAT_TEMPLATES_DIR = os.path.join(
     MEERKAT_BASE_DIR, "meerkat", "interactive", "templates"
 )
 
+# Meerkat demo directory.
+MEERKAT_DEMO_DIR = os.path.join(MEERKAT_BASE_DIR, "meerkat-demo")
+if not os.path.exists(MEERKAT_DEMO_DIR):  # pypi install
+    MEERKAT_DEMO_DIR = os.path.join(MEERKAT_BASE_DIR, "demo")
+if not os.path.exists(MEERKAT_DEMO_DIR):  # repo install
+    MEERKAT_DEMO_DIR = None
+
 # Environment variables that should primarily be used inside the
 # subprocess run by `mk run` (i.e. the subprocess that is used to
 # run the script that is passed to `mk run`).

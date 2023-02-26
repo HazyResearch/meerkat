@@ -209,8 +209,9 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    package_data={NAME: ["demo/*.py"]},
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "demo"])
+    + ["meerkat-demo"],
+    package_dir={"meerkat-demo": "demo"},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
     entry_points={

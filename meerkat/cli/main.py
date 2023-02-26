@@ -9,6 +9,7 @@ import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from meerkat.constants import (
+    MEERKAT_DEMO_DIR,
     MEERKAT_INTERNAL_APP_DIR,
     MEERKAT_NPM_PACKAGE,
     App,
@@ -251,15 +252,15 @@ def install(
         app.run_dev()
 
 
-_DEMO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "demo")
-
 DemoScript = Enum(
     "DemoScript",
     {
         k: k
-        for k in [x.split(".py")[0] for x in os.listdir(_DEMO_DIR) if x.endswith(".py")]
+        for k in [
+            x.split(".py")[0] for x in os.listdir(MEERKAT_DEMO_DIR) if x.endswith(".py")
+        ]
     }
-    if os.path.exists(_DEMO_DIR)
+    if MEERKAT_DEMO_DIR
     else {},
 )
 
@@ -280,7 +281,7 @@ def demo(
     """Run a demo script."""
     # Get the path to the demo script
     script = script.value
-    script_path = os.path.join(_DEMO_DIR, f"{script}.py")
+    script_path = os.path.join(MEERKAT_DEMO_DIR, f"{script}.py")
 
     # Optional: Copy the demo script to the current directory.
     if copy:
