@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a12</title>
+    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a13</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -87,7 +87,7 @@
       <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.2.6a12</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a13</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -1116,82 +1116,54 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "460ca704b3074548aef9d6a0b80b7c7b"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "1b88a581969746d9a479f2af66f9797e"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ParserError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:139,</span> in <span class="ni">download_imagenette</span><span class="nt">(download_dir, version, overwrite, return_df)</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span>     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Directory </span><span class="si">{</span><span class="n">dir_path</span><span class="si">}</span><span class="s2"> already exists. Skipping download.&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">138</span> <span class="c1"># build dataframe</span>
-<span class="ne">--&gt; </span><span class="mi">139</span> <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s2">&quot;noisy_imagenette.csv&quot;</span><span class="p">))</span>
-<span class="g g-Whitespace">    </span><span class="mi">140</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;noisy_labels_0&quot;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">141</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;label_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ID_TO_WORDS</span><span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:132,</span> in <span class="ni">download_imagenette</span><span class="nt">(download_dir, version, overwrite, return_df)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tar archive, this may take a few minutes...&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>     <span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">cached_tar_path</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">download_dir</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>     <span class="c1"># os.remove(tar_path)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="k">else</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:211,</span> in <span class="ni">deprecate_kwarg.&lt;locals&gt;._deprecate_kwarg.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>         <span class="n">kwargs</span><span class="p">[</span><span class="n">new_arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_arg_value</span>
-<span class="ne">--&gt; </span><span class="mi">211</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2021,</span> in <span class="ni">TarFile.extractall</span><span class="nt">(self, path, members, numeric_owner)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2018</span> <span class="k">if</span> <span class="n">members</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2019</span>     <span class="n">members</span> <span class="o">=</span> <span class="bp">self</span>
+<span class="ne">-&gt; </span><span class="mi">2021</span> <span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2022</span>     <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+<span class="g g-Whitespace">   </span><span class="mi">2023</span>         <span class="c1"># Extract directories with a safe mode.</span>
+<span class="g g-Whitespace">   </span><span class="mi">2024</span>         <span class="n">directories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:331,</span> in <span class="ni">deprecate_nonkeyword_arguments.&lt;locals&gt;.decorate.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_allow_args</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arguments</span><span class="o">=</span><span class="n">_format_argument_list</span><span class="p">(</span><span class="n">allow_args</span><span class="p">)),</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="ne">FutureWarning</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>         <span class="n">stacklevel</span><span class="o">=</span><span class="n">find_stack_level</span><span class="p">(),</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span>     <span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">331</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2434,</span> in <span class="ni">TarFile.__iter__</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2432</span>     <span class="n">tarinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+<span class="g g-Whitespace">   </span><span class="mi">2433</span> <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2434</span>     <span class="n">tarinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">2435</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">tarinfo</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2436</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:950,</span> in <span class="ni">read_csv</span><span class="nt">(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, squeeze, prefix, mangle_dupe_cols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, error_bad_lines, warn_bad_lines, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options)</span>
-<span class="g g-Whitespace">    </span><span class="mi">935</span> <span class="n">kwds_defaults</span> <span class="o">=</span> <span class="n">_refine_defaults_read</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">936</span>     <span class="n">dialect</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">937</span>     <span class="n">delimiter</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">946</span>     <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="p">},</span>
-<span class="g g-Whitespace">    </span><span class="mi">947</span> <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">948</span> <span class="n">kwds</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds_defaults</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">950</span> <span class="k">return</span> <span class="n">_read</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2309,</span> in <span class="ni">TarFile.next</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2306</span>     <span class="k">return</span> <span class="n">m</span>
+<span class="g g-Whitespace">   </span><span class="mi">2308</span> <span class="c1"># Advance the file pointer.</span>
+<span class="ne">-&gt; </span><span class="mi">2309</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">tell</span><span class="p">():</span>
+<span class="g g-Whitespace">   </span><span class="mi">2310</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2311</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:611,</span> in <span class="ni">_read</span><span class="nt">(filepath_or_buffer, kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">608</span>     <span class="k">return</span> <span class="n">parser</span>
-<span class="g g-Whitespace">    </span><span class="mi">610</span> <span class="k">with</span> <span class="n">parser</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">611</span>     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">nrows</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/gzip.py:382,</span> in <span class="ni">GzipFile.seek</span><span class="nt">(self, offset, whence)</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span>         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">count</span> <span class="o">%</span> <span class="mi">1024</span><span class="p">))</span>
+<span class="ne">--&gt; </span><span class="mi">382</span> <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">READ</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_check_not_closed</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">384</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1778,</span> in <span class="ni">TextFileReader.read</span><span class="nt">(self, nrows)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1771</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">validate_integer</span><span class="p">(</span><span class="s2">&quot;nrows&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1772</span> <span class="k">try</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1773</span>     <span class="c1"># error: &quot;ParserBase&quot; has no attribute &quot;read&quot;</span>
-<span class="g g-Whitespace">   </span><span class="mi">1774</span>     <span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1775</span>         <span class="n">index</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1776</span>         <span class="n">columns</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1777</span>         <span class="n">col_dict</span><span class="p">,</span>
-<span class="ne">-&gt; </span><span class="mi">1778</span>     <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>  <span class="c1"># type: ignore[attr-defined]</span>
-<span class="g g-Whitespace">   </span><span class="mi">1779</span>         <span class="n">nrows</span>
-<span class="g g-Whitespace">   </span><span class="mi">1780</span>     <span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1781</span> <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1782</span>     <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/c_parser_wrapper.py:230,</span> in <span class="ni">CParserWrapper.read</span><span class="nt">(self, nrows)</span>
-<span class="g g-Whitespace">    </span><span class="mi">228</span> <span class="k">try</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">229</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">low_memory</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">230</span>         <span class="n">chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">read_low_memory</span><span class="p">(</span><span class="n">nrows</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">231</span>         <span class="c1"># destructive to chunks</span>
-<span class="g g-Whitespace">    </span><span class="mi">232</span>         <span class="n">data</span> <span class="o">=</span> <span class="n">_concatenate_chunks</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:808,</span> in <span class="ni">pandas._libs.parsers.TextReader.read_low_memory</span><span class="nt">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:866,</span> in <span class="ni">pandas._libs.parsers.TextReader._read_rows</span><span class="nt">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:852,</span> in <span class="ni">pandas._libs.parsers.TextReader._tokenize_rows</span><span class="nt">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:1973,</span> in <span class="ni">pandas._libs.parsers.raise_parser_error</span><span class="nt">()</span>
-
-<span class="ne">ParserError</span>: Error tokenizing data. C error: Calling read(nbytes) on source failed. Try engine=&#39;python&#39;.
+<span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
 </div>
 </div>

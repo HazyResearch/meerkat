@@ -1,0 +1,150 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import meerkat as mk
+import rich
+
+df = mk.get("imagenette", version="160px")
+IMAGE_COL = "img"
+LABEL_COL = "label"
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+Cell [0;32mIn[1], line 4[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mmeerkat[39;00m [38;5;28;01mas[39;00m [38;5;21;01mmk[39;00m
+[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mrich[39;00m
+[0;32m----> 4[0m df [38;5;241m=[39m [43mmk[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mimagenette[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mversion[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m160px[39;49m[38;5;124;43m"[39;49m[43m)[49m
+[1;32m      5[0m IMAGE_COL [38;5;241m=[39m [38;5;124m"[39m[38;5;124mimg[39m[38;5;124m"[39m
+[1;32m      6[0m LABEL_COL [38;5;241m=[39m [38;5;124m"[39m[38;5;124mlabel[39m[38;5;124m"[39m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/datasets/__init__.py:78[0m, in [0;36mget[0;34m(name, dataset_dir, version, download_mode, registry, **kwargs)[0m
+[1;32m     76[0m [38;5;28;01mif[39;00m registry [38;5;241m==[39m [38;5;124m"[39m[38;5;124mmeerkat[39m[38;5;124m"[39m:
+[1;32m     77[0m     [38;5;28;01mtry[39;00m:
+[0;32m---> 78[0m         dataset [38;5;241m=[39m [43mdatasets[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m
+[1;32m     79[0m [43m            [49m[43mname[49m[38;5;241;43m=[39;49m[43mname[49m[43m,[49m
+[1;32m     80[0m [43m            [49m[43mdataset_dir[49m[38;5;241;43m=[39;49m[43mdataset_dir[49m[43m,[49m
+[1;32m     81[0m [43m            [49m[43mversion[49m[38;5;241;43m=[39;49m[43mversion[49m[43m,[49m
+[1;32m     82[0m [43m            [49m[43mdownload_mode[49m[38;5;241;43m=[39;49m[43mdownload_mode[49m[43m,[49m
+[1;32m     83[0m [43m            [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m,[49m
+[1;32m     84[0m [43m        [49m[43m)[49m
+[1;32m     85[0m         [38;5;28;01mreturn[39;00m dataset
+[1;32m     86[0m     [38;5;28;01mexcept[39;00m [38;5;167;01mKeyError[39;00m [38;5;28;01mas[39;00m e:
+
+File [0;32m~/work/meerkat/meerkat/meerkat/datasets/registry.py:27[0m, in [0;36mRegistry.get[0;34m(self, name, **kwargs)[0m
+[1;32m     22[0m [38;5;28;01mif[39;00m ret [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[1;32m     23[0m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(
+[1;32m     24[0m         [38;5;124m"[39m[38;5;124mNo object named [39m[38;5;124m'[39m[38;5;132;01m{}[39;00m[38;5;124m'[39m[38;5;124m found in [39m[38;5;124m'[39m[38;5;132;01m{}[39;00m[38;5;124m'[39m[38;5;124m registry![39m[38;5;124m"[39m[38;5;241m.[39mformat(name, [38;5;28mself[39m[38;5;241m.[39m_name)
+[1;32m     25[0m     )
+[0;32m---> 27[0m [38;5;28;01mreturn[39;00m [43mret[49m[43m([49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m[43m([49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/datasets/abstract.py:65[0m, in [0;36mDatasetBuilder.__call__[0;34m(self)[0m
+[1;32m     60[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28mself[39m[38;5;241m.[39mis_downloaded():
+[1;32m     61[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m     62[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124mDataset [39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39mname[38;5;132;01m}[39;00m[38;5;124m is not downloaded to [39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39mdataset_dir[38;5;132;01m}[39;00m[38;5;124m.[39m[38;5;124m"[39m
+[1;32m     63[0m     )
+[0;32m---> 65[0m [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mbuild[49m[43m([49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:69[0m, in [0;36mimagenette.build[0;34m(self)[0m
+[1;32m     68[0m [38;5;28;01mdef[39;00m [38;5;21mbuild[39m([38;5;28mself[39m):
+[0;32m---> 69[0m     df [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_build_df[49m[43m([49m[43m)[49m
+[1;32m     70[0m     df [38;5;241m=[39m mk[38;5;241m.[39mDataFrame[38;5;241m.[39mfrom_pandas(df)
+[1;32m     71[0m     df[[38;5;124m"[39m[38;5;124mimg[39m[38;5;124m"[39m] [38;5;241m=[39m mk[38;5;241m.[39mfiles(df[[38;5;124m"[39m[38;5;124mimg_path[39m[38;5;124m"[39m], base_dir[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mdata_dir, [38;5;28mtype[39m[38;5;241m=[39m[38;5;124m"[39m[38;5;124mimage[39m[38;5;124m"[39m)
+
+File [0;32m~/work/meerkat/meerkat/meerkat/datasets/imagenette/__init__.py:85[0m, in [0;36mimagenette._build_df[0;34m(self)[0m
+[1;32m     80[0m [38;5;28;01mdef[39;00m [38;5;21m_build_df[39m(
+[1;32m     81[0m     [38;5;28mself[39m,
+[1;32m     82[0m ):
+[1;32m     83[0m     csv_path [38;5;241m=[39m os[38;5;241m.[39mpath[38;5;241m.[39mjoin([38;5;28mself[39m[38;5;241m.[39mdata_dir, [38;5;124m"[39m[38;5;124mnoisy_imagenette.csv[39m[38;5;124m"[39m)
+[0;32m---> 85[0m     df [38;5;241m=[39m [43mpd[49m[38;5;241;43m.[39;49m[43mread_csv[49m[43m([49m[43mcsv_path[49m[43m)[49m
+[1;32m     86[0m     df[[38;5;124m"[39m[38;5;124mlabel_id[39m[38;5;124m"[39m] [38;5;241m=[39m df[[38;5;124m"[39m[38;5;124mnoisy_labels_0[39m[38;5;124m"[39m]
+[1;32m     87[0m     df[[38;5;124m"[39m[38;5;124mlabel[39m[38;5;124m"[39m] [38;5;241m=[39m df[[38;5;124m"[39m[38;5;124mlabel_id[39m[38;5;124m"[39m][38;5;241m.[39mreplace(ID_TO_WORDS)
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:211[0m, in [0;36mdeprecate_kwarg.<locals>._deprecate_kwarg.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    209[0m     [38;5;28;01melse[39;00m:
+[1;32m    210[0m         kwargs[new_arg_name] [38;5;241m=[39m new_arg_value
+[0;32m--> 211[0m [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:331[0m, in [0;36mdeprecate_nonkeyword_arguments.<locals>.decorate.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    325[0m [38;5;28;01mif[39;00m [38;5;28mlen[39m(args) [38;5;241m>[39m num_allow_args:
+[1;32m    326[0m     warnings[38;5;241m.[39mwarn(
+[1;32m    327[0m         msg[38;5;241m.[39mformat(arguments[38;5;241m=[39m_format_argument_list(allow_args)),
+[1;32m    328[0m         [38;5;167;01mFutureWarning[39;00m,
+[1;32m    329[0m         stacklevel[38;5;241m=[39mfind_stack_level(),
+[1;32m    330[0m     )
+[0;32m--> 331[0m [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:950[0m, in [0;36mread_csv[0;34m(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, squeeze, prefix, mangle_dupe_cols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, error_bad_lines, warn_bad_lines, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options)[0m
+[1;32m    935[0m kwds_defaults [38;5;241m=[39m _refine_defaults_read(
+[1;32m    936[0m     dialect,
+[1;32m    937[0m     delimiter,
+[0;32m   (...)[0m
+[1;32m    946[0m     defaults[38;5;241m=[39m{[38;5;124m"[39m[38;5;124mdelimiter[39m[38;5;124m"[39m: [38;5;124m"[39m[38;5;124m,[39m[38;5;124m"[39m},
+[1;32m    947[0m )
+[1;32m    948[0m kwds[38;5;241m.[39mupdate(kwds_defaults)
+[0;32m--> 950[0m [38;5;28;01mreturn[39;00m [43m_read[49m[43m([49m[43mfilepath_or_buffer[49m[43m,[49m[43m [49m[43mkwds[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:605[0m, in [0;36m_read[0;34m(filepath_or_buffer, kwds)[0m
+[1;32m    602[0m _validate_names(kwds[38;5;241m.[39mget([38;5;124m"[39m[38;5;124mnames[39m[38;5;124m"[39m, [38;5;28;01mNone[39;00m))
+[1;32m    604[0m [38;5;66;03m# Create the parser.[39;00m
+[0;32m--> 605[0m parser [38;5;241m=[39m [43mTextFileReader[49m[43m([49m[43mfilepath_or_buffer[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwds[49m[43m)[49m
+[1;32m    607[0m [38;5;28;01mif[39;00m chunksize [38;5;129;01mor[39;00m iterator:
+[1;32m    608[0m     [38;5;28;01mreturn[39;00m parser
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1442[0m, in [0;36mTextFileReader.__init__[0;34m(self, f, engine, **kwds)[0m
+[1;32m   1439[0m     [38;5;28mself[39m[38;5;241m.[39moptions[[38;5;124m"[39m[38;5;124mhas_index_names[39m[38;5;124m"[39m] [38;5;241m=[39m kwds[[38;5;124m"[39m[38;5;124mhas_index_names[39m[38;5;124m"[39m]
+[1;32m   1441[0m [38;5;28mself[39m[38;5;241m.[39mhandles: IOHandles [38;5;241m|[39m [38;5;28;01mNone[39;00m [38;5;241m=[39m [38;5;28;01mNone[39;00m
+[0;32m-> 1442[0m [38;5;28mself[39m[38;5;241m.[39m_engine [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_make_engine[49m[43m([49m[43mf[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mengine[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1735[0m, in [0;36mTextFileReader._make_engine[0;34m(self, f, engine)[0m
+[1;32m   1733[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m mode:
+[1;32m   1734[0m         mode [38;5;241m+[39m[38;5;241m=[39m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m
+[0;32m-> 1735[0m [38;5;28mself[39m[38;5;241m.[39mhandles [38;5;241m=[39m [43mget_handle[49m[43m([49m
+[1;32m   1736[0m [43m    [49m[43mf[49m[43m,[49m
+[1;32m   1737[0m [43m    [49m[43mmode[49m[43m,[49m
+[1;32m   1738[0m [43m    [49m[43mencoding[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mencoding[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
+[1;32m   1739[0m [43m    [49m[43mcompression[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mcompression[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
+[1;32m   1740[0m [43m    [49m[43mmemory_map[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mmemory_map[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[43m,[49m
+[1;32m   1741[0m [43m    [49m[43mis_text[49m[38;5;241;43m=[39;49m[43mis_text[49m[43m,[49m
+[1;32m   1742[0m [43m    [49m[43merrors[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mencoding_errors[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mstrict[39;49m[38;5;124;43m"[39;49m[43m)[49m[43m,[49m
+[1;32m   1743[0m [43m    [49m[43mstorage_options[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43moptions[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mstorage_options[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m[43m,[49m
+[1;32m   1744[0m [43m[49m[43m)[49m
+[1;32m   1745[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39mhandles [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m
+[1;32m   1746[0m f [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mhandles[38;5;241m.[39mhandle
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/io/common.py:856[0m, in [0;36mget_handle[0;34m(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)[0m
+[1;32m    851[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(handle, [38;5;28mstr[39m):
+[1;32m    852[0m     [38;5;66;03m# Check whether the filename is to be opened in binary mode.[39;00m
+[1;32m    853[0m     [38;5;66;03m# Binary mode does not support 'encoding' and 'newline'.[39;00m
+[1;32m    854[0m     [38;5;28;01mif[39;00m ioargs[38;5;241m.[39mencoding [38;5;129;01mand[39;00m [38;5;124m"[39m[38;5;124mb[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m ioargs[38;5;241m.[39mmode:
+[1;32m    855[0m         [38;5;66;03m# Encoding[39;00m
+[0;32m--> 856[0m         handle [38;5;241m=[39m [38;5;28;43mopen[39;49m[43m([49m
+[1;32m    857[0m [43m            [49m[43mhandle[49m[43m,[49m
+[1;32m    858[0m [43m            [49m[43mioargs[49m[38;5;241;43m.[39;49m[43mmode[49m[43m,[49m
+[1;32m    859[0m [43m            [49m[43mencoding[49m[38;5;241;43m=[39;49m[43mioargs[49m[38;5;241;43m.[39;49m[43mencoding[49m[43m,[49m
+[1;32m    860[0m [43m            [49m[43merrors[49m[38;5;241;43m=[39;49m[43merrors[49m[43m,[49m
+[1;32m    861[0m [43m            [49m[43mnewline[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43m"[39;49m[43m,[49m
+[1;32m    862[0m [43m        [49m[43m)[49m
+[1;32m    863[0m     [38;5;28;01melse[39;00m:
+[1;32m    864[0m         [38;5;66;03m# Binary mode[39;00m
+[1;32m    865[0m         handle [38;5;241m=[39m [38;5;28mopen[39m(handle, ioargs[38;5;241m.[39mmode)
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/noisy_imagenette.csv'
+FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/.meerkat/datasets/imagenette/160px/imagenette2-160/noisy_imagenette.csv'
+
