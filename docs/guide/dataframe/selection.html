@@ -1240,7 +1240,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "b0c9f9dad2fe4f73954e49d148ccba00"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "67342922792f4a3f80f3ae0767bd704b"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
@@ -1328,143 +1328,12 @@ title="Print to PDF"
 <span class="g g-Whitespace">    </span><span class="mi">274</span>         <span class="c1"># cannot catch KeyboardInterrupt when using manual tqdm</span>
 <span class="g g-Whitespace">    </span><span class="mi">275</span>         <span class="c1"># as the interrupt will most likely happen on another statement</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/std.py:1256,</span> in <span class="ni">tqdm.update</span><span class="nt">(self, n)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1254</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_ema_dn</span><span class="p">(</span><span class="n">dn</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1255</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_ema_dt</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">1256</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">lock_args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_args</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1257</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_miniters</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1258</span>     <span class="c1"># If no `miniters` was specified, adjust automatically to the</span>
-<span class="g g-Whitespace">   </span><span class="mi">1259</span>     <span class="c1"># maximum iteration rate seen so far between two prints.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1260</span>     <span class="c1"># e.g.: After running `tqdm.update(5)`, subsequent</span>
-<span class="g g-Whitespace">   </span><span class="mi">1261</span>     <span class="c1"># calls to `tqdm.update()` will only cause an update after</span>
-<span class="g g-Whitespace">   </span><span class="mi">1262</span>     <span class="c1"># at least 5 more iterations.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1263</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxinterval</span> <span class="ow">and</span> <span class="n">dt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxinterval</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/std.py:1361,</span> in <span class="ni">tqdm.refresh</span><span class="nt">(self, nolock, lock_args)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1359</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1360</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
-<span class="ne">-&gt; </span><span class="mi">1361</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
-<span class="g g-Whitespace">   </span><span class="mi">1362</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">nolock</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1363</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/notebook.py:167,</span> in <span class="ni">tqdm_notebook.display</span><span class="nt">(self, msg, pos, close, bar_style, check_delay)</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>     <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_meter</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span> <span class="n">ltext</span><span class="p">,</span> <span class="n">pbar</span><span class="p">,</span> <span class="n">rtext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">children</span>
-<span class="ne">--&gt; </span><span class="mi">167</span> <span class="n">pbar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
-<span class="g g-Whitespace">    </span><span class="mi">169</span> <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">170</span>     <span class="c1"># html escape special characters (like &#39;&amp;&#39;)</span>
-<span class="g g-Whitespace">    </span><span class="mi">171</span>     <span class="k">if</span> <span class="s1">&#39;&lt;bar/&gt;&#39;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/traitlets/traitlets.py:732,</span> in <span class="ni">TraitType.__set__</span><span class="nt">(self, obj, value)</span>
-<span class="g g-Whitespace">    </span><span class="mi">730</span>     <span class="k">raise</span> <span class="n">TraitError</span><span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">%s</span><span class="s1">&quot; trait is read-only.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">731</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">732</span>     <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/traitlets/traitlets.py:721,</span> in <span class="ni">TraitType.set</span><span class="nt">(self, obj, value)</span>
-<span class="g g-Whitespace">    </span><span class="mi">717</span>     <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="g g-Whitespace">    </span><span class="mi">718</span> <span class="k">if</span> <span class="n">silent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">719</span>     <span class="c1"># we explicitly compare silent to True just in case the equality</span>
-<span class="g g-Whitespace">    </span><span class="mi">720</span>     <span class="c1"># comparison above returns something other than True/False</span>
-<span class="ne">--&gt; </span><span class="mi">721</span>     <span class="n">obj</span><span class="o">.</span><span class="n">_notify_trait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">old_value</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/traitlets/traitlets.py:1505,</span> in <span class="ni">HasTraits._notify_trait</span><span class="nt">(self, name, old_value, new_value)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1504</span> <span class="k">def</span> <span class="nf">_notify_trait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old_value</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
-<span class="ne">-&gt; </span><span class="mi">1505</span>     <span class="bp">self</span><span class="o">.</span><span class="n">notify_change</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1506</span>         <span class="n">Bunch</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1507</span>             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1508</span>             <span class="n">old</span><span class="o">=</span><span class="n">old_value</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1509</span>             <span class="n">new</span><span class="o">=</span><span class="n">new_value</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1510</span>             <span class="n">owner</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1511</span>             <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;change&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1512</span>         <span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1513</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipywidgets/widgets/widget.py:693,</span> in <span class="ni">Widget.notify_change</span><span class="nt">(self, change)</span>
-<span class="g g-Whitespace">    </span><span class="mi">689</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">690</span>     <span class="c1"># Make sure this isn&#39;t information that the front-end just sent us.</span>
-<span class="g g-Whitespace">    </span><span class="mi">691</span>     <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_send_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
-<span class="g g-Whitespace">    </span><span class="mi">692</span>         <span class="c1"># Send new state to front-end</span>
-<span class="ne">--&gt; </span><span class="mi">693</span>         <span class="bp">self</span><span class="o">.</span><span class="n">send_state</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">694</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">notify_change</span><span class="p">(</span><span class="n">change</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipywidgets/widgets/widget.py:579,</span> in <span class="ni">Widget.send_state</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">    </span><span class="mi">577</span> <span class="n">state</span><span class="p">,</span> <span class="n">buffer_paths</span><span class="p">,</span> <span class="n">buffers</span> <span class="o">=</span> <span class="n">_remove_buffers</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span> <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span> <span class="s1">&#39;buffer_paths&#39;</span><span class="p">:</span> <span class="n">buffer_paths</span><span class="p">}</span>
-<span class="ne">--&gt; </span><span class="mi">579</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">buffers</span><span class="o">=</span><span class="n">buffers</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipywidgets/widgets/widget.py:818,</span> in <span class="ni">Widget._send</span><span class="nt">(self, msg, buffers)</span>
-<span class="g g-Whitespace">    </span><span class="mi">816</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Sends a message to the model in the front-end.&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">817</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">kernel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">818</span>     <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">buffers</span><span class="o">=</span><span class="n">buffers</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/comm/base_comm.py:113,</span> in <span class="ni">BaseComm.send</span><span class="nt">(self, data, metadata, buffers)</span>
-<span class="g g-Whitespace">    </span><span class="mi">111</span> <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">112</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Send a message to the frontend-side version of this comm&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">113</span>     <span class="bp">self</span><span class="o">.</span><span class="n">publish_msg</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">114</span>         <span class="s2">&quot;comm_msg&quot;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">115</span>         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">116</span>         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">117</span>         <span class="n">buffers</span><span class="o">=</span><span class="n">buffers</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">118</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipykernel/comm/comm.py:35,</span> in <span class="ni">BaseComm.publish_msg</span><span class="nt">(self, msg_type, data, metadata, buffers, **keys)</span>
-<span class="g g-Whitespace">     </span><span class="mi">32</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span>     <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">Kernel</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-<span class="ne">---&gt; </span><span class="mi">35</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">36</span>     <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">iopub_socket</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span>     <span class="n">msg_type</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">38</span>     <span class="n">content</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="n">metadata</span><span class="o">=</span><span class="n">json_clean</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span>     <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="s2">&quot;shell&quot;</span><span class="p">),</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span>     <span class="n">ident</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span>     <span class="n">buffers</span><span class="o">=</span><span class="n">buffers</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span> <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_client/session.py:861,</span> in <span class="ni">Session.send</span><span class="nt">(self, stream, msg_or_type, content, parent, ident, buffers, track, header, metadata)</span>
-<span class="g g-Whitespace">    </span><span class="mi">858</span> <span class="k">elif</span> <span class="n">stream</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">859</span>     <span class="c1"># use dummy tracker, which will be done immediately</span>
-<span class="g g-Whitespace">    </span><span class="mi">860</span>     <span class="n">tracker</span> <span class="o">=</span> <span class="n">DONE</span>
-<span class="ne">--&gt; </span><span class="mi">861</span>     <span class="n">stream</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="n">to_send</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">863</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">864</span>     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># noqa</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipykernel/iostream.py:290,</span> in <span class="ni">BackgroundSocket.send_multipart</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">288</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Schedule send in IO thread&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">289</span> <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<span class="ne">--&gt; </span><span class="mi">290</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_thread</span><span class="o">.</span><span class="n">send_multipart</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipykernel/iostream.py:220,</span> in <span class="ni">IOPubThread.send_multipart</span><span class="nt">(self, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">215</span> <span class="k">def</span> <span class="nf">send_multipart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">216</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;send_multipart schedules actual zmq send in my thread.</span>
-<span class="g g-Whitespace">    </span><span class="mi">217</span><span class="sd"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span><span class="sd">     If my thread isn&#39;t running (e.g. forked process), send immediately.</span>
-<span class="g g-Whitespace">    </span><span class="mi">219</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">220</span>     <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_really_send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/ipykernel/iostream.py:211,</span> in <span class="ni">IOPubThread.schedule</span><span class="nt">(self, f)</span>
-<span class="g g-Whitespace">    </span><span class="mi">209</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># wake event thread (message content is ignored)</span>
-<span class="ne">--&gt; </span><span class="mi">211</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_event_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">213</span>     <span class="n">f</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/zmq/sugar/socket.py:688,</span> in <span class="ni">Socket.send</span><span class="nt">(self, data, flags, copy, track, routing_id, group)</span>
-<span class="g g-Whitespace">    </span><span class="mi">681</span>         <span class="n">data</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">682</span>             <span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">683</span>             <span class="n">track</span><span class="o">=</span><span class="n">track</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">684</span>             <span class="n">copy</span><span class="o">=</span><span class="n">copy</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">685</span>             <span class="n">copy_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy_threshold</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">686</span>         <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">687</span>     <span class="n">data</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
-<span class="ne">--&gt; </span><span class="mi">688</span> <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span> <span class="n">track</span><span class="o">=</span><span class="n">track</span><span class="p">)</span>
-
-<span class="nn">File zmq/backend/cython/socket.pyx:742,</span> in <span class="ni">zmq.backend.cython.socket.Socket.send</span><span class="nt">()</span>
-
-<span class="nn">File zmq/backend/cython/socket.pyx:789,</span> in <span class="ni">zmq.backend.cython.socket.Socket.send</span><span class="nt">()</span>
-
-<span class="nn">File zmq/backend/cython/socket.pyx:250,</span> in <span class="ni">zmq.backend.cython.socket._send_copy</span><span class="nt">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/zmq/backend/cython/checkrc.pxd:13,</span> in <span class="ni">zmq.backend.cython.checkrc._check_rc</span><span class="nt">()</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/std.py:1241,</span> in <span class="ni">tqdm.update</span><span class="nt">(self, n)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1238</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">disable</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1239</span>     <span class="k">return</span>
+<span class="ne">-&gt; </span><span class="mi">1241</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1242</span>     <span class="bp">self</span><span class="o">.</span><span class="n">last_print_n</span> <span class="o">+=</span> <span class="n">n</span>  <span class="c1"># for auto-refresh logic to work</span>
+<span class="g g-Whitespace">   </span><span class="mi">1243</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="n">n</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>

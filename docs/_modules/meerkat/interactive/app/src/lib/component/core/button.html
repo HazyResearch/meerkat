@@ -677,7 +677,7 @@ title="Open an issue"
                 
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.button</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span>
-<span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">EndpointProperty</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.event</span> <span class="kn">import</span> <span class="n">EventInterface</span>
 
 
@@ -691,7 +691,7 @@ title="Open an issue"
     <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;bg-slate-100 py-1 rounded-md flex flex-col hover:bg-slate-200&quot;</span>
     <span class="p">)</span>
-    <span class="n">on_click</span><span class="p">:</span> <span class="n">Endpoint</span><span class="p">[</span><span class="n">EventInterface</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">on_click</span><span class="p">:</span> <span class="n">EndpointProperty</span><span class="p">[</span><span class="n">EventInterface</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 </pre></div>
 
               </div>
