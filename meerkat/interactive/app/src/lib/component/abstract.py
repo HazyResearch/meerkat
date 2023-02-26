@@ -1,7 +1,6 @@
 import collections
 import inspect
 import os
-import sys
 import typing
 import warnings
 from typing import Dict, List, Literal, Set
@@ -16,7 +15,14 @@ from meerkat.interactive.frontend import FrontendMixin
 from meerkat.interactive.graph import Store
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.tools.utils import classproperty, has_var_kwargs, is_subclass, nested_apply
+from meerkat.tools.utils import (
+    classproperty,
+    get_type_hint_args,
+    get_type_hint_origin,
+    has_var_kwargs,
+    is_subclass,
+    nested_apply,
+)
 
 try:
     collections_abc = collections.abc
@@ -354,8 +360,8 @@ class BaseComponent(
                 the endpoint does not have a type hint for the EventInterface.
         """
         if isinstance(type_hint, typing._GenericAlias):
-            origin = _get_type_hint_origin(type_hint)
-            args = _get_type_hint_args(type_hint)
+            origin = get_type_hint_origin(type_hint)
+            args = get_type_hint_args(type_hint)
 
             if is_subclass(origin, Endpoint):
                 # Endpoint[XXX]
@@ -588,21 +594,3 @@ class Component(BaseComponent):
                 value.attach_to_inode(value.create_inode())
 
         return values
-
-
-def _get_type_hint_args(type_hint):
-    """Get the arguments of a type hint."""
-    if sys.version_info >= (3, 8):
-        # Python > 3.8
-        return typing.get_args(type_hint)
-    else:
-        return type_hint.__args__
-
-
-def _get_type_hint_origin(type_hint):
-    """Get the origin of a type hint."""
-    if sys.version_info >= (3, 8):
-        # Python > 3.8
-        return typing.get_origin(type_hint)
-    else:
-        return type_hint.__origin__

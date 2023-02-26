@@ -6,7 +6,6 @@ import typing
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
-from build.lib.meerkat.tools.utils import get_type_hint_origin
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
@@ -16,7 +15,7 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin, is_meerkat_id
 from meerkat.state import state
-from meerkat.tools.utils import has_var_args
+from meerkat.tools.utils import get_type_hint_origin, has_var_args
 
 logger = logging.getLogger(__name__)
 

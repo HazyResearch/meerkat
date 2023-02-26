@@ -1,8 +1,10 @@
 import inspect
+import sys
 import types
+import typing
+import warnings
 import weakref
 from collections import defaultdict
-import warnings
 from collections.abc import Mapping
 from functools import reduce, wraps
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
@@ -56,6 +58,24 @@ def has_var_args(fn: Callable) -> bool:
     return any([True for p in params if p.kind == p.VAR_POSITIONAL])
 
 
+def get_type_hint_args(type_hint):
+    """Get the arguments of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_args(type_hint)
+    else:
+        return type_hint.__args__
+
+
+def get_type_hint_origin(type_hint):
+    """Get the origin of a type hint."""
+    if sys.version_info >= (3, 8):
+        # Python > 3.8
+        return typing.get_origin(type_hint)
+    else:
+        return type_hint.__origin__
+
+
 class classproperty(property):
     """Taken from https://stackoverflow.com/a/13624858.
 
@@ -87,6 +107,7 @@ def deprecated(replacement: Optional[str] = None):
             )
             warnings.simplefilter("default", DeprecationWarning)  # reset filter
             return func(*args, **kwargs)
+
         return new_func
 
     return _decorator
@@ -399,7 +420,6 @@ def translate_index(index, length: int):
     if not _is_batch_index(index):
         return index
 
-    from ..columns.abstract import Column
     from ..columns.scalar.abstract import ScalarColumn
 
     if isinstance(index, pd.Series):
@@ -410,7 +430,7 @@ def translate_index(index, length: int):
 
     if isinstance(index, tuple) or isinstance(index, list):
         index = np.array(index)
-    
+
     if isinstance(index, ScalarColumn):
         index = index.to_numpy()
 
