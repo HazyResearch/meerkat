@@ -594,9 +594,7 @@ def endpoint(
             for k, v in fn_bound_arguments.items():
                 if k in identifiables:
                     # Dereference the argument if it was passed in as a string id
-                    if not isinstance(v, str) or (
-                        isinstance(v, str) and not is_meerkat_id(v)
-                    ):
+                    if not isinstance(v, str):
                         # Not a string id, so just use the object
                         _kwargs[k] = v
                     else:
@@ -614,7 +612,22 @@ def endpoint(
                                 # If that fails, try to look up the string id in
                                 # the Node registry, and then get the object
                                 # from the Node
-                                _kwargs[k] = Node.from_id(v).obj
+                                try:
+                                    _kwargs[k] = Node.from_id(v).obj
+                                except Exception as e:
+                                    # If that fails and the object is a non-id string,
+                                    # then just use the string as is.
+                                    # We have to do this check here rather than above
+                                    # because we want to make sure we check for all
+                                    # identifiable and nodes before checking if the
+                                    # string is just a string.
+                                    # this is required for compatibility with
+                                    # IdentifiableMixin objects that do not start with
+                                    # the meerkat id prefix.
+                                    if isinstance(v, str) and not is_meerkat_id(v):
+                                        _kwargs[k] = v
+                                    else:
+                                        raise e
                 else:
                     if k == "args":
                         # These are *args under the `args` key
