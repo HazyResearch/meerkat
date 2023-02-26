@@ -15,8 +15,8 @@ For example, in the code below, if the value of `a` or `b` changes then value of
 
 .. code-block:: python
 
-    a = mk.gui.Store(1)
-    b = mk.gui.Store(2)
+    a = mk.Store(1)
+    b = mk.Store(2)
     with mk.gui.react():
         c = a + b
 
@@ -29,8 +29,8 @@ If either inputs to the function (`a` or `b`) change, the `add` function will be
     def add(a, b):
         return a + b
     
-    a = mk.gui.Store(a)
-    b = mk.gui.Store(b)
+    a = mk.Store(a)
+    b = mk.Store(b)
     c = add(a, b)  # this operation will be tracked
 
 Is all code inside `mk.gui.react` reactive?
@@ -54,8 +54,8 @@ Yes, you can force code to not be reactive by using `mk.gui.no_react(False)`:
 
 .. code-block:: python
 
-    a = mk.gui.Store(1)
-    b = mk.gui.Store(2)
+    a = mk.Store(1)
+    b = mk.Store(2)
     with mk.gui.react():
         c = a + b  # this is reactive
         with mk.gui.react(False):
@@ -74,8 +74,8 @@ To make a function passively reactive, use the `mk.gui.reactive` decorator:
     def add(a, b):
         return a + b
     
-    a = mk.gui.Store(1)
-    b = mk.gui.Store(2)
+    a = mk.Store(1)
+    b = mk.Store(2)
     c = add(a, b)  # this operation will not be tracked because reactivity is off by default
     with mk.gui.react(True):
         d = add(a, b)  # this operation will be tracked because we explicitly turned reactivity on

@@ -7,7 +7,7 @@ In this tutorial, we'll explore some of the powerful built-in components of Meer
 Through this tutorial, you will learn about:
 
 - the `Filter` and `Sort` components
-- `mk.gui.Store` objects
+- `mk.Store` objects
 - composing components together to create more complex layouts
 
 As in [Tutorial 1](./tutorial-0.md), we'll use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91). However, before creating a `Gallery` component, we'll need to first define our `Filter` and `Sort` components.

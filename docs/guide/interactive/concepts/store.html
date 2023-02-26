@@ -1320,8 +1320,8 @@ Their shortcut counterparts, <code class="docutils literal notranslate"><span cl
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="c1"># Don&#39;t worry about `Store` objects here!</span>
-    <span class="c1"># If x and y are passed in as Store objects, </span>
-    <span class="c1"># they&#39;ve already been unwrapped to their </span>
+    <span class="c1"># If x and y are passed in as Store objects,</span>
+    <span class="c1"># they&#39;ve already been unwrapped to their</span>
     <span class="c1"># wrapped values automatically.</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="c1"># this is just adding two `int`s</span>
 
@@ -1412,16 +1412,16 @@ Their shortcut counterparts, <code class="docutils literal notranslate"><span cl
 <ul class="simple">
 <li><p>A list of Stores is not reactive, a Store of list is reactive</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
     <span class="c1"># my_list is a list of stores. It is not a Store.</span>
     <span class="c1"># Operations on my_list will not trigger reactions.</span>
-    <span class="n">my_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
-    <span class="n">my_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">))]</span>  <span class="c1"># this does nothing</span>
+    <span class="n">my_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">my_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">))]</span>  <span class="c1"># this does nothing</span>
 
     <span class="c1"># my_stores is a store containing list of integers.</span>
     <span class="c1"># appending will change the value of my_stores.</span>
     <span class="c1"># This will trigger reactions.</span>
-    <span class="n">my_stores</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">my_stores</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">my_stores</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
 </div>

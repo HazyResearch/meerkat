@@ -827,8 +827,8 @@ More specifically, if the inputs into that operation change, we want to re-run t
 <p><cite>mk.gui.react</cite> is used to manage reactivity in Meerkat.
 Code that is wrapped in <cite>mk.gui.react</cite> is tracked and re-run if the inputs change.
 For example, in the code below, if the value of <cite>a</cite> or <cite>b</cite> changes then value of <cite>c</cite> will be automatically updated:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">react</span><span class="p">():</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
 </pre></div>
@@ -839,8 +839,8 @@ If either inputs to the function (<cite>a</cite> or <cite>b</cite>) change, the 
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># this operation will be tracked</span>
 </pre></div>
 </div>
@@ -861,8 +861,8 @@ Inputs of primitive types (int, str, etc.) will be auto-wrapped as stores, but t
 <section id="can-i-turn-reactivity-off">
 <h2>Can I turn reactivity off?<a class="headerlink" href="#can-i-turn-reactivity-off" title="Permalink to this headline">¶</a></h2>
 <p>Yes, you can force code to not be reactive by using <cite>mk.gui.no_react(False)</cite>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">react</span><span class="p">():</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>  <span class="c1"># this is reactive</span>
     <span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">react</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
@@ -879,8 +879,8 @@ if reactivity is on, the function should be reactive. If it is off, then it’s 
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
 
-<span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># this operation will not be tracked because reactivity is off by default</span>
 <span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">react</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># this operation will be tracked because we explicitly turned reactivity on</span>

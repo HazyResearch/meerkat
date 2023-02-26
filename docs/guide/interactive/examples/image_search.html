@@ -752,8 +752,8 @@ title="Print to PDF"
 <span class="n">EMBED_COLUMN</span> <span class="o">=</span> <span class="s2">&quot;img_clip&quot;</span>
 
 
-<span class="nd">@mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">endpoint</span>
-<span class="k">def</span> <span class="nf">append_to_sort</span><span class="p">(</span><span class="n">match_criterion</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">append_to_sort</span><span class="p">(</span><span class="n">match_criterion</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add match criterion to the sort criteria.</span>
 
 <span class="sd">    Args:</span>
@@ -782,7 +782,7 @@ title="Print to PDF"
 
 <span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">react</span><span class="p">():</span>
     <span class="c1"># Match</span>
-    <span class="n">sort_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
+    <span class="n">sort_criteria</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">([])</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Match</span><span class="p">(</span>
         <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
         <span class="n">against</span><span class="o">=</span><span class="n">EMBED_COLUMN</span><span class="p">,</span>
