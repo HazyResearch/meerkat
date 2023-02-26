@@ -29,6 +29,7 @@ core
    meerkat.interactive.app.src.lib.component.core.Markdown
    meerkat.interactive.app.src.lib.component.core.Match
    meerkat.interactive.app.src.lib.component.core.Number
+   meerkat.interactive.app.src.lib.component.core.PDF
    meerkat.interactive.app.src.lib.component.core.Put
    meerkat.interactive.app.src.lib.component.core.Radio
    meerkat.interactive.app.src.lib.component.core.RadioGroup

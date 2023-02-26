@@ -1,7 +1,7 @@
 Building image search
 =====================
 
-In this example, we will build an interface to search over images in our dataframe.
+In this example, we will build an interface to search over images in our data frame.
 
 We will see how we can combine components like :class:`~meerkat.gui.Match`, :class:`~meerkat.gui.Sort`, and :class:`~meerkat.gui.Filter`.
 

@@ -99,7 +99,7 @@ One can load multiple rows using any one of following indexing schemes:
 
 ### 📎 _Aside_: `ImageColumn` under the hood, `DeferredColumn`.
 
-If you check out the implementation of `ImageColumn` (at [meerkat/columns/image_column.py](https://github.com/robustness-gym/meerkat/blob/main/meerkat/columns/image_column.py)), you'll notice that it's a super simple subclass of `DeferredColumn`. 
+If you check out the implementation of `ImageColumn` (at [meerkat/columns/image_column.py](https://github.com/HazyResearch/meerkat/blob/main/meerkat/columns/image_column.py)), you'll notice that it's a super simple subclass of `DeferredColumn`. 
 
 _What's a `DeferredColumn`?_
 In `meerkat`, high-dimensional data types like images and videos are typically stored in a `DeferredColumn`. A  `DeferredColumn` wraps around another column and lazily applies a function to it's content as it is indexed. Consider the following example, where we create a simple `meerkat` column...    

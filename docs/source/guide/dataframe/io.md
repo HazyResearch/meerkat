@@ -106,12 +106,12 @@ It's also posible to import data from third-party Python libraries like [Pandas]
 ## Exporting DataFrames
 Meerkat supports exporting DataFrames from Meerkat to other file formats and libraries. These methods are useful for converting data into formats that can be used by other libraries or software.
 
-````{warning}
+```{warning}
 
 Most file formats designed for tabular data do not offer the same flexibility as Meerkat DataFrames, especially when it comes to storing complex data types and multi-dimensional tensors. As a result, exporting a Meerkat DataFrame to a file format may result in data loss.
 
 Specifically, any {class}`~meerkat.DeferredColumn` (or its subclasses) will not be exported. If you want to export a {class}`DeferredColumn`, you should first materialize the column(s) by calling the DataFrame. Also, depending on the export destination, any {class}`~meerkat.TensorColumn` and/or {class}`~meerkat.ObjectColumn` in the DataFrame may not be exported.
-````
+```
 
 If you simply want to save a Meerkat DataFrame to disk, you should use {func}`~meerkat.DataFrame.write()` instead (see {ref}`writing-dataframes`). This will persist the DataFrame in a format that can be read back into Meerkat without any data loss.
 
