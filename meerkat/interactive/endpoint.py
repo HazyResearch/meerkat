@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import inspect
 import logging
-import typing
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
@@ -15,7 +14,7 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin, is_meerkat_id
 from meerkat.state import state
-from meerkat.tools.utils import get_type_hint_origin, has_var_args
+from meerkat.tools.utils import has_var_args
 
 logger = logging.getLogger(__name__)
 
@@ -570,11 +569,6 @@ def endpoint(
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):
                 # This is a non-generic type hinted Store, e.g. `Store`
-                stores.add(name)
-            elif isinstance(annot, typing._GenericAlias) and issubclass(
-                get_type_hint_origin(annot), Store
-            ):
-                # This is a generic type hinted Store, e.g. `Store[int]`
                 stores.add(name)
 
             # TODO: See if we can remove this in the future.
