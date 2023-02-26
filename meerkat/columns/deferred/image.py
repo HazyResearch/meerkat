@@ -42,6 +42,7 @@ def image(
     """
     return FileColumn(
         filepaths,
+        type="image",
         base_dir=base_dir,
         loader=loader,
         downloader=downloader,
