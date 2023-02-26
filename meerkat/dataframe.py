@@ -381,7 +381,7 @@ class DataFrame(
         self.data[name] = column
 
         logger.info(f"Added column `{name}` with length `{len(column)}`.")
-    
+
     def remove_column(self, column: str) -> None:
         """Remove a column from the dataset."""
         assert column in self.columns, f"Column `{column}` does not exist."
@@ -552,6 +552,7 @@ class DataFrame(
         """
         self._set_data(value._data)
         self._set_state(value._get_state())
+        print("has inode", self.has_inode())
 
         if self.has_inode():
             # Add a modification if it's on the graph
@@ -808,11 +809,9 @@ class DataFrame(
         from pyarrow import json
 
         if backend == "arrow":
-            if lines == False:
+            if lines is False:
                 raise ValueError("Arrow backend only supports lines=True.")
-            df = cls.from_arrow(
-                json.read_json(filepath, **kwargs)
-            )
+            df = cls.from_arrow(json.read_json(filepath, **kwargs))
         elif backend == "pandas":
             df = cls.from_pandas(
                 pd.read_json(filepath, orient=orient, lines=lines, **kwargs),

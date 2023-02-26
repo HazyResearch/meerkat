@@ -9,13 +9,13 @@
 	/** Main column to display. */
 	export let mainColumn: string = 'image';
 
-	/** Columns to use for tags in the GalleryView. */ 
+	/** Columns to use for tags in the GalleryView. */
 	export let tagColumns: Array<string> = [];
 
 	/** Columns size to display. */
 	export let cellSize: number = 6;
 
-	/** Selected rows. */ 
+	/** Selected rows. */
 	export let selected: Array<string> = [];
 
 	/** Whether to allow selection. */

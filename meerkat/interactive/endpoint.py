@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import inspect
 import logging
+import typing
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
+from build.lib.meerkat.tools.utils import get_type_hint_origin
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, create_model
 
@@ -12,7 +14,7 @@ from meerkat.interactive.graph import Store, trigger, unmarked
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
-from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.identifiable import IdentifiableMixin, is_meerkat_id
 from meerkat.state import state
 from meerkat.tools.utils import has_var_args
 
@@ -78,7 +80,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
             prefix=prefix,
             tags=[prefix.strip("/").replace("/", "-")],
             responses={404: {"description": "Not found"}},
-            id=prefix,
+            id=self.prepend_meerkat_id_prefix(prefix),
             **kwargs,
         )
 
@@ -291,6 +293,19 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         # should expect that the current value of the dataframe will be passed.
         # Currently, the original value of the dataframe is passed. It makes sense to
         # me why this is happening, but the right fix is eluding me.
+
+        # All NodeMixin objects need to be replaced by their node id.
+        # This ensures that we can resolve the correct object at runtime
+        # even if the object is a result of a reactive function
+        # (i.e. not a root of the graph).
+        def _get_node_id_or_arg(arg):
+            if isinstance(arg, NodeMixin):
+                assert arg.has_inode()
+                return arg.inode.id
+            return arg
+
+        args = [_get_node_id_or_arg(arg) for arg in args]
+        kwargs = {key: _get_node_id_or_arg(val) for key, val in kwargs.items()}
 
         fn = partial(self.fn, *args, **kwargs)
         fn.__name__ = self.fn.__name__
@@ -555,8 +570,15 @@ def endpoint(
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
             if isinstance(annot, type) and issubclass(annot, Store):
+                # This is a non-generic type hinted Store, e.g. `Store`
+                stores.add(name)
+            elif isinstance(annot, typing._GenericAlias) and issubclass(
+                get_type_hint_origin(annot), Store
+            ):
+                # This is a generic type hinted Store, e.g. `Store[int]`
                 stores.add(name)
 
+            # TODO: See if we can remove this in the future.
             if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
                 # This will also include `Store`, so it will be a superset
                 # of `stores`
@@ -600,15 +622,17 @@ def endpoint(
                         # These are *args under the `args` key
                         # These are the only arguments that will be passed in as
                         # *args to the fn
-                        _args, _ = _unpack_stores_from_object(list(v))
+                        v = [_resolve_id_to_obj(_value) for _value in v]
+                        _args, _ = _unpack_stores_from_object(v)
                     elif k == "kwargs":
                         # These are **kwargs under the `kwargs` key
+                        v = {_k: _resolve_id_to_obj(_value) for _k, _value in v.items()}
                         v, _ = _unpack_stores_from_object(v)
                         _kwargs = {**_kwargs, **v}
                     else:
                         # All other positional arguments that were not *args were
                         # bound, so they become kwargs
-                        v, _ = _unpack_stores_from_object(v)
+                        v, _ = _unpack_stores_from_object(_resolve_id_to_obj(v))
                         _kwargs[k] = v
 
             try:
@@ -730,3 +754,11 @@ def get_signature(fn: Union[Callable, Endpoint]) -> inspect.Signature:
     if isinstance(fn, Endpoint):
         fn = fn.fn
     return inspect.signature(fn)
+
+
+def _resolve_id_to_obj(value):
+    if isinstance(value, str) and is_meerkat_id(value):
+        # This is a string that corresponds to a meerkat id,
+        # so look it up.
+        return Node.from_id(value).obj
+    return value

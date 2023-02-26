@@ -1,8 +1,8 @@
 """Flash-fill"""
+import re
 from functools import partial
 
 from manifest import Manifest
-import re
 
 import meerkat as mk
 from meerkat.dataframe import Batch
@@ -70,6 +70,7 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected:
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
         return out
+
     selected_idxs = df.primary_key.isin(selected)
 
     # Concat all of the in-context examples.
@@ -130,6 +131,7 @@ df_view = update_df_with_example_template(df, example_template)
 
 mk.gui.print(df_view)
 
+
 @mk.endpoint
 def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any):
     df.loc[keyidx, column] = value
@@ -169,7 +171,7 @@ overview_panel = mk.gui.html.flexcol(
                 mk.gui.Text("Target column: ", classes="text-slate-600 text-sm"),
                 mk.gui.Text(
                     output_col,
-                    classes="font-mono text-violet-600 font-bold bg-slate-200 rounded-md px-2",
+                    classes="font-mono text-violet-600 font-bold bg-slate-200 rounded-md px-2",  # noqa: E501
                 ),
             ],
             classes="gap-3 align-middle",

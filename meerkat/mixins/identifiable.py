@@ -2,6 +2,8 @@ from uuid import uuid4
 
 from meerkat.tools.utils import classproperty
 
+_MK_ID_PREFIX = "__mkid__"
+
 
 class IdentifiableMixin:
     """Mixin for classes, to give objects an id.
@@ -36,8 +38,12 @@ class IdentifiableMixin:
     def _set_id(self, id: str = None):
         # get uuid as str
         if id is None:
-            self._self_id = uuid4().hex
+            self._self_id = _MK_ID_PREFIX + uuid4().hex
         else:
+            # TODO: Have objects that need special treatment for being
+            # detected in endpoint (e.g. Store, dataframes) implement their
+            # own set id method to assert that id is a meerkat id.
+            # assert is_meerkat_id(id)
             self._self_id = id
 
         from meerkat.state import state
@@ -51,3 +57,11 @@ class IdentifiableMixin:
         from meerkat.state import state
 
         return state.identifiables.get(id=id, group=cls.identifiable_group)
+
+    @staticmethod
+    def prepend_meerkat_id_prefix(id: str) -> str:
+        return _MK_ID_PREFIX + id
+
+
+def is_meerkat_id(id: str) -> bool:
+    return id.startswith(_MK_ID_PREFIX)
