@@ -65,12 +65,12 @@ class DeferredImageFormatter(ImageFormatter):
     component_class: type = Image
     data_prop: str = "data"
 
-    def encode(self, image: DeferredCell, thumbnail: bool = False) -> str:
+    def encode(self, image: DeferredCell) -> str:
         if image.absolute_path.startswith("http"):
             return image.absolute_path
         else:
             image = image()
-            return super().encode(image, thumbnail=thumbnail)
+            return super().encode(image)
 
 
 class DeferredImageFormatterGroup(ImageFormatterGroup):
