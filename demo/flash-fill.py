@@ -7,11 +7,17 @@ from manifest import Manifest
 import meerkat as mk
 from meerkat.dataframe import Batch
 
+# manifest = Manifest(
+#     client_name="huggingface",
+#     client_connection="http://127.0.0.1:7861",
+# )
 manifest = Manifest(
-    client_name="huggingface",
-    client_connection="http://127.0.0.1:7861",
+    client_name="openai",
+    client_connection=open("/Users/sabrieyuboglu/.meerkat/keys/.openai").read(),
+    engine="code-davinci-002",
+    temperature=0,
+    max_tokens=1
 )
-
 
 def complete_prompt(row, example_template: mk.Store[str]):
     assert isinstance(row, dict)
@@ -31,11 +37,10 @@ df = df[df["categories"].str.contains("stat.ML")]
 
 
 df = df[
-    ["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "url"]
+    ["id", "authors", "title", "abstract", "pdf"]
 ]
-df["note"] = ""
+df["answer"] = ""
 
-df = df[:100]
 df = df.mark()
 
 
@@ -57,7 +62,8 @@ def check_example_template(example_template: str, df: mk.DataFrame):
         if content not in df.columns:
             raise ValueError(f"The column '{content}' does not exist in the dataframe.")
     else:
-        raise ValueError("The example template must end with '{" + content + "}'")
+        return None
+        # raise ValueError("The example template must end with '{column_name}'")
     return content
 
 
@@ -65,7 +71,6 @@ def check_example_template(example_template: str, df: mk.DataFrame):
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
-        return ["test"] * len(example)
         out = manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
@@ -116,10 +121,10 @@ def set_code(code: mk.Store[str], new_code: str):
 
 
 instruction_editor = mk.gui.Editor(
-    code="Write a note for my guest.", title="Instruction Editor"
+    code="" #Is this paper theoretical or empirical?", title="Instruction Editor"
 )
 example_template_editor = mk.gui.Editor(
-    code="Abstract: {abstract}, Title: {title}; Note: {note}",
+    code="", #"Abstract: {abstract}, Title: {title}; Answer: {answer}",
     title="Training Template Editor",
 )
 
@@ -155,6 +160,20 @@ run_manifest_button = mk.gui.Button(
     ),
 )
 
+@mk.reactive
+def format_output_col(output_col):
+    if output_col is None:
+        return {
+            "text": "Template doesn't end with column.",
+            "classes": "text-red-600 px-2 text-sm",
+        }
+    else:
+        return {
+            "text": output_col,
+            "classes": "font-mono font-bold bg-slate-200 rounded-md px-2 text-violet-600 w-fit"
+        }
+
+formatted_output_col = format_output_col(output_col)
 
 overview_panel = mk.gui.html.flexcol(
     [
@@ -166,15 +185,15 @@ overview_panel = mk.gui.html.flexcol(
             "Specify the instruction and a template for in-context examples.",
             classes="text-slate-600 text-sm",
         ),
-        mk.gui.html.flex(
+        mk.gui.html.div(
             [
                 mk.gui.Text("Target column: ", classes="text-slate-600 text-sm"),
                 mk.gui.Text(
-                    output_col,
-                    classes="font-mono text-violet-600 font-bold bg-slate-200 rounded-md px-2",  # noqa: E501
+                    formatted_output_col["text"],
+                    classes=formatted_output_col["classes"],  # noqa: E501
                 ),
             ],
-            classes="gap-3 align-middle",
+            classes="gap-3 align-middle grid grid-cols-[auto_1fr]",
         ),
         run_manifest_button,
     ],
@@ -187,6 +206,7 @@ prompt_editor = mk.gui.html.flexcol(
     ],
     classes="flex-1 gap-1",
 )
+
 
 
 page = mk.gui.Page(
