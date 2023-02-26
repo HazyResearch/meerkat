@@ -57,5 +57,6 @@
       ~PDF.virtual_props
       ~PDF.wrapper_import_style
       ~PDF.data
+      ~PDF.classes
    
    

@@ -694,7 +694,9 @@ title="Open an issue"
 <span class="kn">import</span> <span class="nn">dill</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
-<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">DeferredImageFormatter</span><span class="p">,</span> <span class="n">DeferredImageFormatterGroup</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DeferredImageFormatterGroup</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
 <span class="kn">from</span> <span class="nn">meerkat.block.deferred_block</span> <span class="kn">import</span> <span class="n">DeferredOp</span>
@@ -702,7 +704,6 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.base</span> <span class="kn">import</span> <span class="n">DeferredCell</span><span class="p">,</span> <span class="n">DeferredColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.scalar</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ImageFormatterGroup</span><span class="p">,</span>
     <span class="n">HTMLFormatterGroup</span><span class="p">,</span>
     <span class="n">TextFormatterGroup</span><span class="p">,</span>
     <span class="n">TextFormatterGroup</span><span class="p">,</span>
@@ -991,13 +992,13 @@ title="Open an issue"
         <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid file type </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-        <span class="n">spec</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
-        <span class="n">loader</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;loader&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">loader</span>
-        <span class="n">formatters</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;formatters&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;defer&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">spec</span><span class="p">[</span><span class="s2">&quot;formatters&quot;</span><span class="p">]()</span>
-            <span class="k">if</span> <span class="n">formatters</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="n">formatters</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">loader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;loader&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">formatters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">formatters</span> <span class="o">=</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">][</span><span class="s2">&quot;formatters&quot;</span><span class="p">]()</span>
+            <span class="k">if</span> <span class="n">FILE_TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;defer&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">formatters</span> <span class="o">=</span> <span class="n">formatters</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span>
 
         <span class="c1"># if base_dir is not provided and all paths are absolute, then</span>
         <span class="c1"># we can infer the base_dir</span>
@@ -1175,8 +1176,8 @@ title="Open an issue"
     <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_image</span><span class="p">,</span>
         <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">DeferredImageFormatterGroup</span><span class="p">,</span>
-        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.heic&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;defer&quot;</span><span class="p">:</span> <span class="kc">False</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.heic&quot;</span><span class="p">,</span> <span class="s2">&quot;.JPEG&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;defer&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;pdf&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_bytes</span><span class="p">,</span>
