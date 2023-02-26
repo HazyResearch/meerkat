@@ -53,25 +53,25 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[
 [1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
 [0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:1137[0m, in [0;36mDataFrame.map[0;34m(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)[0m
-[1;32m   1124[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
-[1;32m   1125[0m     [38;5;28mself[39m,
-[1;32m   1126[0m     function: Callable,
+File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:1136[0m, in [0;36mDataFrame.map[0;34m(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)[0m
+[1;32m   1123[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
+[1;32m   1124[0m     [38;5;28mself[39m,
+[1;32m   1125[0m     function: Callable,
 [0;32m   (...)[0m
-[1;32m   1133[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
-[1;32m   1134[0m ) [38;5;241m-[39m[38;5;241m>[39m Optional[Union[Dict, List, Column]]:
-[1;32m   1135[0m     [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01mops[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmap[39;00m [38;5;28;01mimport[39;00m [38;5;28mmap[39m
-[0;32m-> 1137[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mmap[39;49m[43m([49m
-[1;32m   1138[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[43m,[49m
-[1;32m   1139[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
-[1;32m   1140[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
-[1;32m   1141[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
-[1;32m   1142[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
-[1;32m   1143[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
-[1;32m   1144[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
-[1;32m   1145[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
-[1;32m   1146[0m [43m        [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m,[49m
-[1;32m   1147[0m [43m    [49m[43m)[49m
+[1;32m   1132[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m   1133[0m ) [38;5;241m-[39m[38;5;241m>[39m Optional[Union[Dict, List, Column]]:
+[1;32m   1134[0m     [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01mops[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmap[39;00m [38;5;28;01mimport[39;00m [38;5;28mmap[39m
+[0;32m-> 1136[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mmap[39;49m[43m([49m
+[1;32m   1137[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[43m,[49m
+[1;32m   1138[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
+[1;32m   1139[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
+[1;32m   1140[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
+[1;32m   1141[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
+[1;32m   1142[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
+[1;32m   1143[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
+[1;32m   1144[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
+[1;32m   1145[0m [43m        [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m,[49m
+[1;32m   1146[0m [43m    [49m[43m)[49m
 
 File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:446[0m, in [0;36mmap[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)[0m
 [1;32m    334[0m [38;5;129m@docs[39m[38;5;241m.[39mdoc(source[38;5;241m=[39m_SHARED_DOCS_, data[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdata[39m[38;5;124m"[39m, name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdefer[39m[38;5;124m"[39m)

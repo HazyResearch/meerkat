@@ -1082,7 +1082,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "30ef3ad4c65f471f9d794982a048032f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "6915a1d891ae43a59582798d3431730f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
@@ -1117,19 +1117,23 @@ title="Print to PDF"
 <span class="g g-Whitespace">   </span><span class="mi">2072</span> <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <span class="g g-Whitespace">   </span><span class="mi">2073</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">errorlevel</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2158,</span> in <span class="ni">TarFile._extract_member</span><span class="nt">(self, tarinfo, targetpath, set_attrs, numeric_owner)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2156</span> <span class="bp">self</span><span class="o">.</span><span class="n">chown</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">,</span> <span class="n">numeric_owner</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2157</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">issym</span><span class="p">():</span>
-<span class="ne">-&gt; </span><span class="mi">2158</span>     <span class="bp">self</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2159</span>     <span class="bp">self</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2141,</span> in <span class="ni">TarFile._extract_member</span><span class="nt">(self, tarinfo, targetpath, set_attrs, numeric_owner)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2138</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_dbg</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2140</span> <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+<span class="ne">-&gt; </span><span class="mi">2141</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2142</span> <span class="k">elif</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+<span class="g g-Whitespace">   </span><span class="mi">2143</span>     <span class="bp">self</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">,</span> <span class="n">targetpath</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2282,</span> in <span class="ni">TarFile.chmod</span><span class="nt">(self, tarinfo, targetpath)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2279</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Set file permissions of targetpath according to tarinfo.</span>
-<span class="g g-Whitespace">   </span><span class="mi">2280</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">   </span><span class="mi">2281</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">2282</span>     <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">targetpath</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2283</span> <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2284</span>     <span class="k">raise</span> <span class="n">ExtractError</span><span class="p">(</span><span class="s2">&quot;could not change mode&quot;</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:2190,</span> in <span class="ni">TarFile.makefile</span><span class="nt">(self, tarinfo, targetpath)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2188</span>     <span class="n">target</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">2189</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2190</span>     <span class="n">copyfileobj</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">ReadError</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/tarfile.py:256,</span> in <span class="ni">copyfileobj</span><span class="nt">(src, dst, length, exception, bufsize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">254</span>     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">remainder</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">255</span>         <span class="k">raise</span> <span class="n">exception</span><span class="p">(</span><span class="s2">&quot;unexpected end of data&quot;</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">256</span>     <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">257</span> <span class="k">return</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
