@@ -20,23 +20,19 @@ def complete_prompt(row, example_template: mk.Store[str]):
 
 
 num_copies = 10
-df = mk.DataFrame(
-    {
-        "guest": [
-            "Col. Mustard",
-            "Mrs. White",
-            "Mr. Green",
-            "Mrs. Peacock",
-            "Prof. Plum",
-        ]
-        * num_copies,
-        "hometown": ["London", "Stockholm", "Bath", "New York", "Paris"] * num_copies,
-        "relationship": ["father", "aunt", "cousin", "teacher", "brother"] * num_copies,
-        "note": ["", "", "", "", ""] * num_copies,
-        # "_status": ["train", "train", "train", "fill", "fill"],
-    }
+df = mk.from_json(
+    "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json",
+    lines=True,
+    nrows=1000,
+    dtype={"id": str},
 )
+df["pdf_url"] = df.map(lambda id: f"https://arxiv.org/pdf/{id}")
+df["pdf"] = mk.files(
+    df["pdf_url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
+)
+df = df[["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "pdf_url"]]
 df["note"] = ""
+
 
 df = df.mark()
 
@@ -118,7 +114,7 @@ instruction_editor = mk.gui.Editor(
     code="Write a note for my guest.", title="Instruction Editor"
 )
 example_template_editor = mk.gui.Editor(
-    code="Guest name: {guest}, hometown: {hometown}; Note: {note}",
+    code="Abstract: {abstract}, Title: {title}; Note: {note}",
     title="Training Template Editor",
 )
 
@@ -156,7 +152,7 @@ overview_panel = mk.gui.html.flexcol(
             "Infer selected rows using in-context learning.",
             classes="font-bold text-slate-600 text-sm",
         ),
-          mk.gui.Text(
+        mk.gui.Text(
             "Specify the instruction and a template for in-context examples.",
             classes="text-slate-600 text-sm",
         ),

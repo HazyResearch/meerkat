@@ -141,7 +141,7 @@ TEST_FILES = {
         os.path.join(BUCKET_URL, "image/test-img-02.png"),
         os.path.join(BUCKET_URL, "image/test-img-01.jpeg"),
         os.path.join(BUCKET_URL, "image/test-img-02.jpeg"),
-    ], 
+    ],
     "pdf": [
         os.path.join(BUCKET_URL, "pdf/test-pdf-01.pdf"),
         os.path.join(BUCKET_URL, "pdf/test-pdf-02.pdf"),
@@ -161,12 +161,11 @@ TEST_FILES = {
         os.path.join(BUCKET_URL, "code/test-code-01.py"),
         os.path.join(BUCKET_URL, "code/test-code-02.py"),
         os.path.join(BUCKET_URL, "code/test-code-03.py"),
-    ]
+    ],
 }
 
-@product_parametrize(
-    {"file_type": list(TEST_FILES.keys())}
-)
+
+@product_parametrize({"file_type": list(TEST_FILES.keys())})
 def test_file_types(file_type: str, tmpdir):
     files = TEST_FILES[file_type]
 
@@ -178,7 +177,6 @@ def test_file_types(file_type: str, tmpdir):
 
     col.formatters["base"].encode(col[0])
 
-    
 
 def test_downloader(monkeypatch, tmpdir):
     import urllib

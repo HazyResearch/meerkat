@@ -47,7 +47,9 @@ class ArrowStringMethods(StringMethods):
         result = {}
         for field_index in range(struct_array.type.num_fields):
             field = struct_array.type.field(field_index)
-            result[field.name] = self.column._clone(pc.struct_field(struct_array, field.name))
+            result[field.name] = self.column._clone(
+                pc.struct_field(struct_array, field.name)
+            )
 
         return DataFrame(result)
 

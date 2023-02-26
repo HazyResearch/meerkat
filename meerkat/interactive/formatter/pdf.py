@@ -10,7 +10,7 @@ class PDFFormatter(Formatter):
     data_prop: str = "data"
 
     def encode(self, data: bytes) -> str:
-        return data
+        return data.decode("latin-1")
 
 
 class PDFFormatterGroup(FormatterGroup):
@@ -21,5 +21,6 @@ class PDFFormatterGroup(FormatterGroup):
             tag=IconFormatter(name="FileEarmarkPdf"),
             small=IconFormatter(name="FileEarmarkPdf"),
             thumbnail=PDFFormatter(),
-            gallery=PDFFormatter(),
+            full=PDFFormatter(classes="w-full"),
+            gallery=PDFFormatter(classes="h-full"),
         )

@@ -22,8 +22,6 @@
 
 	export let allowSelection: boolean = false;
 
-	const componentId = getContext("componentId");
-
 	$: schemaPromise = fetchSchema({
 		df: df,
 		formatter: 'small'

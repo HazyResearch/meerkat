@@ -16,7 +16,9 @@ from PIL import Image
 import dill
 import yaml
 from meerkat.interactive.formatter.base import FormatterGroup
-from meerkat.interactive.formatter.image import DeferredImageFormatter, DeferredImageFormatterGroup
+from meerkat.interactive.formatter.image import (
+    DeferredImageFormatterGroup,
+)
 
 import meerkat.tools.docs as docs
 from meerkat.block.deferred_block import DeferredOp
@@ -24,7 +26,6 @@ from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.interactive.formatter import (
-    ImageFormatterGroup,
     HTMLFormatterGroup,
     TextFormatterGroup,
     TextFormatterGroup,
@@ -313,13 +314,13 @@ class FileColumn(DeferredColumn):
         if type not in FILE_TYPES:
             raise ValueError(f"Invalid file type {type}.")
 
-        spec = FILE_TYPES[type]
-        loader = spec["loader"] if loader is None else loader
-        formatters = (
-            spec["formatters"]().defer() if spec.get("defer", False) else spec["formatters"]()
-            if formatters is None
-            else formatters
-        )
+        if type is not None and loader is None:
+            loader = FILE_TYPES[type]["loader"]
+
+        if type is not None and formatters is None:
+            formatters = FILE_TYPES[type]["formatters"]()
+            if FILE_TYPES[type].get("defer", True):
+                formatters = formatters.defer()
 
         # if base_dir is not provided and all paths are absolute, then
         # we can infer the base_dir
@@ -497,8 +498,8 @@ FILE_TYPES = {
     "image": {
         "loader": load_image,
         "formatters": DeferredImageFormatterGroup,
-        "exts": [".jpg", ".jpeg", ".png", ".heic"],
-        "defer": False
+        "exts": [".jpg", ".jpeg", ".png", ".heic", ".JPEG"],
+        "defer": False,
     },
     "pdf": {
         "loader": load_bytes,

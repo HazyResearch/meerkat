@@ -7,6 +7,7 @@
 		Image,
 		FileEarmarkImage,
 		FileEarmarkFont,
+		FileEarmarkPdf,
 		Hash,
 		Magic
 	} from 'svelte-bootstrap-icons';
@@ -21,7 +22,8 @@
 		FileEarmarkImage: FileEarmarkImage,
 		FileEarmarkFont: FileEarmarkFont,
 		Hash: Hash,
-		Magic: Magic
+		Magic: Magic,
+		FileEarmarkPdf: FileEarmarkPdf
 	};
 </script>
 

@@ -10,27 +10,26 @@
 	export let isOpen: boolean;
 	export let df: DataFrameRef;
 	export let posidx: number;
-	export let mainColumn: string = "";
+	export let mainColumn: string = '';
 
 	// Give the card the `flex-grow` Tailwind class to horizontally
 	// fill out space in the (containing) flex container.
 	export let cardFlexGrow: boolean = false;
 	export let asModal: boolean = false;
 
-	$: schemaPromise = fetchSchema({ df: df, formatter: 'tiny' }).then((schema) => {
-		if (mainColumn === "") {
+	$: schemaPromise = fetchSchema({ df: df, formatter: 'tiny' });
+	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tag' });
+	$: mainChunkPromise = schemaPromise.then((schema) => {
+		if (mainColumn === '') {
 			mainColumn = schema.columns[0].name;
 		}
-		return schema;
+		return fetchChunk({
+			df: df,
+			posidxs: [posidx],
+			columns: [mainColumn],
+			formatter: 'full'
+		});
 	});
-
-	$: mainChunkPromise = fetchChunk({
-		df: df,
-		posidxs: [posidx],
-		columns: [mainColumn],
-		formatter: 'full'
-	});
-	$: chunkPromise = fetchChunk({ df: df, posidxs: [posidx], formatter: 'tag'});
 
 	const increment = async () => {
 		let chunk = await chunkPromise;
@@ -49,10 +48,10 @@
 		// q / esc / enter
 		if (e.charCode === 113 || e.charCode === 13 || e.charCode === 27) {
 			closeModal();
-		// a / left arrow
+			// a / left arrow
 		} else if (e.charCode === 97 || e.charCode === 37) {
 			decrement();
-		// d / right arrow
+			// d / right arrow
 		} else if (e.charCode === 100 || e.charCode === 39) {
 			increment();
 		}
@@ -94,9 +93,7 @@
 											{column.name}
 										</span>
 										<!-- Value -->
-										<span
-											class="text-gray-600 w-full flex justify-end"
-										>
+										<span class="text-gray-600 w-full flex justify-end">
 											{#await chunkPromise then chunk}
 												<Cell {...chunk.getCell(0, column.name)} />
 											{/await}
@@ -154,7 +151,9 @@
 						</button>
 					</div>
 					<!-- Main section -->
-					<div class="flex p-10 items-center h-full w-full justify-center justify-self-center">
+					<div
+						class="flex p-10 items-center h-full w-full justify-center justify-self-center overflow-y-scroll"
+					>
 						{#await mainChunkPromise then chunk}
 							<Cell {...chunk.getCell(0, mainColumn)} />
 						{/await}
@@ -162,7 +161,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="h-fit bg-slate-100 mt-1 w-[90%] rounded-lg text-center text-sm text-gray-600 font-mono">
+		<div
+			class="h-fit bg-slate-100 mt-1 w-[90%] rounded-lg text-center text-sm text-gray-600 font-mono"
+		>
 			a : previous row | d : next row | q : close
 		</div>
 	</div>

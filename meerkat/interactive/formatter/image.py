@@ -47,6 +47,7 @@ class ImageFormatter(BaseFormatter):
 
 class ImageFormatterGroup(FormatterGroup):
     formatter_class: type = ImageFormatter
+
     def __init__(self, classes: str = ""):
         super().__init__(
             icon=IconFormatter(name="Image"),
