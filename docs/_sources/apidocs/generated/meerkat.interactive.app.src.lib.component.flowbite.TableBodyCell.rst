@@ -25,6 +25,7 @@
       ~TableBodyCell.parse_file
       ~TableBodyCell.parse_obj
       ~TableBodyCell.parse_raw
+      ~TableBodyCell.prepend_meerkat_id_prefix
       ~TableBodyCell.schema
       ~TableBodyCell.schema_json
       ~TableBodyCell.update_forward_refs

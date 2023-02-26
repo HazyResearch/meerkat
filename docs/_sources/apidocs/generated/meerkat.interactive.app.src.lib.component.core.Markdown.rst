@@ -25,6 +25,7 @@
       ~Markdown.parse_file
       ~Markdown.parse_obj
       ~Markdown.parse_raw
+      ~Markdown.prepend_meerkat_id_prefix
       ~Markdown.schema
       ~Markdown.schema_json
       ~Markdown.update_forward_refs

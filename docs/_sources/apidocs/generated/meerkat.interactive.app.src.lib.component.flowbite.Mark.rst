@@ -25,6 +25,7 @@
       ~Mark.parse_file
       ~Mark.parse_obj
       ~Mark.parse_raw
+      ~Mark.prepend_meerkat_id_prefix
       ~Mark.schema
       ~Mark.schema_json
       ~Mark.update_forward_refs

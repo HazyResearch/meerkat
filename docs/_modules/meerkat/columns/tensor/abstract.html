@@ -743,7 +743,12 @@ title="Open an issue"
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Cannot create `TensorColumn` from object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_default_formatters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="n">TensorFormatterGroup</span>
+
+        <span class="k">return</span> <span class="n">TensorFormatterGroup</span><span class="p">()</span></div>
 </pre></div>
 
               </div>

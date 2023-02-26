@@ -25,6 +25,7 @@
       ~TimelineItem.parse_file
       ~TimelineItem.parse_obj
       ~TimelineItem.parse_raw
+      ~TimelineItem.prepend_meerkat_id_prefix
       ~TimelineItem.schema
       ~TimelineItem.schema_json
       ~TimelineItem.update_forward_refs

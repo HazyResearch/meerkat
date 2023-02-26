@@ -25,6 +25,7 @@
       ~FloatingLabelInput.parse_file
       ~FloatingLabelInput.parse_obj
       ~FloatingLabelInput.parse_raw
+      ~FloatingLabelInput.prepend_meerkat_id_prefix
       ~FloatingLabelInput.schema
       ~FloatingLabelInput.schema_json
       ~FloatingLabelInput.update_forward_refs

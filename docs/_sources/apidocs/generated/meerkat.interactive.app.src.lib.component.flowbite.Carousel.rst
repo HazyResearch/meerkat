@@ -25,6 +25,7 @@
       ~Carousel.parse_file
       ~Carousel.parse_obj
       ~Carousel.parse_raw
+      ~Carousel.prepend_meerkat_id_prefix
       ~Carousel.schema
       ~Carousel.schema_json
       ~Carousel.update_forward_refs

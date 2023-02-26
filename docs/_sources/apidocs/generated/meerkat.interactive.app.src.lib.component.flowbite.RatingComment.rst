@@ -25,6 +25,7 @@
       ~RatingComment.parse_file
       ~RatingComment.parse_obj
       ~RatingComment.parse_raw
+      ~RatingComment.prepend_meerkat_id_prefix
       ~RatingComment.schema
       ~RatingComment.schema_json
       ~RatingComment.update_forward_refs

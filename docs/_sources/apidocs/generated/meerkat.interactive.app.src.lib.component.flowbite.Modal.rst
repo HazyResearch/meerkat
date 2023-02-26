@@ -25,6 +25,7 @@
       ~Modal.parse_file
       ~Modal.parse_obj
       ~Modal.parse_raw
+      ~Modal.prepend_meerkat_id_prefix
       ~Modal.schema
       ~Modal.schema_json
       ~Modal.update_forward_refs

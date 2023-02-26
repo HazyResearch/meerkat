@@ -25,6 +25,7 @@
       ~form.parse_file
       ~form.parse_obj
       ~form.parse_raw
+      ~form.prepend_meerkat_id_prefix
       ~form.schema
       ~form.schema_json
       ~form.update_forward_refs

@@ -25,6 +25,7 @@
       ~SidebarBrand.parse_file
       ~SidebarBrand.parse_obj
       ~SidebarBrand.parse_raw
+      ~SidebarBrand.prepend_meerkat_id_prefix
       ~SidebarBrand.schema
       ~SidebarBrand.schema_json
       ~SidebarBrand.update_forward_refs

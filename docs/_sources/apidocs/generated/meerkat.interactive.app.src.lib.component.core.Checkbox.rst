@@ -25,6 +25,7 @@
       ~Checkbox.parse_file
       ~Checkbox.parse_obj
       ~Checkbox.parse_raw
+      ~Checkbox.prepend_meerkat_id_prefix
       ~Checkbox.schema
       ~Checkbox.schema_json
       ~Checkbox.update_forward_refs

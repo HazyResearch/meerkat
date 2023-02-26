@@ -25,6 +25,7 @@
       ~Avatar.parse_file
       ~Avatar.parse_obj
       ~Avatar.parse_raw
+      ~Avatar.prepend_meerkat_id_prefix
       ~Avatar.schema
       ~Avatar.schema_json
       ~Avatar.update_forward_refs

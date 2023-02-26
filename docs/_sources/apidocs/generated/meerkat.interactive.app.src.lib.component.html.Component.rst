@@ -25,6 +25,7 @@
       ~Component.parse_file
       ~Component.parse_obj
       ~Component.parse_raw
+      ~Component.prepend_meerkat_id_prefix
       ~Component.schema
       ~Component.schema_json
       ~Component.update_forward_refs

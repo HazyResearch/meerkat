@@ -25,6 +25,7 @@
       ~Filter.parse_file
       ~Filter.parse_obj
       ~Filter.parse_raw
+      ~Filter.prepend_meerkat_id_prefix
       ~Filter.schema
       ~Filter.schema_json
       ~Filter.update_forward_refs

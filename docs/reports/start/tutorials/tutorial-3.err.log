@@ -42,31 +42,31 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:256[0m, in 
 [1;32m    258[0m     [38;5;66;03m# Unready the modification queue[39;00m
 [1;32m    259[0m     state[38;5;241m.[39mmodification_queue[38;5;241m.[39munready()
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:643[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    628[0m         e [38;5;241m=[39m [38;5;167;01mAttributeError[39;00m(
-[1;32m    629[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mException raised in endpoint `[39m[38;5;132;01m{[39;00mfn[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m`. [39m[38;5;124m"[39m
-[1;32m    630[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mThe object of type `[39m[38;5;132;01m{[39;00mobj_name[38;5;132;01m}[39;00m[38;5;124m` that you called to [39m[38;5;124m"[39m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:660[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    645[0m         e [38;5;241m=[39m [38;5;167;01mAttributeError[39;00m(
+[1;32m    646[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mException raised in endpoint `[39m[38;5;132;01m{[39;00mfn[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m`. [39m[38;5;124m"[39m
+[1;32m    647[0m             [38;5;124mf[39m[38;5;124m"[39m[38;5;124mThe object of type `[39m[38;5;132;01m{[39;00mobj_name[38;5;132;01m}[39;00m[38;5;124m` that you called to [39m[38;5;124m"[39m
 [0;32m   (...)[0m
-[1;32m    639[0m             [38;5;124m"[39m[38;5;124mif it is a `Store`.[39m[38;5;124m"[39m
-[1;32m    640[0m         )
-[1;32m    642[0m     logger[38;5;241m.[39mexception(e)
-[0;32m--> 643[0m     [38;5;28;01mraise[39;00m e
-[1;32m    645[0m [38;5;66;03m# Return the result of the function[39;00m
-[1;32m    646[0m [38;5;28;01mreturn[39;00m result
+[1;32m    656[0m             [38;5;124m"[39m[38;5;124mif it is a `Store`.[39m[38;5;124m"[39m
+[1;32m    657[0m         )
+[1;32m    659[0m     logger[38;5;241m.[39mexception(e)
+[0;32m--> 660[0m     [38;5;28;01mraise[39;00m e
+[1;32m    662[0m [38;5;66;03m# Return the result of the function[39;00m
+[1;32m    663[0m [38;5;28;01mreturn[39;00m result
 
-File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:617[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
-[1;32m    614[0m [38;5;28;01mtry[39;00m:
-[1;32m    615[0m     [38;5;28;01mwith[39;00m unmarked():
-[1;32m    616[0m         [38;5;66;03m# Run the function[39;00m
-[0;32m--> 617[0m         result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43m_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43m_kwargs[49m[43m)[49m
-[1;32m    618[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
-[1;32m    619[0m     [38;5;66;03m# If the function raises an exception, log it and return[39;00m
-[1;32m    620[0m     [38;5;66;03m# the exception[39;00m
-[1;32m    621[0m     [38;5;66;03m# In case the exception is about .set() being missing, add[39;00m
-[1;32m    622[0m     [38;5;66;03m# a more helpful error message[39;00m
-[1;32m    623[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mno attribute [39m[38;5;124m'[39m[38;5;124mset[39m[38;5;124m'[39m[38;5;124m"[39m [38;5;129;01min[39;00m [38;5;28mstr[39m(e):
-[1;32m    624[0m         [38;5;66;03m# Get the name of the object that was passed in[39;00m
-[1;32m    625[0m         [38;5;66;03m# as a Store, but did not have a .set() method[39;00m
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/endpoint.py:634[0m, in [0;36mendpoint.<locals>._endpoint.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    631[0m [38;5;28;01mtry[39;00m:
+[1;32m    632[0m     [38;5;28;01mwith[39;00m unmarked():
+[1;32m    633[0m         [38;5;66;03m# Run the function[39;00m
+[0;32m--> 634[0m         result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43m_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43m_kwargs[49m[43m)[49m
+[1;32m    635[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m e:
+[1;32m    636[0m     [38;5;66;03m# If the function raises an exception, log it and return[39;00m
+[1;32m    637[0m     [38;5;66;03m# the exception[39;00m
+[1;32m    638[0m     [38;5;66;03m# In case the exception is about .set() being missing, add[39;00m
+[1;32m    639[0m     [38;5;66;03m# a more helpful error message[39;00m
+[1;32m    640[0m     [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mno attribute [39m[38;5;124m'[39m[38;5;124mset[39m[38;5;124m'[39m[38;5;124m"[39m [38;5;129;01min[39;00m [38;5;28mstr[39m(e):
+[1;32m    641[0m         [38;5;66;03m# Get the name of the object that was passed in[39;00m
+[1;32m    642[0m         [38;5;66;03m# as a Store, but did not have a .set() method[39;00m
 
 Cell [0;32mIn[5], line 3[0m, in [0;36mget_answer[0;34m(question, answer)[0m
 [1;32m      1[0m [38;5;129m@mk[39m[38;5;241m.[39mendpoint()

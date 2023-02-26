@@ -25,6 +25,7 @@
       ~ActivityItem.parse_file
       ~ActivityItem.parse_obj
       ~ActivityItem.parse_raw
+      ~ActivityItem.prepend_meerkat_id_prefix
       ~ActivityItem.schema
       ~ActivityItem.schema_json
       ~ActivityItem.update_forward_refs

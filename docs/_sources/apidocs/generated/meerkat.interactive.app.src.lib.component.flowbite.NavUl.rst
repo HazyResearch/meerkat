@@ -25,6 +25,7 @@
       ~NavUl.parse_file
       ~NavUl.parse_obj
       ~NavUl.parse_raw
+      ~NavUl.prepend_meerkat_id_prefix
       ~NavUl.schema
       ~NavUl.schema_json
       ~NavUl.update_forward_refs

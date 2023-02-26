@@ -25,6 +25,7 @@
       ~AccordionItem.parse_file
       ~AccordionItem.parse_obj
       ~AccordionItem.parse_raw
+      ~AccordionItem.prepend_meerkat_id_prefix
       ~AccordionItem.schema
       ~AccordionItem.schema_json
       ~AccordionItem.update_forward_refs

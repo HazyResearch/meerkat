@@ -25,6 +25,7 @@
       ~SidebarDropdownWrapper.parse_file
       ~SidebarDropdownWrapper.parse_obj
       ~SidebarDropdownWrapper.parse_raw
+      ~SidebarDropdownWrapper.prepend_meerkat_id_prefix
       ~SidebarDropdownWrapper.schema
       ~SidebarDropdownWrapper.schema_json
       ~SidebarDropdownWrapper.update_forward_refs

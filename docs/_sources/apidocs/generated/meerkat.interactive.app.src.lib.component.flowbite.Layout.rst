@@ -25,6 +25,7 @@
       ~Layout.parse_file
       ~Layout.parse_obj
       ~Layout.parse_raw
+      ~Layout.prepend_meerkat_id_prefix
       ~Layout.schema
       ~Layout.schema_json
       ~Layout.update_forward_refs

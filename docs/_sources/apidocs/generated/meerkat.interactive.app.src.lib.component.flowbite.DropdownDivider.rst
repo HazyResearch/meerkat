@@ -25,6 +25,7 @@
       ~DropdownDivider.parse_file
       ~DropdownDivider.parse_obj
       ~DropdownDivider.parse_raw
+      ~DropdownDivider.prepend_meerkat_id_prefix
       ~DropdownDivider.schema
       ~DropdownDivider.schema_json
       ~DropdownDivider.update_forward_refs

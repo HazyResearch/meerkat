@@ -25,6 +25,7 @@
       ~Kbd.parse_file
       ~Kbd.parse_obj
       ~Kbd.parse_raw
+      ~Kbd.prepend_meerkat_id_prefix
       ~Kbd.schema
       ~Kbd.schema_json
       ~Kbd.update_forward_refs

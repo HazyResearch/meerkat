@@ -25,6 +25,7 @@
       ~FooterCopyright.parse_file
       ~FooterCopyright.parse_obj
       ~FooterCopyright.parse_raw
+      ~FooterCopyright.prepend_meerkat_id_prefix
       ~FooterCopyright.schema
       ~FooterCopyright.schema_json
       ~FooterCopyright.update_forward_refs

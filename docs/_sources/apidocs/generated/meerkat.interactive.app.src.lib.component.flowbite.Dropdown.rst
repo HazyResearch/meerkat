@@ -25,6 +25,7 @@
       ~Dropdown.parse_file
       ~Dropdown.parse_obj
       ~Dropdown.parse_raw
+      ~Dropdown.prepend_meerkat_id_prefix
       ~Dropdown.schema
       ~Dropdown.schema_json
       ~Dropdown.update_forward_refs

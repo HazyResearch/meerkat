@@ -25,6 +25,7 @@
       ~Spinner.parse_file
       ~Spinner.parse_obj
       ~Spinner.parse_raw
+      ~Spinner.prepend_meerkat_id_prefix
       ~Spinner.schema
       ~Spinner.schema_json
       ~Spinner.update_forward_refs

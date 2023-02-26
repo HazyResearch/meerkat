@@ -25,6 +25,7 @@
       ~Put.parse_file
       ~Put.parse_obj
       ~Put.parse_raw
+      ~Put.prepend_meerkat_id_prefix
       ~Put.schema
       ~Put.schema_json
       ~Put.update_forward_refs

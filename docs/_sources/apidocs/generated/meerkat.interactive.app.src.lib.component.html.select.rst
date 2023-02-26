@@ -25,6 +25,7 @@
       ~select.parse_file
       ~select.parse_obj
       ~select.parse_raw
+      ~select.prepend_meerkat_id_prefix
       ~select.schema
       ~select.schema_json
       ~select.update_forward_refs

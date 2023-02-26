@@ -25,6 +25,7 @@
       ~Secondary.parse_file
       ~Secondary.parse_obj
       ~Secondary.parse_raw
+      ~Secondary.prepend_meerkat_id_prefix
       ~Secondary.schema
       ~Secondary.schema_json
       ~Secondary.update_forward_refs

@@ -25,6 +25,7 @@
       ~th.parse_file
       ~th.parse_obj
       ~th.parse_raw
+      ~th.prepend_meerkat_id_prefix
       ~th.schema
       ~th.schema_json
       ~th.update_forward_refs

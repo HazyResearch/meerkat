@@ -690,7 +690,7 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.graph.store</span> <span class="kn">import</span> <span class="n">_unpack_stores_from_object</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.node</span> <span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeMixin</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.types</span> <span class="kn">import</span> <span class="n">T</span>
-<span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span>
+<span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span><span class="p">,</span> <span class="n">is_meerkat_id</span>
 <span class="kn">from</span> <span class="nn">meerkat.state</span> <span class="kn">import</span> <span class="n">state</span>
 <span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">has_var_args</span>
 
@@ -756,7 +756,7 @@ title="Open an issue"
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
             <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="n">prefix</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)],</span>
             <span class="n">responses</span><span class="o">=</span><span class="p">{</span><span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Not found&quot;</span><span class="p">}},</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prepend_meerkat_id_prefix</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -969,6 +969,19 @@ title="Open an issue"
         <span class="c1"># should expect that the current value of the dataframe will be passed.</span>
         <span class="c1"># Currently, the original value of the dataframe is passed. It makes sense to</span>
         <span class="c1"># me why this is happening, but the right fix is eluding me.</span>
+
+        <span class="c1"># All NodeMixin objects need to be replaced by their node id.</span>
+        <span class="c1"># This ensures that we can resolve the correct object at runtime</span>
+        <span class="c1"># even if the object is a result of a reactive function</span>
+        <span class="c1"># (i.e. not a root of the graph).</span>
+        <span class="k">def</span> <span class="nf">_get_node_id_or_arg</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">NodeMixin</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="n">arg</span><span class="o">.</span><span class="n">has_inode</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">arg</span><span class="o">.</span><span class="n">inode</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">return</span> <span class="n">arg</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_get_node_id_or_arg</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">_get_node_id_or_arg</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
         <span class="n">fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
@@ -1233,8 +1246,10 @@ title="Open an issue"
         <span class="n">identifiables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">Store</span><span class="p">):</span>
+                <span class="c1"># This is a non-generic type hinted Store, e.g. `Store`</span>
                 <span class="n">stores</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
+            <span class="c1"># TODO: See if we can remove this in the future.</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">annot</span><span class="p">,</span> <span class="n">IdentifiableMixin</span><span class="p">):</span>
                 <span class="c1"># This will also include `Store`, so it will be a superset</span>
                 <span class="c1"># of `stores`</span>
@@ -1278,15 +1293,17 @@ title="Open an issue"
                         <span class="c1"># These are *args under the `args` key</span>
                         <span class="c1"># These are the only arguments that will be passed in as</span>
                         <span class="c1"># *args to the fn</span>
-                        <span class="n">_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">_resolve_id_to_obj</span><span class="p">(</span><span class="n">_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">_value</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+                        <span class="n">_args</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span>
                         <span class="c1"># These are **kwargs under the `kwargs` key</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">_k</span><span class="p">:</span> <span class="n">_resolve_id_to_obj</span><span class="p">(</span><span class="n">_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">_k</span><span class="p">,</span> <span class="n">_value</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
                         <span class="n">v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                         <span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">}</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># All other positional arguments that were not *args were</span>
                         <span class="c1"># bound, so they become kwargs</span>
-                        <span class="n">v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">v</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unpack_stores_from_object</span><span class="p">(</span><span class="n">_resolve_id_to_obj</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
                         <span class="n">_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
             <span class="k">try</span><span class="p">:</span>
@@ -1408,6 +1425,14 @@ title="Open an issue"
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">):</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">fn</span>
     <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_resolve_id_to_obj</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_meerkat_id</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="c1"># This is a string that corresponds to a meerkat id,</span>
+        <span class="c1"># so look it up.</span>
+        <span class="k">return</span> <span class="n">Node</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">obj</span>
+    <span class="k">return</span> <span class="n">value</span>
 </pre></div>
 
               </div>

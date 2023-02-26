@@ -25,6 +25,7 @@
       ~AdvancedRating.parse_file
       ~AdvancedRating.parse_obj
       ~AdvancedRating.parse_raw
+      ~AdvancedRating.prepend_meerkat_id_prefix
       ~AdvancedRating.schema
       ~AdvancedRating.schema_json
       ~AdvancedRating.update_forward_refs

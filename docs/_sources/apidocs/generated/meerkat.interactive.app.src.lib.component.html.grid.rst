@@ -26,6 +26,7 @@
       ~grid.parse_file
       ~grid.parse_obj
       ~grid.parse_raw
+      ~grid.prepend_meerkat_id_prefix
       ~grid.schema
       ~grid.schema_json
       ~grid.update_forward_refs

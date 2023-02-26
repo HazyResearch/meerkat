@@ -25,6 +25,7 @@
       ~RadioGroup.parse_file
       ~RadioGroup.parse_obj
       ~RadioGroup.parse_raw
+      ~RadioGroup.prepend_meerkat_id_prefix
       ~RadioGroup.schema
       ~RadioGroup.schema_json
       ~RadioGroup.update_forward_refs

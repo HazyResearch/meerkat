@@ -25,6 +25,7 @@
       ~MegaMenu.parse_file
       ~MegaMenu.parse_obj
       ~MegaMenu.parse_raw
+      ~MegaMenu.prepend_meerkat_id_prefix
       ~MegaMenu.schema
       ~MegaMenu.schema_json
       ~MegaMenu.update_forward_refs

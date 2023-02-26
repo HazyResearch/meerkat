@@ -25,6 +25,7 @@
       ~Card.parse_file
       ~Card.parse_obj
       ~Card.parse_raw
+      ~Card.prepend_meerkat_id_prefix
       ~Card.schema
       ~Card.schema_json
       ~Card.update_forward_refs

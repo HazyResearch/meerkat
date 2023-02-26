@@ -25,6 +25,7 @@
       ~Chat.parse_file
       ~Chat.parse_obj
       ~Chat.parse_raw
+      ~Chat.prepend_meerkat_id_prefix
       ~Chat.schema
       ~Chat.schema_json
       ~Chat.update_forward_refs

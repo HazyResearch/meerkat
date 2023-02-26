@@ -25,6 +25,7 @@
       ~Toast.parse_file
       ~Toast.parse_obj
       ~Toast.parse_raw
+      ~Toast.prepend_meerkat_id_prefix
       ~Toast.schema
       ~Toast.schema_json
       ~Toast.update_forward_refs

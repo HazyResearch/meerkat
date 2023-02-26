@@ -25,6 +25,7 @@
       ~NavBrand.parse_file
       ~NavBrand.parse_obj
       ~NavBrand.parse_raw
+      ~NavBrand.prepend_meerkat_id_prefix
       ~NavBrand.schema
       ~NavBrand.schema_json
       ~NavBrand.update_forward_refs

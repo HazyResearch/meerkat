@@ -25,6 +25,7 @@
       ~Code.parse_file
       ~Code.parse_obj
       ~Code.parse_raw
+      ~Code.prepend_meerkat_id_prefix
       ~Code.schema
       ~Code.schema_json
       ~Code.update_forward_refs

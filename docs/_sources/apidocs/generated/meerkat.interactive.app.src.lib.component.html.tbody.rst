@@ -25,6 +25,7 @@
       ~tbody.parse_file
       ~tbody.parse_obj
       ~tbody.parse_raw
+      ~tbody.prepend_meerkat_id_prefix
       ~tbody.schema
       ~tbody.schema_json
       ~tbody.update_forward_refs

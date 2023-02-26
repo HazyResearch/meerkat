@@ -25,6 +25,7 @@
       ~NavLi.parse_file
       ~NavLi.parse_obj
       ~NavLi.parse_raw
+      ~NavLi.prepend_meerkat_id_prefix
       ~NavLi.schema
       ~NavLi.schema_json
       ~NavLi.update_forward_refs

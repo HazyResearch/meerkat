@@ -25,6 +25,7 @@
       ~TableSearch.parse_file
       ~TableSearch.parse_obj
       ~TableSearch.parse_raw
+      ~TableSearch.prepend_meerkat_id_prefix
       ~TableSearch.schema
       ~TableSearch.schema_json
       ~TableSearch.update_forward_refs

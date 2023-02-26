@@ -25,6 +25,7 @@
       ~button.parse_file
       ~button.parse_obj
       ~button.parse_raw
+      ~button.prepend_meerkat_id_prefix
       ~button.schema
       ~button.schema_json
       ~button.update_forward_refs

@@ -25,6 +25,7 @@
       ~Editor.parse_file
       ~Editor.parse_obj
       ~Editor.parse_raw
+      ~Editor.prepend_meerkat_id_prefix
       ~Editor.schema
       ~Editor.schema_json
       ~Editor.update_forward_refs

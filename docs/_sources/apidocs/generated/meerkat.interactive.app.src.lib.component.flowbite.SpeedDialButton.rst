@@ -25,6 +25,7 @@
       ~SpeedDialButton.parse_file
       ~SpeedDialButton.parse_obj
       ~SpeedDialButton.parse_raw
+      ~SpeedDialButton.prepend_meerkat_id_prefix
       ~SpeedDialButton.schema
       ~SpeedDialButton.schema_json
       ~SpeedDialButton.update_forward_refs

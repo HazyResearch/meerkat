@@ -26,6 +26,7 @@
       ~Sort.parse_file
       ~Sort.parse_obj
       ~Sort.parse_raw
+      ~Sort.prepend_meerkat_id_prefix
       ~Sort.schema
       ~Sort.schema_json
       ~Sort.update_forward_refs

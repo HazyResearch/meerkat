@@ -26,6 +26,7 @@
       ~Subheader.parse_file
       ~Subheader.parse_obj
       ~Subheader.parse_raw
+      ~Subheader.prepend_meerkat_id_prefix
       ~Subheader.schema
       ~Subheader.schema_json
       ~Subheader.update_forward_refs

@@ -25,6 +25,7 @@
       ~Toggle.parse_file
       ~Toggle.parse_obj
       ~Toggle.parse_raw
+      ~Toggle.prepend_meerkat_id_prefix
       ~Toggle.schema
       ~Toggle.schema_json
       ~Toggle.update_forward_refs

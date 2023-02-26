@@ -25,6 +25,7 @@
       ~Match.parse_file
       ~Match.parse_obj
       ~Match.parse_raw
+      ~Match.prepend_meerkat_id_prefix
       ~Match.schema
       ~Match.schema_json
       ~Match.update_forward_refs

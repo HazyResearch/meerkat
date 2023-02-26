@@ -25,6 +25,7 @@
       ~Alert.parse_file
       ~Alert.parse_obj
       ~Alert.parse_raw
+      ~Alert.prepend_meerkat_id_prefix
       ~Alert.schema
       ~Alert.schema_json
       ~Alert.update_forward_refs

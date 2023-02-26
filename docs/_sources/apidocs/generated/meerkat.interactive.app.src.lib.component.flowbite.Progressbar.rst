@@ -25,6 +25,7 @@
       ~Progressbar.parse_file
       ~Progressbar.parse_obj
       ~Progressbar.parse_raw
+      ~Progressbar.prepend_meerkat_id_prefix
       ~Progressbar.schema
       ~Progressbar.schema_json
       ~Progressbar.update_forward_refs

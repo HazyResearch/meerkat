@@ -25,6 +25,7 @@
       ~CodeCell.parse_file
       ~CodeCell.parse_obj
       ~CodeCell.parse_raw
+      ~CodeCell.prepend_meerkat_id_prefix
       ~CodeCell.schema
       ~CodeCell.schema_json
       ~CodeCell.update_forward_refs

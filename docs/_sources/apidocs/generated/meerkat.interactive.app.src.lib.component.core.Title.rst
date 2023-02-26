@@ -26,6 +26,7 @@
       ~Title.parse_file
       ~Title.parse_obj
       ~Title.parse_raw
+      ~Title.prepend_meerkat_id_prefix
       ~Title.schema
       ~Title.schema_json
       ~Title.update_forward_refs

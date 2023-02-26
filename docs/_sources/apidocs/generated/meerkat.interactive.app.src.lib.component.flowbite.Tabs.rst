@@ -25,6 +25,7 @@
       ~Tabs.parse_file
       ~Tabs.parse_obj
       ~Tabs.parse_raw
+      ~Tabs.prepend_meerkat_id_prefix
       ~Tabs.schema
       ~Tabs.schema_json
       ~Tabs.update_forward_refs

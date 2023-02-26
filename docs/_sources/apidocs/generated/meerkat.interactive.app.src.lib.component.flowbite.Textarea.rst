@@ -25,6 +25,7 @@
       ~Textarea.parse_file
       ~Textarea.parse_obj
       ~Textarea.parse_raw
+      ~Textarea.prepend_meerkat_id_prefix
       ~Textarea.schema
       ~Textarea.schema_json
       ~Textarea.update_forward_refs

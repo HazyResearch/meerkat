@@ -25,6 +25,7 @@
       ~Badge.parse_file
       ~Badge.parse_obj
       ~Badge.parse_raw
+      ~Badge.prepend_meerkat_id_prefix
       ~Badge.schema
       ~Badge.schema_json
       ~Badge.update_forward_refs

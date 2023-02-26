@@ -25,6 +25,7 @@
       ~Vega.parse_file
       ~Vega.parse_obj
       ~Vega.parse_raw
+      ~Vega.prepend_meerkat_id_prefix
       ~Vega.schema
       ~Vega.schema_json
       ~Vega.update_forward_refs

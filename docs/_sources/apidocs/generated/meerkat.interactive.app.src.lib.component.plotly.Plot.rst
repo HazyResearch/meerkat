@@ -25,6 +25,7 @@
       ~Plot.parse_file
       ~Plot.parse_obj
       ~Plot.parse_raw
+      ~Plot.prepend_meerkat_id_prefix
       ~Plot.schema
       ~Plot.schema_json
       ~Plot.update_forward_refs

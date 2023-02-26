@@ -25,6 +25,7 @@
       ~Popover.parse_file
       ~Popover.parse_obj
       ~Popover.parse_raw
+      ~Popover.prepend_meerkat_id_prefix
       ~Popover.schema
       ~Popover.schema_json
       ~Popover.update_forward_refs

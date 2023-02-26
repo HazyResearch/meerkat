@@ -25,6 +25,7 @@
       ~Text.parse_file
       ~Text.parse_obj
       ~Text.parse_raw
+      ~Text.prepend_meerkat_id_prefix
       ~Text.schema
       ~Text.schema_json
       ~Text.update_forward_refs

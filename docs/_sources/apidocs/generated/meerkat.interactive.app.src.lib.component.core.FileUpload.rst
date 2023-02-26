@@ -25,6 +25,7 @@
       ~FileUpload.parse_file
       ~FileUpload.parse_obj
       ~FileUpload.parse_raw
+      ~FileUpload.prepend_meerkat_id_prefix
       ~FileUpload.schema
       ~FileUpload.schema_json
       ~FileUpload.update_forward_refs

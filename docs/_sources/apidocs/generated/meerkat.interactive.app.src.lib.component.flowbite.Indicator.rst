@@ -25,6 +25,7 @@
       ~Indicator.parse_file
       ~Indicator.parse_obj
       ~Indicator.parse_raw
+      ~Indicator.prepend_meerkat_id_prefix
       ~Indicator.schema
       ~Indicator.schema_json
       ~Indicator.update_forward_refs

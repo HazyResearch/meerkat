@@ -25,6 +25,7 @@
       ~ScoreRating.parse_file
       ~ScoreRating.parse_obj
       ~ScoreRating.parse_raw
+      ~ScoreRating.prepend_meerkat_id_prefix
       ~ScoreRating.schema
       ~ScoreRating.schema_json
       ~ScoreRating.update_forward_refs

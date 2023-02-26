@@ -26,6 +26,7 @@
       ~flexcol.parse_file
       ~flexcol.parse_obj
       ~flexcol.parse_raw
+      ~flexcol.prepend_meerkat_id_prefix
       ~flexcol.schema
       ~flexcol.schema_json
       ~flexcol.update_forward_refs

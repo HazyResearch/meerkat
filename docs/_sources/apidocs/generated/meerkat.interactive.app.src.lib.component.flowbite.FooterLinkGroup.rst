@@ -25,6 +25,7 @@
       ~FooterLinkGroup.parse_file
       ~FooterLinkGroup.parse_obj
       ~FooterLinkGroup.parse_raw
+      ~FooterLinkGroup.prepend_meerkat_id_prefix
       ~FooterLinkGroup.schema
       ~FooterLinkGroup.schema_json
       ~FooterLinkGroup.update_forward_refs

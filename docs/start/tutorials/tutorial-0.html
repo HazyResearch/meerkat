@@ -1116,7 +1116,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "dd04242457c44da9b964186a1f85ac32"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "456a176725da471d9ea7e3ec357756e1"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -1387,23 +1387,23 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
 <span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1186,</span> in <span class="ni">DataFrame.filter</span><span class="nt">(self, function, with_indices, input_columns, is_batched_fn, batch_size, drop_last_batch, num_workers, materialize, pbar, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1184</span> <span class="c1"># Map to get the boolean outputs and indices</span>
-<span class="g g-Whitespace">   </span><span class="mi">1185</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running `filter`, a new DataFrame will be returned.&quot;</span><span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">1186</span> <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1187</span>     <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1188</span>     <span class="n">with_indices</span><span class="o">=</span><span class="n">with_indices</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1189</span>     <span class="n">input_columns</span><span class="o">=</span><span class="n">input_columns</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1190</span>     <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1191</span>     <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1192</span>     <span class="n">drop_last_batch</span><span class="o">=</span><span class="n">drop_last_batch</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1193</span>     <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1194</span>     <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1195</span>     <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1196</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1197</span> <span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1198</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">outputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="g g-Whitespace">   </span><span class="mi">1200</span> <span class="c1"># filter returns a new dataframe</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1185,</span> in <span class="ni">DataFrame.filter</span><span class="nt">(self, function, with_indices, input_columns, is_batched_fn, batch_size, drop_last_batch, num_workers, materialize, pbar, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1183</span> <span class="c1"># Map to get the boolean outputs and indices</span>
+<span class="g g-Whitespace">   </span><span class="mi">1184</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running `filter`, a new DataFrame will be returned.&quot;</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1185</span> <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1186</span>     <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1187</span>     <span class="n">with_indices</span><span class="o">=</span><span class="n">with_indices</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1188</span>     <span class="n">input_columns</span><span class="o">=</span><span class="n">input_columns</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1189</span>     <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1190</span>     <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1191</span>     <span class="n">drop_last_batch</span><span class="o">=</span><span class="n">drop_last_batch</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1192</span>     <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1193</span>     <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1194</span>     <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1195</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1196</span> <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1197</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">outputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="g g-Whitespace">   </span><span class="mi">1199</span> <span class="c1"># filter returns a new dataframe</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -1427,25 +1427,25 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1139,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1126</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1127</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1128</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1138,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1125</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1126</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1127</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1135</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1136</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1137</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
-<span class="ne">-&gt; </span><span class="mi">1139</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1140</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1141</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1142</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1143</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1144</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1145</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1146</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1147</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1148</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1149</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1134</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1135</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1136</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
+<span class="ne">-&gt; </span><span class="mi">1138</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1139</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1140</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1141</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1142</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1143</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1144</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1145</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1146</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1147</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1148</span>     <span class="p">)</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:456,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
 <span class="g g-Whitespace">    </span><span class="mi">350</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Create a new :class:`Column` or :class:`DataFrame` by applying a</span>
@@ -1598,12 +1598,13 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:45,</span> in <span class="ni">CloneableMixin._clone</span><span class="nt">(self, data, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span>     <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span>         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view_data</span><span class="p">()</span>
-<span class="ne">---&gt; </span><span class="mi">45</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_state</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">46</span> <span class="n">state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:50,</span> in <span class="ni">CloneableMixin._clone</span><span class="nt">(self, data, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">48</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span> <span class="n">obj</span><span class="o">.</span><span class="n">_set_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">50</span> <span class="n">obj</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ProvenanceMixin</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="c1"># need to create a node for the object</span>
+<span class="g g-Whitespace">     </span><span class="mi">54</span>     <span class="n">obj</span><span class="o">.</span><span class="n">_init_node</span><span class="p">()</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -1627,11 +1628,16 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/cloneable.py:78,</span> in <span class="ni">CloneableMixin._get_state</span><span class="nt">(self, clone)</span>
-<span class="g g-Whitespace">     </span><span class="mi">77</span> <span class="k">def</span> <span class="nf">_get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="ne">---&gt; </span><span class="mi">78</span>     <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_keys</span><span class="p">()}</span>
-<span class="g g-Whitespace">     </span><span class="mi">79</span>     <span class="k">if</span> <span class="n">clone</span><span class="p">:</span>
-<span class="nn">     80         state.update({key: getattr(self, key) for key</span> in <span class="ni">self._clone_keys</span><span class="nt">()})</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/scalar/pandas.py:227,</span> in <span class="ni">PandasScalarColumn._set_data</span><span class="nt">(self, data)</span>
+<span class="g g-Whitespace">    </span><span class="mi">224</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">227</span> <span class="nb">super</span><span class="p">(</span><span class="n">PandasScalarColumn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/abstract.py:127,</span> in <span class="ni">Column._set_data</span><span class="nt">(self, data)</span>
+<span class="g g-Whitespace">    </span><span class="mi">125</span> <span class="k">def</span> <span class="nf">_set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">126</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_blockable</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">127</span>         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_block_view</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">128</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -1650,12 +1656,79 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
 <span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:83,</span> in <span class="ni">unmarked.__exit__</span><span class="nt">(self, type, value, traceback)</span>
-<span class="g g-Whitespace">     </span><span class="mi">80</span>     <span class="n">_IS_UNMARKED_CONTEXT</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">81</span>     <span class="k">return</span> <span class="bp">self</span>
-<span class="ne">---&gt; </span><span class="mi">83</span> <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">84</span>     <span class="n">_IS_UNMARKED_CONTEXT</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">86</span> <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/mixins/blockable.py:20,</span> in <span class="ni">BlockableMixin._unpack_block_view</span><span class="nt">(self, data)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">20</span>     <span class="n">block_view</span><span class="p">:</span> <span class="n">BlockView</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_class</span><span class="o">.</span><span class="n">from_column_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block_index</span> <span class="o">=</span> <span class="n">block_view</span><span class="o">.</span><span class="n">block</span><span class="p">,</span> <span class="n">block_view</span><span class="o">.</span><span class="n">block_index</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">block_view</span><span class="o">.</span><span class="n">data</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/block/pandas_block.py:58,</span> in <span class="ni">PandasBlock.from_column_data</span><span class="nt">(cls, data)</span>
+<span class="g g-Whitespace">     </span><span class="mi">44</span> <span class="nd">@classmethod</span>
+<span class="g g-Whitespace">     </span><span class="mi">45</span> <span class="k">def</span> <span class="nf">from_column_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PandasBlock</span><span class="p">,</span> <span class="n">BlockView</span><span class="p">]:</span>
+<span class="g g-Whitespace">     </span><span class="mi">46</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;[summary]</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span><span class="sd"> </span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span><span class="sd">     Args:</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd">         Tuple[PandasBlock, Mapping[str, BlockIndex]]: [description]</span>
+<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">58</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">})</span>
+<span class="g g-Whitespace">     </span><span class="mi">59</span>     <span class="n">block</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span>     <span class="k">return</span> <span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/frame.py:664,</span> in <span class="ni">DataFrame.__init__</span><span class="nt">(self, data, index, columns, dtype, copy)</span>
+<span class="g g-Whitespace">    </span><span class="mi">658</span>     <span class="n">mgr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_mgr</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">659</span>         <span class="n">data</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">index</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="n">columns</span><span class="p">},</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span>
+<span class="g g-Whitespace">    </span><span class="mi">660</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">662</span> <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">663</span>     <span class="c1"># GH#38939 de facto copy defaults to False only in non-dict cases</span>
+<span class="ne">--&gt; </span><span class="mi">664</span>     <span class="n">mgr</span> <span class="o">=</span> <span class="n">dict_to_mgr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">manager</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">665</span> <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">666</span>     <span class="kn">import</span> <span class="nn">numpy.ma.mrecords</span> <span class="k">as</span> <span class="nn">mrecords</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/internals/construction.py:480,</span> in <span class="ni">dict_to_mgr</span><span class="nt">(data, index, columns, dtype, typ, copy)</span>
+<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">479</span>     <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="ne">--&gt; </span><span class="mi">480</span>     <span class="n">columns</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">481</span>     <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">com</span><span class="o">.</span><span class="n">maybe_iterable_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">482</span>     <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">Index</span><span class="p">)</span> <span class="k">else</span> <span class="n">arr</span><span class="o">.</span><span class="n">_data</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/indexes/base.py:568,</span> in <span class="ni">Index.__new__</span><span class="nt">(cls, data, dtype, copy, name, tupleize_cols, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">565</span> <span class="n">subarr</span> <span class="o">=</span> <span class="n">com</span><span class="o">.</span><span class="n">asarray_tuplesafe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_dtype_obj</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">566</span> <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">567</span>     <span class="c1"># with e.g. a list [1, 2, 3] casting to numeric is _not_ deprecated</span>
+<span class="ne">--&gt; </span><span class="mi">568</span>     <span class="n">subarr</span> <span class="o">=</span> <span class="n">_maybe_cast_data_without_dtype</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">569</span>         <span class="n">subarr</span><span class="p">,</span> <span class="n">cast_numeric_deprecated</span><span class="o">=</span><span class="kc">False</span>
+<span class="g g-Whitespace">    </span><span class="mi">570</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">571</span>     <span class="n">dtype</span> <span class="o">=</span> <span class="n">subarr</span><span class="o">.</span><span class="n">dtype</span>
+<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">return</span> <span class="n">Index</span><span class="p">(</span><span class="n">subarr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/pandas/core/indexes/base.py:7414,</span> in <span class="ni">_maybe_cast_data_without_dtype</span><span class="nt">(subarr, cast_numeric_deprecated)</span>
+<span class="g g-Whitespace">   </span><span class="mi">7396</span> <span class="k">def</span> <span class="nf">_maybe_cast_data_without_dtype</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">7397</span>     <span class="n">subarr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cast_numeric_deprecated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="g g-Whitespace">   </span><span class="mi">7398</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">7399</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">7400</span><span class="sd">     If we have an arraylike input but no passed dtype, try to infer</span>
+<span class="g g-Whitespace">   </span><span class="mi">7401</span><span class="sd">     a supported dtype.</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">   </span><span class="mi">7411</span><span class="sd">     np.ndarray or ExtensionArray</span>
+<span class="g g-Whitespace">   </span><span class="mi">7412</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">7414</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">maybe_convert_objects</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">7415</span>         <span class="n">subarr</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">7416</span>         <span class="n">convert_datetime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">7417</span>         <span class="n">convert_timedelta</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">7418</span>         <span class="n">convert_period</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">7419</span>         <span class="n">convert_interval</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">7420</span>         <span class="n">dtype_if_all_nat</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;datetime64[ns]&quot;</span><span class="p">),</span>
+<span class="g g-Whitespace">   </span><span class="mi">7421</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">7422</span>     <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">]:</span>
+<span class="g g-Whitespace">   </span><span class="mi">7423</span>         <span class="k">if</span> <span class="ow">not</span> <span class="n">cast_numeric_deprecated</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">7424</span>             <span class="c1"># i.e. we started with a list, not an ndarray[object]</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>

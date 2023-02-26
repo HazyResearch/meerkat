@@ -25,6 +25,7 @@
       ~Slider.parse_file
       ~Slider.parse_obj
       ~Slider.parse_raw
+      ~Slider.prepend_meerkat_id_prefix
       ~Slider.schema
       ~Slider.schema_json
       ~Slider.update_forward_refs

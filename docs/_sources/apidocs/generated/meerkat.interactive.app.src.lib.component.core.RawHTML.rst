@@ -25,6 +25,7 @@
       ~RawHTML.parse_file
       ~RawHTML.parse_obj
       ~RawHTML.parse_raw
+      ~RawHTML.prepend_meerkat_id_prefix
       ~RawHTML.schema
       ~RawHTML.schema_json
       ~RawHTML.update_forward_refs

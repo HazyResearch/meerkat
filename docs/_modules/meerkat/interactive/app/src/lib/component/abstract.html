@@ -679,7 +679,6 @@ title="Open an issue"
 <span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Set</span>
@@ -694,7 +693,14 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.graph</span> <span class="kn">import</span> <span class="n">Store</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.node</span> <span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeMixin</span>
 <span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span>
-<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">classproperty</span><span class="p">,</span> <span class="n">has_var_kwargs</span><span class="p">,</span> <span class="n">is_subclass</span><span class="p">,</span> <span class="n">nested_apply</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">classproperty</span><span class="p">,</span>
+    <span class="n">get_type_hint_args</span><span class="p">,</span>
+    <span class="n">get_type_hint_origin</span><span class="p">,</span>
+    <span class="n">has_var_kwargs</span><span class="p">,</span>
+    <span class="n">is_subclass</span><span class="p">,</span>
+    <span class="n">nested_apply</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">collections_abc</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span>
@@ -1032,8 +1038,8 @@ title="Open an issue"
 <span class="sd">                the endpoint does not have a type hint for the EventInterface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_hint</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">_GenericAlias</span><span class="p">):</span>
-            <span class="n">origin</span> <span class="o">=</span> <span class="n">_get_type_hint_origin</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">_get_type_hint_args</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">get_type_hint_origin</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">get_type_hint_args</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">is_subclass</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">Endpoint</span><span class="p">):</span>
                 <span class="c1"># Endpoint[XXX]</span>
@@ -1266,24 +1272,6 @@ title="Open an issue"
                 <span class="n">value</span><span class="o">.</span><span class="n">attach_to_inode</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">create_inode</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">values</span></div>
-
-
-<span class="k">def</span> <span class="nf">_get_type_hint_args</span><span class="p">(</span><span class="n">type_hint</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the arguments of a type hint.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
-        <span class="c1"># Python &gt; 3.8</span>
-        <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_args</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">type_hint</span><span class="o">.</span><span class="n">__args__</span>
-
-
-<span class="k">def</span> <span class="nf">_get_type_hint_origin</span><span class="p">(</span><span class="n">type_hint</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the origin of a type hint.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
-        <span class="c1"># Python &gt; 3.8</span>
-        <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_origin</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">type_hint</span><span class="o">.</span><span class="n">__origin__</span>
 </pre></div>
 
               </div>

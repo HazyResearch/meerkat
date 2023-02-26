@@ -25,6 +25,7 @@
       ~DarkMode.parse_file
       ~DarkMode.parse_obj
       ~DarkMode.parse_raw
+      ~DarkMode.prepend_meerkat_id_prefix
       ~DarkMode.schema
       ~DarkMode.schema_json
       ~DarkMode.update_forward_refs

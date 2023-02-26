@@ -25,6 +25,7 @@
       ~ol.parse_file
       ~ol.parse_obj
       ~ol.parse_raw
+      ~ol.prepend_meerkat_id_prefix
       ~ol.schema
       ~ol.schema_json
       ~ol.update_forward_refs

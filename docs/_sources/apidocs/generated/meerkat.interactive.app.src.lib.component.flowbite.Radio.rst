@@ -25,6 +25,7 @@
       ~Radio.parse_file
       ~Radio.parse_obj
       ~Radio.parse_raw
+      ~Radio.prepend_meerkat_id_prefix
       ~Radio.schema
       ~Radio.schema_json
       ~Radio.update_forward_refs

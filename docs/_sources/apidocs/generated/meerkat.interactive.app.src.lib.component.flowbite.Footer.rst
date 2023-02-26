@@ -25,6 +25,7 @@
       ~Footer.parse_file
       ~Footer.parse_obj
       ~Footer.parse_raw
+      ~Footer.prepend_meerkat_id_prefix
       ~Footer.schema
       ~Footer.schema_json
       ~Footer.update_forward_refs

@@ -26,6 +26,7 @@
       ~Document.parse_file
       ~Document.parse_obj
       ~Document.parse_raw
+      ~Document.prepend_meerkat_id_prefix
       ~Document.schema
       ~Document.schema_json
       ~Document.update_forward_refs

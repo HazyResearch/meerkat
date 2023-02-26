@@ -25,6 +25,7 @@
       ~svg.parse_file
       ~svg.parse_obj
       ~svg.parse_raw
+      ~svg.prepend_meerkat_id_prefix
       ~svg.schema
       ~svg.schema_json
       ~svg.update_forward_refs

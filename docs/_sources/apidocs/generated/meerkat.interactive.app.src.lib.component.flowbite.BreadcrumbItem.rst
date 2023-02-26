@@ -25,6 +25,7 @@
       ~BreadcrumbItem.parse_file
       ~BreadcrumbItem.parse_obj
       ~BreadcrumbItem.parse_raw
+      ~BreadcrumbItem.prepend_meerkat_id_prefix
       ~BreadcrumbItem.schema
       ~BreadcrumbItem.schema_json
       ~BreadcrumbItem.update_forward_refs

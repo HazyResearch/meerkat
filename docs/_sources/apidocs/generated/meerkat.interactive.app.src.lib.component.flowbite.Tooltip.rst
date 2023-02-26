@@ -25,6 +25,7 @@
       ~Tooltip.parse_file
       ~Tooltip.parse_obj
       ~Tooltip.parse_raw
+      ~Tooltip.prepend_meerkat_id_prefix
       ~Tooltip.schema
       ~Tooltip.schema_json
       ~Tooltip.update_forward_refs

@@ -26,6 +26,7 @@
       ~gridcols3.parse_file
       ~gridcols3.parse_obj
       ~gridcols3.parse_raw
+      ~gridcols3.prepend_meerkat_id_prefix
       ~gridcols3.schema
       ~gridcols3.schema_json
       ~gridcols3.update_forward_refs

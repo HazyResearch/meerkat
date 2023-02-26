@@ -25,6 +25,7 @@
       ~Gallery.parse_file
       ~Gallery.parse_obj
       ~Gallery.parse_raw
+      ~Gallery.prepend_meerkat_id_prefix
       ~Gallery.schema
       ~Gallery.schema_json
       ~Gallery.update_forward_refs

@@ -25,6 +25,7 @@
       ~span.parse_file
       ~span.parse_obj
       ~span.parse_raw
+      ~span.prepend_meerkat_id_prefix
       ~span.schema
       ~span.schema_json
       ~span.update_forward_refs

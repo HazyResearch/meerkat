@@ -25,6 +25,7 @@
       ~GroupItem.parse_file
       ~GroupItem.parse_obj
       ~GroupItem.parse_raw
+      ~GroupItem.prepend_meerkat_id_prefix
       ~GroupItem.schema
       ~GroupItem.schema_json
       ~GroupItem.update_forward_refs

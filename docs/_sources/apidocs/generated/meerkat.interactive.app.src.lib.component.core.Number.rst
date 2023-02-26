@@ -25,6 +25,7 @@
       ~Number.parse_file
       ~Number.parse_obj
       ~Number.parse_raw
+      ~Number.prepend_meerkat_id_prefix
       ~Number.schema
       ~Number.schema_json
       ~Number.update_forward_refs

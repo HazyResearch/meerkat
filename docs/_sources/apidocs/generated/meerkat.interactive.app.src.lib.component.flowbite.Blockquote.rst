@@ -25,6 +25,7 @@
       ~Blockquote.parse_file
       ~Blockquote.parse_obj
       ~Blockquote.parse_raw
+      ~Blockquote.prepend_meerkat_id_prefix
       ~Blockquote.schema
       ~Blockquote.schema_json
       ~Blockquote.update_forward_refs

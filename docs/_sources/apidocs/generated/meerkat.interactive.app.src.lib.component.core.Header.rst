@@ -26,6 +26,7 @@
       ~Header.parse_file
       ~Header.parse_obj
       ~Header.parse_raw
+      ~Header.prepend_meerkat_id_prefix
       ~Header.schema
       ~Header.schema_json
       ~Header.update_forward_refs

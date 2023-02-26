@@ -25,6 +25,7 @@
       ~PDF.parse_file
       ~PDF.parse_obj
       ~PDF.parse_raw
+      ~PDF.prepend_meerkat_id_prefix
       ~PDF.schema
       ~PDF.schema_json
       ~PDF.update_forward_refs

@@ -25,6 +25,7 @@
       ~SidebarCta.parse_file
       ~SidebarCta.parse_obj
       ~SidebarCta.parse_raw
+      ~SidebarCta.prepend_meerkat_id_prefix
       ~SidebarCta.schema
       ~SidebarCta.schema_json
       ~SidebarCta.update_forward_refs

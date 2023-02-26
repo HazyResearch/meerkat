@@ -25,6 +25,7 @@
       ~Drawer.parse_file
       ~Drawer.parse_obj
       ~Drawer.parse_raw
+      ~Drawer.prepend_meerkat_id_prefix
       ~Drawer.schema
       ~Drawer.schema_json
       ~Drawer.update_forward_refs

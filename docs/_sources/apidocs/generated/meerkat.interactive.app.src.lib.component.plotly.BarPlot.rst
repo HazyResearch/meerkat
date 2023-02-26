@@ -25,6 +25,7 @@
       ~BarPlot.parse_file
       ~BarPlot.parse_obj
       ~BarPlot.parse_raw
+      ~BarPlot.prepend_meerkat_id_prefix
       ~BarPlot.schema
       ~BarPlot.schema_json
       ~BarPlot.update_forward_refs

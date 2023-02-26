@@ -25,6 +25,7 @@
       ~ScatterPlot.parse_file
       ~ScatterPlot.parse_obj
       ~ScatterPlot.parse_raw
+      ~ScatterPlot.prepend_meerkat_id_prefix
       ~ScatterPlot.schema
       ~ScatterPlot.schema_json
       ~ScatterPlot.update_forward_refs

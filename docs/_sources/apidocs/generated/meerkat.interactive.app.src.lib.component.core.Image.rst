@@ -25,6 +25,7 @@
       ~Image.parse_file
       ~Image.parse_obj
       ~Image.parse_raw
+      ~Image.prepend_meerkat_id_prefix
       ~Image.schema
       ~Image.schema_json
       ~Image.update_forward_refs

@@ -25,6 +25,7 @@
       ~SidebarGroup.parse_file
       ~SidebarGroup.parse_obj
       ~SidebarGroup.parse_raw
+      ~SidebarGroup.prepend_meerkat_id_prefix
       ~SidebarGroup.schema
       ~SidebarGroup.schema_json
       ~SidebarGroup.update_forward_refs

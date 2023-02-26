@@ -25,6 +25,7 @@
       ~PaginationItem.parse_file
       ~PaginationItem.parse_obj
       ~PaginationItem.parse_raw
+      ~PaginationItem.prepend_meerkat_id_prefix
       ~PaginationItem.schema
       ~PaginationItem.schema_json
       ~PaginationItem.update_forward_refs

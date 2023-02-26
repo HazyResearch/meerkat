@@ -25,6 +25,7 @@
       ~FooterBrand.parse_file
       ~FooterBrand.parse_obj
       ~FooterBrand.parse_raw
+      ~FooterBrand.prepend_meerkat_id_prefix
       ~FooterBrand.schema
       ~FooterBrand.schema_json
       ~FooterBrand.update_forward_refs

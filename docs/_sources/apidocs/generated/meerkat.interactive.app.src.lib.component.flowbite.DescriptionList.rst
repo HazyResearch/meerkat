@@ -25,6 +25,7 @@
       ~DescriptionList.parse_file
       ~DescriptionList.parse_obj
       ~DescriptionList.parse_raw
+      ~DescriptionList.prepend_meerkat_id_prefix
       ~DescriptionList.schema
       ~DescriptionList.schema_json
       ~DescriptionList.update_forward_refs

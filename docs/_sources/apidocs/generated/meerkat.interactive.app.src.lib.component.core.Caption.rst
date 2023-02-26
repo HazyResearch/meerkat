@@ -26,6 +26,7 @@
       ~Caption.parse_file
       ~Caption.parse_obj
       ~Caption.parse_raw
+      ~Caption.prepend_meerkat_id_prefix
       ~Caption.schema
       ~Caption.schema_json
       ~Caption.update_forward_refs

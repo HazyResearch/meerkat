@@ -25,6 +25,7 @@
       ~Stats.parse_file
       ~Stats.parse_obj
       ~Stats.parse_raw
+      ~Stats.prepend_meerkat_id_prefix
       ~Stats.schema
       ~Stats.schema_json
       ~Stats.update_forward_refs

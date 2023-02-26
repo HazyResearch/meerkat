@@ -25,6 +25,7 @@
       ~Navbar.parse_file
       ~Navbar.parse_obj
       ~Navbar.parse_raw
+      ~Navbar.prepend_meerkat_id_prefix
       ~Navbar.schema
       ~Navbar.schema_json
       ~Navbar.update_forward_refs

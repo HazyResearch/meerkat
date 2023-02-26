@@ -25,6 +25,7 @@
       ~Icon.parse_file
       ~Icon.parse_obj
       ~Icon.parse_raw
+      ~Icon.prepend_meerkat_id_prefix
       ~Icon.schema
       ~Icon.schema_json
       ~Icon.update_forward_refs

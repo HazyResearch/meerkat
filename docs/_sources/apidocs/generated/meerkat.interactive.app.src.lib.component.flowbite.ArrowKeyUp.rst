@@ -25,6 +25,7 @@
       ~ArrowKeyUp.parse_file
       ~ArrowKeyUp.parse_obj
       ~ArrowKeyUp.parse_raw
+      ~ArrowKeyUp.prepend_meerkat_id_prefix
       ~ArrowKeyUp.schema
       ~ArrowKeyUp.schema_json
       ~ArrowKeyUp.update_forward_refs

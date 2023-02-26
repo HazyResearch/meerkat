@@ -25,6 +25,7 @@
       ~Breadcrumb.parse_file
       ~Breadcrumb.parse_obj
       ~Breadcrumb.parse_raw
+      ~Breadcrumb.prepend_meerkat_id_prefix
       ~Breadcrumb.schema
       ~Breadcrumb.schema_json
       ~Breadcrumb.update_forward_refs

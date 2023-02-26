@@ -25,6 +25,7 @@
       ~Review.parse_file
       ~Review.parse_obj
       ~Review.parse_raw
+      ~Review.prepend_meerkat_id_prefix
       ~Review.schema
       ~Review.schema_json
       ~Review.update_forward_refs

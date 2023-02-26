@@ -25,6 +25,7 @@
       ~Search.parse_file
       ~Search.parse_obj
       ~Search.parse_raw
+      ~Search.prepend_meerkat_id_prefix
       ~Search.schema
       ~Search.schema_json
       ~Search.update_forward_refs

@@ -25,6 +25,7 @@
       ~TableHead.parse_file
       ~TableHead.parse_obj
       ~TableHead.parse_raw
+      ~TableHead.prepend_meerkat_id_prefix
       ~TableHead.schema
       ~TableHead.schema_json
       ~TableHead.update_forward_refs

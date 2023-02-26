@@ -25,6 +25,7 @@
       ~Textbox.parse_file
       ~Textbox.parse_obj
       ~Textbox.parse_raw
+      ~Textbox.prepend_meerkat_id_prefix
       ~Textbox.schema
       ~Textbox.schema_json
       ~Textbox.update_forward_refs

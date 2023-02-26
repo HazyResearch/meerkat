@@ -25,6 +25,7 @@
       ~CarouselTransition.parse_file
       ~CarouselTransition.parse_obj
       ~CarouselTransition.parse_raw
+      ~CarouselTransition.prepend_meerkat_id_prefix
       ~CarouselTransition.schema
       ~CarouselTransition.schema_json
       ~CarouselTransition.update_forward_refs
