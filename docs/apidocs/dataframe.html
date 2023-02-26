@@ -1591,7 +1591,7 @@ objects will be wrapped in &#64;reactive decorators.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="meerkat.column">
-<span class="sig-name descname"><span class="pre">column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#meerkat.Column" title="meerkat.columns.abstract.Column"><span class="pre">meerkat.columns.abstract.Column</span></a></span></span><a class="reference internal" href="../_modules/meerkat/columns/abstract.html#column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#meerkat.column" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.11)"><span class="pre">Sequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#meerkat.Column" title="meerkat.columns.abstract.Column"><span class="pre">meerkat.columns.abstract.Column</span></a></span></span><a class="reference internal" href="../_modules/meerkat/columns/abstract.html#column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#meerkat.column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Meerkat column from data.</p>
 <p>The Meerkat column type is inferred from the type and structure of
 the data passed in.</p>
@@ -2787,7 +2787,9 @@ which each person lives.</p>
 </div>
 <p>We can materialize the deferred map (<em>i.e.</em> run it) by calling the column.</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [6]: </span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]()</span>
-<span class="gh">Out[6]: </span><span class="go">column([56, 30, 13, 38, 16, 33, ...], backend=PandasScalarColumn</span>
+<span class="go">&gt; /home/runner/work/meerkat/meerkat/meerkat/columns/deferred/base.py(71)__call__()</span>
+<span class="go">-&gt; return _materialize(</span>
+<span class="go">(Pdb) </span>
 </pre></div>
 </div>
 <p><strong>Multiple input columns.</strong> Lazily create a column of birth years to a column of
@@ -2798,7 +2800,9 @@ ages.</p>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [8]: </span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">]()</span>
-<span class="gh">Out[8]: </span><span class="go">column([True, False, False, False, False, True, ...], backend=PandasScalarColumn</span>
+<span class="go">&gt; /home/runner/work/meerkat/meerkat/meerkat/columns/deferred/base.py(71)__call__()</span>
+<span class="go">-&gt; return _materialize(</span>
+<span class="go">(Pdb) </span>
 </pre></div>
 </div>
 </dd></dl>

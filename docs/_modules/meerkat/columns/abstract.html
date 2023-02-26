@@ -1355,10 +1355,11 @@ title="Open an issue"
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Column</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">.scalar.pandas</span> <span class="kn">import</span> <span class="n">PandasScalarColumn</span>
+    <span class="kn">from</span> <span class="nn">.scalar.abstract</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 
-        <span class="k">return</span> <span class="n">PandasScalarColumn</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="n">ScalarColumn</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">ChunkedArray</span><span class="p">)):</span>
         <span class="kn">from</span> <span class="nn">.scalar.arrow</span> <span class="kn">import</span> <span class="n">ArrowScalarColumn</span>
@@ -1375,9 +1376,9 @@ title="Open an issue"
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">.scalar.pandas</span> <span class="kn">import</span> <span class="n">PandasScalarColumn</span>
+            <span class="kn">from</span> <span class="nn">.scalar.pandas</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 
-            <span class="k">return</span> <span class="n">PandasScalarColumn</span>
+            <span class="k">return</span> <span class="n">ScalarColumn</span>
         <span class="kn">from</span> <span class="nn">.tensor.numpy</span> <span class="kn">import</span> <span class="n">NumPyTensorColumn</span>
 
         <span class="k">return</span> <span class="n">NumPyTensorColumn</span>
@@ -1396,9 +1397,9 @@ title="Open an issue"
             <span class="k">return</span> <span class="n">TorchTensorColumn</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">)):</span>
-            <span class="kn">from</span> <span class="nn">.scalar.pandas</span> <span class="kn">import</span> <span class="n">PandasScalarColumn</span>
+            <span class="kn">from</span> <span class="nn">.scalar.pandas</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 
-            <span class="k">return</span> <span class="n">PandasScalarColumn</span>
+            <span class="k">return</span> <span class="n">ScalarColumn</span>
 
         <span class="kn">from</span> <span class="nn">.object.base</span> <span class="kn">import</span> <span class="n">ObjectColumn</span>
 
@@ -1407,7 +1408,7 @@ title="Open an issue"
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot create column out of data of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="column"><a class="viewcode-back" href="../../../apidocs/dataframe.html#meerkat.column">[docs]</a><span class="k">def</span> <span class="nf">column</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Column</span><span class="p">:</span>
+<div class="viewcode-block" id="column"><a class="viewcode-back" href="../../../apidocs/dataframe.html#meerkat.column">[docs]</a><span class="k">def</span> <span class="nf">column</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">scalar_backend</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Column</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a Meerkat column from data.</span>
 
 <span class="sd">    The Meerkat column type is inferred from the type and structure of</span>
@@ -1416,8 +1417,13 @@ title="Open an issue"
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Column</span><span class="p">):</span>
         <span class="c1"># TODO: Need ton make this view but should decide where to do it exactly</span>
         <span class="k">return</span> <span class="n">data</span>  <span class="c1"># .view()</span>
+    <span class="kn">from</span> <span class="nn">.scalar.abstract</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 
-    <span class="k">return</span> <span class="n">infer_column_type</span><span class="p">(</span><span class="n">data</span><span class="p">)(</span><span class="n">data</span><span class="p">)</span></div>
+    <span class="n">column_type</span> <span class="o">=</span> <span class="n">infer_column_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">column_type</span> <span class="o">==</span> <span class="n">ScalarColumn</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ScalarColumn</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">scalar_backend</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">column_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 </pre></div>
 
               </div>
