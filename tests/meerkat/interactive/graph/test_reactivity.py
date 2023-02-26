@@ -48,7 +48,7 @@ def test_unmarked_context_manager():
 
     assert not is_unmarked_context()
     keys_reactive = df.keys()
-    with mk.gui.unmarked():
+    with mk.unmarked():
         assert is_unmarked_context()
         keys = df.keys()
 
@@ -93,7 +93,7 @@ def test_unmarked_on_reactive_fn(is_unmarked: bool):
     a = mk.Store(1)
     b = mk.Store(2)
     if is_unmarked:
-        with mk.gui.unmarked():
+        with mk.unmarked():
             c = add(a, b)
     else:
         c = add(a, b)

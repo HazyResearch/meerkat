@@ -15,7 +15,7 @@ We will see how we can combine components like :class:`~meerkat.gui.Match`, :cla
         EMBED_COLUMN = "img_clip"
 
 
-        @mk.gui.endpoint
+        @mk.endpoint()
         def append_to_sort(match_criterion, criteria: mk.Store):
             """Add match criterion to the sort criteria.
 
