@@ -1,5 +1,5 @@
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import Endpoint
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty
 from meerkat.interactive.event import EventInterface
 
 
@@ -13,4 +13,4 @@ class Button(Component):
     classes: str = (
         "bg-slate-100 py-1 rounded-md flex flex-col hover:bg-slate-200"
     )
-    on_click: Endpoint[EventInterface] = None
+    on_click: EndpointProperty[EventInterface] = None
