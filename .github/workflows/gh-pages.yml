@@ -52,6 +52,7 @@ jobs:
       - name: Build website
         run: |
           make website -B
+          echo "meerkat.wiki" > ./website/build/CNAME
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

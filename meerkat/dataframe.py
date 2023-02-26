@@ -551,7 +551,6 @@ class DataFrame(
         """
         self._set_data(value._data)
         self._set_state(value._get_state())
-        print("has inode", self.has_inode())
 
         if self.has_inode():
             # Add a modification if it's on the graph
