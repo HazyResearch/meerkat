@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import os
+import re
 import warnings
 from typing import TYPE_CHECKING, Any, List, Sequence, Set, Union
-import re
-import numpy as np
 
+import numpy as np
 import pyarrow as pa
 import pyarrow.compute as pc
 from pandas.core.accessor import CachedAccessor
-from pyarrow.compute import equal
 
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
@@ -199,10 +198,10 @@ class ArrowScalarColumn(ScalarColumn):
 
     def _set(self, index, value):
         raise ImmutableError("ArrowArrayColumn is immutable.")
-    
+
     def _is_valid_primary_key(self):
         return len(self.unique()) == len(self)
-    
+
     def _keyidx_to_posidx(self, keyidx: Any) -> int:
         """Get the posidx of the first occurrence of the given keyidx. Raise a
         key error if the keyidx is not found.
@@ -215,14 +214,12 @@ class ArrowScalarColumn(ScalarColumn):
         """
         posidx = pc.index(self.data, keyidx)
         if posidx == -1:
-            raise KeyError(f"keyidx not found in column.")
+            raise KeyError(f"keyidx {keyidx} not found in column.")
         return posidx.as_py()
-        
 
     def _keyidxs_to_posidxs(self, keyidxs: Sequence[Any]) -> np.ndarray:
         # FIXME: this implementation is very slow. This should be done with indices
         return np.array([self._keyidx_to_posidx(keyidx) for keyidx in keyidxs])
-
 
     def _repr_cell(self, index) -> object:
         return self.data[index]
@@ -406,7 +403,7 @@ class ArrowScalarColumn(ScalarColumn):
 
     def __radd__(self, other: ScalarColumn):
         if self.dtype == pa.string():
-             return self._dispatch_arithmetic_function(
+            return self._dispatch_arithmetic_function(
                 other, "binary_join_element_wise", True, ""
             )
 

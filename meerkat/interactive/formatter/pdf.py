@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from ..app.src.lib.component.core.pdf import PDF
 from .base import Formatter, FormatterGroup
 from .icon import IconFormatter

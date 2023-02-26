@@ -1,14 +1,14 @@
 port ?= "8000"
 
 autoformat:
-	black meerkat/ tests/
-	isort --atomic meerkat/ tests/
-	docformatter --in-place --recursive meerkat tests
+	black meerkat/ tests/ demo/
+	isort --atomic meerkat/ tests/ demo/
+	docformatter --in-place --recursive meerkat tests demo
 
 lint:
-	isort -c meerkat/ tests/
-	black meerkat/ tests/ --check
-	flake8 meerkat/ tests/
+	isort -c meerkat/ tests/ demo/
+	black meerkat/ tests/ demo/ --check
+	flake8 meerkat/ tests/ demo/
 
 test:
 	pytest tests/

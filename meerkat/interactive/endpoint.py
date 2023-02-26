@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import typing
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
@@ -14,7 +15,7 @@ from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
 from meerkat.mixins.identifiable import IdentifiableMixin, is_meerkat_id
 from meerkat.state import state
-from meerkat.tools.utils import has_var_args
+from meerkat.tools.utils import get_type_hint_args, get_type_hint_origin, has_var_args
 
 logger = logging.getLogger(__name__)
 
@@ -567,12 +568,14 @@ def endpoint(
         stores = set()
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
-            if isinstance(annot, type) and issubclass(annot, Store):
-                # This is a non-generic type hinted Store, e.g. `Store`
+            is_annotation_store = _is_annotation_store(annot)
+            if is_annotation_store:
                 stores.add(name)
 
             # TODO: See if we can remove this in the future.
-            if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
+            if is_annotation_store or (
+                isinstance(annot, type) and issubclass(annot, IdentifiableMixin)
+            ):
                 # This will also include `Store`, so it will be a superset
                 # of `stores`
                 identifiables[name] = annot
@@ -609,7 +612,22 @@ def endpoint(
                                 # If that fails, try to look up the string id in
                                 # the Node registry, and then get the object
                                 # from the Node
-                                _kwargs[k] = Node.from_id(v).obj
+                                try:
+                                    _kwargs[k] = Node.from_id(v).obj
+                                except Exception as e:
+                                    # If that fails and the object is a non-id string,
+                                    # then just use the string as is.
+                                    # We have to do this check here rather than above
+                                    # because we want to make sure we check for all
+                                    # identifiable and nodes before checking if the
+                                    # string is just a string.
+                                    # this is required for compatibility with
+                                    # IdentifiableMixin objects that do not start with
+                                    # the meerkat id prefix.
+                                    if isinstance(v, str) and not is_meerkat_id(v):
+                                        _kwargs[k] = v
+                                    else:
+                                        raise e
                 else:
                     if k == "args":
                         # These are *args under the `args` key
@@ -755,3 +773,26 @@ def _resolve_id_to_obj(value):
         # so look it up.
         return Node.from_id(value).obj
     return value
+
+
+def _is_annotation_store(type_hint) -> bool:
+    """Check if a type hint is a Store or a Union of Stores.
+
+    Returns True if:
+        - The type hint is a Store
+        - The type hint is a Union of Store and other non-Store values.
+        - The type hint is a generic store Store[T] or Union[Store[T], ...]
+    """
+    if isinstance(type_hint, type) and issubclass(type_hint, Store):
+        return True
+
+    if isinstance(type_hint, typing._GenericAlias):
+        origin = get_type_hint_origin(type_hint)
+        args = get_type_hint_args(type_hint)
+
+        if origin == typing.Union:
+            return any(_is_annotation_store(arg) for arg in args)
+        elif issubclass(origin, Store):
+            return True
+
+    return False

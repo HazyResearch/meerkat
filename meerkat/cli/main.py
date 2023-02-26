@@ -277,6 +277,7 @@ def demo(
     copy: bool = typer.Option(
         False, help="Copy the demo script to the current directory"
     ),
+    debug: bool = typer.Option(False, help="Enable debug logging mode"),
 ):
     """Run a demo script."""
     # Get the path to the demo script
@@ -296,6 +297,7 @@ def demo(
             api_port=api_port,
             frontend_port=frontend_port,
             dev=dev,
+            debug=debug,
         )
 
 

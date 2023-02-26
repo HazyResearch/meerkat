@@ -10,7 +10,7 @@ from PIL import Image
 import meerkat as mk
 from meerkat.block.deferred_block import DeferredCellOp, DeferredOp
 from meerkat.columns.deferred.base import DeferredCell
-from meerkat.columns.deferred.file import FileCell, FileColumn, FileLoader, FILE_TYPES
+from meerkat.columns.deferred.file import FILE_TYPES, FileCell, FileColumn, FileLoader
 from meerkat.columns.scalar import ScalarColumn
 from tests.meerkat.columns.abstract import AbstractColumnTestBed, column_parametrize
 from tests.utils import product_parametrize

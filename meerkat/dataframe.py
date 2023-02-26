@@ -193,7 +193,6 @@ class DataFrame(
             f"{self.__class__.__name__}" f"(nrows: {self.nrows}, ncols: {self.ncols})"
         )
 
-    # @no_react()
     def __len__(self):
         # __len__ is required to return an int. It cannot return a Store[int].
         # As such, it cannot be wrapped in `@reactive` decorator.
@@ -552,7 +551,6 @@ class DataFrame(
         """
         self._set_data(value._data)
         self._set_state(value._get_state())
-        print("has inode", self.has_inode())
 
         if self.has_inode():
             # Add a modification if it's on the graph

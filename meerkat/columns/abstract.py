@@ -730,7 +730,7 @@ def infer_column_type(data: Sequence) -> Type[Column]:
         raise ValueError(f"Cannot create column out of data of type {type(data)}")
 
 
-def column(data: Sequence, scalar_backend: str=None) -> Column:
+def column(data: Sequence, scalar_backend: str = None) -> Column:
     """Create a Meerkat column from data.
 
     The Meerkat column type is inferred from the type and structure of
@@ -744,5 +744,5 @@ def column(data: Sequence, scalar_backend: str=None) -> Column:
     column_type = infer_column_type(data)
     if column_type == ScalarColumn:
         return ScalarColumn(data, backend=scalar_backend)
-    
+
     return column_type(data)

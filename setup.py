@@ -74,7 +74,7 @@ with open("docs/requirements.txt") as f:
 EXTRAS = {
     "dev": [
         "black==22.12.0",
-        "isort>=5.7.0",
+        "isort>=5.12.0",
         "flake8>=3.8.4",
         "docformatter>=1.4",
         "pytest-cov>=2.10.1",

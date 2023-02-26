@@ -46,7 +46,7 @@ def add_match_criterion_to_sort(match_criterion, sort_criteria):
     return sort_criteria
 
 
-sort_criteria = mk.gui.Store([])
+sort_criteria = mk.Store([])
 sort_criteria = add_match_criterion_to_sort(match.criterion, sort_criteria)
 sort = mk.gui.Sort(df, criteria=sort_criteria)
 df_sorted = sort(df)

@@ -518,7 +518,9 @@ def _materialize(
             ds = ray.data.from_pandas(pd.DataFrame({"0": curr})).repartition(num_blocks)
             fns.append(lambda x: x["0"])
         elif isinstance(curr, mk.ArrowScalarColumn):
-            ds = ray.data.from_pandas(pa.table({"0": curr.data})).repartition(num_blocks)
+            ds = ray.data.from_pandas(pa.table({"0": curr.data})).repartition(
+                num_blocks
+            )
             fns.append(lambda x: x["0"])
         elif isinstance(curr, mk.NumPyTensorColumn):
             ndarrays = curr.data
@@ -532,7 +534,7 @@ def _materialize(
             ds = ray.data.from_items(curr).repartition(num_blocks)
         elif isinstance(curr, mk.DataFrame):
             raise ValueError(
-                f"Multiple outputs (fan-out) not supported with `use_ray=True`."
+                "Multiple outputs (fan-out) not supported with `use_ray=True`."
             )
             # TODO (dean): Support fan-out (would have to create multiple pipelines)
             # ds = ray.data.from_pandas(curr.data._repr_pandas_()[0])
@@ -584,7 +586,6 @@ def _materialize(
 
     else:
 
-        
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(

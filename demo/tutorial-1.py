@@ -17,6 +17,7 @@ def random_images(df: mk.DataFrame):
     formatter = images.formatters["base"]
     return [formatter.encode(img) for img in images]
 
+
 labels = list(df[LABEL_COL].unique())
 class_selector = mk.gui.Select(
     values=list(labels),
@@ -49,7 +50,9 @@ layout = mk.gui.html.flexcol(
 )
 page = mk.gui.Page(component=layout, id="tutorial-1")
 import os
+
 from fastapi.staticfiles import StaticFiles
+
 # print(os.getcwd())
 # print(os.path.abspath("./meerkat/interactive/app/build/"))
 # libpath = os.path.abspath("./meerkat/interactive/app/")
@@ -66,6 +69,12 @@ from fastapi.staticfiles import StaticFiles
 #     f'VITE_API_URL||"{api_url}"',
 #     "*.js",
 # )
-page().mount("/", StaticFiles(directory=os.path.abspath("./meerkat/interactive/app/build/"), html=True), "test")
+page().mount(
+    "/",
+    StaticFiles(
+        directory=os.path.abspath("./meerkat/interactive/app/build/"), html=True
+    ),
+    "test",
+)
 # page().mount("/static", StaticFiles(directory=os.path.abspath("./temp/"),html = True), "test")
 page.launch()

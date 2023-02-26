@@ -22,8 +22,7 @@ from meerkat.interactive import (
 # When its inputs change, it will be re-run.
 @reactive
 def load_index(dir: str, savefilename: str) -> GPTSimpleVectorIndex:
-    """
-    Function that loads the GPTSimpleVectorIndex from disk if it exists.
+    """Function that loads the GPTSimpleVectorIndex from disk if it exists.
     Otherwise it builds the index and saves it to disk.
 
     Args:
@@ -70,12 +69,11 @@ last_response = mk.Store("The response will appear here.")
 
 @endpoint()
 def query_gpt_index(
-    index: GPTSimpleVectorIndex, 
-    query: str, 
+    index: GPTSimpleVectorIndex,
+    query: str,
     last_response: Store,
 ):
-    """
-    Given an index and query, return a response from the index.
+    """Given an index and query, return a response from the index.
 
     Args:
         index (GPTSimpleVectorIndex): The index.
@@ -94,6 +92,7 @@ def query_gpt_index(
     # functions that depend on them! The special `set` method helps with this.
     last_response.set(response.response)
     return response
+
 
 # Create a Textbox for the user to provide a query.
 query_component = Textbox()
@@ -115,7 +114,7 @@ button = Button(
 # Use HTML to display the response from the index nicely.
 text = html.div(
     html.p(last_response, classes="font-mono whitespace-pre-wrap"),
-    classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200 rounded-sm p-2",
+    classes="flex flex-col items-center justify-center h-full mt-4 bg-violet-200 rounded-sm p-2",  # noqa: E501
 )
 
 # Print the values of the variables to the console, so we can see them.
@@ -132,7 +131,8 @@ page = Page(
             Header("GPT-Index Demo"),
             Subheader("Directory Path"),
             Caption(
-                f"It should contain a few files to build the GPT-Index. Defaults to {dir}."
+                "It should contain a few files to build the GPT-Index. "
+                f"Defaults to {dir}."
             ),
             dir_component,
             Subheader("Query"),

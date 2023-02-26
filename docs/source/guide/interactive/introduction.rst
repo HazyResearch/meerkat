@@ -49,7 +49,7 @@ a way for users to create values that are synchronized between the GUI and the P
 .. code-block:: python
     
     # Initialize the counter to 0
-    counter = mk.gui.Store(0)
+    counter = mk.Store(0)
     
 There are a couple of things to keep in mind when it comes to ``Stores``.
 

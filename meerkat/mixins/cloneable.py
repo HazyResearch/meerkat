@@ -59,8 +59,9 @@ class CloneableMixin:
         if isinstance(self, NodeMixin):
             obj._set_inode()
             # obj._set_children()
-        
+
         from meerkat.dataframe import DataFrame
+
         if isinstance(obj, DataFrame):
             if obj.primary_key_name not in obj:
                 # need to reset the primary key if we remove the column

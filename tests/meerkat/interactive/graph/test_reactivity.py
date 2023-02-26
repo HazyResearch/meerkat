@@ -30,7 +30,7 @@ def test_react_basic():
     out = _add_to_list(keys_reactive, "c")
 
     assert out.inode is not None
-    assert isinstance(keys_reactive, mk.gui.Store)
+    assert isinstance(keys_reactive, mk.Store)
     assert keys_reactive.inode.has_trigger_children()
     op_node = keys_reactive.inode.trigger_children[0]
     assert op_node.obj.fn.__name__ == "_add_to_list"
@@ -40,7 +40,7 @@ def test_react_basic():
     # Outside of context manager.
     with mk.unmarked():
         keys = df.keys()
-    assert not isinstance(keys, mk.gui.Store)
+    assert not isinstance(keys, mk.Store)
 
 
 def test_unmarked_context_manager():
@@ -48,11 +48,11 @@ def test_unmarked_context_manager():
 
     assert not is_unmarked_context()
     keys_reactive = df.keys()
-    with mk.gui.unmarked():
+    with mk.unmarked():
         assert is_unmarked_context()
         keys = df.keys()
 
-    assert isinstance(keys_reactive, mk.gui.Store)
+    assert isinstance(keys_reactive, mk.Store)
     assert isinstance(keys, List)
 
 
@@ -90,15 +90,15 @@ def test_unmarked_on_reactive_fn(is_unmarked: bool):
     def add(a, b):
         return a + b
 
-    a = mk.gui.Store(1)
-    b = mk.gui.Store(2)
+    a = mk.Store(1)
+    b = mk.Store(2)
     if is_unmarked:
-        with mk.gui.unmarked():
+        with mk.unmarked():
             c = add(a, b)
     else:
         c = add(a, b)
 
-    expected_type = int if is_unmarked else mk.gui.Store
+    expected_type = int if is_unmarked else mk.Store
     assert isinstance(c, expected_type)
 
     if not is_unmarked:
@@ -118,23 +118,23 @@ def test_default_nested_return():
     def _return_list(_s):
         return ["a", "b"]
 
-    _s = mk.gui.Store("")
+    _s = mk.Store("")
     with magic():
         out = _return_tuple(_s)
     with mk.unmarked():
         a, b = out
-    assert isinstance(out, mk.gui.Store)
-    assert not isinstance(a, mk.gui.Store)
-    assert not isinstance(b, mk.gui.Store)
+    assert isinstance(out, mk.Store)
+    assert not isinstance(a, mk.Store)
+    assert not isinstance(b, mk.Store)
 
     with magic():
         out = _return_list(_s)
     with mk.unmarked():
         a, b = out
     # Lists are not unpacked by default.
-    assert isinstance(out, mk.gui.Store)
-    assert not isinstance(a, mk.gui.Store)
-    assert not isinstance(b, mk.gui.Store)
+    assert isinstance(out, mk.Store)
+    assert not isinstance(a, mk.Store)
+    assert not isinstance(b, mk.Store)
 
 
 def test_nested_reactive_fns():
@@ -153,7 +153,7 @@ def test_nested_reactive_fns():
     def _outer(x):
         return ["example"] + _inner(x)
 
-    x = mk.gui.Store("c")
+    x = mk.Store("c")
     _outer(x)
 
     assert x.inode.has_trigger_children()
@@ -173,19 +173,19 @@ def test_nested_reactive_fns():
         (1, 4),
         {"a": 1, "b": 2},
         # Basic types.
-        mk.gui.Store(1),
+        mk.Store(1),
         # TODO: Determine why the initialization below is causing problems.
-        # mk.gui.Store("foo"),
-        mk.gui.Store([1, 2]),
-        mk.gui.Store((1, 4)),
-        mk.gui.Store({"a": 1, "b": 2}),
+        # mk.Store("foo"),
+        mk.Store([1, 2]),
+        mk.Store((1, 4)),
+        mk.Store({"a": 1, "b": 2}),
         # # Stores in non-reactive containers.
-        {"a": 1, "b": mk.gui.Store(2)},
-        [1, mk.gui.Store(2)],
-        (mk.gui.Store(1), 2),
-        {"a": {"b": mk.gui.Store(1)}},
+        {"a": 1, "b": mk.Store(2)},
+        [1, mk.Store(2)],
+        (mk.Store(1), 2),
+        {"a": {"b": mk.Store(1)}},
         # # Nested stores.
-        mk.gui.Store([mk.gui.Store(1), 2]),
+        mk.Store([mk.Store(1), 2]),
     ],
 )
 @pytest.mark.parametrize("use_kwargs", [False, True])
@@ -231,11 +231,11 @@ def test_instance_methods():
             return self.x == __o
 
     foo = Foo(1)
-    val = mk.gui.Store(2)
+    val = mk.Store(2)
     out_add = foo.add(val)
     out_eq = foo == val
-    assert isinstance(out_add, mk.gui.Store)
-    assert isinstance(out_eq, mk.gui.Store)
+    assert isinstance(out_add, mk.Store)
+    assert isinstance(out_eq, mk.Store)
 
     assert len(val.inode.trigger_children) == 2
     assert val.inode.trigger_children[0].obj.fn.__name__ == "add"
@@ -245,7 +245,7 @@ def test_instance_methods():
 
     # Trigger the functions.
     @mk.endpoint()
-    def set_val(val: mk.gui.Store):
+    def set_val(val: mk.Store):
         val.set(0)
 
     set_val(val)

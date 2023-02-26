@@ -87,14 +87,14 @@ def test_attributes(react: bool, attr: str):
 
     x = getattr(foo, attr)
     assert x == 1
-    assert (not react) ^ isinstance(x, mk.gui.Store)
+    assert (not react) ^ isinstance(x, mk.Store)
 
 
 @pytest.mark.parametrize("react", [True, False])
 @pytest.mark.parametrize("unmark_store", [True, False])
 @pytest.mark.parametrize("method", ["add", "add_dec_no_parenthesis"])
 def test_instance_method_decorated(react: bool, unmark_store: bool, method: str):
-    y = mk.gui.Store(4)
+    y = mk.Store(4)
 
     foo = Foo(1)
     if react:
@@ -107,7 +107,7 @@ def test_instance_method_decorated(react: bool, unmark_store: bool, method: str)
     x = fn(y)
     assert x == 5
     assert isinstance(x, int)
-    assert (not is_one_arg_marked) ^ isinstance(x, mk.gui.Store)
+    assert (not is_one_arg_marked) ^ isinstance(x, mk.Store)
 
     if y.marked:
         assert len(y.inode.trigger_children) == 1
@@ -141,7 +141,7 @@ def test_magic_method_react_shortcut_getitem_accessor(react: bool, unmark_store:
 
     assert x == 1
     assert isinstance(x, int)
-    assert (not is_one_arg_marked) ^ isinstance(x, mk.gui.Store)
+    assert (not is_one_arg_marked) ^ isinstance(x, mk.Store)
     if y.marked:
         assert len(y.inode.trigger_children) == 1
         assert y.inode.trigger_children[0].obj.fn.__name__ == "__getitem__"
@@ -164,7 +164,7 @@ def test_magic_method_not_decorated(react: bool):
     else:
         x = len(foo)
         assert x == 1
-        assert not isinstance(x, mk.gui.Store)
+        assert not isinstance(x, mk.Store)
 
 
 def test_instance_method_not_decorated():
@@ -176,13 +176,13 @@ def test_instance_method_not_decorated():
     foo = foo.mark()
     x = foo.add_auto_react(1)
     assert x == 2
-    assert not isinstance(x, mk.gui.Store)
+    assert not isinstance(x, mk.Store)
 
     # Object is not reactive.
     foo = foo.unmark()
     x = foo.add_auto_react(1)
     assert x == 2
-    assert not isinstance(x, mk.gui.Store)
+    assert not isinstance(x, mk.Store)
 
 
 # def test_class_method():
@@ -193,7 +193,7 @@ def test_instance_method_not_decorated():
 #     should be reactive or not.
 #     """
 #     name = Foo.name()
-#     assert isinstance(name, mk.gui.Store)
+#     assert isinstance(name, mk.Store)
 #     assert name == "Foo"
 
 
@@ -205,5 +205,5 @@ def test_instance_method_not_decorated():
 #     should be reactive or not.
 #     """
 #     static = Foo.static()
-#     assert isinstance(static, mk.gui.Store)
+#     assert isinstance(static, mk.Store)
 #     assert static == 1

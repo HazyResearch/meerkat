@@ -1,6 +1,4 @@
-"""
-Build a simple chat app with Meerkat.
-"""
+"""Build a simple chat app with Meerkat."""
 from datetime import datetime
 
 import meerkat as mk

@@ -5,7 +5,7 @@ from meerkat.interactive.app.src.lib.component.core.sort import SortCriterion
 
 
 @mk.endpoint()
-def _set_criteria(criteria, store: mk.gui.Store):
+def _set_criteria(criteria, store: mk.Store):
     store.set(criteria)
 
 

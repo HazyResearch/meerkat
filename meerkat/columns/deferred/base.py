@@ -67,6 +67,7 @@ class DeferredColumn(Column):
         batch_size: int = 1,
     ):
         from meerkat.ops.map import _materialize
+
         return _materialize(
             self,
             use_ray=use_ray,

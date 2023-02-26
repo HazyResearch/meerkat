@@ -26,13 +26,12 @@ _SUPPORTED_CALLS = {
 
 @endpoint()
 def refine_match(
-    df: DataFrame, 
+    df: DataFrame,
     against: str,
     match_column: str,
     label_column: str,
 ):
-    """
-    Refine a match, using feedback from the user.
+    """Refine a match, using feedback from the user.
 
     Labels are +1 for a match, -1 for a non-match, and 0 for unlabeled.
     """
@@ -55,9 +54,8 @@ def refine_match(
     y_pred = model.predict(df[against])
 
     # Update the match column.
-    df[f'{match_column}_refined'] = y_pred
+    df[f"{match_column}_refined"] = y_pred
     df.set(df)
-
 
 
 def parse_query(query: str):
