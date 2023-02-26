@@ -900,7 +900,7 @@ Each formatter, specifies optional parameters that can be used to configure how 
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "2593cacaa94e40ec87d6e222974dd113"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "4db64d2a33a7428fb3b5c5f865f650d9"}</script><div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
@@ -995,21 +995,34 @@ Each formatter, specifies optional parameters that can be used to configure how 
 <span class="g g-Whitespace">    </span><span class="mi">630</span>         <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
 <span class="g g-Whitespace">    </span><span class="mi">631</span>             <span class="k">yield</span> <span class="n">data</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:572,</span> in <span class="ni">HTTPResponse.read</span><span class="nt">(self, amt, decode_content, cache_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">570</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">571</span>     <span class="n">cache_content</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="ne">--&gt; </span><span class="mi">572</span>     <span class="k">if</span> <span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">573</span>         <span class="n">amt</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">data</span>
-<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="p">):</span>  <span class="c1"># Platform-specific: Buggy versions of Python.</span>
-<span class="g g-Whitespace">    </span><span class="mi">575</span>         <span class="c1"># Close the connection when no data is returned</span>
-<span class="g g-Whitespace">    </span><span class="mi">576</span>         <span class="c1">#</span>
-<span class="g g-Whitespace">    </span><span class="mi">577</span>         <span class="c1"># This is redundant to what httplib/http.client _should_</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span>         <span class="c1"># already do.  However, versions of python released before</span>
-<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="c1"># December 15, 2012 (http://bugs.python.org/issue16298) do</span>
-<span class="g g-Whitespace">    </span><span class="mi">580</span>         <span class="c1"># not properly close the connection in all cases. There is</span>
-<span class="g g-Whitespace">    </span><span class="mi">581</span>         <span class="c1"># no harm in redundantly calling close.</span>
-<span class="g g-Whitespace">    </span><span class="mi">582</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">583</span>         <span class="n">flush_decoder</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:556,</span> in <span class="ni">HTTPResponse.read</span><span class="nt">(self, amt, decode_content, cache_content)</span>
+<span class="g g-Whitespace">    </span><span class="mi">535</span> <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decode_content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_content</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">536</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">537</span><span class="sd">     Similar to :meth:`http.client.HTTPResponse.read`, but with two additional</span>
+<span class="g g-Whitespace">    </span><span class="mi">538</span><span class="sd">     parameters: ``decode_content`` and ``cache_content``.</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">554</span><span class="sd">         set.)</span>
+<span class="g g-Whitespace">    </span><span class="mi">555</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">556</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_init_decoder</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">557</span>     <span class="k">if</span> <span class="n">decode_content</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">558</span>         <span class="n">decode_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_content</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/urllib3/response.py:381,</span> in <span class="ni">HTTPResponse._init_decoder</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">376</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span><span class="sd"> Set-up the _decoder attribute if necessary.</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span> <span class="c1"># Note: content-encoding value should be case-insensitive, per RFC 7230</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span> <span class="c1"># Section 3.2</span>
+<span class="ne">--&gt; </span><span class="mi">381</span> <span class="n">content_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-encoding&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">382</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span>     <span class="k">if</span> <span class="n">content_encoding</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONTENT_DECODERS</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/_collections_abc.py:659,</span> in <span class="ni">Mapping.get</span><span class="nt">(self, key, default)</span>
+<span class="g g-Whitespace">    </span><span class="mi">657</span> <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">658</span>     <span class="s1">&#39;D.get(k[,d]) -&gt; D[k] if k in D, else d.  d defaults to None.&#39;</span>
+<span class="ne">--&gt; </span><span class="mi">659</span>     <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">660</span>         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">661</span>     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
