@@ -381,7 +381,7 @@ class DataFrame(
         self.data[name] = column
 
         logger.info(f"Added column `{name}` with length `{len(column)}`.")
-
+    
     def remove_column(self, column: str) -> None:
         """Remove a column from the dataset."""
         assert column in self.columns, f"Column `{column}` does not exist."

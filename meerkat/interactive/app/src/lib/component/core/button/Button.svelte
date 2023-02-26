@@ -14,7 +14,7 @@
 	}
 </script>
 
-<div class={'bg-slate-100 py-1 rounded-md flex items-center text-slate-600 hover:bg-slate-200' + classes}>
+<div class={'w-fit bg-slate-100 py-1 rounded-md flex items-center text-slate-600 hover:bg-slate-200' + classes}>
 	<button
 		on:click={(e) => {
 			dispatchClick();

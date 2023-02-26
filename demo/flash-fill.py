@@ -21,17 +21,19 @@ def complete_prompt(row, example_template: mk.Store[str]):
 
 filepath = "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json"
 df = mk.from_json(filepath=filepath, lines=True, backend="arrow")
-df = df[df["categories"].str.contains("stat.ML")]
 df["url"] = "https://arxiv.org/pdf/" + df["id"]
 df["pdf"] = mk.files(
     df["url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
 )
 
+df = df[df["categories"].str.contains("stat.ML")]
+
 
 df = df[
     ["id", "authors", "title", "journal-ref", "categories", "abstract", "pdf", "url"]
 ]
-df["note"] = ""
+df["note"] = mk.scalar([""] * len(df), backend="arrow")
+
 
 
 df = df.mark()
@@ -63,14 +65,17 @@ def check_example_template(example_template: str, df: mk.DataFrame):
 def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list):
     def _run_manifest(example: Batch):
         # Format instruct-example-instruct prompt.
-        return manifest.run(
+        return ["test" for x in example]
+        print("before")
+        out = manifest.run(
             [f"{instruct_cmd} {in_context_examples} {x}" for x in example]
         )
-
+        print("after")
+        return out
     selected_idxs = df.primary_key.isin(selected)
 
     # Concat all of the in-context examples.
-    train_df = df[~selected_idxs]
+    train_df = df[~selected_idxs & df[output_col] != ""]
     in_context_examples = "\n".join(train_df["example"]())
 
     fill_df = df[selected_idxs]

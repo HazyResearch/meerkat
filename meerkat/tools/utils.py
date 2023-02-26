@@ -400,6 +400,7 @@ def translate_index(index, length: int):
         return index
 
     from ..columns.abstract import Column
+    from ..columns.scalar.abstract import ScalarColumn
 
     if isinstance(index, pd.Series):
         index = index.values
@@ -409,6 +410,9 @@ def translate_index(index, length: int):
 
     if isinstance(index, tuple) or isinstance(index, list):
         index = np.array(index)
+    
+    if isinstance(index, ScalarColumn):
+        index = index.to_numpy()
 
     # `index` should return a batch
     if isinstance(index, slice):
@@ -424,9 +428,6 @@ def translate_index(index, length: int):
             indices = np.where(index)[0]
         else:
             return index
-    elif isinstance(index, Column):
-        # TODO (sabri): get rid of the np.arange here, very slow for large columns
-        indices = np.arange(length)[index]
     else:
         raise TypeError("Object of type {} is not a valid index".format(type(index)))
     return indices
