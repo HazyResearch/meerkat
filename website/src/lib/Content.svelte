@@ -122,7 +122,7 @@
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
 			<h1 class="mb-4 text-4xl text-gray-800 dark:text-white">Built for technical teams</h1>
-			<div class="grid grid-cols-3 justify-items-center gap-4 mt-2">
+			<div class="md:grid md:grid-cols-3 justify-items-center gap-4 mt-2 flex flex-col">
 				<Card 
 					title="🤖️ Machine Learning Teams " 
 					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting." 
@@ -172,7 +172,7 @@
 						<img
 							src="https://crfm.stanford.edu/static/img/header/crfm-rgb.png"
 							alt="Stanford CRFM Logo"
-							class="w-full h-full hover:shadow-sm"
+							class="h-full hover:shadow-sm"
 						/>
 					</a>
 				</div>
@@ -198,7 +198,7 @@
 						<img
 							src="{base}/SUSig_2color_Stree_StnfrdOnly_Left.png"
 							alt="Stanford University Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -209,7 +209,7 @@
 						<img
 							src="https://hai.stanford.edu/themes/hai/stanford_basic_hai/lockup.svg"
 							alt="Stanford HAI Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -220,7 +220,7 @@
 						<img
 							src="https://svelte.dev/svelte-logo-horizontal.svg"
 							alt="Svelte Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -231,7 +231,7 @@
 						<img
 							src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.79614a5f61617ba49a0891494521226b.svg"
 							alt="Tailwind Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -242,7 +242,7 @@
 						<img
 							src="https://flowbite.com/images/logo.svg"
 							alt="Flowbite Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -253,7 +253,7 @@
 						<img
 							src="https://docs.pydantic.dev/logo-white.svg"
 							alt="Pydantic Logo"
-							class="w-full h-full filter-black"
+							class="h-full filter-black"
 						/>
 					</a>
 				</div>
@@ -264,7 +264,7 @@
 						<img
 							src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
 							alt="FastAPI Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -275,7 +275,7 @@
 						<img
 							src="https://pandas.pydata.org/static/img/pandas_white.svg"
 							alt="Pandas Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -283,7 +283,7 @@
 					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://numpy.org/">
-						<img src="https://numpy.org/images/logo.svg" alt="Numpy Logo" class="w-full h-full" />
+						<img src="https://numpy.org/images/logo.svg" alt="Numpy Logo" class="h-full" />
 					</a>
 				</div>
 				<div
@@ -293,7 +293,7 @@
 						<img
 							src="https://pytorch.org/assets/images/pytorch-logo.png"
 							alt="Pytorch Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>
@@ -304,7 +304,7 @@
 						<img
 							src="https://arrow.apache.org/img/arrow-inverse.png"
 							alt="Apache Arrow Logo"
-							class="w-full h-full filter-black"
+							class="h-full filter-black"
 						/>
 					</a>
 				</div>
@@ -315,7 +315,7 @@
 						<img
 							src="https://huggingface.co/front/assets/huggingface_logo.svg"
 							alt="Huggingface Logo"
-							class="w-full h-full"
+							class="h-full"
 						/>
 					</a>
 				</div>

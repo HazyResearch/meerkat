@@ -1,6 +1,6 @@
 <!-- Make a sticky footer that tells the user to star us on GitHub, show a star next to the message -->
 <div
-	class="flex justify-center items-center gap-8 font-rubik text-center py-4 bg-orange-50  bottom-0 sticky dark:bg-gray-900 border-t border-gray-200 dark:border-gray-600"
+	class="flex px-4 justify-center items-center gap-8 font-rubik text-center py-4 bg-orange-50  bottom-0 sticky dark:bg-gray-900 border-t border-gray-200 dark:border-gray-600"
 >	
 	<div class="text-md animate-[bounce_3s_ease-in-out_infinite] flex">
 		<a
