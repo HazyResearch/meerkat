@@ -59,7 +59,7 @@ df[["image", "title", "attribution"]].head()
 The function `mk.image` creates a {class}`~meerkat.ImageColumn` which defers the downloading of images from the URLs until the data is needed. 
 
 ```{admonition} Deferred Columns
-If you're wondering how {class}`~meerkat.ImageColumn` works, check out the guide on {doc}`columns/deferred`. 
+If you're wondering how {class}`~meerkat.ImageColumn` works, check out the guide on {doc}`column/deferred`. 
 ```
 
 **Adding a primary key.** The `objectid` column contains a unique identifier for each work of art. We can use {func}`~meerkat.set_primary_key` to set this column as the primary key for the DataFrame, which allows us to perform key-based indexing on the DataFrame.

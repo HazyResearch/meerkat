@@ -150,6 +150,7 @@ html_theme_options = {
         "colab_url": "https://colab.research.google.com",
     },
     "announcement": "<div class='topnav'></div>",
+    # "navigation_depth": 3,
 }
 
 html_context = {

@@ -1,12 +1,12 @@
 format: jb-book
 root: index
 parts:
-  - caption: Getting started
+
+  - caption: Getting Started
     chapters:
       - file: start/install
       - file: start/quickstart-interactive
-      - title: Tutorials
-        file: start/tutorials/index
+      - file: start/tutorials/index
         sections:
           - file: start/tutorials/tutorial-0
           - file: start/tutorials/tutorial-2
@@ -16,103 +16,97 @@ parts:
   - caption: User Guide
     chapters:
 
-      - file: guide/overview
-        title: Overview
+      - file: user-guide/overview
       
-      - file: guide/dataframe/intro
-        title: Data Frames
+      - file: user-guide/dataframe/index
         sections:
-          - file: guide/dataframe/selection
-          - file: guide/dataframe/columns/overview
+          - file: user-guide/dataframe/selection
+          - file: user-guide/dataframe/column/index
             sections:
-              - file: guide/dataframe/columns/scalar
-              - file: guide/dataframe/columns/tensor
-              - file: guide/dataframe/columns/deferred
-              - file: guide/dataframe/columns/object
-
-          - file: guide/dataframe/ops/overview
+              - file: user-guide/dataframe/column/scalar
+              - file: user-guide/dataframe/column/tensor
+              - file: user-guide/dataframe/column/deferred
+              - file: user-guide/dataframe/column/object
+          - file: user-guide/dataframe/ops/index
             sections:
-              - file: guide/dataframe/ops/mapping
-              - file: guide/dataframe/ops/combining
-              - file: guide/dataframe/ops/grouping
-          - file: guide/dataframe/io
-          - title: Advanced
-            file: guide/dataframe/advanced/overview
+              - file: user-guide/dataframe/ops/mapping
+              - file: user-guide/dataframe/ops/combining
+              - file: user-guide/dataframe/ops/grouping
+          - file: user-guide/dataframe/io
+          - file: user-guide/dataframe/advanced/index
             sections:
-              - file: guide/dataframe/advanced/copying
-              - file: guide/dataframe/advanced/blocks
-
-      - title: Reactive Functions
-        file: guide/reactive/index
-        sections:
-          - title: Getting Started
-            file: guide/reactive/getting-started
-          - title: Concepts
-            file: guide/reactive/concepts
-          - file: guide/reactive/user-guide
-          # - file: guide/reactive/examples
-          # - file: guide/reactive/faqs
-          - file: guide/reactive/inbuilts
-
-      - title: Stores
-        file: guide/store/getting-started
-        sections:
-          # - file: guide/store/user-guide
-          - file: guide/store/faqs
-
-      - title: Components
-        file: guide/components/index
-        sections:
-          - file: guide/components/getting-started
-            title: Getting Started
-          - file: guide/components/builtins
-            title: Components in Meerkat
-          - file: guide/components/custom-components
-            title: Custom Components
-
-      - title: Endpoints
-        file: guide/endpoints/index
-        sections:
-          - file: guide/endpoints/getting-started
-            title: Getting Started
-          - file: guide/endpoints/reactive-vs-endpoints
+              - file: user-guide/dataframe/advanced/copying
+              - file: user-guide/dataframe/advanced/blocks
 
       - title: Interactive
-        file: guide/interactive/introduction
-        sections: 
-          - file: guide/interactive/concepts/core-concepts-nutshell
-            sections:
-              - file: guide/interactive/concepts/store
-              - file: guide/interactive/concepts/dataframe
-              - file: guide/interactive/concepts/endpoint
-              - file: guide/interactive/concepts/reactive
-              - file: guide/interactive/concepts/component
-              - file: guide/interactive/concepts/state
-          # - file: guide/interactive/details/why-reactive
-          - file: guide/interactive/environments/running-interfaces
-          - file: guide/interactive/components/component
-            sections:
-              - file: guide/interactive/components/display
-              - file: guide/interactive/components/match
-          - file: guide/interactive/examples/examples
-            sections:
-              - file: guide/interactive/examples/image_search
-
-      - title: Formatters
-        file: guide/formatters/index
+        file: user-guide/interactive/index
         sections:
-          - file: guide/formatters/getting-started
-            title: Getting Started
+          - file: user-guide/interactive/getting-started
+          - file: user-guide/interactive/environments/running-interfaces
+          - file: user-guide/interactive/reactive/index
+            sections:
+              - file: user-guide/interactive/reactive/getting-started
+              - file: user-guide/interactive/reactive/concepts
+              - file: user-guide/interactive/reactive/user-guide
+              # - file: user-guide/interactive/reactive/examples
+              # - file: user-guide/interactive/reactive/faqs
+              - file: user-guide/interactive/reactive/inbuilts
+          - title: Stores
+            file: user-guide/store/getting-started
+            sections:
+              # - file: user-guide/store/user-guide
+              - file: user-guide/store/faqs
+
+          - file: user-guide/components/index
+            sections:
+              - file: user-guide/components/getting-started
+                title: Getting Started
+              - file: user-guide/components/builtins
+                title: Components in Meerkat
+              - file: user-guide/components/custom-components
+                title: Custom Components
+
+          - title: Endpoints
+            file: user-guide/endpoints/index
+            sections:
+              - file: user-guide/endpoints/getting-started
+                title: Getting Started
+              - file: user-guide/endpoints/interactive/reactive-vs-endpoints
+
+          - file: user-guide/formatters/index
+            # sections:
+            #   - file: user-guide/formatters/getting-started
+            #     title: Getting Started
+
+          - file: user-guide/interactive/core-concepts-nutshell
+
+          # old stuff that needs to be refactored
+          - file: user-guide/interactive/core-concepts-nutshell
+            sections:
+              - file: user-guide/interactive/concepts/store
+              - file: user-guide/interactive/concepts/dataframe
+              - file: user-guide/interactive/concepts/endpoint
+              - file: user-guide/interactive/concepts/interactive/reactive
+              - file: user-guide/interactive/concepts/component
+              - file: user-guide/interactive/concepts/state
+          # - file: user-guide/interactive/details/why-reactive
+          - file: user-guide/interactive/components/component
+            sections:
+              - file: user-guide/interactive/components/display
+              - file: user-guide/interactive/components/match
+          - file: user-guide/interactive/examples/examples
+            sections:
+              - file: user-guide/interactive/examples/image_search
 
       - title: Cheat Sheet
-        file: guide/cheat-sheet
+        file: user-guide/cheat-sheet
 
   - caption: Advanced
     chapters:
       - title: Magic
-        file: guide/magic/getting-started
+        file: user-guide/magic/getting-started
         sections:
-          - file: guide/magic/limitations
+          - file: user-guide/magic/limitations
 
       - title: Configuration
         file: start/configure
@@ -123,7 +117,6 @@ parts:
   #       title: Error Analysis
 
   - caption: Ecosystem
-
     chapters:
       - title: Datasets
         file: datasets/index
