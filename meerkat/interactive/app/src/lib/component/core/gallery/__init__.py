@@ -44,6 +44,9 @@ class Gallery(Component):
             cell_size=cell_size,
         )
 
+    def _get_ipython_height(self):
+        return "1000px"
+
 
 register_placeholder(
     name="gallery",

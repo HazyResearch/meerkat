@@ -1,3 +1,0 @@
-(reactivity_faqs)=
-
-# FAQs

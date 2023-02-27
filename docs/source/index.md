@@ -6,7 +6,7 @@ Read more about our motivation for building Meerkat in our [blog post](https://h
 
 Through our Python library and npm package, we offer tools to help you work with unstructured data and foundation models across many contexts:
 - a simple, full-stack framework to build interactive user interfaces purely in Python,
-- a data frame that is designed for use with unstructured data and that underlies all interactivity in Meerkat,
+- a DataFrame that is designed for use with unstructured data and that underlies all interactivity in Meerkat,
 - support for notebooks, standalone scripts and even full scale web applications through integration with [SvelteKit](https://kit.svelte.dev/),
 - out-of-the-box components and workflows in Python for common use cases,
 - careful support for extending Meerkat to your needs, such as integrating custom components with minimal overhead.

@@ -320,6 +320,7 @@ class PandasScalarColumn(
         from meerkat.interactive.formatter import (
             NumberFormatterGroup,
             TextFormatterGroup,
+            BooleanFormatterGroup,
         )
 
         if len(self) == 0:
@@ -333,6 +334,8 @@ class PandasScalarColumn(
 
         cell = self[0]
         if isinstance(cell, np.generic):
+            if isinstance(cell, np.bool_):
+                return BooleanFormatterGroup()
             return NumberFormatterGroup(dtype=type(cell.item()).__name__)
 
         return super()._get_default_formatters()

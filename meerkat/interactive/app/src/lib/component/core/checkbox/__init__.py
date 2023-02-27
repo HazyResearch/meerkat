@@ -17,6 +17,6 @@ class Checkbox(Slottable, Component):
         "orange",
     ] = "purple"
 
-    classes: str = "bg-violet-50 p-2 rounded-lg"
+    classes: str = ""
 
     on_change: Optional[Endpoint] = None

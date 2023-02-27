@@ -28,11 +28,10 @@ class DataFrameGUI(GUI):
         )
 
     def gallery(self, main_column: str = None, tag_columns: List[str] = None, **kwargs):
-        return (
-            mk.gui.Gallery(
+        return mk.gui.Gallery(
                 df=self.df,
                 main_column=main_column,
                 tag_columns=tag_columns,
                 **kwargs,
-            ),
-        )
+            )
+        

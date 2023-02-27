@@ -61,7 +61,7 @@ def _replace_contents_in_file(fpath, *, key: str, contents: Union[str, List[str]
 
 def generate_inbuilt_reactive_fns():
     """Generate the inbuilt reactive functions RST file."""
-    fpath = _DIR / "guide" / "reactive" / "inbuilts.rst"
+    fpath = _DIR / "user-guide" / "interactive" / "reactive-functions" / "inbuilts.rst"
 
     _REACTIVE_FNS = {
         "General": [
@@ -131,7 +131,7 @@ def generate_inbuilt_reactive_fns():
 
 def generate_store_operators():
     """Generate table of store operators that are reactive."""
-    fpath = _DIR / "guide" / "store" / "user-guide.md"
+    fpath = _DIR / "user-guide" / "interactive" / "stores" / "inbuilts.md"
     operators = [
         # Arthmetic
         "Addition, +, x + y",
@@ -154,13 +154,13 @@ def generate_store_operators():
         "Bitwise Right Shift & Assign, >>=, x>>=1",
         "Bitwise AND & Assign, &=, x&=1",
         "Bitwise XOR & Assign, ^=, x^=1",
-        "Bitwise OR & Assign, |=, x|=1",
+        "Bitwise OR & Assign, \|=, x\|=1",
         # Bitwise
         "Bitwise Left Shift, <<, x << y",
         "Bitwise Right Shift, >>, x >> y",
         "Bitwise AND, &, x & y",
         "Bitwise XOR, ^, x ^ y",
-        "Bitwise OR, |, x | y",
+        "Bitwise OR, \|, x \| y",
         "Bitwise Inversion, ~, ~x",
         # Comparison
         "Less Than, <, x < y",
@@ -190,7 +190,7 @@ def generate_store_operators():
 
 def generate_common_inplace_methods():
     """Generate table of common inplace methods."""
-    fpath = _DIR / "guide" / "magic" / "limitations.md"
+    fpath = _DIR / "advanced" / "magic-contexts" / "limitations.md"
 
     # Examples of common inplace methods include:
     methods = [
@@ -238,7 +238,7 @@ def generate_common_inplace_methods():
 
 def generate_components_doc():
     """Generate autosummary doc for all components."""
-    fpath = _DIR / "guide" / "components" / "builtins.rst"
+    fpath = _DIR / "user-guide" / "interactive" / "components" / "inbuilts.rst"
 
     component_libs = ["core", "html", "plotly", "flowbite"]
     _COMPONENTS = {}
@@ -254,7 +254,7 @@ def generate_components_doc():
         _COMPONENTS[name] = components
 
     lines = [
-        ".. _components_builtins:",
+        ".. _components_inbuilts:",
         "",
         "Meerkat Components",
         "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",

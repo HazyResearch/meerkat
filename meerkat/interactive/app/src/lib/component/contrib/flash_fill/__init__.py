@@ -14,13 +14,21 @@ class FlashFill(div):
     def __init__(
         self,
         df: "DataFrame",
+        target_column: str,
         classes: str = "",
     ):
+        df = df.view()
+        if target_column not in df.columns:
+            df[target_column] = ""
+        df["is_train"] = False
         component = _build_component(df)
         super().__init__(
             slots=[component],
             classes=classes,
         )
+
+    def _get_ipython_height(self):
+        return "600px"
 
 
 def _build_component(df: "DataFrame") -> "Component":
@@ -58,7 +66,9 @@ def _build_component(df: "DataFrame") -> "Component":
 
         # Extract out the example template from the prompt template.
         df["example"] = mk.defer(
-            df, function=partial(complete_prompt, example_template=template), inputs="row"
+            df,
+            function=partial(complete_prompt, example_template=template),
+            inputs="row",
         )
         return df
 
@@ -88,14 +98,17 @@ def _build_component(df: "DataFrame") -> "Component":
 
     @mk.endpoint()
     def run_manifest(
-        instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list
+        instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list, api: str
     ):
+        client_name, engine = api.split("/")
         manifest = Manifest(
-            client_name="openai",
+            client_name=client_name,
             client_connection=open("/Users/sabrieyuboglu/.meerkat/keys/.openai").read(),
-            engine="code-davinci-002",
+            engine=engine,
             temperature=0,
             max_tokens=1,
+            cache_name="sqlite",
+            cache_connection="/Users/sabrieyuboglu/.manifest/cache.sqlite",
         )
 
         def _run_manifest(example: mk.Column):
@@ -105,10 +118,10 @@ def _build_component(df: "DataFrame") -> "Component":
             )
             return out
 
-        selected_idxs = df.primary_key.isin(selected)
+        selected_idxs = df.primary_key.isin(selected).to_pandas()
 
         # Concat all of the in-context examples.
-        train_df = df[(~selected_idxs) & (df[output_col] != "")]
+        train_df = df[(~selected_idxs) & (df["is_train"])]
         in_context_examples = "\n".join(train_df["example"]())
 
         fill_df = df[selected_idxs]
@@ -126,7 +139,6 @@ def _build_component(df: "DataFrame") -> "Component":
 
         df[col][selected_idxs] = flash_fill
         df.set(df)
-        print("done with manifest")
 
     df = df.mark()
 
@@ -149,6 +161,16 @@ def _build_component(df: "DataFrame") -> "Component":
         on_edit=on_edit.partial(df=df),
     )
 
+    api_select = mk.gui.core.Select(
+        values=[
+            "together/gpt-j-6b",
+            "together/gpt-2",
+            "openai/text-davinci-003",
+            "openai/code-davinci-002",
+        ],
+        value="together/gpt-j-6b",
+    )
+
     run_manifest_button = mk.gui.Button(
         title="Flash Fill",
         icon="Magic",
@@ -157,6 +179,7 @@ def _build_component(df: "DataFrame") -> "Component":
             df=df_view,
             output_col=output_col,
             selected=table.selected,
+            api=api_select.value,
         ),
     )
     formatted_output_col = format_output_col(output_col)
@@ -168,7 +191,7 @@ def _build_component(df: "DataFrame") -> "Component":
                 classes="font-bold text-slate-600 text-sm",
             ),
             mk.gui.Text(
-                "Specify the instruction and a template for in-context examples.",
+                "Specify the instruction and a template for in-context train examples.",
                 classes="text-slate-600 text-sm",
             ),
             mk.gui.html.div(
@@ -181,7 +204,13 @@ def _build_component(df: "DataFrame") -> "Component":
                 ],
                 classes="gap-3 align-middle grid grid-cols-[auto_1fr]",
             ),
-            run_manifest_button,
+            mk.gui.html.grid(
+                [
+                    run_manifest_button,
+                    api_select,
+                ],
+                classes="grid grid-cols-[auto_1fr] gap-2",
+            ),
         ],
         classes="items-left mx-4 gap-1",
     )

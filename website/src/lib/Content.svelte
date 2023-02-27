@@ -5,7 +5,7 @@
 
 <!-- Top Content Part, should remain below the navbar -->
 <section
-	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-orange-100"
+	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br border-b "
 >
 	<div class="container px-6 mx-auto pt-48 pb-32">
 		<div class="flex flex-col items-center justify-between md:flex-row">
@@ -25,13 +25,13 @@
 
 <!-- Add a section to show code for installing the Meerkat package. -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
+	class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl  border-b "
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="flex flex-col items-center">
 			<h1 class="text-4xl text-gray-800 dark:text-white">Install Meerkat</h1>
-			<pre class="rounded-lg mt-4 py-4 px-8 text-gray-600 bg-white dark:text-gray-400"><code
-					>pip install meerkat-ml</code
+			<pre class="rounded-lg mt-4 py-4 px-8 text-white bg-slate-800 dark:text-gray-400"><code
+					>$ pip install meerkat-ml</code
 				></pre>
 		</div>
 	</div>
@@ -45,7 +45,7 @@
 5. Interfaces in Notebooks
 -->
 <!-- <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200 border-b border-orange-100"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br border-b "
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
@@ -114,10 +114,10 @@
 
 <!-- Add a section with cards for different user personas: Researchers, Data Scientists, Developers, etc. -->
 <!-- <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b "
 > -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
+	class="font-rubik  dark:bg-gray-900 bg-gradient-to-br  border-b "
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
@@ -146,15 +146,15 @@
 
 <!-- Section on who built this -->
 <!-- <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
+	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br  border-b "
 > -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b border-orange-100"
+	class="font-rubik dark:bg-gray-900 bg-gradient-to-bl  "
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
 			<h1 class="text-4xl text-gray-800 dark:text-white">Built by</h1>
-			<div class="flex flex-wrap justify-center mt-6 bg-gray-100 rounded-lg shadow-lg">
+			<div class="flex flex-wrap justify-center mt-6 bg-slate-100 rounded-lg shadow-lg">
 				<div class="h-20 p-4 mx-1 my-1 text-gray-800 dark:text-gray-400 dark:bg-gray-800">
 					<a href="https://hazyresearch.github.io/" class="flex w-full h-full hover:shadow-sm">
 						<img
@@ -185,12 +185,12 @@
 	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200"
 > -->
 <section
-	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br from-purple-200 via-red-200 to-orange-200  border-b border-orange-100"
+	class="font-rubik dark:bg-gray-900 bg-gradient-to-br  border-b "
 >
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
 			<h1 class="text-4xl text-gray-800 dark:text-white">We wouldn't be here without</h1>
-			<div class="flex flex-wrap justify-center mt-6 bg-red-200 shadow-lg">
+			<div class="flex flex-wrap justify-center mt-6 shadow-lg rounded-lg bg-slate-50">
 				<div
 					class="h-20 p-2 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
@@ -203,7 +203,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-5 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-5 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://hai.stanford.edu/">
 						<img
@@ -214,7 +214,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://svelte.dev/">
 						<img
@@ -225,7 +225,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-6 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-6 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://tailwindcss.com/">
 						<img
@@ -236,7 +236,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://flowbite.com/">
 						<img
@@ -247,7 +247,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://pydantic-docs.helpmanual.io/">
 						<img
@@ -258,7 +258,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://fastapi.tiangolo.com/">
 						<img
@@ -269,7 +269,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://pandas.pydata.org/">
 						<img
@@ -280,14 +280,14 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://numpy.org/">
 						<img src="https://numpy.org/images/logo.svg" alt="Numpy Logo" class="h-full" />
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://pytorch.org/">
 						<img
@@ -298,7 +298,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800  hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://arrow.apache.org/">
 						<img
@@ -309,7 +309,7 @@
 					</a>
 				</div>
 				<div
-					class="h-20 p-4 mx-2 my-2 text-gray-800 bg-red-200 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
+					class="h-20 p-4 mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://huggingface.co/">
 						<img

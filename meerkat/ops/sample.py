@@ -29,7 +29,7 @@ def sample(
         weights (Union[str, np.ndarray]): Weights to use for sampling. If `None`
             (default), the rows will be sampled uniformly. If a numpy array, the
             sample will be weighted accordingly. If a string and `data` is a DataFrame,
-            the weights will be applied to the rows based on the column with the name
+            the sampled_df will be applied to the rows based on the column with the name
             specified. If weights do not sum to 1 they will be normalized to sum to 1.
         random_state (Union[int, np.random.RandomState]): Random state or seed to use
             for sampling.

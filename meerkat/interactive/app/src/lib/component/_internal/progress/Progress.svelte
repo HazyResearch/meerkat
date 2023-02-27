@@ -47,7 +47,7 @@
 <div class="h-12 mb-1">
 	{#if running}
 		<div
-			class="mb-2 pt-1 bg-purple-50 rounded-lg px-2 text-sm font-medium text-purple-700 dark:text-white"
+			class="mb-2 pt-1 bg-purple-50 rounded-lg px-2 text-sm font-medium text-purple-700"
 		>
 			{info}
 			<div class="flex items-center justify-between mb-1">
@@ -57,7 +57,7 @@
 		</div>
 	{:else}
 		<div
-			class="text-center mb-2 py-1 bg-green-50 rounded-lg px-2 text-sm font-medium text-green-700 dark:text-white"
+			class="text-center mb-2 py-1 bg-green-50 rounded-lg px-2 text-sm font-medium text-green-700"
 		>
 			{info}
 		</div>

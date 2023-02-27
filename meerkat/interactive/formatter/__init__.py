@@ -6,6 +6,7 @@ from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
 from .tensor import TensorFormatterGroup  # , TensorFormatter
 from .text import TextFormatter, TextFormatterGroup
+from .boolean import BooleanFormatter, BooleanFormatterGroup
 
 __all__ = [
     "Formatter",
@@ -24,6 +25,8 @@ __all__ = [
     "PDFFormatterGroup",
     # "TensorFormatter",
     "TensorFormatterGroup",
+    "BooleanFormatter",
+    "BooleanFormatterGroup"
 ]
 
 # backwards compatibility

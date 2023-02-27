@@ -5,7 +5,7 @@
 	export let tight: boolean;
 </script>
 
-<div class="flex flex-col flex-wrap {tight ? `p-4` : `p-6`} bg-white rounded-lg shadow-lg dark:bg-gray-800">
+<div class="flex flex-col flex-wrap {tight ? `p-4` : `p-6`} bg-slate-50 rounded-lg shadow-lg dark:bg-gray-800">
 	<slot name="header" />
 	<div>
 		<h4 class="mb-1 text-lg font-semibold text-gray-800 dark:text-white">{title}</h4>

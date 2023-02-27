@@ -20,12 +20,14 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class={classes}>
-	<Select
-		on:change={(e) => dispatch('change', { value })}
-		bind:items
-		bind:value
-		bind:disabled
-		defaultClass="bg-purple-200 border-purple-500 ring-purple-200 ring-offset-0 ring-0 focus:border-purple-500 focus:ring-purple-200 focus:ring-offset-0 focus:ring-0 p-2 rounded-lg w-fit"
-	/>
-</div>
+<select
+	on:change={(e) => dispatch('change', { value })}
+	bind:value
+	class="rounded-md bg-slate-100 border-0 px-3 text-slate-600"
+>
+	{#each items as item}
+		<option value={item.value}>{item.name}</option>
+	{/each}
+</select>
+
+
