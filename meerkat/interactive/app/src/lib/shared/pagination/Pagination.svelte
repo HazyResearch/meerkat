@@ -7,6 +7,7 @@
 	export let perPage: number = 10;
 	export let totalItems: number;
 	export let dropdownPlacement: string = 'bottom';
+	export let allowSetPerPage: boolean = true;
 
 	$: pageCount = Math.ceil(totalItems / perPage);
 	$: startItem = page * perPage + 1;
@@ -56,23 +57,29 @@
 				open = !open;
 			}}
 		>
-			Page <span class="font-bold">{page + 1}</span> of
-			<span class="font-bold">{pageCount}</span>
+			{#if pageCount > 0}
+				Page <span class="font-bold">{page + 1}</span> of
+				<span class="font-bold">{pageCount}</span>
+			{:else}
+				No pages
+			{/if}
 		</button>
-		<Dropdown placement={dropdownPlacement} {open} class="w-fit">
-			{#each [10, 20, 50, 100, 200] as p}
-				<DropdownItem
-					on:click={() => {
-						open = false;
-						perPage = p;
-					}}
-				>
-					<div class="text-slate-600">
-						Page size <span class="font-bold">{p}</span>
-					</div>
-				</DropdownItem>
-			{/each}
-		</Dropdown>
+		{#if allowSetPerPage}
+			<Dropdown placement={dropdownPlacement} {open} class="w-fit">
+				{#each [10, 20, 50, 100, 200] as p}
+					<DropdownItem
+						on:click={() => {
+							open = false;
+							perPage = p;
+						}}
+					>
+						<div class="text-slate-600">
+							Page size <span class="font-bold">{p}</span>
+						</div>
+					</DropdownItem>
+				{/each}
+			</Dropdown>
+		{/if}
 	</li>
 	<li>
 		<button

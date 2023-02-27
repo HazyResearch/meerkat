@@ -1,13 +1,13 @@
 import ast
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Literal, Tuple
 
 import numpy as np
 from fastapi import HTTPException
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
-from meerkat.interactive.endpoint import EndpointProperty, endpoint
+from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
 
@@ -22,40 +22,6 @@ _SUPPORTED_BIN_OPS = {
 _SUPPORTED_CALLS = {
     "concat": lambda *args: np.concatenate(args, axis=1),
 }
-
-
-@endpoint()
-def refine_match(
-    df: DataFrame,
-    against: str,
-    match_column: str,
-    label_column: str,
-):
-    """Refine a match, using feedback from the user.
-
-    Labels are +1 for a match, -1 for a non-match, and 0 for unlabeled.
-    """
-    # Train a logistic regression model to predict the label.
-    from sklearn.linear_model import LogisticRegression
-
-    # Mask for positive and negative labels.
-    mask_p = df[label_column] == 1
-    mask_n = df[label_column] == -1
-
-    # Embeddings
-    X = df[against][mask_p | mask_n]
-    y = df[label_column][mask_p | mask_n]
-
-    # Train a logistic regression model to predict the label.
-    model = LogisticRegression()
-    model.fit(X, y)
-
-    # Predict the label for all rows.
-    y_pred = model.predict(df[against])
-
-    # Update the match column.
-    df[f"{match_column}_refined"] = y_pred
-    df.set(df)
 
 
 def parse_query(query: str):
@@ -109,12 +75,20 @@ def get_match_schema(df: DataFrame):
     )
 
 
+def _calc_image_query(df: DataFrame, locs: list, against: str):
+    """Calculate the negative samples for a match.
+    """
+    return df.loc[locs][against].mean(axis=0)
+    
+
 @endpoint()
 def set_criterion(
     df: DataFrame,
     query: str,
     against: str,
     criterion: Store,
+    positives: list = None,
+    negatives: list = None,
     encoder: str = None,
 ):
     """Match a query string against a DataFrame column.
@@ -127,13 +101,24 @@ def set_criterion(
         )
 
     try:
-        query_embedding = parse_query(query)
+        if not query and not negatives and not positives:
+            return criterion
+
+        query_embedding = 0.
+        if query:
+            query_embedding = parse_query(query)
+        if negatives:
+            query_embedding = query_embedding - 0.25 * _calc_image_query(df, negatives, against)
+        if positives:
+            query_embedding = query_embedding + _calc_image_query(df, positives, against)
 
         match_criterion = MatchCriterion(
             query=query,
             against=against,
             query_embedding=query_embedding,
             name=f"match({against}, {query})",
+            positives=positives,
+            negatives=negatives,
         )
         criterion.set(match_criterion)
 
@@ -155,6 +140,8 @@ class MatchCriterion:
     query: str
     name: str
     query_embedding: np.ndarray = None
+    positives: list = None
+    negatives: list = None
 
 
 class OnGetMatchSchemaMatch(EventInterface):
@@ -163,32 +150,6 @@ class OnGetMatchSchemaMatch(EventInterface):
 
 class OnMatchMatch(EventInterface):
     criterion: MatchCriterion
-
-
-@reactive(nested_return=True)
-def compute_match_scores(
-    df: DataFrame,
-    criterion: MatchCriterion,
-) -> Tuple[DataFrame, str]:
-    """Compute the match scores for a given criterion.
-
-    Args:
-        df (DataFrame): The DataFrame to match against.
-        criterion (MatchCriterion): The criterion to match against.
-
-    Returns:
-        Tuple[DataFrame, str]: The DataFrame with the match scores
-            added as a column, and the name of the column.
-    """
-    df = df.view()
-    if criterion == None or criterion.against is None:  # noqa: E711
-        return df, None
-
-    data_embedding = df[criterion.against]
-    scores = (data_embedding @ criterion.query_embedding.T).squeeze()
-    df[criterion.name] = scores
-
-    return df, criterion.name
 
 
 _get_match_schema = get_match_schema
@@ -205,6 +166,11 @@ class Match(Component):
     # and positional arguments
     on_match: EndpointProperty[OnMatchMatch] = None
     get_match_schema: EndpointProperty[OnGetMatchSchemaMatch] = None
+    on_clickminus: Endpoint = None
+    on_unclickminus: Endpoint = None
+    on_clickplus: Endpoint = None
+    on_unclickplus: Endpoint = None
+    on_reset: Endpoint = None
 
     def __init__(
         self,
@@ -216,6 +182,11 @@ class Match(Component):
         title: str = "Match",
         on_match: EndpointProperty = None,
         get_match_schema: EndpointProperty = None,
+        on_clickminus: Endpoint = None,
+        on_unclickminus: Endpoint = None,
+        on_clickplus: Endpoint = None,
+        on_unclickplus: Endpoint = None,
+        on_reset: Endpoint = None,
     ):
         super().__init__(
             df=df,
@@ -225,6 +196,11 @@ class Match(Component):
             title=title,
             on_match=on_match,
             get_match_schema=get_match_schema,
+            on_clickminus=on_clickminus,
+            on_unclickminus=on_unclickminus,
+            on_clickplus=on_clickplus,
+            on_unclickplus=on_unclickplus,
+            on_reset=on_reset,
         )
 
         # we do not add the against or the query to the partial, because we don't
@@ -237,23 +213,88 @@ class Match(Component):
             MatchCriterion(against=None, query=None, name=None),
             backend_only=True,
         )
+        
+        self.negative_selection = Store([], backend_only=True)
+        self.positive_selection = Store([], backend_only=True)
+        self._mode: Store[Literal[
+            "set_negative_selection", 
+            "set_positive_selection", 
+            "",
+        ]] = Store("")
 
         on_match = set_criterion.partial(
             df=self.df,
             encoder=self.encoder,
             criterion=self._criterion,
+            positives=self.positive_selection,
+            negatives=self.negative_selection,
         )
+
         if self.on_match is not None:
             on_match = on_match.compose(self.on_match)
 
         self.on_match = on_match
 
+    def set_selection(self, selection: Store[list]):
+        self.external_selection = selection
+
+
+        self._positive_selection = Store([], backend_only=True)
+        self._negative_selection = Store([], backend_only=True)
+
+        self.on_clickminus = self.on_set_negative_selection.partial(self)
+        self.on_clickplus = self.on_set_positive_selection.partial(self)
+
+        self.on_unclickminus = self.on_unset_negative_selection.partial(self)
+        self.on_unclickplus = self.on_unset_positive_selection.partial(self)
+
+        self.on_reset = self.on_reset_selection.partial(self)
+
+        self.on_external_selection_change(self.external_selection)
+
+    @endpoint()
+    def on_reset_selection(self):
+        """Reset all the selections."""
+        self.negative_selection.set([])
+        self.positive_selection.set([])
+        self.external_selection.set([])
+        self._mode.set("")
+        self._positive_selection.set([])
+        self._negative_selection.set([])
+
+    @reactive()
+    def on_external_selection_change(self, external_selection):
+        if self._mode == 'set_negative_selection':
+            self.negative_selection.set(external_selection)
+        elif self._mode == 'set_positive_selection':
+            self.positive_selection.set(external_selection)
+
+    @endpoint()
+    def on_set_negative_selection(self):
+        if self._mode == 'set_positive_selection':
+            self._positive_selection.set(self.external_selection.value)
+        self._mode.set('set_negative_selection')
+        self.external_selection.set(self._negative_selection.value)
+
+    @endpoint()
+    def on_unset_negative_selection(self):
+        self._negative_selection.set(self.external_selection.value)
+        self._mode.set("")
+        self.external_selection.set([])
+    
+    @endpoint()
+    def on_set_positive_selection(self):
+        if self._mode == 'set_negative_selection':
+            self._negative_selection.set(self.external_selection.value)
+        self._mode.set('set_positive_selection')
+        self.external_selection.set(self._positive_selection.value)
+
+    @endpoint()
+    def on_unset_positive_selection(self):
+        self._positive_selection.set(self.external_selection.value)
+        self._mode.set("")
+        self.external_selection.set([])
+
     @property
     def criterion(self) -> MatchCriterion:
         return self._criterion
-
-    def __call__(self, df: DataFrame = None) -> DataFrame:
-        if df is None:
-            df = self.df
-
-        return compute_match_scores(df, self.criterion)
