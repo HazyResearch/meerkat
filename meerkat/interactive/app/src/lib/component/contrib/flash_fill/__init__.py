@@ -115,7 +115,7 @@ def _build_component(df: "DataFrame") -> "Component":
             )
             return out
 
-        selected_idxs = df.primary_key.isin(selected)
+        selected_idxs = df.primary_key.isin(selected).to_pandas()
 
         # Concat all of the in-context examples.
         train_df = df[(~selected_idxs) & (df[output_col] != "")]
@@ -136,7 +136,6 @@ def _build_component(df: "DataFrame") -> "Component":
 
         df[col][selected_idxs] = flash_fill
         df.set(df)
-        print("done with manifest")
 
     df = df.mark()
 
@@ -177,7 +176,7 @@ def _build_component(df: "DataFrame") -> "Component":
             df=df_view,
             output_col=output_col,
             selected=table.selected,
-            api=api_select,
+            api=api_select.value,
         ),
     )
     formatted_output_col = format_output_col(output_col)
