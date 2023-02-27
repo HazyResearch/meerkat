@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+import shutil
 import warnings
 from typing import (
     TYPE_CHECKING,
@@ -1423,7 +1424,7 @@ class DataFrame(
         **kwargs,
     ) -> DataFrame:
         """Load a DataFrame stored on disk."""
-        from meerkat.datasets.utils import download_df
+        from meerkat.datasets.utils import download_df, extract_tar_file
 
         # URL
         if path.startswith("http://") or path.startswith("https://"):
@@ -1432,6 +1433,19 @@ class DataFrame(
         path = os.path.abspath(os.path.expanduser(path))
         if not os.path.exists(path):
             raise ValueError(f"Path does not exist: {path}")
+
+        # Compressed file.
+        # TODO: Add support for other compressed formats.
+        if path.endswith(".tar.gz"):
+            download_dir = os.path.join(os.path.dirname(path), ".mktemp")
+            cache_dir = os.path.join(
+                download_dir, os.path.basename(path).split(".tar.gz")[0]
+            )
+            os.makedirs(download_dir, exist_ok=True)
+            extract_tar_file(path, download_dir=download_dir)
+            df = cls.read(cache_dir, overwrite=overwrite, *args, **kwargs)
+            shutil.rmtree(download_dir)
+            return df
 
         # Load the metadata
         metadata = load_yaml(os.path.join(path, "meta.yaml"))
