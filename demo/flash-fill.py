@@ -39,8 +39,7 @@ df = df[
 df["answer"] = ""
 
 page = mk.gui.Page(
-    # component=mk.gui.contrib.FlashFill(df=df),
-    component=mk.gui.Gallery(df, main_column="pdf"),
+    component=mk.gui.contrib.FlashFill(df=df, target_column="answer"),
     id="flash-fill",
     progress=False,
 )
