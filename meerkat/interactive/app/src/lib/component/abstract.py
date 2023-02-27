@@ -2,6 +2,7 @@ import collections
 import inspect
 import os
 import typing
+import uuid
 import warnings
 from typing import Dict, List, Literal, Set
 
@@ -548,7 +549,7 @@ class BaseComponent(
         display(
             Page(
                 component=self,
-                id=self.__class__.__name__,
+                id=self.__class__.__name__ + str(uuid.uuid4()),
                 height=self._get_ipython_height(),
                 progress=False,
             ).launch()

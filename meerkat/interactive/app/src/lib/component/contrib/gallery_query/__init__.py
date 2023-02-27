@@ -29,6 +29,9 @@ class GalleryQuery(div):
             classes=classes,
         )
 
+    def _get_ipython_height(self) -> str:
+        return "1000px"
+
 
 def _build_component(
     df: "DataFrame",
