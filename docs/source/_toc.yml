@@ -50,11 +50,11 @@ parts:
               - file: user-guide/interactive/reactive-functions/inbuilts
               - file: user-guide/interactive/reactive-functions/guidelines
               - file: user-guide/interactive/reactive-functions/faqs
-          - file: user-guide/interactivity/stores/index
+          - file: user-guide/interactive/stores/index
             sections:
-              - file: user-guide/interactivity/stores/subtleties
-              - file: user-guide/interactivity/stores/inbuilts
-              - file: user-guide/interactivity/stores/faqs
+              - file: user-guide/interactive/stores/subtleties
+              - file: user-guide/interactive/stores/inbuilts
+              - file: user-guide/interactive/stores/faqs
           - file: user-guide/interactive/components/index
             sections:
               - file: user-guide/interactive/components/display
@@ -79,10 +79,10 @@ parts:
 
   - caption: Advanced
     chapters:
-      - file: user-guide/advanced/magic-contexts/index
+      - file: advanced/magic-contexts/index
         sections:
-          - file: user-guide/advanced/magic-contexts/limitations
-      - file: user-guide/advanced/configuring
+          - file: advanced/magic-contexts/limitations
+      - file: advanced/configuring
 
   - caption: Ecosystem
     chapters:

@@ -190,7 +190,7 @@ def generate_store_operators():
 
 def generate_common_inplace_methods():
     """Generate table of common inplace methods."""
-    fpath = _DIR / "user-guide" / "magic" / "limitations.md"
+    fpath = _DIR / "advanced" / "magic-contexts" / "limitations.md"
 
     # Examples of common inplace methods include:
     methods = [

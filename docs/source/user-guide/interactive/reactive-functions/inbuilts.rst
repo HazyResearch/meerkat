@@ -1,7 +1,7 @@
 .. _reactivity_inbuilts:
 
-Inbuilt Reactive Functions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Reactive Functions in Meerkat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Meerkat provides some reactive functions out of the box.
 
 General
