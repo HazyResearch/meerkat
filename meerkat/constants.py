@@ -38,6 +38,9 @@ MEERKAT_INTERNAL_APP_DIR = os.path.join(
     MEERKAT_BASE_DIR, "meerkat", "interactive", "app"
 )
 
+# Path to the (internal to Python package) meerkat/interactive/app/build directory.
+MEERKAT_INTERNAL_APP_BUILD_DIR = os.path.join(MEERKAT_INTERNAL_APP_DIR, "build")
+
 # Environment variable to set the path to an app directory.
 # See PathHelper.appdir for more details.
 MEERKAT_APP_DIR = os.environ.get("MEERKAT_APP_DIR", None)

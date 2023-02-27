@@ -95,9 +95,15 @@ def download_df(
             dataset_dir=download_dir,
         )
         print("Extracting tar archive, this may take a few minutes...")
-        tar = tarfile.open(cached_tar_path, mode=mode)
-        tar.extractall(download_dir)
-        tar.close()
+        extract_tar_file(filepath=cached_tar_path, download_dir=download_dir, mode=mode)
         os.remove(cached_tar_path)
 
     return DataFrame.read(dir_path)
+
+
+def extract_tar_file(filepath: str, download_dir: str, mode: str = None):
+    if mode is None:
+        mode = "r:gz" if filepath.endswith(".tar.gz") else "r"
+    tar = tarfile.open(filepath, mode=mode)
+    tar.extractall(download_dir)
+    tar.close()

@@ -151,6 +151,8 @@ class UploadCommand(Command):
         pass
 
     def run(self):
+        from huggingface_hub.repository import Repository
+
         try:
             self.status("Removing previous builds…")
             rmtree(os.path.join(here, "dist"))
@@ -162,6 +164,7 @@ class UploadCommand(Command):
         self.status("Building static components…")
         env = os.environ.copy()
         env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
+        shutil.rmtree("./meerkat/interactive/app/build")
         build_process = subprocess.run(
             "npm run build",
             env=env,
@@ -174,17 +177,33 @@ class UploadCommand(Command):
             print(build_process.stdout.decode("utf-8"))
             sys.exit(1)
 
-        # Package static components to a tar file.
-        # self.status("Packaging static component build...")
-        # shutil.make_archive(
-        #     base_name=f"static-build-{VERSION}",
-        #     format="gztar",
-        #     root_dir="./meerkat/interactive/app/build",
-        # )
+        # Package static components to a tar file and push to huggingface.
+        # This requires having write access to meerkat-ml.
+        # TODO: Consider making this a github action.
+        self.status("Packaging static component build...")
+        components_build_targz = shutil.make_archive(
+            base_name=f"static-build-{VERSION}",
+            format="gztar",
+            root_dir="./meerkat/interactive/app/build",
+        )
 
-        # # Push to huggingface
-        # self.status("Uploading static build to huggingface...")
+        self.status("Uploading static build to huggingface...")
+        local_repo_dir = os.path.abspath(
+            os.path.expanduser("~/.meerkat/hf/component-static-builds")
+        )
+        repo = Repository(
+            local_dir=local_repo_dir,
+            clone_from="meerkat-ml/component-static-builds",
+            repo_type="dataset",
+        )
+        shutil.move(
+            components_build_targz,
+            os.path.join(local_repo_dir, os.path.basename(components_build_targz)),
+        )
+        repo.git_pull()
+        repo.push_to_hub(commit_message=f"{VERSION}: new component builds")
 
+        # Build the source and wheel.
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
 
