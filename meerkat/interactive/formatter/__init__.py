@@ -4,7 +4,7 @@ from .image import ImageFormatter, ImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
-from .tensor import TensorFormatterGroup  # , TensorFormatter
+from .tensor import TensorFormatterGroup, TensorFormatter
 from .text import TextFormatter, TextFormatterGroup
 from .boolean import BooleanFormatter, BooleanFormatterGroup
 
@@ -23,7 +23,7 @@ __all__ = [
     "CodeFormatterGroup",
     "PDFFormatter",
     "PDFFormatterGroup",
-    # "TensorFormatter",
+    "TensorFormatter",
     "TensorFormatterGroup",
     "BooleanFormatter",
     "BooleanFormatterGroup"
@@ -37,7 +37,7 @@ class DeprecatedFormatter:  # noqa: E302
 ObjectFormatter = DeprecatedFormatter
 BasicFormatter = DeprecatedFormatter
 NumpyArrayFormatter = DeprecatedFormatter
-TensorFormatter = DeprecatedFormatter
+# TensorFormatter = DeprecatedFormatter
 WebsiteFormatter = DeprecatedFormatter
 # CodeFormatter = DeprecatedFormatter
 PILImageFormatter = DeprecatedFormatter
