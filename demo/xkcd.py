@@ -14,11 +14,13 @@ gallery = mk.gui.html.div(
     [
         filter,
         mk.gui.Gallery(
-            filtered_df.format({
-                "image_url": ImageFormatter(max_size=(300, 300)),
-                "url": WebsiteFormatter(height=30),
-                "explained_url": WebsiteFormatter(height=30),
-            }), 
+            filtered_df.format(
+                {
+                    "image_url": ImageFormatter(max_size=(300, 300)),
+                    "url": WebsiteFormatter(height=30),
+                    "explained_url": WebsiteFormatter(height=30),
+                }
+            ),
             main_column="image_url",
         ),
     ],

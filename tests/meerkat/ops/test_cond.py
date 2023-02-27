@@ -11,8 +11,8 @@ from meerkat.interactive.node import NodeMixin
 @pytest.mark.parametrize("react", [False, True])
 @pytest.mark.parametrize("comp", [mk.cand, mk.cor])
 def test_boolean_operators_multiple_arguments(x, y, react, comp):
-    x_store = mk.gui.Store(x)
-    y_store = mk.gui.Store(y)
+    x_store = mk.Store(x)
+    y_store = mk.Store(y)
 
     if comp == mk.cand:
         expected = x and y
@@ -23,7 +23,7 @@ def test_boolean_operators_multiple_arguments(x, y, react, comp):
 
     assert out == expected
     if react:
-        assert isinstance(out, mk.gui.Store)
+        assert isinstance(out, mk.Store)
     assert isinstance(out, type(expected))
 
 
@@ -31,7 +31,7 @@ def test_boolean_operators_multiple_arguments(x, y, react, comp):
 @pytest.mark.parametrize("react", [False, True])
 @pytest.mark.parametrize("comp", [mk.bool, mk.cnot])
 def test_boolean_operators_single_operator(x, react, comp):
-    x_store = mk.gui.Store(x)
+    x_store = mk.Store(x)
 
     if comp == mk.bool:
         expected = bool(x)
@@ -42,7 +42,7 @@ def test_boolean_operators_single_operator(x, react, comp):
 
     assert out == expected
     if react:
-        assert isinstance(out, mk.gui.Store)
+        assert isinstance(out, mk.Store)
     assert isinstance(out, type(expected))
 
 
@@ -59,11 +59,11 @@ def _invoker_helper(x, *, mk_func, base_func, should_warn: bool = True):
             expected = base_func(x)
     else:
         expected = base_func(x)
-        x = mk.gui.Store(x)
+        x = mk.Store(x)
 
     out = mk_func(x)
     assert out == expected
-    assert isinstance(out, mk.gui.Store)
+    assert isinstance(out, mk.Store)
     assert isinstance(out, type(expected))
 
     # Check the graph is created.

@@ -1,8 +1,6 @@
-import meerkat as mk
-
 from PIL import Image
 
-from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
+import meerkat as mk
 
 # Load the dataset
 df = mk.get(

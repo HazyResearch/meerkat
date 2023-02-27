@@ -15,7 +15,7 @@ galleries = mk.gui.Tabs(
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(slots=[sort1, sort2, galleries]), 
+    component=mk.gui.html.flexcol(slots=[sort1, sort2, galleries]),
     id="multiple-sort",
 )
 page.launch()

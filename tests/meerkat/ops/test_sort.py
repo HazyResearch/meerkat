@@ -180,5 +180,5 @@ def test_sort_tensor_and_pandas_descending():
 
 def test_sort_with_store():
     df = mk.DataFrame({"tensor": mk.TorchTensorColumn([3, 2, 4])})
-    test = df.sort(by=mk.gui.Store("tensor"), ascending=True)
+    test = df.sort(by=mk.Store("tensor"), ascending=True)
     assert (test["tensor"] == mk.TorchTensorColumn([2, 3, 4])).all()

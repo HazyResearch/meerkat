@@ -43,7 +43,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
         self.ims = []
         self.data = []
 
-        self.base_dir = tmpdir if use_base_dir else None
+        self.base_dir = tmpdir if use_base_dir else ""
 
         for i in range(0, length):
             self.image_arrays.append((i * np.ones((4, 4, 3))).astype(np.uint8))
@@ -57,7 +57,7 @@ class ImageColumnTestBed(AbstractColumnTestBed):
             else:
                 self.image_paths.append(os.path.join(tmpdir, filename))
 
-        self.col = ImageColumn.from_filepaths(
+        self.col = ImageColumn(
             self.image_paths,
             loader=folder.default_loader,
             base_dir=self.base_dir,

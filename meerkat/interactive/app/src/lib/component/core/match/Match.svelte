@@ -26,9 +26,12 @@
 		});
 	}
 
-	const onKeyPress = (e) => {
-		if (e.charCode === 13) onSearch();
-		else status = 'waiting';
+	const onKeyPress = (e: CustomEvent) => {
+		console.log('onkeypress', e);
+		if (e.detail.code === 'Enter') {
+			console.log('matching');
+			onSearch();
+		} else status = 'waiting';
 	};
 
 	let onSearch = async () => {
@@ -70,7 +73,7 @@
 			<div class="">
 				<Status {status} />
 			</div>
-			<Textbox bind:text on:keypress={onKeyPress} />
+			<Textbox bind:text on:keyup={onKeyPress} />
 
 			{#if showAgainst}
 				<div class="text-slate-400 px-2">against</div>

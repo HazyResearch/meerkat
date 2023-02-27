@@ -13,10 +13,12 @@ manifest = Manifest(
 
 textbox = mk.gui.Textbox()
 
+
 @mk.endpoint()
 def get_answer(answer: mk.Store, question: str):
     response = manifest.run(question, max_tokens=100)
     return answer.set(response)
+
 
 answer = mk.Store("")
 button = mk.gui.Button(
@@ -25,9 +27,7 @@ button = mk.gui.Button(
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol([
-        textbox, button, mk.gui.Markdown(answer)
-    ]),
+    component=mk.gui.html.flexcol([textbox, button, mk.gui.Markdown(answer)]),
     id="query-llm",
 )
 page.launch()

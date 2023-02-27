@@ -5,7 +5,7 @@ EMBED_COLUMN = "img_clip"
 
 
 @mk.endpoint()
-def append_to_sort(match_criterion, criteria: mk.gui.Store):
+def append_to_sort(match_criterion, criteria: mk.Store):
     """Add match criterion to the sort criteria.
 
     Args:
@@ -34,7 +34,7 @@ df = df.merge(df_clip, on="img_id")
 
 # with mk.gui.reactive():
 # Match
-sort_criteria = mk.gui.Store([])
+sort_criteria = mk.Store([])
 match = mk.gui.Match(
     df=df,
     against=EMBED_COLUMN,

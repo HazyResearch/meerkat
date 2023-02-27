@@ -1,5 +1,4 @@
-"""
-Run ChatGPT with Meerkat's Chat page.
+"""Run ChatGPT with Meerkat's Chat page.
 
 Requirements:
     - Download manifest: `pip install manifest-ml[chatgpt]`

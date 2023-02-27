@@ -25,7 +25,6 @@
 		variants: ['small'],
 		shuffle: buffer
 	}).then((chunk) => {
-
 		let categories = null;
 		if (hue !== null) {
 			// Get the unique categories from the hue column
@@ -36,10 +35,12 @@
 				return {
 					x: chunk.getColumn(x).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
 					y: chunk.getColumn(y).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
-					keyidx: chunk.getColumn(chunk.primaryKey).data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
+					keyidx: chunk
+						.getColumn(chunk.primaryKey)
+						.data.filter((_, i) => chunk.getColumn(hue).data[i] === category),
 					type: 'scatter',
 					mode: 'markers',
-					name: booleanCategory ? category === true ? hue : `not ${hue}` : category,
+					name: booleanCategory ? (category === true ? hue : `not ${hue}`) : category
 				};
 			});
 		} else {
@@ -53,10 +54,14 @@
 				}
 			];
 		}
-
 	});
 
-	$: layout = { xaxis: { title: x }, yaxis: { title: y }, title: title, dragmode: 'select' };
+	$: layout = {
+		xaxis: { title: x, categoryorder: 'category ascending' },
+		yaxis: { title: y, categoryorder: 'category ascending' },
+		title: title,
+		dragmode: 'select'
+	};
 
 	async function onEndpoint(endpoint: Endpoint, e) {
 		let data = await dataPromise;
@@ -82,20 +87,20 @@
 {:then data}
 	<!-- <div class="flex flex-row align-middle justify-center mb-4 bg-transparent">
 		<div> -->
-			<Plot
-				{data}
-				{layout}
-				{config}
-				on:click={(e) => onEndpoint(onClick, e)}
-				on:selected={(e) => {
-					if (e.detail) {
-						selected = e.detail.points.map((p) => p.data.keyidx[p.pointIndex]);
-					} else {
-						selected = [];
-					}
-					eventDispatcher('select', { selected: selected });
-				}}
-			/>
-		<!-- </div>
+	<Plot
+		{data}
+		{layout}
+		{config}
+		on:click={(e) => onEndpoint(onClick, e)}
+		on:selected={(e) => {
+			if (e.detail) {
+				selected = e.detail.points.map((p) => p.data.keyidx[p.pointIndex]);
+			} else {
+				selected = [];
+			}
+			eventDispatcher('select', { selected: selected });
+		}}
+	/>
+	<!-- </div>
 	</div> -->
 {/await}

@@ -6,9 +6,11 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 
 # Data loading.
 imagenette = mk.get("imagenette", version="160px")
-df = mk.DataFrame.read(
-    "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",
-)
+# df = mk.DataFrame.read(
+#     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",
+#     overwrite=False,
+# )
+df = mk.DataFrame.read("~/Downloads/imagenette-remapped.mk")
 df = imagenette.merge(df[["img_id", "logits", "pred"]], on="img_id")
 
 # Download precomupted CLIP embeddings for imagenette.
@@ -30,8 +32,24 @@ filter = mk.gui.Filter(df)
 df = filter(df)
 
 
-with mk.magic():
-    df_sorted = mk.sort(df, by=match.criterion.name, ascending=False)
+@mk.reactive()
+def add_match_criterion_to_sort(match_criterion, sort_criteria):
+    # make a copy of the sort criteria.
+    sort_criteria = list(sort_criteria)
+    if match_criterion.name is None:
+        return sort_criteria
+    sort_criteria.append(
+        mk.gui.Sort.create_criterion(
+            match_criterion.name, ascending=False, source="match"
+        )
+    )
+    return sort_criteria
+
+
+sort_criteria = mk.Store([])
+sort_criteria = add_match_criterion_to_sort(match.criterion, sort_criteria)
+sort = mk.gui.Sort(df, criteria=sort_criteria)
+df_sorted = sort(df)
 
 gallery = html.div(
     mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN),
@@ -107,11 +125,11 @@ plot = mk.gui.plotly.ScatterPlot(
 
 component = html.div(
     [
-        html.flexcol([match, filter, select_container, plot], classes="h-full"),
-        html.div([gallery], classes="h-full"),
+        html.flexcol([match, filter, sort, select_container, plot], classes="h-full"),
+        gallery,
     ],
     # Make a grid with two equal sized columns.
-    classes="h-full grid grid-cols-2 gap-4",
+    classes="h-screen grid grid-cols-2 gap-4",
 )
 
 page = mk.gui.Page(component, id="error-analysis", progress=False)

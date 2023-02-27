@@ -130,7 +130,7 @@ class ChangeList(BaseComponent):
             stats_df = compute_slice_scores(examples=examples_df, slices=slices_df)
 
             @mk.endpoint()
-            def append_to_sort(match_criterion, criteria: mk.gui.Store):
+            def append_to_sort(match_criterion, criteria: mk.Store):
                 SOURCE = "match"
                 criterion = mk.gui.Sort.create_criterion(
                     column=match_criterion.name, ascending=False, source=SOURCE
@@ -138,7 +138,7 @@ class ChangeList(BaseComponent):
 
                 criteria.set([criterion] + [c for c in criteria if c.source != SOURCE])
 
-            sort_criteria = mk.gui.Store([])
+            sort_criteria = mk.Store([])
             match = mk.gui.Match(
                 df=base_examples,
                 against=embed_column,
@@ -186,7 +186,7 @@ class ChangeList(BaseComponent):
             @mk.endpoint()
             def on_select_slice(
                 slice_id: str,
-                criteria: mk.gui.Store,
+                criteria: mk.Store,
                 code: str,
                 query: str,
             ):

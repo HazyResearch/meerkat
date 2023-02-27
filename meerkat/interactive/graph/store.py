@@ -40,7 +40,7 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
             warnings.warn(
                 "Wrapping an iterator in a Store is not recommended. "
                 "If the iterator is derived from an iterable, wrap the iterable:\n"
-                "    >>> store = mk.gui.Store(iterable)\n"
+                "    >>> store = mk.Store(iterable)\n"
                 "    >>> iterator = iter(store)"
             )
         super().__init__(wrapped=wrapped)

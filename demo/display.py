@@ -1,6 +1,4 @@
-"""
-Table and gallery views of a DataFrame.
-"""
+"""Table and gallery views of a DataFrame."""
 import meerkat as mk
 
 # Load in the imagenette dataset
@@ -15,5 +13,7 @@ gallery = mk.gui.Gallery(df=df, main_column="img")
 tabs = mk.gui.Tabs(tabs={"Table": table, "Gallery": gallery})
 
 # Show the page!
-page = mk.gui.Page(component=mk.gui.html.flexcol([tabs], classes="h-full"), id="display")
+page = mk.gui.Page(
+    component=mk.gui.html.flexcol([tabs], classes="h-full"), id="display"
+)
 page.launch()

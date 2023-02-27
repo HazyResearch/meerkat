@@ -5,7 +5,7 @@ df = mk.get("imagenette", version="160px")
 filter = mk.gui.Filter(df=df)
 df = filter(df)
 
-criteria = mk.gui.Store([])
+criteria = mk.Store([])
 sort = mk.gui.Sort(df=df, criteria=criteria)
 df = sort(df)
 

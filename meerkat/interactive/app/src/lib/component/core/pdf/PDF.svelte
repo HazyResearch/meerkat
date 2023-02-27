@@ -35,4 +35,4 @@
 	<script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
 </svelte:head>
 
-<canvas bind:this={canvasRef} class={'aspect-auto border border-slate-50 shadow-sm ' + classes} />
+<canvas bind:this={canvasRef} class={'aspect-auto border border-slate-50 shadow-sm w-full'} />

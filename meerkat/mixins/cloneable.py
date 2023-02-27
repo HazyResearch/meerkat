@@ -60,6 +60,13 @@ class CloneableMixin:
             obj._set_inode()
             # obj._set_children()
 
+        from meerkat.dataframe import DataFrame
+
+        if isinstance(obj, DataFrame):
+            if obj.primary_key_name not in obj:
+                # need to reset the primary key if we remove the column
+                obj.set_primary_key(None, inplace=True)
+
         return obj
 
     def _copy_data(self) -> object:

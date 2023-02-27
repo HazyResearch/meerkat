@@ -408,6 +408,7 @@ class DeferredBlock(AbstractBlock):
     ) -> Union[BlockRef, dict]:
         if indexed_inputs is None:
             indexed_inputs = {}
+
         index = self._convert_index(index)
 
         outputs = self.data._get(

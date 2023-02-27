@@ -5,16 +5,18 @@
 	export let text: string;
 
 	/** Placeholder text. */
-	export let placeholder: string = "Write some text...";
+	export let placeholder: string = 'Write some text...';
 
 	/** Debounce timer (in ms). */
 	export let debounceTimer: number = 150;
 
 	let timer: any;
-	const debounce = (v: string) => {
+	const debounce = (e: KeyboardEvent) => {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
-			text = v;
+			console.log('debounding');
+			text = e.target.value;
+			dispatch('keyup', e);
 		}, debounceTimer);
 	};
 
@@ -28,7 +30,9 @@
 	{placeholder}
 	value={initialText}
 	class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
-	on:keyup={({ target: { value } }) => debounce(value)}
+	on:keyup={(e) => debounce(e)}
 	on:keypress
-	on:blur={(e) => {dispatch('blur', { text: text })}}
+	on:blur={(e) => {
+		dispatch('blur', { text: text });
+	}}
 />

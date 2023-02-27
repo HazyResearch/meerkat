@@ -10,8 +10,6 @@
 	</header>
 	<main class="relative grow">
 		<Content />
-		<!-- <Content /><Content /> -->
-
 	</main>
 	<footer class="sticky bottom-0 z-50">
 		<Footer />

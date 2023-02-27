@@ -1,4 +1,4 @@
-"""Flash-fill"""
+"""Flash-fill."""
 from functools import partial
 
 from manifest import Manifest
@@ -73,6 +73,7 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
 @mk.reactive()
 def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
     """Update the df with the new prompt template.
+
     This is as simple as returning a view.
     """
     df = df.view()

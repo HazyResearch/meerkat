@@ -154,7 +154,10 @@ def filter(
                     f"for value {criterion.value}."
                 )
         else:
-            value = col.dtype.type(criterion.value)
+            if col.dtype in (np.bool_, bool):
+                value = criterion.value not in ("False", "false", "0")
+            else:
+                value = col.dtype.type(criterion.value)
 
         # Remove trailing and leading "" if the value is a string.
         if isinstance(value, str):

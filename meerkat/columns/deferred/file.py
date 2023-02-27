@@ -4,21 +4,17 @@ import functools
 import io
 import logging
 import os
-from pathlib import Path
 import urllib.request
 import warnings
 from ctypes import Union
+from pathlib import Path
 from string import Template
 from typing import IO, Any, Callable, Sequence
 from urllib.parse import urlparse
-from PIL import Image
 
 import dill
 import yaml
-from meerkat.interactive.formatter.base import FormatterGroup
-from meerkat.interactive.formatter.image import (
-    DeferredImageFormatterGroup,
-)
+from PIL import Image
 
 import meerkat.tools.docs as docs
 from meerkat.block.deferred_block import DeferredOp
@@ -26,14 +22,13 @@ from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
 from meerkat.interactive.formatter import (
-    HTMLFormatterGroup,
-    TextFormatterGroup,
-    TextFormatterGroup,
-    PDFFormatterGroup,
     CodeFormatterGroup,
+    HTMLFormatterGroup,
+    PDFFormatterGroup,
+    TextFormatterGroup,
 )
-from meerkat.tools.utils import deprecated
-
+from meerkat.interactive.formatter.base import FormatterGroup
+from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
 
 logger = logging.getLogger(__name__)
 

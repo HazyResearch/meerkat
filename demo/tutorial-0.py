@@ -1,6 +1,5 @@
 import meerkat as mk
 
-
 df = mk.get("imagenette", version="160px")
 mk.gui.start(api_port=3000)
 

@@ -583,7 +583,7 @@ def test_rsplit(backend: str, series: pd.Series, n: int):
         "series": STRING_COLUMNS,
     }
 )
-def test_center(backend: str, series: pd.Series):
+def test_center_other(backend: str, series: pd.Series):
     col = ScalarColumn(series, backend=backend)
     out = col.str.startswith("1290")
     assert isinstance(out, ScalarColumn)
@@ -628,7 +628,7 @@ def test_extract(backend: str, pat: str, series: pd.Series):
     contains_groups = True
     try:
         correct_df = series.str.extract(pat, expand=True)
-        
+
     except ValueError:
         contains_groups = False
 
@@ -638,5 +638,5 @@ def test_extract(backend: str, pat: str, series: pd.Series):
         for name in correct_df.columns:
             assert out[name].equals(ScalarColumn(correct_df[name], backend=backend))
     else:
-        with pytest.raises(ValueError):     
+        with pytest.raises(ValueError):
             out = col.str.extract(pat)

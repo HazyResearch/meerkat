@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from ..app.src.lib.component.core.pdf import PDF
 from .base import Formatter, FormatterGroup
 from .icon import IconFormatter
@@ -21,6 +19,6 @@ class PDFFormatterGroup(FormatterGroup):
             tag=IconFormatter(name="FileEarmarkPdf"),
             small=IconFormatter(name="FileEarmarkPdf"),
             thumbnail=PDFFormatter(),
-            full=PDFFormatter(classes="w-full"),
+            full=PDFFormatter(classes="h-full"),
             gallery=PDFFormatter(classes="h-full"),
         )

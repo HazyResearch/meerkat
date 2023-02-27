@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
+import typing
 from functools import partial, wraps
 from typing import Any, Callable, Generic, Union
 
@@ -12,9 +13,9 @@ from meerkat.interactive.graph import Store, trigger, unmarked
 from meerkat.interactive.graph.store import _unpack_stores_from_object
 from meerkat.interactive.node import Node, NodeMixin
 from meerkat.interactive.types import T
-from meerkat.mixins.identifiable import IdentifiableMixin
+from meerkat.mixins.identifiable import IdentifiableMixin, is_meerkat_id
 from meerkat.state import state
-from meerkat.tools.utils import has_var_args
+from meerkat.tools.utils import get_type_hint_args, get_type_hint_origin, has_var_args
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +79,7 @@ class SimpleRouter(IdentifiableMixin, APIRouter):  # , metaclass=SingletonRouter
             prefix=prefix,
             tags=[prefix.strip("/").replace("/", "-")],
             responses={404: {"description": "Not found"}},
-            id=prefix,
+            id=self.prepend_meerkat_id_prefix(prefix),
             **kwargs,
         )
 
@@ -291,6 +292,19 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         # should expect that the current value of the dataframe will be passed.
         # Currently, the original value of the dataframe is passed. It makes sense to
         # me why this is happening, but the right fix is eluding me.
+
+        # All NodeMixin objects need to be replaced by their node id.
+        # This ensures that we can resolve the correct object at runtime
+        # even if the object is a result of a reactive function
+        # (i.e. not a root of the graph).
+        def _get_node_id_or_arg(arg):
+            if isinstance(arg, NodeMixin):
+                assert arg.has_inode()
+                return arg.inode.id
+            return arg
+
+        args = [_get_node_id_or_arg(arg) for arg in args]
+        kwargs = {key: _get_node_id_or_arg(val) for key, val in kwargs.items()}
 
         fn = partial(self.fn, *args, **kwargs)
         fn.__name__ = self.fn.__name__
@@ -554,10 +568,14 @@ def endpoint(
         stores = set()
         identifiables = {}
         for name, annot in inspect.getfullargspec(fn).annotations.items():
-            if isinstance(annot, type) and issubclass(annot, Store):
+            is_annotation_store = _is_annotation_store(annot)
+            if is_annotation_store:
                 stores.add(name)
 
-            if isinstance(annot, type) and issubclass(annot, IdentifiableMixin):
+            # TODO: See if we can remove this in the future.
+            if is_annotation_store or (
+                isinstance(annot, type) and issubclass(annot, IdentifiableMixin)
+            ):
                 # This will also include `Store`, so it will be a superset
                 # of `stores`
                 identifiables[name] = annot
@@ -594,21 +612,38 @@ def endpoint(
                                 # If that fails, try to look up the string id in
                                 # the Node registry, and then get the object
                                 # from the Node
-                                _kwargs[k] = Node.from_id(v).obj
+                                try:
+                                    _kwargs[k] = Node.from_id(v).obj
+                                except Exception as e:
+                                    # If that fails and the object is a non-id string,
+                                    # then just use the string as is.
+                                    # We have to do this check here rather than above
+                                    # because we want to make sure we check for all
+                                    # identifiable and nodes before checking if the
+                                    # string is just a string.
+                                    # this is required for compatibility with
+                                    # IdentifiableMixin objects that do not start with
+                                    # the meerkat id prefix.
+                                    if isinstance(v, str) and not is_meerkat_id(v):
+                                        _kwargs[k] = v
+                                    else:
+                                        raise e
                 else:
                     if k == "args":
                         # These are *args under the `args` key
                         # These are the only arguments that will be passed in as
                         # *args to the fn
-                        _args, _ = _unpack_stores_from_object(list(v))
+                        v = [_resolve_id_to_obj(_value) for _value in v]
+                        _args, _ = _unpack_stores_from_object(v)
                     elif k == "kwargs":
                         # These are **kwargs under the `kwargs` key
+                        v = {_k: _resolve_id_to_obj(_value) for _k, _value in v.items()}
                         v, _ = _unpack_stores_from_object(v)
                         _kwargs = {**_kwargs, **v}
                     else:
                         # All other positional arguments that were not *args were
                         # bound, so they become kwargs
-                        v, _ = _unpack_stores_from_object(v)
+                        v, _ = _unpack_stores_from_object(_resolve_id_to_obj(v))
                         _kwargs[k] = v
 
             try:
@@ -730,3 +765,34 @@ def get_signature(fn: Union[Callable, Endpoint]) -> inspect.Signature:
     if isinstance(fn, Endpoint):
         fn = fn.fn
     return inspect.signature(fn)
+
+
+def _resolve_id_to_obj(value):
+    if isinstance(value, str) and is_meerkat_id(value):
+        # This is a string that corresponds to a meerkat id,
+        # so look it up.
+        return Node.from_id(value).obj
+    return value
+
+
+def _is_annotation_store(type_hint) -> bool:
+    """Check if a type hint is a Store or a Union of Stores.
+
+    Returns True if:
+        - The type hint is a Store
+        - The type hint is a Union of Store and other non-Store values.
+        - The type hint is a generic store Store[T] or Union[Store[T], ...]
+    """
+    if isinstance(type_hint, type) and issubclass(type_hint, Store):
+        return True
+
+    if isinstance(type_hint, typing._GenericAlias):
+        origin = get_type_hint_origin(type_hint)
+        args = get_type_hint_args(type_hint)
+
+        if origin == typing.Union:
+            return any(_is_annotation_store(arg) for arg in args)
+        elif issubclass(origin, Store):
+            return True
+
+    return False
