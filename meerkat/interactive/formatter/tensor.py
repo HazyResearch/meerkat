@@ -1,20 +1,25 @@
 from typing import Any
 
-from meerkat.interactive.formatter.base import FormatterGroup
-from meerkat.interactive.formatter.icon import IconFormatter
-from meerkat.interactive.formatter.text import TextFormatter
+from .base import FormatterGroup, Formatter
+from .icon import IconFormatter
+from meerkat.interactive.app.src.lib.component.core.tensor import Tensor
 
 
-class TensorFormatter(TextFormatter):
+class TensorFormatter(Formatter):
     """Formatter for an embedding."""
+    component_class: type = Tensor
 
     def encode(self, cell: Any):
-        return f"Tensor (shape: {cell.shape})"
+        return {
+            "data": cell.tolist(),
+            "shape": list(cell.shape),
+            "dtype": str(cell.dtype),
+        }
 
 
 class TensorFormatterGroup(FormatterGroup):
-    def __init__(self):
+    def __init__(self, dtype: str = None):
         super().__init__(
-            base=TensorFormatter(),
+            base=TensorFormatter(dtype=dtype),
             icon=IconFormatter(name="BoxFill"),
         )
