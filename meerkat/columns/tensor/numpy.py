@@ -208,22 +208,27 @@ class NumPyTensorColumn(
         else:
             return self[index]
 
-    def _get_default_formatter(self):
-        from meerkat.interactive.app.src.lib.component.core.scalar import (
-            ScalarFormatter,
+    def _get_default_formatters(self):
+        from meerkat.interactive.formatter import (
+            TensorFormatterGroup,
+            NumberFormatterGroup,
+            TextFormatterGroup,
         )
 
         if len(self) == 0:
-            return ScalarFormatter()
+            return NumberFormatterGroup()
+
+        if len(self.shape) > 1:
+            return TensorFormatterGroup(dtype=str(self.dtype))
 
         if self.dtype.type is np.str_:
-            return ScalarFormatter(dtype="str")
+            return TextFormatterGroup()
 
         cell = self.data[0]
         if isinstance(cell, np.generic):
-            return ScalarFormatter(dtype=type(cell.item()).__name__)
+            return NumberFormatterGroup(dtype=type(cell.item()).__name__)
 
-        return ScalarFormatter()
+        return TextFormatterGroup()
 
     def _is_valid_primary_key(self):
         if self.dtype.kind == "f":
