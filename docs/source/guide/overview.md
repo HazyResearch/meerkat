@@ -1,7 +1,6 @@
 # Overview
 
-This page will introduce some high-level concepts in Meerkat, from organizing your unstructured data to interacting 
-Each of these concepts are covered in more detail in the subsequent pages.
+This page will introduce some high-level concepts in Meerkat, from organizing your unstructured data to interacting with the data through interactive applications. Each of these concepts are covered in more detail in the subsequent pages.
 
 Let's dive in!
 
@@ -41,8 +40,7 @@ Endpoints can serve as API endpoints for Meerkat frontends and can be used to mo
 ## {ref}`Stores <guide_store_getting_started>`
 
 An interactive application also needs some way of creating variables that capture
-the state of the application. This is important to 
-
+the state of the application. This is important to:
 - keep track of application state that is going to change over time
 - keep this state in sync between the frontend and Python code
 - provide explicit ways to manipulate this state

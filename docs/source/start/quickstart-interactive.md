@@ -102,7 +102,7 @@ input_field = mk.gui.Input(value=input_slider.value, dtype=float) #FIXME
 In the app created above, moving the slider in the UI will affect the displayed value. Let's upgrade our app by displaying the square of the current value, not the original. This will require writing a function that runs every time the slider value changes. Introducing _reactive functions_!
 
 ```{admonition} Definition - _reactive function_
-A function that reruns when any of its parameters change.
+A function that reruns when one of its inputs changes.
 ```
 
 Reactive functions in Meerkat are created with the `mk.reactive()` decorator.
