@@ -3,6 +3,7 @@ from .carousel import Carousel
 from .chat import Chat
 from .checkbox import Checkbox
 from .code import Code
+from .copy_button import CopyButton
 from .code_cell import CodeCell
 from .document import Document
 from .editor import Editor
@@ -40,6 +41,7 @@ __all__ = [
     "Checkbox",
     "Code",
     "CodeCell",
+    "CopyButton", 
     "Document",
     "Editor",
     "FileUpload",
