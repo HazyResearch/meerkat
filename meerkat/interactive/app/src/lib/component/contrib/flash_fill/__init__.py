@@ -1,6 +1,6 @@
 import re
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
 from manifest import Manifest
 
@@ -26,7 +26,7 @@ class FlashFill(div):
 def _build_component(df: "DataFrame") -> "Component":
     import meerkat as mk
 
-    def complete_prompt(row, example_template: mk.Store[str]):
+    def complete_prompt(row: Dict[str, any], example_template: mk.Store[str]):
         assert isinstance(row, dict)
         output = example_template.format(**row)
         return output
@@ -58,7 +58,7 @@ def _build_component(df: "DataFrame") -> "Component":
 
         # Extract out the example template from the prompt template.
         df["example"] = mk.defer(
-            df, function=partial(complete_prompt, example_template=template)
+            df, function=partial(complete_prompt, example_template=template), inputs="row"
         )
         return df
 

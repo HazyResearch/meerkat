@@ -44,7 +44,7 @@ class Page(IdentifiableMixin):
         component: BaseComponent,
         id: str,
         name: str = "Page",
-        height: str = "1000px",
+        height: str = "100%",
         width: str = "100%",
         progress: bool = True,
     ):
