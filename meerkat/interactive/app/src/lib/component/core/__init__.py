@@ -1,4 +1,5 @@
 from .button import Button
+from .carousel import Carousel
 from .chat import Chat
 from .checkbox import Checkbox
 from .code import Code
@@ -34,6 +35,7 @@ from .vega import Vega
 __all__ = [
     "Button",
     "Caption",
+    "Carousel",
     "Chat",
     "Checkbox",
     "Code",

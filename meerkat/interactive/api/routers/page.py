@@ -13,7 +13,10 @@ torch = LazyLoader("torch")
 @endpoint(prefix="/page", route="/{page}/config/", method="GET")
 def config(page: Page):
     return jsonable_encoder(
-        page.frontend,
+        # TODO: we should not be doing anything except page.frontend
+        # here. This is a temp workaround to avoid getting an 
+        # exception in the notebook.
+        page.frontend if isinstance(page, Page) else page,
         custom_encoder={
             np.ndarray: lambda v: v.tolist(),
             torch.Tensor: lambda v: v.tolist(),
