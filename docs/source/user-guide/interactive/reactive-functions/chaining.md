@@ -126,6 +126,6 @@ c = add(a, b)
 
 The graph looks like this:
 
-```{figure} ../../../assets/guide/graph/add.png
+```{figure} ../../../../assets/guide/graph/add.png
 
 ```
