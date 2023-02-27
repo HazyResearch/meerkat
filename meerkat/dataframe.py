@@ -179,13 +179,21 @@ class DataFrame(
         )
 
     @unmarked()
-    def _repr_html_(self, max_rows: int = None):
-        if max_rows is None:
-            max_rows = meerkat.config.display.max_rows
+    def _ipython_display_(self):
+        return self.gui.table()._ipython_display_()
 
-        df, formatters = self._repr_pandas_(max_rows=max_rows)
+    # @unmarked()
+    # def _repr_html_(self):
+    #     return self.gui.table()
 
-        return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
+    # @unmarked()
+    # def _repr_html_(self, max_rows: int = None):
+    #     if max_rows is None:
+    #         max_rows = meerkat.config.display.max_rows
+
+    #     df, formatters = self._repr_pandas_(max_rows=max_rows)
+
+    #     return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)
 
     @unmarked()
     def __repr__(self):

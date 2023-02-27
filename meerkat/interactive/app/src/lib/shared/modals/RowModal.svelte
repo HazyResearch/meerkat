@@ -105,7 +105,7 @@
 					</div>
 				</div>
 
-				<div class="grid grid-rows-[auto_1fr] items-center">
+				<div class="grid grid-rows-[auto_1fr] overflow-y-scroll items-center">
 					<!-- Header section -->
 					<div class="grid grid-cols-3 px-3 py-1 items-center">
 						<!-- Navigation buttons -->

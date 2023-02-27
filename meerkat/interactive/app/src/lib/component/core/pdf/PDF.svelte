@@ -5,13 +5,19 @@
 	export let isUrl: boolean = true;
 	export let classes: string = '';
 
-	GlobalWorkerOptions.workerSrc = '../../../../../node_modules/pdfjs-dist/build/pdf.worker.js';
+	// GlobalWorkerOptions.workerSrc = pdfjsWorker;
+	const setWorker = async () => {
+		const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.entry');
+		GlobalWorkerOptions.workerSrc = pdfjsWorker;
+	}
 
 	let canvasRef;
+	const wrappedGetDocument = async () => {
+		return await getDocument({ data: data }).promise;
+	};
+	let docPromise = setWorker().then(wrappedGetDocument);
 
-	let docPromise = getDocument({ data: data });
-
-	let pagePromise = docPromise.promise.then((doc) => doc.getPage(1));
+	let pagePromise = docPromise.then((doc) => doc.getPage(1));
 	pagePromise.then((page) => {
 		const scale = 1.5;
 		const viewport = page.getViewport({ scale });
@@ -31,8 +37,5 @@
 	});
 </script>
 
-<svelte:head>
-	<script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-</svelte:head>
 
-<canvas bind:this={canvasRef} class={'aspect-auto border border-slate-50 shadow-sm ' + classes} />
+<canvas bind:this={canvasRef} class={'aspect-auto border border-slate-50 shadow-sm ' + classes}  />

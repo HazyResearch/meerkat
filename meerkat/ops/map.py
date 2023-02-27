@@ -218,7 +218,9 @@ def defer(
         kwargs = {}
     elif isinstance(data, DataFrame):
         args, kwargs = None, None
-        if isinstance(inputs, Mapping):
+        if inputs == "row":
+            pass
+        elif isinstance(inputs, Mapping):
             args = []
             kwargs = {kw: data[col_name] for col_name, kw in inputs.items()}
         elif isinstance(inputs, Sequence):

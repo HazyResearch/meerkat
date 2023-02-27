@@ -7,6 +7,24 @@ from meerkat.interactive.event import EventInterface
 from meerkat.interactive.formatter.base import register_placeholder
 
 
+class OnEditInterface(EventInterface):
+    """Defines the interface for an event.
+
+    Subclass this to define the interface for a new event type.
+    The class will specify the keyword arguments returned by an event from the
+    frontend to any endpoint that has subscribed to it.
+
+    All endpoints that are expected to receive an event of this type should
+    ensure they have a signature that matches the keyword arguments defined
+    in this class.
+    """
+
+    column: str
+    keyidx: int
+    posidx: int
+    value: str
+
+
 class OnSelectTable(EventInterface):
     selected: List[Any]
 
@@ -16,7 +34,7 @@ class Table(Component):
     selected: List[str] = []
     single_select: bool = False
 
-    on_edit: EndpointProperty = None
+    on_edit: EndpointProperty[OnEditInterface] = None
     on_select: EndpointProperty[OnSelectTable] = None
 
     def __init__(
@@ -28,13 +46,10 @@ class Table(Component):
         on_edit: EndpointProperty = None,
         on_select: EndpointProperty = None
     ):
-        """Gallery view of a DataFrame.
+        """Table view of a DataFrame.
 
         Args:
             df (DataFrame): The DataFrame to display.
-            main_column (str): The column to display in the main gallery view.
-            tag_columns (List[str], optional): The columns to display as tags. \
-                Defaults to [].
             selected (List[int], optional): The indices of the rows selected in the \
                 gallery. Useful for labeling and other tasks. Defaults to [].
             allow_selection (bool, optional): Whether to allow the user to select \
@@ -48,6 +63,9 @@ class Table(Component):
             on_edit=on_edit,
             on_select=on_select,
         )
+
+    def _get_ipython_height(self):
+        return "450px"
 
 
 register_placeholder(
