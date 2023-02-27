@@ -2,17 +2,18 @@
 
 # Stores
 
-<!-- In this section, we will discuss one of the core Markable objects in Meerkat: {py:class}`Store <meerkat.Store>`. -->
+<!-- In this section, we will discuss one of the core Markable objects in Meerkat: {class}`~meerkat.Store`. -->
 
 An interactive application needs some way of creating variables that capture
-the state of the application. This is important to 
+the state of the application. This is important to
 
 - keep track of application state that is going to change over time
 - keep this state in sync between the frontend and Python code
 - provide explicit ways to manipulate this state
 - implement and debug the application in terms of this state
 
-In Meerkat, wrapping a Python object in a {py:class}`Store <meerkat.Store>` object provides a way to do this. These pages will explain:
+In Meerkat, wrapping a Python object in a {class}`~meerkat.Store` object provides a way to do this. These pages will explain:
+
 - what a `Store` is
 - how to work with `Store` objects
 - how `Store` objects are used in interactive applications
@@ -21,10 +22,10 @@ In Meerkat, wrapping a Python object in a {py:class}`Store <meerkat.Store>` obje
 ## What is a `Store`?
 
 ```{important}
-A {py:class}`Store <meerkat.Store>` behaves like the object it wraps, with extra functionality for reactivity.
+A {class}`~meerkat.Store` behaves like the object it wraps, with extra functionality for reactivity.
 ```
 
-A {py:class}`Store <meerkat.Store>` is a special object provided by Meerkat that can be used to wrap arbitrary Python objects, such primitive types (e.g. int, str, list, dict), third-party objects (e.g. pandas.DataFrame, pathlib.Path), and even your custom objects.
+A {class}`~meerkat.Store` is a special object provided by Meerkat that can be used to wrap arbitrary Python objects, such primitive types (e.g. int, str, list, dict), third-party objects (e.g. pandas.DataFrame, pathlib.Path), and even your custom objects.
 
 For example, a `Store` can be used to wrap a string:
 
@@ -60,6 +61,7 @@ type(y) # <class 'pandas.core.indexes.base.Index'>
 ### Using functions with `Stores`
 
 `Store` objects behave (almost) exactly like the object they wrap when you use them as inputs to functions. For instance, the following code works as expected.
+
 ```python
 x = mk.Store('HELLO WORLD')
 y = len(x) # 11
@@ -69,6 +71,7 @@ type(y) # int
 However, sometimes `Store` objects may behave unexpectedly when used with arbitrary functions. This mostly happens when functions are not duck-typed, but instead have behavior that expects specific types. It can also happen when a function is actually implemented in C.
 
 Here's a simple example that fails from Python's `os` module.
+
 ```python
 x = mk.Store('./relative/path/to/file')
 y = os.path.abspath(x)
@@ -76,6 +79,7 @@ y = os.path.abspath(x)
 ```
 
 The workaround is simple. If you encounter an error of this kind, use the `.value` attribute to get the underlying object and pass that in to the function instead.
+
 ```python
 x = mk.Store('./relative/path/to/file')
 y = os.path.abspath(x.value)
@@ -83,12 +87,12 @@ type(y) # str
 ```
 
 ## Why do we need Stores?
+
 As we saw earlier, stores are essential for building interactive interfaces - i.e. {ref}`reactivity <reactivity_getting_started>` and {ref}`endpoints <endpoints_getting_started>`.
 
-### [Recap] Reactivity
-
-### [Recap] Endpoints
-
+```{important}
+Stores are what make it possible to build reactive functions with arbitrary Python objects.
+```
 
 ## Why do we need Stores?
 
@@ -100,7 +104,7 @@ Let's look at an example to understand why they are so important to reactive fun
 
 @mk.reactive()
 def add(a, b):
-    return a + b
+return a + b
 Now, let's try something that might feel natural. Create two int objects, call add with them, and then change one of them.
 
 x = 1
@@ -120,24 +124,28 @@ z = add(x, y) # z is Store(3), type(z) is Store
 
 x.set(4, triggers=True)
 print(z)
+
 # z is now Store(6), type(z) is Store
+
 By calling set() on x, we are changing the object that x points to. This is what allows z to be updated. Ignore the triggers=True argument for now, we discuss it in more detail in the section below.)
 
 Store is a transparent wrapper around the object it wraps, so you can use that object as if the Store wasn't there.
 
+```python
 x = mk.Store(1)
 y = mk.Store(2)
 z = x + y # z is Store(3), type(z) is Store
 
 message = mk.Store("hello")
-message = message + " world" 
+message = message + " world"
+
 # message is Store("hello world"), type(message) is Store
-A very detailed breakdown of how Store objects behave is provided at XXXXXXX. We highly recommend reading that guide.
+```
+
+<!-- A very detailed breakdown of how Store objects behave is provided at XXXXXXX. We highly recommend reading that guide. -->
 
 The takeaways are:
 
-A Store can wrap arbitrary Python objects.
-
-A Store will behave like the object it wraps.
-
-A Store is necessary to track changes when passing an object to a reactive function.
+- A Store can wrap arbitrary Python objects.
+- A Store will behave like the object it wraps.
+- A Store is necessary to track changes when passing an object to a reactive function.

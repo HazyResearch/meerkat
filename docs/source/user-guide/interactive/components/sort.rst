@@ -20,7 +20,7 @@ Example
 
         df = mk.get("imagenette", version="160px")
 
-        with mk.gui.react():
+        with mk.reactive():
             filter = mk.gui.Filter(df=df)
             df = filter(df)
 

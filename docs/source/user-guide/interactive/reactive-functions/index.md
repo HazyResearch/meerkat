@@ -1,3 +1,15 @@
+# Reactive Functions
+
+A reactive function in Meerkat is a function that reruns when one of its inputs changes. This allows for creating functions that are responsive to the data they are given.
+
+```{admonition} Definition - _reactive function_
+A function that reruns when one of its inputs changes.
+```
+
+Reactivity is the essence behind building interactive user interfaces in Meerkat. *Reactive* code is "tracked" by Meerkat so that it can be run again based on if the respective inputs change.
+
+These docs walk through what reactive functions are, how to use them, and how to write your own.
+
 (reactivity_getting_started)=
 
 # Getting Started with Reactive Functions
@@ -70,7 +82,7 @@ So far, we learned a simple definition of reactive functions in Meerkat. This de
 
 Rather than a reactive function being rerun whenever any of its inputs are updated, it is actually rerun whenever any of its **marked** inputs are updated. This is a subtle but important distinction.
 
-**What objects can be marked?** By default, standard objects cannot be marked. However, they can be wrapped in a {py:class}`Store <meerkat.Store>`. `Store` objects are _markable_, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
+**What objects can be marked?** By default, standard objects cannot be marked. However, they can be wrapped in a {class}`~meerkat.Store`. `Store` objects are _markable_, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
 
 This means that for a function to react to changes in its inputs, its inputs must be marked. Let's look at a few examples.
 
@@ -193,7 +205,7 @@ In the above example, the `+` and `*` operators were automatically turned into r
 
 ## Turning reactivity off
 
-In some cases, we may not want certain code to be reactive. To make code non-reactive, we can use {py:class}`unmarked <meerkat.unmarked>`.
+In some cases, we may not want certain code to be reactive. To make code non-reactive, we can use {class}`meerkat.unmarked`.
 
 ```{important}
 Use `unmarked` to turn off reactivity for a function or block of code.

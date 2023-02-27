@@ -1,7 +1,7 @@
 # Magic Contexts
 
 In the {ref}`Store guide <guide_interactive_concepts_store>`, we
-briefly mentioned that {py:class}`Store <meerkat.Store>` objects
+briefly mentioned that {class}`meerkat.Store` objects
 can be used with the {py:class}`mk.magic <meerkat.magic>` context.
 
 In this section, we will:

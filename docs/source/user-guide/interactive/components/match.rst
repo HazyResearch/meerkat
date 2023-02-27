@@ -46,7 +46,7 @@ You can also do arithmetic on the embeddings. For example, you can subtract simi
         df_clip = df_clip[["img_id", "img_clip"]]
         df = df.merge(df_clip, on="img_id")
 
-        with mk.gui.react():
+        with mk.reactive():
             # Match
             match = mk.gui.Match(df=df, against=EMBED_COLUMN)
             examples_df = match(df)[0]

@@ -13,6 +13,7 @@ core
 
    meerkat.interactive.app.src.lib.component.core.Button
    meerkat.interactive.app.src.lib.component.core.Caption
+   meerkat.interactive.app.src.lib.component.core.Carousel
    meerkat.interactive.app.src.lib.component.core.Chat
    meerkat.interactive.app.src.lib.component.core.Checkbox
    meerkat.interactive.app.src.lib.component.core.Code

@@ -1,8 +1,14 @@
+---
+file_format: mystnb
+kernelspec:
+  name: python3
+---
+
 # Column
 
-A {py:class}`Column <meerkat.Column>` is a sequential data structure (analagous to a [`Series`](https://pandas.pydata.org/docs/reference/api/pandas.Series.html) in Pandas or a [`Vector`](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Simple-manipulations-numbers-and-vectors) in R). Meerkat supports a diverse set of column types (*e.g.,* {py:class}`TensorColumn <meerkat.TensorColumn>`, {py:class}`ImageColumn <meerkat.ImageColumn>`), each intended for different kinds of data.
+A {class}`~meerkat.Column` is a sequential data structure (analagous to a [`Series`](https://pandas.pydata.org/docs/reference/api/pandas.Series.html) in Pandas or a [`Vector`](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Simple-manipulations-numbers-and-vectors) in R). Meerkat supports a diverse set of column types (*e.g.,* {class}`~meerkat.TensorColumn`, {class}`~meerkat.ImageColumn`), each intended for different kinds of data.
 
-Below we create a simple column to hold a set of images stored on disk. To create it, we simply pass filepaths to the {py:class}`ImageColumn <meerkat.ImageColumn>` constructor.
+Below we create a simple column to hold a set of images stored on disk. To create it, we simply pass filepaths to the {class}`~meerkat.ImageColumn` constructor.
 
 ```{code-cell} ipython3
 :tags: [remove-cell]
@@ -19,7 +25,7 @@ img_col = mk.image(
 img_col
 ```
 
-All Meerkat columns are subclasses of {py:class}`Column <meerkat.Column>` and share a common interface, which includes 
+All Meerkat columns are subclasses of {class}`~meerkat.Column` and share a common interface, which includes 
 {py:meth}`__len__ <meerkat.Column.__len__>`,
 {py:meth}`__getitem__ <meerkat.Column.__getitem__>`, 
 {py:meth}`__setitem__ <meerkat.Column.__setitem__>`, 
@@ -32,7 +38,7 @@ len(img_col)
 ```
 
 
-Certain column types may expose additional functionality. For example, 　{py:class}`TensorColumn <meerkat.TensorColumn>`　inherits most of the functionality of an　[`ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html).
+Certain column types may expose additional functionality. For example, 　{class}`~meerkat.TensorColumn`　inherits most of the functionality of an　[`ndarray`](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html).
 
 ```{code-cell} ipython3
 id_col = mk.TensorColumn([0, 1, 2])
@@ -52,16 +58,16 @@ mk.Column.from_data(tensor)
 
 There are four core column types in Meerkat, each with a different interface.
 
-1. {py:class}`ScalarColumn <meerkat.ScalarColumn>` Each row stores a single numeric or string value. These columns have an interface similar to a Pandas Series. 
-2. {py:class}`TensorColumn <meerkat.TensorColumn>` Each row stores an identically shaped multi-dimensional array (*e.g.* vector, matrix, or tensor). These columns have an interface similar to a NumPy ndarray. 
-3. {py:class}`ObjectColumn <meerkat.ObjectColumn>` Each row stores an arbitrary Python object. These columns should be used sparingly, as they are significantly slower than the columns above. However, they may be useful in small DataFrames. 
-4. {py:class}`DeferredColumn <meerkat.DeferredColumn>` Represents a *deferred* map operations. A DeferredColumn maintains a single function and a pointer to another column. Each row represents (*but does not actually store*) the value returned from applying the function to the corresponding row of the other column.
+1. {class}`~meerkat.ScalarColumn` Each row stores a single numeric or string value. These columns have an interface similar to a Pandas Series. 
+2. {class}`~meerkat.TensorColumn` Each row stores an identically shaped multi-dimensional array (*e.g.* vector, matrix, or tensor). These columns have an interface similar to a NumPy ndarray. 
+3. {class}`~meerkat.ObjectColumn` Each row stores an arbitrary Python object. These columns should be used sparingly, as they are significantly slower than the columns above. However, they may be useful in small DataFrames. 
+4. {class}`~meerkat.DeferredColumn` Represents a *deferred* map operations. A DeferredColumn maintains a single function and a pointer to another column. Each row represents (*but does not actually store*) the value returned from applying the function to the corresponding row of the other column.
 
 ````{admonition} Flexibility in Implementation
 
 Meerkat columns are simple wrappers around well-optimized data structures from other libraries. These libraries (e.g. NumPy) run compiled machine code that is significantly faster than routines written in Python. 
 
-The data structure underlying a column is available through the ``.data`` attribute of the column. For example, the following code creates a {py:class}`TensorColumn <meerkat.TensorColumn>` and then accesses the underlying NumPy array.
+The data structure underlying a column is available through the ``.data`` attribute of the column. For example, the following code creates a {class}`~meerkat.TensorColumn` and then accesses the underlying NumPy array.
 
 ```{code-cell} ipython3
 import meerkat as mk;
@@ -71,7 +77,7 @@ col.data
 
 Meerkat is unopinionated when it comes to the choice of data structure underlying columns. This provides users the **flexibility** to choose the best data structure for their use case. For example, a `TensorColumn` can be backed by either a [NumPy Array](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)) or a [PyTorch Tensor](https://pytorch.org/docs/stable/tensors.html).
 
-Each `ScalarColumn` object in Meerkat is actually an instance of one of its subclasses ({py:class}`PandasScalarColumn <meerkat.PandasScalarColumn>`, {py:class}`ArrowScalarColumn <meerkat.ArrowScalarColumn>`). These subclasses are responsible for implementing the {py:class}`ScalarColumn <meerkat.ScalarColumn>` interface for a particular choice of data structure. Similarly, each `TensorColumn` object is an instance of its subclasses ({py:class}`NumPyTensorColumn <meerkat.NumPyTensorColumn>`, {py:class}`TorchTensorColumn <meerkat.TorchTensorColumn>`). 
+Each `ScalarColumn` object in Meerkat is actually an instance of one of its subclasses ({class}`~meerkat.PandasScalarColumn`, {class}`~meerkat.ArrowScalarColumn`). These subclasses are responsible for implementing the {class}`~meerkat.ScalarColumn` interface for a particular choice of data structure. Similarly, each `TensorColumn` object is an instance of its subclasses ({class}`~meerkat.NumPyTensorColumn`, {class}`~meerkat.TorchTensorColumn`). 
 
 *How to pick a subclass?* In general, users should not have to think about which subclass to use. Meerkat chooses a subclass based on the data structure of the input data. For example, the following code creates a `ScalarColumn` backed by a Pandas Series:
 

@@ -41,21 +41,22 @@ parts:
       - title: Interactive
         file: user-guide/interactive/index
         sections:
-          - file: user-guide/interactive/getting-started
-          - file: user-guide/interactive/environments/running-interfaces
-          - file: user-guide/interactive/reactive/index
+          - file: user-guide/interactive/running-meerkat-interfaces
+          - file: user-guide/interactive/reactive-functions/index
             sections:
-              - file: user-guide/interactive/reactive/getting-started
-              - file: user-guide/interactive/reactive/concepts
-              - file: user-guide/interactive/reactive/user-guide
-              # - file: user-guide/interactive/reactive/examples
-              # - file: user-guide/interactive/reactive/faqs
-              - file: user-guide/interactive/reactive/inbuilts
+              - file: user-guide/interactive/reactive-functions/creating
+              - file: user-guide/interactive/reactive-functions/markables
+              - file: user-guide/interactive/reactive-functions/chaining
+              - file: user-guide/interactive/reactive-functions/turning-off
+              - file: user-guide/interactive/reactive-functions/inbuilts
+              - file: user-guide/interactive/reactive-functions/guidelines
+              - file: user-guide/interactive/reactive-functions/faqs
           - title: Stores
-            file: user-guide/store/getting-started
+            file: user-guide/interactivity/stores/index
             sections:
-              # - file: user-guide/store/user-guide
-              - file: user-guide/store/faqs
+              - file: user-guide/interactivity/stores/subtleties
+              - file: user-guide/interactivity/stores/inbuilts
+              - file: user-guide/interactivity/stores/faqs
 
           - file: user-guide/components/index
             sections:
@@ -78,7 +79,7 @@ parts:
             #   - file: user-guide/formatters/getting-started
             #     title: Getting Started
 
-          - file: user-guide/interactive/core-concepts-nutshell
+          # - file: user-guide/interactive/core-concepts-nutshell
 
           # old stuff that needs to be refactored
           - file: user-guide/interactive/core-concepts-nutshell

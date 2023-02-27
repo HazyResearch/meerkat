@@ -12,7 +12,7 @@ Meerkat builds on top of FastAPI, using a lightweight wrapper around FastAPI's `
 
 ## Creating Endpoints
 
-Creating endpoints in Meerkat is easy, using the {py:class}`@endpoint() <meerkat.endpoint>` decorator. 
+Creating endpoints in Meerkat is easy, using the {py:class}`@mk.endpoint <meerkat.endpoint>` decorator. 
 
 ```python
 @mk.endpoint()

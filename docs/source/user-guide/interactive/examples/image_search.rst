@@ -43,7 +43,7 @@ We will see how we can combine components like :class:`~meerkat.gui.Match`, :cla
         df_clip = df_clip[["img_id", "img_clip"]]
         df = df.merge(df_clip, on="img_id")
 
-        with mk.gui.react():
+        with mk.reactive():
             # Match
             sort_criteria = mk.Store([])
             match = mk.gui.Match(

@@ -160,13 +160,13 @@ Now, we'll see another concept that Meerkat's interactive GUIs are built on: `re
 .. code-block:: python
     
     # Create a reactive function that returns a filtered view of the DataFrame
-    @mk.gui.reactive
+    @mk.reactive()
     def filter_by_label(df: mk.DataFrame, label: str):
         """If either the `df` or `label` argument changes, this function will be re-run."""
         return df[df['label'] == label]
     
     # Run the reactive function in the `react` context manager to make it retrigger automatically
-    with mk.gui.react():
+    with mk.reactive():
         # Reactively run filter by label with `df` and `choices.value`
         df_filtered = filter_by_label(df, choices.value)
 

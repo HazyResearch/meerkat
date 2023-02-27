@@ -61,7 +61,7 @@ def _replace_contents_in_file(fpath, *, key: str, contents: Union[str, List[str]
 
 def generate_inbuilt_reactive_fns():
     """Generate the inbuilt reactive functions RST file."""
-    fpath = _DIR / "user-guide" / "interactive" / "reactive" / "inbuilts.rst"
+    fpath = _DIR / "user-guide" / "interactive" / "reactive-functions" / "inbuilts.rst"
 
     _REACTIVE_FNS = {
         "General": [
@@ -131,7 +131,7 @@ def generate_inbuilt_reactive_fns():
 
 def generate_store_operators():
     """Generate table of store operators that are reactive."""
-    fpath = _DIR / "user-guide" / "store" / "user-guide.md"
+    fpath = _DIR / "user-guide" / "interactive" / "stores" / "inbuilts.md"
     operators = [
         # Arthmetic
         "Addition, +, x + y",
@@ -154,13 +154,13 @@ def generate_store_operators():
         "Bitwise Right Shift & Assign, >>=, x>>=1",
         "Bitwise AND & Assign, &=, x&=1",
         "Bitwise XOR & Assign, ^=, x^=1",
-        "Bitwise OR & Assign, |=, x|=1",
+        "Bitwise OR & Assign, \|=, x\|=1",
         # Bitwise
         "Bitwise Left Shift, <<, x << y",
         "Bitwise Right Shift, >>, x >> y",
         "Bitwise AND, &, x & y",
         "Bitwise XOR, ^, x ^ y",
-        "Bitwise OR, |, x | y",
+        "Bitwise OR, \|, x \| y",
         "Bitwise Inversion, ~, ~x",
         # Comparison
         "Less Than, <, x < y",

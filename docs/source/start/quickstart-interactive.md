@@ -15,7 +15,7 @@ Make sure you have Meerkat {ref}`installed and running <install>` before you go 
 In Meerkat, components allow us to split the user interface into independent, resuable pieces.
 This functionality can range from quite simple, such as a slider that allows a user to choose a number, to quite complex, such as a full blown web application that helps a user explore their data.
 
-Let's look at an example with a {py:class}`Slider <meerkat.interactive.core.Slider>` component. This code below creates a slider with an initial value of `2.0`.
+Let's look at an example with a {class}`~meerkat.interactive.core.Slider` component. This code below creates a slider with an initial value of `2.0`.
 
 ````{margin}
 ```{admonition}
@@ -29,7 +29,7 @@ import meerkat as mk
 input_slider = mk.gui.core.Slider(value=2.0)
 ```
 
-Once, we have our component, we want to render it. We can do this by passing the component to a {py:class}`Page <meerkat.interactive.Page>`, giving it an `id`, and launching it.
+Once, we have our component, we want to render it. We can do this by passing the component to a {class}`~meerkat.interactive.Page`, giving it an `id`, and launching it.
 
 ```python
 page = mk.gui.Page(component=input_slider, id="quickstart")
@@ -49,7 +49,7 @@ df = mk.get("imagenette")
 gallery = mk.gui.Gallery(df, main_column="img")
 ```
 
-The {class}`Gallery <meerkat.interactive.core.Gallery>` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_builtins>`.
+The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_builtins>`.
 
 ````{margin}
 ```{admonition} Declarative
