@@ -4,9 +4,9 @@
     "description": "The Meerkat Svelte Library",
     "scripts": {
         "dev": "vite dev",
-        "build": "vite build",
-        "build:verbose": "vite build --debug",
-        "livebuild": "vite build --watch",
+        "build": "VITE_API_URL_PLACEHOLDER=http://meerkat.dummy vite build",
+        "build:verbose": "VITE_API_URL_PLACEHOLDER=http://meerkat.dummy vite build --debug",
+        "livebuild": "VITE_API_URL_PLACEHOLDER=http://meerkat.dummy vite build --watch",
         "package": "svelte-package; npm run package:tailwind;",
         "package:tailwind": "npx tailwindcss -i ./src/lib/app.css -o ./package/app.css",
         "preview": "vite preview",
