@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 import meerkat as mk
@@ -27,28 +28,27 @@ IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
 
 df.mark()
-match = mk.gui.Match(df, against=EMBED_COLUMN)
+
+
+@mk.endpoint()
+def add_match_criterion_to_sort(criterion, sort_criteria: mk.Store[List]):
+    # make a copy of the sort criteria.
+    if criterion.name is None:
+        return
+    sort_criteria.insert(
+        0, mk.gui.Sort.create_criterion(criterion.name, ascending=False, source="match")
+    )
+    sort_criteria.set(sort_criteria)
+
+
+sort = mk.gui.Sort(df)
+match = mk.gui.Match(
+    df,
+    against=EMBED_COLUMN,
+    on_match=add_match_criterion_to_sort.partial(sort_criteria=sort.criteria),
+)
 filter = mk.gui.Filter(df)
 df = filter(df)
-
-
-@mk.reactive()
-def add_match_criterion_to_sort(match_criterion, sort_criteria):
-    # make a copy of the sort criteria.
-    sort_criteria = list(sort_criteria)
-    if match_criterion.name is None:
-        return sort_criteria
-    sort_criteria.append(
-        mk.gui.Sort.create_criterion(
-            match_criterion.name, ascending=False, source="match"
-        )
-    )
-    return sort_criteria
-
-
-sort_criteria = mk.Store([])
-sort_criteria = add_match_criterion_to_sort(match.criterion, sort_criteria)
-sort = mk.gui.Sort(df, criteria=sort_criteria)
 df_sorted = sort(df)
 
 gallery = html.div(
@@ -122,10 +122,140 @@ plot = mk.gui.plotly.ScatterPlot(
     on_select=set_filter_with_plot_selection.partial(criteria=filter.criteria),
 )
 
+# ================ Notes =================
+
+
+def capture_state():
+    """Capture the state of the application at the time the"""
+    return {
+        "filter": filter.criteria.value,
+        "sort": sort.criteria.value,
+        "match": match.criterion.value,
+        "select_x": select_x.value.value,
+        "select_y": select_y.value.value,
+        "select_hue": select_hue.value.value,
+    }
+
+
+def set_state(state=None):
+    if state:
+        filter.criteria.set(state["filter"])
+        sort.criteria.set(state["sort"])
+        match.criterion.set(state["match"])
+        select_x.value.set(state["select_x"])
+        select_y.value.set(state["select_y"])
+        select_hue.value.set(state["select_hue"])
+
+    out = (
+        filter.criteria,
+        sort.criteria,
+        match.criterion,
+        select_x.value,
+        select_y.value,
+        select_hue.value,
+    )
+    assert all(isinstance(o, mk.Store) for o in out)
+    return out
+
+
+@mk.endpoint()
+def restore_state(notes: mk.DataFrame, selected: List[int]):
+    print(selected, type(selected))
+    if not selected:
+        return
+
+    if len(selected) > 1:
+        raise ValueError("Can only select one row at a time.")
+
+    state = notes.loc[selected[0]]["state"]
+    set_state(state)
+
+
+@mk.endpoint()
+def add_note(df: mk.DataFrame, notepad_text: mk.Store[str], text):
+    new_df = mk.DataFrame(
+        {"time": [str(datetime.now())], "notes": [text], "state": [capture_state()]}
+    )
+    if len(df) > 0:
+        new_df = new_df.append(df)
+
+    # Clear the text box.
+    notepad_text.set("")
+    df.set(new_df)
+
+    # Clear the selection
+    # selected.set([])
+
+
+notes = mk.DataFrame(
+    {
+        "time": [str(datetime.now())],
+        "notes": ["An example note."],
+        "state": [capture_state()],
+    }
+).mark()
+
+notepad_text = mk.Store("")
+selected = mk.Store([])
+notepad = mk.gui.Textbox(
+    text=notepad_text,
+    placeholder="Add your observations...",
+    classes="w-full h-10 px-3 rounded-md shadow-md my-1 border-gray-400",
+    on_keyenter=add_note.partial(df=notes, notepad_text=notepad_text),
+)
+notes_table = mk.gui.Table(
+    notes[["time", "notes", "state"]],
+    selected=selected,
+    single_select=True,
+    on_select=restore_state.partial(notes=notes),
+)
+
+# @mk.reactive()
+# def get_button_title(selected: List[int]):
+#     if not selected:
+#         return "Restore State"
+#     return "Restore State: " + selected[0]
+
+
+# button = mk.gui.Button(
+#     title=get_button_title(selected=selected),
+#     on_click=restore_state.partial(notes_df=notes, selected=selected),
+#     classes="bg-slate-100 py-1 rounded-md w-fit hover:bg-slate-200",
+# )
+
+# mk.gui.print(out)
+
+# for o in set_state():
+#     print(o.inode.id)
+# print("==" * 40)
+# for x in selected.inode.trigger_children[0].trigger_children:
+#     print(x.id)
+
+# ================ Display =================
 
 component = html.div(
     [
-        html.flexcol([match, filter, sort, select_container, plot], classes="h-full"),
+        html.flexcol(
+            [
+                match,
+                filter,
+                sort,
+                select_container,
+                plot,
+                html.div(
+                    [
+                        html.div(
+                            "Notes",
+                            classes="font-bold text-md text-slate-600 self-start pl-2",
+                        ),
+                        html.div(notepad, classes="px-4"),
+                        notes_table,
+                    ],
+                    classes="bg-slate-100 py-2 gap-y-4 rounded-lg w-full my-1 h-fit",
+                ),
+            ],
+            classes="h-fit",
+        ),
         gallery,
     ],
     # Make a grid with two equal sized columns.

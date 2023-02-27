@@ -2,11 +2,7 @@
 	import RowModal from '$lib/shared/modals/RowModal.svelte';
 	import Pagination from '$lib/shared/pagination/Pagination.svelte';
 	import { fetchChunk, fetchSchema, dispatch } from '$lib/utils/api';
-	import {
-		DataFrameChunk,
- 		type DataFrameRef,
-		type DataFrameSchema
-	} from '$lib/utils/dataframe';
+	import { DataFrameChunk, type DataFrameRef, type DataFrameSchema } from '$lib/utils/dataframe';
 	import { without } from 'underscore';
 	import { onMount } from 'svelte';
 	import { openModal } from 'svelte-modals';
@@ -22,7 +18,9 @@
 	export let perPage: number = 50;
 
 	export let selected: Array<string> = [];
+	export let singleSelect: boolean = false;
 	export let onEdit: Endpoint;
+	export let onSelect: Endpoint;
 
 	// Setup row modal
 	const open_row_modal = (posidx: number) => {
@@ -55,7 +53,7 @@
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
 	}).then((newChunk) => {
-		console.log("here")
+		console.log('here');
 		chunk.set(newChunk);
 	});
 
@@ -114,7 +112,9 @@
 </script>
 
 <!-- FIXME: Figure out how to do h-full -->
-<div class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300">
+<div
+	class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300"
+>
 	<div class="auto-table table-fixed overflow-x-scroll text-sm h-full">
 		<div class="table-header-group">
 			<div class="table-row sticky top-0 bg-slate-100">
@@ -160,9 +160,11 @@
 								open_row_modal(posidx);
 							}}
 							on:click={(e) => {
+								let dispatchSelect = true;
 								if (e.shiftKey) {
 									if (selected.length === 0) {
 										selected.push(keyidx);
+										dispatchSelect = false;
 									} else {
 										let lastIdx = selected[selected.length - 1];
 										let lasti = $chunk.keyidxs.indexOf(lastIdx);
@@ -188,10 +190,17 @@
 									if (selected.includes(keyidx)) {
 										selected = without(selected, keyidx);
 									} else if (!selected.includes(keyidx)) {
+										if (singleSelect) {
+											selected.pop();
+										}
 										selected.push(keyidx);
 									}
 								}
 								selected = selected;
+								if (dispatchSelect) {
+									console.log('dispatching onSelect', selected);
+									dispatch(onSelect.endpointId, { detail: { selected: selected } });
+								}
 							}}
 						>
 							{posidx}
@@ -203,7 +212,7 @@
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}
 								on:edit={(e) => {
-									console.log(keyidx)
+									console.log(keyidx);
 									dispatch(onEdit.endpointId, {
 										detail: {
 											column: col.name,
@@ -263,11 +272,10 @@
 
 		<!-- Right header section -->
 		<div class="flex self-center justify-self-end items-center">
-			<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={"top"} />
+			<Pagination bind:page bind:perPage totalItems={$schema.nrows} dropdownPlacement={'top'} />
 		</div>
 	</div>
 </div>
-
 
 <style>
 	.table-header-group .table-cell {
