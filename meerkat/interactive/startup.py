@@ -14,12 +14,14 @@ import subprocess
 import time
 from typing import Literal, Tuple
 
+import requests
 import rich
 from uvicorn import Config
 
 from meerkat.constants import (
     MEERKAT_APP_DIR,
     MEERKAT_BASE_DIR,
+    MEERKAT_INTERNAL_APP_BUILD_DIR,
     MEERKAT_RUN_ID,
     MEERKAT_RUN_PROCESS,
     MEERKAT_RUN_SUBPROCESS,
@@ -37,6 +39,7 @@ from meerkat.interactive.server import (
 )
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import APIInfo, FrontendInfo, state
+from meerkat.version import __version__ as mk_version
 
 logger = logging.getLogger(__name__)
 
@@ -336,6 +339,42 @@ def run_frontend_build(
             break
 
 
+def download_frontend_build(version: str = None):
+    """Download the frontend build to the meerkat internal app folder.
+
+    This function should be used when users who downloaded the meerkat
+    repo do not have npm/bun to build.
+
+
+    Args:
+        version: The meerkat version associated with the build.
+            Defaults to the current meerkat package version.
+    """
+    from meerkat.datasets.utils import download_url, extract_tar_file
+
+    if version is None:
+        version = mk_version
+
+    # Download the build from huggingface.
+    # This is a tarfile that contains the build folder.
+    # We extract it to the meerkat internal app folder.
+    url = f"https://huggingface.co/datasets/meerkat-ml/component-static-builds/resolve/main/static-build-{version}.tar.gz"  # noqa: E501
+
+    # Check if the url exists.
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise ValueError(
+            f"Could not find a build for version {version}. "
+            "Please check the the url for a list of versions: "
+            "https://huggingface.co/datasets/meerkat-ml/component-static-builds"
+        )
+
+    build_file = download_url(
+        url, dataset_dir=os.path.join(pathlib.Path.home(), ".meerkat", "build")
+    )
+    extract_tar_file(build_file, download_dir=MEERKAT_INTERNAL_APP_BUILD_DIR)
+
+
 def run_frontend_prod(
     port: int,
     api_url: str,
@@ -462,6 +501,11 @@ def run_frontend(
         env.update({"VITE_API_URL": apiurl})
         process = run_frontend_dev(port, package_manager, env)
     else:
+        # Download the build folder from HF
+        if not os.path.exists(MEERKAT_INTERNAL_APP_BUILD_DIR):
+            logger.debug(f"Downloading frontend build for meerkat v{mk_version}")
+            download_frontend_build(version=mk_version)
+
         # Read the timestamp of the most recent file change, for the last build
         if os.path.exists(".buildprint"):
             with open(".buildprint", "r") as f:
