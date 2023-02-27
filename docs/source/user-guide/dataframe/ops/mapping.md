@@ -103,7 +103,7 @@ df.map(is_eligibile, outputs="single")
 ```
 
 ```{warning} 
-{class}`~meerkat.ObjectColumn` is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is **much** slower than other column types. We discuss this more in the guide on {doc}`../columns/object`.
+{class}`~meerkat.ObjectColumn` is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is **much** slower than other column types. We discuss this more in the guide on {doc}`../column/object`.
 ```
 
 If the function returns a dictionary, we can skip the `outputs` argument and {func}`~meerkat.map` will automatically use the keys of the dictionary as column names.
@@ -140,7 +140,7 @@ df.map(is_eligibile, outputs={"ma_eligible": "ma", "la_eligible": "la"})
 In this section, we discuss how we can chain together multiple map operations using deferred maps. This produces a chain of operations that can be executed together. In the following section, we'll discuss how we can pipeline chained operations to take advantage of parallelism.
 
 ```{note}
-If you're unfamiliar with DeferredColumns, you may want to read the guide on {doc}`../columns/deferred` before diving into this section. 
+If you're unfamiliar with DeferredColumns, you may want to read the guide on {doc}`../column/deferred` before diving into this section. 
 ```
 
 ### Simple deferred map
@@ -229,7 +229,7 @@ df["prediction"] = preprocessed.defer(
 accuracy = df.map(lambda prediction, label: prediction == (label == "parachute")).mean()
 ```
 
-Here's a trick question: *How long is the resulting chain?* At first glance, it seems like the chain is three maps long: `preprocess`, `predict`, then `accuracy`. However, recall from the guide on {doc}`../columns/deferred` that images and other complex data types are typically stored in {class}`~meerkat.DeferredColumn`s – that is, the `"img"` column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like `df["img"] = df["filepath"].defer(load_image)`. Because our first {func}`~meerkat.defer` call in the cell above was made on the `"img"` column, the resulting chain is actually four maps long: `load`, `preprocess`, `predict`, then `accuracy`. 
+Here's a trick question: *How long is the resulting chain?* At first glance, it seems like the chain is three maps long: `preprocess`, `predict`, then `accuracy`. However, recall from the guide on {doc}`../column/deferred` that images and other complex data types are typically stored in {class}`~meerkat.DeferredColumn`s – that is, the `"img"` column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like `df["img"] = df["filepath"].defer(load_image)`. Because our first {func}`~meerkat.defer` call in the cell above was made on the `"img"` column, the resulting chain is actually four maps long: `load`, `preprocess`, `predict`, then `accuracy`. 
 
 ```{figure} _figures/map_chain.png
 ---

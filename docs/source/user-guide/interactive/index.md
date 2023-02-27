@@ -1,13 +1,4 @@
-# Overview
-
-This page will introduce some high-level concepts in Meerkat, from organizing your unstructured data to interacting with the data through interactive applications. Each of these concepts are covered in more detail in the subsequent pages.
-
-Let's dive in!
-
-# Data Frames
-TODO: Sabri
-
-# Interactivity
+# Interactive
 
 One of the best ways of understanding your data is to interact with it.
 This requires being able to easily and rapidly build interactive applications.
