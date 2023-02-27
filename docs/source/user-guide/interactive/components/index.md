@@ -1,3 +1,14 @@
+(components_index)=
+
+# Components
+
+Components are the building blocks of interactive user interfaces in Meerkat.
+
+This set of pages will discuss the following topics:
+- what components are
+- how to compose components
+- how to write your own components
+
 (guide_components_getting_started)=
 
 # Getting Started
@@ -26,7 +37,7 @@ slider = Slider(
 *If you have ideas for new components you would like to be able to use within Meerkat, let us know on [Github](https://github.com/hazyresearch/meerkat/issues) or [Discord](https://discord.gg/pw8E4Q26Tq)!*
 ```
 
-Meerkat ships with a variety of components that you can use out-of-the-box, ranging from low-level HTML elements like `div` and `p`, to basic widgets like `Slider` and `Textbox`, to complex components like `Gallery`. A list of the components available in Meerkat can be found [here](builtins.rst).
+Meerkat ships with a variety of components that you can use out-of-the-box, ranging from low-level HTML elements like `div` and `p`, to basic widgets like `Slider` and `Textbox`, to complex components like `Gallery`. A list of the components available in Meerkat can be found [here](inbuilts.rst).
 
 
 ## Understanding Components

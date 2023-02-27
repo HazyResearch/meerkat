@@ -20,7 +20,7 @@ with mk.magic():
     z = x in w
 ```
 
-Meerkat provides reactive alternatives for some of these operators, which can be found in the {ref}`reactivity builtins <reactivity_inbuilts>`.
+Meerkat provides reactive alternatives for some of these operators, which can be found in the {ref}`reactivity inbuilts <reactivity_inbuilts>`.
 
 ```python
 x = mk.Store(1)

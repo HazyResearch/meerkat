@@ -1,4 +1,4 @@
-.. _components_builtins:
+.. _components_inbuilts:
 
 Meerkat Components
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

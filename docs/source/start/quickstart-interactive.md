@@ -49,7 +49,7 @@ df = mk.get("imagenette")
 gallery = mk.gui.Gallery(df, main_column="img")
 ```
 
-The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_builtins>`.
+The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_inbuilts>`.
 
 ````{margin}
 ```{admonition} Declarative
@@ -82,7 +82,7 @@ page.launch()
 
 We just used a `div` to stack up the two components and lay them out.
 In fact, we can use HTML tags like `span`, `div`, `p` as components in Meerkat.
-A full list of supported HTML components is available {ref}`here <components_builtins_html>`.
+A full list of supported HTML components is available {ref}`here <components_inbuilts_html>`.
 
 ```{important}
 **More on components.** There's a lot more to components in Meerkat that you can learn about in the {ref}`Components <components_index>` guide. We go over other components in Meerkat from the [flowbite library](https://flowbite.com/docs/getting-started/introduction/), how to add components from any Svelte component library without writing any frontend code whatsoever, and how to write custom Meerkat components in Svelte.

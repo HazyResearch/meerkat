@@ -60,7 +60,7 @@ Next, let's create a {class}`~meerkat.gui.Select` component that allows the user
 
 ```{margin}
 A list of the components in Meerkat can be found in the
-[component guide](../../guide/components/builtins.rst).
+[component guide](../../guide/components/inbuilts.rst).
 ```
 
 Meerkat provides many components like `Select` that can be used to build useful

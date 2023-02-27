@@ -55,7 +55,7 @@ objects to make them traceable and responsive to state changes.
 
 Modular applications are easier to build and reuse. But they require well-designed building blocks to be effective.
 
-This can be done with {ref}`components <guide_components_getting_started>`, which are the main abstraction for building user interfaces in Meerkat. Users can build their own components and repurpose {ref}`built-in components <components_builtins>` for designing new interfaces.
+This can be done with {ref}`components <guide_components_getting_started>`, which are the main abstraction for building user interfaces in Meerkat. Users can build their own components and repurpose {ref}`built-in components <components_inbuilts>` for designing new interfaces.
 
 ## {ref}`Formatters <guide_formatters_getting_started>`
 

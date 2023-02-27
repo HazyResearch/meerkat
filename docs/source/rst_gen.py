@@ -238,7 +238,7 @@ def generate_common_inplace_methods():
 
 def generate_components_doc():
     """Generate autosummary doc for all components."""
-    fpath = _DIR / "user-guide" / "components" / "builtins.rst"
+    fpath = _DIR / "user-guide" / "interactive" / "components" / "inbuilts.rst"
 
     component_libs = ["core", "html", "plotly", "flowbite"]
     _COMPONENTS = {}
@@ -254,7 +254,7 @@ def generate_components_doc():
         _COMPONENTS[name] = components
 
     lines = [
-        ".. _components_builtins:",
+        ".. _components_inbuilts:",
         "",
         "Meerkat Components",
         "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",

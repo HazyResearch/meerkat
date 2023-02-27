@@ -14,7 +14,11 @@ In this section, we will:
 
 ## What is the magic context?
 
-The `magic` context is a special context in which all methods and attribute access for `Store` objects become reactive. 
+```{important}
+Use the {py:class}`mk.magic <meerkat.magic>` context to make methods and attribute access on `Store` objects reactive.
+```
+
+The `magic` context is a special context in which methods and attribute access for `Store` objects become reactive. 
 
 This means that you can use `Store` objects in a more natural way, without having to worry about whether or not the statement you're writing is reactive.
 
@@ -63,4 +67,3 @@ greeting.set(Greeting("Rhino"), triggers=True)
 print("name:", name)
 print("intro:", intro)
 ```
-
