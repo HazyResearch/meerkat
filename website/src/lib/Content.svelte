@@ -30,7 +30,7 @@
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="flex flex-col items-center">
 			<h1 class="text-4xl text-gray-800 dark:text-white">Install Meerkat</h1>
-			<pre class="rounded-lg mt-4 py-4 px-8 text-white bg-slate-800 dark:text-gray-400"><code
+			<pre class="shadow-md rounded-lg mt-4 py-4 px-8 text-white bg-slate-800 dark:text-gray-400"><code
 					>$ pip install meerkat-ml</code
 				></pre>
 		</div>
@@ -156,7 +156,7 @@
 			<h1 class="text-4xl text-gray-800 dark:text-white">Built by</h1>
 			<div class="flex flex-wrap justify-center mt-6 bg-slate-100 rounded-lg shadow-lg">
 				<div class="h-20 p-4 mx-1 my-1 text-gray-800 dark:text-gray-400 dark:bg-gray-800">
-					<a href="https://hazyresearch.github.io/" class="flex w-full h-full hover:shadow-sm">
+					<a href="https://hazyresearch.github.io/" class="flex w-full h-full hover:drop-shadow-sm">
 						<img
 							src="https://hazyresearch.stanford.edu/hazy-logo.png"
 							alt="Hazy Research Logo"
