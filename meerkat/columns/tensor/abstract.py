@@ -67,7 +67,7 @@ class TensorColumn(Column):
                 f"Cannot create `TensorColumn` from object of type {type(data)}."
             )
 
-    def _get_default_formatters(self):
-        from meerkat.interactive.formatter import TensorFormatterGroup
+    # def _get_default_formatters(self):
+    #     from meerkat.interactive.formatter import TensorFormatterGroup
 
-        return TensorFormatterGroup()
+    #     return TensorFormatterGroup()

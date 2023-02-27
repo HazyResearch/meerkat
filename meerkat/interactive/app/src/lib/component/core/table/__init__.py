@@ -1,10 +1,10 @@
-from typing import List
+from typing import Any, List
 
 from meerkat.dataframe import DataFrame
 from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import EndpointProperty
-from meerkat.interactive.formatter.base import register_placeholder
 from meerkat.interactive.event import EventInterface
+from meerkat.interactive.formatter.base import register_placeholder
 
 
 class OnEditInterface(EventInterface):
@@ -25,17 +25,26 @@ class OnEditInterface(EventInterface):
     value: str
 
 
+class OnSelectTable(EventInterface):
+    selected: List[Any]
+
+
 class Table(Component):
     df: DataFrame
     selected: List[str] = []
+    single_select: bool = False
+
     on_edit: EndpointProperty[OnEditInterface] = None
+    on_select: EndpointProperty[OnSelectTable] = None
 
     def __init__(
         self,
         df: DataFrame,
         *,
         selected: List[int] = [],
-        on_edit: EndpointProperty = None
+        single_select: bool = False,
+        on_edit: EndpointProperty = None,
+        on_select: EndpointProperty = None
     ):
         """Table view of a DataFrame.
 
@@ -43,8 +52,17 @@ class Table(Component):
             df (DataFrame): The DataFrame to display.
             selected (List[int], optional): The indices of the rows selected in the \
                 gallery. Useful for labeling and other tasks. Defaults to [].
+            allow_selection (bool, optional): Whether to allow the user to select \
+                rows. Defaults to False.
+            single_select: Whether to allow the user to select only one row.
         """
-        super().__init__(df=df, selected=selected, on_edit=on_edit)
+        super().__init__(
+            df=df,
+            selected=selected,
+            single_select=single_select,
+            on_edit=on_edit,
+            on_select=on_select,
+        )
 
     def _get_ipython_height(self):
         return "450px"

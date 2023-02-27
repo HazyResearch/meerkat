@@ -57,8 +57,8 @@
 	});
 
 	$: layout = {
-		xaxis: { title: x, categoryorder: 'category ascending' },
-		yaxis: { title: y, categoryorder: 'category ascending' },
+		xaxis: { title: x, categoryorder: 'category ascending', automargin: true },
+		yaxis: { title: y, categoryorder: 'category ascending', automargin: true },
 		title: title,
 		dragmode: 'select'
 	};

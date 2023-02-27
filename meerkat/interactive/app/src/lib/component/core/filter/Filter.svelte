@@ -14,7 +14,7 @@
 	let criteriaFrontend: FilterCriterion[] = [];
 	$: criteriaFrontend = criteria;
 
-	$: console.log("Criteria", criteria);
+	$: console.log('Criteria', criteria);
 
 	let schemaPromise;
 	let itemsPromise;
@@ -89,7 +89,7 @@
 	};
 </script>
 
-<div class="bg-slate-100 p-2 rounded-lg z-40 flex flex-col my-2">
+<div class="bg-slate-100 py-2 rounded-lg z-40 flex flex-col my-2">
 	<div class="flex space-x-6">
 		{#if title != ''}
 			<div class="font-bold text-md text-slate-600 self-start pl-2">
