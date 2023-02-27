@@ -26,14 +26,12 @@ def complete_prompt(row, example_template: mk.Store[str]):
 
 filepath = "/Users/sabrieyuboglu/Downloads/arxiv-metadata-oai-snapshot.json"
 df = mk.from_json(filepath=filepath, lines=True, backend="arrow")
+df = df[df["categories"].str.contains("stat.ML")]
 df = mk.from_pandas(df.to_pandas(), primary_key="id")
 df["url"] = "https://arxiv.org/pdf/" + df["id"]
 df["pdf"] = mk.files(
     df["url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
 )
-
-df = df[df["categories"].str.contains("stat.ML")]
-
 
 df = df[
     ["id", "authors", "title", "abstract", "pdf"]
@@ -41,7 +39,8 @@ df = df[
 df["answer"] = ""
 
 page = mk.gui.Page(
-    component=mk.gui.contrib.FlashFill(df=df),
+    # component=mk.gui.contrib.FlashFill(df=df),
+    component=mk.gui.Gallery(df, main_column="pdf"),
     id="flash-fill",
     progress=False,
 )

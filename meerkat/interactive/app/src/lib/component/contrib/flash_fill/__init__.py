@@ -10,15 +10,9 @@ if TYPE_CHECKING:
     from meerkat import DataFrame, Store, Component
 
 
-def complete_prompt(row, example_template: "Store[str]"):
-    assert isinstance(row, dict)
-    output = example_template.format(**row)
-    return output
-
-
 class FlashFill(div):
     def __init__(
-        self, 
+        self,
         df: "DataFrame",
         classes: str = "",
     ):
@@ -134,10 +128,6 @@ def _build_component(df: "DataFrame") -> "Component":
         df.set(df)
         print("done with manifest")
 
-    @mk.endpoint()
-    def set_code(code: mk.Store[str], new_code: str):
-        code.set(new_code)
-
     df = df.mark()
 
     instruction_editor = mk.gui.Editor(
@@ -212,4 +202,3 @@ def _build_component(df: "DataFrame") -> "Component":
         ],
         classes="gap-4 h-screen grid grid-rows-[auto_1fr]",
     )
-

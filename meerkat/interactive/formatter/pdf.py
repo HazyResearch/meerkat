@@ -19,6 +19,6 @@ class PDFFormatterGroup(FormatterGroup):
             tag=IconFormatter(name="FileEarmarkPdf"),
             small=IconFormatter(name="FileEarmarkPdf"),
             thumbnail=PDFFormatter(),
-            full=PDFFormatter(classes="h-full"),
+            full=PDFFormatter(classes="w-full"),
             gallery=PDFFormatter(classes="h-full"),
         )
