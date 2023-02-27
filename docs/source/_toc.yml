@@ -5,13 +5,18 @@ parts:
   - caption: Getting Started
     chapters:
       - file: start/install
+      - file: start/quickstart-df
       - file: start/quickstart-interactive
       - file: start/tutorials/index
         sections:
           - file: start/tutorials/tutorial-0
+          - file: start/tutorials/tutorial-1
           - file: start/tutorials/tutorial-2
           - file: start/tutorials/tutorial-3
           - file: start/tutorials/tutorial-4
+          - file: start/tutorials/tutorial-filter-sort
+          - file: start/tutorials/tutorial-simple-counter
+          - file: start/tutorials/tutorial-simple-dataframe-viewer
 
   - caption: User Guide
     chapters:
@@ -67,11 +72,9 @@ parts:
             sections:
               - file: user-guide/interactive/endpoints/reactive-vs-endpoints
           - file: user-guide/interactive/formatters/index
-          - file: user-guide/interactive/examples/index
-            sections:
-              - file: user-guide/interactive/examples/image_search
           - file: user-guide/interactive/advanced/index
             sections:
+              - file: user-guide/interactive/advanced/sharing
               - file: user-guide/interactive/advanced/under-the-hood
           # - file: user-guide/interactive/core-concepts-nutshell
 
@@ -87,8 +90,15 @@ parts:
   - caption: Ecosystem
     chapters:
       - file: datasets/index
-        # sections:
-        #   - file: datasets/contributing
+        sections:
+          - file: datasets/contributing-datasets
+
+  - caption: Examples
+    chapters:
+      - file: examples/index
+        sections:
+          - file: examples/meerkat-in-5-minutes
+          - file: examples/image-search
 
   # - caption: Use Cases
   #   chapters:

@@ -32,7 +32,7 @@ In contrast, dataset hubs like `HuggingFace Datasets <https://huggingface.co/doc
 
 .. admonition:: Contributing Datasets
 
-   We encourage users to contribute datasets to the Meerkat registry. If you're already using Meerkat with your dataset, contributing it to the registry is straightforward: you just share the code that you're already using to load the dataset into Meerkat. Please follow the instructions in :doc:`contributing_datasets`. 
+   We encourage users to contribute datasets to the Meerkat registry. If you're already using Meerkat with your dataset, contributing it to the registry is straightforward: you just share the code that you're already using to load the dataset into Meerkat. Please follow the instructions in :doc:`contributing-datasets`. 
 
 
     
@@ -42,10 +42,3 @@ You can also list these datasets programmatically with ``mk.datasets.catalog``.
 
 .. raw:: html
    :file: datasets_table.html
-   
-.. toctree::
-   :hidden:
-   :maxdepth: 2
-
-   contributing_datasets
-   
