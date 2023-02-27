@@ -6,7 +6,7 @@
 </script>
 
 <Navbar
-	navClass="font-rubik px-2 sm:px-4 py-2.5 border-b !border-b-1 !border-purple-200 !bg-orange-50"
+	navClass="font-rubik px-2 sm:px-4 py-2.5 border-b !border-b-1 !bg-slate-50"
 	navDivClass='mx-auto flex flex-wrap justify-between items-center'
 	let:hidden
 	let:toggle
@@ -24,7 +24,7 @@
 		<Button
 			size="sm"
 			href="{base}/docs/index.html"
-			btnClass="bg-gradient-to-r from-violet-400 via-red-400 to-orange-400 hover:from-violet-500 hover:via-red-500 hover:to-orange-500 text-white focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-violet-600 dark:hover:bg-violet-700 dark:focus:ring-violet-800"
+			btnClass="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-400 hover:from-violet-500 hover:via-red-500 hover:to-orange-500 text-white focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-violet-600 dark:hover:bg-violet-700 dark:focus:ring-violet-800"
 		>
 			Get started
 		</Button>
@@ -33,15 +33,15 @@
 	</div>
 	<NavUl {hidden}>
 		<NavLi href="{base}/" active={page === 'home'} activeClass="text-white md:bg-transparent">
-			<span class:text-purple-500={page === 'home'} class="hover:text-purple-800"> Home </span>
+			<span class:text-violet-500={page === 'home'} class="hover:text-violet-800"> Home </span>
 		</NavLi>
 		<NavLi href="{base}/blog" active={page === 'blog'}>
-			<span class:text-purple-500={page === 'blog'} class="text-purple-500 hover:text-purple-800">
+			<span class:text-violet-500={page === 'blog'} class="text-violet-500 hover:text-violet-800">
 				Blog
 			</span>
 		</NavLi>
 		<NavLi href="{base}/docs/index.html" active={page === 'docs'}>
-			<span class:text-purple-500={page === 'docs'} class="text-purple-500 hover:text-purple-800">
+			<span class:text-violet-500={page === 'docs'} class="text-violet-500 hover:text-violet-800">
 				Documentation
 			</span>
 		</NavLi>

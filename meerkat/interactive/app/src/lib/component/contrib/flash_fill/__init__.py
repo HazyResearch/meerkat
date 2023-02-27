@@ -20,6 +20,7 @@ class FlashFill(div):
         df = df.view()
         if target_column not in df.columns:
             df[target_column] = ""
+        df["is_train"] = False
         component = _build_component(df)
         super().__init__(
             slots=[component],
@@ -106,6 +107,8 @@ def _build_component(df: "DataFrame") -> "Component":
             engine=engine,
             temperature=0,
             max_tokens=1,
+            cache_name="sqlite",
+            cache_connection="/Users/sabrieyuboglu/.manifest/cache.sqlite",
         )
 
         def _run_manifest(example: mk.Column):
@@ -118,7 +121,7 @@ def _build_component(df: "DataFrame") -> "Component":
         selected_idxs = df.primary_key.isin(selected).to_pandas()
 
         # Concat all of the in-context examples.
-        train_df = df[(~selected_idxs) & (df[output_col] != "")]
+        train_df = df[(~selected_idxs) & (df["is_train"])]
         in_context_examples = "\n".join(train_df["example"]())
 
         fill_df = df[selected_idxs]
@@ -165,7 +168,7 @@ def _build_component(df: "DataFrame") -> "Component":
             "openai/text-davinci-003",
             "openai/code-davinci-002",
         ],
-        value="together/gpt-j-6b"
+        value="together/gpt-j-6b",
     )
 
     run_manifest_button = mk.gui.Button(
@@ -188,7 +191,7 @@ def _build_component(df: "DataFrame") -> "Component":
                 classes="font-bold text-slate-600 text-sm",
             ),
             mk.gui.Text(
-                "Specify the instruction and a template for in-context examples.",
+                "Specify the instruction and a template for in-context train examples.",
                 classes="text-slate-600 text-sm",
             ),
             mk.gui.html.div(

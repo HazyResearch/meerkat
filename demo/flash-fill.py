@@ -45,3 +45,20 @@ page = mk.gui.Page(
 )
 
 page.launch()
+
+
+""" 
+Does this paper report empirical results on real-world datasets?
+
+Title: {title}
+Abstract: {abstract}
+Answer: {theoretical}
+
+Yes
+Yes
+Yes
+No
+Yes
+No
+"""
+

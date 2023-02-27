@@ -126,7 +126,7 @@
 						style="width:{columnWidths[col_index]}{columnUnit}"
 					>
 						<slot id="header-cell">
-							<div class="flex items-center">
+							<div class="flex items-center gap-1 px-0.5">
 								{#if column.name === $schema.primaryKey}
 									<!-- Show a key icon for the primary key-->
 									<KeyFill class="text-violet-600" />
@@ -207,7 +207,7 @@
 						</button>
 					</div>
 					{#each $chunk.columnInfos as col}
-						<div class="table-cell border-t border-l border-slate-200 hover:opacity-80 bg-white">
+						<div class="table-cell border-t border-l border-slate-200 hover:opacity-80 bg-white px-1">
 							<Cell
 								{...$chunk.getCell(rowi, col.name)}
 								editable={true}

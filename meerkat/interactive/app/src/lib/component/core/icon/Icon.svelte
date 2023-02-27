@@ -10,7 +10,8 @@
 		FileEarmarkPdf,
 		Hash,
 		Magic,
-		BoxFill
+		BoxFill,
+		CheckSquare,
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -25,7 +26,8 @@
 		Hash: Hash,
 		Magic: Magic,
 		FileEarmarkPdf: FileEarmarkPdf,
-		BoxFill: BoxFill
+		BoxFill: BoxFill,
+		CheckSquare: CheckSquare,
 	};
 </script>
 

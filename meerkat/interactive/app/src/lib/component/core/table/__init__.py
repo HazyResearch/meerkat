@@ -22,7 +22,7 @@ class OnEditInterface(EventInterface):
     column: str
     keyidx: int
     posidx: int
-    value: str
+    value: Any
 
 
 class OnSelectTable(EventInterface):
