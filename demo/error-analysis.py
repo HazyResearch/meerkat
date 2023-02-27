@@ -51,10 +51,7 @@ filter = mk.gui.Filter(df)
 df = filter(df)
 df_sorted = sort(df)
 
-gallery = html.div(
-    mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN),
-    classes="h-full",
-)
+gallery = mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN)
 
 
 @mk.reactive()
@@ -204,38 +201,19 @@ notepad = mk.gui.Textbox(
     on_keyenter=add_note.partial(df=notes, notepad_text=notepad_text),
 )
 notes_table = mk.gui.Table(
-    notes[["time", "notes", "state"]],
+    notes[["time", "notes"]],
     selected=selected,
     single_select=True,
     on_select=restore_state.partial(notes=notes),
+    classes="h-full pad-x-5 pl-2",
 )
 
-# @mk.reactive()
-# def get_button_title(selected: List[int]):
-#     if not selected:
-#         return "Restore State"
-#     return "Restore State: " + selected[0]
-
-
-# button = mk.gui.Button(
-#     title=get_button_title(selected=selected),
-#     on_click=restore_state.partial(notes_df=notes, selected=selected),
-#     classes="bg-slate-100 py-1 rounded-md w-fit hover:bg-slate-200",
-# )
-
-# mk.gui.print(out)
-
-# for o in set_state():
-#     print(o.inode.id)
-# print("==" * 40)
-# for x in selected.inode.trigger_children[0].trigger_children:
-#     print(x.id)
 
 # ================ Display =================
 
 component = html.div(
     [
-        html.flexcol(
+        html.div(
             [
                 match,
                 filter,
@@ -246,15 +224,15 @@ component = html.div(
                     [
                         html.div(
                             "Notes",
-                            classes="font-bold text-md text-slate-600 self-start pl-2",
+                            classes="font-bold text-md text-slate-600 self-start pl-1",
                         ),
-                        html.div(notepad, classes="px-4"),
+                        html.div(notepad, classes="px-1"),
                         notes_table,
                     ],
-                    classes="bg-slate-100 py-2 gap-y-4 rounded-lg w-full my-1 h-fit",
+                    classes="bg-slate-100 px-1 py-2 gap-y-4 rounded-lg w-full h-fit",
                 ),
             ],
-            classes="h-fit",
+            classes="grid grid-rows-[auto,auto,auto,auto,3fr,auto] h-full",
         ),
         gallery,
     ],

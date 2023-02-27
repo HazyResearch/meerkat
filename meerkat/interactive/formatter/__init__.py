@@ -4,7 +4,7 @@ from .image import ImageFormatter, ImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
-from .tensor import TensorFormatter, TensorFormatterGroup
+from .tensor import TensorFormatterGroup  # , TensorFormatter
 from .text import TextFormatter, TextFormatterGroup
 
 __all__ = [
@@ -22,7 +22,7 @@ __all__ = [
     "CodeFormatterGroup",
     "PDFFormatter",
     "PDFFormatterGroup",
-    "TensorFormatter",
+    # "TensorFormatter",
     "TensorFormatterGroup",
 ]
 
@@ -34,7 +34,7 @@ class DeprecatedFormatter:  # noqa: E302
 ObjectFormatter = DeprecatedFormatter
 BasicFormatter = DeprecatedFormatter
 NumpyArrayFormatter = DeprecatedFormatter
-# TensorFormatter = DeprecatedFormatter
+TensorFormatter = DeprecatedFormatter
 WebsiteFormatter = DeprecatedFormatter
 # CodeFormatter = DeprecatedFormatter
 PILImageFormatter = DeprecatedFormatter

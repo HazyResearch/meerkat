@@ -33,6 +33,7 @@ class Table(Component):
     df: DataFrame
     selected: List[str] = []
     single_select: bool = False
+    classes: str = "h-fit"
 
     on_edit: EndpointProperty[OnEditInterface] = None
     on_select: EndpointProperty[OnSelectTable] = None
@@ -43,6 +44,7 @@ class Table(Component):
         *,
         selected: List[int] = [],
         single_select: bool = False,
+        classes: str = "h-fit",
         on_edit: EndpointProperty = None,
         on_select: EndpointProperty = None
     ):
@@ -60,6 +62,7 @@ class Table(Component):
             df=df,
             selected=selected,
             single_select=single_select,
+            classes=classes,
             on_edit=on_edit,
             on_select=on_select,
         )

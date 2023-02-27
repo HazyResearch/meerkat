@@ -22,6 +22,8 @@
 	export let onEdit: Endpoint;
 	export let onSelect: Endpoint;
 
+	export let classes: string = 'h-fit';
+
 	// Setup row modal
 	const open_row_modal = (posidx: number) => {
 		openModal(RowModal, {
@@ -113,7 +115,8 @@
 
 <!-- FIXME: Figure out how to do h-full -->
 <div
-	class="flex-1 w-full h-[400px] bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300"
+	class={'flex-1 w-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300 ' +
+		classes}
 >
 	<div class="auto-table table-fixed overflow-x-scroll text-sm h-full">
 		<div class="table-header-group">
