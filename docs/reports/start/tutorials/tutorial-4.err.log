@@ -32,10 +32,12 @@ nbclient.exceptions.CellTimeoutError: A cell timed out while it was being execut
 The message was: Cell execution timed out.
 Here is a preview of the cell contents:
 -------------------
-from meerkat.datasets.imagenette import download_imagenette
+EMBED_COLUMN = "img_clip"
 
-dataset_dir = "./downloads"
-os.makedirs(dataset_dir, exist_ok=True)
-download_imagenette(dataset_dir, overwrite=True);
+# Download the precomupted CLIP embeddings for imagenette.
+df_clip = mk.DataFrame.read(
+    "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",
+    overwrite=False,
+)
 -------------------
 

@@ -621,8 +621,8 @@ title="Open an issue"
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
-<span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="n">_SHARED_DOCS_</span>
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
+<span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="n">_SHARED_DOCS_</span>
 
 
 <div class="viewcode-block" id="complete"><a class="viewcode-back" href="../../../apidocs/dataframe.html#meerkat.complete">[docs]</a><span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">_SHARED_DOCS_</span><span class="p">)</span>
@@ -636,13 +636,12 @@ title="Open an issue"
     <span class="n">blocks_per_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mk</span><span class="o">.</span><span class="n">ScalarColumn</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Apply a generative language model to each row in a DataFrame.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a generative language model to each row in a DataFrame.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (DataFrame): The :class:`DataFrame` to which the</span>
 <span class="sd">            function will be applied.</span>
-<span class="sd">        prompt (str): </span>
+<span class="sd">        prompt (str):</span>
 <span class="sd">        engine (str):</span>
 <span class="sd">        ${batch_size}</span>
 <span class="sd">        ${materialize}</span>
@@ -657,6 +656,7 @@ title="Open an issue"
 <span class="sd">            deferred map.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+
     <span class="n">client_name</span><span class="p">,</span> <span class="n">engine</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
         <span class="n">client_name</span><span class="o">=</span><span class="n">client_name</span><span class="p">,</span>
