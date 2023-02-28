@@ -1,11 +1,12 @@
 import re
 from functools import partial
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict
 
 from ...html import div
 
 if TYPE_CHECKING:
     from meerkat import Component, DataFrame
+
 
 class FlashFill(div):
     def __init__(
