@@ -6,7 +6,7 @@
 </script>
 
 <Navbar
-	navClass="font-rubik px-2 sm:px-4 py-2.5 border-b !border-b-1 !bg-slate-50"
+	navClass="font-rubik px-2 sm:px-4 py-2.5 border-b !border-b-1 !bg-slate-50 drop-shadow-sm"
 	navDivClass='mx-auto flex flex-wrap justify-between items-center'
 	let:hidden
 	let:toggle

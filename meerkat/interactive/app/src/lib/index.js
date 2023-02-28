@@ -18,6 +18,7 @@ export { default as Button } from './component/core/button/Button.svelte';
 export { default as Chat } from './component/core/chat/Chat.svelte';
 export { default as Checkbox } from './component/core/checkbox/Checkbox.svelte';
 export { default as Code } from './component/core/code/Code.svelte';
+export { default as CopyButton } from './component/core/copybutton/CopyButton.svelte';
 export { default as Document } from './component/core/document/Document.svelte';
 export { default as Editor } from './component/core/editor/Editor.svelte';
 export { default as FileUpload } from './component/core/fileupload/FileUpload.svelte';

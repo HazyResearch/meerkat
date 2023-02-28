@@ -3,6 +3,7 @@ from .carousel import Carousel
 from .chat import Chat
 from .checkbox import Checkbox
 from .code import Code
+from .copy_button import CopyButton
 from .code_cell import CodeCell
 from .document import Document
 from .editor import Editor
@@ -16,6 +17,7 @@ from .markdown import Caption, Header, Markdown, Subheader, Title
 from .match import Match
 from .multiselect import MultiSelect
 from .number import Number
+from .numberinput import NumberInput
 from .pdf import PDF
 from .put import Put
 from .radio import Radio, RadioGroup
@@ -40,6 +42,7 @@ __all__ = [
     "Checkbox",
     "Code",
     "CodeCell",
+    "CopyButton", 
     "Document",
     "Editor",
     "FileUpload",
@@ -58,6 +61,7 @@ __all__ = [
     "RadioGroup",
     "RawHTML",
     "Number",
+    "NumberInput",
     "Select",
     "SliceByCards",
     "Slider",
