@@ -18,6 +18,7 @@ core
    meerkat.interactive.app.src.lib.component.core.Checkbox
    meerkat.interactive.app.src.lib.component.core.Code
    meerkat.interactive.app.src.lib.component.core.CodeCell
+   meerkat.interactive.app.src.lib.component.core.CopyButton
    meerkat.interactive.app.src.lib.component.core.Document
    meerkat.interactive.app.src.lib.component.core.Editor
    meerkat.interactive.app.src.lib.component.core.FileUpload
@@ -30,6 +31,7 @@ core
    meerkat.interactive.app.src.lib.component.core.Markdown
    meerkat.interactive.app.src.lib.component.core.Match
    meerkat.interactive.app.src.lib.component.core.Number
+   meerkat.interactive.app.src.lib.component.core.NumberInput
    meerkat.interactive.app.src.lib.component.core.PDF
    meerkat.interactive.app.src.lib.component.core.Put
    meerkat.interactive.app.src.lib.component.core.Radio

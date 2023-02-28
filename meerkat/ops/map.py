@@ -92,13 +92,13 @@ _SHARED_DOCS_ = {
         """
     ),
     "use_ray": docs.Arg(
-        """ 
+        """
         use_ray (bool): Use Ray to parallelize the computation. Defaults to False.
         """
     ),
     "num_blocks": docs.Arg(
         """
-        num_blocks (int): When using Ray, the number of blocks to split the data into. 
+        num_blocks (int): When using Ray, the number of blocks to split the data into.
             Defaults to 100.
         """
     ),
@@ -111,7 +111,7 @@ _SHARED_DOCS_ = {
     "pbar": docs.Arg(
         """
         pbar (bool): Show a progress bar. Defaults to False.
-        """     
+        """
     ),
 }
 

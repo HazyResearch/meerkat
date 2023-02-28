@@ -4,6 +4,8 @@ kernelspec:
   name: python3
 ---
 
+(quickstart-df)=
+
 # Quickstart: Data Frames
 
 *What is `Meerkat`?*  `Meerkat` is a DataFrame library that enables data scientists and ML practitioners to interact with complex data types like images, video and free text.

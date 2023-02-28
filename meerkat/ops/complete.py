@@ -1,8 +1,8 @@
 import re
 
 import meerkat as mk
-from meerkat.ops.map import _SHARED_DOCS_
 import meerkat.tools.docs as docs
+from meerkat.ops.map import _SHARED_DOCS_
 
 
 @docs.doc(source=_SHARED_DOCS_)
@@ -16,13 +16,12 @@ def complete(
     blocks_per_window: int = 10,
     pbar: bool = False,
 ) -> mk.ScalarColumn:
-    """
-    Apply a generative language model to each row in a DataFrame.
+    """Apply a generative language model to each row in a DataFrame.
 
     Args:
         df (DataFrame): The :class:`DataFrame` to which the
             function will be applied.
-        prompt (str): 
+        prompt (str):
         engine (str):
         ${batch_size}
         ${materialize}
@@ -37,6 +36,7 @@ def complete(
             deferred map.
     """
     from manifest import Manifest
+
     client_name, engine = engine.split("/")
     manifest = Manifest(
         client_name=client_name,

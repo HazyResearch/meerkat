@@ -12,7 +12,6 @@ from meerkat.interactive.app.src.lib.component.contrib.fm_filter import FMFilter
 from meerkat.interactive.app.src.lib.component.contrib.mocha import ChangeList
 from meerkat.interactive.app.src.lib.component.core import *  # noqa: F401, F403
 from meerkat.interactive.app.src.lib.shared.cell.website import Website
-from meerkat.interactive.edit import EditTarget  # noqa: F401
 from meerkat.interactive.endpoint import Endpoint, endpoint, endpoints, make_endpoint
 from meerkat.interactive.graph import (  # noqa: F401
     Store,

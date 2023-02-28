@@ -6,13 +6,13 @@ A reactive function in Meerkat is a function that reruns when one of its inputs 
 A function that reruns when one of its inputs changes.
 ```
 
-Reactivity is the essence behind building interactive user interfaces in Meerkat. *Reactive* code is "tracked" by Meerkat so that it can be run again based on if the respective inputs change.
+Reactivity is the essence behind building interactive user interfaces in Meerkat. _Reactive_ code is "tracked" by Meerkat so that it can be run again based on if the respective inputs change.
 
 These docs walk through what reactive functions are, how to use them, and how to write your own.
 
 (reactivity_getting_started)=
 
-# Getting Started with Reactive Functions
+## Getting Started with Reactive Functions
 
 In any interactive application, certain functions will need to be rerun when states of variables in the application change. Meerkat provides a mechanism for this through the concept of _reactivity_, implemented using the {py:func}`@mk.reactive() <meerkat.reactive()>` decorator.
 
@@ -82,7 +82,7 @@ So far, we learned a simple definition of reactive functions in Meerkat. This de
 
 Rather than a reactive function being rerun whenever any of its inputs are updated, it is actually rerun whenever any of its **marked** inputs are updated. This is a subtle but important distinction.
 
-**What objects can be marked?** By default, standard objects cannot be marked. However, they can be wrapped in a {class}`~meerkat.Store`. `Store` objects are _markable_, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like `DataFrame` and `Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
+**What objects can be marked?** By default, standard objects cannot be marked. However, they can be wrapped in a {class}`~meerkat.Store`. `Store` objects are _markable_, which means we can mark them for use with reactive functions. Python primitives, third-party objects, and custom objects can be wrapped in `Store` objects to make them markable. Other objects in Meerkat like {class}`~meerkat.DataFrame` and {class}`~meerkat.Column` are also markable. All of these objects provide a `.mark()` and `.unmark()` method to control whether they are marked or not.
 
 This means that for a function to react to changes in its inputs, its inputs must be marked. Let's look at a few examples.
 

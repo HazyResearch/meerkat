@@ -125,7 +125,7 @@ z = add(x, y) # z is Store(3), type(z) is Store
 x.set(4, triggers=True)
 print(z)
 
-# z is now Store(6), type(z) is Store
+### z is now Store(6), type(z) is Store
 
 By calling set() on x, we are changing the object that x points to. This is what allows z to be updated. Ignore the triggers=True argument for now, we discuss it in more detail in the section below.)
 

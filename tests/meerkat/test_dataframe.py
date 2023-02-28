@@ -736,6 +736,20 @@ def test_io(testbed, tmp_path, move):
             assert False
 
 
+@pytest.mark.parametrize(
+    "url_suffix",
+    ["embeddings/imagenette_160px.mk.tar.gz"],
+)
+def test_read_meerkat_hf_dataframe(url_suffix):
+    """Test reading meerkat dataframe hosted on huggingface."""
+    url = os.path.join(
+        "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main",
+        url_suffix,
+    )
+    df = DataFrame.read(url)
+    assert isinstance(df, DataFrame)
+
+
 def test_repr_html_(testbed):
     testbed.df._repr_html_()
 

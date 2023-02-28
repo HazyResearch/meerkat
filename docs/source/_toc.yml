@@ -65,9 +65,9 @@ parts:
               - file: user-guide/interactive/components/display
               - file: user-guide/interactive/components/custom-components
               - file: user-guide/interactive/components/inbuilts
-              - file: user-guide/interactive/components/filter
-              - file: user-guide/interactive/components/sort
-              - file: user-guide/interactive/components/match
+              # - file: user-guide/interactive/components/filter
+              # - file: user-guide/interactive/components/sort
+              # - file: user-guide/interactive/components/match
           - file: user-guide/interactive/endpoints/index
             sections:
               - file: user-guide/interactive/endpoints/reactive-vs-endpoints

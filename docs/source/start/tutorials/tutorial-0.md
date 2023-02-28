@@ -5,7 +5,7 @@ kernelspec:
 ---
 
 
-# Tutorial 0: Data Frames for Unstructured Data
+# Tutorial 0: Data Frames (Wrangling an Image Dataset)
 
 In this tutorial, we'll learn how to use Meerkat to explore a dataset of images. We'll use the `imagenette` dataset, a small 10-class subset of ImageNet.
 
