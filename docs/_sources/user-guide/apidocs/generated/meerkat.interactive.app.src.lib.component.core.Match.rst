@@ -65,6 +65,7 @@
       ~Match.text
       ~Match.encoder
       ~Match.title
+      ~Match.enable_selection
       ~Match.on_match
       ~Match.get_match_schema
       ~Match.on_clickminus

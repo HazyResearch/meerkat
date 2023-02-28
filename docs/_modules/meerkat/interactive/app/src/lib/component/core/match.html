@@ -620,7 +620,7 @@ title="Open an issue"
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.match</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">HTTPException</span>
@@ -696,10 +696,9 @@ title="Open an issue"
 
 
 <span class="k">def</span> <span class="nf">_calc_image_query</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">locs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">against</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the negative samples for a match.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the negative samples for a match.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">locs</span><span class="p">][</span><span class="n">against</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    
+
 
 <span class="nd">@endpoint</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">set_criterion</span><span class="p">(</span>
@@ -724,13 +723,17 @@ title="Open an issue"
         <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">negatives</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">positives</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">criterion</span>
 
-        <span class="n">query_embedding</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">query_embedding</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
             <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">negatives</span><span class="p">:</span>
-            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">query_embedding</span> <span class="o">-</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">_calc_image_query</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">negatives</span><span class="p">,</span> <span class="n">against</span><span class="p">)</span>
+            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">query_embedding</span> <span class="o">-</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">_calc_image_query</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">negatives</span><span class="p">,</span> <span class="n">against</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">positives</span><span class="p">:</span>
-            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">query_embedding</span> <span class="o">+</span> <span class="n">_calc_image_query</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">positives</span><span class="p">,</span> <span class="n">against</span><span class="p">)</span>
+            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">query_embedding</span> <span class="o">+</span> <span class="n">_calc_image_query</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span> <span class="n">positives</span><span class="p">,</span> <span class="n">against</span>
+            <span class="p">)</span>
 
         <span class="n">match_criterion</span> <span class="o">=</span> <span class="n">MatchCriterion</span><span class="p">(</span>
             <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
@@ -781,6 +784,7 @@ title="Open an issue"
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span>
+    <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># TODO: Revisit this, how to deal with endpoint interfaces when there is composition</span>
     <span class="c1"># and positional arguments</span>
@@ -800,6 +804,7 @@ title="Open an issue"
         <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span><span class="p">,</span>
+        <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">on_match</span><span class="p">:</span> <span class="n">EndpointProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">get_match_schema</span><span class="p">:</span> <span class="n">EndpointProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">on_clickminus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -814,6 +819,7 @@ title="Open an issue"
             <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
             <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">enable_selection</span><span class="o">=</span><span class="n">enable_selection</span><span class="p">,</span>
             <span class="n">on_match</span><span class="o">=</span><span class="n">on_match</span><span class="p">,</span>
             <span class="n">get_match_schema</span><span class="o">=</span><span class="n">get_match_schema</span><span class="p">,</span>
             <span class="n">on_clickminus</span><span class="o">=</span><span class="n">on_clickminus</span><span class="p">,</span>
@@ -833,14 +839,16 @@ title="Open an issue"
             <span class="n">MatchCriterion</span><span class="p">(</span><span class="n">against</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
             <span class="n">backend_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">negative_selection</span> <span class="o">=</span> <span class="n">Store</span><span class="p">([],</span> <span class="n">backend_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">positive_selection</span> <span class="o">=</span> <span class="n">Store</span><span class="p">([],</span> <span class="n">backend_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">:</span> <span class="n">Store</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span>
-            <span class="s2">&quot;set_negative_selection&quot;</span><span class="p">,</span> 
-            <span class="s2">&quot;set_positive_selection&quot;</span><span class="p">,</span> 
-            <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="p">]]</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">:</span> <span class="n">Store</span><span class="p">[</span>
+            <span class="n">Literal</span><span class="p">[</span>
+                <span class="s2">&quot;set_negative_selection&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;set_positive_selection&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
         <span class="n">on_match</span> <span class="o">=</span> <span class="n">set_criterion</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
@@ -857,7 +865,7 @@ title="Open an issue"
 
     <span class="k">def</span> <span class="nf">set_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">:</span> <span class="n">Store</span><span class="p">[</span><span class="nb">list</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span> <span class="o">=</span> <span class="n">selection</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_selection</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_positive_selection</span> <span class="o">=</span> <span class="n">Store</span><span class="p">([],</span> <span class="n">backend_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_negative_selection</span> <span class="o">=</span> <span class="n">Store</span><span class="p">([],</span> <span class="n">backend_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -884,16 +892,16 @@ title="Open an issue"
 
     <span class="nd">@reactive</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">on_external_selection_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">external_selection</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s1">&#39;set_negative_selection&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;set_negative_selection&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">negative_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">external_selection</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s1">&#39;set_positive_selection&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;set_positive_selection&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">positive_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">external_selection</span><span class="p">)</span>
 
     <span class="nd">@endpoint</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">on_set_negative_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s1">&#39;set_positive_selection&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;set_positive_selection&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_positive_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;set_negative_selection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;set_negative_selection&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_negative_selection</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@endpoint</span><span class="p">()</span>
@@ -901,12 +909,12 @@ title="Open an issue"
         <span class="bp">self</span><span class="o">.</span><span class="n">_negative_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">set</span><span class="p">([])</span>
-    
+
     <span class="nd">@endpoint</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">on_set_positive_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s1">&#39;set_negative_selection&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;set_negative_selection&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_negative_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;set_positive_selection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;set_positive_selection&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">external_selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_positive_selection</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@endpoint</span><span class="p">()</span>
