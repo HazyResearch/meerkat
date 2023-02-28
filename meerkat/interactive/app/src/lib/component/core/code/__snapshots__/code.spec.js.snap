@@ -5,7 +5,7 @@ exports[`Code > should render code 1`] = `
   <div>
      
     <div
-      class="whitespace-pre overflow-auto h-full max-h-[50vh] my-1 rounded-lg py-2 px-4 bg-black"
+      class="text-left whitespace-pre overflow-auto py-2 px-4 h-full aspect-video bg-slate-800 "
     >
       <pre>
         <code

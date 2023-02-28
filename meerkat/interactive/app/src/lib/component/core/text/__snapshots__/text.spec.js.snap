@@ -4,11 +4,10 @@ exports[`Text > should render Text 1`] = `
 <body>
   <div>
     <div
-      class="text-ellipsis whitespace-nowrap overflow-hidden"
+      class=""
     >
       hello
     </div>
-    
     
     <!--&lt;Text&gt;-->
   </div>

@@ -4,7 +4,7 @@ exports[`Checkbox > should render checkbox 1`] = `
 <body>
   <div>
     <div
-      class="bg-violet-50 p-2 rounded-lg"
+      class=""
     >
       <label
         class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"
