@@ -4,7 +4,7 @@ kernelspec:
   name: python3
 ---
 
-# Tutorial 3: Query a Large Language Model
+# Tutorial 3: Endpoints (Query a Large Language Model)
 
 In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.
 

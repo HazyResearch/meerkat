@@ -1,15 +1,4 @@
 Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 730, in _async_poll_for_reply
-    msg = await ensure_async(self.kc.shell_channel.get_msg(timeout=new_timeout))
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 96, in ensure_async
-    result = await obj
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_client/channels.py", line 315, in get_msg
-    raise Empty
-_queue.Empty
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
     executenb(
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
@@ -22,20 +11,38 @@ Traceback (most recent call last):
     return future.result()
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 949, in async_execute_cell
-    exec_reply = await self.task_poll_for_reply
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 754, in _async_poll_for_reply
-    await self._async_handle_timeout(timeout, cell)
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 801, in _async_handle_timeout
-    raise CellTimeoutError.error_from_timeout_and_cell(
-nbclient.exceptions.CellTimeoutError: A cell timed out while it was being executed, after 5 seconds.
-The message was: Cell execution timed out.
-Here is a preview of the cell contents:
--------------------
-from meerkat.datasets.imagenette import download_imagenette
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html 
+import seaborn as sns
 
-dataset_dir = "./downloads"
-os.makedirs(dataset_dir, exist_ok=True)
-download_imagenette(dataset_dir, overwrite=True);
--------------------
+plot_df = valid_df[np.isin(valid_df["label"], ["golf ball", "parachute"])]
+sns.displot(
+    data=plot_df.to_pandas(), 
+    x="avg_blue", 
+    hue="label", 
+    height=3, 
+    aspect=2
+)
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [0;32mIn[11], line 2[0m
+[1;32m      1[0m [38;5;66;03m## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html [39;00m
+[0;32m----> 2[0m [38;5;28;01mimport[39;00m [38;5;21;01mseaborn[39;00m [38;5;28;01mas[39;00m [38;5;21;01msns[39;00m
+[1;32m      4[0m plot_df [38;5;241m=[39m valid_df[np[38;5;241m.[39misin(valid_df[[38;5;124m"[39m[38;5;124mlabel[39m[38;5;124m"[39m], [[38;5;124m"[39m[38;5;124mgolf ball[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mparachute[39m[38;5;124m"[39m])]
+[1;32m      5[0m sns[38;5;241m.[39mdisplot(
+[1;32m      6[0m     data[38;5;241m=[39mplot_df[38;5;241m.[39mto_pandas(), 
+[1;32m      7[0m     x[38;5;241m=[39m[38;5;124m"[39m[38;5;124mavg_blue[39m[38;5;124m"[39m, 
+[0;32m   (...)[0m
+[1;32m     10[0m     aspect[38;5;241m=[39m[38;5;241m2[39m
+[1;32m     11[0m )
+
+[0;31mModuleNotFoundError[0m: No module named 'seaborn'
+ModuleNotFoundError: No module named 'seaborn'
 

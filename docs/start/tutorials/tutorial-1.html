@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 1: Image Gallery &#8212; 🔮 v0.2.6a14</title>
+    <title>Tutorial 1: Basic Interactive Apps (Building an Image Gallery) &#8212; 🔮 v0.2.6a15</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -42,8 +42,8 @@
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 2: Reactive Image Viewer" href="tutorial-2.html" />
-    <link rel="prev" title="Tutorial 0: Data Frames for Unstructured Data" href="tutorial-0.html" />
+    <link rel="next" title="Tutorial 2: Reactive Functions (Reactive Image Viewer)" href="tutorial-2.html" />
+    <link rel="prev" title="Tutorial 0: Data Frames (Wrangling an Image Dataset)" href="tutorial-0.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -87,7 +87,7 @@
       <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.2.6a14</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a15</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -128,7 +128,7 @@
   <a class="reference internal" href="index.html">
    Tutorials
   </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
    <i class="fas fa-chevron-down">
    </i>
@@ -136,27 +136,27 @@
   <ul class="current">
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-0.html">
-     Tutorial 0: Data Frames for Unstructured Data
+     Tutorial 0: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     Tutorial 1: Image Gallery
+     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-2.html">
-     Tutorial 2: Reactive Image Viewer
+     Tutorial 2: Reactive Functions (Reactive Image Viewer)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-3.html">
-     Tutorial 3: Query a Large Language Model
+     Tutorial 3: Endpoints (Query a Large Language Model)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-4.html">
-     Tutorial 4: Search Engine over a Dataset
+     Tutorial 4: Complex Components (Embedding Based Search Engine)
     </a>
    </li>
    <li class="toctree-l2">
@@ -166,12 +166,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-simple-counter.html">
-     Tutorial: A Simple Counter
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-simple-dataframe-viewer.html">
-     A Simple DataFrame Viewer
+     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
     </a>
    </li>
   </ul>
@@ -192,7 +187,7 @@
   <a class="reference internal" href="../../user-guide/dataframe/index.html">
    DataFrame
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
   <label for="toctree-checkbox-2">
    <i class="fas fa-chevron-down">
    </i>
@@ -301,7 +296,7 @@
   <a class="reference internal" href="../../user-guide/interactive/index.html">
    Interactive
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
   <label for="toctree-checkbox-5">
    <i class="fas fa-chevron-down">
    </i>
@@ -377,7 +372,7 @@
   <a class="reference internal" href="../../advanced/magic-contexts/index.html">
    Magic Contexts
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
   <label for="toctree-checkbox-7">
    <i class="fas fa-chevron-down">
    </i>
@@ -406,7 +401,7 @@
   <a class="reference internal" href="../../datasets/index.html">
    Datasets
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
   <label for="toctree-checkbox-8">
    <i class="fas fa-chevron-down">
    </i>
@@ -430,7 +425,7 @@
   <a class="reference internal" href="../../examples/index.html">
    Examples
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
   <label for="toctree-checkbox-9">
    <i class="fas fa-chevron-down">
    </i>
@@ -459,7 +454,7 @@
   <a class="reference internal" href="../../apidocs/index.html">
    API Reference
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <input checked class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
   <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
@@ -710,7 +705,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Tutorial 1: Image Gallery</h1>
+                <h1>Tutorial 1: Basic Interactive Apps (Building an Image Gallery)</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -750,8 +745,8 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="tutorial-1-image-gallery">
-<h1>Tutorial 1: Image Gallery<a class="headerlink" href="#tutorial-1-image-gallery" title="Permalink to this headline">¶</a></h1>
+  <section id="tutorial-1-basic-interactive-apps-building-an-image-gallery">
+<h1>Tutorial 1: Basic Interactive Apps (Building an Image Gallery)<a class="headerlink" href="#tutorial-1-basic-interactive-apps-building-an-image-gallery" title="Permalink to this headline">¶</a></h1>
 <!-- TODO: include screenshots? -->
 <p>In this tutorial, we’ll create our first Meerkat GUI by building an image gallery.</p>
 <p>Through this tutorial, you will learn about:</p>
@@ -829,13 +824,13 @@ title="Print to PDF"
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Tutorial 0: Data Frames for Unstructured Data</p>
+            <p class="prev-next-title">Tutorial 0: Data Frames (Wrangling an Image Dataset)</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="tutorial-2.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 2: Reactive Image Viewer</p>
+        <p class="prev-next-title">Tutorial 2: Reactive Functions (Reactive Image Viewer)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

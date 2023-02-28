@@ -1,15 +1,4 @@
 Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 730, in _async_poll_for_reply
-    msg = await ensure_async(self.kc.shell_channel.get_msg(timeout=new_timeout))
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 96, in ensure_async
-    result = await obj
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_client/channels.py", line 315, in get_msg
-    raise Empty
-_queue.Empty
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
     executenb(
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
@@ -22,19 +11,32 @@ Traceback (most recent call last):
     return future.result()
   File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 949, in async_execute_cell
-    exec_reply = await self.task_poll_for_reply
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 754, in _async_poll_for_reply
-    await self._async_handle_timeout(timeout, cell)
-  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 801, in _async_handle_timeout
-    raise CellTimeoutError.error_from_timeout_and_cell(
-nbclient.exceptions.CellTimeoutError: A cell timed out while it was being executed, after 5 seconds.
-The message was: Cell execution timed out.
-Here is a preview of the cell contents:
--------------------
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
 import meerkat as mk
 
 df = mk.get("imagenette")
 df["img"].formatter_group
--------------------
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[2], line 4[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mmeerkat[39;00m [38;5;28;01mas[39;00m [38;5;21;01mmk[39;00m
+[1;32m      3[0m df [38;5;241m=[39m mk[38;5;241m.[39mget([38;5;124m"[39m[38;5;124mimagenette[39m[38;5;124m"[39m)
+[0;32m----> 4[0m [43mdf[49m[43m[[49m[38;5;124;43m"[39;49m[38;5;124;43mimg[39;49m[38;5;124;43m"[39;49m[43m][49m[38;5;241;43m.[39;49m[43mformatter_group[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/mixins/reactifiable.py:60[0m, in [0;36mReactifiableMixin.__getattribute__[0;34m(self, name)[0m
+[1;32m     58[0m [38;5;28;01mwith[39;00m unmarked():
+[1;32m     59[0m     is_self_marked [38;5;241m=[39m [38;5;28msuper[39m()[38;5;241m.[39m[38;5;21m__getattribute__[39m([38;5;124m"[39m[38;5;124m_self_marked[39m[38;5;124m"[39m)
+[0;32m---> 60[0m     attr [38;5;241m=[39m [38;5;28;43msuper[39;49m[43m([49m[43m)[49m[38;5;241;43m.[39;49m[38;5;21;43m__getattribute__[39;49m[43m([49m[43mname[49m[43m)[49m
+[1;32m     61[0m     is_method_or_fn [38;5;241m=[39m inspect[38;5;241m.[39mismethod(attr) [38;5;129;01mor[39;00m inspect[38;5;241m.[39misfunction(attr)
+[1;32m     62[0m     attr_is_reactive_fn [38;5;241m=[39m is_method_or_fn [38;5;129;01mand[39;00m is_reactive_fn(attr)
+
+[0;31mAttributeError[0m: 'FileColumn' object has no attribute 'formatter_group'
+AttributeError: 'FileColumn' object has no attribute 'formatter_group'
 
