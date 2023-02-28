@@ -1,4 +1,4 @@
-# Tutorial 1: Image Gallery
+# Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
 
 <!-- TODO: include screenshots? -->
 
