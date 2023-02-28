@@ -35,8 +35,6 @@ import meerkat as mk
 
 input_slider = mk.gui.core.Slider(value=2.0)
 ```
-<!-- <iframe src="https://en.wikipedia.org/wiki/HTML_element#Frames" height="345px" width="100%"></iframe> -->
-<iframe src="_static/gui/build/index.html" height="345px" width="100%"></iframe>
 
 All components live under the `mk.gui.*` namespace e.g. `mk.gui.core` (core Meerkat components), `mk.gui.html` (html tags as components), `mk.gui.flowbite` (Flowbite components) and `mk.gui.plotly` (Plotly components).
 

@@ -4,7 +4,7 @@ kernelspec:
   name: python3
 ---
 
-# Tutorial 2: Reactive Image Viewer
+# Tutorial 2: Reactive Functions (Reactive Image Viewer)
 
 In this tutorial, we will build a simple image viewer that shows a random subset of images from
 a class in an image dataset.

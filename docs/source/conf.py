@@ -110,7 +110,7 @@ intersphinx_mapping = {
 }
 
 # Set a longer nb execution timeout
-nb_execution_timeout = 5
+nb_execution_timeout = 180
 
 remove_from_toctrees = ["apidocs/generated/*"]
 
