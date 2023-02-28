@@ -141,7 +141,7 @@ html_theme_options = {
     "use_edit_page_button": True,
     "path_to_docs": "doc/source",
     "home_page_in_toc": True,
-    "show_navbar_depth": 1,
+    "show_navbar_depth": 2,
     "use_sidenotes": True,
     "show_toc_level": 2,
     "launch_buttons": {
