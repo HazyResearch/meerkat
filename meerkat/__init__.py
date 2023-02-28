@@ -42,6 +42,7 @@ from meerkat.dataframe import DataFrame
 from meerkat.datasets import get
 from meerkat.ops.aggregate.aggregate import aggregate
 from meerkat.ops.concat import concat
+from meerkat.ops.complete import complete
 from meerkat.ops.cond import (
     _abs,
     _all,
@@ -167,6 +168,7 @@ __all__ = [
     "map",
     "defer",
     "concat",
+    "complete",
     "merge",
     "embed",
     "sort",

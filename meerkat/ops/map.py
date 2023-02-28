@@ -251,6 +251,9 @@ def defer(
             kwargs = {col_name: col for col_name, col in data.items()}
 
             def wrapper(*args, **kwargs):
+                # FIXME: this should use data._clone instead!
+                if is_batched_fn:
+                    kwargs = DataFrame(kwargs)
                 return base_function(kwargs)
 
             function = wrapper

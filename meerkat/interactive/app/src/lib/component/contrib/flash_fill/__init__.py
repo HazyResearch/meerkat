@@ -1,13 +1,32 @@
 import re
 from functools import partial
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, List
 
 
 from ...html import div
 
 if TYPE_CHECKING:
-    from meerkat import DataFrame, Store, Component
+    from meerkat import DataFrame, Component
 
+def _check_prompt_ends_with_column(prompt: str, columns: List[str]=None) -> str:
+    # Define the regular expression pattern
+    pattern = r"\{([^}]+)\}$"
+
+    # Use re.search to find the match in the example_template string
+    match = re.search(pattern, prompt)
+
+    if match:
+        # Extract the content between the curly braces using the group() method
+        content = match.group(1)
+
+        if columns is not None and content not in columns:
+            raise ValueError(
+                f"The column '{content}' does not exist in the dataframe."
+            )
+    else:
+        return None
+        # raise ValueError("The example template must end with '{column_name}'")
+    return content
 
 class FlashFill(div):
     def __init__(
@@ -20,24 +39,24 @@ class FlashFill(div):
         if target_column not in df.columns:
             df[target_column] = ""
         df["is_train"] = False
-        component = self._build_component(df)
+        component, prompt = self._build_component(df)
         super().__init__(
             slots=[component],
             classes=classes,
         )
+        self._prompt = prompt
 
     @property
-    def prompt_template(self):
+    def prompt(self):
+
         return 
 
     def _get_ipython_height(self):
         return "600px"
 
-
     def _build_component(self, df: "DataFrame") -> "Component":
         import meerkat as mk
         from manifest import Manifest
-
 
         def complete_prompt(row: Dict[str, any], example_template: mk.Store[str]):
             assert isinstance(row, dict)
@@ -58,11 +77,13 @@ class FlashFill(div):
                 }
 
         @mk.endpoint
-        def on_edit(df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any):
+        def on_edit(
+            df: mk.DataFrame, column: str, keyidx: any, posidx: int, value: any
+        ):
             df.loc[keyidx, column] = value
 
-        @mk.reactive()
-        def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
+        @mk.reactive(nested_return=True)
+        def update_prompt(df: mk.DataFrame, template: mk.Store[str], instruction: mk.Store[str]):
             """Update the df with the new prompt template.
 
             This is as simple as returning a view.
@@ -75,7 +96,11 @@ class FlashFill(div):
                 function=partial(complete_prompt, example_template=template),
                 inputs="row",
             )
-            return df
+
+            train_df = df[df["is_train"]]
+            in_context_examples = "\n".join(train_df["example"]())
+            prompt = f"{instruction} {in_context_examples} {template}"
+            return df, prompt 
 
         @mk.reactive()
         def check_example_template(example_template: str, df: mk.DataFrame):
@@ -103,12 +128,18 @@ class FlashFill(div):
 
         @mk.endpoint()
         def run_manifest(
-            instruct_cmd: str, df: mk.DataFrame, output_col: str, selected: list, api: str
+            instruct_cmd: str,
+            df: mk.DataFrame,
+            output_col: str,
+            selected: list,
+            api: str,
         ):
             client_name, engine = api.split("/")
             manifest = Manifest(
                 client_name=client_name,
-                client_connection=open("/Users/sabrieyuboglu/.meerkat/keys/.openai").read(),
+                client_connection=open(
+                    "/Users/sabrieyuboglu/.meerkat/keys/.openai"
+                ).read(),
                 engine=engine,
                 temperature=0,
                 max_tokens=1,
@@ -148,7 +179,8 @@ class FlashFill(div):
         df = df.mark()
 
         instruction_editor = mk.gui.Editor(
-            code="", title="Instruction Editor"  # Is this paper theoretical or empirical?",
+            code="",
+            title="Instruction Editor",  # Is this paper theoretical or empirical?",
         )
         example_template_editor = mk.gui.Editor(
             code="",  # "Abstract: {abstract}, Title: {title}; Answer: {answer}",
@@ -157,9 +189,13 @@ class FlashFill(div):
 
         example_template = example_template_editor.code
 
-        output_col = check_example_template(example_template=example_template, df=df)
+        output_col = check_example_template(example_template=example_template_editor.code, df=df)
 
-        df_view = update_df_with_example_template(df, example_template)
+        df_view, prompt = update_prompt(
+            df=df, 
+            template=example_template_editor.code, 
+            instruction=instruction_editor.code
+        )
 
         table = mk.gui.Table(
             df_view,
@@ -187,6 +223,13 @@ class FlashFill(div):
                 api=api_select.value,
             ),
         )
+        run_fn = run_manifest.partial(
+            instruct_cmd=instruction_editor.code,
+            output_col=output_col,
+            selected=table.selected,
+            api=api_select.value,
+        )
+
         formatted_output_col = format_output_col(output_col)
 
         overview_panel = mk.gui.html.flexcol(
@@ -201,7 +244,9 @@ class FlashFill(div):
                 ),
                 mk.gui.html.div(
                     [
-                        mk.gui.Text("Target column: ", classes="text-slate-600 text-sm"),
+                        mk.gui.Text(
+                            "Target column: ", classes="text-slate-600 text-sm"
+                        ),
                         mk.gui.Text(
                             formatted_output_col["text"],
                             classes=formatted_output_col["classes"],  # noqa: E501
@@ -235,4 +280,4 @@ class FlashFill(div):
                 mk.gui.html.div([table], classes="h-full w-screen"),
             ],
             classes="gap-4 h-screen grid grid-rows-[auto_1fr]",
-        )
+        ), prompt
