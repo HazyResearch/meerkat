@@ -47,10 +47,10 @@ class SliceBy(IdentifiableMixin):
             by = [by]
         self.by = by
 
-        # prepare the gui object
-        from meerkat.interactive.gui import SliceByGUI
+        # # prepare the gui object
+        # from meerkat.interactive.gui import SliceByGUI
 
-        self.gui = SliceByGUI(self)
+        # self.gui = SliceByGUI(self)
         self.slice = SliceIndexer(self)
 
     def __len__(self) -> int:
