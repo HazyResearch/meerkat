@@ -1,4 +1,5 @@
 import re
+
 import meerkat as mk
 
 
@@ -9,8 +10,9 @@ def complete(
     engine: str,
 ) -> mk.ScalarColumn:
     from manifest import Manifest
+
     # TODO: check if prompt ends with {.*} using a regex and extract the content
-    keys = re.findall(r'{(.*?)}', prompt)
+    keys = re.findall(r"{(.*?)}", prompt)
 
     manifest = Manifest(
         client_name=client_name,
@@ -21,8 +23,6 @@ def complete(
         cache_name="sqlite",
         cache_connection="/Users/sabrieyuboglu/.manifest/cache.sqlite",
     )
-
-
 
     def _run_manifest(rows: mk.DataFrame):
         out = manifest.run([prompt.format(**row) for row in rows.iterrows()])
@@ -35,7 +35,7 @@ def complete(
         is_batched_fn=True,
         batch_size=4,
         pbar=True,
-        materialize=False
+        materialize=False,
     )
 
     return output

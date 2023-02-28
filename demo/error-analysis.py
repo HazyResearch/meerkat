@@ -126,7 +126,7 @@ plot = mk.gui.plotly.ScatterPlot(
 
 
 def capture_state():
-    """Capture the state of the application at the time the"""
+    """Capture the state of the application at the time the."""
     return {
         "filter": filter.criteria.value,
         "sort": sort.criteria.value,

@@ -3,8 +3,8 @@ from .carousel import Carousel
 from .chat import Chat
 from .checkbox import Checkbox
 from .code import Code
-from .copy_button import CopyButton
 from .code_cell import CodeCell
+from .copy_button import CopyButton
 from .document import Document
 from .editor import Editor
 from .fileupload import FileUpload
@@ -42,7 +42,7 @@ __all__ = [
     "Checkbox",
     "Code",
     "CodeCell",
-    "CopyButton", 
+    "CopyButton",
     "Document",
     "Editor",
     "FileUpload",

@@ -1,6 +1,4 @@
 """Flash-fill."""
-import re
-from functools import partial
 
 from manifest import Manifest
 
@@ -15,8 +13,9 @@ manifest = Manifest(
     client_connection=open("/Users/sabrieyuboglu/.meerkat/keys/.openai").read(),
     engine="code-davinci-002",
     temperature=0,
-    max_tokens=1
+    max_tokens=1,
 )
+
 
 def complete_prompt(row, example_template: mk.Store[str]):
     assert isinstance(row, dict)
@@ -33,9 +32,7 @@ df["pdf"] = mk.files(
     df["url"], cache_dir="/Users/sabrieyuboglu/Downloads/pdf-cache", type="pdf"
 )
 
-df = df[
-    ["id", "authors", "title", "abstract", "pdf"]
-]
+df = df[["id", "authors", "title", "abstract", "pdf"]]
 df["answer"] = ""
 
 page = mk.gui.Page(
@@ -47,7 +44,7 @@ page = mk.gui.Page(
 page.launch()
 
 
-""" 
+"""
 Does this paper report empirical results on real-world datasets?
 
 Title: {title}
@@ -61,4 +58,3 @@ No
 Yes
 No
 """
-

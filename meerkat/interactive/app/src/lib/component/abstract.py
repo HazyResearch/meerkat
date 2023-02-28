@@ -533,18 +533,19 @@ class BaseComponent(
         return values
 
     def _get_ipython_height(self) -> str:
-        """
-        Return the height of the viewport used to render this component in the notebook.
-        Value will be pased to IPython.display.IFrame as the height argument.
-        
+        """Return the height of the viewport used to render this component in
+        the notebook. Value will be pased to IPython.display.IFrame as the
+        height argument.
+
         TODO: Figure out how to do this dynamically.
         """
         return "100%"
 
     def _ipython_display_(self):
 
-        from meerkat.interactive.page import Page
         from IPython.display import display
+
+        from meerkat.interactive.page import Page
 
         display(
             Page(

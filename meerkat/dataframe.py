@@ -1409,7 +1409,7 @@ class DataFrame(
     @reactive()
     def keys(self):
         return self.columns
-    
+
     def iterrows(self):
         for i in range(len(self)):
             yield self[i]

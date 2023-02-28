@@ -5,7 +5,7 @@ from .image import ImageFormatter, ImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
-from .tensor import TensorFormatterGroup, TensorFormatter
+from .tensor import TensorFormatter, TensorFormatterGroup
 from .text import TextFormatter, TextFormatterGroup
 
 __all__ = [
