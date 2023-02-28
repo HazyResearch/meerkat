@@ -164,7 +164,8 @@ class UploadCommand(Command):
         self.status("Building static components…")
         env = os.environ.copy()
         env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
-        shutil.rmtree("./meerkat/interactive/app/build")
+        if os.path.exists("./meerkat/interactive/app/build"):
+            shutil.rmtree("./meerkat/interactive/app/build")
         build_process = subprocess.run(
             "npm run build",
             env=env,
