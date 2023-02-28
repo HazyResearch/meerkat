@@ -115,7 +115,7 @@
 
 <!-- FIXME: Figure out how to do h-full -->
 <div
-	class={'flex-1 h-full w-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300 ' +
+	class={'flex-1 w-full bg-slate-100 grid grid-rows-[1fr_auto] rounded-b-md overflow-hidden border-slate-300 ' +
 		classes}
 >
 	<div class="auto-table table-fixed overflow-x-scroll text-sm h-full">

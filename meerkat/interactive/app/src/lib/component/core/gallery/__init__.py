@@ -17,8 +17,8 @@ class Gallery(Component):
         self,
         df: DataFrame,
         *,
-        main_column: str,
-        tag_columns: List[str] = [],
+        main_column: str = None,
+        tag_columns: List[str] = None,
         selected: List[int] = [],
         allow_selection: bool = False,
         cell_size: int = 24,
@@ -35,6 +35,11 @@ class Gallery(Component):
             allow_selection (bool, optional): Whether to allow the user to select \
                 rows. Defaults to False.
         """
+        if main_column is None:
+            main_column = df.columns[0]
+        
+        if tag_columns is None:
+            tag_columns = []
         super().__init__(
             df=df,
             main_column=main_column,
@@ -45,7 +50,7 @@ class Gallery(Component):
         )
 
     def _get_ipython_height(self):
-        return "1000px"
+        return "600px"
 
 
 register_placeholder(

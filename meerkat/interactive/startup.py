@@ -567,7 +567,7 @@ def start(
     api_server_name: str = LOCALHOST_NAME,
     api_port: int = API_PORT,
     frontend_port: int = FRONTEND_PORT,
-    dev: bool = True,
+    dev: bool = False,
     skip_build: bool = False,
 ) -> Tuple[APIInfo, FrontendInfo]:
     """Start a Meerkat interactive server.

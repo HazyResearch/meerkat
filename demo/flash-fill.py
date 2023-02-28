@@ -49,7 +49,7 @@ Does this paper report empirical results on real-world datasets?
 
 Title: {title}
 Abstract: {abstract}
-Answer: {answer}
+Answer: {is_empirical}
 
 Yes
 Yes

@@ -17,6 +17,7 @@
 		columns: [x, y],
 		variants: ['small']
 	}).then((chunk) => {
+		console.log(chunk.primaryKey)
 		return [
 			{
 				x: chunk.getColumn(x).data,

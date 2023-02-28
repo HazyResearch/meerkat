@@ -73,6 +73,7 @@ export class DataFrameChunk {
     getColumn(column: string) {
         let columnIdx = this.columns.indexOf(column);
         let columnInfo = this.columnInfos[columnIdx];
+        console.log(column)
         return {
             data: this.rows.map((row) => row[columnIdx]),
             cellComponent: columnInfo.cellComponent,

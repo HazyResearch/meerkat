@@ -7,8 +7,8 @@
 <section
 	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br border-b "
 >
-	<div class="container px-6 mx-auto pt-48 pb-32">
-		<div class="flex flex-col items-center justify-between md:flex-row">
+	<div class="container px-6 mx-auto pt-24">
+		<div class="flex flex-col items-center justify-between md:flex-row h-96">
 			<div class="max-w-xl mb-8 md:mb-0">
 				<h1 class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white">
 					Foundation Models meet Unstructured Data.
@@ -16,6 +16,9 @@
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
 					Meerkat is an open-source Python library, designed for technical teams to interactively wrangle unstructured data with foundation models.
 				</p>
+			</div>
+			<div class = "p-5 h-full">
+				<iframe src="https://youtube.com/embed/by50Nwfw1YY?modestbranding=1"  class="aspect-video h-full rounded-md shadow-lg"></iframe>
 			</div>
 			<!-- Insert Demo Video here -->
 		</div>

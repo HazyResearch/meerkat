@@ -1,18 +1,26 @@
 import re
+
 from functools import partial
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict
 
 from ...html import div
 
 if TYPE_CHECKING:
     from meerkat import Component, DataFrame
 
+
 class FlashFill(div):
+    """
+    A component for flash filling a column of data using large language models.
+
+    Args: 
+        df (DataFrame): The dataframe to flash fill.
+        target_column (str): The column to flash fill.
+    """
     def __init__(
         self,
         df: "DataFrame",
         target_column: str,
-        classes: str = "",
     ):
         df = df.view()
         if target_column not in df.columns:
@@ -21,7 +29,7 @@ class FlashFill(div):
         component, prompt = self._build_component(df)
         super().__init__(
             slots=[component],
-            classes=classes,
+            classes="h-full w-full",
         )
         self._prompt = prompt
 
@@ -183,8 +191,7 @@ class FlashFill(div):
         )
 
         table = mk.gui.Table(
-            df_view,
-            on_edit=on_edit.partial(df=df),
+            df_view, on_edit=on_edit.partial(df=df), classes="h-[400px]"
         )
 
         api_select = mk.gui.core.Select(
