@@ -73,65 +73,65 @@ File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:1145[0m, in [0;36mData
 [1;32m   1154[0m [43m        [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m,[49m
 [1;32m   1155[0m [43m    [49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:451[0m, in [0;36mmap[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)[0m
-[1;32m    339[0m [38;5;129m@docs[39m[38;5;241m.[39mdoc(source[38;5;241m=[39m_SHARED_DOCS_, data[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdata[39m[38;5;124m"[39m, name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdefer[39m[38;5;124m"[39m)
-[1;32m    340[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
-[1;32m    341[0m     data: Union[[38;5;124m"[39m[38;5;124mDataFrame[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mColumn[39m[38;5;124m"[39m],
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:471[0m, in [0;36mmap[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)[0m
+[1;32m    361[0m [38;5;129m@docs[39m[38;5;241m.[39mdoc(source[38;5;241m=[39m_SHARED_DOCS_, data[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdata[39m[38;5;124m"[39m, name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdefer[39m[38;5;124m"[39m)
+[1;32m    362[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
+[1;32m    363[0m     data: Union[[38;5;124m"[39m[38;5;124mDataFrame[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mColumn[39m[38;5;124m"[39m],
 [0;32m   (...)[0m
-[1;32m    353[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
-[1;32m    354[0m ):
-[1;32m    355[0m [38;5;250m    [39m[38;5;124;03m"""Create a new :class:`Column` or :class:`DataFrame` by applying a[39;00m
-[1;32m    356[0m [38;5;124;03m    function to each row in ${data}.[39;00m
-[1;32m    357[0m 
+[1;32m    375[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m    376[0m ):
+[1;32m    377[0m [38;5;250m    [39m[38;5;124;03m"""Create a new :class:`Column` or :class:`DataFrame` by applying a[39;00m
+[1;32m    378[0m [38;5;124;03m    function to each row in ${data}.[39;00m
+[1;32m    379[0m 
 [0;32m   (...)[0m
-[1;32m    448[0m [38;5;124;03m        df["ma_eligible"][39;00m
-[1;32m    449[0m [38;5;124;03m    """[39;00m
-[0;32m--> 451[0m     deferred [38;5;241m=[39m [43mdefer[49m[43m([49m
-[1;32m    452[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[43mdata[49m[43m,[49m
-[1;32m    453[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
-[1;32m    454[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
-[1;32m    455[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
-[1;32m    456[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
-[1;32m    457[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
-[1;32m    458[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
-[1;32m    459[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
-[1;32m    460[0m [43m    [49m[43m)[49m
-[1;32m    461[0m     [38;5;28;01mreturn[39;00m _materialize(
-[1;32m    462[0m         deferred,
-[1;32m    463[0m         batch_size[38;5;241m=[39mbatch_size,
+[1;32m    468[0m [38;5;124;03m        df["ma_eligible"][39;00m
+[1;32m    469[0m [38;5;124;03m    """[39;00m
+[0;32m--> 471[0m     deferred [38;5;241m=[39m [43mdefer[49m[43m([49m
+[1;32m    472[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[43mdata[49m[43m,[49m
+[1;32m    473[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
+[1;32m    474[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
+[1;32m    475[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
+[1;32m    476[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
+[1;32m    477[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
+[1;32m    478[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
+[1;32m    479[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
+[1;32m    480[0m [43m    [49m[43m)[49m
+[1;32m    481[0m     [38;5;28;01mreturn[39;00m _materialize(
+[1;32m    482[0m         deferred,
+[1;32m    483[0m         batch_size[38;5;241m=[39mbatch_size,
 [0;32m   (...)[0m
-[1;32m    467[0m         blocks_per_window[38;5;241m=[39mblocks_per_window,
-[1;32m    468[0m     )
+[1;32m    487[0m         blocks_per_window[38;5;241m=[39mblocks_per_window,
+[1;32m    488[0m     )
 
-File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:329[0m, in [0;36mdefer[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)[0m
-[1;32m    324[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
-[1;32m    325[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
-[1;32m    326[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
-[1;32m    327[0m     )
-[1;32m    328[0m [38;5;28;01mreturn[39;00m DataFrame(
-[0;32m--> 329[0m     {
-[1;32m    330[0m         col: DeferredColumn(
-[1;32m    331[0m             data[38;5;241m=[39mBlockView(block_index[38;5;241m=[39moutput_key, block[38;5;241m=[39mblock),
-[1;32m    332[0m             output_type[38;5;241m=[39moutput_type[output_key],
-[1;32m    333[0m         )
-[1;32m    334[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
-[1;32m    335[0m     }
-[1;32m    336[0m )
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:351[0m, in [0;36mdefer[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)[0m
+[1;32m    346[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
+[1;32m    347[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    348[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
+[1;32m    349[0m     )
+[1;32m    350[0m [38;5;28;01mreturn[39;00m DataFrame(
+[0;32m--> 351[0m     {
+[1;32m    352[0m         col: DeferredColumn(
+[1;32m    353[0m             data[38;5;241m=[39mBlockView(block_index[38;5;241m=[39moutput_key, block[38;5;241m=[39mblock),
+[1;32m    354[0m             output_type[38;5;241m=[39moutput_type[output_key],
+[1;32m    355[0m         )
+[1;32m    356[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
+[1;32m    357[0m     }
+[1;32m    358[0m )
 
-File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:330[0m, in [0;36m<dictcomp>[0;34m(.0)[0m
-[1;32m    324[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
-[1;32m    325[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
-[1;32m    326[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
-[1;32m    327[0m     )
-[1;32m    328[0m [38;5;28;01mreturn[39;00m DataFrame(
-[1;32m    329[0m     {
-[0;32m--> 330[0m         col: [43mDeferredColumn[49m[43m([49m
-[1;32m    331[0m [43m            [49m[43mdata[49m[38;5;241;43m=[39;49m[43mBlockView[49m[43m([49m[43mblock_index[49m[38;5;241;43m=[39;49m[43moutput_key[49m[43m,[49m[43m [49m[43mblock[49m[38;5;241;43m=[39;49m[43mblock[49m[43m)[49m[43m,[49m
-[1;32m    332[0m [43m            [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m[[49m[43moutput_key[49m[43m][49m[43m,[49m
-[1;32m    333[0m [43m        [49m[43m)[49m
-[1;32m    334[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
-[1;32m    335[0m     }
-[1;32m    336[0m )
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:352[0m, in [0;36m<dictcomp>[0;34m(.0)[0m
+[1;32m    346[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
+[1;32m    347[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    348[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
+[1;32m    349[0m     )
+[1;32m    350[0m [38;5;28;01mreturn[39;00m DataFrame(
+[1;32m    351[0m     {
+[0;32m--> 352[0m         col: [43mDeferredColumn[49m[43m([49m
+[1;32m    353[0m [43m            [49m[43mdata[49m[38;5;241;43m=[39;49m[43mBlockView[49m[43m([49m[43mblock_index[49m[38;5;241;43m=[39;49m[43moutput_key[49m[43m,[49m[43m [49m[43mblock[49m[38;5;241;43m=[39;49m[43mblock[49m[43m)[49m[43m,[49m
+[1;32m    354[0m [43m            [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m[[49m[43moutput_key[49m[43m][49m[43m,[49m
+[1;32m    355[0m [43m        [49m[43m)[49m
+[1;32m    356[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
+[1;32m    357[0m     }
+[1;32m    358[0m )
 
 File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:59[0m, in [0;36mDeferredColumn.__init__[0;34m(self, data, output_type, *args, **kwargs)[0m
 [1;32m     51[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m(

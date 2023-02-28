@@ -711,6 +711,28 @@ title="Open an issue"
 <span class="sd">            Defaults to True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
     <span class="p">),</span>
+    <span class="s2">&quot;use_ray&quot;</span><span class="p">:</span> <span class="n">docs</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        use_ray (bool): Use Ray to parallelize the computation. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;num_blocks&quot;</span><span class="p">:</span> <span class="n">docs</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        num_blocks (int): When using Ray, the number of blocks to split the data into. </span>
+<span class="sd">            Defaults to 100.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;blocks_per_window&quot;</span><span class="p">:</span> <span class="n">docs</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        blocks_per_window (int): When using Ray, the number of blocks to process in a</span>
+<span class="sd">            single Ray task. Defaults to 10.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;pbar&quot;</span><span class="p">:</span> <span class="n">docs</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        pbar (bool): Show a progress bar. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>     
+    <span class="p">),</span>
 <span class="p">}</span>
 
 
@@ -1026,9 +1048,7 @@ title="Open an issue"
 <span class="sd">        pbar (bool): Show a progress bar. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Union[DataFrame, DeferredColumn]: A :class:`DeferredColumn` or a</span>
-<span class="sd">            :class:`DataFrame` containing :class:`DeferredColumn` representing the</span>
-<span class="sd">            deferred map.</span>
+<span class="sd">        Union[DataFrame, Column]: A :class:`Column` or a :class:`DataFrame`.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    ---------</span>
