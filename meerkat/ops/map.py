@@ -91,6 +91,28 @@ _SHARED_DOCS_ = {
             Defaults to True.
         """
     ),
+    "use_ray": docs.Arg(
+        """ 
+        use_ray (bool): Use Ray to parallelize the computation. Defaults to False.
+        """
+    ),
+    "num_blocks": docs.Arg(
+        """
+        num_blocks (int): When using Ray, the number of blocks to split the data into. 
+            Defaults to 100.
+        """
+    ),
+    "blocks_per_window": docs.Arg(
+        """
+        blocks_per_window (int): When using Ray, the number of blocks to process in a
+            single Ray task. Defaults to 10.
+        """
+    ),
+    "pbar": docs.Arg(
+        """
+        pbar (bool): Show a progress bar. Defaults to False.
+        """     
+    ),
 }
 
 
@@ -406,9 +428,7 @@ def map(
         pbar (bool): Show a progress bar. Defaults to False.
 
     Returns:
-        Union[DataFrame, DeferredColumn]: A :class:`DeferredColumn` or a
-            :class:`DataFrame` containing :class:`DeferredColumn` representing the
-            deferred map.
+        Union[DataFrame, Column]: A :class:`Column` or a :class:`DataFrame`.
 
     Examples
     ---------

@@ -8,26 +8,6 @@ from ...html import div
 if TYPE_CHECKING:
     from meerkat import DataFrame, Component
 
-def _check_prompt_ends_with_column(prompt: str, columns: List[str]=None) -> str:
-    # Define the regular expression pattern
-    pattern = r"\{([^}]+)\}$"
-
-    # Use re.search to find the match in the example_template string
-    match = re.search(pattern, prompt)
-
-    if match:
-        # Extract the content between the curly braces using the group() method
-        content = match.group(1)
-
-        if columns is not None and content not in columns:
-            raise ValueError(
-                f"The column '{content}' does not exist in the dataframe."
-            )
-    else:
-        return None
-        # raise ValueError("The example template must end with '{column_name}'")
-    return content
-
 class FlashFill(div):
     def __init__(
         self,
@@ -48,8 +28,11 @@ class FlashFill(div):
 
     @property
     def prompt(self):
+        pattern = r"^((.|\n)*)\{([^}]+)\}$"
 
-        return 
+        # Use re.search to find the match in the example_template string
+        match = re.search(pattern, self._prompt.value)
+        return match.group(1)
 
     def _get_ipython_height(self):
         return "600px"
