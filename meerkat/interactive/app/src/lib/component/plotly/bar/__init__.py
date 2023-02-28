@@ -20,6 +20,8 @@ class BarPlot(Component):
         title: str = "",
         on_click: EndpointProperty = None,
     ):
+        if len(df[x].unique()) != len(df):
+            df = df.groupby(x)[[x, y]].mean()
         super().__init__(df=df, x=x, y=y, on_click=on_click, title=title)
 
     @classproperty
