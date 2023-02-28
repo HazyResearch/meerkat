@@ -1,13 +1,8 @@
-from typing import Callable, Dict, List, Union
+from typing import List
 
 from IPython.display import IFrame
 
 import meerkat as mk
-from meerkat.interactive.app.src.lib.component.core.slicebycards import SliceByCards
-from meerkat.mixins.identifiable import IdentifiableMixin
-from meerkat.ops.sliceby.sliceby import SliceBy
-
-from . import Page
 
 
 class GUI:

@@ -14,7 +14,7 @@ torch = LazyLoader("torch")
 def config(page: Page):
     return jsonable_encoder(
         # TODO: we should not be doing anything except page.frontend
-        # here. This is a temp workaround to avoid getting an 
+        # here. This is a temp workaround to avoid getting an
         # exception in the notebook.
         page.frontend if isinstance(page, Page) else page,
         custom_encoder={

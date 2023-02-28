@@ -5,9 +5,6 @@ IMAGE_COL = "img"
 LABEL_COL = "label"
 
 
-# df.mark()
-
-
 @mk.reactive()
 def random_images(df: mk.DataFrame):
     images = df.sample(16)[IMAGE_COL]
@@ -33,9 +30,12 @@ filtered_df = mk.reactive(lambda df, label: df[df[LABEL_COL] == label])(
 
 images = random_images(filtered_df)
 
-# This won't work with a simple reactive fn like a random_images that only has df.sample
+# This won't work with a simple reactive fn like a random_images
+# that only has df.sample
 # as the encoding needs to be done in the reactive fn
-# grid = mk.gui.html.gridcols2([mk.gui.Image(data=images.formatters["base"].encode(img)) for img in images])
+# grid = mk.gui.html.gridcols2([
+#   mk.gui.Image(data=images.formatters["base"].encode(img)) for img in images
+# ])
 
 # Basic layout
 # grid = mk.gui.html.gridcols2([mk.gui.Image(data=img) for img in images])

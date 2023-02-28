@@ -43,6 +43,6 @@ class ScatterPlot(Component):
     @classproperty
     def namespace(cls):
         return "plotly"
-    
+
     def _get_ipython_height(self):
         return "400px"

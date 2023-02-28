@@ -6,8 +6,8 @@ from meerkat.interactive.app.src.lib.component.core.markdown import Caption
 from meerkat.interactive.app.src.lib.component.core.match import Match
 from meerkat.interactive.graph.magic import magic
 from meerkat.interactive.graph.reactivity import reactive
-from meerkat.ops.cond import cor
 from meerkat.ops.cond import _bool as mkbool
+from meerkat.ops.cond import cor
 
 from ...html import div, flex, flexcol
 
@@ -39,6 +39,7 @@ def _build_component(
     against: str,
 ) -> "Component":
     from meerkat.ops.sort import sort
+
     match = Match(
         df=df,
         against=against,

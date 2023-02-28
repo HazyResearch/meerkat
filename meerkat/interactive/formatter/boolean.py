@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from ..app.src.lib.component.core.checkbox import Checkbox
 from .base import Formatter, FormatterGroup
 from .icon import IconFormatter
@@ -18,6 +19,7 @@ class BooleanFormatter(Formatter):
         if hasattr(cell, "as_py"):
             return cell.as_py()
         return str(cell)
+
 
 class BooleanFormatterGroup(FormatterGroup):
     def __init__(self):

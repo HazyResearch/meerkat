@@ -2,11 +2,10 @@ import re
 from functools import partial
 from typing import TYPE_CHECKING, Dict, List
 
-
 from ...html import div
 
 if TYPE_CHECKING:
-    from meerkat import DataFrame, Component
+    from meerkat import Component, DataFrame
 
 class FlashFill(div):
     def __init__(
@@ -38,8 +37,9 @@ class FlashFill(div):
         return "600px"
 
     def _build_component(self, df: "DataFrame") -> "Component":
-        import meerkat as mk
         from manifest import Manifest
+
+        import meerkat as mk
 
         def complete_prompt(row: Dict[str, any], example_template: mk.Store[str]):
             assert isinstance(row, dict)
@@ -56,7 +56,7 @@ class FlashFill(div):
             else:
                 return {
                     "text": output_col,
-                    "classes": "font-mono font-bold bg-slate-200 rounded-md px-2 text-violet-600 w-fit",
+                    "classes": "font-mono font-bold bg-slate-200 rounded-md px-2 text-violet-600 w-fit",  # noqa: E501
                 }
 
         @mk.endpoint
@@ -66,7 +66,9 @@ class FlashFill(div):
             df.loc[keyidx, column] = value
 
         @mk.reactive(nested_return=True)
-        def update_prompt(df: mk.DataFrame, template: mk.Store[str], instruction: mk.Store[str]):
+        def update_prompt(
+            df: mk.DataFrame, template: mk.Store[str], instruction: mk.Store[str]
+        ):
             """Update the df with the new prompt template.
 
             This is as simple as returning a view.
@@ -83,13 +85,13 @@ class FlashFill(div):
             train_df = df[df["is_train"]]
             in_context_examples = "\n".join(train_df["example"]())
             prompt = f"{instruction} {in_context_examples} {template}"
-            return df, prompt 
+            return df, prompt
 
         @mk.reactive()
         def check_example_template(example_template: str, df: mk.DataFrame):
             example_template = example_template.strip()
-            # check if example_template ends with {.*} using a regex and extract the content
-            # between the brackets
+            # check if example_template ends with {.*} using a
+            # regex and extract the content between the brackets.
             # Define the regular expression pattern
             pattern = r"\{([^}]+)\}$"
 
@@ -170,14 +172,14 @@ class FlashFill(div):
             title="Training Template Editor",
         )
 
-        example_template = example_template_editor.code
-
-        output_col = check_example_template(example_template=example_template_editor.code, df=df)
+        output_col = check_example_template(
+            example_template=example_template_editor.code, df=df
+        )
 
         df_view, prompt = update_prompt(
-            df=df, 
-            template=example_template_editor.code, 
-            instruction=instruction_editor.code
+            df=df,
+            template=example_template_editor.code,
+            instruction=instruction_editor.code,
         )
 
         table = mk.gui.Table(
@@ -206,7 +208,7 @@ class FlashFill(div):
                 api=api_select.value,
             ),
         )
-        run_fn = run_manifest.partial(
+        run_fn = run_manifest.partial(  # noqa: F841
             instruct_cmd=instruction_editor.code,
             output_col=output_col,
             selected=table.selected,
@@ -222,7 +224,8 @@ class FlashFill(div):
                     classes="font-bold text-slate-600 text-sm",
                 ),
                 mk.gui.Text(
-                    "Specify the instruction and a template for in-context train examples.",
+                    "Specify the instruction and a template for "
+                    "in-context train examples.",
                     classes="text-slate-600 text-sm",
                 ),
                 mk.gui.html.div(
@@ -254,13 +257,16 @@ class FlashFill(div):
             ],
             classes="flex-1 gap-1",
         )
-        return mk.gui.html.div(
-            [
-                mk.gui.html.grid(
-                    [overview_panel, prompt_editor],
-                    classes="grid grid-cols-[1fr_3fr] space-x-5",
-                ),
-                mk.gui.html.div([table], classes="h-full w-screen"),
-            ],
-            classes="gap-4 h-screen grid grid-rows-[auto_1fr]",
-        ), prompt
+        return (
+            mk.gui.html.div(
+                [
+                    mk.gui.html.grid(
+                        [overview_panel, prompt_editor],
+                        classes="grid grid-cols-[1fr_3fr] space-x-5",
+                    ),
+                    mk.gui.html.div([table], classes="h-full w-screen"),
+                ],
+                classes="gap-4 h-screen grid grid-rows-[auto_1fr]",
+            ),
+            prompt,
+        )

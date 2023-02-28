@@ -210,8 +210,8 @@ class NumPyTensorColumn(
 
     def _get_default_formatters(self):
         from meerkat.interactive.formatter import (
-            TensorFormatterGroup,
             NumberFormatterGroup,
+            TensorFormatterGroup,
             TextFormatterGroup,
         )
 

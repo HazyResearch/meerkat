@@ -33,7 +33,8 @@ class NumberInput(Component):
         on_blur: Optional[Endpoint[OnBlurNumberInput]] = None,
         on_keyenter: Optional[Endpoint[OnKeyEnterNumberInput]] = None,
     ):
-        """An input field that can be used to get a numeric input from the user.
+        """An input field that can be used to get a numeric input from the
+        user.
 
         Attributes:
             value: The value in the input field.

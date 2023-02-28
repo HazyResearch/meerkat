@@ -7,13 +7,12 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 
 # Data loading.
 imagenette = mk.get("imagenette", version="160px")
-# df = mk.DataFrame.read(
-#     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",
-#     overwrite=False,
-# )
-df = mk.DataFrame.read("~/Downloads/imagenette-remapped.mk")
+df = mk.DataFrame.read(
+    "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",  # noqa: E501
+    overwrite=False,
+)
+# df = mk.DataFrame.read("~/Downloads/imagenette-remapped.mk")
 df = imagenette.merge(df[["img_id", "logits", "pred"]], on="img_id")
-breakpoint()
 # Download precomupted CLIP embeddings for imagenette.
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
@@ -23,10 +22,6 @@ df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
 df["correct"] = df.map(lambda label, pred: label in pred, batch_size=len(df), pbar=True)
 df.create_primary_key(column="pkey")
-breakpoint()
-# df["logits"] = df["logits"].data[:, 0, :]
-
-# breakpoint()
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
@@ -131,7 +126,7 @@ plot = mk.gui.plotly.ScatterPlot(
 
 
 def capture_state():
-    """Capture the state of the application at the time the"""
+    """Capture the state of the application at the time the."""
     return {
         "filter": filter.criteria.value,
         "sort": sort.criteria.value,
