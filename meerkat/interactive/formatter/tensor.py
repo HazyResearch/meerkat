@@ -1,12 +1,14 @@
 from typing import Any
 
-from .base import FormatterGroup, Formatter
-from .icon import IconFormatter
 from meerkat.interactive.app.src.lib.component.core.tensor import Tensor
+
+from .base import Formatter, FormatterGroup
+from .icon import IconFormatter
 
 
 class TensorFormatter(Formatter):
     """Formatter for an embedding."""
+
     component_class: type = Tensor
 
     def encode(self, cell: Any):

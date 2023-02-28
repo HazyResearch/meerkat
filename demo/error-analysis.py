@@ -13,7 +13,7 @@ imagenette = mk.get("imagenette", version="160px")
 # )
 df = mk.DataFrame.read("~/Downloads/imagenette-remapped.mk")
 df = imagenette.merge(df[["img_id", "logits", "pred"]], on="img_id")
-
+breakpoint()
 # Download precomupted CLIP embeddings for imagenette.
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
@@ -23,6 +23,10 @@ df_clip = df_clip[["img_id", "img_clip"]]
 df = df.merge(df_clip, on="img_id")
 df["correct"] = df.map(lambda label, pred: label in pred, batch_size=len(df), pbar=True)
 df.create_primary_key(column="pkey")
+breakpoint()
+# df["logits"] = df["logits"].data[:, 0, :]
+
+# breakpoint()
 
 IMAGE_COLUMN = "img"
 EMBED_COLUMN = "img_clip"
@@ -33,12 +37,16 @@ df.mark()
 @mk.endpoint()
 def add_match_criterion_to_sort(criterion, sort_criteria: mk.Store[List]):
     # make a copy of the sort criteria.
+    criteria = sort_criteria
     if criterion.name is None:
         return
+    sort_criteria = [
+        criterion for criterion in sort_criteria if criterion.source != "match"
+    ]
     sort_criteria.insert(
         0, mk.gui.Sort.create_criterion(criterion.name, ascending=False, source="match")
     )
-    sort_criteria.set(sort_criteria)
+    criteria.set(sort_criteria)
 
 
 sort = mk.gui.Sort(df)
@@ -68,14 +76,14 @@ select_y = mk.gui.core.Select(values=get_options(df), value="pred")
 select_hue = mk.gui.core.Select(values=get_options(df), value="correct")
 select_container = html.div(
     [
-        html.div("x", classes="self-center"),
+        html.div("x", classes="self-center font-mono"),
         select_x,
-        html.div("y", classes="self-center"),
+        html.div("y", classes="self-center font-mono"),
         select_y,
-        html.div("hue", classes="self-center"),
+        html.div("hue", classes="self-center font-mono"),
         select_hue,
     ],
-    classes="flex flex-row justify-center gap-4",
+    classes="w-full flex flex-row justify-center gap-4",
 )
 
 
@@ -232,7 +240,7 @@ component = html.div(
                     classes="bg-slate-100 px-1 py-2 gap-y-4 rounded-lg w-full h-fit",
                 ),
             ],
-            classes="grid grid-rows-[auto,auto,auto,auto,3fr,auto] h-full",
+            classes="grid grid-rows-[auto_auto_auto_auto_5fr_3fr] h-full",
         ),
         gallery,
     ],
