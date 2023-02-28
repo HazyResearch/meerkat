@@ -6,7 +6,7 @@ This set of pages will discuss what endpoints are, how to use them, and how to w
 
 (guide_endpoints_getting_started)=
 
-# Getting Started with Endpoints
+## Getting Started with Endpoints
 
 Endpoints in Meerkat allow users to define functions that
 
