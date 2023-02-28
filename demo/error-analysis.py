@@ -7,12 +7,14 @@ from meerkat.interactive.app.src.lib.component.core.filter import FilterCriterio
 
 # Data loading.
 imagenette = mk.get("imagenette", version="160px")
+imagenette = imagenette[["img_id", "path", "img", "label", "index"]]
 df = mk.DataFrame.read(
     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/imagenette-160px-facebook-convnext-tiny-224.mk.tar.gz",  # noqa: E501
     overwrite=False,
 )
 # df = mk.DataFrame.read("~/Downloads/imagenette-remapped.mk")
 df = imagenette.merge(df[["img_id", "logits", "pred"]], on="img_id")
+df["logits"] = df["logits"].data
 # Download precomupted CLIP embeddings for imagenette.
 df_clip = mk.DataFrame.read(
     "https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz",  # noqa: E501
