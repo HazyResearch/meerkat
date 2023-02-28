@@ -1,0 +1,1216 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>I/O &#8212; 🔮 v0.2.6a14</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Advanced" href="advanced/index.html" />
+    <link rel="prev" title="Grouping: groupby and clusterby" href="ops/grouping.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a14</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting Started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../start/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../start/quickstart-df.html">
+   Quickstart: Data Frames
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../start/quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../start/tutorials/index.html">
+   Tutorials
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-1.html">
+     Tutorial 1: Image Gallery
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-filter-sort.html">
+     Tutorial: Filter &amp; Sort
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-simple-counter.html">
+     Tutorial: A Simple Counter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-simple-dataframe-viewer.html">
+     A Simple DataFrame Viewer
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="index.html">
+   DataFrame
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="column/index.html">
+     Column
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="ops/index.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../interactive/index.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/running-meerkat-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/reactive-functions/index.html">
+     Reactive Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/stores/index.html">
+     Stores
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/components/index.html">
+     Components
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/endpoints/index.html">
+     Endpoints
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../interactive/formatters/index.html">
+     Formatters
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../interactive/advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../interactive/advanced/sharing.html">
+       Sharing
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../interactive/advanced/under-the-hood.html">
+       Under the Hood
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../advanced/magic-contexts/index.html">
+   Magic Contexts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../advanced/magic-contexts/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../advanced/configuring.html">
+   Configuring Meerkat
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Ecosystem
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../datasets/index.html">
+   Datasets
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../datasets/contributing-datasets.html">
+     Contributing Datasets
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../examples/index.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../examples/meerkat-in-5-minutes.html">
+     Meerkat in 5 Minutes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../examples/image-search.html">
+     Building image search
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/columns.html">
+     Columns
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/ops.html">
+     Operations
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/user-guide/dataframe/io.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/user-guide/dataframe/io.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fuser-guide/dataframe/io.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/user-guide/dataframe/io.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/user-guide/dataframe/io.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../_sources/user-guide/dataframe/io.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-dataframes">
+   Importing DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-importing-a-dataset-from-csv">
+     <em>
+      Example
+     </em>
+     : Importing a dataset from CSV
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#importing-from-storage-formats">
+     Importing from storage formats
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#importing-from-other-libraries">
+     Importing from other libraries
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exporting-dataframes">
+   Exporting DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exporting-to-storage-formats">
+     Exporting to storage formats
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exporting-to-other-libraries">
+     Exporting to other libraries
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#persisting-dataframes">
+   Persisting DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#writing-dataframes">
+     Writing DataFrames
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reading-dataframes">
+     Reading DataFrames
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>I/O</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#importing-dataframes">
+   Importing DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-importing-a-dataset-from-csv">
+     <em>
+      Example
+     </em>
+     : Importing a dataset from CSV
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#importing-from-storage-formats">
+     Importing from storage formats
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#importing-from-other-libraries">
+     Importing from other libraries
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#exporting-dataframes">
+   Exporting DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exporting-to-storage-formats">
+     Exporting to storage formats
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#exporting-to-other-libraries">
+     Exporting to other libraries
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#persisting-dataframes">
+   Persisting DataFrames
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#writing-dataframes">
+     Writing DataFrames
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reading-dataframes">
+     Reading DataFrames
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="i-o">
+<span id="guide-dataframe-io"></span><h1>I/O<a class="headerlink" href="#i-o" title="Permalink to this headline">¶</a></h1>
+<p>In this guide, we will discuss how to bring data into Meerkat from various file formats and external libraries.  We will also discuss how to export data in Meerkat DataFrames back into these formats. Finally, we’ll also discuss how to persist Meerkat DataFrames using <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> and <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.read" title="meerkat.DataFrame.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a>.</p>
+<div class="admonition-should-i-export-or-persist admonition">
+<p class="admonition-title">Should I export or persist?</p>
+<p>This guide discusses two different ways of saving data in Meerkat: exporting and persisting.
+They serve different purposes:</p>
+<ol class="arabic simple">
+<li><p><strong>Export</strong> your DataFrame to another format using one of the <code class="docutils literal notranslate"><span class="pre">to_*</span></code> methods if you need to use the data with other libraries or tools. (See the section on <a class="reference internal" href="#exporting"><span class="std std-ref">Exporting DataFrames</span></a>.)</p></li>
+<li><p><strong>Persist</strong> your DataFrame using <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> if you simply want to save it to disk for later use. (See the section on <a class="reference internal" href="#persisting"><span class="std std-ref">Persisting DataFrames</span></a>.)</p></li>
+</ol>
+</div>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#importing-dataframes" id="id2">Importing DataFrames</a></p>
+<ul>
+<li><p><a class="reference internal" href="#example-importing-a-dataset-from-csv" id="id3"><em>Example</em>: Importing a dataset from CSV</a></p></li>
+<li><p><a class="reference internal" href="#importing-from-storage-formats" id="id4">Importing from storage formats</a></p></li>
+<li><p><a class="reference internal" href="#importing-from-other-libraries" id="id5">Importing from other libraries</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#exporting-dataframes" id="id6">Exporting DataFrames</a></p>
+<ul>
+<li><p><a class="reference internal" href="#exporting-to-storage-formats" id="id7">Exporting to storage formats</a></p></li>
+<li><p><a class="reference internal" href="#exporting-to-other-libraries" id="id8">Exporting to other libraries</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#persisting-dataframes" id="id9">Persisting DataFrames</a></p>
+<ul>
+<li><p><a class="reference internal" href="#writing-dataframes" id="id10">Writing DataFrames</a></p></li>
+<li><p><a class="reference internal" href="#reading-dataframes" id="id11">Reading DataFrames</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="importing-dataframes">
+<h2><a class="toc-backref" href="#id2">Importing DataFrames</a><a class="headerlink" href="#importing-dataframes" title="Permalink to this headline">¶</a></h2>
+<p>Meerkat has a number of built-in functions for reading in data from various file formats and Python libraries.
+We’ll provide one in depth example for reading in data from a CSV file, and then provide a list of the other supported file formats and libraries.</p>
+<section id="example-importing-a-dataset-from-csv">
+<h3><a class="toc-backref" href="#id3"><em>Example</em>: Importing a dataset from CSV</a><a class="headerlink" href="#example-importing-a-dataset-from-csv" title="Permalink to this headline">¶</a></h3>
+<p>Let’s load a CSV file from disk and read it into a Meerkat DataFrame.
+We will be using a small sample of data from the <a class="reference external" href="https://github.com/NationalGalleryOfArt/opendata">National Gallery of Art Open Data Program</a>. We’ve included this data at <code class="docutils literal notranslate"><span class="pre">_data/art_ngoa.csv</span></code> in the Meerkat repository.</p>
+<p>We will use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_csv" title="meerkat.from_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_csv()</span></code></a> function to read in the data.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Frontend is not initialized. Running `<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">mk.gui.start</span><span style="font-weight: bold">()</span>`.
+</pre>
+</div><div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Table123f004d-3275-42b1-bd96-7456a6fd7548"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>Notice that each row corresponds to a single work of art, and each column corresponds to a different attribute of the work of art.</p>
+<p><strong>Representing images.</strong> The last column, <code class="docutils literal notranslate"><span class="pre">iiifthumburl</span></code>, contains a URL to a thumbnail image of the work.
+Using <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.image" title="meerkat.image"><code class="xref py py-func docutils literal notranslate"><span class="pre">image()</span></code></a>, we can download the thumbnail image and display it in the DataFrame.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;iiifthumburl&quot;</span><span class="p">],</span> <span class="n">downloader</span><span class="o">=</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;attribution&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Table79a3e929-247e-4aa2-b42c-5155c11d4792"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">mk.image</span></code> creates a <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.ImageColumn" title="meerkat.ImageColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageColumn</span></code></a> which defers the downloading of images from the URLs until the data is needed.</p>
+<div class="admonition-deferred-columns admonition">
+<p class="admonition-title">Deferred Columns</p>
+<p>If you’re wondering how <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.ImageColumn" title="meerkat.ImageColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageColumn</span></code></a> works, check out the guide on <a class="reference internal" href="column/deferred.html"><span class="doc">Deferred Columns</span></a>.</p>
+</div>
+<p><strong>Adding a primary key.</strong> The <code class="docutils literal notranslate"><span class="pre">objectid</span></code> column contains a unique identifier for each work of art. We can use <code class="xref py py-func docutils literal notranslate"><span class="pre">set_primary_key()</span></code> to set this column as the primary key for the DataFrame, which allows us to perform key-based indexing on the DataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_primary_key</span><span class="p">(</span><span class="s2">&quot;objectid&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">221224</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;title&#39;: &#39;Dispatch No. 4: THREE VALLEYS. The Valleys of Silicon, San Joaquin, and Death&#39;,
+ &#39;attribution&#39;: &#39;Alec Soth&#39;,
+ &#39;medium&#39;: &#39;inkjet print and 48 page newsprint booklet in portfolio case&#39;,
+ &#39;objectid&#39;: 221224,
+ &#39;iiifthumburl&#39;: &#39;https://api.nga.gov/iiif/29e05dbf-f0e3-4088-9ffe-83d4ca8c1968/full/!200,200/0/default.jpg&#39;,
+ &#39;image&#39;: FileCell(fn=&lt;meerkat.columns.deferred.file.FileLoader object at 0x7f96f1255850&gt;)}
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_csv" title="meerkat.from_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_csv()</span></code></a> function has a utility parameter <code class="docutils literal notranslate"><span class="pre">primary_key</span></code> which can be used to set the primary key when the DataFrame is created.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mk</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa.csv&quot;</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="s2">&quot;objectid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Tabledd4b3101-5e0f-4668-bf17-3bcaa1af7ae8"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<div class="admonition-primary-keys admonition">
+<p class="admonition-title">Primary Keys</p>
+<p>To learn more about primary keys and key-based indexing, check out the section <a class="reference internal" href="selection.html#key-based-selection"><span class="std std-ref">Selecting Rows by Key</span></a>.</p>
+</div>
+</section>
+<section id="importing-from-storage-formats">
+<h3><a class="toc-backref" href="#id4">Importing from storage formats</a><a class="headerlink" href="#importing-from-storage-formats" title="Permalink to this headline">¶</a></h3>
+<p>Meerkat supports importing data from a number of other file formats. As in the example above, you may need to set the primary key and/or add additional columns for complex data (<em>e.g.</em> images, audio).</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_csv" title="meerkat.from_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_csv()</span></code></a>: Reads in data from a CSV (comma-separated values) file. CSV files are a common format for storing tabular data.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_feather" title="meerkat.from_feather"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_feather()</span></code></a>: Reads in data from a <a class="reference external" href="https://arrow.apache.org/docs/python/feather.html">Feather file</a>. Feather is a language-agnostic file format for storing DataFrames. It can provide significantly faster I/O than CSV.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_parquet" title="meerkat.from_parquet"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_parquet()</span></code></a>: Reads in data from a <a class="reference external" href="https://parquet.apache.org/">Parquet file</a>. Parquet is a columnar storage format that is designed for efficiency.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_json" title="meerkat.from_json"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_json()</span></code></a>: Reads in data from a JSON file.</p></li>
+</ul>
+<p>If your data is in a format not listed here, load it into a Pandas DataFrame and use <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_pandas" title="meerkat.from_pandas"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_pandas()</span></code></a> to convert it to a Meerkat DataFrame.</p>
+</section>
+<section id="importing-from-other-libraries">
+<h3><a class="toc-backref" href="#id5">Importing from other libraries</a><a class="headerlink" href="#importing-from-other-libraries" title="Permalink to this headline">¶</a></h3>
+<p>It’s also posible to import data from third-party Python libraries like <a class="reference external" href="https://pandas.pydata.org/">Pandas</a> and <a class="reference external" href="https://huggingface.co/datasets">HuggingFace Datasets</a>.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_pandas" title="meerkat.from_pandas"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_pandas()</span></code></a>: Converts a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas DataFrame</a> to a Meerkat DataFrame. By default, the index of the Pandas DataFrame will be used as the primary key for the Meerkat DataFrame.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_arrow" title="meerkat.from_arrow"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_arrow()</span></code></a>: Converts an <a class="reference external" href="https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table">Arrow Table</a> to a Meerkat DataFrame.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.from_huggingface" title="meerkat.from_huggingface"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_huggingface()</span></code></a>: Converts a HuggingFace Dataset to a Meerkat DataFrame. By default, the index of the HuggingFace Dataset will be used as the primary key for the Meerkat DataFrame.</p></li>
+</ul>
+</section>
+</section>
+<section id="exporting-dataframes">
+<span id="exporting"></span><h2><a class="toc-backref" href="#id6">Exporting DataFrames</a><a class="headerlink" href="#exporting-dataframes" title="Permalink to this headline">¶</a></h2>
+<p>Meerkat supports exporting DataFrames from Meerkat to other file formats and libraries. These methods are useful for converting data into formats that can be used by other libraries or software.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Most file formats designed for tabular data do not offer the same flexibility as Meerkat DataFrames, especially when it comes to storing complex data types and multi-dimensional tensors. As a result, exporting a Meerkat DataFrame to a file format may result in data loss.</p>
+<p>Specifically, any <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a> (or its subclasses) will not be exported. If you want to export a <code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code>, you should first materialize the column(s) by calling the DataFrame. Also, depending on the export destination, any <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.TensorColumn" title="meerkat.TensorColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorColumn</span></code></a> and/or <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.ObjectColumn" title="meerkat.ObjectColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectColumn</span></code></a> in the DataFrame may not be exported.</p>
+</div>
+<p>If you simply want to save a Meerkat DataFrame to disk, you should use <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> instead (see <a class="reference internal" href="#writing-dataframes"><span class="std std-ref">Writing DataFrames</span></a>). This will persist the DataFrame in a format that can be read back into Meerkat without any data loss.</p>
+<p>Continuing with the example above, let’s export the DataFrame to a CSV file.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa_export.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/meerkat/meerkat/meerkat/dataframe.py:838: UserWarning: Could not convert column image of type &lt;class &#39;meerkat.columns.deferred.file.FileColumn&#39;&gt;, it will be dropped from the output.
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we inspect the first 5 lines of the CSV file from the command line, we can see that the <code class="docutils literal notranslate"><span class="pre">image</span></code> column is missing. This is because the <code class="docutils literal notranslate"><span class="pre">image</span></code> column is a <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a> and was not exported.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>_data/art_ngoa_export.csv
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>title,attribution,medium,objectid,iiifthumburl
+Boy with Cat,Ernst Ludwig Kirchner,lithograph on yellow wove paper,103631,&quot;https://api.nga.gov/iiif/b309afc0-b270-4c29-9ce7-e8f39125f40d/full/!200,200/0/default.jpg&quot;
+A Hound Chasing a Hare,Benozzo Gozzoli,&quot;pen and brown ink with traces of red chalk, heightened with white on pink prepared paper&quot;,75840,&quot;https://api.nga.gov/iiif/6e53c5bd-799d-4ac8-a57d-2c831a57da14/full/!200,200/0/default.jpg&quot;
+&quot;Lamp, Lower Portion&quot;,&quot;Anonymous Artist after Andrea Briosco, called Riccio&quot;,gilded bronze,130749,&quot;https://api.nga.gov/iiif/8e5477ed-040f-4240-89ca-08d95b1c955b/full/!200,200/0/default.jpg&quot;
+Andiron with Putto Finial,Nicolò Roccatagliata,bronze,73441,&quot;https://api.nga.gov/iiif/a6126402-696e-4333-96af-43362bef1afa/full/!200,200/0/default.jpg&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>When columns are dropped during export, a warning is raised.</p>
+<section id="exporting-to-storage-formats">
+<h3><a class="toc-backref" href="#id7">Exporting to storage formats</a><a class="headerlink" href="#exporting-to-storage-formats" title="Permalink to this headline">¶</a></h3>
+<p>Meerkat supports exporting DataFrames to a number of file formats, with the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame" title="meerkat.DataFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></a> class providing the methods listed below.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_csv" title="meerkat.DataFrame.to_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_csv()</span></code></a>: Writes the DataFrame to a CSV file. CSV files are a common format for storing tabular data. Unlike some alternatives, CSV files are human-readable in a text-editor and can be easily imported into spreadsheet software.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_feather" title="meerkat.DataFrame.to_feather"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_feather()</span></code></a>: Writes the DataFrame to a <a class="reference external" href="https://arrow.apache.org/docs/python/feather.html">Feather file</a>. Feather is a language-agnostic file format for storing DataFrames. It can provide significantly faster I/O than CSV.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_parquet" title="meerkat.DataFrame.to_parquet"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_parquet()</span></code></a>: Writes the DataFrame to a <a class="reference external" href="https://parquet.apache.org/">Parquet file</a>. Parquet is a columnar storage format that is designed for efficiency.</p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_json" title="meerkat.DataFrame.to_json"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_json()</span></code></a>: Writes the DataFrame to a JSON file.</p></li>
+</ul>
+<p>Note that several of the methods take an optional <code class="docutils literal notranslate"><span class="pre">engine</span></code> parameter. This parameter allows you to control the underlying library that is used to write the DataFrame to disk. Options include: <code class="docutils literal notranslate"><span class="pre">pandas</span></code> and <code class="docutils literal notranslate"><span class="pre">arrow</span></code>. If no <code class="docutils literal notranslate"><span class="pre">engine</span></code> is specified, one is automatically chosen based on the columns in the DataFrame. For example, we can write the DataFrame to a CSV file using the Arrow library instead of Pandas.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa_export_arrow.csv&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;arrow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/meerkat/meerkat/meerkat/dataframe.py:838: UserWarning: Could not convert column image of type &lt;class &#39;meerkat.columns.deferred.file.FileColumn&#39;&gt;, it will be dropped from the output.
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="exporting-to-other-libraries">
+<h3><a class="toc-backref" href="#id8">Exporting to other libraries</a><a class="headerlink" href="#exporting-to-other-libraries" title="Permalink to this headline">¶</a></h3>
+<p>It is also possible to export Meerkat DataFrames to other Python DataFrame libraries.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_pandas" title="meerkat.DataFrame.to_pandas"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_pandas()</span></code></a>: Converts the DataFrame to a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas DataFrame</a></p></li>
+<li><p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_arrow" title="meerkat.DataFrame.to_arrow"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_arrow()</span></code></a>: Converts the DataFrame to an <a class="reference external" href="https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table">Arrow Table</a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="persisting-dataframes">
+<span id="persisting"></span><h2><a class="toc-backref" href="#id9">Persisting DataFrames</a><a class="headerlink" href="#persisting-dataframes" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we discuss how to persist Meerkat DataFrames to disk using the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> method. Unlike the export methods discussed above, <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> guarantees that the DataFrame read back in with <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.read" title="meerkat.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a> will contain the exact sam columns as the original DataFrame.</p>
+<section id="writing-dataframes">
+<span id="id1"></span><h3><a class="toc-backref" href="#id10">Writing DataFrames</a><a class="headerlink" href="#writing-dataframes" title="Permalink to this headline">¶</a></h3>
+<p>Above we saw how some column types in Meerkat DataFrames cannot be exported to a single file format. Specifically, we saw that the column we created to display images was dropped when exporting to CSV.</p>
+<p><a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> allows us to persist the DataFrame to disk in a way that will preserve the image column.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa.mk&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><em>How does it work?</em> Under the hood, <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> works by splitting the DataFrame among several different files. For example, the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.ScalarColumn" title="meerkat.ScalarColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalarColumn</span></code></a>s could be stored together in a <a class="reference external" href="https://arrow.apache.org/docs/python/feather.html">Feather file</a>, while the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.TensorColumn" title="meerkat.TensorColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorColumn</span></code></a>s could be stored in <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html#module-numpy.lib.format">NPY format</a>. The path passed to <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.write" title="meerkat.DataFrame.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code></a> is the directory where the files will be stored. The directory will also contain a <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code> file that contains information about the DataFrame. This file is used by <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.read" title="meerkat.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a> to reconstruct the DataFrame.</p>
+</section>
+<section id="reading-dataframes">
+<h3><a class="toc-backref" href="#id11">Reading DataFrames</a><a class="headerlink" href="#reading-dataframes" title="Permalink to this headline">¶</a></h3>
+<p>To read the DataFrame back in from disk, we can use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.read" title="meerkat.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">read()</span></code></a> function.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mk</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;_data/art_ngoa.mk&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Table60bde4c9-c4a7-409c-8c8b-2d88e974402e"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>Note that all the columns are present, including the <code class="docutils literal notranslate"><span class="pre">image</span></code> column, which had previously been lost with <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DataFrame.to_csv" title="meerkat.DataFrame.to_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_csv()</span></code></a>.</p>
+</section>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="ops/grouping.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Grouping: <code class="docutils literal notranslate"><span class="pre">groupby</span></code> and <code class="docutils literal notranslate"><span class="pre">clusterby</span></code></p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="advanced/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Advanced</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

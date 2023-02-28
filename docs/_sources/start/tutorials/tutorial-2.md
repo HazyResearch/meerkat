@@ -56,11 +56,11 @@ rich.print(labels)
 
 **Selecting a class**
 
-Next, let's create a {py:class}`Select <meerkat.gui.Select>` component that allows the user to select a class. Once a user picks the class, we'll then show a random subset of images from that class.
+Next, let's create a {class}`~meerkat.gui.Select` component that allows the user to select a class. Once a user picks the class, we'll then show a random subset of images from that class.
 
 ```{margin}
 A list of the components in Meerkat can be found in the
-[component guide](../../guide/components/builtins.rst).
+[component guide](../../guide/components/inbuilts.rst).
 ```
 
 Meerkat provides many components like `Select` that can be used to build useful
@@ -155,7 +155,7 @@ filtered_df = filter_by_class(df, class_selector.value)
 ```
 
 ```{margin}
-In Meerkat, only `marked` objects can cause a reactive function to re-execute when they are updated. All Meerkat objects have `.mark()` and `.unmark()` methods, and only `Store` objects are marked by default. You can read more about how this works in the [user guide on reactive functions](../../guide/reactive/concepts.md).
+In Meerkat, only `marked` objects can cause a reactive function to re-execute when they are updated. All Meerkat objects have `.mark()` and `.unmark()` methods, and only `Store` objects are marked by default. You can read more about how this works in the [user guide on reactive functions](../../guide/reactive-functions/concepts.md).
 ```
 
 When calling `filter_by_class`, we pass it the `DataFrame` and **the `Store` object `class_selector.value`, and not the actual string value of the class!** 

@@ -122,7 +122,7 @@ def get_answer(question: str, answer: mk.Store):
     return answer
 ```
 
-If you print this endpoint out, you'll see that it the decorator has converted the `get_answer` function into an {py:class}`Endpoint <meerkat.interactive.Endpoint>` object.
+If you print this endpoint out, you'll see that it the decorator has converted the `get_answer` function into an {class}`~meerkat.interactive.Endpoint` object.
 
 ```{code-cell} ipython3
 :tags: [remove-input]

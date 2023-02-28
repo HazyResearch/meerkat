@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a13</title>
+    <title>Tutorial 0: Data Frames for Unstructured Data &#8212; 🔮 v0.2.6a14</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -42,7 +42,7 @@
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 2: Reactive Image Viewer" href="tutorial-2.html" />
+    <link rel="next" title="Tutorial 1: Image Gallery" href="tutorial-1.html" />
     <link rel="prev" title="Tutorials" href="index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -87,7 +87,7 @@
       <img src="../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.2.6a13</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a14</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
@@ -105,13 +105,18 @@
         </ul>
         <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
-  Getting started
+  Getting Started
  </span>
 </p>
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="../install.html">
    Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../quickstart-df.html">
+   Quickstart: Data Frames
   </a>
  </li>
  <li class="toctree-l1">
@@ -135,6 +140,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-1.html">
+     Tutorial 1: Image Gallery
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="tutorial-2.html">
      Tutorial 2: Reactive Image Viewer
     </a>
@@ -149,6 +159,21 @@
      Tutorial 4: Search Engine over a Dataset
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-filter-sort.html">
+     Tutorial: Filter &amp; Sort
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-simple-counter.html">
+     Tutorial: A Simple Counter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-simple-dataframe-viewer.html">
+     A Simple DataFrame Viewer
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -159,13 +184,13 @@
 </p>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="../../guide/overview.html">
+  <a class="reference internal" href="../../user-guide/overview.html">
    Overview
   </a>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/dataframe/intro.html">
-   Data Frames
+  <a class="reference internal" href="../../user-guide/dataframe/index.html">
+   DataFrame
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
   <label for="toctree-checkbox-2">
@@ -174,13 +199,18 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/dataframe/selection.html">
+    <a class="reference internal" href="../../user-guide/dataframe/selection.html">
      Data Selection
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/dataframe/column/index.html">
+     Column
+    </a>
+   </li>
    <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/dataframe/columns/overview.html">
-     Column Types
+    <a class="reference internal" href="../../user-guide/dataframe/ops/index.html">
+     Operations
     </a>
     <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
     <label for="toctree-checkbox-3">
@@ -189,39 +219,7 @@
     </label>
     <ul>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/columns/scalar.html">
-       Scalar Columns
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/columns/tensor.html">
-       Tensor Columns
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/columns/deferred.html">
-       Deferred Columns
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/columns/object.html">
-       Object Columns
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/dataframe/ops/overview.html">
-     Operations
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-    <label for="toctree-checkbox-4">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/ops/mapping.html">
+      <a class="reference internal" href="../../user-guide/dataframe/ops/mapping.html">
        Mapping:
        <code class="docutils literal notranslate">
         <span class="pre">
@@ -237,7 +235,7 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/ops/combining.html">
+      <a class="reference internal" href="../../user-guide/dataframe/ops/combining.html">
        Combining:
        <code class="docutils literal notranslate">
         <span class="pre">
@@ -253,7 +251,7 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/ops/grouping.html">
+      <a class="reference internal" href="../../user-guide/dataframe/ops/grouping.html">
        Grouping:
        <code class="docutils literal notranslate">
         <span class="pre">
@@ -271,27 +269,27 @@
     </ul>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/dataframe/io.html">
+    <a class="reference internal" href="../../user-guide/dataframe/io.html">
      I/O
     </a>
    </li>
    <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/dataframe/advanced/overview.html">
+    <a class="reference internal" href="../../user-guide/dataframe/advanced/index.html">
      Advanced
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-    <label for="toctree-checkbox-5">
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
      <i class="fas fa-chevron-down">
      </i>
     </label>
     <ul>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/advanced/copying.html">
+      <a class="reference internal" href="../../user-guide/dataframe/advanced/copying.html">
        Copy vs. View Behavior
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/dataframe/advanced/blocks.html">
+      <a class="reference internal" href="../../user-guide/dataframe/advanced/blocks.html">
        Blocks and the BlockManager
       </a>
      </li>
@@ -300,177 +298,63 @@
   </ul>
  </li>
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/reactive/index.html">
-   Reactive Functions
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-  <label for="toctree-checkbox-6">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/reactive/getting-started.html">
-     Getting Started
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/reactive/concepts.html">
-     Concepts
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/reactive/user-guide.html">
-     User Guide
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/reactive/inbuilts.html">
-     Reactive Functions in Meerkat
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../../guide/store/getting-started.html">
-   Stores
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/components/index.html">
-   Components
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-  <label for="toctree-checkbox-7">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/components/getting-started.html">
-     Getting Started
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/components/builtins.html">
-     Components in Meerkat
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/components/custom-components.html">
-     Custom Components
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/endpoints/index.html">
-   Endpoints
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
-  <label for="toctree-checkbox-8">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/endpoints/getting-started.html">
-     Getting Started
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/endpoints/reactive-vs-endpoints.html">
-     Endpoints vs. Reactive Functions
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/interactive/introduction.html">
+  <a class="reference internal" href="../../user-guide/interactive/index.html">
    Interactive
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
-  <label for="toctree-checkbox-9">
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
    <i class="fas fa-chevron-down">
    </i>
   </label>
   <ul>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/interactive/concepts/core-concepts-nutshell.html">
-     Core Concepts in a Nutshell
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
-    <label for="toctree-checkbox-10">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/concepts/store.html">
-       Stores
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/concepts/dataframe.html">
-       DataFrame
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/concepts/reactive.html">
-       Reactivity in Meerkat
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/concepts/component.html">
-       Components
-      </a>
-     </li>
-    </ul>
-   </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/interactive/environments/running-interfaces.html">
+    <a class="reference internal" href="../../user-guide/interactive/running-meerkat-interfaces.html">
      Running Meerkat Interfaces
     </a>
    </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/interactive/components/component.html">
-     Component
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/reactive-functions/index.html">
+     Reactive Functions
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
-    <label for="toctree-checkbox-11">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/components/display.html">
-       Displaying data frames
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/components/match.html">
-       <code class="xref py py-class docutils literal notranslate">
-        <span class="pre">
-         mk.gui.Match
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/stores/index.html">
+     Stores
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/components/index.html">
+     Components
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/endpoints/index.html">
+     Endpoints
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/formatters/index.html">
+     Formatters
+    </a>
    </li>
    <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../../guide/interactive/examples/examples.html">
-     Interactive Examples
+    <a class="reference internal" href="../../user-guide/interactive/advanced/index.html">
+     Advanced
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
-    <label for="toctree-checkbox-12">
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
      <i class="fas fa-chevron-down">
      </i>
     </label>
     <ul>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../guide/interactive/examples/image_search.html">
-       Building image search
+      <a class="reference internal" href="../../user-guide/interactive/advanced/sharing.html">
+       Sharing
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../user-guide/interactive/advanced/under-the-hood.html">
+       Under the Hood
       </a>
      </li>
     </ul>
@@ -478,12 +362,7 @@
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../../guide/formatters/getting-started.html">
-   Getting Started
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../../guide/cheat-sheet.html">
+  <a class="reference internal" href="../../user-guide/cheat-sheet.html">
    Cheat Sheet
   </a>
  </li>
@@ -495,26 +374,79 @@
 </p>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../guide/magic/getting-started.html">
-   Magic
+  <a class="reference internal" href="../../advanced/magic-contexts/index.html">
+   Magic Contexts
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
-  <label for="toctree-checkbox-13">
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
    <i class="fas fa-chevron-down">
    </i>
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../guide/magic/limitations.html">
+    <a class="reference internal" href="../../advanced/magic-contexts/limitations.html">
      Limitations
     </a>
    </li>
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../configure.html">
-   Configuration
+  <a class="reference internal" href="../../advanced/configuring.html">
+   Configuring Meerkat
   </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Ecosystem
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../datasets/index.html">
+   Datasets
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../datasets/contributing-datasets.html">
+     Contributing Datasets
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../examples/index.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../examples/meerkat-in-5-minutes.html">
+     Meerkat in 5 Minutes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../examples/image-search.html">
+     Building image search
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
@@ -527,8 +459,8 @@
   <a class="reference internal" href="../../apidocs/index.html">
    API Reference
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
-  <label for="toctree-checkbox-14">
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -539,8 +471,18 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/columns.html">
+     Columns
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../../apidocs/interactive.html">
      Interactive
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../apidocs/ops.html">
+     Operations
     </a>
    </li>
   </ul>
@@ -1116,7 +1058,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "6e9019c085d44e1db9b75a699ea6d418"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "47b686a5deb64471bd19841770e8e731"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
@@ -1206,7 +1148,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </section>
 <section id="creating-an-image-dataframe">
 <h2>📸 Creating an image <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code><a class="headerlink" href="#creating-an-image-dataframe" title="Permalink to this headline">¶</a></h2>
-<p><em>For more information on creating DataFrames from various data sources, see the user guide section on <a class="reference internal" href="../../guide/dataframe/io.html#guide-dataframe-io"><span class="std std-ref">I/O</span></a>.</em></p>
+<p><em>For more information on creating DataFrames from various data sources, see the user guide section on <a class="reference internal" href="../../user-guide/dataframe/io.html#guide-dataframe-io"><span class="std std-ref">I/O</span></a>.</em></p>
 <p>Meerkat’s core contribution is the DataFrame, a simple columnar data abstraction. The Meerkat DataFrame can house columns of arbitrary type – from integers and strings to complex, high-dimensional objects like videos, images, medical volumes and graphs.</p>
 <p>We’re going to build a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> out of the <code class="docutils literal notranslate"><span class="pre">imagenette.csv</span></code> file from the download above.</p>
 <div class="cell tag_output_scroll docutils container">
@@ -1228,7 +1170,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </section>
 <section id="selecting-data">
 <h2>🗂 Selecting data<a class="headerlink" href="#selecting-data" title="Permalink to this headline">¶</a></h2>
-<p><em>For more information see the user guide section on <a class="reference internal" href="../../guide/dataframe/selection.html#guide-dataframe-selection"><span class="std std-ref">Data Selection</span></a>.</em></p>
+<p><em>For more information see the user guide section on <a class="reference internal" href="../../user-guide/dataframe/selection.html#guide-dataframe-selection"><span class="std std-ref">Data Selection</span></a>.</em></p>
 <p>When we create an <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> we don’t load the images into memory. Instead, <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> keeps track of all those filepaths we passed in and only loads the images when they are needed.</p>
 <p>When we select a row of the <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code>, we get an instance <code class="docutils literal notranslate"><span class="pre">FileCell</span></code> back. A <code class="docutils literal notranslate"><span class="pre">FileCell</span></code> is an object that holds everything we need to materialize the cell (e.g. the filepath to the image and the loading function), but stops just short of doing so.</p>
 <div class="cell docutils container">
@@ -1270,7 +1212,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </ul>
 <section id="aside-imagecolumn-under-the-hood-deferredcolumn">
 <h3>📎 <em>Aside</em>: <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> under the hood, <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.<a class="headerlink" href="#aside-imagecolumn-under-the-hood-deferredcolumn" title="Permalink to this headline">¶</a></h3>
-<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/HazyResearch/meerkat/blob/main/meerkat/columns/image_column.py">meerkat/columns/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
+<p>If you check out the implementation of <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> (at <a class="reference external" href="https://github.com/HazyResearch/meerkat/blob/main/meerkat/column/image_column.py">meerkat/column/image_column.py</a>), you’ll notice that it’s a super simple subclass of <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>.</p>
 <p><em>What’s a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>?</em>
 In <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>, high-dimensional data types like images and videos are typically stored in a <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code>. A  <code class="docutils literal notranslate"><span class="pre">DeferredColumn</span></code> wraps around another column and lazily applies a function to it’s content as it is indexed. Consider the following example, where we create a simple <code class="docutils literal notranslate"><span class="pre">meerkat</span></code> column…</p>
 <div class="cell docutils container">
@@ -1593,10 +1535,10 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
             <p class="prev-next-title">Tutorials</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="tutorial-2.html" title="next page">
+    <a class='right-next' id="next-link" href="tutorial-1.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 2: Reactive Image Viewer</p>
+        <p class="prev-next-title">Tutorial 1: Image Gallery</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

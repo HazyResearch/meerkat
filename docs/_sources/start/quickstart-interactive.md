@@ -15,7 +15,7 @@ Make sure you have Meerkat {ref}`installed and running <install>` before you go 
 In Meerkat, components allow us to split the user interface into independent, resuable pieces.
 This functionality can range from quite simple, such as a slider that allows a user to choose a number, to quite complex, such as a full blown web application that helps a user explore their data.
 
-Let's look at an example with a {py:class}`Slider <meerkat.interactive.core.Slider>` component. This code below creates a slider with an initial value of `2.0`.
+Let's look at an example with a {class}`~meerkat.interactive.core.Slider` component. This code below creates a slider with an initial value of `2.0`.
 
 ````{margin}
 ```{admonition}
@@ -29,7 +29,7 @@ import meerkat as mk
 input_slider = mk.gui.core.Slider(value=2.0)
 ```
 
-Once, we have our component, we want to render it. We can do this by passing the component to a {py:class}`Page <meerkat.interactive.Page>`, giving it an `id`, and launching it.
+Once, we have our component, we want to render it. We can do this by passing the component to a {class}`~meerkat.interactive.Page`, giving it an `id`, and launching it.
 
 ```python
 page = mk.gui.Page(component=input_slider, id="quickstart")
@@ -49,7 +49,7 @@ df = mk.get("imagenette")
 gallery = mk.gui.Gallery(df, main_column="img")
 ```
 
-The {class}`Gallery <meerkat.interactive.core.Gallery>` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_builtins>`.
+The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. A full list of our components is available {ref}`here <components_inbuilts>`.
 
 ````{margin}
 ```{admonition} Declarative
@@ -82,7 +82,7 @@ page.launch()
 
 We just used a `div` to stack up the two components and lay them out.
 In fact, we can use HTML tags like `span`, `div`, `p` as components in Meerkat.
-A full list of supported HTML components is available {ref}`here <components_builtins_html>`.
+A full list of supported HTML components is available {ref}`here <components_inbuilts_html>`.
 
 ```{important}
 **More on components.** There's a lot more to components in Meerkat that you can learn about in the {ref}`Components <components_index>` guide. We go over other components in Meerkat from the [flowbite library](https://flowbite.com/docs/getting-started/introduction/), how to add components from any Svelte component library without writing any frontend code whatsoever, and how to write custom Meerkat components in Svelte.
@@ -102,7 +102,7 @@ input_field = mk.gui.Input(value=input_slider.value, dtype=float) #FIXME
 In the app created above, moving the slider in the UI will affect the displayed value. Let's upgrade our app by displaying the square of the current value, not the original. This will require writing a function that runs every time the slider value changes. Introducing _reactive functions_!
 
 ```{admonition} Definition - _reactive function_
-A function that reruns when any of its parameters change.
+A function that reruns when one of its inputs changes.
 ```
 
 Reactive functions in Meerkat are created with the `mk.reactive()` decorator.

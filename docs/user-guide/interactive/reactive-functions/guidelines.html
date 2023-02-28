@@ -1,0 +1,965 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Guidelines &#8212; 🔮 v0.2.6a14</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="FAQs" href="faqs.html" />
+    <link rel="prev" title="meerkat.sort" href="../../apidocs/generated/meerkat.sort.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a14</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting Started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/quickstart-df.html">
+   Quickstart: Data Frames
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../start/tutorials/index.html">
+   Tutorials
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-1.html">
+     Tutorial 1: Image Gallery
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-filter-sort.html">
+     Tutorial: Filter &amp; Sort
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-simple-counter.html">
+     Tutorial: A Simple Counter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-simple-dataframe-viewer.html">
+     A Simple DataFrame Viewer
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../dataframe/index.html">
+   DataFrame
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../dataframe/selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../dataframe/column/index.html">
+     Column
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../dataframe/ops/index.html">
+     Operations
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../dataframe/ops/mapping.html">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../dataframe/ops/combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../dataframe/ops/grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../dataframe/io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../dataframe/advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../dataframe/advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../dataframe/advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../index.html">
+   Interactive
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../running-meerkat-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="index.html">
+     Reactive Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../stores/index.html">
+     Stores
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../components/index.html">
+     Components
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../endpoints/index.html">
+     Endpoints
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../formatters/index.html">
+     Formatters
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../advanced/sharing.html">
+       Sharing
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../advanced/under-the-hood.html">
+       Under the Hood
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../advanced/magic-contexts/index.html">
+   Magic Contexts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../advanced/magic-contexts/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../advanced/configuring.html">
+   Configuring Meerkat
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Ecosystem
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../datasets/index.html">
+   Datasets
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../datasets/contributing-datasets.html">
+     Contributing Datasets
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../examples/index.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/meerkat-in-5-minutes.html">
+     Meerkat in 5 Minutes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/image-search.html">
+     Building image search
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/columns.html">
+     Columns
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/ops.html">
+     Operations
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fuser-guide/interactive/reactive-functions/guidelines.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/user-guide/interactive/reactive-functions/guidelines.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../../_sources/user-guide/interactive/reactive-functions/guidelines.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#write-reactive-functions-like-normal-functions">
+   Write reactive functions like normal functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#use-reactive-functions-over-shortcuts">
+   Use reactive functions over shortcuts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-think-about-return-values-of-reactive-functions">
+   How to think about return values of reactive functions.
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nested-return-values">
+   Nested return values
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Guidelines</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#write-reactive-functions-like-normal-functions">
+   Write reactive functions like normal functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#use-reactive-functions-over-shortcuts">
+   Use reactive functions over shortcuts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-think-about-return-values-of-reactive-functions">
+   How to think about return values of reactive functions.
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nested-return-values">
+   Nested return values
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="guidelines">
+<h1>Guidelines<a class="headerlink" href="#guidelines" title="Permalink to this headline">¶</a></h1>
+<p>Let’s go over a few guidelines for writing reactive functions.</p>
+<section id="write-reactive-functions-like-normal-functions">
+<h2>Write reactive functions like normal functions<a class="headerlink" href="#write-reactive-functions-like-normal-functions" title="Permalink to this headline">¶</a></h2>
+<p>Write reactive functions like any other Python function. There’s no need to think of inputs to the function in any special way, since <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects will be unwrapped by Meerkat to their underlying values automatically.</p>
+<p>The only case in which it doesn’t make sense to wrap a normal function with the <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive</span></code> decorator is for functions that take no arguments, since they can never be re-run.</p>
+<p>An important rule of thumb when using reactive functions is: <strong>don’t edit objects inside them without thinking very carefully about the consequences.</strong></p>
+<p>This isn’t a strict rule, but it’s a good guideline to follow. Let’s look at an example that is particularly bad practice:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="c1"># .... do some stuff to df</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
+<span class="n">df_2</span> <span class="o">=</span> <span class="n">foo</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">foo</span></code> quietly updates the original <code class="docutils literal notranslate"><span class="pre">df</span></code> object, and then returns it. This is bad practice for a couple of reasons:</p>
+<ul class="simple">
+<li><p>The output of <code class="docutils literal notranslate"><span class="pre">foo</span></code> is the same object as the input to it, which leads to a cyclical dependency for this reactive function. This means that if <code class="docutils literal notranslate"><span class="pre">df</span></code> is updated, <code class="docutils literal notranslate"><span class="pre">foo</span></code> will be re-run, and then <code class="docutils literal notranslate"><span class="pre">df</span></code> will be updated again, and so on.</p></li>
+<li><p>Meerkat disregards when <code class="docutils literal notranslate"><span class="pre">df</span></code> is updated in-place inside a reactive function, so it won’t update any outputs that depend on <code class="docutils literal notranslate"><span class="pre">df</span></code>. If it did, it would cause an infinite loop (since <code class="docutils literal notranslate"><span class="pre">foo</span></code> must have been called because <code class="docutils literal notranslate"><span class="pre">df</span></code> was updated, and so on).</p></li>
+</ul>
+<p>The way to avoid this is to just not edit objects in-place inside reactive functions. Generally, this will also mean you won’t return the same object as the input into the function. Instead, create a new object and return that. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="c1"># .... do some stuff to df</span>
+    <span class="n">df_2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_2</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">df_2</span>
+</pre></div>
+</div>
+<p>This is a much better way to write <code class="docutils literal notranslate"><span class="pre">foo</span></code>, because it doesn’t edit the original <code class="docutils literal notranslate"><span class="pre">df</span></code> object, and it doesn’t return the same object as the input into it.</p>
+<p>The appropriate place to edit objects in-place in response to user input is inside a <code class="docutils literal notranslate"><span class="pre">&#64;mk.endpoint()</span></code> function, which you can read more about in the guide at XXXXXXX.</p>
+<p><strong>On type hints</strong>
+Generally, we recommend that you type-hint the inputs to a reactive function without using <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects, since they will be automatically unwrapped inside the function body.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Do this.</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="c1"># Don&#39;t do this.</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+<p>For return values, type-hinting the return value as a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object is better, since the return value will be wrapped into a <code class="docutils literal notranslate"><span class="pre">Store</span></code> automatically.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+</section>
+<section id="use-reactive-functions-over-shortcuts">
+<h2>Use reactive functions over shortcuts<a class="headerlink" href="#use-reactive-functions-over-shortcuts" title="Permalink to this headline">¶</a></h2>
+<p>Another guideline we recommend is to actually write reactive functions rather than using shortcuts such as direct operations on <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects, or overusing the <code class="docutils literal notranslate"><span class="pre">magic</span></code> context. If you do use shortcuts, we recommend you put them inside a <code class="docutils literal notranslate"><span class="pre">magic</span></code> context for readability.</p>
+<p>As an example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Method 1: best and should be preferred, overkill for this example</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">add_five</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">add_five</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="c1"># Method 2: inlined reactive function is quite readable</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="c1"># Method 3: Store shortcut on + is convenient, but not readable</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">5</span>
+
+<span class="c1"># Method 4: same shortcut, but magic context makes it more readable</span>
+<span class="k">with</span> <span class="n">magic</span><span class="p">():</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</section>
+<section id="how-to-think-about-return-values-of-reactive-functions">
+<h2>How to think about return values of reactive functions.<a class="headerlink" href="#how-to-think-about-return-values-of-reactive-functions" title="Permalink to this headline">¶</a></h2>
+<p>When you write a reactive function, the return value will automatically be wrapped in a <strong>single</strong> <code class="docutils literal notranslate"><span class="pre">Store</span></code> object that is created by the function, <strong>regardless of what was returned</strong>. This is different from how you might think about return values in a normal Python function, where the return value is just a reference to an existing object.</p>
+<p>Let’s go over the consequences of this over a few different return value types.</p>
+<p>If you return a single object of any type, it will be wrapped in a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object. The only exception is other Meerkat objects like <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code> and <code class="docutils literal notranslate"><span class="pre">mk.Column</span></code>, which never to be wrapped by <code class="docutils literal notranslate"><span class="pre">Store</span></code>.</p>
+<p>To fix an example, we’ll take the following snippet of code and think about what <code class="docutils literal notranslate"><span class="pre">a</span></code> will be for different return values of <code class="docutils literal notranslate"><span class="pre">foo</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">...</span><span class="p">:</span>
+    <span class="k">return</span> <span class="o">...</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">foo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To be explicit, here are some examples:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Return Value</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">a</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Store(1)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;hello&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Store(&quot;hello&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">2)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Store((1,</span> <span class="pre">2))</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Store([1,</span> <span class="pre">2])</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{&quot;a&quot;:</span> <span class="pre">1}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Store({&quot;a&quot;:</span> <span class="pre">1})</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mk.DataFrame({&quot;a&quot;:</span> <span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">3]})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mk.DataFrame({&quot;a&quot;:</span> <span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">3]})</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>In all cases, <code class="docutils literal notranslate"><span class="pre">a</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, except if the return value is a Meerkat object.</p>
+</section>
+<section id="nested-return-values">
+<h2>Nested return values<a class="headerlink" href="#nested-return-values" title="Permalink to this headline">¶</a></h2>
+<p>There are cases where you might wonder how to return nested <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects. For example, you might wonder how to return a tuple of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects, rather than only a single <code class="docutils literal notranslate"><span class="pre">Store</span></code> object containing a tuple e.g. maybe you want to return a pair of <code class="docutils literal notranslate"><span class="pre">int</span></code> values, where each value is wrapped in a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object.</p>
+<p>This is generally not something you will need to ever do explicitly. Let’s look at a simple example where we chain two reactive functions to understand why.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="c1"># Return a tuple of ints</span>
+
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="c1"># Chain: foo()[0] -&gt; bar()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">foo</span><span class="p">()</span> <span class="c1"># Store((1, 2))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>What happens when we pass <code class="docutils literal notranslate"><span class="pre">x[0]</span></code> to <code class="docutils literal notranslate"><span class="pre">bar</span></code>? Indexing into a <code class="docutils literal notranslate"><span class="pre">Store</span></code> is actually reactive, so <code class="docutils literal notranslate"><span class="pre">x[0]</span></code> will <em>itself</em> behave like a reactive function that takes <code class="docutils literal notranslate"><span class="pre">0</span></code> as input and returns <code class="docutils literal notranslate"><span class="pre">x[0]</span></code> as output <em>wrapped in a <code class="docutils literal notranslate"><span class="pre">Store</span></code></em>. Passing this <code class="docutils literal notranslate"><span class="pre">Store</span></code> on to <code class="docutils literal notranslate"><span class="pre">bar</span></code> means that <code class="docutils literal notranslate"><span class="pre">y</span></code> will be re-run if <code class="docutils literal notranslate"><span class="pre">x</span></code> changes, which is exactly what we want.</p>
+<p>If indexing into a <code class="docutils literal notranslate"><span class="pre">Store</span></code> with <code class="docutils literal notranslate"><span class="pre">x[i]</span></code> was not reactive, it would actually <em>break the chain of reactivity</em>, and <code class="docutils literal notranslate"><span class="pre">bar</span></code> would not be re-run if <code class="docutils literal notranslate"><span class="pre">x</span></code> changed.</p>
+<p>The takeaway is that Meerkat obviates the need to explicitly wrap nested return values in <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects, since indexing into a <code class="docutils literal notranslate"><span class="pre">Store</span></code> is itself reactive.</p>
+<p>However, keep in mind that when indexing into a <code class="docutils literal notranslate"><span class="pre">Store</span></code> to access nested values, a new <code class="docutils literal notranslate"><span class="pre">Store</span></code> object is created each time, even if you index into the same location. This means that if you want to access the same nested value multiple times, you should store it in a variable first.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">Store</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># `a` and `b` are different `Store` objects.</span>
+<span class="c1"># This can lead to subtle bugs e.g. setting `a` would not trigger</span>
+<span class="c1"># functions that depend on `b`.</span>
+</pre></div>
+</div>
+<p>The solution here is to just access the nested value once to define <code class="docutils literal notranslate"><span class="pre">a</span></code>, and then reuse the <code class="docutils literal notranslate"><span class="pre">a</span></code> variable.</p>
+<p>Finally, if you do want to explicitly control how return values of a reactive function are wrapped by <code class="docutils literal notranslate"><span class="pre">Store</span></code>, you have the option to wrap these values in a <code class="docutils literal notranslate"><span class="pre">Store</span></code> inside the function and return it yourself.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">foo</span><span class="p">()</span>
+<span class="c1"># `a` will be Store((Store(1), Store(2)))</span>
+</pre></div>
+</div>
+<p>In this case, the return value is a tuple of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects, and so <code class="docutils literal notranslate"><span class="pre">a</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object containing a tuple of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects.</p>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../../apidocs/generated/meerkat.sort.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">meerkat.sort</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="faqs.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">FAQs</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,188 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+def is_eligibile(age, residence):
+    old_enough = age >= 18
+    return (residence == "MA") and old_enough, (residence == "LA") and old_enough
+
+df.map(is_eligibile)
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[5], line 5[0m
+[1;32m      2[0m     old_enough [38;5;241m=[39m age [38;5;241m>[39m[38;5;241m=[39m [38;5;241m18[39m
+[1;32m      3[0m     [38;5;28;01mreturn[39;00m (residence [38;5;241m==[39m [38;5;124m"[39m[38;5;124mMA[39m[38;5;124m"[39m) [38;5;129;01mand[39;00m old_enough, (residence [38;5;241m==[39m [38;5;124m"[39m[38;5;124mLA[39m[38;5;124m"[39m) [38;5;129;01mand[39;00m old_enough
+[0;32m----> 5[0m [43mdf[49m[38;5;241;43m.[39;49m[43mmap[49m[43m([49m[43mis_eligibile[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74[0m, in [0;36munmarked.__call__.<locals>.decorate_context[0;34m(*args, **kwargs)[0m
+[1;32m     71[0m [38;5;129m@wraps[39m(func)
+[1;32m     72[0m [38;5;28;01mdef[39;00m [38;5;21mdecorate_context[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[1;32m     73[0m     [38;5;28;01mwith[39;00m [38;5;28mself[39m[38;5;241m.[39mclone():
+[0;32m---> 74[0m         [38;5;28;01mreturn[39;00m [43mreactive[49m[43m([49m[43mfunc[49m[43m,[49m[43m [49m[43mnested_return[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    202[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
+[1;32m    203[0m [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 204[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
+[1;32m    206[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
+[1;32m    207[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
+[1;32m    209[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
+[1;32m    210[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
+[1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
+[1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper.<locals>._fn_outer_wrapper.<locals>._fn_wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    135[0m [38;5;129m@wraps[39m(_fn)
+[1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:1145[0m, in [0;36mDataFrame.map[0;34m(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)[0m
+[1;32m   1132[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
+[1;32m   1133[0m     [38;5;28mself[39m,
+[1;32m   1134[0m     function: Callable,
+[0;32m   (...)[0m
+[1;32m   1141[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m   1142[0m ) [38;5;241m-[39m[38;5;241m>[39m Optional[Union[Dict, List, Column]]:
+[1;32m   1143[0m     [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01mops[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmap[39;00m [38;5;28;01mimport[39;00m [38;5;28mmap[39m
+[0;32m-> 1145[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mmap[39;49m[43m([49m
+[1;32m   1146[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[43m,[49m
+[1;32m   1147[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
+[1;32m   1148[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
+[1;32m   1149[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
+[1;32m   1150[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
+[1;32m   1151[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
+[1;32m   1152[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
+[1;32m   1153[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
+[1;32m   1154[0m [43m        [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m,[49m
+[1;32m   1155[0m [43m    [49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:451[0m, in [0;36mmap[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)[0m
+[1;32m    339[0m [38;5;129m@docs[39m[38;5;241m.[39mdoc(source[38;5;241m=[39m_SHARED_DOCS_, data[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdata[39m[38;5;124m"[39m, name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mdefer[39m[38;5;124m"[39m)
+[1;32m    340[0m [38;5;28;01mdef[39;00m [38;5;21mmap[39m(
+[1;32m    341[0m     data: Union[[38;5;124m"[39m[38;5;124mDataFrame[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mColumn[39m[38;5;124m"[39m],
+[0;32m   (...)[0m
+[1;32m    353[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m    354[0m ):
+[1;32m    355[0m [38;5;250m    [39m[38;5;124;03m"""Create a new :class:`Column` or :class:`DataFrame` by applying a[39;00m
+[1;32m    356[0m [38;5;124;03m    function to each row in ${data}.[39;00m
+[1;32m    357[0m 
+[0;32m   (...)[0m
+[1;32m    448[0m [38;5;124;03m        df["ma_eligible"][39;00m
+[1;32m    449[0m [38;5;124;03m    """[39;00m
+[0;32m--> 451[0m     deferred [38;5;241m=[39m [43mdefer[49m[43m([49m
+[1;32m    452[0m [43m        [49m[43mdata[49m[38;5;241;43m=[39;49m[43mdata[49m[43m,[49m
+[1;32m    453[0m [43m        [49m[43mfunction[49m[38;5;241;43m=[39;49m[43mfunction[49m[43m,[49m
+[1;32m    454[0m [43m        [49m[43mis_batched_fn[49m[38;5;241;43m=[39;49m[43mis_batched_fn[49m[43m,[49m
+[1;32m    455[0m [43m        [49m[43mbatch_size[49m[38;5;241;43m=[39;49m[43mbatch_size[49m[43m,[49m
+[1;32m    456[0m [43m        [49m[43minputs[49m[38;5;241;43m=[39;49m[43minputs[49m[43m,[49m
+[1;32m    457[0m [43m        [49m[43moutputs[49m[38;5;241;43m=[39;49m[43moutputs[49m[43m,[49m
+[1;32m    458[0m [43m        [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m,[49m
+[1;32m    459[0m [43m        [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[43mmaterialize[49m[43m,[49m
+[1;32m    460[0m [43m    [49m[43m)[49m
+[1;32m    461[0m     [38;5;28;01mreturn[39;00m _materialize(
+[1;32m    462[0m         deferred,
+[1;32m    463[0m         batch_size[38;5;241m=[39mbatch_size,
+[0;32m   (...)[0m
+[1;32m    467[0m         blocks_per_window[38;5;241m=[39mblocks_per_window,
+[1;32m    468[0m     )
+
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:329[0m, in [0;36mdefer[0;34m(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)[0m
+[1;32m    324[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
+[1;32m    325[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    326[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
+[1;32m    327[0m     )
+[1;32m    328[0m [38;5;28;01mreturn[39;00m DataFrame(
+[0;32m--> 329[0m     {
+[1;32m    330[0m         col: DeferredColumn(
+[1;32m    331[0m             data[38;5;241m=[39mBlockView(block_index[38;5;241m=[39moutput_key, block[38;5;241m=[39mblock),
+[1;32m    332[0m             output_type[38;5;241m=[39moutput_type[output_key],
+[1;32m    333[0m         )
+[1;32m    334[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
+[1;32m    335[0m     }
+[1;32m    336[0m )
+
+File [0;32m~/work/meerkat/meerkat/meerkat/ops/map.py:330[0m, in [0;36m<dictcomp>[0;34m(.0)[0m
+[1;32m    324[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(output_type, Sequence):
+[1;32m    325[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    326[0m         [38;5;124m"[39m[38;5;124mMust provide a `output_type` sequence if `outputs` is a sequence.[39m[38;5;124m"[39m
+[1;32m    327[0m     )
+[1;32m    328[0m [38;5;28;01mreturn[39;00m DataFrame(
+[1;32m    329[0m     {
+[0;32m--> 330[0m         col: [43mDeferredColumn[49m[43m([49m
+[1;32m    331[0m [43m            [49m[43mdata[49m[38;5;241;43m=[39;49m[43mBlockView[49m[43m([49m[43mblock_index[49m[38;5;241;43m=[39;49m[43moutput_key[49m[43m,[49m[43m [49m[43mblock[49m[38;5;241;43m=[39;49m[43mblock[49m[43m)[49m[43m,[49m
+[1;32m    332[0m [43m            [49m[43moutput_type[49m[38;5;241;43m=[39;49m[43moutput_type[49m[43m[[49m[43moutput_key[49m[43m][49m[43m,[49m
+[1;32m    333[0m [43m        [49m[43m)[49m
+[1;32m    334[0m         [38;5;28;01mfor[39;00m output_key, col [38;5;129;01min[39;00m [38;5;28menumerate[39m(outputs)
+[1;32m    335[0m     }
+[1;32m    336[0m )
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:59[0m, in [0;36mDeferredColumn.__init__[0;34m(self, data, output_type, *args, **kwargs)[0m
+[1;32m     51[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m(
+[1;32m     52[0m     [38;5;28mself[39m,
+[1;32m     53[0m     data: Union[DeferredOp, BlockView],
+[0;32m   (...)[0m
+[1;32m     56[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m     57[0m ):
+[1;32m     58[0m     [38;5;28mself[39m[38;5;241m.[39m_output_type [38;5;241m=[39m output_type
+[0;32m---> 59[0m     [38;5;28;43msuper[39;49m[43m([49m[43mDeferredColumn[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m)[49m[38;5;241;43m.[39;49m[38;5;21;43m__init__[39;49m[43m([49m[43mdata[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/abstract.py:105[0m, in [0;36mColumn.__init__[0;34m(self, data, collate_fn, formatters, *args, **kwargs)[0m
+[1;32m     96[0m [38;5;28mself[39m[38;5;241m.[39m_set_data(data)
+[1;32m     98[0m [38;5;28msuper[39m(Column, [38;5;28mself[39m)[38;5;241m.[39m[38;5;21m__init__[39m(
+[1;32m     99[0m     collate_fn[38;5;241m=[39mcollate_fn,
+[1;32m    100[0m     [38;5;241m*[39margs,
+[1;32m    101[0m     [38;5;241m*[39m[38;5;241m*[39mkwargs,
+[1;32m    102[0m )
+[1;32m    104[0m [38;5;28mself[39m[38;5;241m.[39m_formatters [38;5;241m=[39m (
+[0;32m--> 105[0m     formatters [38;5;28;01mif[39;00m formatters [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m [38;5;28;01melse[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_get_default_formatters[49m[43m([49m[43m)[49m
+[1;32m    106[0m )
+[1;32m    108[0m [38;5;66;03m# Log creation[39;00m
+[1;32m    109[0m logger[38;5;241m.[39minfo([38;5;124mf[39m[38;5;124m"[39m[38;5;124mCreated `[39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39m[38;5;18m__class__[39m[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m` with [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m([38;5;28mself[39m)[38;5;132;01m}[39;00m[38;5;124m rows.[39m[38;5;124m"[39m)
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74[0m, in [0;36munmarked.__call__.<locals>.decorate_context[0;34m(*args, **kwargs)[0m
+[1;32m     71[0m [38;5;129m@wraps[39m(func)
+[1;32m     72[0m [38;5;28;01mdef[39;00m [38;5;21mdecorate_context[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[1;32m     73[0m     [38;5;28;01mwith[39;00m [38;5;28mself[39m[38;5;241m.[39mclone():
+[0;32m---> 74[0m         [38;5;28;01mreturn[39;00m [43mreactive[49m[43m([49m[43mfunc[49m[43m,[49m[43m [49m[43mnested_return[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    202[0m [38;5;66;03m# Call the function on the args and kwargs[39;00m
+[1;32m    203[0m [38;5;28;01mwith[39;00m unmarked():
+[0;32m--> 204[0m     result [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43munpacked_args[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43munpacked_kwargs[49m[43m)[49m
+[1;32m    206[0m [38;5;66;03m# TODO: Check if result is equal to one of the inputs.[39;00m
+[1;32m    207[0m [38;5;66;03m# If it is, we need to copy it.[39;00m
+[1;32m    209[0m [38;5;28;01mif[39;00m _is_unmarked_context [38;5;129;01mor[39;00m _force_no_react [38;5;129;01mor[39;00m [38;5;129;01mnot[39;00m any_inputs_marked:
+[1;32m    210[0m     [38;5;66;03m# If we are in an unmarked context, then we don't need to create[39;00m
+[1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
+[1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[0m, in [0;36mreactive.<locals>.__reactive.<locals>.wrapper.<locals>._fn_outer_wrapper.<locals>._fn_wrapper[0;34m(*args, **kwargs)[0m
+[1;32m    135[0m [38;5;129m@wraps[39m(_fn)
+[1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+[0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:170[0m, in [0;36mDeferredColumn._get_default_formatters[0;34m(self)[0m
+[1;32m    167[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmeerkat[39;00m[38;5;21;01m.[39;00m[38;5;21;01minteractive[39;00m[38;5;21;01m.[39;00m[38;5;21;01mformatter[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m [38;5;28;01mimport[39;00m deferred_formatter_group
+[1;32m    169[0m col [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_get(index[38;5;241m=[39m[38;5;28mslice[39m([38;5;241m0[39m, [38;5;241m1[39m, [38;5;241m1[39m), materialize[38;5;241m=[39m[38;5;28;01mTrue[39;00m)
+[0;32m--> 170[0m [38;5;28;01mreturn[39;00m deferred_formatter_group([43mcol[49m[38;5;241;43m.[39;49m[43mformatters[49m)
+
+[0;31mAttributeError[0m: 'numpy.ndarray' object has no attribute 'formatters'
+AttributeError: 'numpy.ndarray' object has no attribute 'formatters'
+

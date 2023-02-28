@@ -1,0 +1,1388 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Mapping: map and defer &#8212; 🔮 v0.2.6a14</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="shortcut icon" href="../../../_static/meerkat_logo.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Combining: concat and merge" href="combining.html" />
+    <link rel="prev" title="Operations" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"><div class='topnav'></div></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">🔮 v0.2.6a14</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../../index.html">
+                    Welcome to Meerkat 🔮
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting Started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/quickstart-df.html">
+   Quickstart: Data Frames
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../start/quickstart-interactive.html">
+   Quickstart: Interactive Apps
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../start/tutorials/index.html">
+   Tutorials
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-0.html">
+     Tutorial 0: Data Frames for Unstructured Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-1.html">
+     Tutorial 1: Image Gallery
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-2.html">
+     Tutorial 2: Reactive Image Viewer
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-3.html">
+     Tutorial 3: Query a Large Language Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-4.html">
+     Tutorial 4: Search Engine over a Dataset
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-filter-sort.html">
+     Tutorial: Filter &amp; Sort
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-simple-counter.html">
+     Tutorial: A Simple Counter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../start/tutorials/tutorial-simple-dataframe-viewer.html">
+     A Simple DataFrame Viewer
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  User Guide
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../overview.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../index.html">
+   DataFrame
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../selection.html">
+     Data Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../column/index.html">
+     Column
+    </a>
+   </li>
+   <li class="toctree-l2 current active has-children">
+    <a class="reference internal" href="index.html">
+     Operations
+    </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul class="current">
+     <li class="toctree-l3 current active">
+      <a class="current reference internal" href="#">
+       Mapping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         map
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         defer
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="combining.html">
+       Combining:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         concat
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         merge
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="grouping.html">
+       Grouping:
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         groupby
+        </span>
+       </code>
+       and
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clusterby
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../io.html">
+     I/O
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../advanced/copying.html">
+       Copy vs. View Behavior
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../advanced/blocks.html">
+       Blocks and the BlockManager
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../interactive/index.html">
+   Interactive
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/running-meerkat-interfaces.html">
+     Running Meerkat Interfaces
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/reactive-functions/index.html">
+     Reactive Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/stores/index.html">
+     Stores
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/components/index.html">
+     Components
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/endpoints/index.html">
+     Endpoints
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../interactive/formatters/index.html">
+     Formatters
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../interactive/advanced/index.html">
+     Advanced
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../interactive/advanced/sharing.html">
+       Sharing
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../interactive/advanced/under-the-hood.html">
+       Under the Hood
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../cheat-sheet.html">
+   Cheat Sheet
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Advanced
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../advanced/magic-contexts/index.html">
+   Magic Contexts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../advanced/magic-contexts/limitations.html">
+     Limitations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../advanced/configuring.html">
+   Configuring Meerkat
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Ecosystem
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../datasets/index.html">
+   Datasets
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../datasets/contributing-datasets.html">
+     Contributing Datasets
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../examples/index.html">
+   Examples
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/meerkat-in-5-minutes.html">
+     Meerkat in 5 Minutes
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../examples/image-search.html">
+     Building image search
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../apidocs/index.html">
+   API Reference
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/dataframe.html">
+     DataFrame
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/columns.html">
+     Columns
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/interactive.html">
+     Interactive
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../apidocs/ops.html">
+     Operations
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/user-guide/dataframe/ops/mapping.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/user-guide/dataframe/ops/mapping.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fuser-guide/dataframe/ops/mapping.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/user-guide/dataframe/ops/mapping.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../../_sources/user-guide/dataframe/ops/mapping.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../../_sources/user-guide/dataframe/ops/mapping.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#map">
+   Map
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-a-single-input-column">
+     Map with a single input column
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-multiple-input-columns">
+     Map with multiple input columns
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-multiple-output-columns">
+     Map with multiple output columns
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#deferred-map-and-chaining">
+   Deferred map and chaining
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#simple-deferred-map">
+     Simple deferred map
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#chaining-deferred-maps">
+     Chaining deferred maps
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipelining-and-parallelism">
+   Pipelining and Parallelism
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Mapping: map and defer</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#map">
+   Map
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-a-single-input-column">
+     Map with a single input column
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-multiple-input-columns">
+     Map with multiple input columns
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-with-multiple-output-columns">
+     Map with multiple output columns
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#deferred-map-and-chaining">
+   Deferred map and chaining
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#simple-deferred-map">
+     Simple deferred map
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#chaining-deferred-maps">
+     Chaining deferred maps
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pipelining-and-parallelism">
+   Pipelining and Parallelism
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="mapping-map-and-defer">
+<span id="guide-dataframe-ops-mapping"></span><h1>Mapping: <code class="docutils literal notranslate"><span class="pre">map</span></code> and <code class="docutils literal notranslate"><span class="pre">defer</span></code><a class="headerlink" href="#mapping-map-and-defer" title="Permalink to this headline">¶</a></h1>
+<p>In this guide, we discuss how we can create new columns by applying a function to each row of existing columns: we call this <em>mapping</em>. We provide detailed examples of how to the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation. We also introduce the <code class="xref py py-func docutils literal notranslate"><span class="pre">update()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">filter()</span></code> operations, which are utilities that wrap the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#map" id="id1">Map</a></p>
+<ul>
+<li><p><a class="reference internal" href="#map-with-a-single-input-column" id="id2">Map with a single input column</a></p></li>
+<li><p><a class="reference internal" href="#map-with-multiple-input-columns" id="id3">Map with multiple input columns</a></p></li>
+<li><p><a class="reference internal" href="#map-with-multiple-output-columns" id="id4">Map with multiple output columns</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#deferred-map-and-chaining" id="id5">Deferred map and chaining</a></p>
+<ul>
+<li><p><a class="reference internal" href="#simple-deferred-map" id="id6">Simple deferred map</a></p></li>
+<li><p><a class="reference internal" href="#chaining-deferred-maps" id="id7">Chaining deferred maps</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#pipelining-and-parallelism" id="id8">Pipelining and Parallelism</a></p></li>
+</ul>
+</div>
+<section id="map">
+<h2><a class="toc-backref" href="#id1">Map</a><a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h2>
+<p>Let’s warm up with an example: converting a column of birth years to a column of ages. We start with a small DataFrame of voters with two columns: <code class="docutils literal notranslate"><span class="pre">birth_year</span></code>, which contains the birth year of each person, and <code class="docutils literal notranslate"><span class="pre">residence</span></code>, which contains the state in which each person lives.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;birth_year&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1967</span><span class="p">,</span> <span class="mi">1993</span><span class="p">,</span> <span class="mi">2010</span><span class="p">,</span> <span class="mi">1985</span><span class="p">,</span> <span class="mi">2007</span><span class="p">,</span> <span class="mi">1990</span><span class="p">,</span> <span class="mi">1943</span><span class="p">],</span>
+    <span class="s2">&quot;residence&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;MA&quot;</span><span class="p">,</span> <span class="s2">&quot;LA&quot;</span><span class="p">,</span> <span class="s2">&quot;NY&quot;</span><span class="p">,</span> <span class="s2">&quot;NY&quot;</span><span class="p">,</span> <span class="s2">&quot;MA&quot;</span><span class="p">,</span> <span class="s2">&quot;MA&quot;</span><span class="p">,</span> <span class="s2">&quot;LA&quot;</span><span class="p">]</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="map-with-a-single-input-column">
+<h3><a class="toc-backref" href="#id2">Map with a single input column</a><a class="headerlink" href="#map-with-a-single-input-column" title="Permalink to this headline">¶</a></h3>
+<p>We want to create a new column, <code class="docutils literal notranslate"><span class="pre">age</span></code>, which contains the age of each person. We can do this with the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation, passing a lambda function that takes a birth year and returns the age.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;birth_year&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">x</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Frontend is not initialized. Running `<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">mk.gui.start</span><span style="font-weight: bold">()</span>`.
+</pre>
+</div><div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Table57be7b24-9913-4f0b-8783-0599ea619e0f"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>Note that we add the new column to the DataFrame in-place by assigning the result of the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation to the <code class="docutils literal notranslate"><span class="pre">age</span></code> column.</p>
+</section>
+<section id="map-with-multiple-input-columns">
+<h3><a class="toc-backref" href="#id3">Map with multiple input columns</a><a class="headerlink" href="#map-with-multiple-input-columns" title="Permalink to this headline">¶</a></h3>
+<p>We can also map a function that takes more than one column as argument. For example, say we wanted to create new column <code class="docutils literal notranslate"><span class="pre">ma_eligible</span></code> that indicates whether or not a person is eligible to vote in Massachusetts. We can do this with the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation, passing a lambda function that takes age and residence.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">age</span><span class="p">,</span> <span class="n">residence</span><span class="p">:</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Tablece68ffac-5873-4eb0-ad21-6b78d78bef42"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>The call to <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> inspects the signature of the function and determines that it takes two arguments: <code class="docutils literal notranslate"><span class="pre">age</span></code> and <code class="docutils literal notranslate"><span class="pre">residence</span></code>. It then finds the columns with the same names in the DataFrame and passes the corresponding values to the function. If the function takes an non-default argument that is not a column in the DataFrame, the operation will raise a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>.</p>
+<p>We can also specify the correspondence between arguments and columns explicitly with the <code class="docutils literal notranslate"><span class="pre">inputs</span></code> argument to <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>. While the inspection of function signature is convenient, it can be error-prone if used with a function that has a large number of arguments, some of which may spuriously match column names. The cell below is functionally equivalent to the one above, but is slightly more verbose.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="mi">18</span><span class="p">),</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;residence&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Tablea9086950-bdde-4b6b-a9cb-61bade214782"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some readers may wonder whether <code class="docutils literal notranslate"><span class="pre">func</span></code>{map} was the right choice
+in the above example. After all, we could have written a vectorized expression <code class="docutils literal notranslate"><span class="pre">df[&quot;ma_eligible&quot;]</span> <span class="pre">=</span> <span class="pre">(df[&quot;residence&quot;]</span> <span class="pre">==</span> <span class="pre">&quot;MA&quot;)</span> <span class="pre">&amp;</span> <span class="pre">(df[&quot;age&quot;]</span> <span class="pre">&gt;=</span> <span class="pre">18)</span></code>. In many cases, this would indeed be more efficient. The example above is meant to illustrate the general pattern of using <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>. The examples in the following sections will highlight the benefits of <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>.</p>
+</div>
+</section>
+<section id="map-with-multiple-output-columns">
+<h3><a class="toc-backref" href="#id4">Map with multiple output columns</a><a class="headerlink" href="#map-with-multiple-output-columns" title="Permalink to this headline">¶</a></h3>
+<p>It’s also possible to map a single function that returns multiple values.</p>
+<p>For example, say we wanted to create a two columns <code class="docutils literal notranslate"><span class="pre">ma_eligible</span></code> and <code class="docutils literal notranslate"><span class="pre">la_eligible</span></code> that indicate whether or not a person is eligible to vote in Massachusetts and Louisiana, respectively. We can do this with the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> operation, passing a lambda function that takes age and residence and returns a tuple of two booleans.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_eligibile</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">residence</span><span class="p">):</span>
+    <span class="n">old_enough</span> <span class="o">=</span> <span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span><span class="p">,</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;LA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">old_enough</span> <span class="o">=</span> <span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="k">return</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span><span class="p">,</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;LA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
+<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1145,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1132</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1133</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1134</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1141</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1142</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1143</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
+<span class="ne">-&gt; </span><span class="mi">1145</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1146</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1147</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1148</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1149</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1150</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1151</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1152</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1153</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1154</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1155</span>     <span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:451,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">339</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">_SHARED_DOCS_</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;defer&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">340</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">341</span>     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="s2">&quot;Column&quot;</span><span class="p">],</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">353</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">354</span> <span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">355</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Create a new :class:`Column` or :class:`DataFrame` by applying a</span>
+<span class="g g-Whitespace">    </span><span class="mi">356</span><span class="sd">     function to each row in ${data}.</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">448</span><span class="sd">         df[&quot;ma_eligible&quot;]</span>
+<span class="g g-Whitespace">    </span><span class="mi">449</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">451</span>     <span class="n">deferred</span> <span class="o">=</span> <span class="n">defer</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">452</span>         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">453</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">454</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">455</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">456</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">457</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">458</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">459</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">460</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">461</span>     <span class="k">return</span> <span class="n">_materialize</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">462</span>         <span class="n">deferred</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">463</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">467</span>         <span class="n">blocks_per_window</span><span class="o">=</span><span class="n">blocks_per_window</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">468</span>     <span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:329,</span> in <span class="ni">defer</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+<span class="ne">--&gt; </span><span class="mi">329</span>     <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">331</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">332</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">333</span>         <span class="p">)</span>
+<span class="nn">    334         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">335</span>     <span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">336</span> <span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:330,</span> in <span class="ni">&lt;dictcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">{</span>
+<span class="ne">--&gt; </span><span class="mi">330</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">331</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">332</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">333</span>         <span class="p">)</span>
+<span class="nn">    334         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">335</span>     <span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">336</span> <span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:59,</span> in <span class="ni">DeferredColumn.__init__</span><span class="nt">(self, data, output_type, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DeferredOp</span><span class="p">,</span> <span class="n">BlockView</span><span class="p">],</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">57</span> <span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">58</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_output_type</span> <span class="o">=</span> <span class="n">output_type</span>
+<span class="ne">---&gt; </span><span class="mi">59</span>     <span class="nb">super</span><span class="p">(</span><span class="n">DeferredColumn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/abstract.py:105,</span> in <span class="ni">Column.__init__</span><span class="nt">(self, data, collate_fn, formatters, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">96</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">98</span> <span class="nb">super</span><span class="p">(</span><span class="n">Column</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">99</span>     <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">100</span>     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">101</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">102</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">104</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatters</span> <span class="o">=</span> <span class="p">(</span>
+<span class="ne">--&gt; </span><span class="mi">105</span>     <span class="n">formatters</span> <span class="k">if</span> <span class="n">formatters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_formatters</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">108</span> <span class="c1"># Log creation</span>
+<span class="g g-Whitespace">    </span><span class="mi">109</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows.&quot;</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="k">def</span> <span class="nf">decorate_context</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">clone</span><span class="p">():</span>
+<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="k">return</span> <span class="n">reactive</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">nested_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">202</span> <span class="c1"># Call the function on the args and kwargs</span>
+<span class="g g-Whitespace">    </span><span class="mi">203</span> <span class="k">with</span> <span class="n">unmarked</span><span class="p">():</span>
+<span class="ne">--&gt; </span><span class="mi">204</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">unpacked_args</span><span class="p">,</span> <span class="o">**</span><span class="n">unpacked_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">206</span> <span class="c1"># TODO: Check if result is equal to one of the inputs.</span>
+<span class="g g-Whitespace">    </span><span class="mi">207</span> <span class="c1"># If it is, we need to copy it.</span>
+<span class="g g-Whitespace">    </span><span class="mi">209</span> <span class="k">if</span> <span class="n">_is_unmarked_context</span> <span class="ow">or</span> <span class="n">_force_no_react</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">any_inputs_marked</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">210</span>     <span class="c1"># If we are in an unmarked context, then we don&#39;t need to create</span>
+<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
+<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137,</span> in <span class="ni">reactive.&lt;locals&gt;.__reactive.&lt;locals&gt;.wrapper.&lt;locals&gt;._fn_outer_wrapper.&lt;locals&gt;._fn_wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">_fn</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:170,</span> in <span class="ni">DeferredColumn._get_default_formatters</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">167</span> <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">deferred_formatter_group</span>
+<span class="g g-Whitespace">    </span><span class="mi">169</span> <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">170</span> <span class="k">return</span> <span class="n">deferred_formatter_group</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">formatters</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span>: &#39;numpy.ndarray&#39; object has no attribute &#39;formatters&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that the output of the function was split into two columns. The names of the columns are just the indices in the tuple returned by the function. We can rename the columns by passing a tuple of column names to the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> argument of <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">,</span> <span class="s2">&quot;la_eligible&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Instead of outputting two columns, one for each state, we may want to output a single <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.ObjectColumn" title="meerkat.ObjectColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectColumn</span></code></a> containing tuples. To accomplish this we can pass <code class="docutils literal notranslate"><span class="pre">&quot;single&quot;</span></code> to the outputs argument.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="s2">&quot;single&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.ObjectColumn" title="meerkat.ObjectColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectColumn</span></code></a> is a column type that can store arbitrary Python objects, but it is backed by a Python list. This means it is <strong>much</strong> slower than other column types. We discuss this more in the guide on <a class="reference internal" href="../column/object.html"><span class="doc">Object Columns</span></a>.</p>
+</div>
+<p>If the function returns a dictionary, we can skip the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> argument and <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> will automatically use the keys of the dictionary as column names.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_eligibile</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">residence</span><span class="p">):</span>
+    <span class="n">old_enough</span> <span class="o">=</span> <span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;ma_eligible&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span><span class="p">,</span>
+        <span class="s2">&quot;la_eligible&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;LA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">old_enough</span>
+    <span class="p">}</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we would like to use a different name for the columns or only use a subset of the keys, we can pass a dictionary to the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> argument.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">is_eligibile</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">:</span> <span class="s2">&quot;ma&quot;</span><span class="p">,</span> <span class="s2">&quot;la_eligible&quot;</span><span class="p">:</span> <span class="s2">&quot;la&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><em>Consistent number of outputs.</em> If a function returns multiple values (either as a tuple or a dictionary), the number of values or the keys must be consistent across all calls to the function.</p>
+<p><em>Consistent type of outputs.</em> It is also important to note that the type of the resulting column is inferred by the first row of the input column(s). As a result, if later rows return values of a different type or shape, an error may be raised because the value cannot be inserted in the inferred column type. To explicitly specify the type of the output column, use the <code class="docutils literal notranslate"><span class="pre">output_types</span></code> argument to <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>.</p>
+</div>
+</section>
+</section>
+<section id="deferred-map-and-chaining">
+<span id="guide-dataframe-ops-mapping-deferred"></span><h2><a class="toc-backref" href="#id5">Deferred map and chaining</a><a class="headerlink" href="#deferred-map-and-chaining" title="Permalink to this headline">¶</a></h2>
+<p>In this section, we discuss how we can chain together multiple map operations using deferred maps. This produces a chain of operations that can be executed together. In the following section, we’ll discuss how we can pipeline chained operations to take advantage of parallelism.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’re unfamiliar with DeferredColumns, you may want to read the guide on <a class="reference internal" href="../column/deferred.html"><span class="doc">Deferred Columns</span></a> before diving into this section.</p>
+</div>
+<section id="simple-deferred-map">
+<h3><a class="toc-backref" href="#id6">Simple deferred map</a><a class="headerlink" href="#simple-deferred-map" title="Permalink to this headline">¶</a></h3>
+<p>In addition to <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> described above, Meerkat provides <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a>, which creates a <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a> representing a deferred map. The two functions share nearly the exact same signature (<em>i.e.</em> all that was discussed in the previous section around multiple inputs and ouputs also applies to <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a>). The difference is that <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> returns a column that has not yet been computed. It is a placeholder for a column that will be computed later.</p>
+<p>To demonstrate, let’s repeat the example above, this time using a deferred map to create a 2-step chain of operations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># no computation yet</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;birth_year&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="n">x</span>
+<span class="p">)</span>
+
+<span class="c1"># computation is done here</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;ma_eligible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">age</span><span class="p">,</span> <span class="n">residence</span><span class="p">:</span> <span class="p">(</span><span class="n">residence</span> <span class="o">==</span> <span class="s2">&quot;MA&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">18</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The only difference between this code and the code in the previous section is that here we use <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> instead of <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> when creating the <code class="docutils literal notranslate"><span class="pre">age</span></code> column. The result is the same, but here the computation of both <code class="docutils literal notranslate"><span class="pre">&quot;age&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;ma_eligible&quot;</span></code> is performed together at the end, instead of in two stages.</p>
+</section>
+<section id="chaining-deferred-maps">
+<h3><a class="toc-backref" href="#id7">Chaining deferred maps</a><a class="headerlink" href="#chaining-deferred-maps" title="Permalink to this headline">¶</a></h3>
+<p>Let’s motivate the use of deferred maps with a more involved example: processing a dataset of images. We’re going to use the <a class="reference external" href="https://github.com/fastai/imagenette#image%E7%BD%91">Imagenette dataset</a>, a small subset of the original <a class="reference external" href="https://www.image-net.org/update-mar-11-2021.php">ImageNet</a>.   We can load it from the Meerkat dataset registry with the <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.get" title="meerkat.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> function. This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”, “golf ball”), but we’ll focus on a simpler binary classification task: “parachute” vs. “golf ball”.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">&quot;parachute&quot;</span><span class="p">,</span> <span class="s2">&quot;golf ball&quot;</span><span class="p">])]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below, we’ve defined a classifier with a silly decision rule: it classifies an image as containing a parachute if in more than half of the pixels, the <strong>blue</strong> channel has the highest value (the logic being that parachutes are often photographed in the sky).</p>
+<p>The classifier has two methods which we need to chain together: <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> and <code class="docutils literal notranslate"><span class="pre">predict</span></code>. The <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> method takes an image and returns a NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(224,</span> <span class="pre">224,</span> <span class="pre">3)</span></code>. The <code class="docutils literal notranslate"><span class="pre">predict</span></code> method takes a batch of images and returns a boolean array with predictions.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title">To batch or not to batch?</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> takes a single image, while <code class="docutils literal notranslate"><span class="pre">predict</span></code> takes a batch of images. This is a common pattern in machine learning: preprocessing functions are often singleton while predict functions are often batched. Consider, for example, the <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> and <code class="docutils literal notranslate"><span class="pre">embed_image</span></code> functions in the implementation of <a class="reference external" href="https://github.com/openai/CLIP">CLIP</a>, a popular image encoder.</p>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">ParachuteClassifier</span><span class="p">:</span>
+    
+    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">Image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare an image for classification.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)))</span>
+    
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Classify a batch of images as containing a parachute or not, using a </span>
+<span class="sd">        simple decision rule. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+
+<span class="n">classifier</span> <span class="o">=</span> <span class="n">ParachuteClassifier</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Because only one of the two methods is batched, chaining them correctly is a bit tricky (one approach might invovle a double for-loop). Fortunately, with deferred maps, we can chain together functions that use different batching strategies. First, we create a deferred column that applies <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> to each image – by default <code class="docutils literal notranslate"><span class="pre">is_batched_fn=False</span></code>, so the <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> method is applied to each image individually. Next, we map the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method over the deferred column. Because <code class="docutils literal notranslate"><span class="pre">predict</span></code> is batched, we can use <code class="docutils literal notranslate"><span class="pre">is_batched_fn=True</span></code> and specify a <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> to indicate that the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method should be applied to batches of images.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocessed</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally we can compute the accuracy of the classifier by mapping a simple function that compares the predictions to the ground truth labels.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="n">prediction</span> <span class="o">==</span> <span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parachute&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Not too bad! I guess you can get pretty far in machine learning relying on spurious correlations.</p>
+<p>We could have chained all of these operations together into a single chain.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preprocessed</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="n">classifier</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+    <span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span>
+<span class="p">)</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="n">prediction</span> <span class="o">==</span> <span class="p">(</span><span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;parachute&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here’s a trick question: <em>How long is the resulting chain?</em> At first glance, it seems like the chain is three maps long: <code class="docutils literal notranslate"><span class="pre">preprocess</span></code>, <code class="docutils literal notranslate"><span class="pre">predict</span></code>, then <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>. However, recall from the guide on <a class="reference internal" href="../column/deferred.html"><span class="doc">Deferred Columns</span></a> that images and other complex data types are typically stored in <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a>s – that is, the <code class="docutils literal notranslate"><span class="pre">&quot;img&quot;</span></code> column is itself a deferred map. This map applies an image loading function to each filepath in the dataset. It could have been created with a line like <code class="docutils literal notranslate"><span class="pre">df[&quot;img&quot;]</span> <span class="pre">=</span> <span class="pre">df[&quot;filepath&quot;].defer(load_image)</span></code>. Because our first <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> call in the cell above was made on the <code class="docutils literal notranslate"><span class="pre">&quot;img&quot;</span></code> column, the resulting chain is actually four maps long: <code class="docutils literal notranslate"><span class="pre">load</span></code>, <code class="docutils literal notranslate"><span class="pre">preprocess</span></code>, <code class="docutils literal notranslate"><span class="pre">predict</span></code>, then <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>.</p>
+<figure class="align-default" id="map-chain">
+<img alt="../../../_images/map_chain.png" src="../../../_images/map_chain.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">The chain of maps created by the code above. Although we only called <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.defer" title="meerkat.defer"><code class="xref py py-func docutils literal notranslate"><span class="pre">defer()</span></code></a> or <a class="reference internal" href="../../../apidocs/dataframe.html#meerkat.map" title="meerkat.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a> three times, the resulting chain is four maps long because the <code class="docutils literal notranslate"><span class="pre">&quot;img&quot;</span></code> column is itself a deferred map.</span><a class="headerlink" href="#map-chain" title="Permalink to this image">¶</a></p>
+<div class="legend">
+</div>
+</figcaption>
+</figure>
+<p><em>Why not just use multiple <code class="docutils literal notranslate"><span class="pre">map</span></code> calls?</em> Chaining together deferred maps has two main advantages over simply calling <code class="docutils literal notranslate"><span class="pre">map</span></code> multiple times.</p>
+<ol class="arabic simple">
+<li><p><strong>Memory.</strong> If one of the intermediate maps produces images or other large data types (as does <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> in this example), then the resulting column may not be able to fit in memory. With a regular <code class="docutils literal notranslate"><span class="pre">map</span></code>, that entire column will be materialized before the next <code class="docutils literal notranslate"><span class="pre">map</span></code> begins. If we use a deferred map, then intermediate results are released from memory once they are consumed by the next map in the chain. This enables us to process data types that are too large to fit in memory (<em>e.g.</em> images, video, audio).</p></li>
+<li><p><strong>Parallelism.</strong> Using deferred maps allows us to better take advantage of the parallelism afforded by our system, especially if each map in the chain depends on different system resources (<em>e.g.</em> CPU vs. GPU vs. I/O bandwidth). Meerkat supports pipelining chained maps, which allows us to run multiple maps in parallel. We discuss this in the next section.</p></li>
+</ol>
+</section>
+</section>
+<section id="pipelining-and-parallelism">
+<h2><a class="toc-backref" href="#id8">Pipelining and Parallelism</a><a class="headerlink" href="#pipelining-and-parallelism" title="Permalink to this headline">¶</a></h2>
+<p>Because map applies the same function to each row, it is a <a class="reference external" href="https://en.wikipedia.org/wiki/Embarrassingly_parallel">delightfully parallelizable</a> operation. In this section, we discuss how to parallelize maps and how to pipeline a chain of parallel maps.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>WIP
+Pipelining is currently an experimental feature. It will be implemented using <a class="reference external" href="https://docs.ray.io/en/latest/data/pipelining-compute.html">Ray</a>.</p>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Operations</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="combining.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Combining: <code class="docutils literal notranslate"><span class="pre">concat</span></code> and <code class="docutils literal notranslate"><span class="pre">merge</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By The Meerkat Team<br/>
+  
+      &copy; Copyright 2023 Meerkat.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
