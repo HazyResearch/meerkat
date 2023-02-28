@@ -1,10 +1,9 @@
 """Write a question answering interface."""
 import os
 
-from manifest import Manifest
+from fastapi.staticfiles import StaticFiles
 
 import meerkat as mk
-from meerkat.interactive.startup import file_find_replace
 
 df = mk.get("imagenette", version="160px")
 IMAGE_COL = "img"
@@ -49,26 +48,7 @@ layout = mk.gui.html.flexcol(
     ]
 )
 page = mk.gui.Page(component=layout, id="tutorial-1")
-import os
 
-from fastapi.staticfiles import StaticFiles
-
-# print(os.getcwd())
-# print(os.path.abspath("./meerkat/interactive/app/build/"))
-# libpath = os.path.abspath("./meerkat/interactive/app/")
-# api_url = "http://localhost:5000"
-# file_find_replace(
-#     libpath + "build",
-#     r"(VITE_API_URL\|\|\".*?\")",
-#     f'VITE_API_URL||"{api_url}"',
-#     "*.js",
-# )
-# file_find_replace(
-#     libpath + ".svelte-kit/output/client/_app/",
-#     r"(VITE_API_URL\|\|\".*?\")",
-#     f'VITE_API_URL||"{api_url}"',
-#     "*.js",
-# )
 page().mount(
     "/",
     StaticFiles(
@@ -76,5 +56,4 @@ page().mount(
     ),
     "test",
 )
-# page().mount("/static", StaticFiles(directory=os.path.abspath("./temp/"),html = True), "test")
 page.launch()
