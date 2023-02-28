@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Select } from 'flowbite-svelte';
 	import { createEventDispatcher } from 'svelte';
 
 	export let values: Array<string | number>;

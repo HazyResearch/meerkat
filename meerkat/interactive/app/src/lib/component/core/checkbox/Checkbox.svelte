@@ -24,6 +24,7 @@
 	<Checkbox
 		on:change={(e) => {
 			cellEdit(checked);
+			dispatch('change');
 		}}
 		bind:checked
 		bind:disabled
