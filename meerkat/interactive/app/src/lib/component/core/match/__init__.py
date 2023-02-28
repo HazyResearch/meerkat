@@ -1,6 +1,6 @@
 import ast
 from dataclasses import dataclass
-from typing import Literal, Tuple
+from typing import Literal
 
 import numpy as np
 from fastapi import HTTPException
@@ -76,10 +76,9 @@ def get_match_schema(df: DataFrame):
 
 
 def _calc_image_query(df: DataFrame, locs: list, against: str):
-    """Calculate the negative samples for a match.
-    """
+    """Calculate the negative samples for a match."""
     return df.loc[locs][against].mean(axis=0)
-    
+
 
 @endpoint()
 def set_criterion(
@@ -104,13 +103,17 @@ def set_criterion(
         if not query and not negatives and not positives:
             return criterion
 
-        query_embedding = 0.
+        query_embedding = 0.0
         if query:
             query_embedding = parse_query(query)
         if negatives:
-            query_embedding = query_embedding - 0.25 * _calc_image_query(df, negatives, against)
+            query_embedding = query_embedding - 0.25 * _calc_image_query(
+                df, negatives, against
+            )
         if positives:
-            query_embedding = query_embedding + _calc_image_query(df, positives, against)
+            query_embedding = query_embedding + _calc_image_query(
+                df, positives, against
+            )
 
         match_criterion = MatchCriterion(
             query=query,
@@ -161,6 +164,7 @@ class Match(Component):
     text: str = ""
     encoder: str = "clip"
     title: str = "Match"
+    enable_selection: bool = False
 
     # TODO: Revisit this, how to deal with endpoint interfaces when there is composition
     # and positional arguments
@@ -180,6 +184,7 @@ class Match(Component):
         text: str = "",
         encoder: str = "clip",
         title: str = "Match",
+        enable_selection: bool = False,
         on_match: EndpointProperty = None,
         get_match_schema: EndpointProperty = None,
         on_clickminus: Endpoint = None,
@@ -194,6 +199,7 @@ class Match(Component):
             text=text,
             encoder=encoder,
             title=title,
+            enable_selection=enable_selection,
             on_match=on_match,
             get_match_schema=get_match_schema,
             on_clickminus=on_clickminus,
@@ -213,14 +219,16 @@ class Match(Component):
             MatchCriterion(against=None, query=None, name=None),
             backend_only=True,
         )
-        
+
         self.negative_selection = Store([], backend_only=True)
         self.positive_selection = Store([], backend_only=True)
-        self._mode: Store[Literal[
-            "set_negative_selection", 
-            "set_positive_selection", 
-            "",
-        ]] = Store("")
+        self._mode: Store[
+            Literal[
+                "set_negative_selection",
+                "set_positive_selection",
+                "",
+            ]
+        ] = Store("")
 
         on_match = set_criterion.partial(
             df=self.df,
@@ -237,7 +245,7 @@ class Match(Component):
 
     def set_selection(self, selection: Store[list]):
         self.external_selection = selection
-
+        self.enable_selection = True
 
         self._positive_selection = Store([], backend_only=True)
         self._negative_selection = Store([], backend_only=True)
@@ -264,16 +272,16 @@ class Match(Component):
 
     @reactive()
     def on_external_selection_change(self, external_selection):
-        if self._mode == 'set_negative_selection':
+        if self._mode == "set_negative_selection":
             self.negative_selection.set(external_selection)
-        elif self._mode == 'set_positive_selection':
+        elif self._mode == "set_positive_selection":
             self.positive_selection.set(external_selection)
 
     @endpoint()
     def on_set_negative_selection(self):
-        if self._mode == 'set_positive_selection':
+        if self._mode == "set_positive_selection":
             self._positive_selection.set(self.external_selection.value)
-        self._mode.set('set_negative_selection')
+        self._mode.set("set_negative_selection")
         self.external_selection.set(self._negative_selection.value)
 
     @endpoint()
@@ -281,12 +289,12 @@ class Match(Component):
         self._negative_selection.set(self.external_selection.value)
         self._mode.set("")
         self.external_selection.set([])
-    
+
     @endpoint()
     def on_set_positive_selection(self):
-        if self._mode == 'set_negative_selection':
+        if self._mode == "set_negative_selection":
             self._negative_selection.set(self.external_selection.value)
-        self._mode.set('set_positive_selection')
+        self._mode.set("set_positive_selection")
         self.external_selection.set(self._positive_selection.value)
 
     @endpoint()
