@@ -4,7 +4,6 @@ from fastapi.testclient import TestClient
 
 import meerkat as mk
 from meerkat.interactive.api.main import app
-from meerkat.interactive.edit import EditTargetConfig
 
 client = TestClient(app)
 
@@ -14,199 +13,103 @@ def df_testbed():
     df = mk.DataFrame(
         {"a": np.arange(10), "b": np.arange(10, 20), "clip(a)": np.zeros((10, 4))}
     )
+    df.set_primary_key("a")
 
     return {"df": df}
 
 
 def test_get_schema(df_testbed):
-    df = df_testbed["df"]
-    ref = Reference(df)
+    df: mk.DataFrame = df_testbed["df"]
     response = client.post(
-        f"/df/{ref.id}/schema/",
+        f"/df/{df.id}/schema/",
         json={"columns": ["a", "b"]},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": ref.obj.id,
+        "id": df.id,
         "columns": [
             {
                 "name": "a",
-                "type": "NumpyArrayColumn",
-                "cell_component": "basic",
-                "cell_props": {"dtype": "int"},
+                "type": "PandasScalarColumn",
+                "cellComponent": "MeerkatNumber",
+                "cellProps": {
+                    "dtype": "int",
+                    "precision": 3,
+                    "percentage": False,
+                    "classes": "",
+                },
+                "cellDataProp": "data",
             },
             {
                 "name": "b",
-                "type": "NumpyArrayColumn",
-                "cell_component": "basic",
-                "cell_props": {"dtype": "int"},
+                "type": "PandasScalarColumn",
+                "cellComponent": "MeerkatNumber",
+                "cellProps": {
+                    "dtype": "int",
+                    "precision": 3,
+                    "percentage": False,
+                    "classes": "",
+                },
+                "cellDataProp": "data",
             },
         ],
         "nrows": 10,
+        "primaryKey": "a",
     }
 
 
 def test_rows(df_testbed):
-    df = df_testbed["df"]
-    ref = Reference(df)
+    df: mk.DataFrame = df_testbed["df"]
     response = client.post(
-        f"/df/{ref.id}/rows/",
+        f"/df/{df.id}/rows/",
         json={"start": 3, "end": 7},
     )
     assert response.status_code == 200
-    assert response.json()["rows"] == [
-        [3, 13, "[0. 0. 0. 0.]"],
-        [4, 14, "[0. 0. 0. 0.]"],
-        [5, 15, "[0. 0. 0. 0.]"],
-        [6, 16, "[0. 0. 0. 0.]"],
+
+    response_json = response.json()
+
+    assert response_json["columnInfos"] == [
+        {
+            "name": "a",
+            "type": "PandasScalarColumn",
+            "cellComponent": "MeerkatNumber",
+            "cellProps": {
+                "dtype": "int",
+                "precision": 3,
+                "percentage": False,
+                "classes": "",
+            },
+            "cellDataProp": "data",
+        },
+        {
+            "name": "b",
+            "type": "PandasScalarColumn",
+            "cellComponent": "MeerkatNumber",
+            "cellProps": {
+                "dtype": "int",
+                "precision": 3,
+                "percentage": False,
+                "classes": "",
+            },
+            "cellDataProp": "data",
+        },
+        {
+            "name": "clip(a)",
+            "type": "NumPyTensorColumn",
+            "cellComponent": "MeerkatTensor",
+            "cellProps": {"dtype": "float64"},
+            "cellDataProp": "data",
+        },
     ]
-    assert response.json()["indices"] == [3, 4, 5, 6]
-    assert response.json()["full_length"] == 10
-
-
-@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
-def test_edit(column_type):
-    df = mk.DataFrame(
-        {
-            "row_id": column_type(list(map(str, np.arange(10, 20)))),
-            "value": column_type(list(map(str, np.arange(10)))),
-        }
-    )
-    df.data.consolidate()
-    pivot = Reference(df)
-
-    response = client.post(
-        f"/df/{pivot.id}/edit/",
-        json={"value": "100", "column": "value", "row_id": "14", "id_column": "row_id"},
-    )
-    assert response.status_code == 200
-    assert df["value"][4] == "100"
-    assert response.json() == [{"id": pivot.id, "scope": ["value"], "type": "ref"}]
-
-
-@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
-def test_edit_target(column_type):
-    df = mk.DataFrame(
-        {
-            "row_id_s": column_type(list(map(str, np.arange(10, 20)))),
-            "value": column_type(list(map(str, np.arange(10)))),
-        }
-    )
-
-    target_df = mk.DataFrame(
-        {
-            "row_id_t": column_type(list(map(str, np.arange(0, 20)))),
-            "value": column_type(list(map(str, np.arange(0, 20)))),
-        }
-    )
-
-    df.data.consolidate()
-    pivot = Reference(df)
-    target_pivot = Reference(target_df)
-
-    data = {
-        "target": EditTargetConfig(
-            target=target_pivot.config,
-            target_id_column="row_id_t",
-            source_id_column="row_id_s",
-        ).dict(),
-        "value": "100",
-        "column": "value",
-        "row_indices": [5, 6, 8],
-    }
-    response = client.post(f"/df/{pivot.id}/edit_target/", json=data)
-
-    assert response.status_code == 200, response.json()
-    assert target_df["value"][15] == "100"
-    assert target_df["value"][16] == "100"
-    assert target_df["value"][18] == "100"
-
-
-@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
-def test_edit_target_keys(column_type):
-    df = mk.DataFrame(
-        {
-            "row_id_s": column_type(list(map(str, np.arange(10, 20)))),
-            "value": column_type(list(map(str, np.arange(10)))),
-        }
-    )
-
-    target_df = mk.DataFrame(
-        {
-            "row_id_t": column_type(list(map(str, np.arange(0, 20)))),
-            "value": column_type(list(map(str, np.arange(0, 20)))),
-        }
-    )
-
-    df.data.consolidate()
-    pivot = Reference(df)
-    target_pivot = Reference(target_df)
-
-    data = {
-        "target": EditTargetConfig(
-            target=target_pivot.config,
-            target_id_column="row_id_t",
-            source_id_column="row_id_s",
-        ).dict(),
-        "value": "100",
-        "column": "value",
-        "row_keys": ["15", "16", "18"],
-        "primary_key": "row_id_s",
-    }
-    response = client.post(f"/df/{pivot.id}/edit_target/", json=data)
-
-    assert response.status_code == 200, response.json()
-    assert target_df["value"][15] == "100"
-    assert target_df["value"][16] == "100"
-    assert target_df["value"][18] == "100"
-
-
-def test_remove_row_by_index(df_testbed):
-    df = df_testbed["df"]
-
-    pivot = Reference(df)
-    data = {
-        "row_index": "5",
-    }
-
-    response = client.post(f"/df/{pivot.id}/remove_row_by_index/", json=data)
-
-    assert response.status_code == 200, response.json()
-
-
-@pytest.mark.parametrize("column_type", [mk.ScalarColumn])
-def test_edit_target_missing_id(column_type):
-    df = mk.DataFrame(
-        {
-            "row_id_s": column_type(list(map(str, np.arange(0, 10)))),
-            "value": column_type(list(map(str, np.arange(10)))),
-        }
-    )
-
-    target_df = mk.DataFrame(
-        {
-            "row_id_t": column_type(list(map(str, np.arange(5, 20)))),
-            "value": column_type(list(map(str, np.arange(5, 20)))),
-        }
-    )
-
-    df.data.consolidate()
-    pivot = Reference(df)
-    target_pivot = Reference(target_df)
-
-    data = {
-        "target": EditTargetConfig(
-            target=target_pivot.config,
-            target_id_column="row_id_t",
-            source_id_column="row_id_s",
-        ).dict(),
-        "value": "100",
-        "column": "value",
-        "row_indices": [2, 6, 8],
-    }
-    response = client.post(f"/df/{pivot.id}/edit_target/", json=data)
-
-    assert response.status_code == 500, response.json()
+    assert response_json["rows"] == [
+        [3, 13, {"data": [0.0, 0.0, 0.0, 0.0], "shape": [4], "dtype": "float64"}],
+        [4, 14, {"data": [0.0, 0.0, 0.0, 0.0], "shape": [4], "dtype": "float64"}],
+        [5, 15, {"data": [0.0, 0.0, 0.0, 0.0], "shape": [4], "dtype": "float64"}],
+        [6, 16, {"data": [0.0, 0.0, 0.0, 0.0], "shape": [4], "dtype": "float64"}],
+    ]
+    assert response_json["fullLength"] == 10
+    assert response_json["posidxs"] == [3, 4, 5, 6]
+    assert response_json["primaryKey"] == df.primary_key
 
 
 @pytest.mark.skip

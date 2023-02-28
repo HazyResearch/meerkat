@@ -692,7 +692,7 @@ def endpoint(
     return _endpoint(fn)
 
 
-def endpoints(cls=None, prefix=None):
+def endpoints(cls: type = None, prefix: str = None):
     """Decorator to mark a class as containing a collection of endpoints. All
     instance methods in the marked class will be converted to endpoints.
 
