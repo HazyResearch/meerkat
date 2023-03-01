@@ -27,17 +27,17 @@ mk run my_script.py --prod
 <!-- Read more about the `mk` command line tool in the :doc:`/reference/cli` reference. -->
 ````
 
-**Requirements.** The only requirement is that the script create an `Interface` object that is assigned to a variable. In other words, your script should look something like this:
+**Requirements.** The only requirement is that the script create an `Page` object that is assigned to a variable. In other words, your script should look something like this:
 
 ```python
 import meerkat as mk
 
 # ....
 
-interface = mk.gui.Interface(...)
+page = mk.gui.Page(...)
 ```
 
-Meerkat assumes that this variable is called `interface` by default. If you use a different variable name, pass it as an argument to the `mk run` command:
+Meerkat assumes that this variable is called `page` by default. If you use a different variable name, pass it as an argument to the `mk run` command:
 
 ```{bash}
 mk run my_script.py --target <variable_name>

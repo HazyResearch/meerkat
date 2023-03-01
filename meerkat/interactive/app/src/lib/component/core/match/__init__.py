@@ -245,7 +245,7 @@ class Match(Component):
 
     def set_selection(self, selection: Store[list]):
         self.external_selection = selection
-        self.enable_selection = True
+        self.enable_selection.set(True)
 
         self._positive_selection = Store([], backend_only=True)
         self._negative_selection = Store([], backend_only=True)
