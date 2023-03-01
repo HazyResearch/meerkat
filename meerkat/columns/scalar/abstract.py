@@ -11,6 +11,7 @@ from pandas.core.accessor import CachedAccessor
 from meerkat.block.abstract import BlockView
 from meerkat.block.arrow_block import ArrowBlock
 from meerkat.block.pandas_block import PandasBlock
+from meerkat.columns.tensor.abstract import TensorColumn
 from meerkat.tools.lazy_loader import LazyLoader
 
 from ..abstract import Column
@@ -185,6 +186,10 @@ class ScalarColumn(Column):
             return super().__new__(PandasScalarColumn)
         elif isinstance(data, pa.Array):
             return super().__new__(ArrowScalarColumn)
+        elif isinstance(data, TensorColumn) and len(data.shape) == 1:
+            return super().__new__(PandasScalarColumn)
+        elif isinstance(data, ScalarColumn):
+            return data
         else:
             raise ValueError(
                 f"Cannot create `ScalarColumn` from object of type {type(data)}."

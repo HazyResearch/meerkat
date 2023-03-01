@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 import torch
 from PIL import Image
+from meerkat.columns.deferred.file import FileColumn
 
 from meerkat.columns.deferred.image import ImageColumn
 from meerkat.columns.object.base import ObjectColumn
@@ -155,4 +156,4 @@ class MockImageColumn:
             im = Image.fromarray(self.image_arrays[-1])
             im.save(self.image_paths[-1])
 
-        self.col = ImageColumn.from_filepaths(self.image_paths)
+        self.col = FileColumn(self.image_paths)

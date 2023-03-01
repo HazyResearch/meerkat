@@ -422,6 +422,7 @@ def translate_index(index, length: int):
         return index
 
     from ..columns.scalar.abstract import ScalarColumn
+    from ..columns.tensor.abstract import TensorColumn
 
     if isinstance(index, pd.Series):
         index = index.values
@@ -434,6 +435,14 @@ def translate_index(index, length: int):
 
     if isinstance(index, ScalarColumn):
         index = index.to_numpy()
+    
+    if isinstance(index, TensorColumn):
+        if len(index.shape) == 1:
+            index = index.to_numpy()
+        else:
+            raise TypeError(
+                "`TensorColumn` index must have 1 axis, not {}".format(len(index.shape))
+            )
 
     # `index` should return a batch
     if isinstance(index, slice):

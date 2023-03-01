@@ -750,8 +750,8 @@ def test_read_meerkat_hf_dataframe(url_suffix):
     assert isinstance(df, DataFrame)
 
 
-def test_repr_html_(testbed):
-    testbed.df._repr_html_()
+def test_ipython_display_(testbed):
+    testbed.df._ipython_display_()
 
 
 def test_append_columns():
@@ -877,7 +877,7 @@ def test_from_huggingface(tmpdir: str):
         cache_dir=tmpdir,
     )["test"]
     assert len(df) == 4
-    assert len(df.columns) == 3
+    assert len(df.columns) == 2
 
     # Returns a dataset
     df = DataFrame.from_huggingface(
@@ -886,7 +886,7 @@ def test_from_huggingface(tmpdir: str):
         split="test",
     )
     assert len(df) == 4
-    assert len(df.columns) == 3
+    assert len(df.columns) == 2
 
 
 def test_from_jsonl():

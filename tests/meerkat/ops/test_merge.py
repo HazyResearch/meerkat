@@ -7,6 +7,7 @@ import pytest
 import torch
 
 from meerkat.columns.abstract import Column
+from meerkat.columns.deferred.file import FileColumn
 from meerkat.columns.deferred.image import ImageColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.tensor.torch import TorchTensorColumn
@@ -289,7 +290,7 @@ class TestMerge:
         )
 
         out = df1.merge(df2, on="a", how="inner")
-        assert isinstance(out["img"], ImageColumn)
+        assert isinstance(out["img"], FileColumn)
         assert [str(fp) for fp in out["img"].data.args[0]] == [
             os.path.basename(img_col_test_bed.image_paths[row]) for row in rows
         ]

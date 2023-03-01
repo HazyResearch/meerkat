@@ -60,7 +60,7 @@ class FileColumnTestBed(AbstractColumnTestBed):
 
         self.data = np.arange(length)
 
-        self.col = FileColumn.from_filepaths(
+        self.col = FileColumn(
             self.paths,
             loader=load_json,
             base_dir=self.base_dir,

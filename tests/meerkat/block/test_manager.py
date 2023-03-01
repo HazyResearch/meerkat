@@ -7,6 +7,7 @@ import torch
 
 import meerkat as mk
 from meerkat.block.manager import BlockManager
+from meerkat.tools.utils import load_yaml
 
 from ...utils import product_parametrize
 
@@ -367,10 +368,10 @@ def test_io(tmpdir):
     col1 = mk.TensorColumn(data=np.arange(10) * 100)
     mgr.add_column(col1, "col1")
     mgr.remove("col9")
-    assert os.path.exists(os.path.join(tmpdir, "columns", "col9"))
+    assert "col9" in load_yaml(os.path.join(tmpdir, "meta.yaml"))["columns"]
     mgr.write(tmpdir)
     # make sure the old column was removed
-    assert not os.path.exists(os.path.join(tmpdir, "columns", "col9"))
+    assert "col9" not in load_yaml(os.path.join(tmpdir, "meta.yaml"))["columns"]
     new_mgr = BlockManager.read(tmpdir)
     assert len(new_mgr._block_refs) == 3
 

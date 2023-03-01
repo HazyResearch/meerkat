@@ -33,7 +33,7 @@ class ImageColumnTestBed:
             im.save(os.path.join(tmpdir, filename))
             self.image_paths.append(os.path.join(tmpdir, filename))
 
-        self.col = mk.ImageColumn.from_filepaths(
+        self.col = mk.FileColumn(
             self.image_paths,
             loader=Image.open,
         )
@@ -88,6 +88,7 @@ def test_embed_images(tmpdir: str, simple_encoder):
         data=df,
         input="image",
         encoder="_simple_encoder",
+        modality="image", 
         batch_size=4,
         num_workers=0,
     )
@@ -95,7 +96,7 @@ def test_embed_images(tmpdir: str, simple_encoder):
     assert isinstance(df, mk.DataFrame)
     assert "_simple_encoder(image)" in df
     assert (
-        simple_image_transform(df["image"][0]).mean()
+        simple_image_transform(df["image"][0]()).mean()
         == df["_simple_encoder(image)"][0].mean()
     )
 
@@ -108,6 +109,7 @@ def test_embed_text(simple_encoder):
         data=df,
         input="text",
         encoder="_simple_encoder",
+        modality="text",
         batch_size=4,
         num_workers=0,
     )

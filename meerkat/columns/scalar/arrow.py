@@ -407,7 +407,7 @@ class ArrowScalarColumn(ScalarColumn):
                 other, "binary_join_element_wise", True, ""
             )
 
-        return self._dispatch_arithmetic_function(other, "radd", right=False)
+        return self._dispatch_arithmetic_function(other, "add", right=False)
 
     def __truediv__(self, other: ScalarColumn):
         return self._true_div(other, right=False)
