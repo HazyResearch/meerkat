@@ -5,12 +5,14 @@ from meerkat.dataframe import DataFrame
 
 from ...utils import product_parametrize
 from ..columns.abstract import AbstractColumnTestBed, column_parametrize
-from ..columns.deferred.test_deferred import DeferredColumnTestBed
-from ..columns.deferred.test_image import ImageColumnTestBed
-from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
-from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
+
+# from ..columns.deferred.test_deferred import DeferredColumnTestBed
+# from ..columns.deferred.test_image import ImageColumnTestBed
+# from ..columns.scalar.test_arrow import ArrowScalarColumnTestBed
+# from ..columns.scalar.test_pandas import PandasScalarColumnTestBed
 from ..columns.tensor.test_numpy import NumPyTensorColumnTestBed
-from ..columns.tensor.test_torch import TorchTensorColumnTestBed
+
+# from ..columns.tensor.test_torch import TorchTensorColumnTestBed
 
 
 @pytest.fixture(
