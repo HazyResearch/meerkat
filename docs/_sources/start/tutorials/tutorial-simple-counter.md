@@ -36,7 +36,7 @@ Then, we'll create an `Endpoint` in Meerkat, which is a Python function that can
 
 ```{code-cell} ipython3
 @mk.gui.endpoint
-def increment(counter: Store[int]):
+def increment(counter: mk.Store[int]):
     # Use the special .set() method to update the Store
     counter.set(counter + 1)
 ```
