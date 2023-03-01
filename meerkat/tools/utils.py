@@ -435,7 +435,7 @@ def translate_index(index, length: int):
 
     if isinstance(index, ScalarColumn):
         index = index.to_numpy()
-    
+
     if isinstance(index, TensorColumn):
         if len(index.shape) == 1:
             index = index.to_numpy()

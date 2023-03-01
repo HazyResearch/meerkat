@@ -88,7 +88,7 @@ def test_embed_images(tmpdir: str, simple_encoder):
         data=df,
         input="image",
         encoder="_simple_encoder",
-        modality="image", 
+        modality="image",
         batch_size=4,
         num_workers=0,
     )

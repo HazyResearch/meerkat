@@ -542,7 +542,6 @@ class BaseComponent(
         return "100%"
 
     def _ipython_display_(self):
-
         from IPython.display import display
 
         from meerkat.interactive.page import Page

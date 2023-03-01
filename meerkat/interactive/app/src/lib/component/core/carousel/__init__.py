@@ -3,7 +3,6 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
 class Carousel(Component):
-
     df: DataFrame
     main_column: str
 

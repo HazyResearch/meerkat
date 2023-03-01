@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 
 class GalleryQuery(div):
-
     # match: Match = None
     # gallery: Gallery = None
 

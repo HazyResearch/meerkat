@@ -14,7 +14,6 @@ class OnKeyEnterNumberInput(EventInterface):
 
 
 class NumberInput(Component):
-
     value: Union[int, float]
     placeholder: str = "Enter a number..."
     debounceTimer: int = 150
