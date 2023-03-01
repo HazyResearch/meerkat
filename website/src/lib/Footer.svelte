@@ -4,7 +4,7 @@
 >	
 	<div class="text-md animate-[bounce_3s_ease-in-out_infinite] flex">
 		<a
-			href="https://github.com/robustness-gym/meerkat"
+			href="https://github.com/hazyresearch/meerkat"
 			class="text-gray-700 dark:text-gray-200 bg-purple-50 hover:bg-purple-200 border border-purple-200 rounded-lg py-1 px-2 shadow-md shadow-purple-900 "
 		>
 			<span>&#127775</span> Star us on GitHub!
@@ -12,7 +12,7 @@
 	</div>
 	<div class="text-md animate-[bounce_3s_ease-in-out_infinite] flex">
 		<a
-			href="https://discord.gg/jwQMr6em"
+			href="https://discord.gg/pw8E4Q26Tq"
 			class="text-gray-700 dark:text-gray-200 bg-purple-50 hover:bg-purple-200 border border-purple-200 rounded-lg py-1 px-2 shadow-md shadow-purple-900 "
 		>	
 			<span>
