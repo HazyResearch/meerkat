@@ -4,7 +4,7 @@ kernelspec:
   name: python3
 ---
 
-# Tutorial 4: Complex Components (Embedding Based Search Engine)
+# Tutorial 6: Complex Components (Embedding Based Search Engine)
 
 In this tutorial, we'll show you how you can build a simple search engine over a dataset, using the CLIP model to drive the search. Users will be able to type in a query to search over images, and will see the dataset images ranked by their similarity to the query.
 

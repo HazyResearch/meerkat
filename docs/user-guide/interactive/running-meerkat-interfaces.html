@@ -135,38 +135,38 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
+    <a class="reference internal" href="../../start/tutorials/tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-1.html">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-2.html">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-3.html">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../start/tutorials/tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="../../start/tutorials/tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../start/tutorials/tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-reactive-viewer.html">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-query-llm.html">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-search-engine.html">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../start/tutorials/tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1441,6 +1441,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -1849,15 +1854,15 @@ script is re-run every time you save a change to the script (live-reloading).</p
 <p>To run in production (<code class="docutils literal notranslate"><span class="pre">prod</span></code>) mode, use the <code class="docutils literal notranslate"><span class="pre">--prod</span></code> flag:</p>
 <!-- Read more about the `mk` command line tool in the :doc:`/reference/cli` reference. -->
 </div>
-<p><strong>Requirements.</strong> The only requirement is that the script create an <code class="docutils literal notranslate"><span class="pre">Interface</span></code> object that is assigned to a variable. In other words, your script should look something like this:</p>
+<p><strong>Requirements.</strong> The only requirement is that the script create an <code class="docutils literal notranslate"><span class="pre">Page</span></code> object that is assigned to a variable. In other words, your script should look something like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 
 <span class="c1"># ....</span>
 
-<span class="n">interface</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Meerkat assumes that this variable is called <code class="docutils literal notranslate"><span class="pre">interface</span></code> by default. If you use a different variable name, pass it as an argument to the <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span></code> command:</p>
+<p>Meerkat assumes that this variable is called <code class="docutils literal notranslate"><span class="pre">page</span></code> by default. If you use a different variable name, pass it as an argument to the <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span></code> command:</p>
 <div class="admonition-note admonition">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span></code> command does a few things behind the scenes:</p>

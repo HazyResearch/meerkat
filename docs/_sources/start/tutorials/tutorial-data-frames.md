@@ -5,7 +5,7 @@ kernelspec:
 ---
 
 
-# Tutorial 0: Data Frames (Wrangling an Image Dataset)
+# Tutorial 1: Data Frames (Wrangling an Image Dataset)
 
 In this tutorial, we'll learn how to use Meerkat to explore a dataset of images. We'll use the `imagenette` dataset, a small 10-class subset of ImageNet.
 
@@ -68,7 +68,7 @@ Meerkat's core contribution is the DataFrame, a simple columnar data abstraction
 We're going to build a `DataFrame` out of the `imagenette.csv` file from the download above.
 
 ```{code-cell} ipython3
-:tags: [output_scroll]
+:tags: [output_scroll, remove-output]
 
 # Create a `DataFrame`
 df = mk.from_csv("./downloads/imagenette2-160/imagenette.csv")

@@ -132,38 +132,38 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-1.html">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-2.html">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-3.html">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../../../start/tutorials/tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../../../start/tutorials/tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-reactive-viewer.html">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-query-llm.html">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-search-engine.html">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../start/tutorials/tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1438,6 +1438,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../../user-guide/interactive/faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -1738,13 +1743,13 @@ title="Open an issue"
     <span class="n">_self_marked</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">backend_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Wrapping an iterator in a Store is not recommended. &quot;</span>
-                <span class="s2">&quot;If the iterator is derived from an iterable, wrap the iterable:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;    &gt;&gt;&gt; store = mk.Store(iterable)</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;    &gt;&gt;&gt; iterator = iter(store)&quot;</span>
-            <span class="p">)</span>
+        <span class="c1"># if not isinstance(wrapped, _IteratorStore) and isinstance(wrapped, Iterator):</span>
+        <span class="c1">#     warnings.warn(</span>
+        <span class="c1">#         &quot;Wrapping an iterator in a Store is not recommended. &quot;</span>
+        <span class="c1">#         &quot;If the iterator is derived from an iterable, wrap the iterable:\n&quot;</span>
+        <span class="c1">#         &quot;    &gt;&gt;&gt; store = mk.Store(iterable)\n&quot;</span>
+        <span class="c1">#         &quot;    &gt;&gt;&gt; iterator = iter(store)&quot;</span>
+        <span class="c1">#     )</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wrapped</span><span class="o">=</span><span class="n">wrapped</span><span class="p">)</span>
         <span class="c1"># Set up these attributes so we can create the</span>
         <span class="c1"># schema and detail properties.</span>

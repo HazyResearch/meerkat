@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 2: Reactive Functions (Reactive Image Viewer) &#8212; 🔮 v0.2.6a15</title>
+    <title>Tutorial 6: Complex Components (Embedding Based Search Engine) &#8212; 🔮 v0.2.6a15</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -39,11 +39,14 @@
     <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script type="application/vnd.jupyter.widget-state+json">{"state": {"3180a0ae795f40119ea00855ae6faa7b": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "f43e32f544b34ac1b0e4c955b3fe0acf": {"model_name": "ProgressStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "c72c63b5123647a5b81aab1137950395": {"model_name": "FloatProgressModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "success", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_3180a0ae795f40119ea00855ae6faa7b", "max": 114352332.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_f43e32f544b34ac1b0e4c955b3fe0acf", "tabbable": null, "tooltip": null, "value": 114352332.0}}, "581eadc26ebb48bebebbf4a2d976a887": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9c17fd2ef359492aa7b55719570fac0f": {"model_name": "HTMLStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "cd854a6de8224cfa83aadee39ad6a7aa": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_581eadc26ebb48bebebbf4a2d976a887", "placeholder": "\u200b", "style": "IPY_MODEL_9c17fd2ef359492aa7b55719570fac0f", "tabbable": null, "tooltip": null, "value": "Downloading: 100%"}}, "497563f0a86a42b7a149052b276f9000": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "0993a39df6954c809e8e2a966df52af5": {"model_name": "HTMLStyleModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "d4f20bcc8ae44c6eb8e79bd7134843b8": {"model_name": "HTMLModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_497563f0a86a42b7a149052b276f9000", "placeholder": "\u200b", "style": "IPY_MODEL_0993a39df6954c809e8e2a966df52af5", "tabbable": null, "tooltip": null, "value": " 114M/114M [00:02&lt;00:00, 48.3MB/s]"}}, "9a9951a840ac4c70b2792d4ae5b64a51": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "81ebff9d647546e3a7ce21bed9b8c10d": {"model_name": "HBoxModel", "model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_cd854a6de8224cfa83aadee39ad6a7aa", "IPY_MODEL_c72c63b5123647a5b81aab1137950395", "IPY_MODEL_d4f20bcc8ae44c6eb8e79bd7134843b8"], "layout": "IPY_MODEL_9a9951a840ac4c70b2792d4ae5b64a51", "tabbable": null, "tooltip": null}}}, "version_major": 2, "version_minor": 0}</script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script crossorigin="anonymous" data-jupyter-widgets-cdn="https://cdn.jsdelivr.net/npm/" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 3: Endpoints (Query a Large Language Model)" href="tutorial-3.html" />
-    <link rel="prev" title="Tutorial 1: Basic Interactive Apps (Building an Image Gallery)" href="tutorial-1.html" />
+    <link rel="next" title="Tutorial 7: Complex Components (Gallery with Filter and Sort)" href="tutorial-filter-sort.html" />
+    <link rel="prev" title="Tutorial 5: Endpoints (Query a Large Language Model)" href="tutorial-query-llm.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -135,38 +138,38 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
+    <a class="reference internal" href="tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-1.html">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-3.html">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-reactive-viewer.html">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-query-llm.html">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1441,6 +1444,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -1628,7 +1636,7 @@ title="Toggle navigation"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-2.md"
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-search-engine.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1646,7 +1654,7 @@ title="Launch on Binder"
       </li>
       
       <li>
-        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-2.md"
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-search-engine.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1706,7 +1714,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-2.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-search-engine.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1723,7 +1731,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-2.md"
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-search-engine.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1751,7 +1759,7 @@ title="Edit this page"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-2.ipynb"
+        <a href="../../_sources/start/tutorials/tutorial-search-engine.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1768,7 +1776,7 @@ title="Download notebook file"
       </li>
       
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-2.md"
+        <a href="../../_sources/start/tutorials/tutorial-search-engine.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1805,23 +1813,142 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installing-dependencies">
+   Installing dependencies
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-in-the-dataset">
+   Loading in the dataset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-the-match-component">
+   Creating the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Match
+    </span>
+   </code>
+   component
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-the-match-criteria">
+   Getting the match criteria
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sorting-by-match-scores">
+   Sorting by match scores
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#visualizing-results-in-a-gallery">
+   Visualizing results in a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Gallery
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Tutorial 2: Reactive Functions (Reactive Image Viewer)</h1>
+                <h1>Tutorial 6: Complex Components (Embedding Based Search Engine)</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installing-dependencies">
+   Installing dependencies
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-in-the-dataset">
+   Loading in the dataset
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-the-match-component">
+   Creating the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Match
+    </span>
+   </code>
+   component
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-the-match-criteria">
+   Getting the match criteria
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sorting-by-match-scores">
+   Sorting by match scores
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#visualizing-results-in-a-gallery">
+   Visualizing results in a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Gallery
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -1829,41 +1956,59 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="tutorial-2-reactive-functions-reactive-image-viewer">
-<h1>Tutorial 2: Reactive Functions (Reactive Image Viewer)<a class="headerlink" href="#tutorial-2-reactive-functions-reactive-image-viewer" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we will build a simple image viewer that shows a random subset of images from
-a class in an image dataset.</p>
-<p>Through this tutorial, you will learn about:</p>
-<ul class="simple">
-<li><p>the concept of <strong>reactive functions</strong> in Meerkat</p></li>
-<li><p>how <strong>chaining reactive functions</strong> together can be used to build complex applications</p></li>
-<li><p>a few more components that you can use in Meerkat</p></li>
-</ul>
+  <section id="tutorial-6-complex-components-embedding-based-search-engine">
+<h1>Tutorial 6: Complex Components (Embedding Based Search Engine)<a class="headerlink" href="#tutorial-6-complex-components-embedding-based-search-engine" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we’ll show you how you can build a simple search engine over a dataset, using the CLIP model to drive the search. Users will be able to type in a query to search over images, and will see the dataset images ranked by their similarity to the query.</p>
 <p>To get started, run the tutorial demo script.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>match
 </pre></div>
 </div>
-<p>You should see the tutorial app when you open the link in your browser.</p>
-<p>Let’s break down the code in the demo script.</p>
-<p><strong>Data loading</strong></p>
+<p>You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.</p>
+<section id="installing-dependencies">
+<h2>Installing dependencies<a class="headerlink" href="#installing-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial has additional dependencies that you need to install. Run the following command to install them.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ftfy<span class="w"> </span>regex<span class="w"> </span>git+https://github.com/openai/CLIP.git
+</pre></div>
+</div>
+<p>Once you run the script, it will download the CLIP model and cache it in your home directory. This will take a few minutes.</p>
+</section>
+<section id="loading-in-the-dataset">
+<h2>Loading in the dataset<a class="headerlink" href="#loading-in-the-dataset" title="Permalink to this headline">¶</a></h2>
 <p>The first few lines just load in the <code class="docutils literal notranslate"><span class="pre">imagenette</span></code> dataset, a small 10-class subset of ImageNet.</p>
-<aside class="margin sidebar">
-<p class="sidebar-title"></p>
-<p><code class="docutils literal notranslate"><span class="pre">df</span></code> is an <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code>, which behaves quite similarly to a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>.</p>
-</aside>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
-<span class="kn">import</span> <span class="nn">rich</span>
-
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">IMAGE_COLUMN</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
-<span class="n">IMAGE_COL</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
-<span class="n">LABEL_COL</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span>
 </pre></div>
 </div>
 </div>
 </div>
-<!-- Show the dataset and hide the input cell. --><div class="cell tag_remove-input docutils container">
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EMBED_COLUMN</span> <span class="o">=</span> <span class="s2">&quot;img_clip&quot;</span>
+
+<span class="c1"># Download the precomupted CLIP embeddings for imagenette.</span>
+<span class="n">df_clip</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+    <span class="s2">&quot;https://huggingface.co/datasets/meerkat-ml/meerkat-dataframes/resolve/main/embeddings/imagenette_160px.mk.tar.gz&quot;</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "81ebff9d647546e3a7ce21bed9b8c10d"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_clip</span><span class="p">[[</span><span class="s2">&quot;img_id&quot;</span><span class="p">,</span> <span class="s2">&quot;img_clip&quot;</span><span class="p">]],</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;img_id&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Frontend is not initialized. Running `<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">mk.gui.start</span><span style="font-weight: bold">()</span>`.
 </pre>
@@ -1871,265 +2016,84 @@ a class in an image dataset.</p>
         <iframe
             width="100%"
             height="450px"
-            src="http://localhost:8000/?id=Tablef3023df0-14d0-48fb-9ca3-d4b9d7a43aa4"
+            src="http://localhost:8000/?id=Tablee47a5717-3aaf-4bc2-b743-fd51d7bfbe92"
             frameborder="0"
             allowfullscreen
             
         ></iframe>
         </div></div>
 </div>
+</section>
+<section id="creating-the-match-component">
+<h2>Creating the <code class="docutils literal notranslate"><span class="pre">Match</span></code> component<a class="headerlink" href="#creating-the-match-component" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a data frame with the dataset and CLIP image embeddings, we want to be able to run a search over the dataset. To do this, we’ll use the <code class="docutils literal notranslate"><span class="pre">Match</span></code> component, which allows us to match a query to the dataset.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unique classes in the dataset.</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">match</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Match</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">against</span><span class="o">=</span><span class="n">EMBED_COLUMN</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">[</span>
-    <span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'tench'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'church'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'french horn'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span>
-<span style="font-weight: bold">]</span>
-</pre>
-</div></div>
-</div>
-<p><strong>Selecting a class</strong></p>
-<p>Next, let’s create a <a class="reference internal" href="../../apidocs/interactive.html#meerkat.gui.Select" title="meerkat.gui.Select"><code class="xref py py-class docutils literal notranslate"><span class="pre">Select</span></code></a> component that allows the user to select a class. Once a user picks the class, we’ll then show a random subset of images from that class.</p>
-<aside class="margin sidebar">
-<p class="sidebar-title"></p>
-<p>A list of the components in Meerkat can be found in the
-<span class="xref myst">component guide</span>.</p>
-</aside>
-<p>Meerkat provides many components like <code class="docutils literal notranslate"><span class="pre">Select</span></code> that can be used to build useful
-apps.</p>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">against</span></code> is the column in the data frame that we want to match against. In this case, we want to match against the CLIP embeddings.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Match</span></code> is a complex component that does a few things:</p>
+<ul class="simple">
+<li><p>as a component, it visualizes a search bar where users can type in a query</p></li>
+<li><p>it provides an endpoint attribute, <code class="docutils literal notranslate"><span class="pre">on_match</span></code>, which can be used to run an endpoint when the user types in a query</p></li>
+<li><p>by default, <code class="docutils literal notranslate"><span class="pre">Match</span></code> assigns <code class="docutils literal notranslate"><span class="pre">on_match</span></code> to an endpoint that adds a column to the data frame with the match scores</p></li>
+</ul>
+</section>
+<section id="getting-the-match-criteria">
+<h2>Getting the match criteria<a class="headerlink" href="#getting-the-match-criteria" title="Permalink to this headline">¶</a></h2>
+<p>When a match query is run, it generates a new column in the data frame with the match scores. The name of this column is stored in the <code class="docutils literal notranslate"><span class="pre">criterion</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">Match</span></code> component. We can use this to get the name of the match criterion.</p>
+<p>Let’s use a <code class="docutils literal notranslate"><span class="pre">magic</span></code> context manager to get the name of the match criterion. Using <code class="docutils literal notranslate"><span class="pre">magic</span></code> makes the <code class="docutils literal notranslate"><span class="pre">match.criterion</span></code> Store property accessors reactive, so accessing its <code class="docutils literal notranslate"><span class="pre">name</span></code> attribute will cause this property access to re-run when the criterion is updated.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Give the user a way to select a class.</span>
-<span class="n">class_selector</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
-    <span class="n">values</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span>
-    <span class="n">value</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the name of the match criterion in a reactive way.</span>
+<span class="k">with</span> <span class="n">mk</span><span class="o">.</span><span class="n">magic</span><span class="p">():</span>
+    <span class="n">criterion_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, when a new match query is run, <code class="docutils literal notranslate"><span class="pre">criterion_name</span></code> will be updated to the name of the new match criterion.</p>
+</section>
+<section id="sorting-by-match-scores">
+<h2>Sorting by match scores<a class="headerlink" href="#sorting-by-match-scores" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have the name of the match criterion, we’ll use it to sort the data frame by the match scores. We’ll use the <code class="docutils literal notranslate"><span class="pre">mk.sort</span></code> function to do this.</p>
+<p>We also want sorting to be reactive, so that when a new match query is run, the data frame is sorted by the new match scores. Fortunately, <code class="docutils literal notranslate"><span class="pre">mk.sort</span></code> is a reactive function.</p>
+<p>However, before we run <code class="docutils literal notranslate"><span class="pre">sort</span></code>, we need to <em>mark</em> the data frame <code class="docutils literal notranslate"><span class="pre">df</span></code>. Any reactive functions that take <code class="docutils literal notranslate"><span class="pre">df</span></code> as an argument when it is marked will re-run when it is updated.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">mark</span><span class="p">()</span>
+<span class="n">df_sorted</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">criterion_name</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this, we now ensure that when <code class="docutils literal notranslate"><span class="pre">df</span></code> is updated with the new match scores from the user’s query, <code class="docutils literal notranslate"><span class="pre">df_sorted</span></code> will be re-sorted by the column with the new match scores.</p>
+</section>
+<section id="visualizing-results-in-a-gallery">
+<h2>Visualizing results in a <code class="docutils literal notranslate"><span class="pre">Gallery</span></code><a class="headerlink" href="#visualizing-results-in-a-gallery" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a sorted data frame, we can visualize the results. Let’s use a <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> component to visualize the data frame, and show the images by default.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df_sorted</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="n">IMAGE_COLUMN</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="putting-it-all-together">
+<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<p>With all the pieces, let’s put them together into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> and launch the app.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span><span class="n">match</span><span class="p">,</span> <span class="n">gallery</span><span class="p">]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;match&quot;</span><span class="p">,</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">class_selector.value</span>: 
-        cassette player 
-<span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">class_selector.value</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span>: 
-        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'meerkat.interactive.graph.store.Store'</span><span style="font-weight: bold">&gt;</span>
-</pre>
-</div></div>
-</div>
-<p>Notice here that <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> is a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object and not a <code class="docutils literal notranslate"><span class="pre">str</span></code>! A <code class="docutils literal notranslate"><span class="pre">Store</span></code> is a special object in Meerkat that serves as a thin wrapper around any Python object. It’s incredibly useful to connect different components to each other, and we’ll see more about how it plays a role in the next section.</p>
-<p>You can access the value of a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">.value</span></code> attribute e.g.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">class_selector.value.value</span>: 
-        cassette player 
-<span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">class_selector.value.value</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span>: 
-        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'str'</span><span style="font-weight: bold">&gt;</span>
-</pre>
-</div></div>
-</div>
-<p>We can also look at the <code class="docutils literal notranslate"><span class="pre">class_selector</span></code> component itself.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Select</span><span style="font-weight: bold">(</span>
-    <span style="color: #808000; text-decoration-color: #808000">values</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">([</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>, <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>, <span style="color: #008000; text-decoration-color: #008000">'tench'</span>, <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>, <span style="color: #008000; text-decoration-color: #008000">'church'</span>, <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>, 
-<span style="color: #008000; text-decoration-color: #008000">'french horn'</span>, <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>, <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>, <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span><span style="font-weight: bold">])</span>,
-    <span style="color: #808000; text-decoration-color: #808000">labels</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">([</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>, <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>, <span style="color: #008000; text-decoration-color: #008000">'tench'</span>, <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>, <span style="color: #008000; text-decoration-color: #008000">'church'</span>, <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>, 
-<span style="color: #008000; text-decoration-color: #008000">'french horn'</span>, <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>, <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>, <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span><span style="font-weight: bold">])</span>,
-    <span style="color: #808000; text-decoration-color: #808000">value</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span><span style="font-weight: bold">)</span>,
-    <span style="color: #808000; text-decoration-color: #808000">disabled</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #ff0000; text-decoration-color: #ff0000; font-style: italic">False</span><span style="font-weight: bold">)</span>,
-    <span style="color: #808000; text-decoration-color: #808000">classes</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #008000; text-decoration-color: #008000">''</span><span style="font-weight: bold">)</span>,
-    <span style="color: #808000; text-decoration-color: #808000">on_change</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>,
-    <span style="color: #808000; text-decoration-color: #808000">_slots</span>=<span style="font-weight: bold">[]</span>,
-    <span style="color: #808000; text-decoration-color: #808000">_self_id</span>=<span style="color: #008000; text-decoration-color: #008000">'__mkid__d234d488e0314870993a031eccfa90f5'</span>
-<span style="font-weight: bold">)</span>
-</pre>
-</div></div>
-</div>
-<p>Notice that all of the attributes of the <code class="docutils literal notranslate"><span class="pre">Select</span></code> component are also <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects. This is done automatically by all classes that subclass <code class="docutils literal notranslate"><span class="pre">Component</span></code> in Meerkat, of which <code class="docutils literal notranslate"><span class="pre">Select</span></code> is one. This is very useful because as <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects all of these attributes are synchronized between the frontend interface and the backend Python code.</p>
-<p><strong>Filtering the dataset by class</strong></p>
-<p>Once the user selects a class, the dataset should be filtered to that class.
-<strong>Importantly, we want this to happen every time the user selects a new class.</strong></p>
-<p>Let’s think about what would happen if we did the obvious thing and just filtered the dataset once.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Do it normally.</span>
-<span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">filtered_df</span>: 
-        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">DataFrame</span><span style="font-weight: bold">(</span>nrows: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1350</span>, ncols: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">15</span><span style="font-weight: bold">)</span>
-</pre>
-</div></div>
-</div>
-<p>The problem that will arise is that this filter uses the class label in <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> <strong>at the time of script execution. Once the user chooses a different class, there’s no way to go back to this line of code and rerun it.</strong></p>
-<p>This is where <strong>reactive functions</strong> come in. A reactive function is a function that is automatically re-executed whenever one of its inputs updates.</p>
-<p>In this example, we would want to re-execute the filter whenever the user selects a class and <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> changes. Let’s write a simple reactive function that filters the dataset to the selected class, using the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.reactive" title="meerkat.reactive"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;reactive()</span></code></a> decorator.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Use a reactive function.</span>
-<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Note a couple of things here:</p>
-<ul class="simple">
-<li><p>The function <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>. This is what makes it reactive.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is written as a normal Python function. This is true in general for reactive functions: there’s no special syntax or anything.</p></li>
-</ul>
-<p>Let’s now call this reactive function on the dataset and the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_df</span> <span class="o">=</span> <span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<aside class="margin sidebar">
-<p class="sidebar-title"></p>
-<p>In Meerkat, only <code class="docutils literal notranslate"><span class="pre">marked</span></code> objects can cause a reactive function to re-execute when they are updated. All Meerkat objects have <code class="docutils literal notranslate"><span class="pre">.mark()</span></code> and <code class="docutils literal notranslate"><span class="pre">.unmark()</span></code> methods, and only <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects are marked by default. You can read more about how this works in the <span class="xref myst">user guide on reactive functions</span>.</p>
-</aside>
-<p>When calling <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code>, we pass it the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and <strong>the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>, and not the actual string value of the class!</strong>
-This is critical to understand: in order for an argument to trigger re-execution of a reactive function, it must be a Meerkat object like a <code class="docutils literal notranslate"><span class="pre">Store</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, and not a Python object like <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
-<p>Of course, reactive functions can be used like normal Python functions, e.g. it would be perfectly fine to pass in <code class="docutils literal notranslate"><span class="pre">str</span></code> objects to <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> instead of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;cassette player&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html">
-        <iframe
-            width="100%"
-            height="450px"
-            src="http://localhost:8000/?id=Table5a32e508-53ec-4991-9079-928cb4356417"
-            frameborder="0"
-            allowfullscreen
-            
-        ></iframe>
-        </div></div>
-</div>
-<p>Let’s also note a couple of other ways in which we could create reactive functions that wouldn’t quite have worked.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Here, we’ve forgotten to create an argument for the class label, so using this reactive function would not work. It would never re-run when the user selects a new class!</p>
-<p>So far so good. We’ve created and used a reactive function that filters the dataset to the selected class.</p>
-<p><strong>Selecting a random subset of images</strong></p>
-<p>Let’s now create another reactive function that selects a random subset of images from the filtered dataset. Then, we’ll chain together the two reactive functions we’ve created so far to get the final result.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Select a random subset of images from the filtered dataset.&quot;&quot;&quot;</span>
-<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">random_images</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-    <span class="c1"># Sample 16 images from the filtered dataset.</span>
-    <span class="c1"># `images` will be a `Column` object.</span>
-    <span class="n">images</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">16</span><span class="p">)[</span><span class="n">IMAGE_COL</span><span class="p">]</span>
-
-    <span class="c1"># Encode the images as base64 strings.</span>
-    <span class="c1"># Use a `Formatter` object to do this.</span>
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">formatters</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span>
-
-    <span class="c1"># All Formatter objects have an `encode` method that</span>
-    <span class="c1"># can be used to take a data object and encode it in some way.</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">formatter</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Here, <code class="docutils literal notranslate"><span class="pre">random_images</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and returns a list of base64-encoded images. It’s decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code> so that it will be re-executed whenever the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is updated.</p>
-<p>Let’s pass the output of <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> to <code class="docutils literal notranslate"><span class="pre">random_images</span></code>.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="n">random_images</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">images</span>: 
-        
-</pre>
-</div></div>
-</div>
-<p>This sets up a chain of reactive functions that will be re-executed whenever the user selects a new class.</p>
-<p><strong>Displaying the images</strong>
-Finally, let’s show the user the images using a grid of <code class="docutils literal notranslate"><span class="pre">Image</span></code> components.</p>
-<div class="cell tag_remove-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make a grid with 4 columns</span>
-<span class="n">grid</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">gridcols4</span><span class="p">([</span>
-    <span class="c1"># Use equal-sized square boxes in the grid</span>
-    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
-        <span class="c1"># Wrap the image in a `mk.gui.Image` component</span>
-        <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">img</span><span class="p">),</span> 
-        <span class="n">style</span><span class="o">=</span><span class="s2">&quot;aspect-ratio: 1 / 1&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span>
-<span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;gap-2&quot;</span><span class="p">)</span> <span class="c1"># Add some spacing in the grid.</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Many components in Meerkat accept</p>
-<ul class="simple">
-<li><p>a <code class="docutils literal notranslate"><span class="pre">classes</span></code> attribute that can be used to add Tailwind CSS classes to the component, and</p></li>
-<li><p>a <code class="docutils literal notranslate"><span class="pre">style</span></code> attribute that can be used to add inline CSS styles to the component.</p></li>
-</ul>
-<p>Finally, let’s use the <code class="docutils literal notranslate"><span class="pre">flexcol</span></code> component to stack the class selector and the grid of images vertically.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span>
-    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Caption</span><span class="p">(</span><span class="s2">&quot;Choose a class:&quot;</span><span class="p">),</span> <span class="n">class_selector</span><span class="p">],</span> 
-        <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;flex justify-center items-center mb-2 gap-4&quot;</span>
-    <span class="p">),</span>
-    <span class="n">grid</span><span class="p">,</span>
-<span class="p">])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can pass everything into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> component to render the app.</p>
-<div class="cell tag_remove-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-2&quot;</span><span class="p">)</span>
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-</div>
-<p>That’s it!</p>
+</section>
 </section>
 
 
@@ -2140,17 +2104,17 @@ Finally, let’s show the user the images using a grid of <code class="docutils 
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="tutorial-1.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="tutorial-query-llm.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Tutorial 1: Basic Interactive Apps (Building an Image Gallery)</p>
+            <p class="prev-next-title">Tutorial 5: Endpoints (Query a Large Language Model)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="tutorial-3.html" title="next page">
+    <a class='right-next' id="next-link" href="tutorial-filter-sort.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 3: Endpoints (Query a Large Language Model)</p>
+        <p class="prev-next-title">Tutorial 7: Complex Components (Gallery with Filter and Sort)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

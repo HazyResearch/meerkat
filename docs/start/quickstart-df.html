@@ -135,38 +135,38 @@
   </label>
   <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
+    <a class="reference internal" href="tutorials/tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-1.html">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-2.html">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-3.html">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorials/tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="tutorials/tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorials/tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorials/tutorial-reactive-viewer.html">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorials/tutorial-query-llm.html">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorials/tutorial-search-engine.html">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorials/tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1441,6 +1441,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../user-guide/interactive/faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -2078,8 +2083,7 @@ title="Print to PDF"
                 
   <section id="quickstart-data-frames">
 <span id="quickstart-df"></span><h1>Quickstart: Data Frames<a class="headerlink" href="#quickstart-data-frames" title="Permalink to this headline">¶</a></h1>
-<p><em>What is <code class="docutils literal notranslate"><span class="pre">Meerkat</span></code>?</em>  <code class="docutils literal notranslate"><span class="pre">Meerkat</span></code> is a DataFrame library that enables data scientists and ML practitioners to interact with complex data types like images, video and free text.</p>
-<p>In this document, we’ll walkthrough how a Meerkat can be used to analyze a small image dataset. It is targetted for newcomers, who would like a fast introduction to core concepts in Meerkat.</p>
+<p>This quickstart provides a quick walkthrough of the <code class="docutils literal notranslate"><span class="pre">Meerkat</span></code> data frame, which allows users to interact with unstructured data alongside standard tabular data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -2093,7 +2097,7 @@ title="Print to PDF"
 <h2>💾 Downloading the data<a class="headerlink" href="#downloading-the-data" title="Permalink to this headline">¶</a></h2>
 <p>First, we’ll download some data to explore. We’re going to use the <a class="reference external" href="https://github.com/fastai/imagenette#image%E7%BD%91">Imagenette dataset</a>, a small subset of the original <a class="reference external" href="https://www.image-net.org/update-mar-11-2021.php">ImageNet</a>.  This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”, “golf ball”).</p>
 <ul class="simple">
-<li><p>Download time: &lt;1 minute</p></li>
+<li><p>Download time: &lt; 1 minute</p></li>
 <li><p>Download size: 130M</p></li>
 </ul>
 <p>In addition to downloading the data, <code class="docutils literal notranslate"><span class="pre">download_imagnette</span></code> prepares a CSV, <code class="docutils literal notranslate"><span class="pre">imagenette.csv</span></code>, with a row for each image.</p>
@@ -2103,12 +2107,12 @@ title="Print to PDF"
 
 <span class="n">dataset_dir</span> <span class="o">=</span> <span class="s2">&quot;./downloads&quot;</span>
 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+<span class="n">download_imagenette</span><span class="p">(</span><span class="n">dataset_dir</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "7ffe229c79d848b8868f60a64c4a186f"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "bbb88d3a03e046c3836a8218ce817e5c"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2154,14 +2158,14 @@ cassette player,train,train/n02979186/n02979186_21736.JPEG
 <div class="cell_output docutils container">
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Frontend is not initialized. Running `<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">mk.gui.start</span><span style="font-weight: bold">()</span>`.
 </pre>
-</div><script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "970ed3c73bfc46d98c01a04720197aae"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Building (may take up to a minute)... 0.34s
+</div><script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "0cc21b954fee45c1add92db828f76abf"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Building (may take up to a minute)... 0.45s
 </pre></div>
 </div>
 <div class="output text_html">
         <iframe
             width="100%"
             height="450px"
-            src="http://localhost:8000/?id=Tablecb1fdbf4-6a28-4263-b26e-29ac6e5eb125"
+            src="http://localhost:8000/?id=Table2e04eaa1-58a8-40b1-a080-273d7d1e57f4"
             frameborder="0"
             allowfullscreen
             

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 3: Endpoints (Query a Large Language Model) &#8212; 🔮 v0.2.6a15</title>
+    <title>Tutorial 4: Reactive Functions (Reactive Image Viewer) &#8212; 🔮 v0.2.6a15</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -42,8 +42,8 @@
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 4: Complex Components (Embedding Based Search Engine)" href="tutorial-4.html" />
-    <link rel="prev" title="Tutorial 2: Reactive Functions (Reactive Image Viewer)" href="tutorial-2.html" />
+    <link rel="next" title="Tutorial 5: Endpoints (Query a Large Language Model)" href="tutorial-query-llm.html" />
+    <link rel="prev" title="Tutorial 3: Basic Interactive Apps (Building A Simple Counter)" href="tutorial-simple-counter.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -135,38 +135,38 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
+    <a class="reference internal" href="tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-1.html">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-2.html">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-query-llm.html">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-search-engine.html">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1441,6 +1441,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -1628,7 +1633,7 @@ title="Toggle navigation"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-3.md"
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-reactive-viewer.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1646,7 +1651,7 @@ title="Launch on Binder"
       </li>
       
       <li>
-        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-3.md"
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-reactive-viewer.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1706,7 +1711,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-3.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-reactive-viewer.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1723,7 +1728,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-3.md"
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-reactive-viewer.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1751,7 +1756,7 @@ title="Edit this page"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-3.ipynb"
+        <a href="../../_sources/start/tutorials/tutorial-reactive-viewer.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1768,7 +1773,7 @@ title="Download notebook file"
       </li>
       
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-3.md"
+        <a href="../../_sources/start/tutorials/tutorial-reactive-viewer.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1805,110 +1810,23 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
-</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#overview">
-   Overview
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
-   (Aside) Setting up LLMs with Manifest
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
-   Adding an Input TextField Component
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoints">
-   Endpoints
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
-   Running Endpoints with Component Events
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#putting-it-all-together">
-   Putting it all together
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
     </div>
     <div class="article row">
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Tutorial 3: Endpoints (Query a Large Language Model)</h1>
+                <h1>Tutorial 4: Reactive Functions (Reactive Image Viewer)</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#overview">
-   Overview
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
-   (Aside) Setting up LLMs with Manifest
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
-   Adding an Input TextField Component
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoints">
-   Endpoints
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
-   Running Endpoints with Component Events
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#putting-it-all-together">
-   Putting it all together
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -1916,164 +1834,307 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="tutorial-3-endpoints-query-a-large-language-model">
-<h1>Tutorial 3: Endpoints (Query a Large Language Model)<a class="headerlink" href="#tutorial-3-endpoints-query-a-large-language-model" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.</p>
+  <section id="tutorial-4-reactive-functions-reactive-image-viewer">
+<h1>Tutorial 4: Reactive Functions (Reactive Image Viewer)<a class="headerlink" href="#tutorial-4-reactive-functions-reactive-image-viewer" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will build a simple image viewer that shows a random subset of images from
+a class in an image dataset.</p>
 <p>Through this tutorial, you will learn about:</p>
 <ul class="simple">
-<li><p>the concept of <strong>endpoints</strong></p></li>
-<li><p>how to pass <strong>endpoints</strong> to components to run on events</p></li>
-<li><p>Using <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> and <code class="docutils literal notranslate"><span class="pre">Button</span></code> components</p></li>
-<li><p>Advanced: Using <a class="reference external" href="https://github.com/hazyresearch/manifest"><code class="docutils literal notranslate"><span class="pre">manifest</span></code></a>, a server-client manager for running LLMs</p></li>
+<li><p>the concept of <strong>reactive functions</strong> in Meerkat</p></li>
+<li><p>how <strong>chaining reactive functions</strong> together can be used to build complex applications</p></li>
+<li><p>a few more components that you can use in Meerkat</p></li>
 </ul>
-<hr class="docutils" />
-<div class="tip admonition">
-<p class="admonition-title">Prerequisites</p>
-<p>You will need to install <code class="docutils literal notranslate"><span class="pre">manifest</span></code> and set up your OPENAI API key:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install manifest</span>
-pip<span class="w"> </span>install<span class="w"> </span>manifest-ml
+<p>To get started, run the tutorial demo script.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-2
+</pre></div>
+</div>
+<p>You should see the tutorial app when you open the link in your browser.</p>
+<p>Let’s break down the code in the demo script.</p>
+<p><strong>Data loading</strong></p>
+<p>The first few lines just load in the <code class="docutils literal notranslate"><span class="pre">imagenette</span></code> dataset, a small 10-class subset of ImageNet.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p><code class="docutils literal notranslate"><span class="pre">df</span></code> is an <code class="docutils literal notranslate"><span class="pre">mk.DataFrame</span></code>, which behaves quite similarly to a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>.</p>
+</aside>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<span class="kn">import</span> <span class="nn">rich</span>
 
-<span class="c1"># Set up your OpenAI key.</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;your-api-key&quot;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
+<span class="n">IMAGE_COL</span> <span class="o">=</span> <span class="s2">&quot;img&quot;</span>
+<span class="n">LABEL_COL</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span>
 </pre></div>
 </div>
 </div>
-<p>To get started, run the tutorial demo script</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-qa
+</div>
+<!-- Show the dataset and hide the input cell. --><div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Frontend is not initialized. Running `<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">mk.gui.start</span><span style="font-weight: bold">()</span>`.
+</pre>
+</div><div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Table04f1e880-b62b-4f04-89ee-a99fe92cd1cd"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unique classes in the dataset.</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 </pre></div>
 </div>
-<p>You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.</p>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>In this interface, we want to ask the LLM for an answer to our question when we press a button.</p>
-<p>This requires having</p>
-<ol class="arabic simple">
-<li><p>An LLM to return answers to our questions</p></li>
-<li><p>An input text field to ask our question</p></li>
-<li><p>A Python API that runs the LLM</p></li>
-<li><p>A button to call the Python API on click</p></li>
-</ol>
-</section>
-<section id="aside-setting-up-llms-with-manifest">
-<h2>(Aside) Setting up LLMs with Manifest<a class="headerlink" href="#aside-setting-up-llms-with-manifest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/hazyresearch/manifest">Manifest</a> is a Python library that provides a convenient interface to call foundation model APIs, e.g. large language models from OpenAI, Cohere, Together, etc.</p>
-<p>Let’s set up manifest to connect to OpenAI.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
-  <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
-  <span class="n">client_connection</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">),</span>
-  <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">[</span>
+    <span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'tench'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'church'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'french horn'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span>
+<span style="font-weight: bold">]</span>
+</pre>
+</div></div>
+</div>
+<p><strong>Selecting a class</strong></p>
+<p>Next, let’s create a <a class="reference internal" href="../../apidocs/interactive.html#meerkat.gui.Select" title="meerkat.gui.Select"><code class="xref py py-class docutils literal notranslate"><span class="pre">Select</span></code></a> component that allows the user to select a class. Once a user picks the class, we’ll then show a random subset of images from that class.</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>A list of the components in Meerkat can be found in the
+<span class="xref myst">component guide</span>.</p>
+</aside>
+<p>Meerkat provides many components like <code class="docutils literal notranslate"><span class="pre">Select</span></code> that can be used to build useful
+apps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Give the user a way to select a class.</span>
+<span class="n">class_selector</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+    <span class="n">values</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Running a prompt through manifest will be easy:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;What is the meaning of life?&quot;</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>That’s it! You can refer to the Manifest codebase to learn more about how to use it. Let’s now move on to the rest of the application.</p>
-</section>
-<section id="adding-an-input-textfield-component">
-<h2>Adding an Input TextField Component<a class="headerlink" href="#adding-an-input-textfield-component" title="Permalink to this headline">¶</a></h2>
-<p>Let’s add a text field where a user can type out their questions.
-Meerkat provides a <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> component that we can use.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">textbox</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Textbox</span><span class="p">()</span>
-</pre></div>
 </div>
 </div>
-</div>
-<p>This component will do a few things:</p>
-<ul class="simple">
-<li><p>create a text field on the frontend that the user can type into</p></li>
-<li><p>synchronize the value of this text field with a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object on the Python backend</p></li>
-</ul>
-<p>Here, <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, a Meerkat data object that is synchronized with the value of the text field on the frontend. This will be important when we want to pass the value of the text field to our LLM API.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">textbox.text</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080">:</span> 
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">class_selector.value</span>: 
+        cassette player 
+<span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">class_selector.value</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span>: 
         <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'meerkat.interactive.graph.store.Store'</span><span style="font-weight: bold">&gt;</span>
 </pre>
 </div></div>
 </div>
-</section>
-<section id="endpoints">
-<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our LLM and our input field, we want to write a Python function that will run the LLM on the input.</p>
-<p>This function has to be special in a few ways:</p>
-<ol class="arabic simple">
-<li><p>It should be able to take in the value of the input field</p></li>
-<li><p>It should run when an event on the frontend happens, e.g. a button is clicked</p></li>
-</ol>
-<p>To do this, we can use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.endpoint" title="meerkat.endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">&#64;mk.endpoint</span></code></a> decorator. This decorator will convert a Python function into an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, which is a special type of Python function that can be passed to components to run on events.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-    <span class="n">answer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">answer</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>If you print this endpoint out, you’ll see that it the decorator has converted the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> function into an <code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code> object.</p>
+<p>Notice here that <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> is a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object and not a <code class="docutils literal notranslate"><span class="pre">str</span></code>! A <code class="docutils literal notranslate"><span class="pre">Store</span></code> is a special object in Meerkat that serves as a thin wrapper around any Python object. It’s incredibly useful to connect different components to each other, and we’ll see more about how it plays a role in the next section.</p>
+<p>You can access the value of a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">.value</span></code> attribute e.g.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">get_answer:</span> 
-        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Endpoint</span><span style="font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">id</span>=<span style="color: #800080; text-decoration-color: #800080">__mkid__b56773d1ac9e4956ac2568a3a140f25a</span>, <span style="color: #808000; text-decoration-color: #808000">name</span>=<span style="color: #800080; text-decoration-color: #800080">get_answer</span>, <span style="color: #808000; text-decoration-color: #808000">prefix</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>, <span style="color: #808000; text-decoration-color: #808000">route</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span><span style="font-weight: bold">)</span>
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">class_selector.value.value</span>: 
+        cassette player 
+<span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">class_selector.value.value</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span>: 
+        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'str'</span><span style="font-weight: bold">&gt;</span>
 </pre>
 </div></div>
 </div>
-<p>Notice that in addition to the <code class="docutils literal notranslate"><span class="pre">question</span></code>, we also pass in an <code class="docutils literal notranslate"><span class="pre">answer</span></code> argument. This allows us to update the <code class="docutils literal notranslate"><span class="pre">answer</span></code> store with the response from the LLM. When the store is updated, it will tell all frontend components that depend on this store to also update their values.</p>
-</section>
-<section id="running-endpoints-with-component-events">
-<h2>Running Endpoints with Component Events<a class="headerlink" href="#running-endpoints-with-component-events" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our endpoint, we want to run it when a button is clicked.</p>
-<p>We can do this by passing the endpoint to the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> argument of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
+<p>We can also look at the <code class="docutils literal notranslate"><span class="pre">class_selector</span></code> component itself.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Select</span><span style="font-weight: bold">(</span>
+    <span style="color: #808000; text-decoration-color: #808000">values</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">([</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>, <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>, <span style="color: #008000; text-decoration-color: #008000">'tench'</span>, <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>, <span style="color: #008000; text-decoration-color: #008000">'church'</span>, <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>, 
+<span style="color: #008000; text-decoration-color: #008000">'french horn'</span>, <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>, <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>, <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span><span style="font-weight: bold">])</span>,
+    <span style="color: #808000; text-decoration-color: #808000">labels</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">([</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span>, <span style="color: #008000; text-decoration-color: #008000">'garbage truck'</span>, <span style="color: #008000; text-decoration-color: #008000">'tench'</span>, <span style="color: #008000; text-decoration-color: #008000">'english springer spaniel'</span>, <span style="color: #008000; text-decoration-color: #008000">'church'</span>, <span style="color: #008000; text-decoration-color: #008000">'parachute'</span>, 
+<span style="color: #008000; text-decoration-color: #008000">'french horn'</span>, <span style="color: #008000; text-decoration-color: #008000">'chainsaw'</span>, <span style="color: #008000; text-decoration-color: #008000">'golf ball'</span>, <span style="color: #008000; text-decoration-color: #008000">'gas pump'</span><span style="font-weight: bold">])</span>,
+    <span style="color: #808000; text-decoration-color: #808000">value</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #008000; text-decoration-color: #008000">'cassette player'</span><span style="font-weight: bold">)</span>,
+    <span style="color: #808000; text-decoration-color: #808000">disabled</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #ff0000; text-decoration-color: #ff0000; font-style: italic">False</span><span style="font-weight: bold">)</span>,
+    <span style="color: #808000; text-decoration-color: #808000">classes</span>=<span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Store</span><span style="font-weight: bold">(</span><span style="color: #008000; text-decoration-color: #008000">''</span><span style="font-weight: bold">)</span>,
+    <span style="color: #808000; text-decoration-color: #808000">on_change</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>,
+    <span style="color: #808000; text-decoration-color: #808000">_slots</span>=<span style="font-weight: bold">[]</span>,
+    <span style="color: #808000; text-decoration-color: #808000">_self_id</span>=<span style="color: #008000; text-decoration-color: #008000">'__mkid__41d5b67f29e84fccb5288680d7fb52b1'</span>
+<span style="font-weight: bold">)</span>
+</pre>
+</div></div>
+</div>
+<p>Notice that all of the attributes of the <code class="docutils literal notranslate"><span class="pre">Select</span></code> component are also <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects. This is done automatically by all classes that subclass <code class="docutils literal notranslate"><span class="pre">Component</span></code> in Meerkat, of which <code class="docutils literal notranslate"><span class="pre">Select</span></code> is one. This is very useful because as <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects all of these attributes are synchronized between the frontend interface and the backend Python code.</p>
+<p><strong>Filtering the dataset by class</strong></p>
+<p>Once the user selects a class, the dataset should be filtered to that class.
+<strong>Importantly, we want this to happen every time the user selects a new class.</strong></p>
+<p>Let’s think about what would happen if we did the obvious thing and just filtered the dataset once.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The store to keep track of the LLM answer.</span>
-<span class="n">answer</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
-  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ask&quot;</span><span class="p">,</span>
-  <span class="n">on_click</span><span class="o">=</span><span class="n">get_answer</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="n">textbox</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="n">answer</span><span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>When the button is clicked, the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> endpoint will be called with the value of the <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> store as the <code class="docutils literal notranslate"><span class="pre">question</span></code> argument.</p>
-<p>We can simulate this button click by running the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> endpoint directly. Since it’s an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, we can call it with the <code class="docutils literal notranslate"><span class="pre">.run()</span></code> method.</p>
-<div class="cell tag_remove-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="o">.</span><span class="n">on_click</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Do it normally.</span>
+<span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">filtered_df</span>: 
+        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">DataFrame</span><span style="font-weight: bold">(</span>nrows: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1350</span>, ncols: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">15</span><span style="font-weight: bold">)</span>
+</pre>
+</div></div>
 </div>
-<p>Different components expose different events that can be tied to endpoints. All endpoints start with <code class="docutils literal notranslate"><span class="pre">on_</span></code> and are followed by the name of the event. For example, the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> event is tied to the <code class="docutils literal notranslate"><span class="pre">click</span></code> event of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
-</section>
-<section id="putting-it-all-together">
-<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
-<p>Now we display these different components on the frontend.</p>
+<p>The problem that will arise is that this filter uses the class label in <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> <strong>at the time of script execution. Once the user chooses a different class, there’s no way to go back to this line of code and rerun it.</strong></p>
+<p>This is where <strong>reactive functions</strong> come in. A reactive function is a function that is automatically re-executed whenever one of its inputs updates.</p>
+<p>In this example, we would want to re-execute the filter whenever the user selects a class and <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code> changes. Let’s write a simple reactive function that filters the dataset to the selected class, using the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.reactive" title="meerkat.reactive"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;reactive()</span></code></a> decorator.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
-    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span><span class="n">textbox</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">answer</span><span class="p">)]),</span>
-    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-query-llm&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Filter the dataset to the selected class. Use a reactive function.</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>When you run the app, you should see the following interface:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+<p>Note a couple of things here:</p>
+<ul class="simple">
+<li><p>The function <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code>. This is what makes it reactive.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> is written as a normal Python function. This is true in general for reactive functions: there’s no special syntax or anything.</p></li>
+</ul>
+<p>Let’s now call this reactive function on the dataset and the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_df</span> <span class="o">=</span> <span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
+</div>
+</div>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>In Meerkat, only <code class="docutils literal notranslate"><span class="pre">marked</span></code> objects can cause a reactive function to re-execute when they are updated. All Meerkat objects have <code class="docutils literal notranslate"><span class="pre">.mark()</span></code> and <code class="docutils literal notranslate"><span class="pre">.unmark()</span></code> methods, and only <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects are marked by default. You can read more about how this works in the <span class="xref myst">user guide on reactive functions</span>.</p>
+</aside>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code>, we pass it the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and <strong>the <code class="docutils literal notranslate"><span class="pre">Store</span></code> object <code class="docutils literal notranslate"><span class="pre">class_selector.value</span></code>, and not the actual string value of the class!</strong>
+This is critical to understand: in order for an argument to trigger re-execution of a reactive function, it must be a Meerkat object like a <code class="docutils literal notranslate"><span class="pre">Store</span></code> or <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, and not a Python object like <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
+<p>Of course, reactive functions can be used like normal Python functions, e.g. it would be perfectly fine to pass in <code class="docutils literal notranslate"><span class="pre">str</span></code> objects to <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> instead of <code class="docutils literal notranslate"><span class="pre">Store</span></code> objects.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;cassette player&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html">
+        <iframe
+            width="100%"
+            height="450px"
+            src="http://localhost:8000/?id=Tablea7c24acb-e094-403a-9611-5ef60fb257b5"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        </div></div>
+</div>
+<p>Let’s also note a couple of other ways in which we could create reactive functions that wouldn’t quite have worked.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">filter_by_class</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">LABEL_COL</span><span class="p">]</span> <span class="o">==</span> <span class="n">class_selector</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here, we’ve forgotten to create an argument for the class label, so using this reactive function would not work. It would never re-run when the user selects a new class!</p>
+<p>So far so good. We’ve created and used a reactive function that filters the dataset to the selected class.</p>
+<p><strong>Selecting a random subset of images</strong></p>
+<p>Let’s now create another reactive function that selects a random subset of images from the filtered dataset. Then, we’ll chain together the two reactive functions we’ve created so far to get the final result.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Select a random subset of images from the filtered dataset.&quot;&quot;&quot;</span>
+<span class="nd">@mk</span><span class="o">.</span><span class="n">reactive</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">random_images</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="c1"># Sample 16 images from the filtered dataset.</span>
+    <span class="c1"># `images` will be a `Column` object.</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">16</span><span class="p">)[</span><span class="n">IMAGE_COL</span><span class="p">]</span>
+
+    <span class="c1"># Encode the images as base64 strings.</span>
+    <span class="c1"># Use a `Formatter` object to do this.</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">formatters</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span>
+
+    <span class="c1"># All Formatter objects have an `encode` method that</span>
+    <span class="c1"># can be used to take a data object and encode it in some way.</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">formatter</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">random_images</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and returns a list of base64-encoded images. It’s decorated with <code class="docutils literal notranslate"><span class="pre">&#64;mk.reactive()</span></code> so that it will be re-executed whenever the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is updated.</p>
+<p>Let’s pass the output of <code class="docutils literal notranslate"><span class="pre">filter_by_class</span></code> to <code class="docutils literal notranslate"><span class="pre">random_images</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="n">random_images</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">images</span>: 
+        
+</pre>
+</div></div>
+</div>
+<p>This sets up a chain of reactive functions that will be re-executed whenever the user selects a new class.</p>
+<p><strong>Displaying the images</strong>
+Finally, let’s show the user the images using a grid of <code class="docutils literal notranslate"><span class="pre">Image</span></code> components.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make a grid with 4 columns</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">gridcols4</span><span class="p">([</span>
+    <span class="c1"># Use equal-sized square boxes in the grid</span>
+    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+        <span class="c1"># Wrap the image in a `mk.gui.Image` component</span>
+        <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">img</span><span class="p">),</span> 
+        <span class="n">style</span><span class="o">=</span><span class="s2">&quot;aspect-ratio: 1 / 1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span>
+<span class="p">],</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;gap-2&quot;</span><span class="p">)</span> <span class="c1"># Add some spacing in the grid.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Many components in Meerkat accept</p>
+<ul class="simple">
+<li><p>a <code class="docutils literal notranslate"><span class="pre">classes</span></code> attribute that can be used to add Tailwind CSS classes to the component, and</p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">style</span></code> attribute that can be used to add inline CSS styles to the component.</p></li>
+</ul>
+<p>Finally, let’s use the <code class="docutils literal notranslate"><span class="pre">flexcol</span></code> component to stack the class selector and the grid of images vertically.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span>
+    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Caption</span><span class="p">(</span><span class="s2">&quot;Choose a class:&quot;</span><span class="p">),</span> <span class="n">class_selector</span><span class="p">],</span> 
+        <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;flex justify-center items-center mb-2 gap-4&quot;</span>
+    <span class="p">),</span>
+    <span class="n">grid</span><span class="p">,</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can pass everything into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> component to render the app.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-2&quot;</span><span class="p">)</span>
+<span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>That’s it!</p>
 </section>
 
 
@@ -2084,17 +2145,17 @@ Meerkat provides a <code class="docutils literal notranslate"><span class="pre">
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="tutorial-2.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="tutorial-simple-counter.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Tutorial 2: Reactive Functions (Reactive Image Viewer)</p>
+            <p class="prev-next-title">Tutorial 3: Basic Interactive Apps (Building A Simple Counter)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="tutorial-4.html" title="next page">
+    <a class='right-next' id="next-link" href="tutorial-query-llm.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 4: Complex Components (Embedding Based Search Engine)</p>
+        <p class="prev-next-title">Tutorial 5: Endpoints (Query a Large Language Model)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

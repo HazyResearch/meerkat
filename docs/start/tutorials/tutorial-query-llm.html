@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 1: Basic Interactive Apps (Building an Image Gallery) &#8212; 🔮 v0.2.6a15</title>
+    <title>Tutorial 5: Endpoints (Query a Large Language Model) &#8212; 🔮 v0.2.6a15</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -42,8 +42,8 @@
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 2: Reactive Functions (Reactive Image Viewer)" href="tutorial-2.html" />
-    <link rel="prev" title="Tutorial 0: Data Frames (Wrangling an Image Dataset)" href="tutorial-0.html" />
+    <link rel="next" title="Tutorial 6: Complex Components (Embedding Based Search Engine)" href="tutorial-search-engine.html" />
+    <link rel="prev" title="Tutorial 4: Reactive Functions (Reactive Image Viewer)" href="tutorial-reactive-viewer.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -135,38 +135,38 @@
   </label>
   <ul class="current">
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-0.html">
-     Tutorial 0: Data Frames (Wrangling an Image Dataset)
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Tutorial 1: Basic Interactive Apps (Building an Image Gallery)
+    <a class="reference internal" href="tutorial-data-frames.html">
+     Tutorial 1: Data Frames (Wrangling an Image Dataset)
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-2.html">
-     Tutorial 2: Reactive Functions (Reactive Image Viewer)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-3.html">
-     Tutorial 3: Endpoints (Query a Large Language Model)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-4.html">
-     Tutorial 4: Complex Components (Embedding Based Search Engine)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial-filter-sort.html">
-     Tutorial: Filter &amp; Sort
+    <a class="reference internal" href="tutorial-image-gallery.html">
+     Tutorial 2: Basic Interactive Apps (Building an Image Gallery)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-simple-counter.html">
-     Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+     Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-reactive-viewer.html">
+     Tutorial 4: Reactive Functions (Reactive Image Viewer)
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Tutorial 5: Endpoints (Query a Large Language Model)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-search-engine.html">
+     Tutorial 6: Complex Components (Embedding Based Search Engine)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-filter-sort.html">
+     Tutorial 7: Complex Components (Gallery with Filter and Sort)
     </a>
    </li>
   </ul>
@@ -1441,6 +1441,11 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../user-guide/interactive/faqs.html">
+     FAQs
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -1620,6 +1625,53 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-query-llm.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-query-llm.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -1659,7 +1711,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-1.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-query-llm.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1676,7 +1728,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-1.md"
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-query-llm.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1704,7 +1756,24 @@ title="Edit this page"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-1.md"
+        <a href="../../_sources/start/tutorials/tutorial-query-llm.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-query-llm.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1764,23 +1833,33 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#downloading-the-dataset">
-   💾 Downloading the dataset
+  <a class="reference internal nav-link" href="#overview">
+   Overview
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#starting-a-meerkat-interactive-server">
-   🕸️ Starting a Meerkat interactive server
+  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
+   (Aside) Setting up LLMs with Manifest
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-the-layout">
-   🖼️ Building the layout
+  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
+   Adding an Input TextField Component
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#launching-the-app">
-   🚀 Launching the app
+  <a class="reference internal nav-link" href="#endpoints">
+   Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
+   Running Endpoints with Component Events
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
   </a>
  </li>
 </ul>
@@ -1792,7 +1871,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Tutorial 1: Basic Interactive Apps (Building an Image Gallery)</h1>
+                <h1>Tutorial 5: Endpoints (Query a Large Language Model)</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1803,23 +1882,33 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#downloading-the-dataset">
-   💾 Downloading the dataset
+  <a class="reference internal nav-link" href="#overview">
+   Overview
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#starting-a-meerkat-interactive-server">
-   🕸️ Starting a Meerkat interactive server
+  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
+   (Aside) Setting up LLMs with Manifest
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-the-layout">
-   🖼️ Building the layout
+  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
+   Adding an Input TextField Component
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#launching-the-app">
-   🚀 Launching the app
+  <a class="reference internal nav-link" href="#endpoints">
+   Endpoints
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
+   Running Endpoints with Component Events
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#putting-it-all-together">
+   Putting it all together
   </a>
  </li>
 </ul>
@@ -1832,70 +1921,163 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="tutorial-1-basic-interactive-apps-building-an-image-gallery">
-<h1>Tutorial 1: Basic Interactive Apps (Building an Image Gallery)<a class="headerlink" href="#tutorial-1-basic-interactive-apps-building-an-image-gallery" title="Permalink to this headline">¶</a></h1>
-<!-- TODO: include screenshots? -->
-<p>In this tutorial, we’ll create our first Meerkat GUI by building an image gallery.</p>
+  <section id="tutorial-5-endpoints-query-a-large-language-model">
+<h1>Tutorial 5: Endpoints (Query a Large Language Model)<a class="headerlink" href="#tutorial-5-endpoints-query-a-large-language-model" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.</p>
 <p>Through this tutorial, you will learn about:</p>
 <ul class="simple">
-<li><p>downloading a dataset</p></li>
-<li><p>starting a Meerkat interactive server</p></li>
-<li><p>building a layout</p></li>
-<li><p>launching an app</p></li>
+<li><p>the concept of <strong>endpoints</strong></p></li>
+<li><p>how to pass <strong>endpoints</strong> to components to run on events</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> and <code class="docutils literal notranslate"><span class="pre">Button</span></code> components</p></li>
+<li><p>Advanced: Using <a class="reference external" href="https://github.com/hazyresearch/manifest"><code class="docutils literal notranslate"><span class="pre">manifest</span></code></a>, a server-client manager for running LLMs</p></li>
 </ul>
-<p>As always, the first step is to import <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>! This will give you access to the Meerkat <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> object as well as the Meerkat frontend components that will serve as the building blocks for our layouts.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<hr class="docutils" />
+<div class="tip admonition">
+<p class="admonition-title">Prerequisites</p>
+<p>You will need to install <code class="docutils literal notranslate"><span class="pre">manifest</span></code> and set up your OPENAI API key:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install **manifest**</span>
+pip<span class="w"> </span>install<span class="w"> </span>manifest-ml
+
+<span class="c1"># Set up your OpenAI key.</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;your-api-key&quot;</span>
 </pre></div>
 </div>
-<section id="downloading-the-dataset">
-<h2>💾 Downloading the dataset<a class="headerlink" href="#downloading-the-dataset" title="Permalink to this headline">¶</a></h2>
-<p>Meerkat provides an interface into many datasets out of the box, but you are always free to download and use any dataset you like, or even make your own dataset.</p>
-<p>For this demo, we’re going to use the <a class="reference external" href="https://github.com/fastai/imagenette#image%E7%BD%91">Imagenette dataset</a>, a small subset of the original <a class="reference external" href="https://www.image-net.org/update-mar-11-2021.php">ImageNet</a>. This dataset is made up of 10 classes (e.g., “garbage truck”, “gas pump”, “golf ball”). This particular dataset offers three versions, so we’ll choose the smallest by specifying <code class="docutils literal notranslate"><span class="pre">version=&quot;160px&quot;</span></code>.</p>
+</div>
+<p>To get started, run the tutorial demo script</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-qa
+</pre></div>
+</div>
+<p>You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>In this interface, we want to ask the LLM for an answer to our question when we press a button.</p>
+<p>This requires having</p>
+<ol class="arabic simple">
+<li><p>An LLM to return answers to our questions</p></li>
+<li><p>An input text field to ask our question</p></li>
+<li><p>A Python API that runs the LLM</p></li>
+<li><p>A button to call the Python API on click</p></li>
+</ol>
+</section>
+<section id="aside-setting-up-llms-with-manifest">
+<h2>(Aside) Setting up LLMs with Manifest<a class="headerlink" href="#aside-setting-up-llms-with-manifest" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/hazyresearch/manifest">Manifest</a> is a Python library that provides a convenient interface to call foundation model APIs, e.g. large language models from OpenAI, Cohere, Together, etc.</p>
+<p>Let’s set up manifest to connect to OpenAI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+  <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+  <span class="n">client_connection</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">),</span>
+  <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Running a prompt through manifest will be easy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;What is the meaning of life?&quot;</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s it! You can refer to the Manifest codebase to learn more about how to use it. Let’s now move on to the rest of the application.</p>
+</section>
+<section id="adding-an-input-textfield-component">
+<h2>Adding an Input TextField Component<a class="headerlink" href="#adding-an-input-textfield-component" title="Permalink to this headline">¶</a></h2>
+<p>Let’s add a text field where a user can type out their questions.
+Meerkat provides a <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> component that we can use.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">textbox</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Textbox</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This component will do a few things:</p>
 <ul class="simple">
-<li><p>Download time: &lt;1 minute</p></li>
-<li><p>Download size: 206MB</p></li>
+<li><p>create a text field on the frontend that the user can type into</p></li>
+<li><p>synchronize the value of this text field with a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object on the Python backend</p></li>
 </ul>
-<p>Loading in this dataset will be lightning fast in the future, since Meerkat will cache the data locally.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
-</pre></div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, a Meerkat data object that is synchronized with the value of the text field on the frontend. This will be important when we want to pass the value of the text field to our LLM API.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">textbox.text</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080">:</span> 
+        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'meerkat.interactive.graph.store.Store'</span><span style="font-weight: bold">&gt;</span>
+</pre>
+</div></div>
 </div>
 </section>
-<section id="starting-a-meerkat-interactive-server">
-<h2>🕸️ Starting a Meerkat interactive server<a class="headerlink" href="#starting-a-meerkat-interactive-server" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our dataset, we can spin up a Meerkat interactive server. This will allow us to view our dataset in the browser. By default, the interactive server will run on port 5000, but you can specify a different port if you’d like.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">api_port</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+<section id="endpoints">
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have our LLM and our input field, we want to write a Python function that will run the LLM on the input.</p>
+<p>This function has to be special in a few ways:</p>
+<ol class="arabic simple">
+<li><p>It should be able to take in the value of the input field</p></li>
+<li><p>It should run when an event on the frontend happens, e.g. a button is clicked</p></li>
+</ol>
+<p>To do this, we can use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.endpoint" title="meerkat.endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">&#64;mk.endpoint</span></code></a> decorator. This decorator will convert a Python function into an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, which is a special type of Python function that can be passed to components to run on events.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">answer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answer</span>
 </pre></div>
 </div>
+</div>
+</div>
+<p>If you print this endpoint out, you’ll see that it the decorator has converted the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> function into an <code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code> object.</p>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">get_answer:</span> 
+        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Endpoint</span><span style="font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">id</span>=<span style="color: #800080; text-decoration-color: #800080">__mkid__c12d9e4ff37f4013b9c28fe3df29e2ce</span>, <span style="color: #808000; text-decoration-color: #808000">name</span>=<span style="color: #800080; text-decoration-color: #800080">get_answer</span>, <span style="color: #808000; text-decoration-color: #808000">prefix</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>, <span style="color: #808000; text-decoration-color: #808000">route</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span><span style="font-weight: bold">)</span>
+</pre>
+</div></div>
+</div>
+<p>Notice that in addition to the <code class="docutils literal notranslate"><span class="pre">question</span></code>, we also pass in an <code class="docutils literal notranslate"><span class="pre">answer</span></code> argument. This allows us to update the <code class="docutils literal notranslate"><span class="pre">answer</span></code> store with the response from the LLM. When the store is updated, it will tell all frontend components that depend on this store to also update their values.</p>
 </section>
-<section id="building-the-layout">
-<h2>🖼️ Building the layout<a class="headerlink" href="#building-the-layout" title="Permalink to this headline">¶</a></h2>
-<p>Let’s create our frontend components. Meerkat has numerous components for use out of the box, so we’ll use the <code class="docutils literal notranslate"><span class="pre">Gallery</span></code> component to display our <code class="docutils literal notranslate"><span class="pre">df</span></code> DataFrame. You can browse the complete list of components <span class="xref myst">here</span>. We’ll specify the name of the column in our <code class="docutils literal notranslate"><span class="pre">df</span></code> where our images are stored, and we can optionally specify the names of a few columns to render as tags below each image.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">])</span>
+<section id="running-endpoints-with-component-events">
+<h2>Running Endpoints with Component Events<a class="headerlink" href="#running-endpoints-with-component-events" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have our endpoint, we want to run it when a button is clicked.</p>
+<p>We can do this by passing the endpoint to the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> argument of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The store to keep track of the LLM answer.</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ask&quot;</span><span class="p">,</span>
+  <span class="n">on_click</span><span class="o">=</span><span class="n">get_answer</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="n">textbox</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="n">answer</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>For the final step, we’ll stick our <code class="docutils literal notranslate"><span class="pre">gallery</span></code> into a <code class="docutils literal notranslate"><span class="pre">Page</span></code> component, specifying an <code class="docutils literal notranslate"><span class="pre">id</span></code> of <code class="docutils literal notranslate"><span class="pre">&quot;gallery&quot;</span></code>. Every Meerkat app must have a <code class="docutils literal notranslate"><span class="pre">Page</span></code> component as its root. The <code class="docutils literal notranslate"><span class="pre">id</span></code> is used to uniquely identify the page, and the <code class="docutils literal notranslate"><span class="pre">Page</span></code> is the only comment with the special <code class="docutils literal notranslate"><span class="pre">launch()</span></code> method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">gallery</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;gallery&quot;</span><span class="p">)</span>
-<span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</div>
+</div>
+<p>When the button is clicked, the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> endpoint will be called with the value of the <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> store as the <code class="docutils literal notranslate"><span class="pre">question</span></code> argument.</p>
+<p>We can simulate this button click by running the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> endpoint directly. Since it’s an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, we can call it with the <code class="docutils literal notranslate"><span class="pre">.run()</span></code> method.</p>
+<div class="cell tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="o">.</span><span class="n">on_click</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+</div>
+<p>Different components expose different events that can be tied to endpoints. All endpoints start with <code class="docutils literal notranslate"><span class="pre">on_</span></code> and are followed by the name of the event. For example, the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> event is tied to the <code class="docutils literal notranslate"><span class="pre">click</span></code> event of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
 </section>
-<section id="launching-the-app">
-<h2>🚀 Launching the app<a class="headerlink" href="#launching-the-app" title="Permalink to this headline">¶</a></h2>
-<p>Here is all six lines of code put together:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
-
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;imagenette&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;160px&quot;</span><span class="p">)</span>
-<span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">api_port</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
-
-<span class="n">gallery</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Gallery</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">main_column</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">tag_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">])</span>
-
-<span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="n">gallery</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;gallery&quot;</span><span class="p">)</span>
-<span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+<section id="putting-it-all-together">
+<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
+<p>Now we display these different components on the frontend.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span><span class="n">textbox</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">answer</span><span class="p">)]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-query-llm&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>That’s it! You can run this code either in a standalone <code class="docutils literal notranslate"><span class="pre">.py</span></code> file or directly in a Jupyter notebook. If running a <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, use the command <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span> <span class="pre">gallery.py</span> <span class="pre">--dev</span></code> and follow the link in the terminal to view your app in the browser. Any changes you make to the code will cause the page to automatically refresh. If running in a Jupyter notebook, the app should show up in the cell’s output.</p>
-<p>🥳 Congratulations on building your first Meerkat GUI.</p>
+</div>
+</div>
+<p>When you run the app, you should see the following interface:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -1907,17 +2089,17 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="tutorial-0.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="tutorial-reactive-viewer.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Tutorial 0: Data Frames (Wrangling an Image Dataset)</p>
+            <p class="prev-next-title">Tutorial 4: Reactive Functions (Reactive Image Viewer)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="tutorial-2.html" title="next page">
+    <a class='right-next' id="next-link" href="tutorial-search-engine.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 2: Reactive Functions (Reactive Image Viewer)</p>
+        <p class="prev-next-title">Tutorial 6: Complex Components (Embedding Based Search Engine)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

@@ -1,4 +1,4 @@
-# Tutorial 1.1: Basic Interactive Apps (Building A Simple Counter)
+# Tutorial 3: Basic Interactive Apps (Building A Simple Counter)
 
 Let's go through a simple example to get familiar with interactivity. We'll build a simple counter that increments by 1 every time the user clicks on it.
 

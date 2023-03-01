@@ -4,7 +4,7 @@ kernelspec:
   name: python3
 ---
 
-# Tutorial 3: Endpoints (Query a Large Language Model)
+# Tutorial 5: Endpoints (Query a Large Language Model)
 
 In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.
 
@@ -19,7 +19,7 @@ Through this tutorial, you will learn about:
 You will need to install `manifest` and set up your OPENAI API key:
 
 ```bash
-# Install manifest
+# Install **manifest**
 pip install manifest-ml
 
 # Set up your OpenAI key.

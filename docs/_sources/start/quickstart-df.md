@@ -8,10 +8,7 @@ kernelspec:
 
 # Quickstart: Data Frames
 
-*What is `Meerkat`?*  `Meerkat` is a DataFrame library that enables data scientists and ML practitioners to interact with complex data types like images, video and free text.
-
-In this document, we'll walkthrough how a Meerkat can be used to analyze a small image dataset. It is targetted for newcomers, who would like a fast introduction to core concepts in Meerkat. 
-
+This quickstart provides a quick walkthrough of the `Meerkat` data frame, which allows users to interact with unstructured data alongside standard tabular data.
 
 ```{code-cell}
 import os
@@ -21,7 +18,7 @@ import numpy as np
 
 ## 💾 Downloading the data
 First, we'll download some data to explore. We're going to use the [Imagenette dataset](https://github.com/fastai/imagenette#image%E7%BD%91), a small subset of the original [ImageNet](https://www.image-net.org/update-mar-11-2021.php).  This dataset is made up of 10 classes (e.g. "garbage truck", "gas pump", "golf ball").
-- Download time: <1 minute
+- Download time: < 1 minute
 - Download size: 130M
 
 In addition to downloading the data, `download_imagnette` prepares a CSV, `imagenette.csv`, with a row for each image. 
@@ -31,7 +28,7 @@ from meerkat.datasets.imagenette import download_imagenette
 
 dataset_dir = "./downloads"
 os.makedirs(dataset_dir, exist_ok=True)
-download_imagenette(dataset_dir, overwrite=True);
+download_imagenette(dataset_dir, overwrite=True)
 ```
 
 Let's take a look at the CSV.
