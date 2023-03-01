@@ -14,6 +14,7 @@
 
 Meerkat is a Python library aimed at technical teams that want to interactively wrangle their unstructured data with foundation models.
 
+[**Website**](meerkat.wiki)
 [**Quickstart**](⚡️-Quickstart)
 | [**Docs**](https://meerkat.readthedocs.io/en/dev/index.html)
 | [**Contributing**](CONTRIBUTING.md)
@@ -27,7 +28,6 @@ We recommend installing Meerkat in a fresh virtual environment,
 conda create -n meerkat python=3.10 # or use your favorite virtual environment
 conda activate meerkat
 pip install meerkat-ml
-mk install
 ```
 > **_GPU Install_**: If you want to use Meerkat with a GPU, you will need to install PyTorch with GPU support. See [here](https://pytorch.org/get-started/locally/) for more details.
 <!-- ```bash
