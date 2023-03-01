@@ -46,7 +46,7 @@ jobs:
         run: |
           python3 -m pip install -e '.[dev]'
           python3 -m pip install -r docs/requirements.txt
-          python3 -m pip install seaborn
+          python3 -m pip install seaborn torchvision
           make dev
           make website-install
 
