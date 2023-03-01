@@ -28,8 +28,9 @@ def test_endpoint_wrapping_reactive_fn(fn_decorator):
     x = mk.Store(1)
     assert not mk.gui.is_unmarked_context()  # Verify we are in a reactive context
     fn_endpoint(x)
-    assert x == 4  # Verify the endpoint works
-    assert x.inode is None  # Graph should be empty
+    with mk.unmarked():
+        assert x == 4  # Verify the endpoint works
+        assert x.inode is None  # Graph should be empty
 
 
 @pytest.mark.parametrize(
