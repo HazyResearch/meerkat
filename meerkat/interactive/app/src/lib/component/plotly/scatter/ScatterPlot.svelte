@@ -79,14 +79,12 @@
 
 {#await dataPromise}
 	{#if buffer}
-		<div class="bg-purple-50 text-center my-1">Loading Scatter Plot...</div>
+		<!-- <div class="bg-purple-50 text-center my-1">Loading Scatter Plot...</div> -->
 		<Plot data={[]} {layout} {config} on:click={(e) => onEndpoint(onClick, e)} />
 	{:else}
 		<svelte:self {df} {x} {y} {hue} {config} {title} on_click={onClick} buffer={true} on:select />
 	{/if}
 {:then data}
-	<!-- <div class="flex flex-row align-middle justify-center mb-4 bg-transparent">
-		<div> -->
 	<Plot
 		{data}
 		{layout}
@@ -101,6 +99,4 @@
 			eventDispatcher('select', { selected: selected });
 		}}
 	/>
-	<!-- </div>
-	</div> -->
 {/await}
