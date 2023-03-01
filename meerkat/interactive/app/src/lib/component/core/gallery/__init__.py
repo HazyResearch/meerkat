@@ -37,7 +37,7 @@ class Gallery(Component):
         """
         if main_column is None:
             main_column = df.columns[0]
-        
+
         if tag_columns is None:
             tag_columns = []
         super().__init__(

@@ -9,9 +9,10 @@ import pandas as pd
 import pytest
 import torch
 from PIL import Image
+
 from meerkat.columns.deferred.file import FileColumn
 
-from meerkat.columns.deferred.image import ImageColumn
+# from meerkat.columns.deferred.image import ImageColumn
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.dataframe import DataFrame
 

@@ -1,5 +1,4 @@
 import re
-
 from functools import partial
 from typing import TYPE_CHECKING, Dict
 
@@ -10,10 +9,10 @@ if TYPE_CHECKING:
 
 
 class FlashFill(div):
-    """
-    A component for flash filling a column of data using large language models.
+    """A component for flash filling a column of data using large language
+    models.
 
-    Args: 
+    Args:
         df (DataFrame): The dataframe to flash fill.
         target_column (str): The column to flash fill.
     """

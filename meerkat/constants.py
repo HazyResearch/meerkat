@@ -366,10 +366,17 @@ class App:
         index_js_path = os.path.join(package_path, "index.js")
         with open(index_js_path, "r") as f:
             index_js = f.read()
+
         components = re.findall(
             r"export \{ default as (\w+) \}",
             index_js,
         )
+        # Exclude commented out components.
+        remove_components = re.findall(
+            r"(?!\/\/) export \{ default as (\w+) \}",
+            index_js,
+        )
+        components = [c for c in components if c not in remove_components]
         return components
 
     def install(self, dev=False):
@@ -416,6 +423,17 @@ class App:
         subprocess.run(
             [self.package_manager, "i", MEERKAT_NPM_PACKAGE], cwd=self.appdir
         )
+
+    def update_build_command(self, command: str):
+        """Update the build command in package.json."""
+        with open(os.path.join(self.appdir, "package.json")) as f:
+            package = json.load(f)
+
+        package["scripts"]["build"] = command
+
+        with open(os.path.join(self.appdir, "package.json"), "w") as f:
+            # Format the JSON nicely.
+            json.dump(package, f, indent=4)
 
     def update_dependencies(self, deps: dict, dev=False):
         """Update the dependencies in package.json."""
@@ -502,6 +520,12 @@ class MeerkatApp(App):
         self.write_setup_py()  # setup.py
 
         self.copy_assets()
+
+    def setup_mk_build_command(self):
+        """Update the build command in package.json."""
+        self.update_build_command(
+            "VITE_API_URL_PLACEHOLDER=http://meerkat.dummy vite build"
+        )
 
     def setup_mk_dependencies(self):
         self.update_dependencies(

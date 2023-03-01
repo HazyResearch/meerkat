@@ -12,11 +12,10 @@ from meerkat.ops.cond import cor
 from ...html import div, flex, flexcol
 
 if TYPE_CHECKING:
-    from meerkat import Component, DataFrame
+    from meerkat import DataFrame
 
 
 class GalleryQuery(div):
-
     # match: Match = None
     # gallery: Gallery = None
 
@@ -46,7 +45,6 @@ class GalleryQuery(div):
         # Gallery
         with magic():
             allow_selection = cor(False, mkbool(match._mode))
-
 
         gallery = Gallery(
             df_sorted,
