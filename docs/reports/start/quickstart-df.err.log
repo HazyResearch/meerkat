@@ -36,10 +36,10 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:204[
 [1;32m    211[0m     [38;5;66;03m# any nodes in the graph.[39;00m
 [1;32m    212[0m     [38;5;66;03m# `fn` should be run as normal.[39;00m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:535[0m, in [0;36mDataFrame.__getitem__[0;34m(self, posidx)[0m
-[1;32m    533[0m [38;5;129m@reactive[39m()
-[1;32m    534[0m [38;5;28;01mdef[39;00m [38;5;21m__getitem__[39m([38;5;28mself[39m, posidx):
-[0;32m--> 535[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_get[49m[43m([49m[43mposidx[49m[43m,[49m[43m [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m
+File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:536[0m, in [0;36mDataFrame.__getitem__[0;34m(self, posidx)[0m
+[1;32m    534[0m [38;5;129m@reactive[39m()
+[1;32m    535[0m [38;5;28;01mdef[39;00m [38;5;21m__getitem__[39m([38;5;28mself[39m, posidx):
+[0;32m--> 536[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_get[49m[43m([49m[43mposidx[49m[43m,[49m[43m [49m[43mmaterialize[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m
 
 File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74[0m, in [0;36munmarked.__call__.<locals>.decorate_context[0;34m(*args, **kwargs)[0m
 [1;32m     71[0m [38;5;129m@wraps[39m(func)
@@ -63,12 +63,12 @@ File [0;32m~/work/meerkat/meerkat/meerkat/interactive/graph/reactivity.py:137[
 [1;32m    136[0m [38;5;28;01mdef[39;00m [38;5;21m_fn_wrapper[39m([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs):
 [0;32m--> 137[0m     [38;5;28;01mreturn[39;00m [43m_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
-File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:523[0m, in [0;36mDataFrame._get[0;34m(self, posidx, materialize)[0m
-[1;32m    521[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28mset[39m(posidx)[38;5;241m.[39missubset([38;5;28mself[39m[38;5;241m.[39mcolumns):
-[1;32m    522[0m     missing_cols [38;5;241m=[39m [38;5;28mset[39m(posidx) [38;5;241m-[39m [38;5;28mset[39m([38;5;28mself[39m[38;5;241m.[39mcolumns)
-[0;32m--> 523[0m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m([38;5;124mf[39m[38;5;124m"[39m[38;5;124mDataFrame does not have columns [39m[38;5;132;01m{[39;00mmissing_cols[38;5;132;01m}[39;00m[38;5;124m"[39m)
-[1;32m    525[0m df [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_clone(data[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mdata[posidx])
-[1;32m    526[0m [38;5;28;01mreturn[39;00m df
+File [0;32m~/work/meerkat/meerkat/meerkat/dataframe.py:524[0m, in [0;36mDataFrame._get[0;34m(self, posidx, materialize)[0m
+[1;32m    522[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28mset[39m(posidx)[38;5;241m.[39missubset([38;5;28mself[39m[38;5;241m.[39mcolumns):
+[1;32m    523[0m     missing_cols [38;5;241m=[39m [38;5;28mset[39m(posidx) [38;5;241m-[39m [38;5;28mset[39m([38;5;28mself[39m[38;5;241m.[39mcolumns)
+[0;32m--> 524[0m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m([38;5;124mf[39m[38;5;124m"[39m[38;5;124mDataFrame does not have columns [39m[38;5;132;01m{[39;00mmissing_cols[38;5;132;01m}[39;00m[38;5;124m"[39m)
+[1;32m    526[0m df [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_clone(data[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mdata[posidx])
+[1;32m    527[0m [38;5;28;01mreturn[39;00m df
 
 [0;31mKeyError[0m: "DataFrame does not have columns {'label_idx'}"
 KeyError: "DataFrame does not have columns {'label_idx'}"

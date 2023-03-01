@@ -2112,7 +2112,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "bc036d2a23ac4995a76db019e8f78d6c"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "c3dbfe09605541c1a296f61a8b5dcf46"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2406,11 +2406,11 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/meerkat/meerkat/meerkat/dataframe.py:835: UserWarning: Could not convert column img of type &lt;class &#39;meerkat.columns.deferred.file.FileColumn&#39;&gt;, it will be dropped from the output.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/meerkat/meerkat/meerkat/dataframe.py:836: UserWarning: Could not convert column img of type &lt;class &#39;meerkat.columns.deferred.file.FileColumn&#39;&gt;, it will be dropped from the output.
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7fc954612a30&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f2b51e3d1c0&gt;
 </pre></div>
 </div>
 <img alt="../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" src="../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" />
@@ -2423,7 +2423,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FileCell(fn=&lt;meerkat.columns.deferred.file.FileLoader object at 0x7fca134c23a0&gt;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FileCell(fn=&lt;meerkat.columns.deferred.file.FileLoader object at 0x7f2bd687deb0&gt;)
 </pre></div>
 </div>
 </div>
@@ -2452,7 +2452,7 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 Downloading: &quot;https://download.pytorch.org/models/resnet18-f37072fd.pth&quot; to /home/runner/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
 </pre></div>
 </div>
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "60d5adc30fa74187b53697c0b0a4cadc"}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "a36b0a9563034850bfc45135308900f8"}</script></div>
 </div>
 <section id="applying-a-transform-to-the-images">
 <h3>💈  Applying a transform to the images.<a class="headerlink" href="#applying-a-transform-to-the-images" title="Permalink to this headline">¶</a></h3>
@@ -2679,10 +2679,10 @@ Downloading: &quot;https://download.pytorch.org/models/resnet18-f37072fd.pth&quo
 <span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="c1"># any nodes in the graph.</span>
 <span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># `fn` should be run as normal.</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:535,</span> in <span class="ni">DataFrame.__getitem__</span><span class="nt">(self, posidx)</span>
-<span class="g g-Whitespace">    </span><span class="mi">533</span> <span class="nd">@reactive</span><span class="p">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">534</span> <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posidx</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">535</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">posidx</span><span class="p">,</span> <span class="n">materialize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:536,</span> in <span class="ni">DataFrame.__getitem__</span><span class="nt">(self, posidx)</span>
+<span class="g g-Whitespace">    </span><span class="mi">534</span> <span class="nd">@reactive</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">535</span> <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posidx</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">536</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">posidx</span><span class="p">,</span> <span class="n">materialize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/interactive/graph/marking.py:74,</span> in <span class="ni">unmarked.__call__.&lt;locals&gt;.decorate_context</span><span class="nt">(*args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">71</span> <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
@@ -2706,12 +2706,12 @@ Downloading: &quot;https://download.pytorch.org/models/resnet18-f37072fd.pth&quo
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:523,</span> in <span class="ni">DataFrame._get</span><span class="nt">(self, posidx, materialize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">521</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">522</span>     <span class="n">missing_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">523</span>     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataFrame does not have columns </span><span class="si">{</span><span class="n">missing_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">525</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">posidx</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">526</span> <span class="k">return</span> <span class="n">df</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:524,</span> in <span class="ni">DataFrame._get</span><span class="nt">(self, posidx, materialize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">522</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">523</span>     <span class="n">missing_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">posidx</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">524</span>     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataFrame does not have columns </span><span class="si">{</span><span class="n">missing_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">526</span> <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">posidx</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">527</span> <span class="k">return</span> <span class="n">df</span>
 
 <span class="ne">KeyError</span>: &quot;DataFrame does not have columns {&#39;label_idx&#39;}&quot;
 </pre></div>
