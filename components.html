@@ -6,18 +6,18 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
 		<link href="./_app/immutable/assets/_layout-a82d3f67.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/_page-8bf76ce1.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_page-f0c41ff0.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/start-8c6262f6.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index-f8c1caff.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-d64b6db8.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index-39fcfd13.js">
+		<link rel="modulepreload" href="./_app/immutable/start-bd1ee103.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-ea933268.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-6fdd5294.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-004a8daa.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/shared-23917130.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-38bc3a92.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-8916ea07.js">
 		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/components/_page.svelte-bef0dde7.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-4cdabf32.js"><!-- HEAD_svelte-1dsodst_START --><link href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-okaidia.min.css" rel="stylesheet"><!-- HEAD_svelte-1dsodst_END -->
+		<link rel="modulepreload" href="./_app/immutable/components/pages/components/_page.svelte-c50f8570.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-50035759.js"><!-- HEAD_svelte-1dsodst_START --><link href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-okaidia.min.css" rel="stylesheet"><!-- HEAD_svelte-1dsodst_END -->
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
@@ -56,20 +56,22 @@
 
 			<div><div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Button</label></div>
-					<div class="w-20"><div class="bg-slate-100 py-3 rounded-lg drop-shadow-md flex flex-col hover:bg-slate-200"><button>Hello</button></div></div></div>
+					<div class="w-20"><div class="w-fit bg-slate-100 py-1 px-2 rounded-md flex items-center text-slate-600 hover:bg-slate-200"><button><div class="flex flex-row gap-1 items-center">
+
+			Hello</div></button></div></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Checkbox</label></div>
-					<div class="w-fit"><div class="bg-violet-50 p-2 rounded-lg">
+					<div class="w-fit"><div class="">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300 flex items-center"><input type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 focus:ring-2 mr-2 dark:bg-gray-700 dark:border-gray-600 rounded text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-600" checked></label></div></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Text</label></div>
-					<div class="w-fit"><div class="text-ellipsis whitespace-nowrap overflow-hidden">A quick brown fox jumped over a lazy dog.</div></div></div>
+					<div class="w-fit"><div class="">A quick brown fox jumped over a lazy dog.</div></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Textbox</label></div>
-					<div class="w-fit"><input type="text" placeholder="Write some text..." class="grow h-10 px-3 rounded-md shadow-md"></div></div>
+					<div class="w-fit"><input type="text" placeholder="Write some text..." value="Write." class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Slider</label></div>
@@ -119,19 +121,20 @@
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Toggle</label></div>
-					<div class="w-fit"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" value="" class="sr-only peer" >
-	<div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-	<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"></span></label></div></div>
+					<div class="w-fit"><label class="relative inline-flex items-center cursor-pointer w-fit"><input type="checkbox" value="" class="sr-only peer">
+	<div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div></label></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Code</label></div>
 					
 
-<div class="whitespace-pre overflow-auto h-full max-h-[50vh] my-1 rounded-lg py-2 px-4 bg-black"><pre><code class="language-python"><!-- HTML_TAG_START --><span class="token keyword">import</span> meerkat <span class="token keyword">as</span> mk<!-- HTML_TAG_END --></code></pre></div></div>
+<div class="text-left whitespace-pre overflow-auto py-2 px-4 h-full aspect-video bg-slate-800 "><pre><code class="language-python"><!-- HTML_TAG_START --><span class="token keyword">import</span> meerkat <span class="token keyword">as</span> mk<!-- HTML_TAG_END --></code></pre></div>
+
+</div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Image</label></div>
-					<div class="w-fit"><img class="h-full w-full" src="http://placekitten.com/200/200" alt="A Meerkat cell."></div></div>
+					<div class="w-fit"><img class="" src="http://placekitten.com/200/200" alt="A Meerkat cell."></div></div>
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Markdown</label></div>
@@ -308,7 +311,7 @@
 			</button></div></div>
 
 
-	<div class="text-ellipsis whitespace-nowrap overflow-hidden">This is a component in Tab 1</div></div></div>
+	<div class="">This is a component in Tab 1</div></div></div>
 
 				
 
@@ -316,7 +319,9 @@
 
 				<div class="flex flex-col items-center mb-4"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Select</label></div>
-					<div class=""><select class="block w-full bg-purple-200 border-purple-500 ring-purple-200 ring-offset-0 ring-0 focus:border-purple-500 focus:ring-purple-200 focus:ring-offset-0 focus:ring-0 p-2 rounded-lg w-fit text-sm p-2.5"><option disabled selected value="">Choose option ...</option><option value="1">Option 1</option><option value="2">Option 2</option><option value="3">Option 3</option><option value="4">Option 4</option></select></div></div>
+					<select class="rounded-md bg-slate-100 border-0 px-3 text-slate-600 w-full"><option value="1">Option 1</option><option value="2">Option 2</option><option value="3">Option 3</option><option value="4">Option 4</option></select>
+
+</div>
 
 				<div class="flex flex-col items-center mb-4 h-64"><div class="flex flex-col items-center mt-4 mb-4">
   <label class="text-sm font-medium block text-gray-900 dark:text-gray-300">Chat</label></div>
@@ -333,14 +338,14 @@
 			</span></a></div></div></footer></div>
 
 
-		<script type="module" data-sveltekit-hydrate="v5tt5z">
-			import { start } from "./_app/immutable/start-8c6262f6.js";
+		<script type="module" data-sveltekit-hydrate="18pqz45">
+			import { start } from "./_app/immutable/start-bd1ee103.js";
 
 			start({
 				env: {},
 				paths: {"assets":"","base":""},
-				target: document.querySelector('[data-sveltekit-hydrate="v5tt5z"]').parentNode,
-				version: "1677705374283",
+				target: document.querySelector('[data-sveltekit-hydrate="18pqz45"]').parentNode,
+				version: "1677706285967",
 				hydrate: {
 					node_ids: [0, 4],
 					data: [null,null],
