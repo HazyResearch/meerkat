@@ -2,7 +2,7 @@
 
 ```{admonition} Under Construction
 :class: warning
-Meerkat's documentation is still under construction to make it as comprehensive as possible. If you have any questions that are not addressed by the docs, please reach out to us on [Discord](https://discord.gg/K7HuZuXU).
+Meerkat's documentation is still under construction to make it as comprehensive as possible. If you have any questions that are not addressed by the docs, please reach out to us on [Discord](https://discord.gg/pw8E4Q26Tq).
 ```
 
 
