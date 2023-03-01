@@ -9,14 +9,13 @@ parts:
       - file: start/quickstart-interactive
       - file: start/tutorials/index
         sections:
-          - file: start/tutorials/tutorial-0
-          - file: start/tutorials/tutorial-1
-          - file: start/tutorials/tutorial-2
-          - file: start/tutorials/tutorial-3
-          - file: start/tutorials/tutorial-4
-          - file: start/tutorials/tutorial-filter-sort
+          - file: start/tutorials/tutorial-data-frames
+          - file: start/tutorials/tutorial-image-gallery
           - file: start/tutorials/tutorial-simple-counter
-          - file: start/tutorials/tutorial-simple-dataframe-viewer
+          - file: start/tutorials/tutorial-reactive-viewer
+          - file: start/tutorials/tutorial-query-llm
+          - file: start/tutorials/tutorial-search-engine
+          - file: start/tutorials/tutorial-filter-sort
 
   - caption: User Guide
     chapters:
@@ -76,6 +75,7 @@ parts:
             sections:
               - file: user-guide/interactive/advanced/sharing
               - file: user-guide/interactive/advanced/under-the-hood
+          - file: user-guide/interactive/faqs
           # - file: user-guide/interactive/core-concepts-nutshell
 
       - file: user-guide/cheat-sheet

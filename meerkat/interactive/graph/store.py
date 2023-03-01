@@ -36,13 +36,13 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     _self_marked = True
 
     def __init__(self, wrapped: T, backend_only: bool = False):
-        if isinstance(wrapped, Iterator):
-            warnings.warn(
-                "Wrapping an iterator in a Store is not recommended. "
-                "If the iterator is derived from an iterable, wrap the iterable:\n"
-                "    >>> store = mk.Store(iterable)\n"
-                "    >>> iterator = iter(store)"
-            )
+        # if not isinstance(wrapped, _IteratorStore) and isinstance(wrapped, Iterator):
+        #     warnings.warn(
+        #         "Wrapping an iterator in a Store is not recommended. "
+        #         "If the iterator is derived from an iterable, wrap the iterable:\n"
+        #         "    >>> store = mk.Store(iterable)\n"
+        #         "    >>> iterator = iter(store)"
+        #     )
         super().__init__(wrapped=wrapped)
         # Set up these attributes so we can create the
         # schema and detail properties.

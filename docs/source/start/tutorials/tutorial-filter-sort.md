@@ -1,4 +1,4 @@
-# Tutorial: Filter & Sort
+# Tutorial 7: Complex Components (Gallery with Filter and Sort) 
 
 <!-- TODO: include screenshots? -->
 
