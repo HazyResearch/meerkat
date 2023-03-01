@@ -1625,6 +1625,53 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-simple-counter.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-simple-counter.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -1709,6 +1756,23 @@ title="Edit this page"
   <div class="menu-dropdown__content">
     <ul>
       <li>
+        <a href="../../_sources/start/tutorials/tutorial-simple-counter.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
         <a href="../../_sources/start/tutorials/tutorial-simple-counter.md"
    class="headerbtn"
    data-toggle="tooltip"
@@ -1789,8 +1853,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interface">
-   Interface
+  <a class="reference internal nav-link" href="#page">
+   Page
   </a>
  </li>
 </ul>
@@ -1833,8 +1897,8 @@ title="Print to PDF"
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#interface">
-   Interface
+  <a class="reference internal nav-link" href="#page">
+   Page
   </a>
  </li>
 </ul>
@@ -1853,16 +1917,24 @@ title="Print to PDF"
 <section id="import">
 <h2>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h2>
 <p>First, we’ll import the Meerkat library.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="store">
 <h2>Store<a class="headerlink" href="#store" title="Permalink to this headline">¶</a></h2>
 <p>Next, let’s create a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object to keep track of the state of the counter. <code class="docutils literal notranslate"><span class="pre">Stores</span></code> in Meerkat are borrowed from their Svelte counterparts, and provide a way for users to create values that are synchronized between the GUI and the Python code.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the counter to 0</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the counter to 0</span>
 <span class="n">counter</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 <p>There are a couple of things to keep in mind when it comes to <code class="docutils literal notranslate"><span class="pre">Stores</span></code>.</p>
 <ul class="simple">
@@ -1873,37 +1945,54 @@ title="Print to PDF"
 <section id="endpoint">
 <h2>Endpoint<a class="headerlink" href="#endpoint" title="Permalink to this headline">¶</a></h2>
 <p>Then, we’ll create an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> in Meerkat, which is a Python function that can be called from the frontend. In this case, we’ll create an endpoint that increments the counter by 1.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">endpoint</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">endpoint</span>
 <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">counter</span><span class="p">:</span> <span class="n">Store</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
     <span class="c1"># Use the special .set() method to update the Store</span>
     <span class="n">counter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="nd">@mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">endpoint</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">counter</span><span class="p">:</span> <span class="n">Store</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="c1"># Use the special .set() method to update the Store</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">counter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;Store&#39; is not defined
+</pre></div>
+</div>
+</div>
 </div>
 <p>What’s great here is that Meerkat uses FastAPI under the hood to automatically setup an API endpoint for <code class="docutils literal notranslate"><span class="pre">increment</span></code>. This can then be called by other services as well!</p>
 </section>
 <section id="component">
 <h2>Component<a class="headerlink" href="#component" title="Permalink to this headline">¶</a></h2>
 <p>Next, we’ll want to assemble our GUI: we want a button that we can press to increment the counter, as well as a way to display the current count value.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A button, which when clicked calls the `increment` endpoint with the `counter` argument filled in</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># A button, which when clicked calls the `increment` endpoint with the `counter` argument filled in</span>
 <span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Increment&quot;</span><span class="p">,</span> <span class="n">on_click</span><span class="o">=</span><span class="n">increment</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">counter</span><span class="p">))</span>
 <span class="c1"># Display the counter value</span>
 <span class="n">text</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">counter</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
 <p>Meerkat comes with a collection of prebuilt Components that can be used to assemble interfaces.</p>
 </section>
-<section id="interface">
-<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h2>
-<p>Finally, we can start the API and frontend servers, and launch the interface.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start the server</span>
-<span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="c1"># Launch the interface</span>
-<span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span>
-    <span class="c1"># Put the components into a row layout for display</span>
-    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">RowLayout</span><span class="p">(</span>
-        <span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">button</span><span class="p">,</span> <span class="n">text</span><span class="p">]</span>
-    <span class="p">),</span>
+<section id="page">
+<h2>Page<a class="headerlink" href="#page" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can launch the interface.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Launch the interface</span>
+<span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
+    <span class="c1"># Put the components into a layout for display</span>
+    <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">div</span><span class="p">([</span><span class="n">button</span><span class="p">,</span> <span class="n">text</span><span class="p">]),</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;counter&quot;</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>

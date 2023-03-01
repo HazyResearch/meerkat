@@ -2145,7 +2145,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "4e1b036c76964967b71cb0eed9e32ee2"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "d7809ddffeb2413999cab58facf37e63"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2348,27 +2348,24 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1">## OPTIONAL: this cell requires the seaborn dependency: https://seaborn.pydata.org/installing.html </span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">plot_df</span> <span class="o">=</span> <span class="n">valid_df</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;golf ball&quot;</span><span class="p">,</span> <span class="s2">&quot;parachute&quot;</span><span class="p">])]</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">data</span><span class="o">=</span><span class="n">plot_df</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span> 
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">,</span> 
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="p">)</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;seaborn&#39;
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/meerkat/meerkat/meerkat/dataframe.py:835: UserWarning: Could not convert column img of type &lt;class &#39;meerkat.columns.deferred.file.FileColumn&#39;&gt;, it will be dropped from the output.
+  warnings.warn(
 </pre></div>
 </div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f060e1169a0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" src="../../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" />
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">]))]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FileCell(fn=&lt;meerkat.columns.deferred.file.FileLoader object at 0x7f061dc23ac0&gt;)
 </pre></div>
 </div>
 </div>
@@ -2386,6 +2383,19 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <span class="kn">from</span> <span class="nn">torchvision.models</span> <span class="kn">import</span> <span class="n">resnet18</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">torch</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">torchvision.models</span> <span class="kn">import</span> <span class="n">resnet18</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">model</span> <span class="o">=</span> <span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;torchvision&#39;
 </pre></div>
 </div>
 </div>

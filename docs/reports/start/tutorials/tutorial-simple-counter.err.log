@@ -17,20 +17,20 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import torch
-from torchvision.models import resnet18
-import torchvision.transforms as transforms
-model = resnet18(pretrained=True)
+@mk.gui.endpoint
+def increment(counter: Store[int]):
+    # Use the special .set() method to update the Store
+    counter.set(counter + 1)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
-Cell [0;32mIn[13], line 2[0m
-[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mtorch[39;00m
-[0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mtorchvision[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmodels[39;00m [38;5;28;01mimport[39;00m resnet18
-[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mtorchvision[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtransforms[39;00m [38;5;28;01mas[39;00m [38;5;21;01mtransforms[39;00m
-[1;32m      4[0m model [38;5;241m=[39m resnet18(pretrained[38;5;241m=[39m[38;5;28;01mTrue[39;00m)
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[3], line 2[0m
+[1;32m      1[0m [38;5;129m@mk[39m[38;5;241m.[39mgui[38;5;241m.[39mendpoint
+[0;32m----> 2[0m [38;5;28;01mdef[39;00m [38;5;21mincrement[39m(counter: [43mStore[49m[[38;5;28mint[39m]):
+[1;32m      3[0m     [38;5;66;03m# Use the special .set() method to update the Store[39;00m
+[1;32m      4[0m     counter[38;5;241m.[39mset(counter [38;5;241m+[39m [38;5;241m1[39m)
 
-[0;31mModuleNotFoundError[0m: No module named 'torchvision'
-ModuleNotFoundError: No module named 'torchvision'
+[0;31mNameError[0m: name 'Store' is not defined
+NameError: name 'Store' is not defined
 
