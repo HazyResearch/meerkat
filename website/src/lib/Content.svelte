@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { base } from '$app/paths';
+  	import { base } from '$app/paths';
 	import Card from './Card.svelte';
+
+	let words = ['Unstructured Datasets', 'Interactive Apps', 'Data Frames']
+	let word_idx = 0;
 </script>
 
 <!-- Top Content Part, should remain below the navbar -->
@@ -11,7 +14,16 @@
 		<div class="md:grid md:grid-cols-[2fr_3fr] items-center justify-between md:h-[400px] gap-14">
 			<div class="max-w-xl mb-8 md:mb-0">
 				<h1 class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white">
-					Unstructured Datasets meet <span class="italic text-violet-600">Foundation Models</span>.
+					<!-- <div class="flex flex-col align-top"> -->
+					<div class="animate-pulse" 
+						on:animationiteration={() => {
+							word_idx = (word_idx + 1) % words.length;
+					}}>
+						{words[word_idx]}
+					</div>
+					meet 
+					<div class="italic text-violet-600">Foundation Models.</div>
+					<!-- </div> -->
 				</h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
 					Meerkat is an open-source Python library, designed for technical teams to interactively wrangle images, videos, text documents and more with foundation models.
@@ -131,7 +143,7 @@
 					title="🤖️ Machine Learning Teams " 
 					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting." 
 					byline=""
-				/>
+				/>n
 				<Card 
 					title="🧪️ Data Science Teams " 
 					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python." 
@@ -335,5 +347,27 @@
 <style>
 	.filter-black {
 		filter: invert(100%) sepia(99%) saturate(14%) hue-rotate(345deg) brightness(106%) contrast(100%);
+	}
+
+	.will-change-transform {
+		will-change: transform;
+	}
+
+	@keyframes pulse {
+		100% {
+        	opacity: 0.0;
+		}
+		90% {
+        	opacity: 0.0;
+		}
+    	30% {
+        	opacity: 1.0;
+		}
+		0% {
+			opacity: 0.0;
+		}
+	}
+	.animate-pulse {
+		animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	}
 </style>
