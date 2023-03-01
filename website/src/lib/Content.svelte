@@ -143,7 +143,7 @@
 					title="🤖️ Machine Learning Teams " 
 					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting." 
 					byline=""
-				/>n
+				/>
 				<Card 
 					title="🧪️ Data Science Teams " 
 					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python." 
