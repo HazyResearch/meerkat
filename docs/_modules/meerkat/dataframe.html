@@ -1888,20 +1888,17 @@ title="Open an issue"
 
     <span class="nd">@unmarked</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">_ipython_display_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">meerkat.state</span> <span class="kn">import</span> <span class="n">state</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">frontend_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_rows</span> <span class="o">=</span> <span class="n">meerkat</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span>
+            <span class="n">df</span><span class="p">,</span> <span class="n">formatters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr_pandas_</span><span class="p">(</span><span class="n">max_rows</span><span class="o">=</span><span class="n">max_rows</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">formatters</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span> <span class="n">max_rows</span><span class="o">=</span><span class="n">max_rows</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="p">))</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">table</span><span class="p">()</span><span class="o">.</span><span class="n">_ipython_display_</span><span class="p">()</span>
-
-    <span class="c1"># @unmarked()</span>
-    <span class="c1"># def _repr_html_(self):</span>
-    <span class="c1">#     return self.gui.table()</span>
-
-    <span class="c1"># @unmarked()</span>
-    <span class="c1"># def _repr_html_(self, max_rows: int = None):</span>
-    <span class="c1">#     if max_rows is None:</span>
-    <span class="c1">#         max_rows = meerkat.config.display.max_rows</span>
-
-    <span class="c1">#     df, formatters = self._repr_pandas_(max_rows=max_rows)</span>
-
-    <span class="c1">#     return df.to_html(formatters=formatters, max_rows=max_rows, escape=False)</span>
 
     <span class="nd">@unmarked</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

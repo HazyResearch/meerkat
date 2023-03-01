@@ -279,7 +279,7 @@ valid_df = mk.concat([valid_df, pred_df], axis="columns")
 The predictions, output probabilities, and activations are now stored alongside the examples in the `DataFrame`. 
 
 ```{code-cell}
-valid_df[["label_id", "input", "pred", "probs", "activation"]].head()
+valid_df[["label_idx", "input", "pred", "probs", "activation"]].head()
 ```
 
 ### 🎯  Computing metrics and analyzing performance. 
