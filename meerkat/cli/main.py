@@ -100,6 +100,7 @@ def init(
         try:
             # Install packages in the new app.
             app.setup_mk_dependencies()
+            app.setup_mk_build_command()
             app.install()
         except subprocess.CalledProcessError as e:
             rich.print(e.stdout.decode("utf-8"))
