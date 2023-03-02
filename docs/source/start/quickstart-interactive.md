@@ -14,7 +14,11 @@ Working with unstructured data frequently involves interacting with it and visua
 There's no better way to do that than through an interactive application.
 These applications can range from simple user input forms inside Jupyter notebooks to full-blown dashboards and web applications that are deployed to the cloud.
 
-Make sure you have Meerkat {ref}`installed and running <install>` before you go through this quickstart.
+Make sure you have Meerkat {ref}`installed and running <install>` before you go through this quickstart. You can run the code in this demo using
+
+```bash
+mk demo quickstart-interactive
+```
 
 ## 🖼️ Components: Display Elements
 
@@ -296,3 +300,7 @@ page = mk.gui.Page(
 )
 page.launch()
 ```
+
+
+## 📚 Where to go next
+Check out our [tutorials](./tutorials/index.md) to learn more about Meerkat's core concepts.
