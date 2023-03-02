@@ -148,7 +148,7 @@ Under the hood, dataloading is multiprocessed so that costly I/O doesn't bottlen
 
 Let's start by filtering the `DataFrame` down to the examples in the validation set. 
 ```{code-cell}
-valid_df = df.filter(lambda split: split == "valid")
+valid_df = df.filter(lambda split: split == "valid", is_batched_fn=True, batch_size=len(df))
 ```
 
 ### 🫐  Using `DataFrame.map` to compute average intensity of the blue color channel in the images.
@@ -186,7 +186,7 @@ sns.displot(
 ```
 
 ```{code-cell}
-valid_df["img"][int(np.argmax(valid_df["avg_blue"]))]
+valid_df["img"][int(np.argmax(valid_df["avg_blue"]))]()
 ```
 
 ## 📉 ML with images in `meerkat`.
@@ -200,7 +200,7 @@ The cell below downloads the model..
 import torch
 from torchvision.models import resnet18
 import torchvision.transforms as transforms
-model = resnet18(pretrained=True)
+model = resnet18(weights="ResNet18_Weights.IMAGENET1K_V1")
 ```
 
 ### 💈  Applying a transform to the images.
