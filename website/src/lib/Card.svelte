@@ -20,5 +20,12 @@
 				</p>
 			{/if}
         </slot>
+		<div class="p-14 h-full self-icenter">
+			<iframe
+				src="https://youtube.com/embed/HJv9ZvtisN0?modestbranding=1"
+				allowfullscreen="allowfullscreen"
+				class="aspect-video h-full rounded-md shadow-lg"
+			/>
+		</div>
 	</div>
 </div>

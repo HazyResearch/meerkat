@@ -58,21 +58,25 @@ mk.gui.html.div([search, gallery]")
 >
 	<div class="container px-6 mx-auto pt-24">
 		<div
-			class="md:grid md:grid-cols-[2fr_3fr] items-center justify-between md:h-[400px] gap-14"
+			class="md:grid md:grid-cols-[2fr_3fr] items-center flex flex-col justify-between md:h-[400px] gap-14"
 		>
 			<div class="max-w-xl mb-8 md:mb-0">
 				<h1
 					class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white"
 				>
-					Unstructured datasets meet
+					Unstructured Datasets meet
 					<span class="italic text-violet-600"
 						>Foundation Models.</span
 					>
 				</h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
-					Meerkat is an open-source Python library, designed for
-					technical teams to interactively wrangle images, videos,
+					Meerkat is an open-source Python library, designed to help
+					technical teams interactively wrangle images, videos,
 					text documents and more with foundation models.
+				</p>
+				<p class="mt-4 text-gray-600 dark:text-gray-400">
+					Our goal is to make foundation models a more reliable software abstraction for processing unstructured datasets. 
+					<span class="text-violet-600" >Read our <a href="blog">blogpost</a> to learn more.</span>
 				</p>
 			</div>
 			<div class="p-14 h-full self-icenter">
@@ -183,7 +187,7 @@ mk.gui.html.div([search, gallery]")
 				<div>
 					<div>
 						<span class="font-bold">
-							Interactive data frame visualizations that allow you to supervise foundation models as they process your data.
+							Interactive data frame visualizations that allow you to control foundation models as they process your data.
 						</span>
 						<ul class="pl-3 flex-col gap-1 flex pt-2">
 							<li class="text-sm">
@@ -345,17 +349,7 @@ mk.gui.html.div([search, gallery]")
 					</a>
 				</div>
 
-				<div
-					class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
-				>
-					<a href="https://crfm.stanford.edu/">
-						<img
-							src="https://crfm.stanford.edu/static/img/header/crfm-rgb.png"
-							alt="Stanford CRFM Logo"
-							class="h-full hover:shadow-sm"
-						/>
-					</a>
-				</div>
+				
 				<div
 					class="h-16 -mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
 				>
@@ -388,6 +382,7 @@ mk.gui.html.div([search, gallery]")
 	class="font-rubik dark:bg-gray-900 bg-gradient-to-br  border-b "
 > -->
 	<div class="container px-6 py-16 mx-auto md:py-8 h-full">
+		
 		<div class="mb-8 flex flex-col items-center h-full">
 			<h1 class="text-3xl text-gray-800 dark:text-white">
 				...with the support of
@@ -395,6 +390,17 @@ mk.gui.html.div([search, gallery]")
 			<div
 				class="flex flex-wrap justify-center mt-6 p-4  border shadow-sm rounded-lg bg-slate-50 gap-2 h-full"
 			>
+			<div
+					class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
+				>
+					<a href="https://crfm.stanford.edu/">
+						<img
+							src="https://crfm.stanford.edu/static/img/header/crfm-rgb.png"
+							alt="Stanford CRFM Logo"
+							class="h-full hover:shadow-sm"
+						/>
+					</a>
+				</div>
 				<div
 					class="h-12 mx-2 my-2 text-gray-800  hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
