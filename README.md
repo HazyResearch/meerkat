@@ -7,7 +7,6 @@
 [![GitHub](https://img.shields.io/github/license/HazyResearch/meerkat)](https://img.shields.io/github/license/HazyResearch/meerkat)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-
 Meerkat is a open-source Python library designed for technical teams that want to interactively wrangle their unstructured data with foundation models.
 
 [**Website**](http://meerkat.wiki)
@@ -60,14 +59,16 @@ software abstraction for processing unstructured datasets.
 Meerkat’s approach is based on two pillars:
 
 **(1) Heterogeneous data frames with extended API.** At the heart of Meerkat is a data frame that can store structured fields (e.g. numbers, strings, and dates) alongside complex objects (e.g. images, web pages, audio) and their tensor representations (e.g. embeddings, logits) in a single table. Meerkat's data frame API goes beyond structured data analysis libraries like Pandas by providing a set of FM-backed unstructured data operations.
+
 ```python
-import meerkat as mk 
+import meerkat as mk
 
 df = mk.from_csv("paintings.csv")
 df["img"] = mk.files("img_path")
 df["embeddings"] = mk.embed(df["img"], encoder="clip")
 df
 ```
+
 <div align="center">
 
 <img src="website/static/dataframe-demo.gif" height=400 alt="Meerkat logo"/>
@@ -78,17 +79,18 @@ Meerkat visualizations are implemented in Python, so they can be composed and cu
 Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
 
 ```python
-match = mk.gui.Match(df, 
-	against="embedding", 
+match = mk.gui.Match(df,
+	against="embedding",
 	engine="clip"
 )
-sorted_df = mk.sort(df, 
-	by=match.criterion.name, 
+sorted_df = mk.sort(df,
+	by=match.criterion.name,
 	ascending=False
 )
 gallery = mk.gui.Gallery(sorted_df)
 mk.gui.html.div([match, gallery])
 ```
+
 <div align="center">
 <img src="website/static/interact-demo.gif" height=400 alt="Meerkat logo"/>
 </div>
