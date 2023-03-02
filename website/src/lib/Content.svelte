@@ -1,54 +1,213 @@
 <script lang="ts">
-  	import { base } from '$app/paths';
-	import Card from './Card.svelte';
+	import { base } from "$app/paths";
+	import Card from "./Card.svelte";
+	import Prism from "prismjs";
 
-	let words = ['Unstructured Datasets', 'Interactive Apps', 'Data Frames']
+	let words = ["Images", "Audio", "Web Pages", "PDFs", "Tensors"];
 	let word_idx = 0;
+
+	const df_code = `import meerkat as mk 
+
+df = mk.from_csv("paintings.csv")
+df["img"] = mk.files("img_path")
+df["embedding"] = mk.embed(
+	df["img"], 
+	engine="clip"
+)`;
+	const df_code_html = Prism.highlight(df_code, Prism.languages.js, "python");
+
+	const interact_code = `search = mk.gui.Search(df, 
+	against="embedding", engine="clip"
+)
+sorted_df = mk.sort(df, 
+	by=search.criterion.name, 
+	ascending=False
+)
+gallery = mk.gui.Gallery(sorted_df)
+mk.gui.html.div([search, gallery]")
+`;
+	const interact_code_html = Prism.highlight(
+		interact_code,
+		Prism.languages.js,
+		"python"
+	);
 </script>
+
+<!-- <link
+	rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
+	crossorigin="anonymous"
+/>
+
+<script:head
+	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"
+/>
+<script:head
+	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"
+/>-->
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
+	/>
+</svelte:head>
 
 <!-- Top Content Part, should remain below the navbar -->
 <section
 	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br border-b "
 >
 	<div class="container px-6 mx-auto pt-24">
-		<div class="md:grid md:grid-cols-[2fr_3fr] items-center justify-between md:h-[400px] gap-14">
+		<div
+			class="md:grid md:grid-cols-[2fr_3fr] items-center flex flex-col justify-between md:h-[400px] gap-14"
+		>
 			<div class="max-w-xl mb-8 md:mb-0">
-				<h1 class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white">
-					<!-- <div class="flex flex-col align-top"> -->
-					<div class="animate-pulse" 
-						on:animationiteration={() => {
-							word_idx = (word_idx + 1) % words.length;
-					}}>
-						{words[word_idx]}
-					</div>
-					meet 
-					<div class="italic text-violet-600">Foundation Models.</div>
-					<!-- </div> -->
+				<h1
+					class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white"
+				>
+					Unstructured Datasets meet
+					<span class="italic text-violet-600"
+						>Foundation Models.</span
+					>
 				</h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
-					Meerkat is an open-source Python library, designed for technical teams to interactively wrangle images, videos, text documents and more with foundation models.
+					Meerkat is an open-source Python library, designed to help
+					technical teams interactively wrangle images, videos,
+					text documents and more with foundation models.
+				</p>
+				<p class="mt-4 text-gray-600 dark:text-gray-400">
+					Our goal is to make foundation models a more reliable software abstraction for processing unstructured datasets. 
+					<span class="text-violet-600" >Read our <a href="blog">blogpost</a> to learn more.</span>
 				</p>
 			</div>
-			<div class = "p-14 h-full self-icenter">
-				<iframe src="https://youtube.com/embed/HJv9ZvtisN0?modestbranding=1"          allowfullscreen="allowfullscreen"
- 				class="aspect-video h-full rounded-md shadow-lg"></iframe>
+			<div class="p-14 h-full self-icenter">
+				<iframe
+					src="https://youtube.com/embed/HJv9ZvtisN0?modestbranding=1"
+					allowfullscreen="allowfullscreen"
+					class="aspect-video h-full rounded-md shadow-lg"
+				/>
 			</div>
 			<!-- Insert Demo Video here -->
 		</div>
 	</div>
 </section>
- 
 
 <!-- Add a section to show code for installing the Meerkat package. -->
-<section
-	class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl  border-b "
->
+<section class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl  border-b ">
 	<div class="container px-6 py-16 mx-auto md:py-8">
-		<div class="flex flex-col items-center">
-			<h1 class="text-4xl text-gray-800 dark:text-white">Install Meerkat</h1>
-			<pre class="shadow-md rounded-lg mt-4 py-4 px-8 text-white bg-slate-800 dark:text-gray-400"><code
+		<div class="flex flex-col items-center gap-3">
+			<h1 class="text-4xl text-gray-800 dark:text-white">
+				Install Meerkat
+			</h1>
+			<pre
+				class="shadow-md rounded-lg mt-4 py-4 px-8 text-white bg-slate-800 dark:text-gray-400"><code
 					>$ pip install meerkat-ml</code
 				></pre>
+			<div
+				class="bg-slate-50 border border-orange-400 flex rounded-lg max-w-md px-4 py-1 shadow-sm gap-2"
+			>
+				<div class="font-rubik text-orange-700 font-bold italic">
+					Notice
+				</div>
+				<div class="font-rubik text-slate-600">
+					Meerkat is a research project, so users should expect rapid
+					updates. The current API is subject to change.
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl border-b">
+	<div class="container lg:grid lg:grid-cols-2 flex flex-col px-6 mx-auto  pt-16 gap-10 pb-10">
+		<div class="grid grid-rows-[auto_auto_1fr]">
+			<div class="text-2xl font-bold text-gray-800 md:text-4xl pb-3">
+				<span>Data Frames for</span>
+				<span class="bg-slate-100 rounded-md px-2 border">
+					<span
+						class="animate-pulse italic text-yellow-400 "
+						on:animationiteration={() => {
+							word_idx = (word_idx + 1) % words.length;
+						}}
+					>
+						{words[word_idx]}
+					</span>
+				</span>
+			</div>
+
+			<div class="lg:grid lg:grid-cols-2 flex flex-col items-center gap-4 pb-6">
+				<div>
+					<span class="font-bold"
+						>A Meerkat <span class="font-mono text-violet-600"
+							>DataFrame</span
+						> is a heterogeneous data structure with an API backed by
+						foundation models.</span
+					>
+					<ul class="pl-3 flex-col gap-1 flex pt-2">
+						<li class="text-sm">
+							Structured fields (<span class="italic">e.g.</span>
+							numbers and dates) live alongside unstructured
+							objects (<span class="italic">e.g.</span> images),
+							and their tensor representations (<span
+								class="italic">e.g.</span
+							> embeddings).
+						</li>
+						<li class="text-sm">
+							Functions like <span
+								class="font-mono text-violet-600">mk.embed</span
+							> abstract away boiler-plate ML code, keeping the focus
+							on the data.
+						</li>
+					</ul>
+				</div>
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
+					<pre><code class="language-python"
+							>{@html df_code_html}</code
+						></pre>
+				</div>
+			</div>
+
+			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[600px] self-center">
+				<img src={base + "dataframe-demo.gif"} />
+			</div>
+		</div>
+
+		<div class="grid grid-rows-[auto_auto_1fr]">
+			<div
+				class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1 pb-3"
+			>
+				<div
+					class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1"
+				>
+					Interactivity in <span class="italic text-pink-500"
+						>Python</span
+					>
+				</div>
+			</div>
+			<div class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center">
+				<div>
+					<div>
+						<span class="font-bold">
+							Interactive data frame visualizations that allow you to control foundation models as they process your data.
+						</span>
+						<ul class="pl-3 flex-col gap-1 flex pt-2">
+							<li class="text-sm">
+								Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
+							</li>
+							<li class="text-sm">
+								Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
+					<pre><code class="language-python"
+							>{@html interact_code_html}</code
+						></pre>
+				</div>
+			</div>
+			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[650px] self-end self-justify-end">
+				<img src={base + "interact-demo.gif"} />
+			</div>
 		</div>
 	</div>
 </section>
@@ -127,81 +286,86 @@
 	</div>
 </section> -->
 
-
 <!-- Add a section with cards for different user personas: Researchers, Data Scientists, Developers, etc. -->
 <!-- <section
 	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200 border-b "
 > -->
-<section
-	class="font-rubik  dark:bg-gray-900 bg-gradient-to-br  border-b "
->
+<section class="font-rubik  dark:bg-gray-900 bg-gradient-to-br  border-b ">
 	<div class="container px-6 py-16 mx-auto md:py-8">
 		<div class="mb-8 flex flex-col items-center">
-			<h1 class="mb-4 text-4xl text-gray-800 dark:text-white">Built for technical teams</h1>
-			<div class="md:grid md:grid-cols-3 justify-items-center gap-4 mt-2 flex flex-col">
-				<Card 
-					title="🤖️ Machine Learning Teams " 
-					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting." 
+			<h1 class="mb-4 text-4xl text-gray-800 dark:text-white">
+				Built for technical teams
+			</h1>
+			<div
+				class="md:grid md:grid-cols-3 justify-items-center gap-4 mt-2 flex flex-col"
+			>
+				<Card
+					title="🤖️ Machine Learning Teams "
+					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting."
 					byline=""
 				/>
-				<Card 
-					title="🧪️ Data Science Teams " 
-					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python." 
+				<Card
+					title="🧪️ Data Science Teams "
+					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python."
 					byline=""
 				/>
-				<Card 
-					title="👨‍💻️ Software Engineering Teams " 
+				<Card
+					title="👨‍💻️ Software Engineering Teams "
 					description="Fully custom applications in SvelteKit that seamlessly connect to unstructured data and model APIs in Python."
 					byline=""
 				/>
 			</div>
 		</div>
-	</div>	
+	</div>
 </section>
-
 
 <!-- Section on who built this -->
 <!-- <section
 	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-br  border-b "
 > -->
 <section class="font-rubik md:grid-cols-[1fr_2fr] grid xl:px-36">
-
 	<div class="container px-6 py-16 mx-auto md:py-8 h-full">
 		<div class="flex flex-col items-center h-full">
 			<h1 class="text-3xl text-gray-800 dark:text-white">Built by...</h1>
-			<div class="flex flex-wrap justify-center mt-6 bg-slate-50 h-full rounded-lg shadow-lg px-4 gap-0.5 py-3 items-center">
-				<div class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800">
-					<a href="https://hazyresearch.github.io/" class="flex w-full h-4/5 hover:drop-shadow-sm">
+			<div
+				class="flex flex-wrap justify-center mt-6 bg-slate-50 h-full rounded-lg  border shadow-sm px-4 gap-0.5 py-3 items-center"
+			>
+				<div
+					class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
+				>
+					<a
+						href="https://hazyresearch.github.io/"
+						class="flex w-full h-4/5 hover:drop-shadow-sm"
+					>
 						<img
 							src="https://hazyresearch.stanford.edu/hazy-logo.png"
 							alt="Hazy Research Logo"
 							class="h-full rounded-md"
 						/>
-						<span class="ml-2 text-2xl font-bold text-red-800 align-middle self-center lg:whitespace-nowrap"
+						<span
+							class="ml-2 text-2xl font-bold text-red-800 align-middle self-center lg:whitespace-nowrap"
 							>Hazy Research</span
 						>
 					</a>
 				</div>
-		
 
-				<div class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800">
-					<a href="https://crfm.stanford.edu/">
-						<img
-							src="https://crfm.stanford.edu/static/img/header/crfm-rgb.png"
-							alt="Stanford CRFM Logo"
-							class="h-full hover:shadow-sm"
-						/>
-					</a>
-				</div>
-					<div class="h-16 -mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800">
-					<a href="https://www.james-zou.com/people" class="flex w-full h-full hover:drop-shadow-sm">
+				
+				<div
+					class="h-16 -mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
+				>
+					<a
+						href="https://www.james-zou.com/people"
+						class="flex w-full h-full hover:drop-shadow-sm"
+					>
 						<img
 							src="https://identity.stanford.edu/wp-content/uploads/sites/3/2020/07/block-s-right.png"
 							alt="Hazy Research Logo"
 							class="h-full rounded-md"
 						/>
-						<div class="ml-2 text-2xl font-mono text-red-800 align-middle self-center flex flex-col">
-							<span class="text-sm">Biomedical</span> 
+						<div
+							class="ml-2 text-2xl font-mono text-red-800 align-middle self-center flex flex-col"
+						>
+							<span class="text-sm">Biomedical</span>
 							<span class="text-sm">Data Science</span>
 						</div>
 					</a>
@@ -210,17 +374,33 @@
 		</div>
 	</div>
 
-<!-- <div
+	<!-- <div
 	</section>
 	class="font-rubik bg-purple-50 dark:bg-gray-900 bg-gradient-to-bl from-orange-200 via-red-200 to-purple-200"
 > -->
-<!-- </section>
+	<!-- </section>
 	class="font-rubik dark:bg-gray-900 bg-gradient-to-br  border-b "
 > -->
 	<div class="container px-6 py-16 mx-auto md:py-8 h-full">
+		
 		<div class="mb-8 flex flex-col items-center h-full">
-			<h1 class="text-3xl text-gray-800 dark:text-white">...with the support of</h1>
-			<div class="flex flex-wrap justify-center mt-6 p-4 shadow-lg rounded-lg bg-slate-50 gap-2 h-full">
+			<h1 class="text-3xl text-gray-800 dark:text-white">
+				...with the support of
+			</h1>
+			<div
+				class="flex flex-wrap justify-center mt-6 p-4  border shadow-sm rounded-lg bg-slate-50 gap-2 h-full"
+			>
+			<div
+					class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
+				>
+					<a href="https://crfm.stanford.edu/">
+						<img
+							src="https://crfm.stanford.edu/static/img/header/crfm-rgb.png"
+							alt="Stanford CRFM Logo"
+							class="h-full hover:shadow-sm"
+						/>
+					</a>
+				</div>
 				<div
 					class="h-12 mx-2 my-2 text-gray-800  hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
@@ -302,7 +482,11 @@
 					class="h-12  mx-2 my-2 text-gray-800 hover:shadow-sm dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://numpy.org/">
-						<img src="https://numpy.org/images/logo.svg" alt="Numpy Logo" class="h-full" />
+						<img
+							src="https://numpy.org/images/logo.svg"
+							alt="Numpy Logo"
+							class="h-full"
+						/>
 					</a>
 				</div>
 				<div
@@ -343,24 +527,24 @@
 	</div>
 </section>
 
-
 <style>
 	.filter-black {
-		filter: invert(100%) sepia(99%) saturate(14%) hue-rotate(345deg) brightness(106%) contrast(100%);
+		filter: invert(100%) sepia(99%) saturate(14%) hue-rotate(345deg)
+			brightness(106%) contrast(100%);
 	}
 
 	@keyframes pulse {
 		100% {
-        	opacity: 0.0;
+			opacity: 0;
 		}
 		90% {
-        	opacity: 0.0;
+			opacity: 0;
 		}
-    	30% {
-        	opacity: 1.0;
+		30% {
+			opacity: 1;
 		}
 		0% {
-			opacity: 0.0;
+			opacity: 0;
 		}
 	}
 	.animate-pulse {

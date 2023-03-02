@@ -5,7 +5,7 @@
 	export let tight: boolean;
 </script>
 
-<div class="flex flex-col flex-wrap {tight ? `p-4` : `p-6`} bg-slate-50 rounded-lg shadow-lg dark:bg-gray-800">
+<div class="flex flex-col flex-wrap {tight ? `p-4` : `p-6`} bg-slate-50 rounded-lg  border shadow-sm dark:bg-gray-800">
 	<slot name="header" />
 	<div>
 		<h4 class="mb-1 text-lg font-semibold text-gray-800 dark:text-white">{title}</h4>
@@ -20,5 +20,12 @@
 				</p>
 			{/if}
         </slot>
+		<div class="p-14 h-full self-icenter">
+			<iframe
+				src="https://youtube.com/embed/HJv9ZvtisN0?modestbranding=1"
+				allowfullscreen="allowfullscreen"
+				class="aspect-video h-full rounded-md shadow-lg"
+			/>
+		</div>
 	</div>
 </div>
