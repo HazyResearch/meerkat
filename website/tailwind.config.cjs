@@ -14,7 +14,7 @@ module.exports = {
         'rubik': ['Rubik', 'sans-serif'],
         'bitter': ['Bitter', 'serif'],
       },
-    },
+    }
   },
   plugins: [
     require('flowbite/plugin')

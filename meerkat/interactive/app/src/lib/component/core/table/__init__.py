@@ -68,7 +68,7 @@ class Table(Component):
         )
 
     def _get_ipython_height(self):
-        return "450px"
+        return "600px"
 
 
 register_placeholder(

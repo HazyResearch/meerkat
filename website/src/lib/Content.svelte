@@ -1,10 +1,56 @@
 <script lang="ts">
 	import { base } from "$app/paths";
 	import Card from "./Card.svelte";
+	import Prism from "prismjs";
 
 	let words = ["Images", "Audio", "Web Pages", "PDFs", "Tensors"];
 	let word_idx = 0;
+
+	const df_code = `import meerkat as mk 
+
+df = mk.from_csv("paintings.csv")
+df["img"] = mk.files("img_path")
+df["embedding"] = mk.embed(
+	df["img"], 
+	engine="clip"
+)`;
+	const df_code_html = Prism.highlight(df_code, Prism.languages.js, "python");
+
+	const interact_code = `search = mk.gui.Search(df, 
+	against="embedding", engine="clip"
+)
+sorted_df = mk.sort(df, 
+	by=search.criterion.name, 
+	ascending=False
+)
+gallery = mk.gui.Gallery(sorted_df)
+mk.gui.html.div([search, gallery]")
+`;
+	const interact_code_html = Prism.highlight(
+		interact_code,
+		Prism.languages.js,
+		"python"
+	);
 </script>
+
+<!-- <link
+	rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
+	crossorigin="anonymous"
+/>
+
+<script:head
+	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"
+/>
+<script:head
+	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"
+/>-->
+<svelte:head>
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
+	/>
+</svelte:head>
 
 <!-- Top Content Part, should remain below the navbar -->
 <section
@@ -68,70 +114,95 @@
 </section>
 
 <section class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl border-b">
-	<div class="container grid grid-cols-2 px-6 mx-auto  pt-16">
-		<div>
-			<div
-				class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1"
-			>
-				Data Frames that can hold
+	<div class="container lg:grid lg:grid-cols-2 flex flex-col px-6 mx-auto  pt-16 gap-10 pb-10">
+		<div class="grid grid-rows-[auto_auto_1fr]">
+			<div class="text-2xl font-bold text-gray-800 md:text-4xl pb-3">
+				<span>Data Frames for</span>
+				<span class="bg-slate-100 rounded-md px-2 border">
+					<span
+						class="animate-pulse italic text-yellow-400 "
+						on:animationiteration={() => {
+							word_idx = (word_idx + 1) % words.length;
+						}}
+					>
+						{words[word_idx]}
+					</span>
+				</span>
+			</div>
 
-				<div
-					class="animate-pulse italic text-yellow-400"
-					on:animationiteration={() => {
-						word_idx = (word_idx + 1) % words.length;
-					}}
-				>
-					{words[word_idx]}
+			<div class="lg:grid lg:grid-cols-2 flex flex-col items-center gap-4 pb-6">
+				<div>
+					<span class="font-bold"
+						>A Meerkat <span class="font-mono text-violet-600"
+							>DataFrame</span
+						> is a heterogeneous data structure with an API backed by
+						foundation models.</span
+					>
+					<ul class="pl-3 flex-col gap-1 flex pt-2">
+						<li class="text-sm">
+							Structured fields (<span class="italic">e.g.</span>
+							numbers and dates) live alongside unstructured
+							objects (<span class="italic">e.g.</span> images),
+							and their tensor representations (<span
+								class="italic">e.g.</span
+							> embeddings).
+						</li>
+						<li class="text-sm">
+							Functions like <span
+								class="font-mono text-violet-600">mk.embed</span
+							> abstract away boiler-plate ML code, keeping the focus
+							on the data.
+						</li>
+					</ul>
+				</div>
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
+					<pre><code class="language-python"
+							>{@html df_code_html}</code
+						></pre>
 				</div>
 			</div>
 
-			<div class="bg-slate-800 rounded-md p-4">
-				<pre><code class="font-mono text-gray-100">
-					<span class="text-purple-400">import</span> <span class="text-yellow-400"
-							>meerkat</span
-						> <span class="text-purple-400">as</span> <span
-							class="text-yellow-400">mk</span
-						> 
-					<span class="text-yellow-400">df</span> <span class="text-purple-400">=</span
-						> <span class="text-yellow-400">mk.from_csv</span><span
-							class="text-purple-400">(</span
-						><span class="text-green-400">""</span><span
-							class="text-purple-400">)</span
-						>
-					
-					<span class="text-yellow-400">df</span><span class="text-purple-400">[</span
-						><span class="text-green-400">"img"</span><span
-							class="text-purple-400">]</span
-						> <span class="text-purple-400">=</span> <span
-							class="text-yellow-400">mk.files</span
-						><span class="text-purple-400">(</span><span
-							class="text-green-400">"img_path"</span
-						><span class="text-purple-400">)</span>
-					
-					<span class="text-yellow-400">df</span><span class="text-purple-400">[</span
-						><span class="text-green-400">"embeddings"</span><span
-							class="text-purple-400">]</span
-						> <span class="text-purple-400">=</span> <span
-							class="text-yellow-400">mk.embed</span
-						><span class="text-purple-400">(</span><span
-							class="text-yellow-400">df</span
-						><span class="text-purple-400">[</span><span
-							class="text-green-400">"img"</span
-						><span class="text-purple-400">], engine=</span><span
-							class="text-green-400">"clip"</span
-						><span class="text-purple-400">)</span>
-					</code></pre>
+			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[600px] self-center">
+				<img src={base + "dataframe-demo.gif"} />
 			</div>
-			<div>
+		</div>
+
+		<div class="grid grid-rows-[auto_auto_1fr]">
+			<div
+				class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1 pb-3"
+			>
 				<div
 					class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1"
 				>
-					<div
-						class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1"
+					Interactivity in <span class="italic text-pink-500"
+						>Python</span
 					>
-						Interact with your data
+				</div>
+			</div>
+			<div class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center">
+				<div>
+					<div>
+						<span class="font-bold">
+							Interactive data frame visualizations that allow you to supervise foundation models as they process your data.
+						</span>
+						<ul class="pl-3 flex-col gap-1 flex pt-2">
+							<li class="text-sm">
+								Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
+							</li>
+							<li class="text-sm">
+								Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
+							</li>
+						</ul>
 					</div>
 				</div>
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
+					<pre><code class="language-python"
+							>{@html interact_code_html}</code
+						></pre>
+				</div>
+			</div>
+			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[650px] self-end self-justify-end">
+				<img src={base + "interact-demo.gif"} />
 			</div>
 		</div>
 	</div>

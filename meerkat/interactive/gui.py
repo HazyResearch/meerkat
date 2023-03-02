@@ -19,7 +19,7 @@ class DataFrameGUI(GUI):
     ) -> IFrame:
         return mk.gui.Table(
             df=self.df,
-            classes="h-[400px]",
+            classes="h-[550px]",
             **kwargs,
         )
 
