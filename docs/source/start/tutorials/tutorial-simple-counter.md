@@ -8,7 +8,9 @@ kernelspec:
 
 Let's go through a simple example to get familiar with interactivity. We'll build a simple counter that increments by 1 every time the user clicks on it.
 
-## Import
+
+
+## 🔮 Importing Meerkat
 
 First, we'll import the Meerkat library.
 
@@ -16,7 +18,7 @@ First, we'll import the Meerkat library.
 import meerkat as mk
 ```
 
-## Store
+## 🧺 Store: Keeping Track of State
 
 Next, let's create a `Store` object to keep track of the state of the counter. `Stores` in Meerkat are borrowed from their Svelte counterparts, and provide a way for users to create values that are synchronized between the GUI and the Python code.
 
@@ -30,7 +32,7 @@ There are a couple of things to keep in mind when it comes to `Stores`.
 - If the `Store` value is manipulated on the frontend, the updated value will be reflected here.
 - If the `Store` value is set using the special `.set()` method here, the updated value will be reflected in the frontend.
 
-## Endpoint
+## 🔚 Endpoint: Updating the State
 
 Then, we'll create an `Endpoint` in Meerkat, which is a Python function that can be called from the frontend. In this case, we'll create an endpoint that increments the counter by 1.
 
@@ -43,7 +45,7 @@ def increment(counter: mk.Store[int]):
 
 What's great here is that Meerkat uses FastAPI under the hood to automatically setup an API endpoint for `increment`. This can then be called by other services as well!
 
-## Component
+## 🖼️ Component: Assembling the GUI
 
 Next, we'll want to assemble our GUI: we want a button that we can press to increment the counter, as well as a way to display the current count value.
 
@@ -56,7 +58,7 @@ text = mk.gui.Text(data=counter)
 
 Meerkat comes with a collection of prebuilt Components that can be used to assemble interfaces.
 
-## Page
+## 📃 Page: Launching the GUI
 
 Finally, we can launch the interface.
 

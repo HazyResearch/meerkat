@@ -6,8 +6,11 @@ df = mk.get("olivierdehaene/xkcd", registry="huggingface")["train"]
 for col in df.columns:
     df[col] = df[col].to_numpy()
 
+df['webpage'] = mk.files(df['url']).format(HTMLFormatterGroup().defer())
+
 filter = mk.gui.Filter(df)
 filtered_df = filter(df)
+
 
 gallery = mk.gui.html.div(
     [
@@ -15,7 +18,6 @@ gallery = mk.gui.html.div(
         mk.gui.Gallery(
             filtered_df.format(
                 {
-                    "url": HTMLFormatterGroup(),
                     "explained_url": HTMLFormatterGroup(),
                 }
             ),

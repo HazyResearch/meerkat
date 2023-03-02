@@ -12,7 +12,12 @@ for col in df.columns:
     df[col] = df[col].to_numpy()
 
 df["image_path"] = df["image"].defer(lambda x: x["path"])
-df["image"] = df["image_path"].map(lambda x: Image.open(x))
+df["image"] = (
+    df["image_path"]
+    .map(lambda x: Image.open(x))
+    .format(mk.format.ImageFormatterGroup())
+)
+
 
 # Add a filtering component
 df = df.mark()
