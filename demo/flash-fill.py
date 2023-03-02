@@ -48,6 +48,7 @@ def complete_prompt(row, example_template: mk.Store[str]):
 
 filepath = ARXIV_DATASET_JSON
 df = mk.from_json(filepath=filepath, lines=True, backend="arrow")
+breakpoint()
 df = df[df["categories"].str.contains("stat.ML")]
 df = mk.from_pandas(df.to_pandas(), primary_key="id")
 df["url"] = "https://arxiv.org/pdf/" + df["id"]
@@ -63,19 +64,3 @@ page = mk.gui.Page(
 )
 
 page.launch()
-
-
-"""
-Does this paper report empirical results on real-world datasets?
-
-Title: {title}
-Abstract: {abstract}
-Answer: {is_empirical}
-
-Yes
-Yes
-Yes
-No
-Yes
-No
-"""
