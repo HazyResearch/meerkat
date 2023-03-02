@@ -1,5 +1,6 @@
 <script>
-  import { Markdown } from "@meerkat-ml/meerkat";
+  import { marked } from "marked";
+
   const content = `
 # Interactive Data Frames and Meerkat: A Path to Foundation Models as a Reliable Software Abstraction
 _The Meerkat Team_
@@ -102,23 +103,31 @@ Thanks to all the readers who provided feedback on this post and this release: D
 </script>
 
 <div class="w-full flex flex-col items-center flex-wrap mt-28 mb-16">
-  <Markdown body={content} />
+  <div class="prose">
+    {@html marked.parse(content)}
+  </div>
   <iframe
     class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
     src="https://youtube.com/embed/a8FBT33QACQ"
     allowfullscreen="allowfullscreen"
   />
-  <Markdown body={content_2} />
+  <div class="prose">
+    {@html marked.parse(content_2)}
+  </div>
   <iframe
     class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
     src="https://youtube.com/embed/3ItA70qoe-o"
     allowfullscreen="allowfullscreen"
   />
-  <Markdown body={content_3} />
+  <div class="prose">
+    {@html marked.parse(content_3)}
+  </div>
   <iframe
     class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
     src="https://youtube.com/embed/4Kk_LZbNWNs"
     allowfullscreen="allowfullscreen"
   />
-  <Markdown body={content_4} />
+  <div class="prose">
+    {@html marked.parse(content_4)}
+  </div>
 </div>
