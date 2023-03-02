@@ -231,6 +231,7 @@ def reactive(
 
             # If the object is a ReactifiableMixin, we should turn
             # reactivity on.
+            # TODO: This should be done in a nested way.
             if isinstance(result, MarkableMixin):
                 result._self_marked = True
 

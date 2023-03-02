@@ -331,18 +331,30 @@ def test_store_getitem_multi_access(is_magic: bool, obj, idx: int):
 
 @pytest.mark.parametrize("is_magic", [False, True])
 def test_index(is_magic: bool):
+    @mk.endpoint()
+    def _endpoint(store: mk.Store):
+        store.set([4, 5, 1])
+
     store = mk.Store([0, 1, 2])
     with mk.magic(magic=is_magic):
         out = store.index(1)
+    assert out == 1
+
     if is_magic:
+        inode = out.inode
         assert isinstance(out, mk.Store)
-        _is_output_reactive(out, store, op_name="index", op_num_children=1)
+        # Make sure it reacts.
+        _endpoint.run(store)
+        assert inode.obj == 2
+
+        # _is_output_reactive(out, store, op_name="index", op_num_children=1)
     else:
         assert not isinstance(out, mk.Store)
 
 
 def test_iterator_store_warning():
-    """The store class should raise a warning when initialized with an iterator."""
+    """The store class should raise a warning when initialized with an
+    iterator."""
     with pytest.warns(UserWarning):
         mk.Store(iter([0, 1, 2]))
 

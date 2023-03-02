@@ -148,8 +148,8 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
         return hash(self.__wrapped__)
 
     @reactive()
-    def __call__(self):
-        return self.__wrapped__()
+    def __call__(self, *args, **kwargs):
+        return self.__wrapped__(*args, **kwargs)
 
     @reactive()
     def __lt__(self, other):
