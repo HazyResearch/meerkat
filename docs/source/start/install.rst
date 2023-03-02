@@ -111,16 +111,15 @@ Installation
     in your terminal to see a list of available commands.
 
 
-.. admonition:: Installation for Interactive Apps (recommended)
+.. admonition:: Additional installation required for custom components in interactive applications
 
-    You will additionally need the following programs if you would like to 
-    use Meerkat to build interactive applications. 
+    You will additionally need the following programs if you would like to build custom interactive components. 
 
     - Node.js (``node``) version ``>=18.0.0``
     - Node Package Manager (``npm``) version ``>=8.0.0``
 
     Once you have installed Node.js and npm, you can use the Meerkat CLI to
-    install dependencies for creating Meerkat apps.
+    install dependencies for creating Meerkat components.
 
     .. code-block:: bash
 
