@@ -12,10 +12,15 @@ for col in df.columns:
     df[col] = df[col].to_numpy()
 
 df["image_path"] = df["image"].defer(lambda x: x["path"])
-df["image"] = df["image_path"].map(lambda x: Image.open(x))
+df["image"] = (
+    df["image_path"]
+    .map(lambda x: Image.open(x))
+    .format(mk.format.ImageFormatterGroup())
+)
+
 
 # Add a filtering component
-df = mk.reactive(df)
+df = df.mark()
 filter = mk.gui.Filter(df)
 df_filtered = filter(df)
 df_grouped = df_filtered.groupby("cfg").count()
@@ -51,5 +56,5 @@ component = mk.gui.html.gridcols2(
 )
 
 # Make a page and launch
-page = mk.gui.Page(component=component, id="diffusiondb")
+page = mk.gui.Page(component, id="diffusiondb")
 page.launch()

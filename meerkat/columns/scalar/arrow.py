@@ -200,7 +200,11 @@ class ArrowScalarColumn(ScalarColumn):
         raise ImmutableError("ArrowArrayColumn is immutable.")
 
     def _is_valid_primary_key(self):
-        return len(self.unique()) == len(self)
+        try:
+            return len(self.unique()) == len(self)
+        except Exception as e:
+            warnings.warn(f"Unable to check if column is a valid primary key: {e}")
+            return False
 
     def _keyidx_to_posidx(self, keyidx: Any) -> int:
         """Get the posidx of the first occurrence of the given keyidx. Raise a

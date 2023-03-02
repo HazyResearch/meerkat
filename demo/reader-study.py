@@ -1,13 +1,12 @@
 """A head-to-head reader study.
 
-In a head-to-head reader study, the user inspects all variants of an
-image and selects the best one.
+The reader inspects all variants of an image and selects the best one.
 """
 import numpy as np
 from PIL import Image
 
 import meerkat as mk
-from meerkat.interactive import Store, endpoint, html, reactive
+from meerkat.interactive import html
 
 
 def add_noise(img: Image) -> Image:
@@ -18,25 +17,24 @@ def add_noise(img: Image) -> Image:
     return Image.fromarray(img)
 
 
-@endpoint()
+@mk.endpoint()
 def on_label(index, df: mk.DataFrame):
     """Add a label to the dataframe."""
     df["label"][row] = index
     row.set(row + 1)
-    print("Dataframe", df["label"][: row.value].data)
 
 
-@endpoint()
+@mk.endpoint()
 def go_back(row: mk.Store, df: mk.DataFrame):
     row.set(max(0, row - 1))
 
 
-@endpoint()
+@mk.endpoint()
 def go_forward(row: mk.Store, df: mk.DataFrame):
     row.set(min(row + 1, len(df) - 1))
 
 
-@reactive()
+@mk.reactive()
 def get_selected(label, value_list):
     # Label needs to be converted to a string because the values
     # are auto converted to strings by the RadioGroup component.
@@ -46,7 +44,7 @@ def get_selected(label, value_list):
     return selected
 
 
-@reactive()
+@mk.reactive()
 def select_row(df, row):
     # We have to do this because range indexing doesn't work with
     # stores.
@@ -76,7 +74,7 @@ anonymized_img_columns = ["img1", "img2"]
 df["label"] = np.full(len(df), "")
 
 df = df.mark()
-row = Store(0)
+row = mk.Store(0)
 label = df[row]["label"]  # figure out why ["label"]["row"] doesn't work
 cell_size = mk.Store(24)
 
@@ -103,13 +101,13 @@ label_display = mk.gui.core.markdown.Markdown(body="## Label: " + label)
 
 display_df = select_row(df, row)
 galleries = [
-    mk.gui.core.Gallery(df=display_df, main_column=main_column, cell_size=cell_size)
+    mk.gui.core.Gallery(display_df, main_column=main_column, cell_size=cell_size)
     for main_column in anonymized_img_columns
 ]
 
 
 page = mk.gui.Page(
-    component=html.flexcol(
+    html.flexcol(
         [
             html.gridcols2(galleries, classes="gap-4"),
             html.div(label_display),

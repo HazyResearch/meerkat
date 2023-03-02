@@ -527,10 +527,6 @@ mk.gui.html.div([search, gallery]")
 			brightness(106%) contrast(100%);
 	}
 
-	.will-change-transform {
-		will-change: transform;
-	}
-
 	@keyframes pulse {
 		100% {
 			opacity: 0;

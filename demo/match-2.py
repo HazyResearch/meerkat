@@ -1,3 +1,5 @@
+"""Similarity search with CLIP in an interactive image gallery, with advanced
+controls for user feedback."""
 import rich
 
 import meerkat as mk
@@ -25,6 +27,5 @@ df = df.merge(df_clip[["img_id", "img_clip"]], on="img_id")
 page = mk.gui.Page(
     GalleryQuery(df, main_column=IMAGE_COLUMN, against=EMBED_COLUMN),
     id="match",
-    progress=False,
 )
 page.launch()

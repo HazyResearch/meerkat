@@ -16,13 +16,13 @@ Through this tutorial, you will learn about:
 
 To get started, run the tutorial demo script.
 ```{code-block} bash
-mk demo tutorial-2
+mk demo tutorial-reactive-viewer
 ```
 You should see the tutorial app when you open the link in your browser.
 
 Let's break down the code in the demo script.
 
-**Data loading**
+## Data loading
 
 The first few lines just load in the `imagenette` dataset, a small 10-class subset of ImageNet.
 ```{margin}
@@ -54,7 +54,7 @@ rich.print(labels)
 ```
 
 
-**Selecting a class**
+## Selecting a class
 
 Next, let's create a {class}`~meerkat.gui.Select` component that allows the user to select a class. Once a user picks the class, we'll then show a random subset of images from that class.
 
@@ -110,7 +110,7 @@ rich.print(class_selector)
 
 Notice that all of the attributes of the `Select` component are also `Store` objects. This is done automatically by all classes that subclass `Component` in Meerkat, of which `Select` is one. This is very useful because as `Store` objects all of these attributes are synchronized between the frontend interface and the backend Python code.
 
-**Filtering the dataset by class**
+## Filtering the dataset by class
 
 Once the user selects a class, the dataset should be filtered to that class. 
 **Importantly, we want this to happen every time the user selects a new class.**
@@ -178,7 +178,7 @@ Here, we've forgotten to create an argument for the class label, so using this r
 
 So far so good. We've created and used a reactive function that filters the dataset to the selected class. 
 
-**Selecting a random subset of images**
+## Selecting a random subset of images
 
 Let's now create another reactive function that selects a random subset of images from the filtered dataset. Then, we'll chain together the two reactive functions we've created so far to get the final result.
 
@@ -217,7 +217,7 @@ rich.print(
 
 This sets up a chain of reactive functions that will be re-executed whenever the user selects a new class.
 
-**Displaying the images**
+## Displaying the images
 Finally, let's show the user the images using a grid of `Image` components.
 
 ```{code-cell} ipython3

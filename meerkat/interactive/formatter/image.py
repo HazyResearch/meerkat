@@ -1,4 +1,5 @@
 import base64
+import os
 from io import BytesIO
 from typing import Any, Dict, Tuple
 
@@ -66,11 +67,15 @@ class DeferredImageFormatter(ImageFormatter):
     data_prop: str = "data"
 
     def encode(self, image: DeferredCell) -> str:
-        if image.absolute_path.startswith("http"):
-            return image.absolute_path
-        else:
-            image = image()
-            return super().encode(image)
+        if hasattr(image, "absolute_path"):
+            absolute_path = image.absolute_path
+            if isinstance(absolute_path, os.PathLike):
+                absolute_path = str(absolute_path)
+            if isinstance(absolute_path, str) and absolute_path.startswith("http"):
+                return image.absolute_path
+
+        image = image()
+        return super().encode(image)
 
 
 class DeferredImageFormatterGroup(ImageFormatterGroup):

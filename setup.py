@@ -43,6 +43,7 @@ REQUIRED = [
     "scikit-learn",
     "tqdm>=4.49.0",
     "datasets>=1.4.1",
+    "pyarrow>=11.0.0",
     "PyYAML>=5.4.1",
     "omegaconf>=2.0.5",
     "semver>=2.13.0",
@@ -83,6 +84,7 @@ EXTRAS = {
         "pre-commit>=2.9.3",
         "twine",
         "httpx",
+        "ray",
     ]
     + DOCS_REQUIREMENTS,
     "embeddings-mac": [

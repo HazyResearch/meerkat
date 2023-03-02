@@ -1,4 +1,5 @@
 """Build a simple chat app with Meerkat."""
+# TODO: improve the chat component
 from datetime import datetime
 
 import meerkat as mk
@@ -65,7 +66,7 @@ chat = Chat(
 )
 
 page = mk.gui.Page(
-    component=chat,
+    chat,
     id="chat",
 )
 page.launch()

@@ -1,4 +1,5 @@
 """Flash-fill."""
+import os
 from functools import partial
 
 from manifest import Manifest
@@ -7,16 +8,14 @@ import meerkat as mk
 from meerkat.dataframe import Batch
 
 manifest = Manifest(
-    client_name="huggingface",
-    client_connection="http://127.0.0.1:8010",
+    client_name="openai",
+    client_connection=os.getenv("OPENAI_API_KEY"),
 )
 
 
 def complete_prompt(row, example_template: mk.Store[str]):
     assert isinstance(row, dict)
-    print("prompt template", example_template)
     output = example_template.format(**row)
-    print(output)
     return output
 
 
@@ -48,8 +47,6 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     train_df = df[df["_status"] == "train"]
     in_context_examples = "\n".join(train_df["example"]())
 
-    print("in_context_examples", in_context_examples)
-
     fill_df_index = df["_status"] == "fill"
     fill_df = df[fill_df_index]
 
@@ -59,8 +56,6 @@ def run_manifest(instruct_cmd: str, df: mk.DataFrame, output_col: str):
     flash_fill = mk.map(
         fill_df, function=_run_manifest, is_batched_fn=True, batch_size=4
     )
-
-    print("flash fill", flash_fill)
 
     # If the dataframe does not have the column, add it.
     if col not in df.columns:
@@ -88,8 +83,6 @@ def update_df_with_example_template(df: mk.DataFrame, template: mk.Store[str]):
 output_col_area = mk.gui.Textbox("", placeholder="Column name here...")
 output_col = output_col_area.text
 
-# show_prompts = mk.gui.Markdown("")
-
 
 @mk.endpoint()
 def set_code(code: mk.Store[str], new_code: str):
@@ -100,7 +93,7 @@ instruction_editor = mk.gui.Editor(code="give me the name of my guest")
 example_template_editor = mk.gui.Editor(
     code="Guest name: {guest}, hometown: {hometown}; Result: {guest}"
 )
-# prompt_editor = mk.gui.Editor(code="Write the prompt here.")
+
 instruction_cmd = instruction_editor.code
 mk.gui.print("Instruction commmand:", instruction_cmd)
 mk.gui.print("Example template:", example_template_editor.code)
@@ -117,10 +110,9 @@ run_manifest_button = mk.gui.Button(
     ),
 )
 
-# mk.gui.print("Prompt template here:", prompt_template)
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(
+    mk.gui.html.flexcol(
         [
             mk.gui.html.flex(
                 [

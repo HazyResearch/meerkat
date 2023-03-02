@@ -23,11 +23,20 @@ squared_value = square(input_slider.value)
 result = multiply(coef_slider.value, squared_value)
 
 button = mk.gui.Button(
-    title="Increment", on_click=increment.partial(value=input_slider.value)
+    title="Increment",
+    on_click=increment.partial(value=input_slider.value),
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.div([input_slider, coef_slider, button, mk.gui.Text(result)]),
+    component=mk.gui.html.div(
+        [
+            input_slider,
+            coef_slider,
+            button,
+            mk.gui.Text(result),
+        ],
+        classes="flex flex-col gap-4 items-center",
+    ),
     id="quickstart",
 )
 page.launch()

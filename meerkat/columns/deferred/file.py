@@ -456,12 +456,10 @@ def _infer_file_type(filepaths: ScalarColumn):
     NUM_SAMPLES = 100
     filepaths = filepaths[:NUM_SAMPLES]
     # extract the extension, taking into account that it may not exist
-    ext = filepaths.str.extract(r"(\.[^\.]+)$")["0"].str.lower()
+    # FIXME: make this work for URLs with `.com/...`
+    ext = filepaths.str.extract(r"(?P<ext>\.[^\.]+)$")["ext"].str.lower()
 
     # if the extension is not present, then we assume it is a text file
-    if ext.isna().all():
-        return "text"
-
     for type, info in FILE_TYPES.items():
         if ext.isin(info["exts"]).any():
             return type
