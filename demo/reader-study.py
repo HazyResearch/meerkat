@@ -1,8 +1,6 @@
-"""
-A head-to-head reader study.
+"""A head-to-head reader study.
 
-The reader inspects all variants of an
-image and selects the best one.
+The reader inspects all variants of an image and selects the best one.
 """
 import numpy as np
 from PIL import Image

@@ -1,7 +1,4 @@
-"""
-Similarity search with CLIP in an interactive image
-gallery.
-"""
+"""Similarity search with CLIP in an interactive image gallery."""
 import rich
 
 import meerkat as mk

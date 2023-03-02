@@ -1,7 +1,5 @@
-"""
-Similarity search with CLIP in an interactive image
-gallery, with advanced controls for user feedback.
-"""
+"""Similarity search with CLIP in an interactive image gallery, with advanced
+controls for user feedback."""
 import rich
 
 import meerkat as mk
