@@ -26,7 +26,7 @@ One reason is that the reliable software abstractions (*e.g.* NumPy) that power 
 
 What if we viewed foundation models as a software abstraction that processes unstructured data? Much like NumPy is to Pandas, this software abstraction would power a data frame for unstructured data.
 
-**The problem?** FMs are a terrible software abstraction, and we’re not the first to notice this ([Bommasani et al.](https://crfm.stanford.edu/2022/11/17/helm.html), [Narayan et al.](https://www.vldb.org/pvldb/vol16/p738-narayan.pdf)). FMs are hard to control (e.g. brittle to prompt wording), often produce undesired outputs (e.g. hallucinate knowledge), and require careful evaluation. The process of using a traditional software abstraction (*i.e.* reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.
+**The problem?** FMs are a terrible software abstraction, and we’re not the first to notice this ([Bommasani et al.](https://crfm.stanford.edu/2022/11/17/helm.html), [Narayan et al.](https://www.vldb.org/pvldb/vol16/p738-narayan.pdf)). FMs are hard to control (e.g. brittle to prompt wording [[Arora, et al.]](https://arxiv.org/abs/2210.02441)), often produce undesired outputs (e.g. hallucinate knowledge, perpetuate social biases), and require careful evaluation. The process of using a traditional software abstraction (*i.e.* reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.
 
 People have found success using FMs by carefully instructing and testing them. But this process is miserable when done in code alone:
 
@@ -71,25 +71,25 @@ We'll go through three demos, where each demo will be loosely oriented around th
 ### Demo 1 (Data Science): Analyzing a Dataset of Paintings in a Notebook
 
 Identifying patterns in image data is challenging without visualization and interactivity. Here’s a demo where Meerkat makes the analysis of art data possible in a notebook alone.
-`
+`;
 
-let content_2 = `
+  let content_2 = `
 *A demo of Meerkat on a dataset of art images in a Jupyter notebook. We spin up interactive interfaces powered by vision-language FMs to explore this data, and create an on-the-fly interface in Python that combines data exploration and plotting.*
 
 ### Demo 2 (Software Engineering): Using Spreadsheet-Style Flash Fill to Analyze PDFs
 
 Software teams that want to build products around unstructured data will need to program and control these models, as well as evaluate and check if they work correctly on internal validation data. Here’s a demo where Meerkat simplifies this process by mixing code and user interaction.
-`
+`;
 
-let content_3 = `
+  let content_3 = `
 *A demo of Meerkat where we take on the role of a software engineer working on a bibliography manager. We analyze a dataset of scientific papers, using the flash fill component to fill in missing metadata. This component was built using the Meerkat framework in < 300 lines of pure Python code.*
 
 ### Demo 3 (Machine Learning): Interactive Error Analysis of an Image Classifier
 
 Machine learning teams routinely perform error analyses when building models, but often struggle to extract nuanced information about the errors. Here’s a demo that shows how Meerkat can be used to perform fine-grained error analyses. (Meerkat is already being used by this community, and we’re continuing to support this set of users as a finalist of the Stanford HAI AI Audit challenge.)
-`
+`;
 
-let content_4 = `
+  let content_4 = `
 *A standalone Meerkat application for fine-grained error analysis of image classification models. Combining traditional dataframe and new FM-powered components can help us get a deeper understanding of the errors made by an image classifier.*
 
 ## Conclusion
@@ -102,19 +102,20 @@ Thanks to all the readers who provided feedback on this post and this release: D
 </script>
 
 <div class="w-full flex flex-col items-center flex-wrap mt-28 mb-16">
-    <Markdown 
-        body={content}
-    />
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/a8FBT33QACQ" />
-    <Markdown 
-        body={content_2}
-    />
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/3ItA70qoe-o" />
-    <Markdown 
-        body={content_3}
-    />
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/4Kk_LZbNWNs" />
-    <Markdown 
-        body={content_4}
-    />
+  <Markdown body={content} />
+  <iframe
+    class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
+    src="https://youtube.com/embed/a8FBT33QACQ"
+  />
+  <Markdown body={content_2} />
+  <iframe
+    class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
+    src="https://youtube.com/embed/3ItA70qoe-o"
+  />
+  <Markdown body={content_3} />
+  <iframe
+    class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]"
+    src="https://youtube.com/embed/4Kk_LZbNWNs"
+  />
+  <Markdown body={content_4} />
 </div>
