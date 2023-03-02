@@ -18,7 +18,7 @@
 		<link href="./_app/immutable/assets/Content-4e2c0d97.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Website-f0c41ff0.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/start-4c12da2a.js">
+		<link rel="modulepreload" href="./_app/immutable/start-efd93520.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-7605b856.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-a50d324f.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-44203cbd.js">
@@ -26,7 +26,7 @@
 		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-5257305d.js">
 		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-aacb519f.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-10de2918.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-a5ee01cc.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Website.svelte_svelte_type_style_lang-60d8fba5.js">
 	</head>
@@ -64,7 +64,7 @@
 <p>As unstructured data permeates the work of technical teams, it’s critical that they have the right toolbox for wrangling it. For structured data, teams swear by data frames, like those provided by Pandas and R. Back in 2021, <a href="https://www.notion.so/64891aca2c584f1889eb0129bb747863">we started wondering</a>: <em>why doesn’t something similar exist for unstructured data?</em></p>
 <p>One reason is that the reliable software abstractions (<em>e.g.</em> NumPy) that power traditional DataFrame operations fall flat when applied to unstructured data. A filter over a structured column (<em>e.g.</em> <code>df[df[”age”] &gt; 18]</code>) can be implemented with one line of NumPy code, but there is no simple abstraction that could implement a semantic  filter over unstructured data (<em>e.g.</em> <code>df[df[”image”].contains(”person”)]</code>).</p>
 <p>What if we viewed foundation models as a software abstraction that processes unstructured data? Much like NumPy is to Pandas, this software abstraction would power a data frame for unstructured data.</p>
-<p><strong>The problem?</strong> FMs are a terrible software abstraction, and we’re not the first to notice this (<a href="https://crfm.stanford.edu/2022/11/17/helm.html">Bommasani et al.</a>, <a href="https://www.vldb.org/pvldb/vol16/p738-narayan.pdf">Narayan et al.</a>). FMs are hard to control (e.g. brittle to prompt wording), often produce undesired outputs (e.g. hallucinate knowledge), and require careful evaluation. The process of using a traditional software abstraction (<em>i.e.</em> reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.</p>
+<p><strong>The problem?</strong> FMs are a terrible software abstraction, and we’re not the first to notice this (<a href="https://crfm.stanford.edu/2022/11/17/helm.html">Bommasani et al.</a>, <a href="https://www.vldb.org/pvldb/vol16/p738-narayan.pdf">Narayan et al.</a>). FMs are hard to control (e.g. brittle to prompt wording <a href="https://arxiv.org/abs/2210.02441">[Arora, et al.]</a>), often produce undesired outputs (e.g. hallucinate knowledge, perpetuate social biases), and require careful evaluation. The process of using a traditional software abstraction (<em>i.e.</em> reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.</p>
 <p>People have found success using FMs by carefully instructing and testing them. But this process is miserable when done in code alone:</p>
 <ul>
 <li>Say we’re trying to filter a dataset of paintings based on artistic style. A vision-language FM can produce scores to filter on, but how do we verify that the FM is correct if we can’t see and label the images?</li>
@@ -98,18 +98,18 @@ Critically, Meerkat GUIs are remarkably composable — users can build custom da
 <h3 id="demo-1-data-science-analyzing-a-dataset-of-paintings-in-a-notebook">Demo 1 (Data Science): Analyzing a Dataset of Paintings in a Notebook</h3>
 <p>Identifying patterns in image data is challenging without visualization and interactivity. Here’s a demo where Meerkat makes the analysis of art data possible in a notebook alone.</p>
 <!-- HTML_TAG_END --></div>
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/a8FBT33QACQ"></iframe>
-    <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat on a dataset of art images in a Jupyter notebook. We spin up interactive interfaces powered by vision-language FMs to explore this data, and create an on-the-fly interface in Python that combines data exploration and plotting.</em></p>
+  <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/a8FBT33QACQ"></iframe>
+  <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat on a dataset of art images in a Jupyter notebook. We spin up interactive interfaces powered by vision-language FMs to explore this data, and create an on-the-fly interface in Python that combines data exploration and plotting.</em></p>
 <h3 id="demo-2-software-engineering-using-spreadsheet-style-flash-fill-to-analyze-pdfs">Demo 2 (Software Engineering): Using Spreadsheet-Style Flash Fill to Analyze PDFs</h3>
 <p>Software teams that want to build products around unstructured data will need to program and control these models, as well as evaluate and check if they work correctly on internal validation data. Here’s a demo where Meerkat simplifies this process by mixing code and user interaction.</p>
 <!-- HTML_TAG_END --></div>
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/3ItA70qoe-o"></iframe>
-    <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat where we take on the role of a software engineer working on a bibliography manager. We analyze a dataset of scientific papers, using the flash fill component to fill in missing metadata. This component was built using the Meerkat framework in &lt; 300 lines of pure Python code.</em></p>
+  <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/3ItA70qoe-o"></iframe>
+  <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat where we take on the role of a software engineer working on a bibliography manager. We analyze a dataset of scientific papers, using the flash fill component to fill in missing metadata. This component was built using the Meerkat framework in &lt; 300 lines of pure Python code.</em></p>
 <h3 id="demo-3-machine-learning-interactive-error-analysis-of-an-image-classifier">Demo 3 (Machine Learning): Interactive Error Analysis of an Image Classifier</h3>
 <p>Machine learning teams routinely perform error analyses when building models, but often struggle to extract nuanced information about the errors. Here’s a demo that shows how Meerkat can be used to perform fine-grained error analyses. (Meerkat is already being used by this community, and we’re continuing to support this set of users as a finalist of the Stanford HAI AI Audit challenge.)</p>
 <!-- HTML_TAG_END --></div>
-    <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/4Kk_LZbNWNs"></iframe>
-    <div class="prose "><!-- HTML_TAG_START --><p><em>A standalone Meerkat application for fine-grained error analysis of image classification models. Combining traditional dataframe and new FM-powered components can help us get a deeper understanding of the errors made by an image classifier.</em></p>
+  <iframe class="mt-4 md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/4Kk_LZbNWNs"></iframe>
+  <div class="prose "><!-- HTML_TAG_START --><p><em>A standalone Meerkat application for fine-grained error analysis of image classification models. Combining traditional dataframe and new FM-powered components can help us get a deeper understanding of the errors made by an image classifier.</em></p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Meerkat is new Python library that makes it easier to work with unstructured data and foundation models by bringing them into close proximity via interactive data frames.
 We’re excited to see what the community can do with Meerkat. <a href="https://discord.gg/pw8E4Q26Tq">Join our Discord</a> if you want to talk to us, use Meerkat or build on top of it, and definitely give Meerkat a try!</p>
@@ -124,14 +124,14 @@ We’re excited to see what the community can do with Meerkat. <a href="https://
 			</span></a></div></div></footer></div>
 
 
-		<script type="module" data-sveltekit-hydrate="707fc">
-			import { start } from "./_app/immutable/start-4c12da2a.js";
+		<script type="module" data-sveltekit-hydrate="1bz1lsy">
+			import { start } from "./_app/immutable/start-efd93520.js";
 
 			start({
 				env: {},
 				paths: {"assets":"","base":""},
-				target: document.querySelector('[data-sveltekit-hydrate="707fc"]').parentNode,
-				version: "1677756677424",
+				target: document.querySelector('[data-sveltekit-hydrate="1bz1lsy"]').parentNode,
+				version: "1677757885157",
 				hydrate: {
 					node_ids: [0, 3],
 					data: [null,null],

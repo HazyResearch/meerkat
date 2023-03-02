@@ -24,7 +24,7 @@ One reason is that the reliable software abstractions (*e.g.* NumPy) that power 
 
 What if we viewed foundation models as a software abstraction that processes unstructured data? Much like NumPy is to Pandas, this software abstraction would power a data frame for unstructured data.
 
-**The problem?** FMs are a terrible software abstraction, and we’re not the first to notice this ([Bommasani et al.](https://crfm.stanford.edu/2022/11/17/helm.html), [Narayan et al.](https://www.vldb.org/pvldb/vol16/p738-narayan.pdf)). FMs are hard to control (e.g. brittle to prompt wording), often produce undesired outputs (e.g. hallucinate knowledge), and require careful evaluation. The process of using a traditional software abstraction (*i.e.* reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.
+**The problem?** FMs are a terrible software abstraction, and we’re not the first to notice this ([Bommasani et al.](https://crfm.stanford.edu/2022/11/17/helm.html), [Narayan et al.](https://www.vldb.org/pvldb/vol16/p738-narayan.pdf)). FMs are hard to control (e.g. brittle to prompt wording [[Arora, et al.]](https://arxiv.org/abs/2210.02441)), often produce undesired outputs (e.g. hallucinate knowledge, perpetuate social biases), and require careful evaluation. The process of using a traditional software abstraction (*i.e.* reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.
 
 People have found success using FMs by carefully instructing and testing them. But this process is miserable when done in code alone:
 
