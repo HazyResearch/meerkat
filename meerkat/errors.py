@@ -18,5 +18,13 @@ class ImmutableError(ValueError):
     pass
 
 
+class ConversionError(ValueError):
+    pass
+
+
 class ExperimentalWarning(FutureWarning):
+    pass
+
+
+class TriggerError(Exception):
     pass

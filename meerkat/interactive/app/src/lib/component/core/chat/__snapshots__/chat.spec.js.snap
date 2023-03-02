@@ -1,0 +1,213 @@
+// Vitest Snapshot v1
+
+exports[`Chat > should render chat 1`] = `
+<body>
+  <div>
+    <div
+      class="h-full bg-violet-100 p-4 rounded-lg flex flex-col justify-between shadow-md"
+    >
+      <div
+        class="flex flex-col-reverse overflow-y-scroll"
+      >
+        <div
+          class="flex ml-2 pl-4 pr-4 mb-4"
+        >
+          <img
+            alt=""
+            class="rounded-full w-10 h-10 border-2 -ml-4 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 mr-2"
+            src="https://placeimg.com/200/200/people"
+          />
+          
+          <!--&lt;Avatar&gt;-->
+           
+           
+          <div
+            class="ml-2 w-full"
+          >
+            <p
+              class="flex justify-between"
+            >
+              <span
+                class="font-bold"
+              >
+                user
+              </span>
+               
+              <span
+                class="text-gray-500"
+              >
+                2021-01-01 00:00:00
+              </span>
+            </p>
+             
+            <p
+              class="text-gray-800 whitespace-pre-line"
+            >
+              im good thanks
+            </p>
+          </div>
+        </div>
+        <!--&lt;Message&gt;-->
+        <div
+          class="flex ml-2 pl-4 pr-4 mb-4"
+        >
+          <img
+            alt=""
+            class="rounded-full w-10 h-10 border-2 -ml-4 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 mr-2"
+            src="https://placeimg.com/200/200/people"
+          />
+          
+          <!--&lt;Avatar&gt;-->
+           
+           
+          <div
+            class="ml-2 w-full"
+          >
+            <p
+              class="flex justify-between"
+            >
+              <span
+                class="font-bold"
+              >
+                chatbot
+              </span>
+               
+              <span
+                class="text-gray-500"
+              >
+                2021-01-01 00:00:00
+              </span>
+            </p>
+             
+            <p
+              class="text-gray-800 whitespace-pre-line"
+            >
+              how can i help
+            </p>
+          </div>
+        </div>
+        <!--&lt;Message&gt;-->
+        <div
+          class="flex ml-2 pl-4 pr-4 mb-4"
+        >
+          <img
+            alt=""
+            class="rounded-full w-10 h-10 border-2 -ml-4 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 mr-2"
+            src="https://placeimg.com/200/200/people"
+          />
+          
+          <!--&lt;Avatar&gt;-->
+           
+           
+          <div
+            class="ml-2 w-full"
+          >
+            <p
+              class="flex justify-between"
+            >
+              <span
+                class="font-bold"
+              >
+                user
+              </span>
+               
+              <span
+                class="text-gray-500"
+              >
+                2021-01-01 00:00:00
+              </span>
+            </p>
+             
+            <p
+              class="text-gray-800 whitespace-pre-line"
+            >
+              hi
+            </p>
+          </div>
+        </div>
+        <!--&lt;Message&gt;-->
+        <div
+          class="flex ml-2 pl-4 pr-4 mb-4"
+        >
+          <img
+            alt=""
+            class="rounded-full w-10 h-10 border-2 -ml-4 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 mr-2"
+            src="https://placeimg.com/200/200/people"
+          />
+          
+          <!--&lt;Avatar&gt;-->
+           
+           
+          <div
+            class="ml-2 w-full"
+          >
+            <p
+              class="flex justify-between"
+            >
+              <span
+                class="font-bold"
+              >
+                chatbot
+              </span>
+               
+              <span
+                class="text-gray-500"
+              >
+                2021-01-01 00:00:00
+              </span>
+            </p>
+             
+            <p
+              class="text-gray-800 whitespace-pre-line"
+            >
+              hello
+            </p>
+          </div>
+        </div>
+        <!--&lt;Message&gt;-->
+        
+      </div>
+       
+      <div
+        class="flex mt-4"
+      >
+         
+        <textarea
+          class="w-full rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:placeholder-gray-400 dark:text-white  border border-gray-200 dark:border-gray-600 mx-4 resize-none p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Your message..."
+          rows="5"
+        />
+        
+        <!--&lt;Wrapper&gt;-->
+         
+        
+        
+        <!--&lt;Wrapper&gt;-->
+        <!--&lt;Textarea&gt;-->
+         
+        <button
+          class="text-center font-medium focus:ring-4 focus:outline-none inline-flex items-center justify-center px-5 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 rounded-lg text-violet-600 dark:text-violet-500"
+          type="button"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        
+        <!--&lt;Button&gt;-->
+      </div>
+    </div>
+    <!--&lt;Chat&gt;-->
+  </div>
+</body>
+`;

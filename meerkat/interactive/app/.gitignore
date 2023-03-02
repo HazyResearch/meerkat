@@ -1,0 +1,17 @@
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+!/src/lib
+src/lib/wrappers
+src/lib/ComponentContext.svelte
+src/routes/*
+!/src/routes/*.svelte
+!/src/routes/*.js
+!/src/routes/*.ts
+!/src/routes/*slug*
+.buildprint

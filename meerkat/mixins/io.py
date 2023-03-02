@@ -1,9 +1,8 @@
 import os
 
 import dill
-import yaml
 
-from meerkat.tools.utils import MeerkatLoader
+from meerkat.tools.utils import dump_yaml, load_yaml, meerkat_dill_load
 
 
 class ColumnIOMixin:
@@ -16,13 +15,13 @@ class ColumnIOMixin:
         metadata = self._get_meta()
 
         # Write the state
-        self._write_state(path)
+        state = self._get_state()
+        metadata["state"] = state
         self._write_data(path, *args, **kwargs)
 
         # Save the metadata as a yaml file
         metadata_path = os.path.join(path, "meta.yaml")
-        yaml.dump(metadata, open(metadata_path, "w"))
-
+        dump_yaml(metadata, metadata_path)
         return metadata
 
     def _get_meta(self):
@@ -45,45 +44,49 @@ class ColumnIOMixin:
     def read(
         cls, path: str, _data: object = None, _meta: object = None, *args, **kwargs
     ) -> object:
-        # Assert that the path exists
-        assert os.path.exists(path), f"`path` {path} does not exist."
-
         # Load in the metadata
         meta = (
-            dict(
-                yaml.load(
-                    open(os.path.join(path, "meta.yaml")),
-                    Loader=MeerkatLoader,
-                )
-            )
-            if _meta is None
-            else _meta
+            dict(load_yaml(os.path.join(path, "meta.yaml"))) if _meta is None else _meta
         )
 
         col_type = meta["dtype"]
         # Load states
-        state = col_type._read_state(path)
+        if "state" not in meta:
+            assert os.path.exists(path), f"`path` {path} does not exist."
+            try:
+                state = col_type._read_state(path)
+            except Exception:
+                state = None
+        else:
+            state = meta["state"]
         data = col_type._read_data(path, *args, **kwargs) if _data is None else _data
 
-        col = col_type.__new__(col_type)
-        col._set_state(state)
-        col._set_data(data)
+        if state is None:
+            # KG, Sabri: need to remove this `if-else` in the future,
+            # this is only for backwards compatibility.
+            # this if statement will not be required.
+            col = col_type(data)
+        else:
+            col = col_type.__new__(col_type)
+            col._set_state(state)
+            col._set_data(data)
+
+        from meerkat.interactive.formatter import DeprecatedFormatter
+
+        if "_formatters" not in col.__dict__ or isinstance(
+            col.formatters, DeprecatedFormatter
+        ):
+            # FIXME: make deprecated above work with new formatters
+            # PATCH: backwards compatability patch for old dataframes
+            # saved before v0.2.4
+            col.formatters = col._get_default_formatters()
 
         return col
 
     @staticmethod
     def _read_state(path: str):
-        try:
-            return dill.load(open(os.path.join(path, "state.dill"), "rb"))
-        except ModuleNotFoundError:
-            dill_str = open(os.path.join(path, "state.dill"), "rb").read()
-
-            if b"meerkat.nn" in dill_str:
-                # backwards compatibility
-                # TODO (Sabri): remove this in a future release
-                dill_str = dill_str.replace(b"meerkat.nn", b"meerkat.ml")
-            return dill.loads(dill_str)
+        return meerkat_dill_load(os.path.join(path, "state.dill"))
 
     @staticmethod
     def _read_data(path: str, *args, **kwargs):
-        return dill.load(open(os.path.join(path, "data.dill"), "rb"))
+        return meerkat_dill_load(os.path.join(path, "data.dill"))

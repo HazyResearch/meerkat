@@ -1,8 +1,33 @@
+# Scratch folder
+scratch/
+
+# Meerkat written
+*.mk
+
+docs/source/user-guide/dataframe/_data/art_ngoa_export.csv
+docs/source/user-guide/dataframe/_data/art_ngoa_export_arrow.csv
+# Ignore generated stubs from sphinx docs
+docs/source/**/generated
+
+
 # Jupyter notebooks
 notebooks/
+scratch/sabri/data
+
+*.mjs
+
+*.lock
+
+# .reload files
+*.reload
 
 # Note files
 notes.md
+
+*.lwp
+*.ctrl
+**/apicache-py3
+
 
 # Mac
 .DS_STORE
@@ -145,4 +170,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Giant file
+examples/datasets
+
+examples/imagenette2-160/
+
+# History
+.history
 

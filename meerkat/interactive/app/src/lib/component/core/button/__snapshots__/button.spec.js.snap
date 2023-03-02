@@ -1,0 +1,23 @@
+// Vitest Snapshot v1
+
+exports[`Button > should render button 1`] = `
+<body>
+  <div>
+    <div
+      class="w-fit bg-slate-100 py-1 px-2 rounded-md flex items-center text-slate-600 hover:bg-slate-200"
+    >
+      <button>
+        <div
+          class="flex flex-row gap-1 items-center"
+        >
+          
+          <!--&lt;Icon&gt;-->
+           
+          hello
+        </div>
+      </button>
+    </div>
+    <!--&lt;Button&gt;-->
+  </div>
+</body>
+`;

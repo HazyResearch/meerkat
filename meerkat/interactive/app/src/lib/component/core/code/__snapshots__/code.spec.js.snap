@@ -1,0 +1,77 @@
+// Vitest Snapshot v1
+
+exports[`Code > should render code 1`] = `
+<body>
+  <div>
+     
+    <div
+      class="text-left whitespace-pre overflow-auto py-2 px-4 h-full aspect-video bg-slate-800 "
+    >
+      <pre>
+        <code
+          class="language-python"
+        >
+          <span
+            class="token keyword"
+          >
+            import
+          </span>
+           meerkat 
+          <span
+            class="token keyword"
+          >
+            as
+          </span>
+           mk
+df 
+          <span
+            class="token operator"
+          >
+            =
+          </span>
+           mk
+          <span
+            class="token punctuation"
+          >
+            .
+          </span>
+          <span
+            class="token function"
+          >
+            DataFrame
+          </span>
+          <span
+            class="token punctuation"
+          >
+            (
+          </span>
+          <span
+            class="token punctuation"
+          >
+            )
+          </span>
+          
+
+          <span
+            class="token function"
+          >
+            print
+          </span>
+          <span
+            class="token punctuation"
+          >
+            (
+          </span>
+          df
+          <span
+            class="token punctuation"
+          >
+            )
+          </span>
+        </code>
+      </pre>
+    </div>
+    <!--&lt;Code&gt;-->
+  </div>
+</body>
+`;

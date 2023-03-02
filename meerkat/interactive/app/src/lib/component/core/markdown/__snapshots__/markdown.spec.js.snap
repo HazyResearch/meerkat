@@ -1,0 +1,27 @@
+// Vitest Snapshot v1
+
+exports[`Markdown > should render markdown 1`] = `
+<body>
+  <div>
+    <div
+      class="prose "
+    >
+      <h1>
+        hello This is a 
+        <strong>
+          bold
+        </strong>
+         and it has a 
+        <a
+          href="https://google.com"
+        >
+          link
+        </a>
+      </h1>
+      
+
+    </div>
+    <!--&lt;Markdown&gt;-->
+  </div>
+</body>
+`;

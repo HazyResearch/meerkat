@@ -2,7 +2,10 @@ from collections.abc import Callable, Mapping, Sequence
 from types import SimpleNamespace
 
 import numpy as np
-import torch
+
+from meerkat.tools.lazy_loader import LazyLoader
+
+torch = LazyLoader("torch")
 
 
 class FunctionInspectorMixin:
@@ -23,7 +26,7 @@ class FunctionInspectorMixin:
         # Initialize variables to track
         no_output = dict_output = bool_output = list_output = False
 
-        # If dict_output = True and `function` is used for updating the `DataPanel`
+        # If dict_output = True and `function` is used for updating the `DataFrame`
         # useful to know if any existing column is modified
         updates_existing_column = True
         existing_columns_updated = []
@@ -34,9 +37,9 @@ class FunctionInspectorMixin:
         # Run the function to test it
         if data is None:
             if is_batched_fn:
-                data = self[:2] if materialize else self.lz[:2]
+                data = self[:2] if materialize else self[:2]
             else:
-                data = self[0] if materialize else self.lz[0]
+                data = self[0] if materialize else self[0]
 
         if indices is None:
             if is_batched_fn:
@@ -52,15 +55,14 @@ class FunctionInspectorMixin:
             output = function(data, **kwargs)
 
         # lazy import to avoid circular dependency
-        from meerkat.columns.abstract import AbstractColumn
-        from meerkat.columns.numpy_column import NumpyArrayColumn
-        from meerkat.columns.tensor_column import TensorColumn
+        from meerkat.columns.abstract import Column
+        from meerkat.columns.tensor.torch import TorchTensorColumn
 
         if isinstance(output, Mapping):
             # `function` returns a dict output
             dict_output = True
 
-            # Check if `self` is a `DataPanel`
+            # Check if `self` is a `DataFrame`
             if hasattr(self, "all_columns"):
                 # Set of columns that are updated
                 existing_columns_updated = set(self.all_columns).intersection(
@@ -78,11 +80,11 @@ class FunctionInspectorMixin:
         elif (
             isinstance(output, (bool, np.bool_))
             or (
-                isinstance(output, (np.ndarray, NumpyArrayColumn))
+                isinstance(output, (np.ndarray, TorchTensorColumn))
                 and output.dtype == bool
             )
             or (
-                isinstance(output, (torch.Tensor, TensorColumn))
+                isinstance(output, (torch.Tensor, TorchTensorColumn))
                 and output.dtype == torch.bool
             )
         ):
@@ -90,7 +92,7 @@ class FunctionInspectorMixin:
             # `function` returns a bool
             bool_output = True
 
-        elif isinstance(output, (Sequence, AbstractColumn, torch.Tensor, np.ndarray)):
+        elif isinstance(output, (Sequence, Column, torch.Tensor, np.ndarray)):
             # `function` returns a list
             list_output = True
             if is_batched_fn and (

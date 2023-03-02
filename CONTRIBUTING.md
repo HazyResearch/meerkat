@@ -6,6 +6,8 @@ We welcome contributions of all kinds: code, documentation, feedback and support
   
 This contribution borrows from and is heavily inspired by [Huggingface transformers](https://github.com/huggingface/transformers). 
 
+If you encounter any steps that are missing from this guide, we'd appreciate if you open an issue or a pull request to improve it.
+
 ## How to contribute
 
 There are 4 ways you can contribute:
@@ -17,7 +19,13 @@ There are 4 ways you can contribute:
 ## Submitting a new issue or feature request
 
 Do your best to follow these guidelines when submitting an issue or a feature
-request. It will make it easier for us to give feedback and move your request forward.
+request. 
+
+**However, we actively encourage that you** 
+* file an incomplete issue than no issue at all
+* suggest a feature that you are not sure how to implement, and even if you're unsure if it's a good idea
+
+If you are unsure about something, don't hesitate to ask.
 
 ### Bugs
 
@@ -59,7 +67,7 @@ Git](https://git-scm.com/book/en/v2) is a very good reference.
 
 Follow these steps to start contributing:
 
-1. Fork the [repository](https://github.com/meerkat/meerkat) by
+1. Fork the [repository](https://github.com/hazyresearch/meerkat) by
    clicking on the 'Fork' button on the repository's page. 
    This creates a copy of the code under your GitHub user account.
 
@@ -68,17 +76,17 @@ Follow these steps to start contributing:
    ```bash
    $ git clone git@github.com:<your GitHub handle>/meerkat.git
    $ cd meerkat
-   $ git remote add upstream https://github.com/robustness-gym/meerkat.git
+   $ git remote add upstream https://github.com/hazyresearch/meerkat.git
    ```
    
 
-3. Create a new branch off of the `dev` branch to hold your development changes:
+3. Create a new branch off of the `main` branch to hold your development changes:
 
    ```bash
    $ git fetch upstream
    $ git checkout -b a-descriptive-name-for-my-changes upstream/dev
    ```
-   **Do not** work directly on the `main` or `dev`  branches.
+   **Do not** work directly on the `main` branch.
 
 4. Meerkat manages dependencies using [`setuptools`](https://packaging.python.org/guides/distributing-packages-using-setuptools/). From the base of the `meerkat` repo, install the project in editable mode with all the extra dependencies with 
 
@@ -110,6 +118,7 @@ Follow these steps to start contributing:
    ```bash
    $ make lint
    ```
+   Note: if you have a bunch of unused import warnings, you can run `autoflake --remove-all-unused-imports . -ri` to remove them. (You may need to pip install autoflake.)
 
    If you're modifying documents under `docs/source`, make sure to validate that
    they can still be built. This check also runs in CI. To run a local check
@@ -154,25 +163,21 @@ Follow these steps to start contributing:
    $ git push -u origin a-descriptive-name-for-my-changes
    ```
 
-6. Once you are satisfied (**and the checklist below is happy too**), go to the
+6. Once you are satisfied (**and the checklist below is done**), go to the
    webpage of your fork on GitHub. Click on 'Pull request' to send your changes
    to the project maintainers for review. 
 
    **Important**:  Ensure that the you create a pull request onto meerkat's `dev` branch. The drop down menus at the top of the "Open a pull request page" should look
-   >base repository: **robustness-gym/meerkat**  base: **dev** <- head repository: **\<your GitHub handle\>/meerkat**  compare: **\<your branch name\>** 
+   >base repository: **hazyresearch/meerkat**  base: **main** <- head repository: **\<your GitHub handle\>/meerkat**  compare: **\<your branch name\>** 
    
 
 7. It's ok if maintainers ask you for changes. It happens to core contributors
    too! So everyone can see the changes in the Pull request, work in your local
    branch and push the changes to your fork. They will automatically appear in
    the pull request.
-   
-8. We follow a one-commit-per-PR policy. Before your PR can be merged, you will have to
- `git rebase` to squash your changes into a single commit.
 
 ### Checklist
 
-0. One commit per PR.
 1. The title of your pull request should be a summary of its contribution;
 2. If your pull request addresses an issue, please mention the issue number in
    the pull request description to make sure they are linked (and people
@@ -181,7 +186,7 @@ Follow these steps to start contributing:
    are useful to avoid duplicated work, and to differentiate it from PRs ready
    to be merged;
 4. Make sure existing tests pass;
-5. Add high-coverage tests. No quality testing = no merge.
+5. Add high-coverage tests.
 6. All public methods must have informative docstrings that work nicely with sphinx.
 
 

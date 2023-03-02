@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Note: To use the 'upload' functionality of this file, you must:
-#   $ pipenv install twine --dev
-
 import io
 import os
+
+# Note: To use the 'upload' functionality of this file, you must:
+#   $ pipenv install twine --dev
+import shutil
+import subprocess
 import sys
 from distutils.util import convert_path
 from shutil import rmtree
@@ -38,40 +40,53 @@ REQUIRED = [
     "cytoolz",
     "ujson",
     "torch>=1.7.0",
+    "scikit-learn",
     "tqdm>=4.49.0",
     "datasets>=1.4.1",
+    "pyarrow>=11.0.0",
     "PyYAML>=5.4.1",
     "omegaconf>=2.0.5",
-    "fuzzywuzzy>=0.18.0",
     "semver>=2.13.0",
-    "multiprocess>=0.70.11" "Cython>=0.29.21",
+    "multiprocess>=0.70.11",
+    "Cython>=0.29.21",
     "progressbar>=2.5",
     "fvcore",
-    "ipywidgets>=7.6.2",
+    "ipywidgets>=7.0.0",
     "IPython",
+    "fastapi",
+    "uvicorn",
+    "rich",
+    "cryptography",
+    "fastapi",
+    "wrapt",
+    "typer",
+    "jinja2",
+    "nbformat",
+    "sse-starlette",
+    "tabulate",
+    "pyparsing",
 ]
+
+# Read in docs/requirements.txt
+with open("docs/requirements.txt") as f:
+    DOCS_REQUIREMENTS = f.read().splitlines()
 
 # What packages are optional?
 EXTRAS = {
     "dev": [
-        "black>=21.5b0",
-        "isort>=5.7.0",
+        "black==22.12.0",
+        "isort>=5.12.0",
         "flake8>=3.8.4",
         "docformatter>=1.4",
         "pytest-cov>=2.10.1",
-        "sphinx-rtd-theme>=0.5.1",
-        "nbsphinx>=0.8.0",
         "recommonmark>=0.7.1",
         "parameterized",
         "pre-commit>=2.9.3",
-        "sphinx-autobuild",
         "twine",
-    ],
-    "interactive": [
-        "plotly",
-        "bokeh",
-        "kaleido",
-    ],
+        "httpx",
+        "ray",
+    ]
+    + DOCS_REQUIREMENTS,
     "embeddings-mac": [
         "faiss-cpu",
         "umap-learn[plot]",
@@ -80,26 +95,18 @@ EXTRAS = {
         "faiss-gpu",
         "umap-learn[plot]",
     ],
-    "tabular": [
-        "scikit-learn",
-    ],
     "text": [
         "transformers",
         "spacy>=3.0.0",
-        "fastBPE>=0.1.0",
     ],
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
     "audio": ["torchaudio"],
-    "wilds": [
-        "wilds>=1.1.0",
-    ],
     "medimg": [
         "dosma>=0.0.13",
         "kaggle",
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
     ],
-    "ml": ["pytorch_lightning"],
 }
 EXTRAS["all"] = list(set(sum(EXTRAS.values(), [])))
 
@@ -146,12 +153,60 @@ class UploadCommand(Command):
         pass
 
     def run(self):
+        from huggingface_hub.repository import Repository
+
         try:
             self.status("Removing previous builds…")
             rmtree(os.path.join(here, "dist"))
+            rmtree(os.path.join(here, "build"))
         except OSError:
             pass
 
+        # Build static components
+        self.status("Building static components…")
+        env = os.environ.copy()
+        env.update({"VITE_API_URL_PLACEHOLDER": "http://meerkat.dummy"})
+        if os.path.exists("./meerkat/interactive/app/build"):
+            shutil.rmtree("./meerkat/interactive/app/build")
+        build_process = subprocess.run(
+            "npm run build",
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=True,
+            cwd="./meerkat/interactive/app",
+        )
+        if build_process.returncode != 0:
+            print(build_process.stdout.decode("utf-8"))
+            sys.exit(1)
+
+        # Package static components to a tar file and push to huggingface.
+        # This requires having write access to meerkat-ml.
+        # TODO: Consider making this a github action.
+        self.status("Packaging static component build...")
+        components_build_targz = shutil.make_archive(
+            base_name=f"static-build-{VERSION}",
+            format="gztar",
+            root_dir="./meerkat/interactive/app/build",
+        )
+
+        self.status("Uploading static build to huggingface...")
+        local_repo_dir = os.path.abspath(
+            os.path.expanduser("~/.meerkat/hf/component-static-builds")
+        )
+        repo = Repository(
+            local_dir=local_repo_dir,
+            clone_from="meerkat-ml/component-static-builds",
+            repo_type="dataset",
+        )
+        shutil.move(
+            components_build_targz,
+            os.path.join(local_repo_dir, os.path.basename(components_build_targz)),
+        )
+        repo.git_pull()
+        repo.push_to_hub(commit_message=f"{VERSION}: new component builds")
+
+        # Build the source and wheel.
         self.status("Building Source and Wheel (universal) distribution…")
         os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
 
@@ -176,12 +231,14 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*", "demo"])
+    + ["meerkat-demo"],
+    package_dir={"meerkat-demo": "demo"},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    entry_points={
+        "console_scripts": ["mk=meerkat.cli.main:cli"],
+    },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,

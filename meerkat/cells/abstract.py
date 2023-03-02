@@ -16,9 +16,6 @@ class AbstractCell(abc.ABC):
         """Get the metadata associated with this cell."""
         return {}
 
-    def loader(self, *args, **kwargs) -> object:
-        return self
-
     def __getitem__(self, index):
         return self.get()[index]
 

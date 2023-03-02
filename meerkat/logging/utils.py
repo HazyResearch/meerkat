@@ -6,14 +6,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Union
 
+from rich.logging import RichHandler
+
 logger = logging.getLogger(__name__)
 
 
 def initialize_logging(
     log_dir: str = None,
     log_name: str = "meerkat.log",
-    format: str = "[%(asctime)s][%(levelname)s][%(name)s:%(lineno)s] :: %(message)s",
-    level: int = logging.WARNING,
+    format: str = "[%(funcName)s()] [%(name)s: %(lineno)s] :: %(message)s",
+    level: int = os.environ.get("MEERKAT_LOGGING_LEVEL", logging.WARNING),
 ) -> None:
     """Initialize logging for Meerkat."""
 
@@ -56,7 +58,8 @@ def initialize_logging(
         level=level,
         handlers=[
             logging.FileHandler(os.path.join(log_path, log_name)),
-            logging.StreamHandler(),
+            # logging.StreamHandler(),
+            RichHandler(rich_tracebacks=True),
         ],
     )
 
@@ -72,6 +75,7 @@ def set_logging_level_for_imports(level: int = logging.WARNING) -> None:
     logging.getLogger("matplotlib").setLevel(level)
     logging.getLogger("textattack").setLevel(level)
     logging.getLogger("filelock").setLevel(level)
+    logging.getLogger("sse_starlette").setLevel(level)
 
 
 def set_logging_level(level: Union[int, str] = logging.INFO):

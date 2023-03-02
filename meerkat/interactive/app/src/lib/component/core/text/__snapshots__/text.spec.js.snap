@@ -1,0 +1,15 @@
+// Vitest Snapshot v1
+
+exports[`Text > should render Text 1`] = `
+<body>
+  <div>
+    <div
+      class=""
+    >
+      hello
+    </div>
+    
+    <!--&lt;Text&gt;-->
+  </div>
+</body>
+`;

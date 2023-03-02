@@ -1,0 +1,14 @@
+// Vitest Snapshot v1
+
+exports[`NumberInput > should render NumberInput 1`] = `
+<body>
+  <div>
+    <input
+      class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
+      placeholder="Enter a number..."
+      type="number"
+    />
+    <!--&lt;NumberInput&gt;-->
+  </div>
+</body>
+`;

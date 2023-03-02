@@ -1,0 +1,22 @@
+// Vitest Snapshot v1
+
+exports[`Vega > should render vega 1`] = `
+<body>
+  <div>
+    <div
+      class="text-center bg-violet-50 rounded-lg p-4"
+    >
+      <h2
+        class="font-mono text-xl font-bold"
+      >
+        Vega
+      </h2>
+       
+      <div />
+      <!--&lt;VegaEmbed&gt;-->
+      <!--&lt;Vega&gt;-->
+    </div>
+    <!--&lt;Vega&gt;-->
+  </div>
+</body>
+`;

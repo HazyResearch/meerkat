@@ -1,0 +1,28 @@
+// Vitest Snapshot v1
+
+exports[`Select > should render Select 1`] = `
+<body>
+  <div>
+    <select
+      class="rounded-md bg-slate-100 border-0 px-3 text-slate-600"
+    >
+      <option
+        value="1"
+      >
+        one
+      </option>
+      <option
+        value="2"
+      >
+        two
+      </option>
+      <option
+        value="3"
+      >
+        three
+      </option>
+    </select>
+    <!--&lt;Select&gt;-->
+  </div>
+</body>
+`;

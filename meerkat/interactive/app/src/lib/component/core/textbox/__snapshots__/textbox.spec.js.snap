@@ -1,0 +1,14 @@
+// Vitest Snapshot v1
+
+exports[`Textbox > should render Textbox 1`] = `
+<body>
+  <div>
+    <input
+      class="grow h-10 px-3 rounded-md shadow-md my-1 border-gray-400"
+      placeholder="Write some text..."
+      type="text"
+    />
+    <!--&lt;Textbox&gt;-->
+  </div>
+</body>
+`;

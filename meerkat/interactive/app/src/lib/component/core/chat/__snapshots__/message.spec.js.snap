@@ -1,0 +1,39 @@
+// Vitest Snapshot v1
+
+exports[`Message > should render message 1`] = `
+<body>
+  <div>
+    <div
+      class="flex ml-2 pl-4 pr-4 mb-4"
+    >
+       
+      <div
+        class="ml-2 w-full"
+      >
+        <p
+          class="flex justify-between"
+        >
+          <span
+            class="font-bold"
+          >
+            John Doe
+          </span>
+           
+          <span
+            class="text-gray-500"
+          >
+            12:00
+          </span>
+        </p>
+         
+        <p
+          class="text-gray-800 whitespace-pre-line"
+        >
+          Hello world!
+        </p>
+      </div>
+    </div>
+    <!--&lt;Message&gt;-->
+  </div>
+</body>
+`;

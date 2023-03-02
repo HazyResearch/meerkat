@@ -10,13 +10,14 @@ import pytest
 import torch
 from PIL import Image
 
-from meerkat.columns.image_column import ImageColumn
-from meerkat.columns.list_column import ListColumn
-from meerkat.datapanel import DataPanel
+from meerkat.columns.deferred.file import FileColumn
+
+# from meerkat.columns.deferred.image import ImageColumn
+from meerkat.columns.object.base import ObjectColumn
+from meerkat.dataframe import DataFrame
 
 
 class AbstractColumnTestBed:
-
     DEFAULT_CONFIG = {}
 
     @classmethod
@@ -61,7 +62,7 @@ class MockDatapanel:
     ):
         batch = {
             "a": np.arange(length),
-            "b": ListColumn(np.arange(length)),
+            "b": ObjectColumn(np.arange(length)),
             "c": [{"a": 2}] * length,
             "d": torch.arange(length),
             # offset the index to test robustness to nonstandard indices
@@ -76,23 +77,23 @@ class MockDatapanel:
             self.img_col = MockImageColumn(length=length, tmpdir=tmpdir)
             batch["img"] = self.img_col.col
 
-        self.dp = DataPanel.from_batch(batch)
+        self.df = DataFrame.from_batch(batch)
 
         self.visible_rows = [0, 4, 6, 11] if use_visible_rows else np.arange(length)
         if use_visible_rows:
-            for column in self.dp.values():
+            for column in self.df.values():
                 column.visible_rows = self.visible_rows
 
-        self.visible_columns = ["a", "b"] if use_visible_columns else self.dp.columns
+        self.visible_columns = ["a", "b"] if use_visible_columns else self.df.columns
         if use_visible_columns:
-            self.dp.visible_columns = self.visible_columns
+            self.df.visible_columns = self.visible_columns
 
 
 class MockColumn:
     def __init__(
         self,
         use_visible_rows: bool = False,
-        col_type: type = ListColumn,
+        col_type: type = ObjectColumn,
         dtype: str = "int",
     ):
         self.array = np.arange(16, dtype=dtype)
@@ -106,7 +107,7 @@ class MockColumn:
 
 
 class MockStrColumn:
-    def __init__(self, use_visible_rows: bool = False, col_type: type = ListColumn):
+    def __init__(self, use_visible_rows: bool = False, col_type: type = ObjectColumn):
         self.array = np.array([f"row_{idx}" for idx in range(16)])
         self.col = col_type(self.array)
 
@@ -122,7 +123,7 @@ class MockAnyColumn:
         self,
         data: Sequence,
         use_visible_rows: bool = False,
-        col_type: type = ListColumn,
+        col_type: type = ObjectColumn,
     ):
         self.array = data
         self.col = col_type(self.array)
@@ -140,7 +141,7 @@ class MockImageColumn:
 
         Args:
             wrap_dataset (bool, optional): If `True`, create a
-            `meerkat.DataPanel`
+            `meerkat.DataFrame`
             ,
                 otherwise create a
                 `meerkat.core.dataformats.vision.VisionDataPane`
@@ -156,4 +157,4 @@ class MockImageColumn:
             im = Image.fromarray(self.image_arrays[-1])
             im.save(self.image_paths[-1])
 
-        self.col = ImageColumn.from_filepaths(self.image_paths)
+        self.col = FileColumn(self.image_paths)
