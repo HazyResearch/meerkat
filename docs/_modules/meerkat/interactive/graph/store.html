@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>meerkat.interactive.graph.store &#8212; 🔮 v0.2.6a16</title>
+    <title>meerkat.interactive.graph.store &#8212; 🔮 v0.4.0a1</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -84,7 +84,7 @@
       <img src="../../../../_static/meerkat_banner_padded.svg" class="logo" alt="logo">
       
       
-      <h1 class="site-logo" id="site-title">🔮 v0.2.6a16</h1>
+      <h1 class="site-logo" id="site-title">🔮 v0.4.0a1</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
@@ -1743,14 +1743,16 @@ title="Open an issue"
     <span class="n">_self_marked</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">backend_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-        <span class="c1"># if not isinstance(wrapped, _IteratorStore) and isinstance(wrapped, Iterator):</span>
-        <span class="c1">#     warnings.warn(</span>
-        <span class="c1">#         &quot;Wrapping an iterator in a Store is not recommended. &quot;</span>
-        <span class="c1">#         &quot;If the iterator is derived from an iterable, wrap the iterable:\n&quot;</span>
-        <span class="c1">#         &quot;    &gt;&gt;&gt; store = mk.Store(iterable)\n&quot;</span>
-        <span class="c1">#         &quot;    &gt;&gt;&gt; iterator = iter(store)&quot;</span>
-        <span class="c1">#     )</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wrapped</span><span class="o">=</span><span class="n">wrapped</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_IteratorStore</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Wrapping an iterator in a Store is not recommended. &quot;</span>
+                <span class="s2">&quot;If the iterator is derived from an iterable, wrap the iterable:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &gt;&gt;&gt; store = mk.Store(iterable)</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;    &gt;&gt;&gt; iterator = iter(store)&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># Set up these attributes so we can create the</span>
         <span class="c1"># schema and detail properties.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_self_schema</span> <span class="o">=</span> <span class="kc">None</span>
