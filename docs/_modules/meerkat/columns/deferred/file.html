@@ -2163,12 +2163,10 @@ title="Open an issue"
     <span class="n">NUM_SAMPLES</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">filepaths</span> <span class="o">=</span> <span class="n">filepaths</span><span class="p">[:</span><span class="n">NUM_SAMPLES</span><span class="p">]</span>
     <span class="c1"># extract the extension, taking into account that it may not exist</span>
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">filepaths</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\.[^\.]+)$&quot;</span><span class="p">)[</span><span class="s2">&quot;0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c1"># FIXME: make this work for URLs with `.com/...`</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">filepaths</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;ext&gt;\.[^\.]+)$&quot;</span><span class="p">)[</span><span class="s2">&quot;ext&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="c1"># if the extension is not present, then we assume it is a text file</span>
-    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
-
     <span class="k">for</span> <span class="nb">type</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;exts&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">type</span>

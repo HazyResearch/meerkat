@@ -1833,28 +1833,28 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#import">
-   Import
+  <a class="reference internal nav-link" href="#importing-meerkat">
+   🔮 Importing Meerkat
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#store">
-   Store
+  <a class="reference internal nav-link" href="#store-keeping-track-of-state">
+   🧺 Store: Keeping Track of State
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoint">
-   Endpoint
+  <a class="reference internal nav-link" href="#endpoint-updating-the-state">
+   🔚 Endpoint: Updating the State
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#component">
-   Component
+  <a class="reference internal nav-link" href="#component-assembling-the-gui">
+   🖼️ Component: Assembling the GUI
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#page">
-   Page
+  <a class="reference internal nav-link" href="#page-launching-the-gui">
+   📃 Page: Launching the GUI
   </a>
  </li>
 </ul>
@@ -1877,28 +1877,28 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#import">
-   Import
+  <a class="reference internal nav-link" href="#importing-meerkat">
+   🔮 Importing Meerkat
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#store">
-   Store
+  <a class="reference internal nav-link" href="#store-keeping-track-of-state">
+   🧺 Store: Keeping Track of State
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoint">
-   Endpoint
+  <a class="reference internal nav-link" href="#endpoint-updating-the-state">
+   🔚 Endpoint: Updating the State
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#component">
-   Component
+  <a class="reference internal nav-link" href="#component-assembling-the-gui">
+   🖼️ Component: Assembling the GUI
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#page">
-   Page
+  <a class="reference internal nav-link" href="#page-launching-the-gui">
+   📃 Page: Launching the GUI
   </a>
  </li>
 </ul>
@@ -1914,8 +1914,8 @@ title="Print to PDF"
   <section id="tutorial-3-basic-interactive-apps-building-a-simple-counter">
 <h1>Tutorial 3: Basic Interactive Apps (Building A Simple Counter)<a class="headerlink" href="#tutorial-3-basic-interactive-apps-building-a-simple-counter" title="Permalink to this headline">¶</a></h1>
 <p>Let’s go through a simple example to get familiar with interactivity. We’ll build a simple counter that increments by 1 every time the user clicks on it.</p>
-<section id="import">
-<h2>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h2>
+<section id="importing-meerkat">
+<h2>🔮 Importing Meerkat<a class="headerlink" href="#importing-meerkat" title="Permalink to this headline">¶</a></h2>
 <p>First, we’ll import the Meerkat library.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1925,8 +1925,8 @@ title="Print to PDF"
 </div>
 </div>
 </section>
-<section id="store">
-<h2>Store<a class="headerlink" href="#store" title="Permalink to this headline">¶</a></h2>
+<section id="store-keeping-track-of-state">
+<h2>🧺 Store: Keeping Track of State<a class="headerlink" href="#store-keeping-track-of-state" title="Permalink to this headline">¶</a></h2>
 <p>Next, let’s create a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object to keep track of the state of the counter. <code class="docutils literal notranslate"><span class="pre">Stores</span></code> in Meerkat are borrowed from their Svelte counterparts, and provide a way for users to create values that are synchronized between the GUI and the Python code.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1942,8 +1942,8 @@ title="Print to PDF"
 <li><p>If the <code class="docutils literal notranslate"><span class="pre">Store</span></code> value is set using the special <code class="docutils literal notranslate"><span class="pre">.set()</span></code> method here, the updated value will be reflected in the frontend.</p></li>
 </ul>
 </section>
-<section id="endpoint">
-<h2>Endpoint<a class="headerlink" href="#endpoint" title="Permalink to this headline">¶</a></h2>
+<section id="endpoint-updating-the-state">
+<h2>🔚 Endpoint: Updating the State<a class="headerlink" href="#endpoint-updating-the-state" title="Permalink to this headline">¶</a></h2>
 <p>Then, we’ll create an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> in Meerkat, which is a Python function that can be called from the frontend. In this case, we’ll create an endpoint that increments the counter by 1.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1957,8 +1957,8 @@ title="Print to PDF"
 </div>
 <p>What’s great here is that Meerkat uses FastAPI under the hood to automatically setup an API endpoint for <code class="docutils literal notranslate"><span class="pre">increment</span></code>. This can then be called by other services as well!</p>
 </section>
-<section id="component">
-<h2>Component<a class="headerlink" href="#component" title="Permalink to this headline">¶</a></h2>
+<section id="component-assembling-the-gui">
+<h2>🖼️ Component: Assembling the GUI<a class="headerlink" href="#component-assembling-the-gui" title="Permalink to this headline">¶</a></h2>
 <p>Next, we’ll want to assemble our GUI: we want a button that we can press to increment the counter, as well as a way to display the current count value.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1972,8 +1972,8 @@ title="Print to PDF"
 </div>
 <p>Meerkat comes with a collection of prebuilt Components that can be used to assemble interfaces.</p>
 </section>
-<section id="page">
-<h2>Page<a class="headerlink" href="#page" title="Permalink to this headline">¶</a></h2>
+<section id="page-launching-the-gui">
+<h2>📃 Page: Launching the GUI<a class="headerlink" href="#page-launching-the-gui" title="Permalink to this headline">¶</a></h2>
 <p>Finally, we can launch the interface.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Launch the interface</span>
 <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>

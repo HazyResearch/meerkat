@@ -1625,6 +1625,53 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-image-gallery.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-image-gallery.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Colab"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="headerbtn__text-container">Colab</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -1708,6 +1755,23 @@ title="Edit this page"
   </button>
   <div class="menu-dropdown__content">
     <ul>
+      <li>
+        <a href="../../_sources/start/tutorials/tutorial-image-gallery.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download notebook file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
       <li>
         <a href="../../_sources/start/tutorials/tutorial-image-gallery.md"
    class="headerbtn"
@@ -1845,9 +1909,13 @@ title="Print to PDF"
 <ul class="simple">
 <li><p>downloading a dataset</p></li>
 <li><p>starting a Meerkat interactive server</p></li>
-<li><p>building a layout</p></li>
-<li><p>launching an app</p></li>
+<li><p>building a layout with <strong>components</strong></p></li>
+<li><p>launching an <strong>app</strong></p></li>
 </ul>
+<p>If you want to follow along, you can run the tutorial demo script.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-image-gallery
+</pre></div>
+</div>
 <p>As always, the first step is to import <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>! This will give you access to the Meerkat <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> object as well as the Meerkat frontend components that will serve as the building blocks for our layouts.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 </pre></div>
@@ -1899,7 +1967,7 @@ title="Print to PDF"
 <span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>That’s it! You can run this code either in a standalone <code class="docutils literal notranslate"><span class="pre">.py</span></code> file or directly in a Jupyter notebook. If running a <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, use the command <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span> <span class="pre">gallery.py</span> <span class="pre">--dev</span></code> and follow the link in the terminal to view your app in the browser. Any changes you make to the code will cause the page to automatically refresh. If running in a Jupyter notebook, the app should show up in the cell’s output.</p>
+<p>That’s it! You can run this code either in a standalone <code class="docutils literal notranslate"><span class="pre">.py</span></code> file or directly in a Jupyter notebook. If running a <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, use the command <code class="docutils literal notranslate"><span class="pre">mk</span> <span class="pre">run</span> <span class="pre">&lt;file&gt;.py</span> <span class="pre">--dev</span></code> and follow the link in the terminal to view your app in the browser. Any changes you make to the code will cause the page to automatically refresh. If running in a Jupyter notebook, the app should show up in the cell’s output.</p>
 <p>🥳 Congratulations on building your first Meerkat GUI.</p>
 </section>
 </section>
