@@ -1,3 +1,4 @@
+import os
 import re
 from functools import partial
 from typing import TYPE_CHECKING, Dict
@@ -16,10 +17,12 @@ class FlashFill(div):
         df (DataFrame): The dataframe to flash fill.
         target_column (str): The column to flash fill.
     """
+
     def __init__(
         self,
         df: "DataFrame",
         target_column: str,
+        manifest_cache_dir: str = "~/.cache/manifest",
     ):
         df = df.view()
         if target_column not in df.columns:
@@ -31,6 +34,10 @@ class FlashFill(div):
             classes="h-full w-full",
         )
         self._prompt = prompt
+        self.manifest_cache_dir = os.path.abspath(
+            os.path.expanduser(manifest_cache_dir)
+        )
+        os.makedirs(self.manifest_cache_dir)
 
     @property
     def prompt(self):
@@ -129,14 +136,12 @@ class FlashFill(div):
             client_name, engine = api.split("/")
             manifest = Manifest(
                 client_name=client_name,
-                client_connection=open(
-                    "/Users/sabrieyuboglu/.meerkat/keys/.openai"
-                ).read(),
+                client_connection=os.getenv("OPENAI_API_KEY"),
                 engine=engine,
                 temperature=0,
                 max_tokens=1,
                 cache_name="sqlite",
-                cache_connection="/Users/sabrieyuboglu/.manifest/cache.sqlite",
+                cache_connection=os.path.join(self.manifest_cache_dir, "cache.sqlite"),
             )
 
             def _run_manifest(example: mk.Column):
