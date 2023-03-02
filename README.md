@@ -10,7 +10,7 @@
 Meerkat is a open-source Python library aimed at technical teams that want to interactively wrangle their unstructured data with foundation models.
 
 [**Website**](meerkat.wiki)
-| [**Quickstart**](⚡️-Quickstart)
+| [**Quickstart**](-quickstart)
 | [**Docs**](http://meerkat.wiki/docs/index.html)
 | [**Contributing**](CONTRIBUTING.md)
 | [**Blogpost**](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
