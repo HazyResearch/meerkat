@@ -1,7 +1,7 @@
 
 <div align="center">
     <img src="docs/assets/meerkat_banner.png" height=100 alt="Meerkat logo"/>
-</div>
+
 
 -----
 
@@ -18,7 +18,7 @@ Meerkat is a open-source Python library aimed at technical teams that want to in
 | [**Docs**](http://meerkat.wiki/docs/index.html)
 | [**Contributing**](CONTRIBUTING.md)
 | [**Blogpost**](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
-
+</div>
 
 ## ⚡️ Quickstart
 We recommend installing Meerkat in a fresh virtual environment,
