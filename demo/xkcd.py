@@ -1,6 +1,5 @@
 import meerkat as mk
-from meerkat.interactive.app.src.lib.shared.cell.website import WebsiteFormatter
-from meerkat.interactive.formatter.image import ImageFormatter
+from meerkat.interactive.formatter.raw_html import HTMLFormatterGroup
 
 df = mk.get("olivierdehaene/xkcd", registry="huggingface")["train"]
 
@@ -16,9 +15,8 @@ gallery = mk.gui.html.div(
         mk.gui.Gallery(
             filtered_df.format(
                 {
-                    "image_url": ImageFormatter(max_size=(300, 300)),
-                    "url": WebsiteFormatter(height=30),
-                    "explained_url": WebsiteFormatter(height=30),
+                    "url": HTMLFormatterGroup(),
+                    "explained_url": HTMLFormatterGroup(),
                 }
             ),
             main_column="image_url",
