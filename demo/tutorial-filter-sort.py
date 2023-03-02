@@ -1,3 +1,10 @@
+"""
+Filter and sort an image dataset in a gallery.
+
+This is a tutorial on how to compose complex data components
+like `Filter`, `Sort`, and `Gallery` in Meerkat in order to
+create an application.
+"""
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
