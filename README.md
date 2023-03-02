@@ -37,13 +37,15 @@ pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@clever-d
 Then try one of our demos,
 
 ```bash
-mk demo match
+mk demo tutorial-image-gallery --copy
 ```
+
+Explore the code for this demo in `tutorial-image-gallery.py`. 
 
 To see a full list of demos, use `mk demo --help`. (If this didn't work for you, we'd appreciate if you could open an issue and let us know.)
 
 **Next Steps**.
-Check out our [Getting Started page](https://meerkat.readthedocs.io/en/dev/guide/guide.html) and our [documentation](https://meerkat.readthedocs.io/en/dev/guide/guide.html) to start building with Meerkat. As we work to make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions.
+Check out our [Getting Started page](http://meerkat.wiki/docs/start/quickstart-df.html) and our [documentation](http://meerkat.wiki/docs/index.html) to start building with Meerkat. As we work to make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions.
 
 ## Why Meerkat?
 
