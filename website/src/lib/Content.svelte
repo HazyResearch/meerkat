@@ -56,9 +56,9 @@ mk.gui.html.div([search, gallery]")
 <section
 	class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br border-b "
 >
-	<div class="container px-6 mx-auto pt-24">
+	<div class="container px-6 mx-auto sm:pt-8 pt-32">
 		<div
-			class="md:grid md:grid-cols-[2fr_3fr] items-center flex flex-col justify-between md:h-[400px] gap-14"
+			class="md:grid md:grid-cols-[2fr_3fr] items-center flex flex-col justify-between gap-14"
 		>
 			<div class="max-w-xl mb-8 md:mb-0">
 				<h1
@@ -74,16 +74,16 @@ mk.gui.html.div([search, gallery]")
 					technical teams interactively wrangle images, videos,
 					text documents and more with foundation models.
 				</p>
-				<p class="mt-4 text-gray-600 dark:text-gray-400">
+				<p class="mt-4 text-gray-600 dark:text-gray-400 md:mb-8">
 					Our goal is to make foundation models a more reliable software abstraction for processing unstructured datasets. 
-					<span class="text-violet-600" >Read our <a href="blog">blogpost</a> to learn more.</span>
+					<a href="{base}/blog"><span class="text-violet-600" >Read our blogpost to learn more.</span></a>
 				</p>
 			</div>
-			<div class="p-14 h-full self-icenter">
+			<div class="flex flex-col md:m-10 p-8 self-icenter w-full">
 				<iframe
-					src="https://youtube.com/embed/HJv9ZvtisN0?modestbranding=1"
+					src="https://youtube.com/embed/3ItA70qoe-o?modestbranding=1"
 					allowfullscreen="allowfullscreen"
-					class="aspect-video h-full rounded-md shadow-lg"
+					class="aspect-video rounded-md shadow-lg"
 				/>
 			</div>
 			<!-- Insert Demo Video here -->
@@ -103,7 +103,7 @@ mk.gui.html.div([search, gallery]")
 					>$ pip install meerkat-ml</code
 				></pre>
 			<div
-				class="bg-slate-50 border border-orange-400 flex rounded-lg max-w-md px-4 py-1 shadow-sm gap-2"
+				class="bg-slate-50 border border-orange-400 flex rounded-lg max-w-lg px-4 py-1 shadow-sm gap-2"
 			>
 				<div class="font-rubik text-orange-700 font-bold italic">
 					Notice
@@ -297,22 +297,25 @@ mk.gui.html.div([search, gallery]")
 				Built for technical teams
 			</h1>
 			<div
-				class="md:grid md:grid-cols-3 justify-items-center gap-4 mt-2 flex flex-col"
+				class="lg:grid lg:grid-cols-3 lg:gap-8 justify-items-center gap-4 mt-2 flex flex-col"
 			>
-				<Card
-					title="🤖️ Machine Learning Teams "
-					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting."
-					byline=""
-				/>
 				<Card
 					title="🧪️ Data Science Teams "
 					description="Data frames, visualizations and interactive data analysis over unstructured data in Jupyter Notebooks with pure Python."
 					byline=""
+					videoUrl="https://youtube.com/embed/a8FBT33QACQ?modestbranding=1"
 				/>
 				<Card
 					title="👨‍💻️ Software Engineering Teams "
 					description="Fully custom applications in SvelteKit that seamlessly connect to unstructured data and model APIs in Python."
 					byline=""
+					videoUrl="https://youtube.com/embed/3ItA70qoe-o?modestbranding=1"
+				/>
+				<Card
+					title="🤖️ Machine Learning Teams "
+					description="Graphical user interfaces to prompt and control foundation models, collect feedback and iterate, all with Python scripting."
+					byline=""
+					videoUrl="https://youtube.com/embed/4Kk_LZbNWNs?modestbranding=1"
 				/>
 			</div>
 		</div>
