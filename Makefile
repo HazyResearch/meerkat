@@ -19,7 +19,7 @@ test-basic:
 	python -c "import meerkat.version as mversion"
 
 test-cov:
-	pytest tests/meerkat/ops/test_merge.py --cov=./ --cov-report=xml
+	pytest tests/ --cov=./ --cov-report=xml
 
 test-interactive-install:
 	set -e
