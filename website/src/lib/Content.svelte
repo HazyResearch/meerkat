@@ -349,10 +349,6 @@
 		filter: invert(100%) sepia(99%) saturate(14%) hue-rotate(345deg) brightness(106%) contrast(100%);
 	}
 
-	.will-change-transform {
-		will-change: transform;
-	}
-
 	@keyframes pulse {
 		100% {
         	opacity: 0.0;
