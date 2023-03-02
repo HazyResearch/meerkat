@@ -1,4 +1,6 @@
-"""Test that sort1 and sort2 are independent of each other."""
+"""
+Multiple galleries in tabs, with independent sorting.
+"""
 import meerkat as mk
 
 df1 = mk.get("imagenette", version="160px")
@@ -15,7 +17,7 @@ galleries = mk.gui.Tabs(
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(slots=[sort1, sort2, galleries]),
+    mk.gui.html.flexcol(slots=[sort1, sort2, galleries]),
     id="multiple-sort",
 )
 page.launch()

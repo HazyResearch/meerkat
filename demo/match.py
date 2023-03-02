@@ -1,3 +1,7 @@
+"""
+Similarity search with CLIP in an interactive image
+gallery.
+"""
 import rich
 
 import meerkat as mk
@@ -21,21 +25,19 @@ df_clip = mk.DataFrame.read(
 )
 df = df.merge(df_clip[["img_id", "img_clip"]], on="img_id")
 
-match = mk.gui.Match(df=df, against=EMBED_COLUMN)
+match = mk.gui.Match(df, against=EMBED_COLUMN)
 
 df = df.mark()
-# Get the name of the match criterion in a reactive way.
+
 with mk.magic():
+    # Get the name of the match criterion in a reactive way.
     criterion_name = match.criterion.name
 
-# Sort
-df_sorted = mk.sort(data=df, by=criterion_name, ascending=False)
-
-# Gallery
+df_sorted = mk.sort(df, by=criterion_name, ascending=False)
 gallery = mk.gui.Gallery(df_sorted, main_column=IMAGE_COLUMN)
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol([match, gallery]),
+    mk.gui.html.flexcol([match, gallery]),
     id="match",
 )
 page.launch()
