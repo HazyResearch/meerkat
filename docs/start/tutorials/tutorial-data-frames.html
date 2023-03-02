@@ -2145,7 +2145,7 @@ This dataset is made up of 10 classes (e.g. “garbage truck”, “gas pump”,
 </div>
 </div>
 <div class="cell_output docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "17da55dcb89c4c369a9715c740bdfdd0"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
+<script type="application/vnd.jupyter.widget-view+json">{"version_major": 2, "version_minor": 0, "model_id": "b2ba3ca24da84de18574512e4069fb4b"}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting tar archive, this may take a few minutes...
 </pre></div>
 </div>
 </div>
@@ -2304,7 +2304,7 @@ In <code class="docutils literal notranslate"><span class="pre">meerkat</span></
 <p>Let’s start by filtering the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> down to the examples in the validation set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">split</span><span class="p">:</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;valid&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">split</span><span class="p">:</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="n">is_batched_fn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -2352,7 +2352,7 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
   warnings.warn(
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f7a6ca9cb50&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.FacetGrid at 0x7f4f6a70bb50&gt;
 </pre></div>
 </div>
 <img alt="../../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" src="../../_images/df0a91cdf32b905dfffe40d1fe6c8527fd2378d1ba0284c189b5e5434b9bb33a.png" />
@@ -2360,14 +2360,12 @@ Using the <a class="reference external" href="https://seaborn.pydata.org/install
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">]))]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">valid_df</span><span class="p">[</span><span class="s2">&quot;avg_blue&quot;</span><span class="p">]))]()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FileCell(fn=&lt;meerkat.columns.deferred.file.FileLoader object at 0x7f7afa7e5ee0&gt;)
-</pre></div>
-</div>
+<img alt="../../_images/1223cfe44b712414ed64f7c2d0b1baac3d7a24b4612abec4dbbec812507bb9ca.png" src="../../_images/1223cfe44b712414ed64f7c2d0b1baac3d7a24b4612abec4dbbec812507bb9ca.png" />
 </div>
 </div>
 </section>
@@ -2382,15 +2380,7 @@ We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inferen
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchvision.models</span> <span class="kn">import</span> <span class="n">resnet18</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter &#39;pretrained&#39; is deprecated since 0.13 and may be removed in the future, please use &#39;weights&#39; instead.
-  warnings.warn(
-/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for &#39;weights&#39; are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
-  warnings.warn(msg)
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet18</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;ResNet18_Weights.IMAGENET1K_V1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
