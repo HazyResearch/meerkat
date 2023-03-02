@@ -125,8 +125,8 @@ print(
 
 page = Page(
     # Layout the Interface components one row each, and launch the page.
-    component=html.flexcol(
-        slots=[
+    html.flexcol(
+        [
             # fileupload_component,
             Header("GPT-Index Demo"),
             Subheader("Directory Path"),
