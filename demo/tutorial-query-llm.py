@@ -1,8 +1,7 @@
-"""
-Query a large language model (LLM) with a question and get an answer.
+"""Query a large language model (LLM) with a question and get an answer.
 
-This is a tutorial on creating an `endpoint` in Meerkat that 
-responds to a button click.
+This is a tutorial on creating an `endpoint` in Meerkat that responds to
+a button click.
 """
 import os
 

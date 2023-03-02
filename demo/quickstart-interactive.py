@@ -28,12 +28,15 @@ button = mk.gui.Button(
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.div([
-        input_slider, 
-        coef_slider, 
-        button, 
-        mk.gui.Text(result),
-    ], classes="flex flex-col gap-4 items-center"),
+    component=mk.gui.html.div(
+        [
+            input_slider,
+            coef_slider,
+            button,
+            mk.gui.Text(result),
+        ],
+        classes="flex flex-col gap-4 items-center",
+    ),
     id="quickstart",
 )
 page.launch()
