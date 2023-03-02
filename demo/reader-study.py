@@ -23,7 +23,6 @@ def on_label(index, df: mk.DataFrame):
     """Add a label to the dataframe."""
     df["label"][row] = index
     row.set(row + 1)
-    print("Dataframe", df["label"][: row.value].data)
 
 
 @endpoint()
