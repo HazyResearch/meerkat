@@ -1,56 +1,11 @@
 <script lang="ts">
 	import { base } from "$app/paths";
 	import Card from "./Card.svelte";
-	import Prism from "prismjs";
 
 	let words = ["Images", "Audio", "Web Pages", "PDFs", "Tensors"];
 	let word_idx = 0;
 
-	const df_code = `import meerkat as mk 
-
-df = mk.from_csv("paintings.csv")
-df["img"] = mk.files("img_path")
-df["embedding"] = mk.embed(
-	df["img"], 
-	engine="clip"
-)`;
-	const df_code_html = Prism.highlight(df_code, Prism.languages.js, "python");
-
-	const interact_code = `search = mk.gui.Search(df, 
-	against="embedding", engine="clip"
-)
-sorted_df = mk.sort(df, 
-	by=search.criterion.name, 
-	ascending=False
-)
-gallery = mk.gui.Gallery(sorted_df)
-mk.gui.html.div([search, gallery]")
-`;
-	const interact_code_html = Prism.highlight(
-		interact_code,
-		Prism.languages.js,
-		"python"
-	);
 </script>
-
-<!-- <link
-	rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
-	crossorigin="anonymous"
-/>
-
-<script:head
-	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"
-/>
-<script:head
-	src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"
-/>-->
-<svelte:head>
-	<link
-		rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"
-	/>
-</svelte:head>
 
 <!-- Top Content Part, should remain below the navbar -->
 <section
@@ -71,12 +26,17 @@ mk.gui.html.div([search, gallery]")
 				</h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">
 					Meerkat is an open-source Python library, designed to help
-					technical teams interactively wrangle images, videos,
-					text documents and more with foundation models.
+					technical teams interactively wrangle images, videos, text
+					documents and more with foundation models.
 				</p>
 				<p class="mt-4 text-gray-600 dark:text-gray-400 md:mb-8">
-					Our goal is to make foundation models a more reliable software abstraction for processing unstructured datasets. 
-					<a href="{base}/blog"><span class="text-violet-600" >Read our blogpost to learn more.</span></a>
+					Our goal is to make foundation models a more reliable
+					software abstraction for processing unstructured datasets.
+					<a href="{base}/blog"
+						><span class="text-violet-600"
+							>Read our blogpost to learn more.</span
+						></a
+					>
 				</p>
 			</div>
 			<div class="flex flex-col md:m-10 p-8 self-icenter w-full">
@@ -110,7 +70,8 @@ mk.gui.html.div([search, gallery]")
 				</div>
 				<div class="font-rubik text-slate-600">
 					Meerkat is a research project, so users should expect rapid
-					updates and rough edges. The current API is subject to change.
+					updates and rough edges. The current API is subject to
+					change.
 				</div>
 			</div>
 		</div>
@@ -118,7 +79,9 @@ mk.gui.html.div([search, gallery]")
 </section>
 
 <section class="font-rubik  dark:bg-gray-900 bg-gradient-to-bl border-b">
-	<div class="container lg:grid lg:grid-cols-2 flex flex-col px-6 mx-auto  pt-16 gap-10 pb-10">
+	<div
+		class="container lg:grid lg:grid-cols-2 flex flex-col px-6 mx-auto  pt-16 gap-10 pb-10"
+	>
 		<div class="grid grid-rows-[auto_auto_1fr]">
 			<div class="text-2xl font-bold text-gray-800 md:text-4xl pb-3">
 				<span>Data Frames for</span>
@@ -134,7 +97,9 @@ mk.gui.html.div([search, gallery]")
 				</span>
 			</div>
 
-			<div class="lg:grid lg:grid-cols-2 flex flex-col items-center gap-4 pb-6">
+			<div
+				class="lg:grid lg:grid-cols-2 flex flex-col items-center gap-4 pb-6"
+			>
 				<div>
 					<span class="font-bold"
 						>A Meerkat <span class="font-mono text-violet-600"
@@ -145,10 +110,10 @@ mk.gui.html.div([search, gallery]")
 					<ul class="pl-3 flex-col gap-1 flex pt-2">
 						<li class="text-sm">
 							Structured fields (<span class="italic">e.g.</span>
-							numbers and dates) live alongside unstructured
-							objects (<span class="italic">e.g.</span> images),
-							and their tensor representations (<span
-								class="italic">e.g.</span
+							numbers and dates) live alongside unstructured objects
+							(<span class="italic">e.g.</span> images), and their
+							tensor representations (<span class="italic"
+								>e.g.</span
 							> embeddings).
 						</li>
 						<li class="text-sm">
@@ -159,14 +124,36 @@ mk.gui.html.div([search, gallery]")
 						</li>
 					</ul>
 				</div>
-				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
+				<div
+					class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll text-slate-200"
+				>
 					<pre><code class="language-python"
-							>{@html df_code_html}</code
+							>import <span class="text-violet-400">meerkat</span
+							> as <span class="text-violet-400">mk</span> 
+
+<span class="text-pink-400">df</span> = <span class="text-violet-400">mk</span
+							>.from_csv(<span class="text-yellow-400"
+								>"paintings.csv"</span
+							>)
+<span class="text-pink-400">df</span>[<span class="text-yellow-400">"img"</span
+							>] = <span class="text-violet-400">mk</span
+							>.files(<span class="text-yellow-400"
+								>"img_path"</span
+							>)
+<span class="text-pink-400">df</span>[<span class="text-yellow-400"
+								>"embedding"</span
+							>] = <span class="text-violet-400">mk</span>.embed(
+	<span class="text-pink-400">df</span>[<span class="text-yellow-400">"img"</span
+							>], 
+	engine=<span class="text-yellow-400">"clip"</span>
+)</code
 						></pre>
 				</div>
 			</div>
 
-			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[600px] self-center">
+			<div
+				class="rounded-lg w-fit shadow-lg border p-2 max-w-[600px] self-center"
+			>
 				<img src={base + "dataframe-demo.gif"} />
 			</div>
 		</div>
@@ -183,29 +170,49 @@ mk.gui.html.div([search, gallery]")
 					>
 				</div>
 			</div>
-			<div class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center">
+			<div
+				class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center"
+			>
 				<div>
 					<div>
 						<span class="font-bold">
-							Interactive data frame visualizations that allow you to control foundation models as they process your data.
+							Interactive data frame visualizations that allow you
+							to control foundation models as they process your
+							data.
 						</span>
 						<ul class="pl-3 flex-col gap-1 flex pt-2">
 							<li class="text-sm">
-								Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
+								Meerkat visualizations are implemented in
+								Python, so they can be composed and customized
+								in notebooks or data scripts.
 							</li>
 							<li class="text-sm">
-								Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
+								Labeling is critical for instructing and
+								validating foundation models. Labeling GUIs are
+								a priority in Meerkat.
 							</li>
 						</ul>
 					</div>
 				</div>
-				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll">
-					<pre><code class="language-python"
-							>{@html interact_code_html}</code
-						></pre>
+				<div
+					class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll text-slate-100"
+				>
+				<pre><code class="language-python"><span class="text-pink-400">match</span> = <span class="text-violet-400">mk</span>.gui.Match(<span class="text-pink-400">df</span>, 
+	against=<span class="text-yellow-400">"embedding"</span>, 
+	engine=<span class="text-yellow-400">"clip"</span>
+)
+<span class="text-pink-400">sorted_df</span> = <span class="text-violet-400">mk</span>.sort(<span class="text-pink-400">df</span>, 
+	by=<span class="text-pink-400">match</span>.criterion.name, 
+	ascending=<span class="text-orange-400">False</span>
+)
+<span class="text-pink-400">gallery</span> = <span class="text-violet-400">mk</span>.gui.Gallery(<span class="text-pink-400">sorted_df</span>)
+<span class="text-violet-400">mk</span>.gui.html.div([<span class="text-pink-400">match</span>, <span class="text-pink-400">gallery</span>])</code
+></pre>
 				</div>
 			</div>
-			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[650px] self-end self-justify-end">
+			<div
+				class="rounded-lg w-fit shadow-lg border p-2 max-w-[650px] self-end self-justify-end"
+			>
 				<img src={base + "interact-demo.gif"} />
 			</div>
 		</div>
@@ -352,7 +359,6 @@ mk.gui.html.div([search, gallery]")
 					</a>
 				</div>
 
-				
 				<div
 					class="h-16 -mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
 				>
@@ -385,7 +391,6 @@ mk.gui.html.div([search, gallery]")
 	class="font-rubik dark:bg-gray-900 bg-gradient-to-br  border-b "
 > -->
 	<div class="container px-6 py-16 mx-auto md:py-8 h-full">
-		
 		<div class="mb-8 flex flex-col items-center h-full">
 			<h1 class="text-3xl text-gray-800 dark:text-white">
 				...with the support of
@@ -393,7 +398,7 @@ mk.gui.html.div([search, gallery]")
 			<div
 				class="flex flex-wrap justify-center mt-6 p-4  border shadow-sm rounded-lg bg-slate-50 gap-2 h-full"
 			>
-			<div
+				<div
 					class="h-16 mx-1  text-gray-800 dark:text-gray-400 dark:bg-gray-800"
 				>
 					<a href="https://crfm.stanford.edu/">
