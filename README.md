@@ -13,6 +13,7 @@ Meerkat is a open-source Python library designed for technical teams that want t
 | [**Quickstart**](http://meerkat.wiki/docs/start/quickstart-df.html)
 | [**Docs**](http://meerkat.wiki/docs/index.html)
 | [**Contributing**](CONTRIBUTING.md)
+| [**Discord**](https://discord.gg/pw8E4Q26Tq)
 | [**Blogpost**](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
 
 </div>
