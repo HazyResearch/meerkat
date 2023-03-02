@@ -1,4 +1,9 @@
-"""Write a question answering interface."""
+"""
+Query a large language model (LLM) with a question and get an answer.
+
+This is a tutorial on creating an `endpoint` in Meerkat that 
+responds to a button click.
+"""
 import os
 
 from manifest import Manifest
@@ -22,12 +27,15 @@ def get_answer(answer: mk.Store, question: str):
 
 answer = mk.Store("")
 button = mk.gui.Button(
-    title="Ask an LLM",
+    title="Ask an LLM 🗣️",
     on_click=get_answer.partial(answer=answer, question=textbox.text),
 )
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol([textbox, button, mk.gui.Markdown(answer)]),
+    mk.gui.html.div(
+        [textbox, button, mk.gui.Markdown(answer)],
+        classes="flex flex-col m-3 items-center gap-1",
+    ),
     id="query-llm",
 )
 page.launch()
