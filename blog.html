@@ -18,7 +18,7 @@
 		<link href="./_app/immutable/assets/Content-4e2c0d97.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Website-f0c41ff0.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/start-0d5179d3.js">
+		<link rel="modulepreload" href="./_app/immutable/start-25b18c2b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-7605b856.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-a50d324f.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-44203cbd.js">
@@ -26,7 +26,7 @@
 		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-24d86774.js">
 		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-7fe5710e.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-36b6aae2.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-a5ee01cc.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Website.svelte_svelte_type_style_lang-60d8fba5.js">
 	</head>
@@ -64,7 +64,7 @@
 <p>As unstructured data permeates the work of technical teams, it’s critical that they have the right toolbox for wrangling it. For structured data, teams swear by data frames, like those provided by Pandas and R. Back in 2021, <a href="https://www.notion.so/64891aca2c584f1889eb0129bb747863">we started wondering</a>: <em>why doesn’t something similar exist for unstructured data?</em></p>
 <p>One reason is that the reliable software abstractions (<em>e.g.</em> NumPy) that power traditional DataFrame operations fall flat when applied to unstructured data. A filter over a structured column (<em>e.g.</em> <code>df[df[”age”] &gt; 18]</code>) can be implemented with one line of NumPy code, but there is no simple abstraction that could implement a semantic  filter over unstructured data (<em>e.g.</em> <code>df[df[”image”].contains(”person”)]</code>).</p>
 <p>What if we viewed foundation models as a software abstraction that processes unstructured data? Much like NumPy is to Pandas, this software abstraction would power a data frame for unstructured data.</p>
-<p><strong>The problem?</strong> FMs are a terrible software abstraction, and we’re not the first to notice this (<a href="https://crfm.stanford.edu/2022/11/17/helm.html">Bommasani et al.</a>, <a href="https://www.vldb.org/pvldb/vol16/p738-narayan.pdf">Narayan et al.</a>). FMs are hard to control (e.g. brittle to prompt wording <a href="https://arxiv.org/abs/2210.02441">[Arora, et al.]</a>), often produce undesired outputs (e.g. hallucinate knowledge, perpetuate social biases), and require careful evaluation. The process of using a traditional software abstraction (<em>i.e.</em> reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.</p>
+<p><strong>The problem?</strong> FMs are a terrible software abstraction, and we’re not the first to notice this (<a href="https://crfm.stanford.edu/2022/11/17/helm.html">Bommasani et al.</a>, <a href="https://www.vldb.org/pvldb/vol16/p738-narayan.pdf">Narayan et al.</a>). FMs are hard to control (e.g. brittle to prompt wording (<a href="https://arxiv.org/abs/2210.02441">Arora, et al.</a>), often produce undesired outputs (e.g. hallucinate knowledge, perpetuate social biases), and require careful evaluation. The process of using a traditional software abstraction (<em>i.e.</em> reading the documentation and writing code) is very different than the process of using FMs, which lack the predictability of a good software abstraction.</p>
 <p>People have found success using FMs by carefully instructing and testing them. But this process is miserable when done in code alone:</p>
 <ul>
 <li>Say we’re trying to filter a dataset of paintings based on artistic style. A vision-language FM can produce scores to filter on, but how do we verify that the FM is correct if we can’t see and label the images?</li>
@@ -113,7 +113,7 @@ Critically, Meerkat GUIs are remarkably composable — users can build custom da
 <h2 id="conclusion">Conclusion</h2>
 <p>Meerkat is new Python library that makes it easier to work with unstructured data and foundation models by bringing them into close proximity via interactive data frames.
 We’re excited to see what the community can do with Meerkat. <a href="https://discord.gg/pw8E4Q26Tq">Join our Discord</a> if you want to talk to us, use Meerkat or build on top of it, and definitely give Meerkat a try!</p>
-<h2 id="acknowledgements">Acknowledgements</h2>
+<h2 id="acknowledgments">Acknowledgments</h2>
 <p>Thanks to all the readers who provided feedback on this post and this release: Dean Stratakos, Geoff Angus, Shreya Rajpal, Dan Fu, Brandon Yang, Neel Guha, Sarah Hooper, Simran Arora, Mayee Chen, Michael Zhang, Khaled Saab, Kabir Goel, Gordon Downs, Joel Johnson and Zachary Marion.</p>
 <!-- HTML_TAG_END --></div></div></main>
 	<footer class="sticky bottom-0 z-50">
@@ -124,14 +124,14 @@ We’re excited to see what the community can do with Meerkat. <a href="https://
 			</span></a></div></div></footer></div>
 
 
-		<script type="module" data-sveltekit-hydrate="1rhv3eb">
-			import { start } from "./_app/immutable/start-0d5179d3.js";
+		<script type="module" data-sveltekit-hydrate="1xyfth9">
+			import { start } from "./_app/immutable/start-25b18c2b.js";
 
 			start({
 				env: {},
 				paths: {"assets":"","base":""},
-				target: document.querySelector('[data-sveltekit-hydrate="1rhv3eb"]').parentNode,
-				version: "1677761439006",
+				target: document.querySelector('[data-sveltekit-hydrate="1xyfth9"]').parentNode,
+				version: "1677763120774",
 				hydrate: {
 					node_ids: [0, 3],
 					data: [null,null],
