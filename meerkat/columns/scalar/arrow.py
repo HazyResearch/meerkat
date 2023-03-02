@@ -203,9 +203,7 @@ class ArrowScalarColumn(ScalarColumn):
         try:
             return len(self.unique()) == len(self)
         except Exception as e:
-            warnings.warn(
-                f"Unable to check if column is a valid primary key: {e}"
-            )
+            warnings.warn(f"Unable to check if column is a valid primary key: {e}")
             return False
 
     def _keyidx_to_posidx(self, keyidx: Any) -> int:

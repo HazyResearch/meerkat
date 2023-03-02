@@ -1,7 +1,5 @@
-"""
-Display a data frame in an interactive table 
-and gallery in a tabbed view.
-"""
+"""Display a data frame in an interactive table and gallery in a tabbed
+view."""
 import meerkat as mk
 
 # Load in the imagenette dataset
@@ -16,7 +14,7 @@ tabs = mk.gui.Tabs(tabs={"Table": table, "Gallery": gallery})
 
 # Show the page!
 page = mk.gui.Page(
-    mk.gui.html.flexcol([tabs], classes="h-full"), 
+    mk.gui.html.flexcol([tabs], classes="h-full"),
     id="display",
 )
 page.launch()

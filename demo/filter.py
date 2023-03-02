@@ -1,6 +1,4 @@
-"""
-Filter an image dataset in a gallery.
-"""
+"""Filter an image dataset in a gallery."""
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")

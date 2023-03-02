@@ -1,6 +1,4 @@
-"""
-Multiple galleries in tabs, with independent sorting.
-"""
+"""Multiple galleries in tabs, with independent sorting."""
 import meerkat as mk
 
 df1 = mk.get("imagenette", version="160px")
