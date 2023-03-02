@@ -9,4 +9,5 @@ global-exclude *.DS_Store
 graft meerkat/interactive/app/build
 graft meerkat/interactive/templates
 recursive-include meerkat/interactive/app/src/lib/component *.svelte
+recursive-include meerkat/interactive/app/src/lib/shared *.svelte
 include demo/*.py
