@@ -7,9 +7,7 @@
 
 ![GitHub Workflow Status](
 https://github.com/HazyResearch/meerkat/actions/workflows/.github/workflows/ci.yml/badge.svg)
-
-![GitHub](https://img.shields.io/github/license/robustness-gym/meerkat)
-[![Documentation Status](https://readthedocs.org/projects/meerkat/badge/?version=latest)](https://meerkat.readthedocs.io/en/latest/?badge=latest)
+[![GitHub](https://img.shields.io/github/license/HazyResearch/meerkat)](https://img.shields.io/github/license/HazyResearch/meerkat)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
@@ -63,12 +61,14 @@ Check out our [Getting Started page](https://meerkat.readthedocs.io/en/dev/guide
 Meerkat’s approach is based on two pillars:
 
 **(1) Heterogeneous data frames with extended API.** At the heart of Meerkat is a data frame that can store structured fields (e.g. numbers, strings, and dates) alongside complex objects (e.g. images, web pages, audio) and their tensor representations (e.g. embeddings, logits) in a single table. Meerkat's data frame API goes beyond structured data analysis libraries like Pandas by providing a set of FM-backed unstructured data operations.
-<img src="website/static/dataframe-demo.gif" height=100 alt="Meerkat logo"/>
+
+<img src="website/static/dataframe-demo.gif" height=400 alt="Meerkat logo"/>
 
 **(2) Interactivity in Python.** Meerkat provides interactive data frame visualizations that allow you to control foundation models as they process your data.
 Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
 Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
-<img src="website/static/interact-demo.gif" height=100 alt="Meerkat logo"/>
+
+<img src="website/static/interact-demo.gif" height=400 alt="Meerkat logo"/>
 
 ## ✉️ About
 Meerkat is being developed at Stanford's Hazy Research Lab. Please reach out to `kgoel [at] cs [dot] stanford [dot] edu, eyuboglu [at] stanford [dot] edu, and arjundd [at] stanford [dot] edu` if you would like to use Meerkat for a project, at your company or if you have any questions.
