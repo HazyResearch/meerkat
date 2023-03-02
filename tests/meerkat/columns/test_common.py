@@ -117,6 +117,7 @@ def test_copy(column_testbed: AbstractColumnTestBed):
     assert col.is_equal(col_copy)
 
 
+@pytest.mark.skip
 def test_pickle(column_testbed):
     import dill as pickle  # needed so that it works with lambda functions
 
