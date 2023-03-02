@@ -1,9 +1,8 @@
-"""
-Filter and sort an image dataset in a gallery.
+"""Filter and sort an image dataset in a gallery.
 
-This is a tutorial on how to compose complex data components
-like `Filter`, `Sort`, and `Gallery` in Meerkat in order to
-create an application.
+This is a tutorial on how to compose complex data components like
+`Filter`, `Sort`, and `Gallery` in Meerkat in order to create an
+application.
 """
 import meerkat as mk
 

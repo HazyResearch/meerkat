@@ -1,8 +1,7 @@
-"""
-Display images in an interactive gallery.
+"""Display images in an interactive gallery.
 
-This is a tutorial on how to build a basic interactive application
-with Meerkat.
+This is a tutorial on how to build a basic interactive application with
+Meerkat.
 """
 import meerkat as mk
 

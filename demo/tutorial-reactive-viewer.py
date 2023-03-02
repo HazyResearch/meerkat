@@ -1,9 +1,8 @@
-"""
-A reactive image viewer that allows you to select a class
-and see 16 random images from that class.
+"""A reactive image viewer that allows you to select a class and see 16 random
+images from that class.
 
-This is a tutorial on how to use `reactive` functions in Meerkat,
-to build complex reactive workflows.
+This is a tutorial on how to use `reactive` functions in Meerkat, to
+build complex reactive workflows.
 """
 
 import meerkat as mk
@@ -28,7 +27,7 @@ class_selector = mk.gui.Select(
 )
 
 # Note that neither of these will work:
-# filtered_df = df[df[LABEL_COL] == class_selector.value] 
+# filtered_df = df[df[LABEL_COL] == class_selector.value]
 #       (doesn't react to changes in class_selector.value)
 # filtered_df = mk.reactive(lambda df: df[df[LABEL_COL] == class_selector.value])(df)
 #       (doesn't react to changes in class_selector.value)
@@ -61,7 +60,7 @@ layout = mk.gui.html.div(
             classes="flex justify-center items-center mb-2 gap-2",
         ),
         grid,
-    ], 
+    ],
     classes="h-full flex flex-col m-2",
 )
 
