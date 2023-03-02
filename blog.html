@@ -14,21 +14,20 @@
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
-		<link href="./_app/immutable/assets/_layout-45d30847.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_layout-63267524.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Content-4e2c0d97.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/Website-f0c41ff0.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/start-8397a076.js">
+		<link rel="modulepreload" href="./_app/immutable/start-65807a9c.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-d0966100.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-fc9f5dc2.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index-37bc12fd.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/shared-23917130.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-49c0a04e.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-20015c2f.js">
 		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-ad7a7272.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/blog/_page.svelte-87ddc5f0.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-026e7ad2.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/Website.svelte_svelte_type_style_lang-b368b6ff.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/marked.esm-75dc6516.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
@@ -48,7 +47,7 @@
 			</span></a></li>
 		<li><a href="/docs/index.html" class="block py-2 pr-4 pl-3 md:p-0 rounded md:border-0 text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"><span class="text-violet-500 hover:text-violet-800">Documentation
 			</span></a></li></ul></div></div></nav></header>
-	<main class="relative grow"><div class="w-full flex flex-col items-center flex-wrap mt-28 mb-16"><div class="prose "><!-- HTML_TAG_START --><h1 id="interactive-data-frames-and-meerkat-a-path-to-foundation-models-as-a-reliable-software-abstraction">Interactive Data Frames and Meerkat: A Path to Foundation Models as a Reliable Software Abstraction</h1>
+	<main class="relative grow"><div class="w-full flex flex-col items-center flex-wrap mt-28 mb-16"><div class="prose"><!-- HTML_TAG_START --><h1 id="interactive-data-frames-and-meerkat-a-path-to-foundation-models-as-a-reliable-software-abstraction">Interactive Data Frames and Meerkat: A Path to Foundation Models as a Reliable Software Abstraction</h1>
 <p><em>The Meerkat Team</em></p>
 <h2 id="the-rise-of-unstructured-data">The Rise of Unstructured Data</h2>
 <p>Recent progress in machine learning shows that <a href="https://crfm.stanford.edu/assets/report.pdf">foundation models</a>—large machine learning models trained on massive amounts of data—can perform a remarkably wide range of tasks with reasonable proficiency. These models can even be taught to perform entirely new tasks through <em>in-context learning</em> with a small number of examples, e.g. using text prompts with a large language model. Foundation models range from text-only models like <a href="https://arxiv.org/pdf/2005.14165.pdf">GPT-3</a>, to multi-modal models that involve training on images, text, audio and video data e.g. vision-language models like <a href="https://openai.com/research/clip">CLIP</a>.</p>
@@ -99,17 +98,17 @@ Critically, Meerkat GUIs are remarkably composable — users can build custom da
 <p>Identifying patterns in image data is challenging without visualization and interactivity. Here’s a demo where Meerkat makes the analysis of art data possible in a notebook alone.</p>
 <!-- HTML_TAG_END --></div>
   <iframe class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/a8FBT33QACQ" allowfullscreen="allowfullscreen"></iframe>
-  <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat on a dataset of art images in a Jupyter notebook. We spin up interactive interfaces powered by vision-language FMs to explore this data, and create an on-the-fly interface in Python that combines data exploration and plotting.</em></p>
+  <div class="prose"><!-- HTML_TAG_START --><p><em>A demo of Meerkat on a dataset of art images in a Jupyter notebook. We spin up interactive interfaces powered by vision-language FMs to explore this data, and create an on-the-fly interface in Python that combines data exploration and plotting.</em></p>
 <h3 id="demo-2-software-engineering-using-spreadsheet-style-flash-fill-to-analyze-pdfs">Demo 2 (Software Engineering): Using Spreadsheet-Style Flash Fill to Analyze PDFs</h3>
 <p>Software teams that want to build products around unstructured data will need to program and control these models, as well as evaluate and check if they work correctly on internal validation data. Here’s a demo where Meerkat simplifies this process by mixing code and user interaction.</p>
 <!-- HTML_TAG_END --></div>
   <iframe class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/3ItA70qoe-o" allowfullscreen="allowfullscreen"></iframe>
-  <div class="prose "><!-- HTML_TAG_START --><p><em>A demo of Meerkat where we take on the role of a software engineer working on a bibliography manager. We analyze a dataset of scientific papers, using the flash fill component to fill in missing metadata. This component was built using the Meerkat framework in &lt; 300 lines of pure Python code.</em></p>
+  <div class="prose"><!-- HTML_TAG_START --><p><em>A demo of Meerkat where we take on the role of a software engineer working on a bibliography manager. We analyze a dataset of scientific papers, using the flash fill component to fill in missing metadata. This component was built using the Meerkat framework in &lt; 300 lines of pure Python code.</em></p>
 <h3 id="demo-3-machine-learning-interactive-error-analysis-of-an-image-classifier">Demo 3 (Machine Learning): Interactive Error Analysis of an Image Classifier</h3>
 <p>Machine learning teams routinely perform error analyses when building models, but often struggle to extract nuanced information about the errors. Here’s a demo that shows how Meerkat can be used to perform fine-grained error analyses. (Meerkat is already being used by this community, and we’re continuing to support this set of users as a finalist of the Stanford HAI AI Audit challenge.)</p>
 <!-- HTML_TAG_END --></div>
   <iframe class="mt-4 aspect-video md:w-[512px] md:h-[280px] sm:w-[256px] sm:h-[140px]" src="https://youtube.com/embed/4Kk_LZbNWNs" allowfullscreen="allowfullscreen"></iframe>
-  <div class="prose "><!-- HTML_TAG_START --><p><em>A standalone Meerkat application for fine-grained error analysis of image classification models. Combining traditional dataframe and new FM-powered components can help us get a deeper understanding of the errors made by an image classifier.</em></p>
+  <div class="prose"><!-- HTML_TAG_START --><p><em>A standalone Meerkat application for fine-grained error analysis of image classification models. Combining traditional dataframe and new FM-powered components can help us get a deeper understanding of the errors made by an image classifier.</em></p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Meerkat is new Python library that makes it easier to work with unstructured data and foundation models by bringing them into close proximity via interactive data frames.
 We’re excited to see what the community can do with Meerkat. <a href="https://discord.gg/pw8E4Q26Tq">Join our Discord</a> if you want to talk to us, use Meerkat or build on top of it, and definitely give Meerkat a try!</p>
@@ -124,14 +123,14 @@ We’re excited to see what the community can do with Meerkat. <a href="https://
 			</span></a></div></div></footer></div>
 
 
-		<script type="module" data-sveltekit-hydrate="1xyfth9">
-			import { start } from "./_app/immutable/start-8397a076.js";
+		<script type="module" data-sveltekit-hydrate="n9lful">
+			import { start } from "./_app/immutable/start-65807a9c.js";
 
 			start({
 				env: {},
 				paths: {"assets":"","base":""},
-				target: document.querySelector('[data-sveltekit-hydrate="1xyfth9"]').parentNode,
-				version: "1677781358836",
+				target: document.querySelector('[data-sveltekit-hydrate="n9lful"]').parentNode,
+				version: "1677783053133",
 				hydrate: {
 					node_ids: [0, 3],
 					data: [null,null],
