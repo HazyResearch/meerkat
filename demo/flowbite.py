@@ -1,3 +1,6 @@
+"""
+An assortment of Flowbite components.
+"""
 import meerkat as mk
 from meerkat.interactive import flowbite as fb
 from meerkat.interactive import html as html
@@ -279,10 +282,9 @@ toast = fb.Toast(
 
 heading = html.h1(slots="Flowbite Demo", classes="text-4xl")
 
-mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(
-        slots=[heading, card, accordion, alert, avatar, carousel, toast]
+    mk.gui.html.flexcol(
+        [heading, card, accordion, alert, avatar, carousel, toast]
     ),
     id="flowbite",
 )

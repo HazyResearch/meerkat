@@ -1,3 +1,6 @@
+"""
+Filter an image dataset in a gallery.
+"""
 import meerkat as mk
 
 df = mk.get("imagenette", version="160px")
@@ -5,14 +8,10 @@ df = mk.get("imagenette", version="160px")
 filter = mk.gui.Filter(df)
 df = filter(df)
 
-# Gallery
-gallery = mk.gui.Gallery(
-    df=df,
-    main_column="img",
-)
+gallery = mk.gui.Gallery(df, main_column="img")
 
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(slots=[filter, gallery]),
+    mk.gui.html.flexcol([filter, gallery]),
     id="filter",
 )
 page.launch()
