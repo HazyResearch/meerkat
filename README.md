@@ -47,20 +47,15 @@ Check out our [Getting Started page](https://meerkat.readthedocs.io/en/dev/guide
 
 ## Why Meerkat?
 
-<p class="mt-4 text-gray-600 dark:text-gray-400">
-    Meerkat is an open-source Python library, designed to help
-    technical teams interactively wrangle images, videos, text
-    documents and more with foundation models.
-</p>
-<p class="mt-4 text-gray-600 dark:text-gray-400 md:mb-8">
-    Our goal is to make foundation models a more reliable
-    software abstraction for processing unstructured datasets.
-    <a href="{base}/blog"
-        ><span class="text-violet-600"
-            >Read our blogpost to learn more.</span
-        ></a
-    >
-</p>
+Meerkat is an open-source Python library, designed to help
+technical teams interactively wrangle images, videos, text
+documents and more with foundation models.
+
+Our goal is to make foundation models a more reliable
+software abstraction for processing unstructured datasets.
+[Read our blogpost to learn more.](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
+
+
 
 Meerkat’s approach is based on two pillars:
 
