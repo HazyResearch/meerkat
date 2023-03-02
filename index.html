@@ -14,19 +14,19 @@
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
-		<link href="./_app/immutable/assets/_layout-86b96a58.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_layout-45d30847.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Content-4e2c0d97.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Footer-1d121e74.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/start-0a4de1af.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index-7605b856.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-a50d324f.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index-44203cbd.js">
+		<link rel="modulepreload" href="./_app/immutable/start-8397a076.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-d0966100.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons-fc9f5dc2.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index-37bc12fd.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/shared-23917130.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-24d86774.js">
+		<link rel="modulepreload" href="./_app/immutable/components/pages/_layout.svelte-49c0a04e.js">
 		<link rel="modulepreload" href="./_app/immutable/modules/pages/_layout.js-9cbb603b.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/_layout-da46b06b.js">
-		<link rel="modulepreload" href="./_app/immutable/components/pages/_page.svelte-cd81b4f4.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-a5ee01cc.js"><!-- HEAD_svelte-11anx9s_START --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css"><!-- HEAD_svelte-11anx9s_END -->
+		<link rel="modulepreload" href="./_app/immutable/components/pages/_page.svelte-0569991a.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Footer-026e7ad2.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
@@ -47,16 +47,14 @@
 		<li><a href="/docs/index.html" class="block py-2 pr-4 pl-3 md:p-0 rounded md:border-0 text-gray-700 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"><span class="text-violet-500 hover:text-violet-800">Documentation
 			</span></a></li></ul></div></div></nav></header>
 	<main class="relative grow">
-
-
-
 <section class="font-rubik bg-white dark:bg-gray-900 bg-gradient-to-br border-b "><div class="container px-6 mx-auto sm:pt-8 pt-32"><div class="md:grid md:grid-cols-[2fr_3fr] items-center flex flex-col justify-between gap-14"><div class="max-w-xl mb-8 md:mb-0"><h1 class="text-3xl font-bold text-gray-800 md:text-5xl dark:text-white">Unstructured Datasets meet
 					<span class="italic text-violet-600">Foundation Models.</span></h1>
 				<p class="mt-4 text-gray-600 dark:text-gray-400">Meerkat is an open-source Python library, designed to help
-					technical teams interactively wrangle images, videos,
-					text documents and more with foundation models.
+					technical teams interactively wrangle images, videos, text
+					documents and more with foundation models.
 				</p>
-				<p class="mt-4 text-gray-600 dark:text-gray-400 md:mb-8">Our goal is to make foundation models a more reliable software abstraction for processing unstructured datasets. 
+				<p class="mt-4 text-gray-600 dark:text-gray-400 md:mb-8">Our goal is to make foundation models a more reliable
+					software abstraction for processing unstructured datasets.
 					<a href="/blog"><span class="text-violet-600">Read our blogpost to learn more.</span></a></p></div>
 			<div class="flex flex-col md:m-10 p-8 self-icenter w-full"><iframe src="https://youtube.com/embed/3ItA70qoe-o?modestbranding=1" allowfullscreen="allowfullscreen" class="aspect-video rounded-md shadow-lg"></iframe></div>
 			</div></div></section>
@@ -68,7 +66,8 @@
 			<div class="bg-slate-50 border border-orange-400 flex rounded-lg max-w-lg px-4 py-1 shadow-sm gap-2"><div class="font-rubik text-orange-700 font-bold italic">Notice
 				</div>
 				<div class="font-rubik text-slate-600">Meerkat is a research project, so users should expect rapid
-					updates and rough edges. The current API is subject to change.
+					updates and rough edges. The current API is subject to
+					change.
 				</div></div></div></div></section>
 
 <section class="font-rubik dark:bg-gray-900 bg-gradient-to-bl border-b"><div class="container lg:grid lg:grid-cols-2 flex flex-col px-6 mx-auto pt-16 gap-10 pb-10"><div class="grid grid-rows-[auto_auto_1fr]"><div class="text-2xl font-bold text-gray-800 md:text-4xl pb-3"><span>Data Frames for</span>
@@ -77,41 +76,47 @@
 			<div class="lg:grid lg:grid-cols-2 flex flex-col items-center gap-4 pb-6"><div><span class="font-bold">A Meerkat <span class="font-mono text-violet-600">DataFrame</span> is a heterogeneous data structure with an API backed by
 						foundation models.</span>
 					<ul class="pl-3 flex-col gap-1 flex pt-2"><li class="text-sm">Structured fields (<span class="italic">e.g.</span>
-							numbers and dates) live alongside unstructured
-							objects (<span class="italic">e.g.</span> images),
-							and their tensor representations (<span class="italic">e.g.</span> embeddings).
+							numbers and dates) live alongside unstructured objects
+							(<span class="italic">e.g.</span> images), and their
+							tensor representations (<span class="italic">e.g.</span> embeddings).
 						</li>
 						<li class="text-sm">Functions like <span class="font-mono text-violet-600">mk.embed</span> abstract away boiler-plate ML code, keeping the focus
 							on the data.
 						</li></ul></div>
-				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll"><pre><code class="language-python"><!-- HTML_TAG_START --><span class="token keyword">import</span> meerkat <span class="token keyword">as</span> mk 
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll text-slate-200"><pre><code class="language-python">import <span class="text-violet-400">meerkat</span> as <span class="text-violet-400">mk</span> 
 
-df <span class="token operator">=</span> mk<span class="token punctuation">.</span><span class="token function">from_csv</span><span class="token punctuation">(</span><span class="token string">"paintings.csv"</span><span class="token punctuation">)</span>
-df<span class="token punctuation">[</span><span class="token string">"img"</span><span class="token punctuation">]</span> <span class="token operator">=</span> mk<span class="token punctuation">.</span><span class="token function">files</span><span class="token punctuation">(</span><span class="token string">"img_path"</span><span class="token punctuation">)</span>
-df<span class="token punctuation">[</span><span class="token string">"embedding"</span><span class="token punctuation">]</span> <span class="token operator">=</span> mk<span class="token punctuation">.</span><span class="token function">embed</span><span class="token punctuation">(</span>
-	df<span class="token punctuation">[</span><span class="token string">"img"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> 
-	engine<span class="token operator">=</span><span class="token string">"clip"</span>
-<span class="token punctuation">)</span><!-- HTML_TAG_END --></code></pre></div></div>
+<span class="text-pink-400">df</span> = <span class="text-violet-400">mk</span>.from_csv(<span class="text-yellow-400">&quot;paintings.csv&quot;</span>)
+<span class="text-pink-400">df</span>[<span class="text-yellow-400">&quot;img&quot;</span>] = <span class="text-violet-400">mk</span>.files(<span class="text-yellow-400">&quot;img_path&quot;</span>)
+<span class="text-pink-400">df</span>[<span class="text-yellow-400">&quot;embedding&quot;</span>] = <span class="text-violet-400">mk</span>.embed(
+	<span class="text-pink-400">df</span>[<span class="text-yellow-400">&quot;img&quot;</span>], 
+	engine=<span class="text-yellow-400">&quot;clip&quot;</span>
+)</code></pre></div></div>
 
 			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[600px] self-center"><img src="dataframe-demo.gif"></div></div>
 
 		<div class="grid grid-rows-[auto_auto_1fr]"><div class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1 pb-3"><div class="text-2xl font-bold text-gray-800 md:text-4xl flex gap-1">Interactivity in <span class="italic text-pink-500">Python</span></div></div>
-			<div class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center"><div><div><span class="font-bold">Interactive data frame visualizations that allow you to control foundation models as they process your data.
+			<div class="lg:grid lg:grid-cols-2 gap-4 pb-6 flex flex-col items-center"><div><div><span class="font-bold">Interactive data frame visualizations that allow you
+							to control foundation models as they process your
+							data.
 						</span>
-						<ul class="pl-3 flex-col gap-1 flex pt-2"><li class="text-sm">Meerkat visualizations are implemented in Python, so they can be composed and customized in notebooks or data scripts.
+						<ul class="pl-3 flex-col gap-1 flex pt-2"><li class="text-sm">Meerkat visualizations are implemented in
+								Python, so they can be composed and customized
+								in notebooks or data scripts.
 							</li>
-							<li class="text-sm">Labeling is critical for instructing and validating foundation models. Labeling GUIs are a priority in Meerkat.
+							<li class="text-sm">Labeling is critical for instructing and
+								validating foundation models. Labeling GUIs are
+								a priority in Meerkat.
 							</li></ul></div></div>
-				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll"><pre><code class="language-python"><!-- HTML_TAG_START -->search <span class="token operator">=</span> mk<span class="token punctuation">.</span>gui<span class="token punctuation">.</span><span class="token function">Search</span><span class="token punctuation">(</span>df<span class="token punctuation">,</span> 
-	against<span class="token operator">=</span><span class="token string">"embedding"</span><span class="token punctuation">,</span> engine<span class="token operator">=</span><span class="token string">"clip"</span>
-<span class="token punctuation">)</span>
-sorted_df <span class="token operator">=</span> mk<span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span>df<span class="token punctuation">,</span> 
-	by<span class="token operator">=</span>search<span class="token punctuation">.</span>criterion<span class="token punctuation">.</span>name<span class="token punctuation">,</span> 
-	ascending<span class="token operator">=</span>False
-<span class="token punctuation">)</span>
-gallery <span class="token operator">=</span> mk<span class="token punctuation">.</span>gui<span class="token punctuation">.</span><span class="token function">Gallery</span><span class="token punctuation">(</span>sorted_df<span class="token punctuation">)</span>
-mk<span class="token punctuation">.</span>gui<span class="token punctuation">.</span>html<span class="token punctuation">.</span><span class="token function">div</span><span class="token punctuation">(</span><span class="token punctuation">[</span>search<span class="token punctuation">,</span> gallery<span class="token punctuation">]</span>"<span class="token punctuation">)</span>
-<!-- HTML_TAG_END --></code></pre></div></div>
+				<div class="bg-slate-800 rounded-md px-4 py-3 w-fit text-sm w-full overflow-x-scroll text-slate-100"><pre><code class="language-python"><span class="text-pink-400">match</span> = <span class="text-violet-400">mk</span>.gui.Match(<span class="text-pink-400">df</span>, 
+	against=<span class="text-yellow-400">&quot;embedding&quot;</span>, 
+	engine=<span class="text-yellow-400">&quot;clip&quot;</span>
+)
+<span class="text-pink-400">sorted_df</span> = <span class="text-violet-400">mk</span>.sort(<span class="text-pink-400">df</span>, 
+	by=<span class="text-pink-400">match</span>.criterion.name, 
+	ascending=<span class="text-orange-400">False</span>
+)
+<span class="text-pink-400">gallery</span> = <span class="text-violet-400">mk</span>.gui.Gallery(<span class="text-pink-400">sorted_df</span>)
+<span class="text-violet-400">mk</span>.gui.html.div([<span class="text-pink-400">match</span>, <span class="text-pink-400">gallery</span>])</code></pre></div></div>
 			<div class="rounded-lg w-fit shadow-lg border p-2 max-w-[650px] self-end self-justify-end"><img src="interact-demo.gif"></div></div></div></section>
 
 
@@ -152,7 +157,6 @@ mk<span class="token punctuation">.</span>gui<span class="token punctuation">.</
 			<div class="flex flex-wrap justify-center mt-6 bg-slate-50 h-full rounded-lg border shadow-sm px-4 gap-0.5 py-3 items-center"><div class="h-16 mx-1 text-gray-800 dark:text-gray-400 dark:bg-gray-800"><a href="https://hazyresearch.github.io/" class="flex w-full h-4/5 hover:drop-shadow-sm"><img src="https://hazyresearch.stanford.edu/hazy-logo.png" alt="Hazy Research Logo" class="h-full rounded-md">
 						<span class="ml-2 text-2xl font-bold text-red-800 align-middle self-center lg:whitespace-nowrap">Hazy Research</span></a></div>
 
-				
 				<div class="h-16 -mx-1 text-gray-800 dark:text-gray-400 dark:bg-gray-800"><a href="https://www.james-zou.com/people" class="flex w-full h-full hover:drop-shadow-sm"><img src="https://identity.stanford.edu/wp-content/uploads/sites/3/2020/07/block-s-right.png" alt="Hazy Research Logo" class="h-full rounded-md">
 						<div class="ml-2 text-2xl font-mono text-red-800 align-middle self-center flex flex-col"><span class="text-sm">Biomedical</span>
 							<span class="text-sm">Data Science</span></div></a></div></div></div></div>
@@ -182,14 +186,14 @@ mk<span class="token punctuation">.</span>gui<span class="token punctuation">.</
 			</span></a></div></div></footer></div>
 
 
-		<script type="module" data-sveltekit-hydrate="1w7dfpc">
-			import { start } from "./_app/immutable/start-0a4de1af.js";
+		<script type="module" data-sveltekit-hydrate="ofwdu5">
+			import { start } from "./_app/immutable/start-8397a076.js";
 
 			start({
 				env: {},
 				paths: {"assets":"","base":""},
-				target: document.querySelector('[data-sveltekit-hydrate="1w7dfpc"]').parentNode,
-				version: "1677778697497",
+				target: document.querySelector('[data-sveltekit-hydrate="ofwdu5"]').parentNode,
+				version: "1677781358836",
 				hydrate: {
 					node_ids: [0, 2],
 					data: [null,null],
