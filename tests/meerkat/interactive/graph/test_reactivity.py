@@ -298,7 +298,8 @@ def test_slicing(x, mark: bool):
     _compare_objs(x_sl, x[0:4])
 
     if not x.marked:
-        assert x.inode is None
+        # Even if x is not marked, an inode should still be created.
+        assert x.inode is not None
         return
 
     inode = x_sl.inode

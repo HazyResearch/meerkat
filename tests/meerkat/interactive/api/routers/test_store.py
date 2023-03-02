@@ -21,7 +21,7 @@ def df_testbed():
 def test_store():
     store = Store(0)
     derived = unary_op(store)
-    response = client.post(f"/store/{store.id}/trigger/", json={"value": 2})
+    response = client.post(f"/store/{store.id}/update/", json={"value": 2})
 
     assert response.status_code == 200
     assert derived.value == 5
