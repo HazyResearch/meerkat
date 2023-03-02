@@ -110,7 +110,7 @@ mk.gui.html.div([search, gallery]")
 				</div>
 				<div class="font-rubik text-slate-600">
 					Meerkat is a research project, so users should expect rapid
-					updates. The current API is subject to change.
+					updates and rough edges. The current API is subject to change.
 				</div>
 			</div>
 		</div>
