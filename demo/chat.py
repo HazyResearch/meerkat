@@ -1,4 +1,5 @@
 """Build a simple chat app with Meerkat."""
+# TODO: improve the chat component
 from datetime import datetime
 
 import meerkat as mk
