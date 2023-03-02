@@ -36,7 +36,7 @@ df = df.merge(df_clip, on="img_id")
 # Match
 sort_criteria = mk.Store([])
 match = mk.gui.Match(
-    df=df,
+    df,
     against=EMBED_COLUMN,
     title="Search Examples",
     on_match=append_to_sort.partial(criteria=sort_criteria),
@@ -44,20 +44,17 @@ match = mk.gui.Match(
 df = match(df)[0]
 
 # Filter
-filter = mk.gui.Filter(df=df)
+filter = mk.gui.Filter(df)
 df = filter(df)
 
-# Sort
-sort = mk.gui.Sort(df=df, criteria=sort_criteria, title="Sort Examples")
+sort = mk.gui.Sort(df, criteria=sort_criteria, title="Sort Examples")
 df = sort(df)
-
-# Gallery
-gallery = mk.gui.Gallery(df=df, main_column="img")
+gallery = mk.gui.Gallery(df, main_column="img")
 
 mk.gui.start(shareable=False)
 page = mk.gui.Page(
-    component=mk.gui.html.flexcol(
-        slots=[
+    mk.gui.html.flexcol(
+        [
             match,
             mk.gui.html.flexcol(slots=[filter, sort], classes="grid-cols-2 gap-2"),
             gallery,

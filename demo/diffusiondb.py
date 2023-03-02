@@ -51,5 +51,5 @@ component = mk.gui.html.gridcols2(
 )
 
 # Make a page and launch
-page = mk.gui.Page(component=component, id="diffusiondb")
+page = mk.gui.Page(component, id="diffusiondb")
 page.launch()
