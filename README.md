@@ -19,7 +19,7 @@ Meerkat is a open-source Python library aimed at technical teams that want to in
 
 ## ⚡️ Quickstart
 
-We recommend installing Meerkat in a fresh virtual environment,
+We recommend installing Meerkat in a virtual environment,
 
 ```bash
 pip install meerkat-ml
