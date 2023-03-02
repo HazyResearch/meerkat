@@ -65,7 +65,7 @@ chat = Chat(
 )
 
 page = mk.gui.Page(
-    component=chat,
+    chat,
     id="chat",
 )
 page.launch()
