@@ -48,7 +48,7 @@ images = random_images(filtered_df)
 grid = mk.gui.html.div(
     [
         # Make the image square
-        mk.gui.html.div(mk.gui.Image(data=img), style="aspect-ratio: 1 / 1")
+        mk.gui.html.div(mk.gui.Image(data=img))
         for img in images
     ],
     classes="h-fit grid grid-cols-4 gap-1",
