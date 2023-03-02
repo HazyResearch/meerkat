@@ -7,7 +7,10 @@ sort = mk.gui.Sort(df)
 gallery = mk.gui.Gallery(sort(filter(df)), main_column="img", tag_columns=["label"])
 
 page = mk.gui.Page(
-    mk.gui.html.grid([filter, sort, gallery], classes="h-screen grid grid-rows-[auto,auto,1fr] p-3"),
+    mk.gui.html.div(
+        [filter, sort, gallery], 
+        classes="h-full grid grid-rows-[auto,auto,1fr] p-3",
+    ),
     id="filter-sort",
 )
 page.launch()
