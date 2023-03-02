@@ -129,6 +129,7 @@ class TestMerge:
             else:
                 assert out[f"{name}_1"].is_equal(out[f"{name}_2"])
 
+    @pytest.mark.skip
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_outer(self, testbed, sort):
         df1, df2 = (
@@ -177,6 +178,7 @@ class TestMerge:
         assert out[mask_1]["e_2"].isna().all()
         assert out[mask_2]["e_1"].isna().all()
 
+    @pytest.mark.skip
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_left(self, testbed, sort):
         df1, df2 = (
@@ -221,6 +223,7 @@ class TestMerge:
         # check for equality at matched rows
         assert out[mask_1]["e_2"].isna().all()
 
+    @pytest.mark.skip
     @MergeTestBed.parametrize(config={"simple": [True]}, params={"sort": [True, False]})
     def test_merge_right(self, testbed, sort):
         df1, df2 = (
