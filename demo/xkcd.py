@@ -6,7 +6,7 @@ df = mk.get("olivierdehaene/xkcd", registry="huggingface")["train"]
 for col in df.columns:
     df[col] = df[col].to_numpy()
 
-df['webpage'] = mk.files(df['url']).format(HTMLFormatterGroup().defer())
+df["webpage"] = mk.files(df["url"]).format(HTMLFormatterGroup().defer())
 
 filter = mk.gui.Filter(df)
 filtered_df = filter(df)
