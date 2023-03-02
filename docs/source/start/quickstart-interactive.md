@@ -14,7 +14,11 @@ Working with unstructured data frequently involves interacting with it and visua
 There's no better way to do that than through an interactive application.
 These applications can range from simple user input forms inside Jupyter notebooks to full-blown dashboards and web applications that are deployed to the cloud.
 
-Make sure you have Meerkat {ref}`installed and running <install>` before you go through this quickstart.
+Make sure you have Meerkat {ref}`installed and running <install>` before you go through this quickstart. You can run the code in this demo using
+
+```bash
+mk demo quickstart-interactive
+```
 
 ## 🖼️ Components: Display Elements
 
@@ -49,7 +53,7 @@ If you're in a Jupyter notebook, `page.launch()` will render the component direc
 
 Now we have a slider! When we move the slider, the value will automatically be updated in the Python program for us to use.
 
-### 📋 Data Components: Display Data Frames
+## 📋 Data Components: Display Data Frames
 
 Meerkat also includes components that allow us to visualize and interact with data frames (see our quickstart on data frames if you're not familiar). Let's take a look at an example.
 
@@ -58,7 +62,7 @@ df = mk.get("imagenette", version="160px")
 gallery = mk.gui.Gallery(df, main_column="img")
 ```
 
-The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a paginated, interactive table. Check out other data components like `Table`, `Filter` and `Match` in the list of available components {ref}`here <components_inbuilts>`.
+The {class}`~meerkat.interactive.core.Gallery` component takes in a `mk.DataFrame` as input and visualizes it in a interactive gallery view. Check out other data components like `Table`, `Filter` and `Match` in the list of available components {ref}`here <components_inbuilts>`.
 
 ````{margin}
 ```{admonition} Declarative Component Interfaces
@@ -71,7 +75,7 @@ For example, we generally implement DataFrame components so they can be called w
 
 ````
 
-### 🧩 Composing Components for Layout
+## 🧩 Composing Components for Layout
 
 Components are composable, so you can take multiple components and put them together to build an application. For example, let's say you have two components.
 
@@ -99,7 +103,7 @@ A full list of supported HTML components is available {ref}`here <components_inb
 There's a lot more to Meerkat components that you can learn about in the {ref}`Components <components_index>` guide. We go over other components in Meerkat from the [flowbite library](https://flowbite.com/docs/getting-started/introduction/), how to add components from any Svelte component library using only Python, and how to write custom Meerkat components in Svelte.
 ```
 
-### 🖇️ Connecting Components
+## 🖇️ Connecting Components
 
 We might like to tie the values of the the slider and the input, so that they stay in-sync. This can be done by simply passing `input_slider.value` to the input component.
 
@@ -148,40 +152,40 @@ Let's be precise about how this happens.
 
 1. The value of the `input_slider` is a floating point number, but when we check the type of `input_slider.value`, we'll see it is actually a special Meerkat object called a `Store`.
 
-   ```{code-cell} ipython3
-   type(input_slider.value)
-   ```
+```{code-cell} ipython3
+type(input_slider.value)
+```
 
    A `Store` can wrap around arbitrary Python objects, while still exposing all of their functions and properties. In almost all cases, we can use a `Store` as if it were unwrapped.
 
-   ```{code-cell} ipython3
-   input_slider.value.is_integer()
-   ```
+```{code-cell} ipython3
+input_slider.value.is_integer()
+```
 
    By any Python object, we mean **_any_**, so we can even do this:
 
-   ```{code-cell} ipython3
-   import pandas as pd
+```{code-cell} ipython3
+import pandas as pd
 
-   df = mk.Store(pd.DataFrame({'a': [1, 2, 3], 'b': [1, 1, 2]}))
-   df.groupby(by='b')
-   ```
+df = mk.Store(pd.DataFrame({'a': [1, 2, 3], 'b': [1, 1, 2]}))
+df.groupby(by='b')
+```
 
 ```{margin}
-The `Store` object does have some gotchas with certain objects that you can read more about {ref}`here <guide_interactive_concepts_store_gotchas>` (e.g., `Store(None) is None` will return `False`).
+`Store` does have gotchas with certain objects that you can read more about {ref}`here <guide_interactive_concepts_store_gotchas>` (e.g., `Store(None) is None` will return `False`).
 ```
 
 2. Passing this `Store` to `square` tells Meerkat to watch `input_slider.value` and rerun `square` when it changes. Remember that this only works because `square` is decorated with `@mk.reactive()`.
 
-   ```python
-   squared_value = square(input_slider.value)
-   ```
+```{code-cell} ipython3
+squared_value = square(input_slider.value)
+```
 
-### 🔗 Chaining Reactive Functions
+## 🔗 Chaining Reactive Functions
 
 Because it is a reactive function, the result of `square` is a `Store`, so we can pass it into other reactive functions and create a chain! Let's write a function `multiply` that takes as input a coefficient and the result of `square` and returns the product of the two.
 
-```python
+```{code-cell} ipython3
 @mk.reactive()
 def square(a: float) -> float:
     return a ** 2
@@ -197,7 +201,9 @@ coef_slider = mk.gui.Slider(value=2.0)
 
 squared_value = square(input_slider.value)
 result = multiply(coef_slider.value, squared_value)
+```
 
+```python
 page = mk.gui.Page(
     mk.gui.html.div([input_slider, coef_slider, mk.gui.Text(result)]),
     id="quickstart",
@@ -226,7 +232,7 @@ The paradigm of reactivity shows up all the time in our applications, so it is i
 
 ## 🔚 Endpoints
 
-Often, we want the frontend to trigger a function on the backend. This is exactly what _endpoints_ are for.
+Often, we want the frontend to trigger a function on the Python backend. This is exactly what _endpoints_ are for.
 
 ```{admonition} Definition: _endpoint_
 A function that is run when an event occurs on the frontend.
@@ -234,7 +240,11 @@ A function that is run when an event occurs on the frontend.
 
 Similar to reactive functions, endpoints in Meerkat are created with the `@mk.endpoint()` decorator. Inside an endpoint, you can update the value of a `Store` by calling `.set(new_value)` on it.
 
-To demonstrate this, let's add a button that increments `slider.value` when clicked on. We'll need to define an endpoint called `increment` that takes as input a `Store`.
+```{margin}
+Endpoints will automatically unwrap `Store` objects, unless you explicitly type-hint arguments that should be left as `Store` objects.
+```
+
+To demonstrate this, let's add a button that increments `slider.value` when clicked. We'll need to define an endpoint called `increment` that takes as input a `Store`.
 
 ```{code-cell} ipython3
 @mk.endpoint()
@@ -246,7 +256,7 @@ Next, we'll use `endpoint.partial` to bind the endpoint to `slider.value`.
 
 <!-- TODO: explain `endpoint.partial` -->
 
-We can create a new `Button` component and pass the partialed endpoint to its `on_click` argument, which tells the button to run this endpoint when clicked on.
+We can create a new `Button` component and pass the partialed endpoint to its `on_click` argument, which tells the button to run this endpoint when clicked.
 
 ```{code-cell} ipython3
 button = mk.gui.Button(
@@ -256,7 +266,7 @@ button = mk.gui.Button(
 
 ## 🥂 Putting it all together
 
-```{code-cell} ipython3
+```python
 import meerkat as mk
 
 @mk.reactive()
@@ -283,12 +293,14 @@ result = multiply(coef_slider.value, squared_value)
 button = mk.gui.Button(
     title="Increment", on_click=increment.partial(value=input_slider.value)
 )
-```
 
-```python
 page = mk.gui.Page(
     component=mk.gui.html.div([input_slider, coef_slider, button, mk.gui.Text(result)]),
     id="quickstart",
 )
 page.launch()
 ```
+
+
+## 📚 Where to go next
+Check out our [tutorials](./tutorials/index.md) to learn more about Meerkat's core concepts.

@@ -13,7 +13,7 @@
 	});
 </script>
 
-<div class="h-screen p-3">
+<div class="h-screen">
 	{#if config}
 		<Page {config} />
 	{:else}

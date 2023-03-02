@@ -46,7 +46,7 @@ class Page(IdentifiableMixin):
         name: str = "Page",
         height: str = "100%",
         width: str = "100%",
-        progress: bool = True,
+        progress: bool = False,
     ):
 
         super().__init__(id=id)

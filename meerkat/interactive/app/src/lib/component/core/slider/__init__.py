@@ -13,18 +13,18 @@ class Slider(Component):
     """A slider that allows the user to select a value from a range.
 
     Args:
-        value (float): The current value of the slider.
-        min (float): The minimum value of the slider.
-        max (float): The maximum value of the slider.
-        step (float): The step size of the slider.
-        disabled (bool): Whether the slider is disabled.
-        classes (str): The Tailwind classes to apply to the component.
+        value: The current value of the slider.
+        min: The minimum value of the slider.
+        max: The maximum value of the slider.
+        step: The step size of the slider.
+        disabled: Whether the slider is disabled.
+        classes: The Tailwind classes to apply to the component.
     """
 
-    value: Union[int, float] = 0
-    min: Union[int, float] = 0.0
-    max: Union[int, float] = 100.0
-    step: Union[int, float] = 1.0
+    value: Union[float, int] = 0.0
+    min: Union[float, int] = 0.0
+    max: Union[float, int] = 100.0
+    step: Union[float, int] = 1.0
     disabled: bool = False
     classes: str = "bg-violet-50 px-4 py-1 rounded-lg"
 
