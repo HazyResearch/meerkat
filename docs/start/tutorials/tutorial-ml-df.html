@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutorial 5: Endpoints (Query a Large Language Model) &#8212; 🔮 v0.4.2</title>
+    <title>📉 ML with images in meerkat. &#8212; 🔮 v0.4.2</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -42,8 +42,6 @@
     <link rel="shortcut icon" href="../../_static/meerkat_logo.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial 6: Complex Components (Embedding Based Search Engine)" href="tutorial-search-engine.html" />
-    <link rel="prev" title="Tutorial 4: Reactive Functions (Reactive Image Viewer)" href="tutorial-reactive-viewer.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -108,7 +106,7 @@
   Getting Started
  </span>
 </p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="../install.html">
    Installation
@@ -124,7 +122,7 @@
    Quickstart: Interactive Apps
   </a>
  </li>
- <li class="toctree-l1 current active has-children">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="index.html">
    Tutorials
   </a>
@@ -133,7 +131,7 @@
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul class="current">
+  <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial-data-frames.html">
      Tutorial 1: Data Frames (Wrangling an Image Dataset)
@@ -154,8 +152,8 @@
      Tutorial 4: Reactive Functions (Reactive Image Viewer)
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial-query-llm.html">
      Tutorial 5: Endpoints (Query a Large Language Model)
     </a>
    </li>
@@ -1625,53 +1623,6 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
-<div class="menu-dropdown menu-dropdown-launch-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Launch interactive content">
-      <i class="fas fa-rocket"></i>
-  </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://mybinder.org/v2/gh/hazyresearch/meerkat/master?urlpath=lab/tree/doc/source/start/tutorials/tutorial-query-llm.md"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Launch on Binder"
->
-  
-
-<span class="headerbtn__icon-container">
-  
-    <img src="../../_static/images/logo_binder.svg">
-  </span>
-<span class="headerbtn__text-container">Binder</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://colab.research.google.com/github/hazyresearch/meerkat/blob/master/doc/source/start/tutorials/tutorial-query-llm.md"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Launch on Colab"
->
-  
-
-<span class="headerbtn__icon-container">
-  
-    <img src="../../_static/images/logo_colab.png">
-  </span>
-<span class="headerbtn__text-container">Colab</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -1711,7 +1662,7 @@ title="Source repository"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-query-llm.html&body=Your%20issue%20content%20here."
+        <a href="https://github.com/hazyresearch/meerkat//issues/new?title=Issue%20on%20page%20%2Fstart/tutorials/tutorial-ml-df.html&body=Your%20issue%20content%20here."
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1728,7 +1679,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-query-llm.md"
+        <a href="https://github.com/hazyresearch/meerkat/edit/master/doc/source/start/tutorials/tutorial-ml-df.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1756,24 +1707,7 @@ title="Edit this page"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="../../_sources/start/tutorials/tutorial-query-llm.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download notebook file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-code"></i>
-  </span>
-<span class="headerbtn__text-container">.ipynb</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="../../_sources/start/tutorials/tutorial-query-llm.md"
+        <a href="../../_sources/start/tutorials/tutorial-ml-df.md"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -1833,33 +1767,23 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#overview">
-   Overview
+  <a class="reference internal nav-link" href="#applying-a-transform-to-the-images">
+   💈  Applying a transform to the images.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
-   (Aside) Setting up LLMs with Manifest
+  <a class="reference internal nav-link" href="#computing-model-predictions-and-activations">
+   💫 Computing model predictions and activations.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
-   Adding an Input TextField Component
+  <a class="reference internal nav-link" href="#computing-metrics-and-analyzing-performance">
+   🎯  Computing metrics and analyzing performance.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoints">
-   Endpoints
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
-   Running Endpoints with Component Events
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#putting-it-all-together">
-   Putting it all together
+  <a class="reference internal nav-link" href="#exploring-model-activations">
+   🔎  Exploring model activations.
   </a>
  </li>
 </ul>
@@ -1871,7 +1795,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Tutorial 5: Endpoints (Query a Large Language Model)</h1>
+                <h1>📉 ML with images in meerkat.</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -1882,33 +1806,23 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#overview">
-   Overview
+  <a class="reference internal nav-link" href="#applying-a-transform-to-the-images">
+   💈  Applying a transform to the images.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#aside-setting-up-llms-with-manifest">
-   (Aside) Setting up LLMs with Manifest
+  <a class="reference internal nav-link" href="#computing-model-predictions-and-activations">
+   💫 Computing model predictions and activations.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#adding-an-input-textfield-component">
-   Adding an Input TextField Component
+  <a class="reference internal nav-link" href="#computing-metrics-and-analyzing-performance">
+   🎯  Computing metrics and analyzing performance.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#endpoints">
-   Endpoints
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-endpoints-with-component-events">
-   Running Endpoints with Component Events
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#putting-it-all-together">
-   Putting it all together
+  <a class="reference internal nav-link" href="#exploring-model-activations">
+   🔎  Exploring model activations.
   </a>
  </li>
 </ul>
@@ -1921,163 +1835,42 @@ title="Print to PDF"
                 
               <div>
                 
-  <section id="tutorial-5-endpoints-query-a-large-language-model">
-<h1>Tutorial 5: Endpoints (Query a Large Language Model)<a class="headerlink" href="#tutorial-5-endpoints-query-a-large-language-model" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we will build a simple demo interface to ask a large language model (LLM) questions.</p>
-<p>Through this tutorial, you will learn about:</p>
-<ul class="simple">
-<li><p>the concept of <strong>endpoints</strong></p></li>
-<li><p>how to pass <strong>endpoints</strong> to components to run on events</p></li>
-<li><p>Using <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> and <code class="docutils literal notranslate"><span class="pre">Button</span></code> components</p></li>
-<li><p>Advanced: Using <a class="reference external" href="https://github.com/hazyresearch/manifest"><code class="docutils literal notranslate"><span class="pre">manifest</span></code></a>, a server-client manager for running LLMs</p></li>
-</ul>
-<hr class="docutils" />
-<div class="tip admonition">
-<p class="admonition-title">Prerequisites</p>
-<p>You will need to install <code class="docutils literal notranslate"><span class="pre">manifest</span></code> and set up your OPENAI API key:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install **manifest**</span>
-pip<span class="w"> </span>install<span class="w"> </span>manifest-ml
-
-<span class="c1"># Set up your OpenAI key.</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;your-api-key&quot;</span>
-</pre></div>
-</div>
-</div>
-<p>To get started, run the tutorial demo script</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mk<span class="w"> </span>demo<span class="w"> </span>tutorial-qa
-</pre></div>
-</div>
-<p>You should see the tutorial app when you open the link in your browser. Let’s break down the code in the demo script.</p>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>In this interface, we want to ask the LLM for an answer to our question when we press a button.</p>
-<p>This requires having</p>
+  <section id="ml-with-images-in-meerkat">
+<h1>📉 ML with images in <code class="docutils literal notranslate"><span class="pre">meerkat</span></code>.<a class="headerlink" href="#ml-with-images-in-meerkat" title="Permalink to this headline">¶</a></h1>
+<p>Let’s do some machine learning on our Imagenette <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.
+We’ll take a resnet18 pretrained on the full ImageNet dataset, perform inference on the validation set, and analyze the model’s predictions and activations.</p>
+<p>The cell below downloads the model..</p>
+<section id="applying-a-transform-to-the-images">
+<h2>💈  Applying a transform to the images.<a class="headerlink" href="#applying-a-transform-to-the-images" title="Permalink to this headline">¶</a></h2>
+<p>In order to do inference, we’ll need to create a <em>new</em> <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.DeferredColumn" title="meerkat.DeferredColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeferredColumn</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code> we defined above (<em>i.e.</em> <code class="docutils literal notranslate"><span class="pre">&quot;img_path&quot;</span></code>), does not apply any transforms after loading and simply returns a PIL image. Before passing the images through the model, we need to convert the PIL image to a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> and normalize the color channels (along with a few other transformations).</p>
+<p>Note: the transforms defined below are the same as the ones used by torchvision, see <a class="reference external" href="https://github.com/pytorch/examples/blob/cbb760d5e50a03df667cdc32a61f75ac28e11cbf/imagenet/main.py#L225">here</a>.</p>
+<p>In the cell below, we specify a transform when creating the <code class="docutils literal notranslate"><span class="pre">ImageColumn</span></code>.</p>
+<p>Notice that indexing this new column returns a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>, not a PIL image…</p>
+<p>… and that indexing a slice of this new column returns a <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.TensorColumn" title="meerkat.TensorColumn"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorColumn</span></code></a>.</p>
+<p>Let’s see what the full <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> looks like now.</p>
+</section>
+<section id="computing-model-predictions-and-activations">
+<h2>💫 Computing model predictions and activations.<a class="headerlink" href="#computing-model-predictions-and-activations" title="Permalink to this headline">¶</a></h2>
+<p>We’d like to perform inference and extract:</p>
 <ol class="arabic simple">
-<li><p>An LLM to return answers to our questions</p></li>
-<li><p>An input text field to ask our question</p></li>
-<li><p>A Python API that runs the LLM</p></li>
-<li><p>A button to call the Python API on click</p></li>
+<li><p>Output predictions</p></li>
+<li><p>Output class probabilities</p></li>
+<li><p>Model activations</p></li>
 </ol>
+<p>Note: in order to extract model activations, we’ll need to use a <a class="reference external" href="https://pytorch.org/tutorials/beginner/former_torchies/nnft_tutorial.html#forward-and-backward-function-hooks">PyTorch forward hook</a> and register it on the final layer of the ResNet. Forward hooks are just functions that get executed on the forward pass of a <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p>
+<p>We want to apply a forward pass to each image in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and store the outputs as new columns: <code class="docutils literal notranslate"><span class="pre">DataFrame.map</span></code> is perfectly suited for this task.</p>
+<p>The predictions, output probabilities, and activations are now stored alongside the examples in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
 </section>
-<section id="aside-setting-up-llms-with-manifest">
-<h2>(Aside) Setting up LLMs with Manifest<a class="headerlink" href="#aside-setting-up-llms-with-manifest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/hazyresearch/manifest">Manifest</a> is a Python library that provides a convenient interface to call foundation model APIs, e.g. large language models from OpenAI, Cohere, Together, etc.</p>
-<p>Let’s set up manifest to connect to OpenAI.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
-  <span class="n">client_name</span><span class="o">=</span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
-  <span class="n">client_connection</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">),</span>
-  <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Running a prompt through manifest will be easy:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;What is the meaning of life?&quot;</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>That’s it! You can refer to the Manifest codebase to learn more about how to use it. Let’s now move on to the rest of the application.</p>
+<section id="computing-metrics-and-analyzing-performance">
+<h2>🎯  Computing metrics and analyzing performance.<a class="headerlink" href="#computing-metrics-and-analyzing-performance" title="Permalink to this headline">¶</a></h2>
+<p>Computing statistics on Meerkat <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> is straightforward because standard NumPy operators and functions can be applied directly to a <code class="docutils literal notranslate"><span class="pre">NumpyArrayColumn</span></code>. We take advantage of this below to compute the accuracy of the model.</p>
+<p>Furthermore, since the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is naturally converted to a Pandas DataFrame, it’s easy to use data visualization tools that interface with Pandas (<em>e.g.</em> seaborn, bokeh).</p>
 </section>
-<section id="adding-an-input-textfield-component">
-<h2>Adding an Input TextField Component<a class="headerlink" href="#adding-an-input-textfield-component" title="Permalink to this headline">¶</a></h2>
-<p>Let’s add a text field where a user can type out their questions.
-Meerkat provides a <code class="docutils literal notranslate"><span class="pre">Textbox</span></code> component that we can use.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">textbox</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Textbox</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>This component will do a few things:</p>
-<ul class="simple">
-<li><p>create a text field on the frontend that the user can type into</p></li>
-<li><p>synchronize the value of this text field with a <code class="docutils literal notranslate"><span class="pre">Store</span></code> object on the Python backend</p></li>
-</ul>
-<p>Here, <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> will be a <code class="docutils literal notranslate"><span class="pre">Store</span></code>, a Meerkat data object that is synchronized with the value of the text field on the frontend. This will be important when we want to pass the value of the text field to our LLM API.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">type(</span><span style="color: #000080; text-decoration-color: #000080">textbox.text</span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080">:</span> 
-        <span style="font-weight: bold">&lt;</span><span style="color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold">class</span><span style="color: #000000; text-decoration-color: #000000"> </span><span style="color: #008000; text-decoration-color: #008000">'meerkat.interactive.graph.store.Store'</span><span style="font-weight: bold">&gt;</span>
-</pre>
-</div></div>
-</div>
-</section>
-<section id="endpoints">
-<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our LLM and our input field, we want to write a Python function that will run the LLM on the input.</p>
-<p>This function has to be special in a few ways:</p>
-<ol class="arabic simple">
-<li><p>It should be able to take in the value of the input field</p></li>
-<li><p>It should run when an event on the frontend happens, e.g. a button is clicked</p></li>
-</ol>
-<p>To do this, we can use the <a class="reference internal" href="../../apidocs/dataframe.html#meerkat.endpoint" title="meerkat.endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">&#64;mk.endpoint</span></code></a> decorator. This decorator will convert a Python function into an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, which is a special type of Python function that can be passed to components to run on events.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@mk</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">):</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-    <span class="n">answer</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">answer</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>If you print this endpoint out, you’ll see that it the decorator has converted the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> function into an <code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code> object.</p>
-<div class="cell tag_remove-input docutils container">
-<div class="cell_output docutils container">
-<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">get_answer:</span> 
-        <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">Endpoint</span><span style="font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">id</span>=<span style="color: #800080; text-decoration-color: #800080">__mkid__ac75651a3c8f494ba7552f66f3be5191</span>, <span style="color: #808000; text-decoration-color: #808000">name</span>=<span style="color: #800080; text-decoration-color: #800080">get_answer</span>, <span style="color: #808000; text-decoration-color: #808000">prefix</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span>, <span style="color: #808000; text-decoration-color: #808000">route</span>=<span style="color: #800080; text-decoration-color: #800080; font-style: italic">None</span><span style="font-weight: bold">)</span>
-</pre>
-</div></div>
-</div>
-<p>Notice that in addition to the <code class="docutils literal notranslate"><span class="pre">question</span></code>, we also pass in an <code class="docutils literal notranslate"><span class="pre">answer</span></code> argument. This allows us to update the <code class="docutils literal notranslate"><span class="pre">answer</span></code> store with the response from the LLM. When the store is updated, it will tell all frontend components that depend on this store to also update their values.</p>
-</section>
-<section id="running-endpoints-with-component-events">
-<h2>Running Endpoints with Component Events<a class="headerlink" href="#running-endpoints-with-component-events" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our endpoint, we want to run it when a button is clicked.</p>
-<p>We can do this by passing the endpoint to the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> argument of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The store to keep track of the LLM answer.</span>
-<span class="n">answer</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-<span class="n">button</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
-  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ask&quot;</span><span class="p">,</span>
-  <span class="n">on_click</span><span class="o">=</span><span class="n">get_answer</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="n">textbox</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">answer</span><span class="o">=</span><span class="n">answer</span><span class="p">),</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>When the button is clicked, the <code class="docutils literal notranslate"><span class="pre">get_answer</span></code> endpoint will be called with the value of the <code class="docutils literal notranslate"><span class="pre">textbox.text</span></code> store as the <code class="docutils literal notranslate"><span class="pre">question</span></code> argument.</p>
-<p>We can simulate this button click by running the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> endpoint directly. Since it’s an <code class="docutils literal notranslate"><span class="pre">Endpoint</span></code> object, we can call it with the <code class="docutils literal notranslate"><span class="pre">.run()</span></code> method.</p>
-<div class="cell tag_remove-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="o">.</span><span class="n">on_click</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_remove-input docutils container">
-</div>
-<p>Different components expose different events that can be tied to endpoints. All endpoints start with <code class="docutils literal notranslate"><span class="pre">on_</span></code> and are followed by the name of the event. For example, the <code class="docutils literal notranslate"><span class="pre">on_click</span></code> event is tied to the <code class="docutils literal notranslate"><span class="pre">click</span></code> event of a <code class="docutils literal notranslate"><span class="pre">Button</span></code> component.</p>
-</section>
-<section id="putting-it-all-together">
-<h2>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h2>
-<p>Now we display these different components on the frontend.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Page</span><span class="p">(</span>
-    <span class="n">component</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">flexcol</span><span class="p">([</span><span class="n">textbox</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">answer</span><span class="p">)]),</span>
-    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tutorial-query-llm&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>When you run the app, you should see the following interface:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
-</pre></div>
-</div>
+<section id="exploring-model-activations">
+<h2>🔎  Exploring model activations.<a class="headerlink" href="#exploring-model-activations" title="Permalink to this headline">¶</a></h2>
+<p>To better understand the behavior of our model, we’ll explore the activations of the final convolutional layer of the ResNet. Recall that when we performed our forward pass, we extracted these activations and stored them in a new column called <code class="docutils literal notranslate"><span class="pre">&quot;activation&quot;</span></code>.</p>
+<p>Unlike the the <code class="docutils literal notranslate"><span class="pre">NumpyArrayColumn</span></code>s we’ve been working with so far, the activation column has an additional dimension of size 512.</p>
+<p>To visualize the activations, we’ll use a dimensionality reduction technique (<a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a>) to embed the activations in two dimensions. We’ll store these embeddings in two new columns “umap_0” and “umap_1”.</p>
 </section>
 </section>
 
@@ -2089,20 +1882,6 @@ Meerkat provides a <code class="docutils literal notranslate"><span class="pre">
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="tutorial-reactive-viewer.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Tutorial 4: Reactive Functions (Reactive Image Viewer)</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="tutorial-search-engine.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorial 6: Complex Components (Embedding Based Search Engine)</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
 </div>
             </footer>
         </div>
