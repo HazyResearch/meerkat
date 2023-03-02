@@ -1,12 +1,9 @@
-
 <div align="center">
     <img src="docs/assets/meerkat_banner.png" height=100 alt="Meerkat logo"/>
 
+---
 
------
-
-![GitHub Workflow Status](
-https://github.com/HazyResearch/meerkat/actions/workflows/.github/workflows/ci.yml/badge.svg)
+![GitHub Workflow Status](https://github.com/HazyResearch/meerkat/actions/workflows/.github/workflows/ci.yml/badge.svg)
 [![GitHub](https://img.shields.io/github/license/HazyResearch/meerkat)](https://img.shields.io/github/license/HazyResearch/meerkat)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
@@ -18,22 +15,29 @@ Meerkat is a open-source Python library designed for technical teams that want t
 | [**Docs**](http://meerkat.wiki/docs/index.html)
 | [**Contributing**](CONTRIBUTING.md)
 | [**Blogpost**](https://hazyresearch.stanford.edu/blog/2023-03-01-meerkat)
+
 </div>
 
 ## ⚡️ Quickstart
-We recommend installing Meerkat in a fresh virtual environment,
+
+We recommend installing Meerkat in a virtual environment,
+
 ```bash
 pip install meerkat-ml
 ```
+
 > **_GPU Install_**: If you want to use Meerkat with a GPU, you will need to install PyTorch with GPU support. See [here](https://pytorch.org/get-started/locally/) for more details.
+
 <!-- ```bash
 pip install "meerkat-ml @ git+https://github.com/robustness-gym/meerkat@clever-dev"
 ```  -->
-> **_Optional Dependencies_**: some parts of Meerkat rely on optional dependencies e.g. audio processing may rely on utilities from `torchaudio`. We leave it up to you to install necessary dependencies when required. As a convenience, we provide bundles of optional dependencies that you can install e.g. `pip install meerkat-ml[text]` for text dependencies. See `setup.py` for a full list of optional dependencies.   
+
+> **_Optional Dependencies_**: some parts of Meerkat rely on optional dependencies e.g. audio processing may rely on utilities from `torchaudio`. We leave it up to you to install necessary dependencies when required. As a convenience, we provide bundles of optional dependencies that you can install e.g. `pip install meerkat-ml[text]` for text dependencies. See `setup.py` for a full list of optional dependencies.
 
 Then try one of our demos,
+
 ```bash
-mk demo match 
+mk demo match
 ```
 
 To see a full list of demos, use `mk demo --help`. (If this didn't work for you, we'd appreciate if you could open an issue and let us know.)
@@ -41,7 +45,7 @@ To see a full list of demos, use `mk demo --help`. (If this didn't work for you,
 **Next Steps**.
 Check out our [Getting Started page](https://meerkat.readthedocs.io/en/dev/guide/guide.html) and our [documentation](https://meerkat.readthedocs.io/en/dev/guide/guide.html) to start building with Meerkat. As we work to make the documentation more comprehensive, please feel free to open an issue or reach out if you have any questions.
 
-## Why Meerkat? 
+## Why Meerkat?
 
 <p class="mt-4 text-gray-600 dark:text-gray-400">
     Meerkat is an open-source Python library, designed to help
@@ -95,4 +99,7 @@ mk.gui.html.div([match, gallery])
 </div>
 
 ## ✉️ About
-Meerkat is being developed at Stanford's Hazy Research Lab. Please reach out to `kgoel [at] cs [dot] stanford [dot] edu, eyuboglu [at] stanford [dot] edu, and arjundd [at] stanford [dot] edu` if you would like to use Meerkat for a project, at your company or if you have any questions.
+
+Meerkat is being built by Machine Learning PhD students in the [Hazy Research](https://hazyresearch.stanford.edu) lab at Stanford. We're excited to build for a future where models will make it easier for teams to sift and reason through large volumes of data effortlessly. We have varied research backgrounds and have done research that touches all parts of the machine learning process: we've created new model architectures, studied model robustness and evaluation, worked on applications ranging from audio generation to medical imaging.
+
+Please reach out to `kgoel [at] cs [dot] stanford [dot] edu, eyuboglu [at] stanford [dot] edu, and arjundd [at] stanford [dot] edu` if you would like to use Meerkat for a project, at your company or if you have any questions.
