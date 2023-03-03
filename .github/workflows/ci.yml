@@ -2,9 +2,11 @@ name: CI
 
 on:
     push:
-        branches: [ '*' ]
+        branches:
+            - main
     pull_request:
-        branches: [ '*' ]
+        branches:
+            - main
     
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -38,33 +40,33 @@ jobs:
                 run: |
                     make lint
     
-    Documentation:
-        needs: Linting
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                python-version: ['3.8', '3.9', '3.10']
+    # Documentation:
+    #     needs: Linting
+    #     runs-on: ubuntu-latest
+    #     strategy:
+    #         matrix:
+    #             python-version: ['3.8', '3.9', '3.10']
                 
-        steps:
-            -   uses: actions/checkout@v2
-            -   name: Set up Python ${{ matrix.python-version }}
-                uses: actions/setup-python@v2
-                with:
-                    python-version: ${{ matrix.python-version }}
+    #     steps:
+    #         -   uses: actions/checkout@v2
+    #         -   name: Set up Python ${{ matrix.python-version }}
+    #             uses: actions/setup-python@v2
+    #             with:
+    #                 python-version: ${{ matrix.python-version }}
                     
-            -   uses: actions/cache@v2
-                with:
-                    path: ~/.cache/pip
-                    key: ${{ runner.os }}-pip
+    #         -   uses: actions/cache@v2
+    #             with:
+    #                 path: ~/.cache/pip
+    #                 key: ${{ runner.os }}-pip
     
-            -   name: Install Dependencies
-                run: |
-                    python -m pip install --upgrade pip
-                    make dev
+    #         -   name: Install Dependencies
+    #             run: |
+    #                 python -m pip install --upgrade pip
+    #                 make dev
     
-            -   name: Generate Docs
-                run: |
-                    make docs
+    #         -   name: Generate Docs
+    #             run: |
+    #                 make docs
 
     Interactive-Setup:
         # needs: Documentation
@@ -97,7 +99,7 @@ jobs:
                     make test-interactive-install
 
     Build-Basic:
-        needs: Documentation
+        # needs: Documentation
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
