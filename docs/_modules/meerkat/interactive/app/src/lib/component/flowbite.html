@@ -1706,7 +1706,7 @@ title="Open an issue"
                 
   <h1>Source code for meerkat.interactive.app.src.lib.component.flowbite</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.abstract</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Slottable</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span>
@@ -1727,6 +1727,11 @@ title="Open an issue"
     <span class="n">TransitionTypes</span><span class="p">,</span>
     <span class="n">number</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 
 <span class="k">class</span> <span class="nc">FlowbiteSvelteMixin</span><span class="p">:</span>

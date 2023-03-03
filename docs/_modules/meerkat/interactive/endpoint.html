@@ -1929,7 +1929,6 @@ title="Open an issue"
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">no_args</span> <span class="ow">and</span> <span class="n">no_kwonlyargs</span> <span class="ow">and</span> <span class="n">no_unfilled_args</span><span class="p">):</span>
-
             <span class="c1"># Find the missing keyword arguments</span>
             <span class="n">missing_args</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">kwonlyargs</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">partial_fn</span><span class="o">.</span><span class="n">keywords</span>

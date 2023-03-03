@@ -1839,7 +1839,6 @@ title="Open an issue"
     <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">pat</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">repl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">regex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalarColumn</span><span class="p">:</span>
-
         <span class="n">fn</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">replace_substring_regex</span> <span class="k">if</span> <span class="n">regex</span> <span class="k">else</span> <span class="n">pc</span><span class="o">.</span><span class="n">replace_substring</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">_clone</span><span class="p">(</span>
             <span class="n">fn</span><span class="p">(</span>

@@ -2387,7 +2387,6 @@ title="Open an issue"
     <span class="kn">from</span> <span class="nn">.scalar.abstract</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-
         <span class="k">return</span> <span class="n">ScalarColumn</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">ChunkedArray</span><span class="p">)):</span>

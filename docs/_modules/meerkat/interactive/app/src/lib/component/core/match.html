@@ -1707,7 +1707,6 @@ title="Open an issue"
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.match</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">HTTPException</span>
@@ -1717,6 +1716,11 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">EndpointProperty</span><span class="p">,</span> <span class="n">endpoint</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.event</span> <span class="kn">import</span> <span class="n">EventInterface</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.graph</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">reactive</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="n">_SUPPORTED_BIN_OPS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;Add&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>

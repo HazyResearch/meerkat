@@ -1838,7 +1838,6 @@ title="Open an issue"
         <span class="c1"># support including environment varaiables in the base_dir so that DataFrames</span>
         <span class="c1"># can be easily moved between machines</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
             <span class="c1"># need to convert Path objects to strings for Template to work</span>
             <span class="n">base_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span><span class="p">)</span>
             <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
@@ -2005,7 +2004,6 @@ title="Open an issue"
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ScalarColumn</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">ScalarColumn</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
