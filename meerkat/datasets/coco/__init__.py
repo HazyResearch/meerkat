@@ -109,7 +109,6 @@ def build_coco_2014_df(dataset_dir: str, download: bool = False):
 
         # download test image info
         if not os.path.exists("annotations/image_info_test2014.json"):
-
             subprocess.run(
                 args=[
                     "wget",

@@ -54,7 +54,6 @@ class BlockManager(MutableMapping):
 
         for block_id, block_ref in self._block_refs.items():
             if isinstance(block_ref.block, DeferredBlock):
-
                 for arg in block_ref.block.data.args + list(
                     block_ref.block.data.kwargs.values()
                 ):
@@ -86,7 +85,6 @@ class BlockManager(MutableMapping):
         results = None
         indexed_inputs = {}
         for _, block_ref in self.topological_block_refs():
-
             if isinstance(block_ref.block, DeferredBlock):
                 # defer computation of lambda columns, since they may be functions of
                 # the other columns

@@ -22,7 +22,6 @@ class FunctionInspectorMixin:
         materialize=True,
         **kwargs
     ) -> SimpleNamespace:
-
         # Initialize variables to track
         no_output = dict_output = bool_output = list_output = False
 
@@ -88,7 +87,6 @@ class FunctionInspectorMixin:
                 and output.dtype == torch.bool
             )
         ):
-
             # `function` returns a bool
             bool_output = True
 

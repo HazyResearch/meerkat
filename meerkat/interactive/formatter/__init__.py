@@ -29,6 +29,7 @@ __all__ = [
     "BooleanFormatterGroup",
 ]
 
+
 # backwards compatibility
 class DeprecatedFormatter:  # noqa: E302
     pass

@@ -9,6 +9,7 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
+
 class OnChangeRadio(EventInterface):
     index: int
 

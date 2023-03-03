@@ -105,7 +105,6 @@ class imagenet(DatasetBuilder):
 def build_imagenet_dfs(
     dataset_dir: str, download: bool = False
 ) -> Dict[str, mk.DataFrame]:
-
     if download:
         curr_dir = os.getcwd()
         os.makedirs(dataset_dir, exist_ok=True)

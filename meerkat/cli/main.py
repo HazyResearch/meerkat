@@ -77,7 +77,6 @@ def init(
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
-
         # Install prerequisites: package manager
         progress.add_task(description="Installing system prerequisites...", total=None)
         try:

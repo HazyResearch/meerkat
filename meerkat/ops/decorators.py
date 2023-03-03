@@ -16,7 +16,6 @@ def check_primary_key(fn: callable):
         out = fn(*args, **kwargs)
 
         if isinstance(out, DataFrame):
-
             if out._primary_key is not None and (
                 out._primary_key not in out
                 or not out.primary_key._is_valid_primary_key()

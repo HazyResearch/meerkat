@@ -55,7 +55,7 @@ def build_eeg_df(
             raw_dataset_dir, dataset_dir, split, clip_len, stride
         )
 
-        for (edf_fn, clip_idx, _) in tqdm(file_tuples, total=len(file_tuples)):
+        for edf_fn, clip_idx, _ in tqdm(file_tuples, total=len(file_tuples)):
             filepath = [file for file in edf_files if edf_fn in file]
             filepath = filepath[0]
             file_id = edf_fn.split(".edf")[0]
@@ -149,7 +149,7 @@ def build_stanford_eeg_df(
     )
     data = []
 
-    for (filepath, sz_loc, split) in file_tuples:
+    for filepath, sz_loc, split in file_tuples:
         row_df = {
             "filepath": filepath,
             "file_id": filepath.split("/")[-1].split(".eeghdf")[0],
