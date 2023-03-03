@@ -1,9 +1,13 @@
-from typing import List, Literal, Optional
+from typing import List, Optional
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
 from meerkat.interactive.event import EventInterface
 
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 class OnChangeRadio(EventInterface):
     index: int

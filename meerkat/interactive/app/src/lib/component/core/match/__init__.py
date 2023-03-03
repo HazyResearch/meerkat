@@ -1,6 +1,5 @@
 import ast
 from dataclasses import dataclass
-from typing import Literal
 
 import numpy as np
 from fastapi import HTTPException
@@ -10,6 +9,11 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 _SUPPORTED_BIN_OPS = {
     "Add": lambda x, y: x + y,

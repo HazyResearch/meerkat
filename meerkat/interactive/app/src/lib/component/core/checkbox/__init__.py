@@ -1,7 +1,12 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 
 class Checkbox(Slottable, Component):
