@@ -301,7 +301,6 @@ def convert_to_batch_column_fn(
         # Iterate and apply the function
         outputs = None
         for i in range(batch_size):
-
             # Apply the unbatched function
             if with_indices:
                 output = function(
@@ -354,7 +353,6 @@ def convert_to_batch_fn(
         # Iterate and apply the function
         outputs = None
         for i in range(batch_size):
-
             # Apply the unbatched function
             if with_indices:
                 output = function(

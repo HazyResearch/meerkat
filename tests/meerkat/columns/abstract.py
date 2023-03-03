@@ -79,7 +79,6 @@ class AbstractColumnTestBed:
         params: dict = None,
         single: bool = False,
     ):
-
         return pytest.mark.parametrize(
             **cls.get_params(config=config, single=single), indirect=["testbed"]
         )

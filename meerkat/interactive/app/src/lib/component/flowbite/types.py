@@ -1,5 +1,10 @@
 from dataclasses import dataclass
-from typing import Callable, List, Literal, Optional, Union
+from typing import Callable, List, Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 number = Union[int, float]
 AlignType = Literal["text-center", "text-left", "text-right"]

@@ -4,7 +4,7 @@ import os
 import typing
 import uuid
 import warnings
-from typing import Dict, List, Literal, Set
+from typing import Dict, List, Set
 
 from pydantic import BaseModel, Extra, root_validator
 
@@ -29,6 +29,11 @@ try:
     collections_abc = collections.abc
 except AttributeError:
     collections_abc = collections
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 
 class ComponentFrontend(BaseModel):

@@ -132,7 +132,6 @@ class ArrowStringMethods(StringMethods):
     def replace(
         self, pat: str, repl: str, n: int = -1, regex: bool = False, **kwargs
     ) -> ScalarColumn:
-
         fn = pc.replace_substring_regex if regex else pc.replace_substring
         return self.column._clone(
             fn(

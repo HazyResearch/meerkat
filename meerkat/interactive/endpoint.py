@@ -222,7 +222,6 @@ class Endpoint(IdentifiableMixin, NodeMixin, Generic[T]):
         )
 
         if not (no_args and no_kwonlyargs and no_unfilled_args):
-
             # Find the missing keyword arguments
             missing_args = [
                 arg for arg in spec.kwonlyargs if arg not in partial_fn.keywords

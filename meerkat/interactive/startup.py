@@ -12,7 +12,7 @@ import re
 import socket
 import subprocess
 import time
-from typing import Literal, Tuple
+from typing import Tuple
 
 import requests
 import rich
@@ -40,6 +40,11 @@ from meerkat.interactive.server import (
 from meerkat.interactive.tunneling import setup_tunnel
 from meerkat.state import APIInfo, FrontendInfo, state
 from meerkat.version import __version__ as mk_version
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 logger = logging.getLogger(__name__)
 
@@ -383,7 +388,6 @@ def run_frontend_prod(
     env: dict = {},
     skip_build: bool = False,
 ) -> subprocess.Popen:
-
     if not skip_build:
         run_frontend_build(package_manager, env)
     else:

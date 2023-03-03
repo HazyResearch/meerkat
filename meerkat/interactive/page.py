@@ -48,7 +48,6 @@ class Page(IdentifiableMixin):
         width: str = "100%",
         progress: bool = False,
     ):
-
         super().__init__(id=id)
 
         if progress:
@@ -90,7 +89,6 @@ class Page(IdentifiableMixin):
         if is_notebook():
             return IFrame(url, width=self.width, height=self.height)
         else:
-
             rich.print(
                 ":scroll: "
                 f"Frontend [violet]{self.id}[/violet] "

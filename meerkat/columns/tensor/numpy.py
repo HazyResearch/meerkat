@@ -51,7 +51,6 @@ class NumPyTensorColumn(
     TensorColumn,
     np.lib.mixins.NDArrayOperatorsMixin,
 ):
-
     block_class: type = NumPyBlock
 
     def __init__(

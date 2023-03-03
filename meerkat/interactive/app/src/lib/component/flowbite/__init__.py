@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from meerkat.interactive.app.src.lib.component.abstract import Component, Slottable
 from meerkat.interactive.endpoint import Endpoint
@@ -20,6 +20,11 @@ from .types import (
     TransitionTypes,
     number,
 )
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 
 class FlowbiteSvelteMixin:

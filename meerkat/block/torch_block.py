@@ -168,7 +168,6 @@ class TorchBlock(AbstractBlock):
     def _get(
         self, index, block_ref: BlockRef, materialize: bool = True
     ) -> Union[BlockRef, dict]:
-
         index = self._convert_index(index)
         # TODO: check if they're trying to index more than just the row dimension
         data = self.data[index]

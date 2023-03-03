@@ -131,7 +131,6 @@ class FileLoader:
         # support including environment varaiables in the base_dir so that DataFrames
         # can be easily moved between machines
         if self.base_dir is not None:
-
             # need to convert Path objects to strings for Template to work
             base_dir = str(self.base_dir)
             base_dir = os.path.expanduser(base_dir)
@@ -298,7 +297,6 @@ class FileColumn(DeferredColumn):
         *args,
         **kwargs,
     ):
-
         if not isinstance(data, ScalarColumn):
             data = ScalarColumn(data)
 

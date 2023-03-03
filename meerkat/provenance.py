@@ -251,7 +251,6 @@ def visualize_provenance(
     show_columns: bool = False,
     last_parent_only: bool = False,
 ):
-
     warnings.warn(  # pragma: no cover
         ExperimentalWarning(
             "The function `meerkat.provenance.visualize_provenance` is experimental and"

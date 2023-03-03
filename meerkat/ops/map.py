@@ -610,7 +610,6 @@ def _materialize(
             )
 
     else:
-
         result = []
         for batch_start in tqdm(range(0, len(data), batch_size), disable=not pbar):
             result.append(

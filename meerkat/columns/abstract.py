@@ -680,7 +680,6 @@ def infer_column_type(data: Sequence) -> Type[Column]:
     from .scalar.abstract import ScalarColumn
 
     if isinstance(data, pd.Series):
-
         return ScalarColumn
 
     if isinstance(data, (pa.Array, pa.ChunkedArray)):
