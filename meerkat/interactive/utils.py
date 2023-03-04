@@ -1,10 +1,12 @@
-import rich
+from typing import Callable, Dict, Type
+
 import numpy as np
 import pandas as pd
+import rich
+
+from meerkat.env import is_torch_available
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.tools.lazy_loader import LazyLoader
-from meerkat.env import is_torch_available
-from typing import Dict, Type, Callable
 
 torch = LazyLoader("torch")
 

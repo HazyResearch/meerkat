@@ -1,8 +1,5 @@
-import numpy as np
-import pandas as pd
 from fastapi.encoders import jsonable_encoder
 
-from meerkat.columns.abstract import Column
 from meerkat.interactive import Page
 from meerkat.interactive.endpoint import endpoint
 from meerkat.interactive.utils import get_custom_json_encoder

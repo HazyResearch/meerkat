@@ -1,10 +1,10 @@
-"""Adapted from https://github.com/ad12/meddlr/blob/main/meddlr/utils/env.py."""
+"""Adapted from
+https://github.com/ad12/meddlr/blob/main/meddlr/utils/env.py."""
 import importlib
-import sys
-from packaging import version
-from importlib import util
 import re
+from importlib import util
 
+from packaging import version
 
 _SUPPORTED_PACKAGES = {}
 
@@ -50,9 +50,8 @@ def get_package_version(package_or_name) -> str:
 
 
 def is_package_installed(pkg_str) -> bool:
-    """
-    Verify that a package dependency is installed and
-    in the expected version range.
+    """Verify that a package dependency is installed and in the expected
+    version range.
 
     This is useful for optional third-party dependencies where implementation
     changes are not backwards-compatible.

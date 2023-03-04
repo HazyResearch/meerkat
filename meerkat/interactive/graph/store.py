@@ -3,7 +3,6 @@ import warnings
 from typing import Any, Generic, Iterator, List, Tuple, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder
-
 from pydantic import BaseModel, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
@@ -62,7 +61,9 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
 
     def to_json(self) -> Any:
         """Converts the wrapped object into a jsonifiable object."""
-        return jsonable_encoder(self.__wrapped__, custom_encoder=get_custom_json_encoder())
+        return jsonable_encoder(
+            self.__wrapped__, custom_encoder=get_custom_json_encoder()
+        )
 
     @property
     def frontend(self):
