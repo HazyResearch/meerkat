@@ -1709,6 +1709,7 @@ title="Open an issue"
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">from</span> <span class="nn">fastapi.encoders</span> <span class="kn">import</span> <span class="n">jsonable_encoder</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">pydantic.fields</span> <span class="kn">import</span> <span class="n">ModelField</span>
 <span class="kn">from</span> <span class="nn">wrapt</span> <span class="kn">import</span> <span class="n">ObjectProxy</span>
@@ -1719,6 +1720,7 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.modification</span> <span class="kn">import</span> <span class="n">StoreModification</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.node</span> <span class="kn">import</span> <span class="n">NodeMixin</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.types</span> <span class="kn">import</span> <span class="n">Storeable</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.utils</span> <span class="kn">import</span> <span class="n">get_custom_json_encoder</span>
 <span class="kn">from</span> <span class="nn">meerkat.mixins.identifiable</span> <span class="kn">import</span> <span class="n">IdentifiableMixin</span>
 <span class="kn">from</span> <span class="nn">meerkat.mixins.reactifiable</span> <span class="kn">import</span> <span class="n">MarkableMixin</span>
 
@@ -1764,8 +1766,11 @@ title="Open an issue"
     <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span>
 
-    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span>
+<div class="viewcode-block" id="Store.to_json"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.Store.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the wrapped object into a jsonifiable object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">jsonable_encoder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">,</span> <span class="n">custom_encoder</span><span class="o">=</span><span class="n">get_custom_json_encoder</span><span class="p">()</span>
+        <span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">frontend</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -2476,7 +2476,13 @@ changes, even though <cite>f</cite> is reactive.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="meerkat.Store">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wrapped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">meerkat.interactive.graph.store.T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/meerkat/interactive/graph/store.html#Store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#meerkat.Store" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py property">
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="meerkat.Store.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="../_modules/meerkat/interactive/graph/store.html#Store.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#meerkat.Store.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the wrapped object into a jsonifiable object.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="meerkat.Store.frontend">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frontend</span></span><a class="headerlink" href="#meerkat.Store.frontend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a Pydantic model that can be should be sent to the frontend.</p>
