@@ -1,15 +1,13 @@
 import logging
 import traceback
 
-import numpy as np
-import pandas as pd
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
-from meerkat.columns.abstract import Column
 from meerkat.interactive.endpoint import Endpoint, endpoint
 from meerkat.interactive.graph import Store, trigger
 from meerkat.interactive.modification import StoreModification
+from meerkat.interactive.utils import get_custom_json_encoder
 from meerkat.state import state
 from meerkat.tools.lazy_loader import LazyLoader
 
@@ -66,15 +64,5 @@ def update(store: Store, value=Endpoint.EmbeddedBody()):
     # Return the modifications
     return jsonable_encoder(
         modifications,
-        custom_encoder={
-            np.ndarray: lambda v: v.tolist(),
-            torch.Tensor: lambda v: v.tolist(),
-            pd.Series: lambda v: v.tolist(),
-            Column: lambda v: v.to_json(),
-            np.int64: lambda v: int(v),
-            np.float64: lambda v: float(v),
-            np.int32: lambda v: int(v),
-            np.bool_: lambda v: bool(v),
-            np.bool8: lambda v: bool(v),
-        },
+        custom_encoder=get_custom_json_encoder(),
     )
