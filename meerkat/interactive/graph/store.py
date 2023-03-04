@@ -2,6 +2,8 @@ import logging
 import warnings
 from typing import Any, Generic, Iterator, List, Tuple, TypeVar, Union
 
+from fastapi.encoders import jsonable_encoder
+
 from pydantic import BaseModel, ValidationError
 from pydantic.fields import ModelField
 from wrapt import ObjectProxy
@@ -12,6 +14,7 @@ from meerkat.interactive.graph.reactivity import reactive
 from meerkat.interactive.modification import StoreModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.interactive.types import Storeable
+from meerkat.interactive.utils import get_custom_json_encoder
 from meerkat.mixins.identifiable import IdentifiableMixin
 from meerkat.mixins.reactifiable import MarkableMixin
 
@@ -57,8 +60,9 @@ class Store(IdentifiableMixin, NodeMixin, MarkableMixin, Generic[T], ObjectProxy
     def value(self):
         return self.__wrapped__
 
-    def to_json(self):
-        return self.__wrapped__
+    def to_json(self) -> Any:
+        """Converts the wrapped object into a jsonifiable object."""
+        return jsonable_encoder(self.__wrapped__, custom_encoder=get_custom_json_encoder())
 
     @property
     def frontend(self):

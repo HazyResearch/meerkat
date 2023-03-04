@@ -1,7 +1,6 @@
 import rich
 import numpy as np
 import pandas as pd
-from meerkat.columns.abstract import Column
 from meerkat.interactive.graph.reactivity import reactive
 from meerkat.tools.lazy_loader import LazyLoader
 from meerkat.env import is_torch_available
@@ -11,7 +10,11 @@ torch = LazyLoader("torch")
 
 print = reactive(rich.print)
 
+
 def get_custom_json_encoder() -> Dict[Type, Callable]:
+    from meerkat.columns.abstract import Column
+    from meerkat.interactive.graph.store import Store
+
     custom_encoder = {
         np.ndarray: lambda v: v.tolist(),
         pd.Series: lambda v: v.tolist(),
@@ -21,6 +24,7 @@ def get_custom_json_encoder() -> Dict[Type, Callable]:
         np.int32: lambda v: int(v),
         np.bool_: lambda v: bool(v),
         np.bool8: lambda v: bool(v),
+        Store: lambda v: v.to_json(),
     }
 
     if is_torch_available():
