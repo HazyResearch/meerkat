@@ -6,11 +6,11 @@ from typing import Sequence
 
 import cytoolz as tz
 import pandas as pd
+from PIL.Image import Image
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
 from meerkat.mixins.cloneable import CloneableMixin
-from PIL.Image import Image
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -63,9 +63,8 @@ class ObjectColumn(Column):
         return self[index]
 
     def _get_default_formatters(self):
-
         from meerkat.interactive.formatter.image import ImageFormatterGroup
-    
+
         sample = self[0]
         if isinstance(sample, Image):
             return ImageFormatterGroup()

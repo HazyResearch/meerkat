@@ -3,13 +3,14 @@ import os
 from io import BytesIO
 from typing import Any, Dict, Tuple
 
+from PIL import Image as PILImage
+
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.formatter.icon import IconFormatter
 
 from ..app.src.lib.component.core.image import Image
 from .base import BaseFormatter, FormatterGroup
 
-from PIL import Image as PILImage
 
 class ImageFormatter(BaseFormatter):
     component_class = Image
