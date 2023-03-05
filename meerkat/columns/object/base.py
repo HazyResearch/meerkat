@@ -10,6 +10,7 @@ from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
 from meerkat.mixins.cloneable import CloneableMixin
+from PIL.Image import Image
 
 Representer.add_representer(abc.ABCMeta, Representer.represent_name)
 
@@ -61,19 +62,15 @@ class ObjectColumn(Column):
     def _repr_cell(self, index) -> object:
         return self[index]
 
-    def _get_default_formatter(self):
-        from PIL.Image import Image
+    def _get_default_formatters(self):
 
-        from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
-        from meerkat.interactive.app.src.lib.component.core.scalar import (
-            ScalarFormatter,
-        )
-
+        from meerkat.interactive.formatter.image import ImageFormatterGroup
+    
         sample = self[0]
         if isinstance(sample, Image):
-            return ImageFormatter()
+            return ImageFormatterGroup()
 
-        return ScalarFormatter()
+        return super()._get_default_formatters()
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         return pd.Series([self[int(idx)] for idx in range(len(self))])
