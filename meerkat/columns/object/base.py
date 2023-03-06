@@ -6,6 +6,7 @@ from typing import Sequence
 
 import cytoolz as tz
 import pandas as pd
+from PIL.Image import Image
 from yaml.representer import Representer
 
 from meerkat.columns.abstract import Column
@@ -61,19 +62,14 @@ class ObjectColumn(Column):
     def _repr_cell(self, index) -> object:
         return self[index]
 
-    def _get_default_formatter(self):
-        from PIL.Image import Image
-
-        from meerkat.interactive.app.src.lib.component.core.image import ImageFormatter
-        from meerkat.interactive.app.src.lib.component.core.scalar import (
-            ScalarFormatter,
-        )
+    def _get_default_formatters(self):
+        from meerkat.interactive.formatter.image import ImageFormatterGroup
 
         sample = self[0]
         if isinstance(sample, Image):
-            return ImageFormatter()
+            return ImageFormatterGroup()
 
-        return ScalarFormatter()
+        return super()._get_default_formatters()
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         return pd.Series([self[int(idx)] for idx in range(len(self))])

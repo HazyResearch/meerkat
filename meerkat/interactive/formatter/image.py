@@ -3,6 +3,8 @@ import os
 from io import BytesIO
 from typing import Any, Dict, Tuple
 
+from PIL import Image as PILImage
+
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.formatter.icon import IconFormatter
 
@@ -18,9 +20,22 @@ class ImageFormatter(BaseFormatter):
         self.max_size = max_size
         self.classes = classes
 
-    def encode(self, cell: Image) -> str:
+    def encode(self, cell: PILImage, skip_copy: bool = False) -> str:
+        """Encodes an image as a base64 string.
+
+        Args:
+            cell: The image to encode.
+            skip_copy: If True, the image may be modified in place.
+                Set to ``True`` if the image is already a copy
+                or is loaded dynamically (e.g. DeferredColumn).
+                This may save time for large images.
+        """
         with BytesIO() as buffer:
             if self.max_size:
+                # Image.thumbnail modifies the image in place, so we need to
+                # make a copy first.
+                if not skip_copy:
+                    cell = cell.copy()
                 cell.thumbnail(self.max_size)
             cell.save(buffer, "jpeg")
             return "data:image/jpeg;base64,{im_base_64}".format(
@@ -75,7 +90,7 @@ class DeferredImageFormatter(ImageFormatter):
                 return image.absolute_path
 
         image = image()
-        return super().encode(image)
+        return super().encode(image, skip_copy=True)
 
 
 class DeferredImageFormatterGroup(ImageFormatterGroup):
