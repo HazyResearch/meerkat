@@ -1713,6 +1713,7 @@ title="Open an issue"
 
 <span class="kn">import</span> <span class="nn">cytoolz</span> <span class="k">as</span> <span class="nn">tz</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">yaml.representer</span> <span class="kn">import</span> <span class="n">Representer</span>
 
 <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">Column</span>
@@ -1768,19 +1769,14 @@ title="Open an issue"
     <span class="k">def</span> <span class="nf">_repr_cell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_default_formatter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">Image</span>
-
-        <span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.core.image</span> <span class="kn">import</span> <span class="n">ImageFormatter</span>
-        <span class="kn">from</span> <span class="nn">meerkat.interactive.app.src.lib.component.core.scalar</span> <span class="kn">import</span> <span class="p">(</span>
-            <span class="n">ScalarFormatter</span><span class="p">,</span>
-        <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_default_formatters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">ImageFormatterGroup</span>
 
         <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">Image</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">ImageFormatter</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">ImageFormatterGroup</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">ScalarFormatter</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get_default_formatters</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ObjectColumn.to_pandas"><a class="viewcode-back" href="../../../../apidocs/dataframe.html#meerkat.ObjectColumn.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_objects</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="bp">self</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))])</span></div></div>
