@@ -34,8 +34,12 @@ def _contains(column: Column, value):
             "contains operator only works on string columns. "
             f"Got column {type(column)} with value {type(column[0])}."
         )
-    
+    if isinstance(value, (list, tuple)):
+        assert len(value) == 1
+        value = value[0]
+
     return column.str.contains(str(value))
+
 
 # Map a string operator to a function that takes a value and returns a boolean.
 _operator_str_to_func = {
