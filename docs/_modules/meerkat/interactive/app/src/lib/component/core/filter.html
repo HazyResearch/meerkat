@@ -1735,6 +1735,19 @@ title="Open an issue"
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_contains</span><span class="p">(</span><span class="n">column</span><span class="p">:</span> <span class="n">Column</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;contains operator only works on string columns. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got column </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">column</span><span class="p">)</span><span class="si">}</span><span class="s2"> with value </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">column</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">column</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+
 <span class="c1"># Map a string operator to a function that takes a value and returns a boolean.</span>
 <span class="n">_operator_str_to_func</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">,</span>  <span class="c1"># equality</span>
@@ -1743,9 +1756,9 @@ title="Open an issue"
     <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span><span class="p">,</span>  <span class="c1"># less than</span>
     <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">y</span><span class="p">,</span>  <span class="c1"># greater than or equal to</span>
     <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">y</span><span class="p">,</span>  <span class="c1"># less than or equal to</span>
-    <span class="c1"># TODO (arjundd): Add support for &quot;in&quot; and &quot;not in&quot; operators.</span>
     <span class="s2">&quot;in&quot;</span><span class="p">:</span> <span class="n">_in</span><span class="p">,</span>
     <span class="s2">&quot;not in&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="o">~</span><span class="n">_in</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+    <span class="s2">&quot;contains&quot;</span><span class="p">:</span> <span class="n">_contains</span><span class="p">,</span>
 <span class="p">}</span>
 
 
