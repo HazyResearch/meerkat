@@ -37,7 +37,7 @@ class FlashFill(div):
         self.manifest_cache_dir = os.path.abspath(
             os.path.expanduser(manifest_cache_dir)
         )
-        os.makedirs(self.manifest_cache_dir)
+        os.makedirs(self.manifest_cache_dir, exist_ok=True)
 
     @property
     def prompt(self):
