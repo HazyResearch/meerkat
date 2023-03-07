@@ -104,10 +104,13 @@ def is_notebook() -> bool:
     -is-executed-in-the-ipython-notebook.
     """
     try:
-        shell = get_ipython().__class__.__name__
-        if shell == "ZMQInteractiveShell":
+        shell = get_ipython()
+        
+        if shell.__class__.__name__ == "ZMQInteractiveShell":
             return True  # Jupyter notebook or qtconsole
-        elif shell == "TerminalInteractiveShell":
+        elif shell.__class__.__module__ == "google.colab._shell":
+            return True
+        elif shell.__class__.__name__ == "TerminalInteractiveShell":
             return False  # Terminal running IPython
         else:
             return False  # Other type (?)
