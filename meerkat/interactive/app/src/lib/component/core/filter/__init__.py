@@ -28,6 +28,19 @@ def _in(column: Column, value):
     return data.isin(value)
 
 
+def _contains(column: Column, value):
+    if not isinstance(column[0], str):
+        raise ValueError(
+            "contains operator only works on string columns. "
+            f"Got column {type(column)} with value {type(column[0])}."
+        )
+    if isinstance(value, (list, tuple)):
+        assert len(value) == 1
+        value = value[0]
+
+    return column.str.contains(str(value))
+
+
 # Map a string operator to a function that takes a value and returns a boolean.
 _operator_str_to_func = {
     "==": lambda x, y: x == y,  # equality
@@ -36,9 +49,9 @@ _operator_str_to_func = {
     "<": lambda x, y: x < y,  # less than
     ">=": lambda x, y: x >= y,  # greater than or equal to
     "<=": lambda x, y: x <= y,  # less than or equal to
-    # TODO (arjundd): Add support for "in" and "not in" operators.
     "in": _in,
     "not in": lambda x, y: ~_in(x, y),
+    "contains": _contains,
 }
 
 

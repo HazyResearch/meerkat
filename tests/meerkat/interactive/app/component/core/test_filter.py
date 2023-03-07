@@ -72,6 +72,20 @@ def test_filter_operations(op, value):
     assert np.all(node.obj["a"].data == expected)
 
 
+@pytest.mark.parametrize("value,expected", [("hello", [0, 2]), ("bye", [1, 2])])
+def test_filter_contains(value, expected):
+    df = mk.DataFrame({"a": ["hello world", "bye world", "hello bye world"]})
+
+    expected = df["a"][expected]
+    filter = mk.gui.Filter(df=df)
+    out = filter(df)
+    node = out.inode
+
+    criterion = FilterCriterion(is_enabled=True, column="a", op="contains", value=value)
+    _set_criteria.run(filter.criteria.value + [criterion], filter.criteria)
+    assert np.all(node.obj["a"].data == expected.data)
+
+
 def test_filter_bool():
     """TODO: Test filtering with a boolean column."""
     pass
