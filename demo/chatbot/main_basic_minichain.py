@@ -1,6 +1,4 @@
-"""
-A basic chatbot demo, powered by Meerkat and Minichain.
-"""
+"""A basic chatbot demo, powered by Meerkat and Minichain."""
 import os
 
 import meerkat as mk

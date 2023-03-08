@@ -268,7 +268,8 @@ DemoScript = Enum(
         k: k
         for k in [
             x.split(".py")[0] for x in os.listdir(MEERKAT_DEMO_DIR) if x.endswith(".py")
-        ] + demos
+        ]
+        + demos
     }
     if MEERKAT_DEMO_DIR
     else {},

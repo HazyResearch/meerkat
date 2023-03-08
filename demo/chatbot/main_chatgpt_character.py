@@ -1,6 +1,4 @@
-"""
-A lofi version of character.ai, built in Meerkat with ChatGPT.
-"""
+"""A lofi version of character.ai, built in Meerkat with ChatGPT."""
 import os
 
 import meerkat as mk

@@ -1,6 +1,4 @@
-"""
-A ChatGPT demo, built in Meerkat.
-"""
+"""A ChatGPT demo, built in Meerkat."""
 import os
 
 import meerkat as mk

@@ -2,18 +2,19 @@ import json
 import os
 import shutil
 from datetime import datetime
-from demo.chatbot.characters import CHARACTERS
+
 import openai
 
 import meerkat as mk
-
+from demo.chatbot.characters import CHARACTERS
 
 CHATBOT = "chatbot"
 USER = "user"
 
+
 class ConversationHistory:
-    """Stores the full conversation history, and keeps track of
-    the agent's memory to use for prompting."""
+    """Stores the full conversation history, and keeps track of the agent's
+    memory to use for prompting."""
 
     def __init__(
         self,
@@ -82,9 +83,7 @@ def get_chatbot_response(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": instructions}]
         + [
-            message
-            if message["role"] == USER
-            else {**message, **{"role": "assistant"}}
+            message if message["role"] == USER else {**message, **{"role": "assistant"}}
             for message in messages["role", "content"]
         ],
     )
@@ -126,25 +125,32 @@ class CharacterChatbot(mk.gui.html.div):
         img_user: str = "http://placekitten.com/200/200",
         savepath: str = "history.jsonl",
         classes: str = "h-full flex flex-col pb-12",
-    ):  
+    ):
         # Selector for character name
         character_select = mk.gui.Select(
             values=list(range(len(CHARACTERS))),
-            labels=[c['character'] for c in CHARACTERS],
+            labels=[c["character"] for c in CHARACTERS],
             value=0,
         )
         character = mk.reactive(lambda value: CHARACTERS[value])(character_select.value)
-        chatbot_name = mk.reactive(lambda character: "🤖 " + character['character'])(character)
-        instructions = mk.reactive(lambda character: character['instructions'] + f" You must only answer as {character['character']}, and never refer to yourself as a language model. Make your responses as crazy and whimsical as possible.")(character)
+        chatbot_name = mk.reactive(lambda character: "🤖 " + character["character"])(
+            character
+        )
+        instructions = mk.reactive(
+            lambda character: character["instructions"]
+            + f" You must only answer as {character['character']}, and never refer to yourself as a language model. Make your responses as crazy and whimsical as possible."
+        )(character)
         mk.gui.print(character)
 
         # Keep track of the conversation history.
         # Also contains a memory that is used for prompting.
-        history = mk.reactive(lambda character: ConversationHistory(
-            greeting=character['greeting'],
-            chatbot_name=chatbot_name,
-            savepath=savepath.replace(".jsonl", f".{character['id']}.jsonl"),
-        ))(character)
+        history = mk.reactive(
+            lambda character: ConversationHistory(
+                greeting=character["greeting"],
+                chatbot_name=chatbot_name,
+                savepath=savepath.replace(".jsonl", f".{character['id']}.jsonl"),
+            )
+        )(character)
 
         # This endpoint takes in one remaining argument, `message`, which
         # is the message sent by the user. It then updates the conversation
@@ -161,7 +167,7 @@ class CharacterChatbot(mk.gui.html.div):
         with mk.magic():
             chat = mk.gui.Chat(
                 df=history.df,
-                img_chatbot=character['img'],
+                img_chatbot=character["img"],
                 img_user=img_user,
                 on_send=on_send,
             )

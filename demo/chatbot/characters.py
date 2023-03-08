@@ -139,4 +139,4 @@ CHARACTERS = [
         "img": "https://upload.wikimedia.org/wikipedia/en/4/42/Master_chief_halo_infinite.png",
         "greeting": "Hello, I am Master Chief, the main character of the Halo video game franchise.",
     },
-]   
+]

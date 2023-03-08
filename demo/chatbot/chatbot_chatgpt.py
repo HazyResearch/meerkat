@@ -10,9 +10,10 @@ import meerkat as mk
 CHATBOT = "chatbot"
 USER = "user"
 
+
 class ConversationHistory:
-    """Stores the full conversation history, and keeps track of
-    the agent's memory to use for prompting."""
+    """Stores the full conversation history, and keeps track of the agent's
+    memory to use for prompting."""
 
     def __init__(
         self,
@@ -81,9 +82,7 @@ def get_chatbot_response(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": instructions}]
         + [
-            message
-            if message["role"] == USER
-            else {**message, **{"role": "assistant"}}
+            message if message["role"] == USER else {**message, **{"role": "assistant"}}
             for message in messages["role", "content"]
         ],
     )
@@ -170,8 +169,8 @@ class ChatGPT(mk.gui.html.div):
 
 
 def test_chatgpt():
-    """Test the chatgpt component by simulating a conversation
-    and checking that the memory is updated."""
+    """Test the chatgpt component by simulating a conversation and checking
+    that the memory is updated."""
 
     # Create chatgpt
     chatgpt = ChatGPT(savepath="temp.history.jsonl")

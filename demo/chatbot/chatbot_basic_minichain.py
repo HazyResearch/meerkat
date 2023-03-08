@@ -1,7 +1,5 @@
-"""
-A basic chatbot implementation that uses Meerkat to 
-create a chatbot and manage its state, and MiniChain to
-perform prompting.
+"""A basic chatbot implementation that uses Meerkat to create a chatbot and
+manage its state, and MiniChain to perform prompting.
 
 Borrows code from [MiniChain](https://github.com/srush/minichain)'s
 chatbot example.
@@ -54,8 +52,8 @@ class ChatPrompt(minichain.TemplatePrompt):
 
 
 class ConversationHistory:
-    """Stores the full conversation history, and keeps track of
-    the agent's memory to use for prompting."""
+    """Stores the full conversation history, and keeps track of the agent's
+    memory to use for prompting."""
 
     def __init__(
         self,
@@ -174,7 +172,6 @@ class BasicChatbot(mk.gui.html.div):
         savepath: str = "history.jsonl",
         classes: str = "h-full flex flex-col",
     ):
-
         # Spin up the prompt engine with `minichain`.
         backend = minichain.start_chain("chatbot")
         prompt = ChatPrompt(backend.OpenAI(model=model))
@@ -223,8 +220,8 @@ class BasicChatbot(mk.gui.html.div):
 
 
 def test_basic_chatbot():
-    """Test the basic chatbot component by simulating a conversation
-    and checking that the memory is updated."""
+    """Test the basic chatbot component by simulating a conversation and
+    checking that the memory is updated."""
 
     # Create a basic chatbot
     chatbot = BasicChatbot("curie")
