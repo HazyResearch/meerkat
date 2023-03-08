@@ -153,7 +153,7 @@ class ChatGPT(mk.gui.html.div):
 
         # Make a little header on top of the chat component.
         header = mk.gui.Caption(
-            f"ChatGPT, built using 🔮 [Meerkat](http://meerkat.wiki).",
+            "ChatGPT, built using 🔮 [Meerkat](http://meerkat.wiki).",
             classes="self-center max-w-full bg-gray-50 dark:bg-slate-300 mx-8 px-2"
             " w-fit text-center rounded-t-lg",
         )

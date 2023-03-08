@@ -138,7 +138,9 @@ class CharacterChatbot(mk.gui.html.div):
         )
         instructions = mk.reactive(
             lambda character: character["instructions"]
-            + f" You must only answer as {character['character']}, and never refer to yourself as a language model. Make your responses as crazy and whimsical as possible."
+            + f" You must only answer as {character['character']},"
+            " and never refer to yourself as a language model."
+            " Make your responses as crazy and whimsical as possible."
         )(character)
         mk.gui.print(character)
 
@@ -174,9 +176,9 @@ class CharacterChatbot(mk.gui.html.div):
 
         # Make a little header on top of the chat component.
         header = mk.gui.Caption(
-            f"Character chat, built using 🔮 [Meerkat](http://meerkat.wiki).",
-            classes="self-center max-w-full bg-gray-50 dark:bg-slate-300 mx-8 px-2"
-            " w-fit text-center rounded-t-lg",
+            "Character chat, built using 🔮 [Meerkat](http://meerkat.wiki).",
+            classes="self-center max-w-full bg-gray-50 dark:bg-slate-300"
+            " mx-8 px-2 w-fit text-center rounded-t-lg",
         )
 
         # Call the constructor for `div`, which we wrap around

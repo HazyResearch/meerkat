@@ -204,7 +204,8 @@ class BasicChatbot(mk.gui.html.div):
         # Make a little header on top of the chat component.
         header = mk.gui.html.div(
             mk.gui.Caption(
-                f"Chatbot running `{model}`, and built using 🔮 [Meerkat](http://meerkat.wiki)."
+                f"Chatbot running `{model}`, and built using "
+                "🔮 [Meerkat](http://meerkat.wiki)."
             ),
             classes="bg-gray-50 dark:bg-slate-300 mx-8 px-2 w-fit rounded-t-lg",
         )
