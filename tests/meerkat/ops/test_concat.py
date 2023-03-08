@@ -8,7 +8,8 @@ from meerkat import concat
 from meerkat.columns.object.base import ObjectColumn
 from meerkat.columns.tensor.numpy import NumPyTensorColumn
 from meerkat.dataframe import DataFrame
-from meerkat.errors import ConcatError
+from meerkat.errors import ConcatError, ConcatWarning
+from meerkat.ops.map import defer
 
 from ...testbeds import AbstractColumnTestBed, MockDatapanel
 from ...utils import product_parametrize
@@ -133,3 +134,33 @@ def test_concat_different_lengths():
 def test_empty_concat():
     out = concat([])
     assert isinstance(out, DataFrame)
+
+
+def test_concat_deferred_column_different_fns():
+    """
+    Test concat with deferred columns that have different functions.
+
+    The fn of the first dataframe will be taken.
+    """
+    a = DataFrame.from_batch({"a": [1, 2, 3]})
+    b = DataFrame.from_batch({"a": [4, 5, 6]})
+
+    a["fn"] = defer(a["a"], lambda x: x + 1)
+    b["fn"] = defer(b["a"], lambda x: x + 2)
+
+    with pytest.warns(ConcatWarning):
+        out = concat([a, b], axis="rows")
+
+    np.testing.assert_equal(out["fn"]().data, [2, 3, 4, 5, 6, 7])
+
+
+# def test_concat_deferred_column_expand():
+#     """
+#     Deferred columns should expand to dataframes when concatenated.
+#     """
+#     a = DataFrame.from_batch({"a": [1, 2, 3]})
+#     b = DataFrame.from_batch({"a": [4, 5, 6]})
+#     a["fn"] = defer(a["a"], lambda x: x + 1)
+
+#     out = concat([a, b], axis="rows")
+#     np.testing.assert_equal(out["fn"]().data, [2, 3, 4, 5, 6, 7])
