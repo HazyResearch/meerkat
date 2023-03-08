@@ -37,12 +37,9 @@ except ImportError:
 
 
 class ComponentFrontend(BaseModel):
-    component_id: str
-    path: str
     name: str
     props: Dict
     slots: list
-    library: str
 
 
 class WrappableMixin:
@@ -304,15 +301,16 @@ class BaseComponent(
             base_types=(Store),
         )
         return ComponentFrontend(
-            component_id=self.id,
-            path=os.path.join(
-                os.path.dirname(inspect.getfile(self.__class__)),
-                f"{self.component_name}.svelte",
-            ),
-            name=self.alias,
+            # component_id=self.id,
+            # path=os.path.join(
+            #     os.path.dirname(inspect.getfile(self.__class__)),
+            #     f"{self.component_name}.svelte",
+            # ),
+            # name=self.alias,
+            name=self.frontend_alias,
             props=frontend_props,
             slots=[slot.frontend for slot in self.slots],
-            library=self.library,
+            # library=self.library,
         )
 
     @property
