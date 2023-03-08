@@ -252,7 +252,7 @@ def install(
         app.run_dev()
 
 
-# Find all .py files in MEERKAT_DEMO_DIR, OR .py files 
+# Find all .py files in MEERKAT_DEMO_DIR, OR .py files
 # in subdirectories of MEERKAT_DEMO_DIR that start with "main_"
 demos = []
 if MEERKAT_DEMO_DIR:
