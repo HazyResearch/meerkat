@@ -252,13 +252,23 @@ def install(
         app.run_dev()
 
 
+# Find all .py files in MEERKAT_DEMO_DIR, OR .py files in subdirectories of MEERKAT_DEMO_DIR
+# that start with "main_"
+demos = []
+if MEERKAT_DEMO_DIR:
+    for root, dirs, files in os.walk(MEERKAT_DEMO_DIR):
+        for dir in dirs:
+            for file in os.listdir(os.path.join(root, dir)):
+                if file.startswith("main") and file.endswith(".py"):
+                    demos.append(os.path.join(dir, file.replace(".py", "")))
+
 DemoScript = Enum(
     "DemoScript",
     {
         k: k
         for k in [
             x.split(".py")[0] for x in os.listdir(MEERKAT_DEMO_DIR) if x.endswith(".py")
-        ]
+        ] + demos
     }
     if MEERKAT_DEMO_DIR
     else {},
