@@ -1876,6 +1876,7 @@ title="Open an issue"
     <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span>
     <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">reset_criterion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># TODO: Revisit this, how to deal with endpoint interfaces when there is composition</span>
     <span class="c1"># and positional arguments</span>
@@ -1896,6 +1897,7 @@ title="Open an issue"
         <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span><span class="p">,</span>
         <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">reset_criterion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">on_match</span><span class="p">:</span> <span class="n">EndpointProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">get_match_schema</span><span class="p">:</span> <span class="n">EndpointProperty</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">on_clickminus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1904,6 +1906,18 @@ title="Open an issue"
         <span class="n">on_unclickplus</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">on_reset</span><span class="p">:</span> <span class="n">Endpoint</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            df: The DataFrame.</span>
+<span class="sd">            against: The column to match against.</span>
+<span class="sd">            text: The query text.</span>
+<span class="sd">            encoder: The encoder to use.</span>
+<span class="sd">            title: The title of the component.</span>
+<span class="sd">            enable_selection: Whether to enable selection for image-based matching.</span>
+<span class="sd">            reset_criterion: Whether to reset the criterion when on_reset is called.</span>
+<span class="sd">            on_match: The endpoint to call when the match button is clicked.</span>
+<span class="sd">                This endpoint will be called after ``self.criterion`` is set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
             <span class="n">against</span><span class="o">=</span><span class="n">against</span><span class="p">,</span>
@@ -1911,6 +1925,7 @@ title="Open an issue"
             <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">enable_selection</span><span class="o">=</span><span class="n">enable_selection</span><span class="p">,</span>
+            <span class="n">reset_criterion</span><span class="o">=</span><span class="n">reset_criterion</span><span class="p">,</span>
             <span class="n">on_match</span><span class="o">=</span><span class="n">on_match</span><span class="p">,</span>
             <span class="n">get_match_schema</span><span class="o">=</span><span class="n">get_match_schema</span><span class="p">,</span>
             <span class="n">on_clickminus</span><span class="o">=</span><span class="n">on_clickminus</span><span class="p">,</span>
@@ -1980,6 +1995,8 @@ title="Open an issue"
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_positive_selection</span><span class="o">.</span><span class="n">set</span><span class="p">([])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_negative_selection</span><span class="o">.</span><span class="n">set</span><span class="p">([])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_criterion</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_criterion</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">MatchCriterion</span><span class="p">(</span><span class="n">against</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
 
     <span class="nd">@reactive</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">on_external_selection_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">external_selection</span><span class="p">):</span>
