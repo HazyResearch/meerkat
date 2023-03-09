@@ -12,6 +12,7 @@
 		Magic,
 		BoxFill,
 		CheckSquare,
+		TrashFill
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -28,6 +29,7 @@
 		FileEarmarkPdf: FileEarmarkPdf,
 		BoxFill: BoxFill,
 		CheckSquare: CheckSquare,
+		TrashFill: TrashFill
 	};
 </script>
 

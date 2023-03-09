@@ -169,6 +169,7 @@ class Match(Component):
     encoder: str = "clip"
     title: str = "Match"
     enable_selection: bool = False
+    reset_criterion: bool = False
 
     # TODO: Revisit this, how to deal with endpoint interfaces when there is composition
     # and positional arguments
@@ -189,6 +190,7 @@ class Match(Component):
         encoder: str = "clip",
         title: str = "Match",
         enable_selection: bool = False,
+        reset_criterion: bool = False,
         on_match: EndpointProperty = None,
         get_match_schema: EndpointProperty = None,
         on_clickminus: Endpoint = None,
@@ -197,6 +199,18 @@ class Match(Component):
         on_unclickplus: Endpoint = None,
         on_reset: Endpoint = None,
     ):
+        """
+        Args:
+            df: The DataFrame.
+            against: The column to match against.
+            text: The query text.
+            encoder: The encoder to use.
+            title: The title of the component.
+            enable_selection: Whether to enable selection for image-based matching.
+            reset_criterion: Whether to reset the criterion when on_reset is called.
+            on_match: The endpoint to call when the match button is clicked.
+                This endpoint will be called after ``self.criterion`` is set.
+        """
         super().__init__(
             df=df,
             against=against,
@@ -204,6 +218,7 @@ class Match(Component):
             encoder=encoder,
             title=title,
             enable_selection=enable_selection,
+            reset_criterion=reset_criterion,
             on_match=on_match,
             get_match_schema=get_match_schema,
             on_clickminus=on_clickminus,
@@ -273,6 +288,8 @@ class Match(Component):
         self._mode.set("")
         self._positive_selection.set([])
         self._negative_selection.set([])
+        if self.reset_criterion:
+            self._criterion.set(MatchCriterion(against=None, query=None, name=None))
 
     @reactive()
     def on_external_selection_change(self, external_selection):
