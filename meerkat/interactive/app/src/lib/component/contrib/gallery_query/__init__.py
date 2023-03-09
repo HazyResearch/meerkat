@@ -24,8 +24,20 @@ class GalleryQuery(div):
         df: "DataFrame",
         main_column: str,
         against: str,
+        allow_selection: bool = False,
         classes: str = "h-screen",
     ):
+        """
+        Args:
+            df: The DataFrame to match against and select examples from.
+            main_column: The main column to display in the gallery.
+            against: The column to match against.
+            allow_selection: Whether to allow the user to select examples
+                from the gallery even when not in image match mode.
+                Note the selection will be reset when the user switches
+                to a different mode.
+            classes: The classes to apply to the div.
+        """
         from meerkat.ops.sort import sort
 
         match = Match(
@@ -44,7 +56,7 @@ class GalleryQuery(div):
 
         # Gallery
         with magic():
-            allow_selection = cor(False, mkbool(match._mode))
+            allow_selection = cor(allow_selection, mkbool(match._mode))
 
         gallery = Gallery(
             df_sorted,
