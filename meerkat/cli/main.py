@@ -182,7 +182,6 @@ def _run(
     rich.print()
 
     # Run the frontend
-    # TODO: make the dummy API info take in the actual hostname
     dummy_api_info = APIInfo(api=None, port=api_port, name=host, shared=host != "127.0.0.1")
     frontend_info = run_frontend(
         package_manager=package_manager,

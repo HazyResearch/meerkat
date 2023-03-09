@@ -64,10 +64,29 @@ class APIInfo:
     process: Optional[subprocess.Popen] = None
     _url: Optional[str] = None
 
+    def _get_hf_spaces_info(self):
+        author = os.environ.get("SPACE_AUTHOR_NAME", None)
+        repo = os.environ.get("SPACE_REPO_NAME", None)
+        return author, repo
+
+    def on_hf_spaces(self):
+        author, repo = self._get_hf_spaces_info()
+        if author and repo:
+            return True
+        return False
+
+    def get_hf_spaces_url(self):
+        author, repo = self._get_hf_spaces_info()
+        return f"https://{author}-{repo}.hf.space"
+
     @property
     def url(self):
         if self._url:
             return self._url
+
+        if self.on_hf_spaces():
+            return self.get_hf_spaces_url()
+
         if self.shared:
             return f"http://{self.name}"
         return f"http://{self.name}:{self.port}"
