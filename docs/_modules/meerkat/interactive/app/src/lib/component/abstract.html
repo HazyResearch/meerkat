@@ -1744,12 +1744,9 @@ title="Open an issue"
 
 
 <span class="k">class</span> <span class="nc">ComponentFrontend</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">component_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">props</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="n">slots</span><span class="p">:</span> <span class="nb">list</span>
-    <span class="n">library</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="k">class</span> <span class="nc">WrappableMixin</span><span class="p">:</span>
@@ -2011,15 +2008,16 @@ title="Open an issue"
             <span class="n">base_types</span><span class="o">=</span><span class="p">(</span><span class="n">Store</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">ComponentFrontend</span><span class="p">(</span>
-            <span class="n">component_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)),</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">component_name</span><span class="si">}</span><span class="s2">.svelte&quot;</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span>
+            <span class="c1"># component_id=self.id,</span>
+            <span class="c1"># path=os.path.join(</span>
+            <span class="c1">#     os.path.dirname(inspect.getfile(self.__class__)),</span>
+            <span class="c1">#     f&quot;{self.component_name}.svelte&quot;,</span>
+            <span class="c1"># ),</span>
+            <span class="c1"># name=self.alias,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frontend_alias</span><span class="p">,</span>
             <span class="n">props</span><span class="o">=</span><span class="n">frontend_props</span><span class="p">,</span>
             <span class="n">slots</span><span class="o">=</span><span class="p">[</span><span class="n">slot</span><span class="o">.</span><span class="n">frontend</span> <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">],</span>
-            <span class="n">library</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">library</span><span class="p">,</span>
+            <span class="c1"># library=self.library,</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
