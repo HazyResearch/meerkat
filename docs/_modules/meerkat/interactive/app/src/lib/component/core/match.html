@@ -1707,6 +1707,7 @@ title="Open an issue"
   <h1>Source code for meerkat.interactive.app.src.lib.component.core.match</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">HTTPException</span>
@@ -1716,6 +1717,9 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.endpoint</span> <span class="kn">import</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">EndpointProperty</span><span class="p">,</span> <span class="n">endpoint</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.event</span> <span class="kn">import</span> <span class="n">EventInterface</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.graph</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">reactive</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">meerkat.ops.embed.encoder</span> <span class="kn">import</span> <span class="n">Encoder</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
@@ -1735,25 +1739,26 @@ title="Open an issue"
 <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_parse_query</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;eval&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">encoder</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Encoder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_parse_query</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;eval&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span>
-    <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">,</span> <span class="n">encoder</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Encoder&quot;</span><span class="p">]):</span>
     <span class="kn">import</span> <span class="nn">meerkat</span> <span class="k">as</span> <span class="nn">mk</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">BinOp</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_SUPPORTED_BIN_OPS</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">](</span>
-            <span class="n">_parse_query</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">),</span> <span class="n">_parse_query</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+            <span class="n">_parse_query</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">),</span>
+            <span class="n">_parse_query</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Call</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_SUPPORTED_CALLS</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="p">](</span><span class="o">*</span><span class="p">[</span><span class="n">_parse_query</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">_SUPPORTED_CALLS</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">id</span><span class="p">](</span>
+            <span class="o">*</span><span class="p">[</span><span class="n">_parse_query</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mk</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">column</span><span class="p">([</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">]),</span>
-            <span class="n">encoder</span><span class="o">=</span><span class="s2">&quot;clip&quot;</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">pbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1799,7 +1804,7 @@ title="Open an issue"
     <span class="n">criterion</span><span class="p">:</span> <span class="n">Store</span><span class="p">,</span>
     <span class="n">positives</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">negatives</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Encoder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Match a query string against a DataFrame column.</span>
 
@@ -1816,7 +1821,7 @@ title="Open an issue"
 
         <span class="n">query_embedding</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
-            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">parse_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">negatives</span><span class="p">:</span>
             <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">query_embedding</span> <span class="o">-</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">_calc_image_query</span><span class="p">(</span>
                 <span class="n">df</span><span class="p">,</span> <span class="n">negatives</span><span class="p">,</span> <span class="n">against</span>
@@ -1873,7 +1878,6 @@ title="Open an issue"
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span>
     <span class="n">against</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span>
     <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">reset_criterion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1894,7 +1898,7 @@ title="Open an issue"
         <span class="o">*</span><span class="p">,</span>
         <span class="n">against</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">encoder</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span><span class="p">,</span>
+        <span class="n">encoder</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Encoder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;clip&quot;</span><span class="p">,</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Match&quot;</span><span class="p">,</span>
         <span class="n">enable_selection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">reset_criterion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1922,7 +1926,6 @@ title="Open an issue"
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
             <span class="n">against</span><span class="o">=</span><span class="n">against</span><span class="p">,</span>
             <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
-            <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">enable_selection</span><span class="o">=</span><span class="n">enable_selection</span><span class="p">,</span>
             <span class="n">reset_criterion</span><span class="o">=</span><span class="n">reset_criterion</span><span class="p">,</span>
@@ -1958,7 +1961,7 @@ title="Open an issue"
 
         <span class="n">on_match</span> <span class="o">=</span> <span class="n">set_criterion</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span>
-            <span class="n">encoder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
             <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_criterion</span><span class="p">,</span>
             <span class="n">positives</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">positive_selection</span><span class="p">,</span>
             <span class="n">negatives</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">negative_selection</span><span class="p">,</span>

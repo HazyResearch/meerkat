@@ -1827,13 +1827,15 @@ title="Open an issue"
         <span class="c1"># pyarrow.lib.StringScalars in a mk.ArrowArrayColumn</span>
         <span class="k">if</span> <span class="n">modality</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">mk</span><span class="o">.</span><span class="n">ArrowScalarColumn</span><span class="p">):</span>
             <span class="n">col</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">ScalarColumn</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">encoders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="n">encoder</span> <span class="o">=</span> <span class="n">encoders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">modality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">encoder</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Encoder &quot;</span><span class="si">{</span><span class="n">encoder</span><span class="si">}</span><span class="s1">&quot; does not support modality &quot;</span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
-
-    <span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">modality</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">encoder</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Encoder &quot;</span><span class="si">{</span><span class="n">encoder</span><span class="si">}</span><span class="s1">&quot; does not support modality &quot;</span><span class="si">{</span><span class="n">modality</span><span class="si">}</span><span class="s1">&quot;.&#39;</span>
+            <span class="p">)</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">[</span><span class="n">modality</span><span class="p">]</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">_embed</span><span class="p">(</span>
         <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
@@ -1866,7 +1868,10 @@ title="Open an issue"
     <span class="n">pbar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">_encode</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">_prepare_input</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="n">_prepare_input</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>

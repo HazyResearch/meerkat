@@ -59,5 +59,7 @@
       ~RawHTML.wrapper_import_style
       ~RawHTML.html
       ~RawHTML.view
+      ~RawHTML.sanitize
+      ~RawHTML.classes
    
    

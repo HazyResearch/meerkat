@@ -63,7 +63,6 @@
       ~Match.df
       ~Match.against
       ~Match.text
-      ~Match.encoder
       ~Match.title
       ~Match.enable_selection
       ~Match.reset_criterion
