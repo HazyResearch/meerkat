@@ -119,6 +119,8 @@ Follow these steps to start contributing:
    $ make lint
    ```
    Note: if you have a bunch of unused import warnings, you can run `autoflake --remove-all-unused-imports . -ri` to remove them. (You may need to pip install autoflake.)
+   
+   Note: if you are failing linting locally, but passing on CI/CD, ensure that you do not have additional subpackages other than `X.0.0 (mccabe: 0.7.0, pycodestyle: 2.10.0, pyflakes: 3.0.1) CPython 3.9.12 on Darwin` when you run `flake8 --version`. 
 
    If you're modifying documents under `docs/source`, make sure to validate that
    they can still be built. This check also runs in CI. To run a local check
