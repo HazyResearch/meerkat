@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { fetchChunk } from '$lib/utils/api';
-	import type { DataFrameRef } from '$lib/utils/dataframe';
+	import { DataFrameChunk, type DataFrameRef } from '$lib/utils/dataframe';
 	import { Avatar, Button, Textarea } from 'flowbite-svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 	import Message from './Message.svelte';
 
 	const eventDispatcher = createEventDispatcher();
@@ -11,36 +12,60 @@
 	export let imgChatbot: string;
 	export let imgUser: string;
 
-	$: messages_promise = fetchChunk({ df, start: 0, end: 100000 });
-
+	let messages: Writable<DataFrameChunk> = writable(new DataFrameChunk([], [], [], 0, 'pkey'));
 	let value: string = '';
-	let send = () => {
-		eventDispatcher('send', { message: value });
+
+	$: fetchChunk({ df: df, start: 0 }).then((newChunk) => messages.set(newChunk));
+
+	let textarea = null;
+	// Reset the textarea value when the response is received i.e. df was updated.
+	let resetValue = () => {
 		value = '';
+		if (textarea !== null) {
+			// Make the textarea active and editable again.
+			textarea.focus();
+			textarea.removeAttribute('readonly');
+		}
+	};
+	$: df, resetValue();
+
+	let sendMessage = () => {
+		// Remove the newline character at the end of the message if it exists.
+		if (value[value.length - 1] === '\n') {
+			value = value.slice(0, -1);
+		}
+		eventDispatcher('send', { message: value });
+		if (document.activeElement instanceof HTMLElement) {
+			// Deactivate the textarea so that the user can't send the same message again.
+			textarea = document.activeElement;
+			document.activeElement.blur();
+			// Make the textarea non-editable.
+			textarea.setAttribute('readonly', 'readonly');
+		}
 	};
 </script>
 
-<div class="h-full bg-violet-100 p-4 rounded-lg flex flex-col justify-between shadow-md">
+<div
+	class="h-full bg-gray-50 dark:bg-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-md"
+>
 	<div class="flex flex-col-reverse overflow-y-scroll">
-		{#await messages_promise then messages}
-			{#each messages.rows as _, i}
-				<Message
-					message={messages.getCell(messages.fullLength - i - 1, 'message').data}
-					name={messages.getCell(messages.fullLength - i - 1, 'name').data}
-					time={messages.getCell(messages.fullLength - i - 1, 'time').data}
-				>
-					<svelte:fragment slot="avatar">
-						<Avatar
-							src={messages.getCell(messages.fullLength - i - 1, 'sender').data === 'chatbot'
-								? imgChatbot
-								: imgUser}
-							stacked={true}
-							class="mr-2"
-						/>
-					</svelte:fragment>
-				</Message>
-			{/each}
-		{/await}
+		{#each $messages.rows as _, i}
+			<Message
+				message={$messages.getCell($messages.fullLength - i - 1, 'message').data}
+				name={$messages.getCell($messages.fullLength - i - 1, 'name').data}
+				time={$messages.getCell($messages.fullLength - i - 1, 'time').data}
+			>
+				<svelte:fragment slot="avatar">
+					<Avatar
+						src={$messages.getCell($messages.fullLength - i - 1, 'sender').data === 'chatbot'
+							? imgChatbot
+							: imgUser}
+						stacked={true}
+						class="mr-2"
+					/>
+				</svelte:fragment>
+			</Message>
+		{/each}
 	</div>
 	<div class="flex mt-4">
 		<Textarea
@@ -49,10 +74,12 @@
 			class="mx-4 resize-none"
 			bind:value
 			on:keyup={(e) => {
-				e.key === 'Enter' && !e.shiftKey ? send() : null;
+				if (e.key === 'Enter' && !e.shiftKey) {
+					sendMessage();
+				}
 			}}
 		/>
-		<Button class="text-violet-600 dark:text-violet-500" on:click={send} color="light">
+		<Button class="text-violet-600 dark:text-violet-500" on:click={sendMessage} color="light">
 			<svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 				<path
 					stroke-linecap="round"
