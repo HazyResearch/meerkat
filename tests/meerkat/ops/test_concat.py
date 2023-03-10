@@ -151,7 +151,7 @@ def test_concat_deferred_column_different_fns():
     with pytest.warns(ConcatWarning):
         out = concat([a, b], axis="rows")
 
-    np.testing.assert_equal(out["fn"]().data, [2, 3, 4, 5, 6, 7])
+    np.testing.assert_equal(np.asarray(out["fn"]().data), [2, 3, 4, 5, 6, 7])
 
 
 # def test_concat_deferred_column_expand():
