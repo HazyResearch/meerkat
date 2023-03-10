@@ -277,7 +277,7 @@ class FileColumn(DeferredColumn):
     instead.
 
     Args:
-        data (Sequence[str]): A list of filepaths to images.
+        data (Sequence[str]): A list of filepaths.
 
         ${loader}
         ${base_dir}
