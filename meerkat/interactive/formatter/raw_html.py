@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from ..app.src.lib.component.core.raw_html import RawHTML
 from .base import Formatter, FormatterGroup
 from .icon import IconFormatter

@@ -32,22 +32,22 @@ _SUPPORTED_CALLS = {
 }
 
 
-def parse_query(query: str, encoder: Union[str, "Encoder"]="clip"):
+def parse_query(query: str, encoder: Union[str, "Encoder"] = "clip"):
     return _parse_query(ast.parse(query, mode="eval").body, encoder=encoder)
 
 
-def _parse_query(
-    node: ast.AST,
-    encoder: Union[str, "Encoder"]
-):
+def _parse_query(node: ast.AST, encoder: Union[str, "Encoder"]):
     import meerkat as mk
 
     if isinstance(node, ast.BinOp):
         return _SUPPORTED_BIN_OPS[node.op.__class__.__name__](
-            _parse_query(node.left, encoder=encoder), _parse_query(node.right, encoder=encoder)
+            _parse_query(node.left, encoder=encoder),
+            _parse_query(node.right, encoder=encoder),
         )
     elif isinstance(node, ast.Call):
-        return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg, encoder=encoder) for arg in node.args])
+        return _SUPPORTED_CALLS[node.func.id](
+            *[_parse_query(arg, encoder=encoder) for arg in node.args]
+        )
     elif isinstance(node, ast.Constant):
         return mk.embed(
             data=mk.column([node.value]),
