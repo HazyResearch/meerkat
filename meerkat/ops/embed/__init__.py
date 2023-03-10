@@ -125,7 +125,9 @@ def embed(
 
     if isinstance(encoder, dict):
         if modality not in encoder:
-            raise ValueError(f'Encoder "{encoder}" does not support modality "{modality}".')
+            raise ValueError(
+                f'Encoder "{encoder}" does not support modality "{modality}".'
+            )
         encoder = encoder[modality]
 
     out = _embed(

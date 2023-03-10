@@ -511,7 +511,7 @@ FILE_TYPES = {
         "loader": load_text,
         "formatters": CodeFormatterGroup,
         "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
-    }
+    },
 }
 
 
