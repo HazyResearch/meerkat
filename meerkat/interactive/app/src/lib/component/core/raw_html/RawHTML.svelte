@@ -4,15 +4,22 @@
 
 	export let html: string;
 	export let view: string = 'full';
-	console.log(html)
+	export let sanitize: boolean = true;
+	export let classes: string = "rounded-md shadow-md";
 
-	$: sanitizedHtml = sanitizeHtml(html);
+	let process = (html: string) => {
+		if (sanitize) {
+			return sanitizeHtml(html);
+		} else {
+			return html;
+		}
+	};
+	$: sanitizedHtml = process(html);
 </script>
 
-{#if view === 'icon'}
-	<span><Globe2/></span>
-{:else if view === 'thumbnail'}
-	<div class="thumbnail h-full aspect-square rounded-md shadow-md border-black">
+
+{#if view === 'thumbnail'}
+	<div class={"thumbnail h-full aspect-square " + classes}>
 		<iframe
 			srcdoc={sanitizedHtml}
 			title={'title'}
@@ -22,7 +29,7 @@
 		/>
 	</div>
 {:else}
-	<div class="h-full w-full rounded-md shadow-md border-black">
+	<div class={"h-full w-full " + classes}>
 		<iframe
 			srcdoc={sanitizedHtml}
 			title={'title'}

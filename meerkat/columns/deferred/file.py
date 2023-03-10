@@ -277,7 +277,7 @@ class FileColumn(DeferredColumn):
     instead.
 
     Args:
-        data (Sequence[str]): A list of filepaths to images.
+        data (Sequence[str]): A list of filepaths.
 
         ${loader}
         ${base_dir}
@@ -511,7 +511,7 @@ FILE_TYPES = {
         "loader": load_text,
         "formatters": CodeFormatterGroup,
         "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
-    },
+    }
 }
 
 

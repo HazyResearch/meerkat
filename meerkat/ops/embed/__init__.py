@@ -120,13 +120,13 @@ def embed(
         # pyarrow.lib.StringScalars in a mk.ArrowArrayColumn
         if modality == "text" and isinstance(col, mk.ArrowScalarColumn):
             col = mk.ScalarColumn(col.to_pandas())
+    if isinstance(encoder, str):
+        encoder = encoders.get(encoder, device=device, **kwargs)
 
-    encoder = encoders.get(encoder, device=device, **kwargs)
-
-    if modality not in encoder:
-        raise ValueError(f'Encoder "{encoder}" does not support modality "{modality}".')
-
-    encoder = encoder[modality]
+    if isinstance(encoder, dict):
+        if modality not in encoder:
+            raise ValueError(f'Encoder "{encoder}" does not support modality "{modality}".')
+        encoder = encoder[modality]
 
     out = _embed(
         col=col,
@@ -159,7 +159,10 @@ def _embed(
     pbar: bool = True,
 ):
     def _encode(x):
-        return encode(_prepare_input(x)).cpu().detach().numpy()
+        out = encode(_prepare_input(x))
+        if torch.is_tensor(out):
+            out = out.cpu().detach().numpy()
+        return out
 
     if device is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"

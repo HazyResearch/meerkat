@@ -1,5 +1,6 @@
 import ast
 from dataclasses import dataclass
+from typing import Union, TYPE_CHECKING
 
 import numpy as np
 from fastapi import HTTPException
@@ -9,6 +10,9 @@ from meerkat.interactive.app.src.lib.component.abstract import Component
 from meerkat.interactive.endpoint import Endpoint, EndpointProperty, endpoint
 from meerkat.interactive.event import EventInterface
 from meerkat.interactive.graph import Store, reactive
+
+if TYPE_CHECKING:
+    from meerkat.ops.embed.encoder import Encoder
 
 try:
     from typing import Literal
@@ -28,25 +32,26 @@ _SUPPORTED_CALLS = {
 }
 
 
-def parse_query(query: str):
-    return _parse_query(ast.parse(query, mode="eval").body)
+def parse_query(query: str, encoder: Union[str, "Encoder"]="clip"):
+    return _parse_query(ast.parse(query, mode="eval").body, encoder=encoder)
 
 
 def _parse_query(
     node: ast.AST,
+    encoder: Union[str, "Encoder"]
 ):
     import meerkat as mk
 
     if isinstance(node, ast.BinOp):
         return _SUPPORTED_BIN_OPS[node.op.__class__.__name__](
-            _parse_query(node.left), _parse_query(node.right)
+            _parse_query(node.left, encoder=encoder), _parse_query(node.right, encoder=encoder)
         )
     elif isinstance(node, ast.Call):
-        return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg) for arg in node.args])
+        return _SUPPORTED_CALLS[node.func.id](*[_parse_query(arg, encoder=encoder) for arg in node.args])
     elif isinstance(node, ast.Constant):
         return mk.embed(
             data=mk.column([node.value]),
-            encoder="clip",
+            encoder=encoder,
             num_workers=0,
             pbar=False,
         )
@@ -92,7 +97,7 @@ def set_criterion(
     criterion: Store,
     positives: list = None,
     negatives: list = None,
-    encoder: str = None,
+    encoder: Union[str, "Encoder"] = None,
 ):
     """Match a query string against a DataFrame column.
 
@@ -109,7 +114,7 @@ def set_criterion(
 
         query_embedding = 0.0
         if query:
-            query_embedding = parse_query(query)
+            query_embedding = parse_query(query, encoder=encoder)
         if negatives:
             query_embedding = query_embedding - 0.25 * _calc_image_query(
                 df, negatives, against
@@ -166,7 +171,6 @@ class Match(Component):
     df: DataFrame
     against: str
     text: str = ""
-    encoder: str = "clip"
     title: str = "Match"
     enable_selection: bool = False
     reset_criterion: bool = False
@@ -187,7 +191,7 @@ class Match(Component):
         *,
         against: str,
         text: str = "",
-        encoder: str = "clip",
+        encoder: Union[str, "Encoder"] = "clip",
         title: str = "Match",
         enable_selection: bool = False,
         reset_criterion: bool = False,
@@ -215,7 +219,6 @@ class Match(Component):
             df=df,
             against=against,
             text=text,
-            encoder=encoder,
             title=title,
             enable_selection=enable_selection,
             reset_criterion=reset_criterion,
@@ -251,7 +254,7 @@ class Match(Component):
 
         on_match = set_criterion.partial(
             df=self.df,
-            encoder=self.encoder,
+            encoder=encoder,
             criterion=self._criterion,
             positives=self.positive_selection,
             negatives=self.negative_selection,
