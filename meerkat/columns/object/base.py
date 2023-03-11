@@ -5,6 +5,7 @@ import logging
 from typing import Sequence
 
 import cytoolz as tz
+import numpy as np
 import pandas as pd
 from PIL.Image import Image
 from yaml.representer import Representer
@@ -73,3 +74,6 @@ class ObjectColumn(Column):
 
     def to_pandas(self, allow_objects: bool = False) -> pd.Series:
         return pd.Series([self[int(idx)] for idx in range(len(self))])
+
+    def to_numpy(self):
+        return np.array(self.data)

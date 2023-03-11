@@ -63,7 +63,7 @@ class ReactifiableMixin(MarkableMixin):
             attr_is_unmarked_fn = is_method_or_fn and is_unmarked_fn(attr)
 
         if is_method_or_fn:
-            if name in ["_reactive_warning"]:
+            if name in ["_reactive_warning", "_set_data"]:
                 # There are some functions we never want to wrap because the function
                 # needs access to the current reactive state (i.e. is_reactive()).
                 # These functions should all be declared here.
