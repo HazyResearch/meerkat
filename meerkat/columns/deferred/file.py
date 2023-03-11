@@ -512,6 +512,10 @@ FILE_TYPES = {
         "formatters": CodeFormatterGroup,
         "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
     },
+    # "audio": {
+    #     "loader": load_audio,
+    #     "formatters": DeferredAudioFormatterGroup,
+    # }
 }
 
 

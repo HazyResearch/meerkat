@@ -2,6 +2,8 @@
 	import '$lib/app.css';
 	import ComponentContext from '$lib/ComponentContext.svelte';
 	import Modals from '$lib/shared/common/Modals.svelte';
+	import MediaPLayer from '$lib/shared/MediaPlayer.svelte';
+
 </script>
 
 <svelte:head>
