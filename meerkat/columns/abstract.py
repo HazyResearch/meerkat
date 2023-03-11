@@ -649,6 +649,10 @@ class Column(
             f"Cannot convert column of type {type(self)} to Numpy array."
         )
 
+    def __array__(self) -> np.ndarray:
+        """Convert the data to a numpy array."""
+        return self.to_numpy()
+
     def to_json(self) -> dict:
         """Convert the column to a JSON object.
 
