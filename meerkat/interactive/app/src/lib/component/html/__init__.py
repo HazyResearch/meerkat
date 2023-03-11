@@ -18,6 +18,15 @@ class HtmlMixin:
     @classproperty
     def namespace(cls):
         return "html"
+    
+    def _get_ipython_height(self):
+        import re
+        # search the classes for the tailwind height class
+        if isinstance(self.classes, str):
+            match = re.search(r"(^|\s)h-\[(\d+px)\]", self.classes.value)
+            if match:
+                return match.group(2)
+        return super()._get_ipython_height()
 
 
 class a(Slottable, HtmlMixin, Component):
@@ -51,7 +60,6 @@ class div(Slottable, HtmlMixin, Component):
                 this div. Defaults to None.
         """
         super().__init__(slots=slots, classes=classes, style=style)
-
 
 class flex(div):
     def __init__(
