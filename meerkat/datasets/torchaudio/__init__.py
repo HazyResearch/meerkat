@@ -53,7 +53,7 @@ class yesno(DatasetBuilder):
         df = mk.DataFrame(
             {
                 "id": dataset._walker,
-                "audio": mk.AudioColumn(
+                "audio": mk.files(
                     pd.Series(dataset._walker) + ".wav", base_dir=dataset._path
                 ),
                 "labels": torch.tensor(
@@ -62,10 +62,6 @@ class yesno(DatasetBuilder):
             }
         )
 
-        # TODO: remove this once we have a better way to handle audio columns.
-        df["audio"].fn.loader = lambda filepath: torchaudio.load(filepath)
-        df["audio_tensor"] = df["audio"].defer(lambda x: x[0])
-        df["sampling_rate"] = df["audio"].defer(lambda x: x[1])
         return df
 
 

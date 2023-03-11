@@ -1,28 +1,23 @@
 import base64
 import os
 from io import BytesIO
-from typing import TYPE_CHECKING, Any, Dict, Tuple, Union
+from typing import Any, Dict
 
-import numpy as np
 from scipy.io.wavfile import write
 
+from meerkat.cells.audio import Audio as AudioCell
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.formatter.icon import IconFormatter
 
 from ..app.src.lib.component.core.audio import Audio
 from .base import BaseFormatter, FormatterGroup
 
-if TYPE_CHECKING:
-    import torch
-
-AudioCell = Tuple[Union["torch.Tensor", np.ndarray], int]
-
 
 class AudioFormatter(BaseFormatter):
     component_class = Audio
     data_prop: str = "data"
 
-    def __init__(self, downsampling_factor: int, classes: str = ""):
+    def __init__(self, downsampling_factor: int = 1, classes: str = ""):
         """
         Args:
             sampling_rate_factor: The factor by which to multiply the sampling rate.
@@ -31,7 +26,7 @@ class AudioFormatter(BaseFormatter):
         self.downsampling_factor = downsampling_factor
         self.classes = classes
 
-    def encode(self, cell: AudioCell, skip_copy: bool = False) -> str:
+    def encode(self, cell: AudioCell) -> str:
         """Encodes audio as a base64 string.
 
         Args:
@@ -41,7 +36,11 @@ class AudioFormatter(BaseFormatter):
                 or is loaded dynamically (e.g. DeferredColumn).
                 This may save time for large images.
         """
-        arr, sampling_rate = cell
+        arr = cell.data
+        sampling_rate = cell.sampling_rate
+
+        import torch
+
         if isinstance(arr, torch.Tensor):
             arr = arr.cpu().numpy()
 
@@ -50,7 +49,7 @@ class AudioFormatter(BaseFormatter):
 
         with BytesIO() as buffer:
             write(buffer, sampling_rate, arr)
-            return "data:audio/mp3;base64,{im_base_64}".format(
+            return "data:audio/mpeg;base64,{im_base_64}".format(
                 im_base_64=base64.b64encode(buffer.getvalue()).decode()
             )
 
@@ -60,7 +59,10 @@ class AudioFormatter(BaseFormatter):
 
     def html(self, cell: AudioCell) -> str:
         encoded = self.encode(cell)
-        return f'<audio src="{encoded}">'
+        return (
+            "<audio controls={true} autoplay={false}>"
+            + f"<source src={encoded} /></audio>"
+        )
 
     def _get_state(self) -> Dict[str, Any]:
         return {"classes": self.classes}
@@ -75,7 +77,7 @@ class AudioFormatterGroup(FormatterGroup):
     def __init__(self, classes: str = ""):
         super().__init__(
             icon=IconFormatter(name="Soundwave"),
-            base=IconFormatter(name="Soundwave"),
+            base=self.formatter_class(),
         )
 
 
@@ -92,7 +94,7 @@ class DeferredAudioFormatter(AudioFormatter):
                 return audio.absolute_path
 
         audio = audio()
-        return super().encode(audio, skip_copy=True)
+        return super().encode(audio)
 
 
 class DeferredAudioFormatterGroup(AudioFormatterGroup):
