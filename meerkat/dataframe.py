@@ -38,6 +38,7 @@ from meerkat.columns.scalar.arrow import ArrowScalarColumn
 from meerkat.errors import ConversionError
 from meerkat.interactive.graph.marking import is_unmarked_context, unmarked
 from meerkat.interactive.graph.reactivity import reactive
+from meerkat.interactive.graph.store import Store
 from meerkat.interactive.modification import DataFrameModification
 from meerkat.interactive.node import NodeMixin
 from meerkat.mixins.cloneable import CloneableMixin
@@ -542,8 +543,12 @@ class DataFrame(
         # but those modifications will be cleared by the endpoint before it is
         # run.
         if self.has_inode():
+            columns = self.columns
+            if isinstance(columns, Store):
+                # df modifications expects a list, not a Store[list]
+                columns = columns.value
             # Add a modification if it's on the graph
-            mod = DataFrameModification(id=self.id, scope=self.columns)
+            mod = DataFrameModification(id=self.id, scope=columns)
             mod.add_to_queue()
 
     def __call__(self):
@@ -560,11 +565,14 @@ class DataFrame(
         self._set_state(value._get_state())
 
         if self.has_inode():
+            columns = self.columns
+            if isinstance(columns, Store):
+                columns = columns.value
             # Add a modification if it's on the graph
             # TODO: think about what the scope should be.
             #   How does `scope` relate to the the skip_fn mechanism
             #   in Operation?
-            mod = DataFrameModification(id=self.inode.id, scope=self.columns)
+            mod = DataFrameModification(id=self.inode.id, scope=columns)
             mod.add_to_queue()
 
     def consolidate(self):
