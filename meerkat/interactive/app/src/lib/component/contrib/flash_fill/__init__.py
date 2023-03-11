@@ -23,7 +23,10 @@ class FlashFill(div):
         df: "DataFrame",
         target_column: str,
         manifest_cache_dir: str = "~/.cache/manifest",
+        max_tokens: int = 1,
     ):
+        self.max_tokens = max_tokens
+
         df = df.view()
         if target_column not in df.columns:
             df[target_column] = ""
@@ -139,7 +142,7 @@ class FlashFill(div):
                 client_connection=os.getenv("OPENAI_API_KEY"),
                 engine=engine,
                 temperature=0,
-                max_tokens=1,
+                max_tokens=self.max_tokens,
                 cache_name="sqlite",
                 cache_connection=os.path.join(self.manifest_cache_dir, "cache.sqlite"),
             )
