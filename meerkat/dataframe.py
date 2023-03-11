@@ -108,8 +108,7 @@ class DataFrame(
             **kwargs,
         )
         self._primary_key = None if primary_key is False else primary_key
-        with unmarked():
-            self.data = data
+        self.data = data
 
         if primary_key is True:
             self._infer_primary_key(create=True)
