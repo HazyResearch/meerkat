@@ -44,16 +44,15 @@ class coco(DatasetBuilder):
                     "rb",
                 )
             )
-            breakpoint()
 
             df = mk.DataFrame(dct["images"])
-            df["split"] = [split] * len(df)
+            df["split"] = split
             dfs.append(df)
 
         df = mk.concat(dfs, axis=0)
 
         path = df["split"] + "2014/" + df["file_name"]
-        df["image"] = mk.ImageColumn.from_filepaths(path, base_dir=self.var_dataset_dir)
+        df["image"] = mk.files(path, base_dir=self.var_dataset_dir)
 
         df.data.reorder(
             ["id", "image"] + [c for c in df.columns if c not in ["id", "image"]]
@@ -130,13 +129,13 @@ def build_coco_2014_df(dataset_dir: str, download: bool = False):
         )
 
         df = mk.DataFrame(dct["images"])
-        df["split"] = [split] * len(df)
+        df["split"] = split
         dfs.append(df)
 
     df = mk.concat(dfs, axis=0)
 
     path = df["split"] + "2014/" + df["file_name"]
-    df["image"] = mk.ImageColumn.from_filepaths(path, base_dir=dataset_dir)
+    df["image"] = mk.files(path, base_dir=dataset_dir)
 
     df.data.reorder(
         ["id", "image"] + [c for c in df.columns if c not in ["id", "image"]]
