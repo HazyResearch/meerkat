@@ -2257,25 +2257,25 @@ in the above example. After all, we could have written a vectorized expression <
 <span class="g g-Whitespace">    </span><span class="mi">136</span> <span class="k">def</span> <span class="nf">_fn_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="ne">--&gt; </span><span class="mi">137</span>     <span class="k">return</span> <span class="n">_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1143,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1130</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1131</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1132</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/dataframe.py:1151,</span> in <span class="ni">DataFrame.map</span><span class="nt">(self, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1138</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1139</span>     <span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1140</span>     <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1139</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1140</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1141</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
-<span class="ne">-&gt; </span><span class="mi">1143</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">1144</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1145</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1146</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1147</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1148</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1149</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1150</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1151</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1152</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1153</span>     <span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1147</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1148</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Column</span><span class="p">]]:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1149</span>     <span class="kn">from</span> <span class="nn">meerkat.ops.map</span> <span class="kn">import</span> <span class="nb">map</span>
+<span class="ne">-&gt; </span><span class="mi">1151</span>     <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1152</span>         <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1153</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1154</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1155</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1156</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1157</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1158</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1159</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1160</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1161</span>     <span class="p">)</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:471,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
 <span class="g g-Whitespace">    </span><span class="mi">361</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">_SHARED_DOCS_</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;defer&quot;</span><span class="p">)</span>
