@@ -1,7 +1,7 @@
 import base64
 import os
 from io import BytesIO
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from scipy.io.wavfile import write
 
@@ -26,7 +26,7 @@ class AudioFormatter(BaseFormatter):
         self.downsampling_factor = downsampling_factor
         self.classes = classes
 
-    def encode(self, cell: AudioCell) -> str:
+    def encode(self, cell: Union[AudioCell, bytes]) -> str:
         """Encodes audio as a base64 string.
 
         Args:
@@ -36,6 +36,15 @@ class AudioFormatter(BaseFormatter):
                 or is loaded dynamically (e.g. DeferredColumn).
                 This may save time for large images.
         """
+        if isinstance(cell, DeferredCell):
+            cell = cell()
+
+        # If the audio is already encoded, return it.
+        if isinstance(cell, bytes):
+            return "data:audio/mpeg;base64,{im_base_64}".format(
+                im_base_64=base64.b64encode(cell).decode()
+            )
+
         arr = cell.data
         sampling_rate = cell.sampling_rate
 
