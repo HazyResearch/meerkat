@@ -15,6 +15,7 @@ from .ngoa import ngoa
 from .pascal import pascal
 from .registry import datasets
 from .rfw import rfw
+from .torchaudio import yesno
 
 __all__ = [
     "celeba",
@@ -29,6 +30,7 @@ __all__ = [
     "rfw",
     "ngoa",
     "coco",
+    "yesno",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]

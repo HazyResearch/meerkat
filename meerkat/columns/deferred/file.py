@@ -19,6 +19,7 @@ from PIL import Image
 import meerkat.tools.docs as docs
 from meerkat import env
 from meerkat.block.deferred_block import DeferredOp
+from meerkat.cells.audio import Audio
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
 from meerkat.columns.scalar import ScalarColumn
@@ -28,6 +29,7 @@ from meerkat.interactive.formatter import (
     PDFFormatterGroup,
     TextFormatterGroup,
 )
+from meerkat.interactive.formatter.audio import DeferredAudioFormatterGroup
 from meerkat.interactive.formatter.base import FormatterGroup
 from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
 
@@ -491,6 +493,14 @@ def load_text(path: Union[str, io.BytesIO]):
         return f.read()
 
 
+def load_audio(path: str) -> Audio:
+    import torchaudio
+
+    data, sampling_rate = torchaudio.load(path)
+    data = data.squeeze()
+    return Audio(data, sampling_rate=sampling_rate)
+
+
 # TODO: Add @requires decorator when available.
 def load_medimg(path: Union[str, io.BytesIO]):
     return voxel.read(path)
@@ -522,6 +532,11 @@ FILE_TYPES = {
         "loader": load_text,
         "formatters": CodeFormatterGroup,
         "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
+    },
+    "audio": {
+        "loader": load_audio,
+        "formatters": DeferredAudioFormatterGroup,
+        "exts": [".wav", ".mp3"],
     },
     "medimg": {
         "loader": load_medimg,

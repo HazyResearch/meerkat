@@ -1,6 +1,6 @@
 {
     "name": "@meerkat-ml/meerkat",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "description": "The Meerkat Svelte Library",
     "scripts": {
         "dev": "vite dev",
@@ -77,6 +77,7 @@
         "d3-selection": "^3.0.0",
         "flowbite": "^1.5.2",
         "flowbite-svelte": "^0.29.11",
+        "howler": "^2.2.3",
         "layercake": "^7.0.0",
         "marked": "^4.2.12",
         "monaco-editor": "^0.34.1",

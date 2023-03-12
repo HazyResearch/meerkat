@@ -323,6 +323,8 @@ class Column(
         else:
             col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
 
+        # TODO: if the objects have a _repr_html_ method, we should be able to use
+        # that instead of explicitly relying on the column having a formatter.
         return (
             col,
             self.formatters["base"]
