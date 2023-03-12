@@ -17,6 +17,7 @@ import yaml
 from PIL import Image
 
 import meerkat.tools.docs as docs
+from meerkat import env
 from meerkat.block.deferred_block import DeferredOp
 from meerkat.columns.abstract import Column
 from meerkat.columns.deferred.base import DeferredCell, DeferredColumn
@@ -29,6 +30,11 @@ from meerkat.interactive.formatter import (
 )
 from meerkat.interactive.formatter.base import FormatterGroup
 from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
+
+if env.is_package_installed("voxel"):
+    import voxel
+else:
+    voxel = None
 
 logger = logging.getLogger(__name__)
 
@@ -485,6 +491,11 @@ def load_text(path: Union[str, io.BytesIO]):
         return f.read()
 
 
+# TODO: Add @requires decorator when available.
+def load_medimg(path: Union[str, io.BytesIO]):
+    return voxel.read(path)
+
+
 FILE_TYPES = {
     "image": {
         "loader": load_image,
@@ -511,6 +522,12 @@ FILE_TYPES = {
         "loader": load_text,
         "formatters": CodeFormatterGroup,
         "exts": [".py", ".js", ".css", ".json", ".java", ".cpp", ".c", ".h", ".hpp"],
+    },
+    "medimg": {
+        "loader": load_medimg,
+        "formatters": DeferredImageFormatterGroup,
+        "exts": [".dcm", ".nii", ".nii.gz"],
+        "defer": False,
     },
 }
 

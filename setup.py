@@ -102,7 +102,7 @@ EXTRAS = {
     "vision": ["torchvision>=0.9.0", "opencv-python", "Pillow"],
     "audio": ["torchaudio"],
     "medimg": [
-        "dosma>=0.0.13",
+        "pyvoxel",
         "kaggle",
         "google-cloud-storage",
         "google-cloud-bigquery[bqstorage,pandas]",
