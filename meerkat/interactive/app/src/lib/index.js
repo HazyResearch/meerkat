@@ -16,6 +16,7 @@ export { default as Row } from './component/contrib/row/Row.svelte';
 export { default as FMFilter } from "./component/contrib/fm_filter/FMFilter.svelte";
 export { default as GlobalStats } from './component/contrib/global_stats/GlobalStats.svelte';
 /** Core Components */
+export { default as Audio } from './component/core/audio/Audio.svelte';
 export { default as Button } from './component/core/button/Button.svelte';
 export { default as Carousel } from './component/core/carousel/Carousel.svelte';
 export { default as Chat } from './component/core/chat/Chat.svelte';
