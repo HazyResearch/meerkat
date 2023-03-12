@@ -323,6 +323,8 @@ class Column(
         else:
             col = pd.Series([self._repr_cell(idx) for idx in range(len(self))])
 
+        # TODO: if the objects have a _repr_html_ method, we should be able to use
+        # that instead of explicitly relying on the column having a formatter.
         return (
             col,
             self.formatters["base"]
@@ -648,6 +650,10 @@ class Column(
         raise ConversionError(
             f"Cannot convert column of type {type(self)} to Numpy array."
         )
+
+    def __array__(self) -> np.ndarray:
+        """Convert the data to a numpy array."""
+        return self.to_numpy()
 
     def to_json(self) -> dict:
         """Convert the column to a JSON object.

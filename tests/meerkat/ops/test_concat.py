@@ -137,8 +137,7 @@ def test_empty_concat():
 
 
 def test_concat_deferred_column_different_fns():
-    """
-    Test concat with deferred columns that have different functions.
+    """Test concat with deferred columns that have different functions.
 
     The fn of the first dataframe will be taken.
     """

@@ -85,13 +85,16 @@ class lvis(DatasetBuilder):
             )
 
             image_df = mk.DataFrame(dct["images"])
-            image_df["split"] = [split] * len(image_df)
+            image_df["split"] = split
             image_dfs.append(image_df)
 
             annot_df = mk.DataFrame(dct["annotations"])
             if not self.include_segmentations:
                 annot_df.remove_column("segmentation")
-            annot_df["bbox"] = np.array(annot_df["bbox"])
+            # Creating a numpy array from the raw data is much faster than
+            # iterating through the column.
+            # TODO: Consider adding the __array__ protocol for the abstract column.
+            annot_df["bbox"] = np.array(annot_df["bbox"].data)
             annot_dfs.append(annot_df)
 
             cat_dfs.append(mk.DataFrame(dct["categories"]))

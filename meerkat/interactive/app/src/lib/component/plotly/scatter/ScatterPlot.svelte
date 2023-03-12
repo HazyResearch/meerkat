@@ -66,7 +66,6 @@
 	async function onEndpoint(endpoint: Endpoint, e) {
 		let data = await dataPromise;
 		e.detail.points;
-		console.log(e);
 		if (endpoint) {
 			dispatch(endpoint.endpointId, {
 				detail: {

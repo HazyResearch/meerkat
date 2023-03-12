@@ -15,6 +15,7 @@ import pandas as pd
 import yaml
 from yaml.constructor import ConstructorError
 
+from meerkat import env
 from meerkat.tools.lazy_loader import LazyLoader
 
 torch = LazyLoader("torch")
@@ -110,6 +111,29 @@ def deprecated(replacement: Optional[str] = None):
             return func(*args, **kwargs)
 
         return new_func
+
+    return _decorator
+
+
+def requires(*packages):
+    """Use this decorator to identify which packages must be installed.
+
+    It will raise an error if the function is called and these packages
+    are not available.
+    """
+
+    def _decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            for package in packages:
+                fn_str = f"{func.__qualname__}()"
+                if not env.package_available(package):
+                    raise ImportError(
+                        f"Missing package `{package}` which is required for {fn_str}."
+                    )
+            return func(*args, **kwargs)
+
+        return wrapped
 
     return _decorator
 
