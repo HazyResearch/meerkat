@@ -683,7 +683,7 @@ class DataFrame(
         if isinstance(dataset, dict):
             return dict(
                 map(
-                    lambda t: (t[0], cls.from_arrow(t[1]._data)),
+                    lambda t: (t[0], cls.from_arrow(t[1]._data.table)),
                     dataset.items(),
                 )
             )

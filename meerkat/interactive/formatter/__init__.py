@@ -1,3 +1,4 @@
+from .audio import AudioFormatter, AudioFormatterGroup
 from .base import Formatter, deferred_formatter_group
 from .boolean import BooleanFormatter, BooleanFormatterGroup
 from .code import CodeFormatter, CodeFormatterGroup
@@ -27,6 +28,8 @@ __all__ = [
     "TensorFormatterGroup",
     "BooleanFormatter",
     "BooleanFormatterGroup",
+    "AudioFormatter",
+    "AudioFormatterGroup",
 ]
 
 
