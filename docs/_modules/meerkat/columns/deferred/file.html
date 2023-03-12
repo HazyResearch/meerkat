@@ -1725,6 +1725,7 @@ title="Open an issue"
 
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
 <span class="kn">from</span> <span class="nn">meerkat.block.deferred_block</span> <span class="kn">import</span> <span class="n">DeferredOp</span>
+<span class="kn">from</span> <span class="nn">meerkat.cells.audio</span> <span class="kn">import</span> <span class="n">Audio</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">Column</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.base</span> <span class="kn">import</span> <span class="n">DeferredCell</span><span class="p">,</span> <span class="n">DeferredColumn</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.scalar</span> <span class="kn">import</span> <span class="n">ScalarColumn</span>
@@ -1734,6 +1735,7 @@ title="Open an issue"
     <span class="n">PDFFormatterGroup</span><span class="p">,</span>
     <span class="n">TextFormatterGroup</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.audio</span> <span class="kn">import</span> <span class="n">DeferredAudioFormatterGroup</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">DeferredImageFormatterGroup</span>
 
@@ -2192,6 +2194,14 @@ title="Open an issue"
         <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
 
+<span class="k">def</span> <span class="nf">load_audio</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Audio</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">torchaudio</span>
+
+    <span class="n">data</span><span class="p">,</span> <span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Audio</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">)</span>
+
+
 <span class="n">FILE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_image</span><span class="p">,</span>
@@ -2218,6 +2228,11 @@ title="Open an issue"
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_text</span><span class="p">,</span>
         <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">CodeFormatterGroup</span><span class="p">,</span>
         <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.py&quot;</span><span class="p">,</span> <span class="s2">&quot;.js&quot;</span><span class="p">,</span> <span class="s2">&quot;.css&quot;</span><span class="p">,</span> <span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;.java&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.h&quot;</span><span class="p">,</span> <span class="s2">&quot;.hpp&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;audio&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_audio</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">DeferredAudioFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp3&quot;</span><span class="p">],</span>
     <span class="p">},</span>
 <span class="p">}</span>
 

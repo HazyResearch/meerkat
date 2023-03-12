@@ -1722,6 +1722,7 @@ title="Open an issue"
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="kn">import</span> <span class="n">ConstructorError</span>
 
+<span class="kn">from</span> <span class="nn">meerkat</span> <span class="kn">import</span> <span class="n">env</span>
 <span class="kn">from</span> <span class="nn">meerkat.tools.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
 
 <span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
@@ -1817,6 +1818,29 @@ title="Open an issue"
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_func</span>
+
+    <span class="k">return</span> <span class="n">_decorator</span>
+
+
+<span class="k">def</span> <span class="nf">requires</span><span class="p">(</span><span class="o">*</span><span class="n">packages</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use this decorator to identify which packages must be installed.</span>
+
+<span class="sd">    It will raise an error if the function is called and these packages</span>
+<span class="sd">    are not available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">:</span>
+                <span class="n">fn_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">()&quot;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="o">.</span><span class="n">package_available</span><span class="p">(</span><span class="n">package</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Missing package `</span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s2">` which is required for </span><span class="si">{</span><span class="n">fn_str</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapped</span>
 
     <span class="k">return</span> <span class="n">_decorator</span>
 
