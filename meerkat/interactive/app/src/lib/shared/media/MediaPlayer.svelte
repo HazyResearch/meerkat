@@ -21,6 +21,7 @@
             bind:paused={$currentMedia.paused}
             bind:ended={$currentMedia.ended}
         />
+        
 	</div>
 
 {/if}
