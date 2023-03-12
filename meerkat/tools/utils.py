@@ -126,9 +126,10 @@ def requires(*packages):
         @wraps(func)
         def wrapped(*args, **kwargs):
             for package in packages:
+                fn_str = f"{func.__qualname__}()"
                 if not env.package_available(package):
                     raise ImportError(
-                        f"Missing package `{package}` which is required for {func}."
+                        f"Missing package `{package}` which is required for {fn_str}."
                     )
             return func(*args, **kwargs)
 
