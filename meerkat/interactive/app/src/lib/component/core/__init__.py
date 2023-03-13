@@ -1,3 +1,5 @@
+from .audio import Audio
+from .audio_wave import AudioWave
 from .button import Button
 from .carousel import Carousel
 from .chat import Chat
@@ -35,6 +37,8 @@ from .toggle import Toggle
 from .vega import Vega
 
 __all__ = [
+    "Audio",
+    "AudioWave",
     "Button",
     "Caption",
     "Carousel",
