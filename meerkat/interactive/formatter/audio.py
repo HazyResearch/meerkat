@@ -10,6 +10,7 @@ from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.formatter.icon import IconFormatter
 
 from ..app.src.lib.component.core.audio import Audio
+from ..app.src.lib.component.core.audio_wave import AudioWave
 from .base import BaseFormatter, FormatterGroup
 
 
@@ -80,13 +81,16 @@ class AudioFormatter(BaseFormatter):
         self.classes = state["classes"]
 
 
-class AudioFormatterGroup(FormatterGroup):
-    formatter_class: type = AudioFormatter
+class AudioWaveFormatter(AudioFormatter):
+    component_class = AudioWave
 
+
+class AudioFormatterGroup(FormatterGroup):
     def __init__(self, classes: str = ""):
         super().__init__(
             icon=IconFormatter(name="Soundwave"),
-            base=self.formatter_class(),
+            base=AudioFormatter(classes=classes),
+            full=AudioWaveFormatter(classes=classes),
         )
 
 
@@ -106,5 +110,14 @@ class DeferredAudioFormatter(AudioFormatter):
         return super().encode(audio)
 
 
+class DeferredAudioWaveFormatter(DeferredAudioFormatter):
+    component_class: type = AudioWave
+
+
 class DeferredAudioFormatterGroup(AudioFormatterGroup):
-    formatter_class: type = DeferredAudioFormatter
+    def __init__(self, classes: str = ""):
+        super().__init__(
+            icon=IconFormatter(name="Soundwave"),
+            base=DeferredAudioFormatter(classes=classes),
+            full=DeferredAudioWaveFormatter(classes=classes),
+        )
