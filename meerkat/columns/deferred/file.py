@@ -32,6 +32,7 @@ from meerkat.interactive.formatter import (
 from meerkat.interactive.formatter.audio import DeferredAudioFormatterGroup
 from meerkat.interactive.formatter.base import FormatterGroup
 from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
+from meerkat.tools.utils import requires
 
 if env.is_package_installed("voxel"):
     import voxel
@@ -501,7 +502,7 @@ def load_audio(path: str) -> Audio:
     return Audio(data, sampling_rate=sampling_rate)
 
 
-# TODO: Add @requires decorator when available.
+@requires("voxel")
 def load_medimg(path: Union[str, io.BytesIO]):
     return voxel.read(path)
 
