@@ -32,6 +32,7 @@ from meerkat.interactive.formatter import (
 from meerkat.interactive.formatter.audio import DeferredAudioFormatterGroup
 from meerkat.interactive.formatter.base import FormatterGroup
 from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
+from meerkat.interactive.formatter.medimage import MedicalImageFormatterGroup
 from meerkat.tools.utils import requires
 
 if env.is_package_installed("voxel"):
@@ -464,7 +465,7 @@ def _infer_file_type(filepaths: ScalarColumn):
     filepaths = filepaths[:NUM_SAMPLES]
     # extract the extension, taking into account that it may not exist
     # FIXME: make this work for URLs with `.com/...`
-    ext = filepaths.str.extract(r"(?P<ext>\.[^\.]+)$")["ext"].str.lower()
+    ext = filepaths.str.extract(r"(?P<ext>\.[^\.]+(\.gz))$")["ext"].str.lower()
 
     # if the extension is not present, then we assume it is a text file
     for type, info in FILE_TYPES.items():
@@ -541,7 +542,7 @@ FILE_TYPES = {
     },
     "medimg": {
         "loader": load_medimg,
-        "formatters": DeferredImageFormatterGroup,
+        "formatters": MedicalImageFormatterGroup,
         "exts": [".dcm", ".nii", ".nii.gz"],
         "defer": False,
     },

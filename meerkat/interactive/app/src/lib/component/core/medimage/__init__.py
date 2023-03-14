@@ -1,4 +1,6 @@
-class MedImage:
+from meerkat.interactive.app.src.lib.component.abstract import Component
+
+
+class MedImage(Component):
     data: str
     classes: str = ""
-    altText: str = "A medical image."

@@ -1,25 +1,26 @@
 <script lang="ts">
-    export let data: object;
+    export let data: Array<string>;
     export let classes: string = '';
-    export let altText: string = "A Meerkat cell."
+    export let numSlices: number = null;
 
-    const images, numSlices = data;
-
-    let slice: number = 0;
+    // TODO: this should be reactive.
+    if (numSlices === null) {
+        numSlices = data.length;
+    }
+    let sliceNumber: number = Math.floor(numSlices / 2);
     
     function handleScroll(event: WheelEvent) {
-        slice += event.deltaY * 0.01;
+        if (numSlices === 1) {
+            return;
+        }
+        sliceNumber += event.deltaY * 0.5;
+        sliceNumber = Math.floor(sliceNumber);
 
-        slice = Math.floor(slice);
-
-        // Restrict scale
-        slice = Math.min(Math.max(0, slice), numSlices-1);
+        // Restrict slices to the range [0, numSlices-1].
+        sliceNumber = Math.min(Math.max(0, sliceNumber), numSlices-1);
     }
 </script>
 
 
-  
-<div on:wheel={handleScroll}>
-    <img class={classes} src={images[slice]} alt={altText} />
-</div>
 
+<img on:wheel|preventDefault={handleScroll} class={classes} src={data[sliceNumber]} alt='A medical image.' />
