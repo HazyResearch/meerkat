@@ -20,10 +20,12 @@ class MedicalImageFormatter(ImageFormatter):
         classes: str = "",
         dim: int = 2,
         scrollable: bool = False,
+        show_toolbar: bool = False,
     ):
         super().__init__(max_size=max_size, classes=classes)
         self.dim = dim
         self.scrollable = scrollable
+        self.show_toolbar = show_toolbar
 
     def encode(self, cell: MedicalVolume, *, skip_copy: bool = False) -> str:
         """Encodes an image as a base64 string.
@@ -68,9 +70,10 @@ class MedicalImageFormatter(ImageFormatter):
 
     @property
     def props(self) -> Dict[str, Any]:
-        return {"classes": self.classes}
+        return {"classes": self.classes, "show_toolbar": self.show_toolbar}
 
     def html(self, cell: MedicalVolume) -> str:
+        # TODO: Fix standard html rendering.
         encoded = self.encode(cell)
         return f'<img src="{encoded[len(encoded) // 2]}">'
 
@@ -78,11 +81,15 @@ class MedicalImageFormatter(ImageFormatter):
         return {
             "max_size": self.max_size,
             "classes": self.classes,
+            "dim": self.dim,
+            "show_toolbar": self.show_toolbar,
         }
 
     def _set_state(self, state: Dict[str, Any]):
         self.max_size = state["max_size"]
         self.classes = state["classes"]
+        self.dim = state["dim"]
+        self.show_toolbar = state["show_toolbar"]
 
 
 class MedicalImageFormatterGroup(FormatterGroup):
@@ -99,5 +106,7 @@ class MedicalImageFormatterGroup(FormatterGroup):
                 max_size=[512, 512],
                 classes="h-full w-full" + " " + classes,
             ),
-            full=self.formatter_class(classes=classes, scrollable=True),
+            full=self.formatter_class(
+                classes=classes, scrollable=True, show_toolbar=True
+            ),
         )

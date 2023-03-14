@@ -13,7 +13,9 @@
 		BoxFill,
 		CheckSquare,
 		TrashFill,
-		Soundwave
+		Soundwave,
+		Fullscreen,
+		FullscreenExit
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -31,7 +33,9 @@
 		BoxFill: BoxFill,
 		CheckSquare: CheckSquare,
 		TrashFill: TrashFill,
-		Soundwave: Soundwave
+		Soundwave: Soundwave,
+		Fullscreen: Fullscreen,
+		FullscreenExit: FullscreenExit
 	};
 </script>
 
