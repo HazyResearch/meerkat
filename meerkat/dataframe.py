@@ -676,6 +676,7 @@ class DataFrame(
         >>> dict_of_dataframes = DataFrame.from_huggingface('boolq')
         """
         import datasets
+
         datasets.logging.set_verbosity_error()
         import pyarrow.compute as pc
 
@@ -700,6 +701,7 @@ class DataFrame(
                         )
                     elif (~path.isnull()).all():
                         from meerkat.columns.deferred.file import FileColumn
+
                         df[name] = FileColumn(path, type="audio")
                     else:
                         raise ValueError(
@@ -711,9 +713,11 @@ class DataFrame(
                     bytes = ArrowScalarColumn(pc.struct_field(column._data, "bytes"))
                     path = ArrowScalarColumn(pc.struct_field(column._data, "path"))
                     if (~ArrowScalarColumn(bytes).isnull()).all():
-                        from meerkat.interactive.formatter import ImageFormatterGroup
                         import io
+
                         from PIL import Image
+
+                        from meerkat.interactive.formatter import ImageFormatterGroup
 
                         df[name] = bytes.defer(
                             lambda x: Image.open(io.BytesIO(x))
@@ -741,7 +745,6 @@ class DataFrame(
                 )
             )
         else:
-            df = cls.from_arrow(dataset._data)
             return _convert_columns(dataset)
 
     @classmethod

@@ -526,7 +526,7 @@ FILE_TYPES = {
         "loader": load_audio,
         "formatters": DeferredAudioFormatterGroup,
         "exts": [".wav", ".mp3"],
-        "defer": False
+        "defer": False,
     },
 }
 
