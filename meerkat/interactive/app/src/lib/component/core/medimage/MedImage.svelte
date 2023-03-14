@@ -17,6 +17,11 @@
 	// Whether the toolbar information should be shown.
 	let isToolbarActive: boolean = false;
 
+    // Transform properties.
+    let scale = 1.0;
+    let x = 0;
+    let y = 0;
+
 	// TODO: this should be reactive.
 	if (numSlices === null) {
 		numSlices = data.length;
@@ -31,8 +36,8 @@
 		if (numSlices === 1) {
 			return;
 		}
-		sliceNumber += event.deltaY * 0.5;
-		sliceNumber = Math.floor(sliceNumber);
+		sliceNumber += event.deltaY * 0.1;
+		sliceNumber = Math.round(sliceNumber);
 
 		// Restrict slices to the range [0, numSlices-1].
 		sliceNumber = boundSliceNumber(sliceNumber);
@@ -73,72 +78,71 @@
 
 {#if showToolbar}
 	<div class={isFullscreen ? 'fullscreen' : ''}>
-		<div class="image-container">
+		<div class="image-container w-full h-full">
 			<img
 				src={data[sliceNumber]}
 				class={classes}
 				on:wheel|preventDefault={handleScroll}
 				alt="A medical image."
+                style="width: 100%; height: 100%; object-fit: contain;"
 			/>
 
 			<!-- Top toolbar -->
 			<div
-				class="toolbar top-0 left-0 w-full h-1rem"
+				class="toolbar top-0 w-full"
 				on:mouseenter={() => (isToolbarActive = true)}
 				on:mouseleave={() => (isToolbarActive = false)}
+				on:wheel|preventDefault={handleScroll}
 			>
-				{#if isToolbarActive}
-					<!-- Slice label -->
-					<div class="overlay top-0 left-0 flex-1">
+				<!-- Slice label -->
+				<div class="button-container items-center">
+					{#if isToolbarActive}
 						<span
-							class="text-align-left"
+							class="flex-1 px-1"
 							style="color: white; font-size: 0.8rem; font-weight: bold;"
 						>
 							Slice {sliceNumber + 1}/{numSlices}
 						</span>
-					</div>
-				{/if}
+					{/if}
+				</div>
 			</div>
 
 			<!-- Bottom toolbar -->
 			<!-- Play button -->
 			<!-- TODO fix handling of space bar key press -->
 			<div
-				class="toolbar bottom-0 left-0 w-full h-1rem"
+				class="toolbar bottom-1 w-full"
 				on:mouseenter={() => (isToolbarActive = true)}
 				on:mouseleave={() => (isToolbarActive = false)}
+				on:wheel|preventDefault={handleScroll}
 			>
-				{#if isToolbarActive}
-					<div class="overlay bottom-0 left-0">
-						<div class="bottom-0 left-0 flex-1">
-							{#if isPlaying}
-								<button
-									class="button"
-									on:click={() => {
-										isPlaying = false;
-									}}
-								>
-									<PauseFill width={24} height={24} fill="white" />
-								</button>
-							{:else}
-								<button class="button" on:click={play}>
-									<PlayFill width={24} height={24} fill="white" />
-								</button>
-							{/if}
-						</div>
+				<div class="button-container mx-1">
+					{#if isToolbarActive}
+						{#if isPlaying}
+							<button
+								class="flex-1"
+								on:click={() => {
+									isPlaying = false;
+								}}
+							>
+								<PauseFill width={24} height={24} fill="white" />
+							</button>
+						{:else}
+							<button class="flex-1" on:click={play}>
+								<PlayFill width={24} height={24} fill="white" />
+							</button>
+						{/if}
 
 						<!-- Fullscreen button -->
-						<div class="bottom-0 right-0 text-right-align">
-							<button class="button" on:click={toggleFullscreen}>
-								{#if isFullscreen}
-									<FullscreenExit width={24} height={24} fill="white" />
-								{:else}
-									<Fullscreen width={24} height={24} fill="white" />
-								{/if}
-							</button>
-						</div>
-					</div>
-				{/if}
+						<button on:click={toggleFullscreen}>
+							{#if isFullscreen}
+								<FullscreenExit width={24} height={24} fill="white" />
+							{:else}
+								<Fullscreen width={24} height={24} fill="white" />
+							{/if}
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -165,13 +169,22 @@
 		align-items: center;
 	}
 
-	.fullscreen img {
+	/* .fullscreen img {
 		max-width: 100%;
 		max-height: 100%;
-	}
+	} */
 
 	.image-container {
 		position: relative;
+	}
+
+	.button-container {
+		position: relative;
+		z-index: 3;
+		display: flex;
+		/* justify-content: flex-end; */
+		width: 100%;
+		height: 100%;
 	}
 
 	.toolbar {
@@ -180,19 +193,18 @@
 		display: flex;
 		justify-content: flex-end;
 		padding: 0.1rem;
+		height: 10%;
 	}
 
 	.overlay {
 		position: absolute;
-        padding: 1rem;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		/* background-color: rgba(76, 74, 74, 0.5); */
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-
-	.overlay span {
-		color: white;
-		font-size: 2rem;
-		text-align: center;
 	}
 </style>

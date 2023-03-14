@@ -1,13 +1,18 @@
 from typing import Any, Dict, Tuple
 
 import numpy as np
-from voxel import MedicalVolume
 
+from meerkat import env
 from meerkat.interactive.formatter.icon import IconFormatter
 
 from ..app.src.lib.component.core.medimage import MedImage
 from .base import FormatterGroup
 from .image import ImageFormatter
+
+if env.package_available("voxel"):
+    from voxel import MedicalVolume
+else:
+    MedicalVolume = None
 
 
 class MedicalImageFormatter(ImageFormatter):
@@ -22,6 +27,11 @@ class MedicalImageFormatter(ImageFormatter):
         scrollable: bool = False,
         show_toolbar: bool = False,
     ):
+        if not env.package_available("voxel"):
+            raise ImportError(
+                "voxel is not installed. Install with `pip install pyvoxel`."
+            )
+
         super().__init__(max_size=max_size, classes=classes)
         self.dim = dim
         self.scrollable = scrollable
