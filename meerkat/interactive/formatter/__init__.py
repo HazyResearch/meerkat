@@ -2,7 +2,7 @@ from .audio import AudioFormatter, AudioFormatterGroup
 from .base import Formatter, deferred_formatter_group
 from .boolean import BooleanFormatter, BooleanFormatterGroup
 from .code import CodeFormatter, CodeFormatterGroup
-from .image import ImageFormatter, ImageFormatterGroup
+from .image import ImageFormatter, ImageFormatterGroup, DeferredImageFormatter, DeferredImageFormatterGroup
 from .number import NumberFormatter, NumberFormatterGroup
 from .pdf import PDFFormatter, PDFFormatterGroup
 from .raw_html import HTMLFormatter, HTMLFormatterGroup
@@ -14,6 +14,8 @@ __all__ = [
     "deferred_formatter_group",
     "ImageFormatter",
     "ImageFormatterGroup",
+    "DeferredImageFormatter",
+    "DeferredImageFormatterGroup",
     "TextFormatter",
     "TextFormatterGroup",
     "NumberFormatter",

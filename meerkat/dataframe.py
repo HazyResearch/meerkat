@@ -676,19 +676,73 @@ class DataFrame(
         >>> dict_of_dataframes = DataFrame.from_huggingface('boolq')
         """
         import datasets
+        datasets.logging.set_verbosity_error()
+        import pyarrow.compute as pc
 
         # Load the dataset
         dataset = datasets.load_dataset(*args, **kwargs)
 
+        def _convert_columns(dataset: datasets.Dataset):
+            df = cls.from_arrow(dataset._data.table)
+            for name, feature in dataset.features.items():
+                if isinstance(feature, datasets.Audio):
+
+                    column = df[name]
+                    bytes = ArrowScalarColumn(pc.struct_field(column._data, "bytes"))
+                    path = ArrowScalarColumn(pc.struct_field(column._data, "path"))
+                    if (~bytes.isnull()).all():
+                        from meerkat.interactive.formatter import AudioFormatterGroup
+
+                        df[name] = (
+                            df[name]
+                            .defer(lambda x: x["bytes"])
+                            .format(AudioFormatterGroup())
+                        )
+                    elif (~path.isnull()).all():
+                        from meerkat.columns.deferred.file import FileColumn
+                        df[name] = FileColumn(path, type="audio")
+                    else:
+                        raise ValueError(
+                            "Huggingface column must either provide bytes or path for "
+                            "every row."
+                        )
+                elif isinstance(feature, datasets.Image):
+                    column = df[name]
+                    bytes = ArrowScalarColumn(pc.struct_field(column._data, "bytes"))
+                    path = ArrowScalarColumn(pc.struct_field(column._data, "path"))
+                    if (~ArrowScalarColumn(bytes).isnull()).all():
+                        from meerkat.interactive.formatter import ImageFormatterGroup
+                        import io
+                        from PIL import Image
+
+                        df[name] = bytes.defer(
+                            lambda x: Image.open(io.BytesIO(x))
+                        ).format(ImageFormatterGroup().defer())
+                    elif (~path.isnull()).all():
+                        from meerkat.columns.deferred.file import FileColumn
+
+                        df[name] = FileColumn(path, type="image")
+                    else:
+                        raise ValueError(
+                            "Huggingface column must either provide bytes or path for "
+                            "every row."
+                        )
+
+            return df
+
         if isinstance(dataset, dict):
             return dict(
                 map(
-                    lambda t: (t[0], cls.from_arrow(t[1]._data.table)),
+                    lambda t: (
+                        t[0],
+                        _convert_columns(t[1]),
+                    ),
                     dataset.items(),
                 )
             )
         else:
-            return cls.from_arrow(dataset._data)
+            df = cls.from_arrow(dataset._data)
+            return _convert_columns(dataset)
 
     @classmethod
     # @capture_provenance(capture_args=["filepath"])
