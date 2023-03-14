@@ -2,6 +2,7 @@ from typing import Dict, List, Union
 
 from meerkat.dataframe import DataFrame
 
+from .arxiv import arxiv
 from .celeba import celeba
 from .coco import coco
 from .expw import expw
@@ -18,6 +19,7 @@ from .rfw import rfw
 from .torchaudio import yesno
 
 __all__ = [
+    "arxiv",
     "celeba",
     "imagenet",
     "imagenette",

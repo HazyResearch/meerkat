@@ -216,7 +216,7 @@ class ArrowScalarColumn(ScalarColumn):
             The posidx of the first occurrence of the given keyidx.
         """
         posidx = pc.index(self.data, keyidx)
-        if posidx == -1:
+        if posidx.as_py() == -1:
             raise KeyError(f"keyidx {keyidx} not found in column.")
         return posidx.as_py()
 
