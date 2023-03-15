@@ -37,6 +37,7 @@ class arxiv(DatasetBuilder):
             backend="arrow",
         )
         df.set_primary_key("id", inplace=True)
+<<<<<<< HEAD
 
         # TODO: This is a hack to remove the rows that are not in main arxiv.
         df = df[~df["id"].str.contains("/")]
@@ -73,6 +74,8 @@ class arxiv(DatasetBuilder):
         except ImportError:
             pass
 
+=======
+>>>>>>> 6a76bf81fb6889d6100d336e71852a693bda2b7f
         return df
 
     def download(self):
@@ -89,6 +92,7 @@ class arxiv(DatasetBuilder):
 
         kaggle.api.authenticate()
         kaggle.api.dataset_download_files(dataset, path=dest_dir, unzip=False)
+<<<<<<< HEAD
 
 
 def extract_text(bytes: bytes) -> str:
@@ -97,3 +101,5 @@ def extract_text(bytes: bytes) -> str:
 
     pdf = pdftotext.PDF(io.BytesIO(bytes))
     return "\n\n".join(pdf)
+=======
+>>>>>>> 6a76bf81fb6889d6100d336e71852a693bda2b7f
