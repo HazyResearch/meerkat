@@ -113,6 +113,7 @@ class FormatterGroup(collections.abc.Mapping):
 
     def update(self, other: Union[FormatterGroup, Dict]):
         self._dict.update(other)
+        return self
 
     def copy(self):
         new = self.__class__.__new__(self.__class__)

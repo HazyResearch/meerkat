@@ -157,7 +157,7 @@ class ArrowStringMethods(StringMethods):
 class ArrowScalarColumn(ScalarColumn):
     block_class: type = ArrowBlock
 
-    str = CachedAccessor("str", ArrowStringMethods)
+    str: ArrowStringMethods = CachedAccessor("str", ArrowStringMethods)
 
     def __init__(
         self,

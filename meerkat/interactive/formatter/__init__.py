@@ -2,6 +2,7 @@ from .audio import AudioFormatter, AudioFormatterGroup
 from .base import Formatter, deferred_formatter_group
 from .boolean import BooleanFormatter, BooleanFormatterGroup
 from .code import CodeFormatter, CodeFormatterGroup
+from .icon import IconFormatter
 from .image import (
     DeferredImageFormatter,
     DeferredImageFormatterGroup,
@@ -17,6 +18,7 @@ from .text import TextFormatter, TextFormatterGroup
 __all__ = [
     "Formatter",
     "deferred_formatter_group",
+    "IconFormatter"
     "ImageFormatter",
     "ImageFormatterGroup",
     "DeferredImageFormatter",

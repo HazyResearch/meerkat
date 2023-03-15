@@ -284,6 +284,7 @@ class FileColumn(DeferredColumn):
         ${loader}
         ${base_dir}
         ${downloader}
+        ${fallback_downloader}
         ${cache_dir}
     """
 
@@ -293,6 +294,7 @@ class FileColumn(DeferredColumn):
         type: str = None,
         loader: callable = None,
         downloader: Union[callable | str] = None,
+        fallback_downloader: Callable[[Union[str, IO]], None] = None,
         base_dir: str = None,
         cache_dir: str = None,
         formatters: FormatterGroup = None,
@@ -329,7 +331,6 @@ class FileColumn(DeferredColumn):
                 downloader = download_url
             elif data.str.startswith("gs://").all():
                 downloader = download_gcs
-
         if isinstance(loader, FileLoader):
             if base_dir is not None or downloader is not None:
                 raise ValueError(
@@ -346,6 +347,7 @@ class FileColumn(DeferredColumn):
                 base_dir=base_dir,
                 downloader=downloader,
                 cache_dir=cache_dir,
+                fallback_downloader=fallback_downloader,
             )
 
         data = DeferredOp(
@@ -572,3 +574,5 @@ def download_gcs(uri: str, dst: Union[str, io.BytesIO]):
         os.remove(dst)
 
         raise FileNotFoundError(uri)
+
+

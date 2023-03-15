@@ -55,7 +55,6 @@
 		end: (page + 1) * perPage,
 		formatter: 'tiny'
 	}).then((newChunk) => {
-		console.log('here');
 		chunk.set(newChunk);
 	});
 
