@@ -2027,6 +2027,8 @@ title="Open an issue"
         <span class="n">col</span> <span class="o">=</span> <span class="n">DeferredColumn</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span> <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Column</span><span class="p">):</span>
+            <span class="n">col</span><span class="o">.</span><span class="n">formatters</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">formatters</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">col</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">output_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

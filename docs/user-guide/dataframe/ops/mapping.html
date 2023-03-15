@@ -2277,65 +2277,65 @@ in the above example. After all, we could have written a vectorized expression <
 <span class="g g-Whitespace">   </span><span class="mi">1217</span>         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="g g-Whitespace">   </span><span class="mi">1218</span>     <span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:471,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">361</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">_SHARED_DOCS_</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;defer&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">362</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">363</span>     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="s2">&quot;Column&quot;</span><span class="p">],</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:473,</span> in <span class="ni">map</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize, use_ray, num_blocks, blocks_per_window, pbar, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">363</span> <span class="nd">@docs</span><span class="o">.</span><span class="n">doc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">_SHARED_DOCS_</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;defer&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">364</span> <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">365</span>     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DataFrame&quot;</span><span class="p">,</span> <span class="s2">&quot;Column&quot;</span><span class="p">],</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">375</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">376</span> <span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">377</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Create a new :class:`Column` or :class:`DataFrame` by applying a</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span><span class="sd">     function to each row in ${data}.</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span>     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span> <span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Create a new :class:`Column` or :class:`DataFrame` by applying a</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span><span class="sd">     function to each row in ${data}.</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span><span class="sd"> </span>
 <span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">468</span><span class="sd">         df[&quot;ma_eligible&quot;]</span>
-<span class="g g-Whitespace">    </span><span class="mi">469</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">471</span>     <span class="n">deferred</span> <span class="o">=</span> <span class="n">defer</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">472</span>         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">473</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">474</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">475</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">476</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">477</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">478</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">479</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">480</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">481</span>     <span class="k">return</span> <span class="n">_materialize</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">482</span>         <span class="n">deferred</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">483</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">470</span><span class="sd">         df[&quot;ma_eligible&quot;]</span>
+<span class="g g-Whitespace">    </span><span class="mi">471</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">473</span>     <span class="n">deferred</span> <span class="o">=</span> <span class="n">defer</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">474</span>         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">475</span>         <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">476</span>         <span class="n">is_batched_fn</span><span class="o">=</span><span class="n">is_batched_fn</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">477</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">478</span>         <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">479</span>         <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">480</span>         <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">481</span>         <span class="n">materialize</span><span class="o">=</span><span class="n">materialize</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">482</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">483</span>     <span class="k">return</span> <span class="n">_materialize</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">484</span>         <span class="n">deferred</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">485</span>         <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
    <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">487</span>         <span class="n">blocks_per_window</span><span class="o">=</span><span class="n">blocks_per_window</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">488</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">489</span>         <span class="n">blocks_per_window</span><span class="o">=</span><span class="n">blocks_per_window</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">490</span>     <span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:351,</span> in <span class="ni">defer</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">346</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">347</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">348</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">349</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">350</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
-<span class="ne">--&gt; </span><span class="mi">351</span>     <span class="p">{</span>
-<span class="g g-Whitespace">    </span><span class="mi">352</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">353</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">354</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">355</span>         <span class="p">)</span>
-<span class="nn">    356         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">357</span>     <span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">358</span> <span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:353,</span> in <span class="ni">defer</span><span class="nt">(data, function, is_batched_fn, batch_size, inputs, outputs, output_type, materialize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">348</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">349</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">350</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">351</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">352</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+<span class="ne">--&gt; </span><span class="mi">353</span>     <span class="p">{</span>
+<span class="g g-Whitespace">    </span><span class="mi">354</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">355</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">356</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span>         <span class="p">)</span>
+<span class="nn">    358         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">359</span>     <span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">360</span> <span class="p">)</span>
 
-<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:352,</span> in <span class="ni">&lt;dictcomp&gt;</span><span class="nt">(.0)</span>
-<span class="g g-Whitespace">    </span><span class="mi">346</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">347</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">348</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">349</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">350</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">351</span>     <span class="p">{</span>
-<span class="ne">--&gt; </span><span class="mi">352</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">353</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
-<span class="g g-Whitespace">    </span><span class="mi">354</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
-<span class="g g-Whitespace">    </span><span class="mi">355</span>         <span class="p">)</span>
-<span class="nn">    356         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">357</span>     <span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">358</span> <span class="p">)</span>
+<span class="nn">File ~/work/meerkat/meerkat/meerkat/ops/map.py:354,</span> in <span class="ni">&lt;dictcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">    </span><span class="mi">348</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_type</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">349</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">350</span>         <span class="s2">&quot;Must provide a `output_type` sequence if `outputs` is a sequence.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">351</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">352</span> <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">353</span>     <span class="p">{</span>
+<span class="ne">--&gt; </span><span class="mi">354</span>         <span class="n">col</span><span class="p">:</span> <span class="n">DeferredColumn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">355</span>             <span class="n">data</span><span class="o">=</span><span class="n">BlockView</span><span class="p">(</span><span class="n">block_index</span><span class="o">=</span><span class="n">output_key</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">356</span>             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">[</span><span class="n">output_key</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">357</span>         <span class="p">)</span>
+<span class="nn">    358         for output_key, col</span> in <span class="ni">enumerate</span><span class="nt">(outputs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">359</span>     <span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">360</span> <span class="p">)</span>
 
 <span class="nn">File ~/work/meerkat/meerkat/meerkat/columns/deferred/base.py:59,</span> in <span class="ni">DeferredColumn.__init__</span><span class="nt">(self, data, output_type, *args, **kwargs)</span>
 <span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>

@@ -1724,6 +1724,7 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">import</span> <span class="nn">meerkat.tools.docs</span> <span class="k">as</span> <span class="nn">docs</span>
+<span class="kn">from</span> <span class="nn">meerkat</span> <span class="kn">import</span> <span class="n">env</span>
 <span class="kn">from</span> <span class="nn">meerkat.block.deferred_block</span> <span class="kn">import</span> <span class="n">DeferredOp</span>
 <span class="kn">from</span> <span class="nn">meerkat.cells.audio</span> <span class="kn">import</span> <span class="n">Audio</span>
 <span class="kn">from</span> <span class="nn">meerkat.columns.abstract</span> <span class="kn">import</span> <span class="n">Column</span>
@@ -1738,6 +1739,13 @@ title="Open an issue"
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.audio</span> <span class="kn">import</span> <span class="n">DeferredAudioFormatterGroup</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.base</span> <span class="kn">import</span> <span class="n">FormatterGroup</span>
 <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.image</span> <span class="kn">import</span> <span class="n">DeferredImageFormatterGroup</span>
+<span class="kn">from</span> <span class="nn">meerkat.interactive.formatter.medimage</span> <span class="kn">import</span> <span class="n">MedicalImageFormatterGroup</span>
+<span class="kn">from</span> <span class="nn">meerkat.tools.utils</span> <span class="kn">import</span> <span class="n">requires</span>
+
+<span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">is_package_installed</span><span class="p">(</span><span class="s2">&quot;voxel&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">voxel</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">voxel</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -2164,7 +2172,7 @@ title="Open an issue"
     <span class="n">filepaths</span> <span class="o">=</span> <span class="n">filepaths</span><span class="p">[:</span><span class="n">NUM_SAMPLES</span><span class="p">]</span>
     <span class="c1"># extract the extension, taking into account that it may not exist</span>
     <span class="c1"># FIXME: make this work for URLs with `.com/...`</span>
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">filepaths</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;ext&gt;\.[^\.]+)$&quot;</span><span class="p">)[</span><span class="s2">&quot;ext&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">filepaths</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?P&lt;ext&gt;\.[^\.]+(\.gz)?)$&quot;</span><span class="p">)[</span><span class="s2">&quot;ext&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="c1"># if the extension is not present, then we assume it is a text file</span>
     <span class="k">for</span> <span class="nb">type</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">FILE_TYPES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -2202,6 +2210,11 @@ title="Open an issue"
     <span class="k">return</span> <span class="n">Audio</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">)</span>
 
 
+<span class="nd">@requires</span><span class="p">(</span><span class="s2">&quot;voxel&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">load_medimg</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">]):</span>
+    <span class="k">return</span> <span class="n">voxel</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+
 <span class="n">FILE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_image</span><span class="p">,</span>
@@ -2233,6 +2246,12 @@ title="Open an issue"
         <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_audio</span><span class="p">,</span>
         <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">DeferredAudioFormatterGroup</span><span class="p">,</span>
         <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp3&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;defer&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;medimg&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;loader&quot;</span><span class="p">:</span> <span class="n">load_medimg</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="n">MedicalImageFormatterGroup</span><span class="p">,</span>
+        <span class="s2">&quot;exts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;.nii&quot;</span><span class="p">,</span> <span class="s2">&quot;.nii.gz&quot;</span><span class="p">],</span>
         <span class="s2">&quot;defer&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
