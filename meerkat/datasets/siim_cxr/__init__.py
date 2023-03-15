@@ -37,7 +37,10 @@ class siim_cxr(DatasetBuilder):
         https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation/data
     """
 
-    VERSIONS = ["stage_2"]
+    VERSIONS = [
+        "stage_2",
+        "stage_1",
+    ]
 
     info = DatasetInfo(
         name="siim_cxr",
@@ -52,6 +55,22 @@ class siim_cxr(DatasetBuilder):
     )
 
     def download(self):
+        if self.version == "stage_1":
+            self._download_stage_1()
+        elif self.version == "stage_2":
+            self._download_stage_2()
+
+    def _download_stage_1(self):
+        tar_file = os.path.join(self.dataset_dir, "dicom-images-train.tar.gz")
+        dirpath = os.path.join(self.dataset_dir, "dicom-images-train")
+
+        if not os.path.exists(tar_file):
+            raise ValueError("Please download the stage 1 dataset tar file.")
+        if not os.path.exists(dirpath):
+            extract(tar_file, self.dataset_dir)
+        assert os.path.isdir(dirpath)
+
+    def _download_stage_2(self):
         """Download the SIIM CXR dataset from kaggle."""
         if not env.package_available("kaggle"):
             raise ImportError("Please install kaggle using `pip install kaggle`")
@@ -81,6 +100,26 @@ class siim_cxr(DatasetBuilder):
         extract(expected_zip_file, self.dataset_dir)
 
     def build(self):
+        if self.version == "stage_1":
+            return self._build_stage_1()
+        elif self.version == "stage_2":
+            return self._build_stage_2()
+
+    def _build_stage_1(self):
+        """Build the SIIM CXR dataset (stage 1 version)."""
+        dcm_folder = os.path.join(self.dataset_dir, "dicom-images-train")
+        _files = _collect_all_dicoms(dcm_folder)
+        df = DataFrame({"fname": column(_files)})
+
+        # Load the data
+        df["img"] = FileColumn(
+            _files, type="image", loader=_load_siim_cxr, base_dir=dcm_folder
+        )
+        df["img_tfm"] = df["img"].defer(cxr_transform)
+
+        return df
+
+    def _build_stage_2(self):
         """Build the SIIM CXR dataset."""
         dcm_folder = os.path.join(self.dataset_dir, "stage_2_images")
         _files = os.listdir(dcm_folder)
@@ -94,6 +133,25 @@ class siim_cxr(DatasetBuilder):
         df["img_tfm"] = df["img"].defer(cxr_transform)
 
         return df
+
+
+def _collect_all_dicoms(root_dir: str):
+    """Return the relative paths for all dicoms in a directory."""
+    # TODO: make this work with windows
+    remove_str = root_dir
+    if remove_str[-1] != "/":
+        remove_str += "/"
+
+    relative_paths = []
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(".dcm"):
+                file_path = os.path.join(root, file)
+                # Remove the root directory from the file path.
+                file_path.replace(remove_str, "")
+                relative_paths.append(file_path)
+
+    return relative_paths
 
 
 def _load_siim_cxr(filepath) -> PIL.Image:
