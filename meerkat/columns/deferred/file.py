@@ -17,6 +17,7 @@ import yaml
 from PIL import Image
 
 import meerkat.tools.docs as docs
+from meerkat import env
 from meerkat.block.deferred_block import DeferredOp
 from meerkat.cells.audio import Audio
 from meerkat.columns.abstract import Column
@@ -31,6 +32,13 @@ from meerkat.interactive.formatter import (
 from meerkat.interactive.formatter.audio import DeferredAudioFormatterGroup
 from meerkat.interactive.formatter.base import FormatterGroup
 from meerkat.interactive.formatter.image import DeferredImageFormatterGroup
+from meerkat.interactive.formatter.medimage import MedicalImageFormatterGroup
+from meerkat.tools.utils import requires
+
+if env.is_package_installed("voxel"):
+    import voxel
+else:
+    voxel = None
 
 logger = logging.getLogger(__name__)
 
@@ -457,7 +465,7 @@ def _infer_file_type(filepaths: ScalarColumn):
     filepaths = filepaths[:NUM_SAMPLES]
     # extract the extension, taking into account that it may not exist
     # FIXME: make this work for URLs with `.com/...`
-    ext = filepaths.str.extract(r"(?P<ext>\.[^\.]+)$")["ext"].str.lower()
+    ext = filepaths.str.extract(r"(?P<ext>\.[^\.]+(\.gz)?)$")["ext"].str.lower()
 
     # if the extension is not present, then we assume it is a text file
     for type, info in FILE_TYPES.items():
@@ -495,6 +503,11 @@ def load_audio(path: str) -> Audio:
     return Audio(data, sampling_rate=sampling_rate)
 
 
+@requires("voxel")
+def load_medimg(path: Union[str, io.BytesIO]):
+    return voxel.read(path)
+
+
 FILE_TYPES = {
     "image": {
         "loader": load_image,
@@ -526,6 +539,12 @@ FILE_TYPES = {
         "loader": load_audio,
         "formatters": DeferredAudioFormatterGroup,
         "exts": [".wav", ".mp3"],
+        "defer": False,
+    },
+    "medimg": {
+        "loader": load_medimg,
+        "formatters": MedicalImageFormatterGroup,
+        "exts": [".dcm", ".nii", ".nii.gz"],
         "defer": False,
     },
 }
