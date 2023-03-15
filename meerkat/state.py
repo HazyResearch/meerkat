@@ -67,9 +67,6 @@ class APIInfo:
     def _get_hf_spaces_info(self):
         author = os.environ.get("SPACE_AUTHOR_NAME", None)
         repo = os.environ.get("SPACE_REPO_NAME", None)
-        print("Author:", author)
-        print("Repo:", repo)
-        print(os.environ)
         return author, repo
 
     def on_hf_spaces(self):

@@ -47,6 +47,7 @@ class Page(IdentifiableMixin):
         height: str = "100%",
         width: str = "100%",
         progress: bool = False,
+        multiuser: bool = False,
     ):
         super().__init__(id=id)
 
@@ -62,6 +63,7 @@ class Page(IdentifiableMixin):
         self.name = name
         self.height = height
         self.width = width
+        self.multiuser = multiuser
 
     def __call__(self):
         """Return the FastAPI object, this allows Page objects to be targeted

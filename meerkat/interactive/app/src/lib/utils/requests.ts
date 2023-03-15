@@ -1,8 +1,20 @@
 import { globalStores } from "$lib/utils/stores";
+import { WEBSOCKET } from "$lib/websocket";
 import { get } from "svelte/store";
 
 
 export async function getRequest(url: string): Promise<any> {
+    const ws = get(WEBSOCKET);
+    if (ws !== null) {
+        // Use the websocket.
+        ws.send(
+            JSON.stringify({
+                method: "GET",
+                url: url,
+            })
+        );
+    }
+
     const res: Response = await fetch(url);
     if (!res.ok) {
         throw new Error('HTTP status ' + res.status);

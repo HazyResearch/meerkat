@@ -90,6 +90,18 @@ MEERKAT_INIT_PROCESS = (os.path.basename(sys.argv[0]) == "mk") and (
 # Create a Jinja2 environment.
 JINJA_ENV = Environment(loader=FileSystemLoader(MEERKAT_TEMPLATES_DIR))
 
+# A flag to indicate whether we are running with multiple clients.
+MEERKAT_MULTIUSER = os.environ.get("MEERKAT_MULTIUSER", "0") == "1"
+
+# The host name passed to the uvicorn server. Only passed in if
+# MEERKAT_RUN_SUBPROCESS is True.
+MEERKAT_HOSTNAME = os.environ.get("MEERKAT_HOSTNAME", "127.0.0.1")
+
+# The app name targeted by the uvicorn server.
+MEERKAT_APP_TARGET = os.environ.get("MEERKAT_APP_TARGET", "page")
+
+# The port on which the uvicorn server is running.
+MEERKAT_APP_PORT = int(os.environ.get("MEERKAT_APP_PORT", "8000"))
 
 def write_file(path: str, content: str) -> None:
     with open(path, "w") as f:

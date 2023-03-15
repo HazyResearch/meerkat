@@ -26,3 +26,20 @@ def config(page: Page):
             np.float64: lambda v: float(v),
         },
     )
+
+
+@endpoint(prefix="/page", route="/all/", method="GET")
+def all():
+    from meerkat.state import state
+
+    return jsonable_encoder(
+        list(state.identifiables.pages.values()),
+        custom_encoder={
+            np.ndarray: lambda v: v.tolist(),
+            torch.Tensor: lambda v: v.tolist(),
+            pd.Series: lambda v: v.tolist(),
+            Column: lambda v: v.to_json(),
+            np.int64: lambda v: int(v),
+            np.float64: lambda v: float(v),
+        },
+    )

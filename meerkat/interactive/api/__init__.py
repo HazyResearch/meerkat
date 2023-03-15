@@ -7,4 +7,5 @@ from .routers import (  # noqa: F401
     sliceby,
     store,
     subscribe,
+    websocket,
 )

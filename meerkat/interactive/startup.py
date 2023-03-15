@@ -137,6 +137,7 @@ def run_script(
     subdomain: str = "app",
     frontend_url: str = None,
     apiurl: str = None,
+    multiuser: bool = False,
     debug: bool = False,
 ) -> APIInfo:
     """Run a script with uvicorn.
@@ -151,6 +152,18 @@ def run_script(
             mode. Defaults to True.
         target (str, optional): the target `Page` instance to run. Defaults to
             "page".
+        shareable (bool, optional): whether to make the app shareable.
+            Defaults to False.
+        subdomain (str, optional): the subdomain to use for the app.
+            Defaults to "app".
+        frontend_url (str, optional): the URL of the frontend to use.
+            Defaults to None.
+        apiurl (str, optional): the URL of the API to use. Defaults to
+            None.
+        multiuser (bool, optional): whether to run the script in
+            multiuser mode. Defaults to False.
+        debug (bool, optional): whether to run the script in debug mode.
+            Defaults to False.
     """
     # Make sure script is in module format.
     script = os.path.abspath(script)  # to_py_module_name(script)
@@ -164,9 +177,14 @@ def run_script(
         env["MEERKAT_API_URL"] = apiurl
     if debug:
         env["MEERKAT_LOGGING_LEVEL"] = "DEBUG"
+
+    env["MEERKAT_MULTIUSER"] = "1" if multiuser else "0"
     env["MEERKAT_RUN_SUBPROCESS"] = str(1)
     env["MEERKAT_RUN_SCRIPT_PATH"] = script
     env["MEERKAT_RUN_ID"] = MEERKAT_RUN_ID
+    env["MEERKAT_HOSTNAME"] = server_name
+    env["MEERKAT_APP_TARGET"] = target
+    env["MEERKAT_APP_PORT"] = str(port)
 
     # Create a file that will be used to count the number of times the script has been
     # reloaded. This is used by `SvelteWriter` to decide when to write the Svelte

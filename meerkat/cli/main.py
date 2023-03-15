@@ -1,3 +1,4 @@
+import functools
 import os
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from meerkat.constants import (
+    JINJA_ENV,
     MEERKAT_DEMO_DIR,
     MEERKAT_INTERNAL_APP_DIR,
     MEERKAT_NPM_PACKAGE,
@@ -17,6 +19,7 @@ from meerkat.constants import (
     PackageManager,
     PathHelper,
     SystemHelper,
+    write_file,
 )
 from meerkat.interactive.server import API_PORT, FRONTEND_PORT
 from meerkat.interactive.startup import run_frontend, run_script
@@ -182,7 +185,9 @@ def _run(
     rich.print()
 
     # Run the frontend
-    dummy_api_info = APIInfo(api=None, port=api_port, name=host, shared=host != "127.0.0.1")
+    dummy_api_info = APIInfo(
+        api=None, port=api_port, name=host, shared=host != "127.0.0.1"
+    )
     frontend_info = run_frontend(
         package_manager=package_manager,
         port=frontend_port,
@@ -298,6 +303,120 @@ def demo(
             dev=dev,
             debug=debug,
         )
+
+
+@cli.command()
+def multirun(
+    script_path: str = typer.Argument(..., help="Path to a Meerkat Python script"),
+    api_port: int = typer.Option(API_PORT, help="Meerkat API port"),
+    frontend_port: int = typer.Option(FRONTEND_PORT, help="Meerkat frontend port"),
+    host: str = typer.Option("127.0.0.1", help="Host to run on"),
+    target: str = typer.Option("page", help="Target to run in script"),
+    dev: bool = typer.Option(False, "--dev/--prod", help="Run in development mode"),
+    debug: bool = typer.Option(False, help="Enable debug logging mode"),
+):
+    from meerkat.interactive.api.routers.websocket import manager
+
+    # Pretty print information to console
+    rich.print(f":rocket: Running [bold violet]{script_path}[/bold violet]")
+    if dev:
+        rich.print(
+            ":wrench: Dev mode is [bold violet]on[/bold violet]\n"
+            ":hammer: Live reload is [bold violet]enabled[/bold violet]"
+        )
+    else:
+        rich.print(":wrench: Production mode is [bold violet]on[/bold violet]")
+    rich.print(":x: To stop the app, press [bold violet]Ctrl+C[/bold violet]")
+    rich.print()
+
+    # Run the frontend
+    dummy_api_info = APIInfo(
+        api=None, port=api_port, name=host, shared=host != "127.0.0.1"
+    )
+    frontend_info = run_frontend(
+        port=frontend_port,
+        dev=dev,
+        apiurl=dummy_api_info.url,
+        appdir=PathHelper().appdir,
+        skip_build=True,
+    )
+
+    # Run the uvicorn server
+    api_info = run_script(
+        script_path,
+        server_name=host,
+        port=api_port,
+        dev=dev,
+        target=target,
+        frontend_url=frontend_info.url,
+        apiurl=dummy_api_info.url,
+        multiuser=True,
+        debug=debug,
+    )
+
+    # Put them into the global state so the exit handler can use them to clean up
+    # the processes when the user exits this script.
+    state.api_info = api_info
+    state.frontend_info = frontend_info
+
+    while (api_info.process.poll() is None) or (frontend_info.process.poll() is None):
+        # Exit on Ctrl+C
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            rich.print()
+            break
+
+
+@cli.command()
+def space(
+    script: str = typer.Argument(..., help="Path to the script to deploy"),
+    name: str = typer.Option(
+        None, help="Space name", prompt=True, prompt_required=True
+    ),
+    user: str = typer.Option(None, help="Hugging Face username"),
+):
+    """Deploy a Meerkat app to Hugging Face Spaces."""
+    try:
+        from huggingface_hub.hf_api import HfApi
+        from huggingface_hub.utils import HfHubHTTPError
+
+        api = HfApi()
+    except ImportError:
+        rich.print(
+            ":x: You need to install the [purple]huggingface_hub[/purple] "
+            "package to use this command."
+        )
+        return
+
+    if not user:
+        user = api.whoami()["name"]
+    repo_id = f"{user}/{name}"
+
+    rich.print(f"Deploying space [bold violet]{repo_id}[/bold violet]...")
+
+    # Create the space
+    try:
+        api.create_repo(repo_id=repo_id, repo_type="space", space_sdk="docker")
+    except HfHubHTTPError as e:
+        rich.print(str(e))
+        # Ask the user if they want to overwrite the existing space
+        if not typer.confirm("Overwrite existing space?"):
+            return
+
+    # Load in the Dockerfile
+    scriptname = os.path.basename(script).split(".")[0]
+    dockerfile = JINJA_ENV.get_template("deploy/spaces/Dockerfile").render(
+        script=scriptname,
+        space_author=user,
+        space_repo=name,
+    )
+    localdir = repo_id.replace("/", "-")
+    os.makedirs(localdir, exist_ok=True)
+
+    write_file(os.path.join(localdir, "Dockerfile"), dockerfile)
+    shutil.copy(script, os.path.join(localdir, f"{scriptname}.py"))
+    api.upload_folder(repo_id=repo_id, folder_path=localdir, repo_type="space")
 
 
 @cli.command()
