@@ -2384,18 +2384,75 @@ title="Open an issue"
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">datasets</span>
 
+        <span class="n">datasets</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity_error</span><span class="p">()</span>
+        <span class="kn">import</span> <span class="nn">pyarrow.compute</span> <span class="k">as</span> <span class="nn">pc</span>
+
         <span class="c1"># Load the dataset</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_convert_columns</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">datasets</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">Audio</span><span class="p">):</span>
+
+                    <span class="n">column</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                    <span class="nb">bytes</span> <span class="o">=</span> <span class="n">ArrowScalarColumn</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">struct_field</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">))</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">ArrowScalarColumn</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">struct_field</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="nb">bytes</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="n">AudioFormatterGroup</span>
+
+                        <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                            <span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;bytes&quot;</span><span class="p">])</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">AudioFormatterGroup</span><span class="p">())</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="o">~</span><span class="n">path</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.file</span> <span class="kn">import</span> <span class="n">FileColumn</span>
+
+                        <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">FileColumn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;audio&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Huggingface column must either provide bytes or path for &quot;</span>
+                            <span class="s2">&quot;every row.&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
+                    <span class="n">column</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                    <span class="nb">bytes</span> <span class="o">=</span> <span class="n">ArrowScalarColumn</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">struct_field</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">))</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">ArrowScalarColumn</span><span class="p">(</span><span class="n">pc</span><span class="o">.</span><span class="n">struct_field</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ArrowScalarColumn</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="kn">import</span> <span class="nn">io</span>
+
+                        <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+                        <span class="kn">from</span> <span class="nn">meerkat.interactive.formatter</span> <span class="kn">import</span> <span class="n">ImageFormatterGroup</span>
+
+                        <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ImageFormatterGroup</span><span class="p">()</span><span class="o">.</span><span class="n">defer</span><span class="p">())</span>
+                    <span class="k">elif</span> <span class="p">(</span><span class="o">~</span><span class="n">path</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="kn">from</span> <span class="nn">meerkat.columns.deferred.file</span> <span class="kn">import</span> <span class="n">FileColumn</span>
+
+                        <span class="n">df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">FileColumn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Huggingface column must either provide bytes or path for &quot;</span>
+                            <span class="s2">&quot;every row.&quot;</span>
+                        <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">df</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">table</span><span class="p">)),</span>
+                    <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">_convert_columns</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="p">),</span>
                     <span class="n">dataset</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">_convert_columns</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataFrame.from_csv"><a class="viewcode-back" href="../../apidocs/dataframe.html#meerkat.DataFrame.from_csv">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="c1"># @capture_provenance(capture_args=[&quot;filepath&quot;])</span>
