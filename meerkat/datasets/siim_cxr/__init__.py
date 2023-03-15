@@ -4,15 +4,101 @@ from glob import glob
 
 import numpy as np
 import pandas as pd
+import PIL
 from PIL import Image
 
+from meerkat import column, env
 from meerkat.cells.volume import MedicalVolumeCell
+from meerkat.columns.deferred.file import FileColumn
+from meerkat.dataframe import DataFrame
 from meerkat.tools.lazy_loader import LazyLoader
+
+from ..abstract import DatasetBuilder
+from ..info import DatasetInfo
+from ..registry import datasets
+from ..utils import extract
 
 transforms = LazyLoader("torchvision.transforms")
 
+if env.package_available("pydicom"):
+    import pydicom
+else:
+    pydicom = None
+
 
 GAZE_DATA_URL = "https://raw.githubusercontent.com/robustness-gym/meerkat/dev/examples/03-med_img/cxr_gaze_data.json"  # noqa: E501
+
+
+@datasets.register()
+class siim_cxr(DatasetBuilder):
+    """The SIIM-CXR dataset from Kaggle.
+
+    Reference:
+        https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation/data
+    """
+
+    VERSIONS = ["stage_2"]
+
+    info = DatasetInfo(
+        name="siim_cxr",
+        full_name="SSIM-ACR Pneumothorax Segmentation",
+        description=(
+            "SSIM CXR is a dataset of chest X-rays of patients with and without "
+            "pneumothorax. "
+            "This dataset consists of RLE encoded masks for the pneumothorax regions. "
+        ),
+        homepage="https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation/data",  # noqa: E501
+        tags=["image", "classification", "segmentation"],
+    )
+
+    def download(self):
+        """Download the SIIM CXR dataset from kaggle."""
+        if not env.package_available("kaggle"):
+            raise ImportError("Please install kaggle using `pip install kaggle`")
+
+        # download and integrate gaze data
+        # os.environ["KAGGLE_USERNAME"] = self.kaggle_username
+        # os.environ["KAGGLE_KEY"] = self.kaggle_key
+        out = subprocess.run(
+            [
+                "kaggle",
+                "competitions",
+                "download",
+                "-c",
+                "siim-acr-pneumothorax-segmentation",
+                "-p",
+                self.dataset_dir,
+            ]
+        )
+        if out.returncode != 0:
+            raise ValueError("Downloading the kaggle dataset failed.")
+
+        expected_zip_file = os.path.join(
+            self.dataset_dir, "siim-acr-pneumothorax-segmentation.zip"
+        )
+        if not os.path.exists(expected_zip_file):
+            raise ValueError("Downloaded dataset is not in the expected format.")
+        extract(expected_zip_file, self.dataset_dir)
+
+    def build(self):
+        """Build the SIIM CXR dataset."""
+        dcm_folder = os.path.join(self.dataset_dir, "stage_2_images")
+        _files = os.listdir(dcm_folder)
+        _files = [fname for fname in _files if fname.endswith(".dcm")]
+        df = DataFrame({"fname": column(_files)})
+
+        # Load the data
+        df["img"] = FileColumn(
+            _files, type="image", loader=_load_siim_cxr, base_dir=dcm_folder
+        )
+        df["img_tfm"] = df["img"].defer(cxr_transform)
+
+        return df
+
+
+def _load_siim_cxr(filepath) -> PIL.Image:
+    """Load a single image from the SIIM-CXR dataset."""
+    return PIL.Image.fromarray(pydicom.read_file(filepath).pixel_array)
 
 
 def download_siim_cxr(
@@ -41,10 +127,13 @@ def download_siim_cxr(
         download_gaze_data (str): Download a pkl file containing eye-tracking data
             collected on a radiologist interpreting the xray.
     """
+    if not env.package_available("kaggle"):
+        raise ImportError("Please install kaggle using `pip install kaggle`")
+
     # download and integrate gaze data
     os.environ["KAGGLE_USERNAME"] = kaggle_username
     os.environ["KAGGLE_KEY"] = kaggle_key
-    subprocess.run(
+    out = subprocess.run(
         [
             "kaggle",
             "datasets",
@@ -55,6 +144,8 @@ def download_siim_cxr(
             dataset_dir,
         ]
     )
+    if out.returncode != 0:
+        raise ValueError("Downloading the kaggle dataset failed.")
     if os.path.exists(os.path.join(dataset_dir, "siim-train-test.zip")):
         subprocess.run(
             [
@@ -128,7 +219,11 @@ def cxr_transform_pil(volume: MedicalVolumeCell):
 
 
 def cxr_transform(volume: MedicalVolumeCell):
-    img = cxr_transform_pil(volume)
+    if isinstance(volume, MedicalVolumeCell):
+        img = cxr_transform_pil(volume)
+    else:
+        img = volume
+
     img = transforms.Compose(
         [
             transforms.Resize([CXR_SIZE, CXR_SIZE]),

@@ -15,6 +15,7 @@ from .ngoa import ngoa
 from .pascal import pascal
 from .registry import datasets
 from .rfw import rfw
+from .siim_cxr import siim_cxr
 from .torchaudio import yesno
 
 __all__ = [
@@ -31,6 +32,7 @@ __all__ = [
     "ngoa",
     "coco",
     "yesno",
+    "siim_cxr",
 ]
 
 DOWNLOAD_MODES = ["force", "extract", "reuse", "skip"]
