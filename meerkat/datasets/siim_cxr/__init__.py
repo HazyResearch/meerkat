@@ -70,6 +70,16 @@ class siim_cxr(DatasetBuilder):
             extract(tar_file, self.dataset_dir)
         assert os.path.isdir(dirpath)
 
+        # Download the pneumothorax labels.
+        labels = os.path.join(self.dataset_dir, "train-rle.csv")
+        if not os.path.exists(labels):
+            raise ValueError("Please download the stage 1 labels.")
+
+        # Download the chest tube labels.
+        # path = download_url("https://github.com/khaledsaab/spatial_specificity/blob/main/cxr_tube_dict.pkl", self.dataset_dir)  # noqa: E501
+        # with open(path, "rb") as f:
+        #     tube_dict = pickle.load(f)
+
     def _download_stage_2(self):
         """Download the SIIM CXR dataset from kaggle."""
         if not env.package_available("kaggle"):
@@ -107,17 +117,44 @@ class siim_cxr(DatasetBuilder):
 
     def _build_stage_1(self):
         """Build the SIIM CXR dataset (stage 1 version)."""
+        # Get filenames.
         dcm_folder = os.path.join(self.dataset_dir, "dicom-images-train")
         _files = _collect_all_dicoms(dcm_folder)
-        df = DataFrame({"fname": column(_files)})
+        df = pd.DataFrame({"fname": column(_files)})
+        df["image_id"] = df["fname"].map(
+            lambda fname: os.path.splitext(os.path.basename(fname))[0]
+        )
+
+        # Get pneumothorax labels.
+        label_df = self._build_stage_1_labels()
+
+        # important to perform a left join here, because there are some images in the
+        # directory without labels in `segment_df` and we only want those with labelsy
+        df = df.merge(label_df, how="left", on="image_id")
+
+        df = DataFrame.from_pandas(df).drop("index")
 
         # Load the data
         df["img"] = FileColumn(
             _files, type="image", loader=_load_siim_cxr, base_dir=dcm_folder
         )
-        df["img_tfm"] = df["img"].defer(cxr_transform)
+        df["img_tensor"] = df["img"].defer(cxr_transform)
 
         return df
+
+    def _build_stage_1_labels(self):
+        segment_df = pd.read_csv(os.path.join(self.dataset_dir, "train-rle.csv"))
+        segment_df = segment_df.rename(
+            columns={"ImageId": "image_id", " EncodedPixels": "encoded_pixels"}
+        )
+        # there are some images that were segemented by multiple annotators,
+        # we'll just take the first
+        segment_df = segment_df[~segment_df.image_id.duplicated(keep="first")]
+
+        # get binary labels for pneumothorax, any row with a "-1" for
+        # encoded pixels is considered a negative
+        segment_df["pmx"] = (segment_df.encoded_pixels != "-1").astype(int)
+        return segment_df[["image_id", "pmx"]]
 
     def _build_stage_2(self):
         """Build the SIIM CXR dataset."""
@@ -130,7 +167,7 @@ class siim_cxr(DatasetBuilder):
         df["img"] = FileColumn(
             _files, type="image", loader=_load_siim_cxr, base_dir=dcm_folder
         )
-        df["img_tfm"] = df["img"].defer(cxr_transform)
+        df["img_tensor"] = df["img"].defer(cxr_transform)
 
         return df
 
@@ -148,7 +185,7 @@ def _collect_all_dicoms(root_dir: str):
             if file.endswith(".dcm"):
                 file_path = os.path.join(root, file)
                 # Remove the root directory from the file path.
-                file_path.replace(remove_str, "")
+                file_path = file_path.replace(remove_str, "")
                 relative_paths.append(file_path)
 
     return relative_paths
