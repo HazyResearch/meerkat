@@ -120,41 +120,45 @@ class siim_cxr(DatasetBuilder):
         # Get filenames.
         dcm_folder = os.path.join(self.dataset_dir, "dicom-images-train")
         _files = _collect_all_dicoms(dcm_folder)
-        df = pd.DataFrame({"fname": column(_files)})
-        df["image_id"] = df["fname"].map(
-            lambda fname: os.path.splitext(os.path.basename(fname))[0]
+        df = pd.DataFrame({"filename": column(_files)})
+        df["img_id"] = df["filename"].map(
+            lambda filename: os.path.splitext(os.path.basename(filename))[0]
         )
+
 
         # Get pneumothorax labels.
         label_df = self._build_stage_1_labels()
 
         # important to perform a left join here, because there are some images in the
         # directory without labels in `segment_df` and we only want those with labelsy
-        df = df.merge(label_df, how="left", on="image_id")
+        df = df.merge(label_df, how="left", on="img_id")
 
-        df = DataFrame.from_pandas(df).drop("index")
+        df = DataFrame.from_pandas(df, primary_key="img_id").drop("index")
 
         # Load the data
         df["img"] = FileColumn(
             _files, type="image", loader=_load_siim_cxr, base_dir=dcm_folder
         )
-        df["img_tensor"] = df["img"].defer(cxr_transform)
+        # df["img_tensor"] = df["img"].defer(cxr_transform)
+
+        # drop nan columns
+        df = df[~df["pmx"].isna()]
 
         return df
 
     def _build_stage_1_labels(self):
         segment_df = pd.read_csv(os.path.join(self.dataset_dir, "train-rle.csv"))
         segment_df = segment_df.rename(
-            columns={"ImageId": "image_id", " EncodedPixels": "encoded_pixels"}
+            columns={"ImageId": "img_id", " EncodedPixels": "encoded_pixels"}
         )
         # there are some images that were segemented by multiple annotators,
         # we'll just take the first
-        segment_df = segment_df[~segment_df.image_id.duplicated(keep="first")]
+        segment_df = segment_df[~segment_df.img_id.duplicated(keep="first")]
 
         # get binary labels for pneumothorax, any row with a "-1" for
         # encoded pixels is considered a negative
         segment_df["pmx"] = (segment_df.encoded_pixels != "-1").astype(int)
-        return segment_df[["image_id", "pmx"]]
+        return segment_df[["img_id", "pmx"]]
 
     def _build_stage_2(self):
         """Build the SIIM CXR dataset."""
