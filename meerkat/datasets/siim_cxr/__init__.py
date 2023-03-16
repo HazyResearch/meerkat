@@ -1,4 +1,6 @@
 import os
+import pickle
+import shutil
 import subprocess
 from glob import glob
 
@@ -16,7 +18,7 @@ from meerkat.tools.lazy_loader import LazyLoader
 from ..abstract import DatasetBuilder
 from ..info import DatasetInfo
 from ..registry import datasets
-from ..utils import extract
+from ..utils import download_url, extract
 
 transforms = LazyLoader("torchvision.transforms")
 
@@ -76,9 +78,11 @@ class siim_cxr(DatasetBuilder):
             raise ValueError("Please download the stage 1 labels.")
 
         # Download the chest tube labels.
-        # path = download_url("https://github.com/khaledsaab/spatial_specificity/blob/main/cxr_tube_dict.pkl", self.dataset_dir)  # noqa: E501
-        # with open(path, "rb") as f:
-        #     tube_dict = pickle.load(f)
+        path = download_url(
+            "https://github.com/khaledsaab/spatial_specificity/raw/main/cxr_tube_dict.pkl",  # noqa: E501
+            self.dataset_dir,
+        )  # noqa: E501
+        shutil.move(path, os.path.join(self.dataset_dir, "cxr_tube_dict.pkl"))
 
     def _download_stage_2(self):
         """Download the SIIM CXR dataset from kaggle."""
@@ -125,7 +129,6 @@ class siim_cxr(DatasetBuilder):
             lambda filename: os.path.splitext(os.path.basename(filename))[0]
         )
 
-
         # Get pneumothorax labels.
         label_df = self._build_stage_1_labels()
 
@@ -158,7 +161,16 @@ class siim_cxr(DatasetBuilder):
         # get binary labels for pneumothorax, any row with a "-1" for
         # encoded pixels is considered a negative
         segment_df["pmx"] = (segment_df.encoded_pixels != "-1").astype(int)
-        return segment_df[["img_id", "pmx"]]
+
+        # Chest tube labels.
+        with open(os.path.join(self.dataset_dir, "cxr_tube_dict.pkl"), "rb") as f:
+            tube_dict = pickle.load(f)
+        img_id = tube_dict.keys()
+        values = [tube_dict[k] for k in img_id]
+        tube_df = pd.DataFrame({"img_id": img_id, "tube": values})
+        segment_df = segment_df.merge(tube_df, how="left", on="img_id")
+
+        return segment_df[["img_id", "pmx", "tube"]]
 
     def _build_stage_2(self):
         """Build the SIIM CXR dataset."""

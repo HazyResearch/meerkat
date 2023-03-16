@@ -56,6 +56,7 @@ class Sort(Component):
     df: DataFrame
     criteria: Union[List[SortCriterion], SortCriterion] = []
     title: str = "Sort"
+    classes: str = ""
 
     def __init__(
         self,
@@ -63,6 +64,7 @@ class Sort(Component):
         *,
         criteria: List[SortCriterion] = [],
         title: str = "Sort",
+        classes: str = "",
     ):
         """This component handles a sort_by list and a sort_order list.
 
@@ -77,7 +79,7 @@ class Sort(Component):
             df: The dataframe to sort.
             criteria: The sorting criteria to use.
         """
-        super().__init__(df=df, criteria=criteria, title=title)
+        super().__init__(df=df, criteria=criteria, title=title, classes=classes)
 
     def __call__(self, df: DataFrame = None) -> DataFrame:
         if df is None:
