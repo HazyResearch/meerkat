@@ -3,13 +3,18 @@ import os
 from io import BytesIO
 from typing import Any, Dict, Tuple
 
+import numpy as np
 from PIL import Image as PILImage
 
+from meerkat import env
 from meerkat.columns.deferred.base import DeferredCell
 from meerkat.interactive.formatter.icon import IconFormatter
+from meerkat.tools.lazy_loader import LazyLoader
 
 from ..app.src.lib.component.core.image import Image
 from .base import BaseFormatter, FormatterGroup
+
+torch = LazyLoader("torch")
 
 
 class ImageFormatter(BaseFormatter):
@@ -17,6 +22,7 @@ class ImageFormatter(BaseFormatter):
     data_prop: str = "data"
 
     def __init__(self, max_size: Tuple[int] = None, classes: str = ""):
+        super().__init__()
         self.max_size = max_size
         self.classes = classes
 
@@ -30,6 +36,14 @@ class ImageFormatter(BaseFormatter):
                 or is loaded dynamically (e.g. DeferredColumn).
                 This may save time for large images.
         """
+        if env.package_available("torch") and isinstance(cell, torch.Tensor):
+            cell = cell.cpu().numpy()
+
+        if isinstance(cell, np.ndarray):
+            cell = PILImage.fromarray(cell)
+            # We can skip copying if we are constructing the image from a numpy array.
+            skip_copy = True
+
         with BytesIO() as buffer:
             if self.max_size:
                 # Image.thumbnail modifies the image in place, so we need to

@@ -320,6 +320,8 @@ def defer(
         col = DeferredColumn(
             data=BlockView(block_index=None, block=block), output_type=output_type
         )
+        if isinstance(data, Column):
+            col.formatters = data.formatters.defer()
         return col
     elif isinstance(outputs, Mapping):
         if output_type is None:
