@@ -13,7 +13,8 @@
 		BoxFill,
 		CheckSquare,
 		TrashFill,
-		Soundwave
+		Soundwave,
+		Tag
 	} from 'svelte-bootstrap-icons';
 
 	export let name: string = 'Globe2';
@@ -31,7 +32,8 @@
 		BoxFill: BoxFill,
 		CheckSquare: CheckSquare,
 		TrashFill: TrashFill,
-		Soundwave: Soundwave
+		Soundwave: Soundwave,
+		Tag: Tag
 	};
 </script>
 
