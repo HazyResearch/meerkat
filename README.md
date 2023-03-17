@@ -7,7 +7,7 @@
 [![GitHub](https://img.shields.io/github/license/HazyResearch/meerkat)](https://img.shields.io/github/license/HazyResearch/meerkat)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-Meerkat is a open-source Python library designed for technical teams that want to interactively wrangle their unstructured data with foundation models.
+Meerkat is an open-source Python library helps teams index unstructured data with foundation models.
 
 [**Website**](http://meerkat.wiki)
 | [**Quickstart**](http://meerkat.wiki/docs/start/quickstart-df.html)
