@@ -1404,6 +1404,7 @@ class DataFrame(
         # Copy the ._data dict with a reference to the actual columns
         new_df = self.view()
 
+        new_primary_key = None
         if isinstance(mapper, Dict):
             assert len(set(mapper.values())) == len(
                 mapper.values()
@@ -1421,6 +1422,9 @@ class DataFrame(
                 if old_name == new_name:
                     continue
 
+                if self.primary_key_name == old_name:
+                    new_primary_key = new_name
+
                 # Copy old column into new column
                 new_df[new_name] = new_df[old_name]
                 new_df.remove_column(old_name)
@@ -1433,6 +1437,9 @@ class DataFrame(
                 if old_name == new_name:
                     continue
 
+                if self.primary_key_name == old_name:
+                    new_primary_key = new_name
+
                 # Copy old column into new column
                 new_df[new_name] = new_df[old_name]
                 new_df.remove_column(old_name)
@@ -1440,6 +1447,9 @@ class DataFrame(
             logger.info(
                 f"Mapper type is not one of Dict or Callable: {type(mapper)}. Returning"
             )
+
+        if new_primary_key is not None:
+            new_df = new_df.set_primary_key(new_primary_key)
 
         return new_df
 

@@ -14,6 +14,7 @@
 		CheckSquare,
 		TrashFill,
 		Soundwave,
+		Tag,
 		Fullscreen,
 		FullscreenExit
 	} from 'svelte-bootstrap-icons';
@@ -34,6 +35,7 @@
 		CheckSquare: CheckSquare,
 		TrashFill: TrashFill,
 		Soundwave: Soundwave,
+		Tag: Tag,
 		Fullscreen: Fullscreen,
 		FullscreenExit: FullscreenExit
 	};

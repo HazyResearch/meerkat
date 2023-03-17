@@ -9,6 +9,7 @@ class BarPlot(Component):
     x: str
     y: str
     title: str
+    orientation: str = "v"
     on_click: EndpointProperty = None
 
     def __init__(
@@ -18,6 +19,7 @@ class BarPlot(Component):
         x: str,
         y: str,
         title: str = "",
+        orientation: str = "v",
         on_click: EndpointProperty = None,
     ):
         if df.primary_key_name is None:
@@ -25,7 +27,9 @@ class BarPlot(Component):
         if len(df[x].unique()) != len(df):
             df = df.groupby(x)[[x, y]].mean()
             df.create_primary_key("id")
-        super().__init__(df=df, x=x, y=y, on_click=on_click, title=title)
+        super().__init__(
+            df=df, x=x, y=y, orientation=orientation, on_click=on_click, title=title
+        )
 
     @classproperty
     def namespace(cls):

@@ -203,6 +203,7 @@ class Filter(Component):
     )
 
     title: str = "Filter"
+    classes: str = ""
 
     def __init__(
         self,
@@ -210,6 +211,8 @@ class Filter(Component):
         *,
         criteria: List[FilterCriterion] = [],
         operations: List[str] = list(_operator_str_to_func.keys()),
+        title: str = "Filter",
+        classes: str = "",
     ):
         """Filter a dataframe based on a list of filter criteria.
 
@@ -220,6 +223,8 @@ class Filter(Component):
             df=df,
             criteria=criteria,
             operations=operations,
+            title=title,
+            classes=classes,
         )
 
     def __call__(self, df: DataFrame = None) -> DataFrame:

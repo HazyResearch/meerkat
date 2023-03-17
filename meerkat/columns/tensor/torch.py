@@ -172,13 +172,24 @@ class TorchTensorColumn(
         else:
             return self[index]
 
-    @staticmethod
-    def _get_default_formatter() -> Callable:
-        from meerkat.interactive.app.src.lib.component.core.scalar import (
-            ScalarFormatter,
+    def _get_default_formatters(self) -> Callable:
+        from meerkat.interactive.formatter import (
+            NumberFormatterGroup,
+            TensorFormatterGroup,
+            TextFormatterGroup,
         )
 
-        return ScalarFormatter()
+        if len(self) == 0:
+            return NumberFormatterGroup()
+
+        if len(self.shape) > 1:
+            return TensorFormatterGroup(dtype=str(self.dtype))
+
+        cell = self.data[0]
+        if isinstance(cell, np.generic):
+            return NumberFormatterGroup(dtype=type(cell.item()).__name__)
+
+        return TextFormatterGroup()
 
     @classmethod
     def from_data(cls, data: Union[Columnable, Column]):
