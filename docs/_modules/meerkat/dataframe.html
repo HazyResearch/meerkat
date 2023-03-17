@@ -3111,6 +3111,7 @@ title="Open an issue"
         <span class="c1"># Copy the ._data dict with a reference to the actual columns</span>
         <span class="n">new_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">()</span>
 
+        <span class="n">new_primary_key</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">Dict</span><span class="p">):</span>
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mapper</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
                 <span class="n">mapper</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
@@ -3128,6 +3129,9 @@ title="Open an issue"
                 <span class="k">if</span> <span class="n">old_name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
                     <span class="k">continue</span>
 
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key_name</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
+                    <span class="n">new_primary_key</span> <span class="o">=</span> <span class="n">new_name</span>
+
                 <span class="c1"># Copy old column into new column</span>
                 <span class="n">new_df</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_df</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
                 <span class="n">new_df</span><span class="o">.</span><span class="n">remove_column</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
@@ -3140,6 +3144,9 @@ title="Open an issue"
                 <span class="k">if</span> <span class="n">old_name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
                     <span class="k">continue</span>
 
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key_name</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
+                    <span class="n">new_primary_key</span> <span class="o">=</span> <span class="n">new_name</span>
+
                 <span class="c1"># Copy old column into new column</span>
                 <span class="n">new_df</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_df</span><span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
                 <span class="n">new_df</span><span class="o">.</span><span class="n">remove_column</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
@@ -3147,6 +3154,9 @@ title="Open an issue"
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Mapper type is not one of Dict or Callable: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span><span class="si">}</span><span class="s2">. Returning&quot;</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_primary_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_df</span> <span class="o">=</span> <span class="n">new_df</span><span class="o">.</span><span class="n">set_primary_key</span><span class="p">(</span><span class="n">new_primary_key</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_df</span></div>
 

@@ -61,5 +61,6 @@
       ~Sort.df
       ~Sort.criteria
       ~Sort.title
+      ~Sort.classes
    
    

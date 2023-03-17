@@ -61,6 +61,7 @@
       ~BarPlot.x
       ~BarPlot.y
       ~BarPlot.title
+      ~BarPlot.orientation
       ~BarPlot.on_click
    
    

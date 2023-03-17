@@ -61,5 +61,6 @@
       ~Filter.criteria
       ~Filter.operations
       ~Filter.title
+      ~Filter.classes
    
    

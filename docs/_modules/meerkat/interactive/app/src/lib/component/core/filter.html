@@ -1910,6 +1910,7 @@ title="Open an issue"
     <span class="p">)</span>
 
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Filter&quot;</span>
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <div class="viewcode-block" id="Filter.__init__"><a class="viewcode-back" href="../../../../../../../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.Filter.html#meerkat.interactive.app.src.lib.component.core.Filter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1917,6 +1918,8 @@ title="Open an issue"
         <span class="o">*</span><span class="p">,</span>
         <span class="n">criteria</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">FilterCriterion</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">operations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_operator_str_to_func</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Filter&quot;</span><span class="p">,</span>
+        <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter a dataframe based on a list of filter criteria.</span>
 
@@ -1927,6 +1930,8 @@ title="Open an issue"
             <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
             <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
             <span class="n">operations</span><span class="o">=</span><span class="n">operations</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>

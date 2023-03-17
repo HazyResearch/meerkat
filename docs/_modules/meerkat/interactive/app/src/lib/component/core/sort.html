@@ -1763,6 +1763,7 @@ title="Open an issue"
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span>
     <span class="n">criteria</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SortCriterion</span><span class="p">],</span> <span class="n">SortCriterion</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sort&quot;</span>
+    <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <div class="viewcode-block" id="Sort.__init__"><a class="viewcode-back" href="../../../../../../../../user-guide/apidocs/generated/meerkat.interactive.app.src.lib.component.core.Sort.html#meerkat.interactive.app.src.lib.component.core.Sort.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1770,6 +1771,7 @@ title="Open an issue"
         <span class="o">*</span><span class="p">,</span>
         <span class="n">criteria</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SortCriterion</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Sort&quot;</span><span class="p">,</span>
+        <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This component handles a sort_by list and a sort_order list.</span>
 
@@ -1784,7 +1786,7 @@ title="Open an issue"
 <span class="sd">            df: The dataframe to sort.</span>
 <span class="sd">            criteria: The sorting criteria to use.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
