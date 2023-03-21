@@ -3,7 +3,7 @@ from typing import List
 from meerkat.interactive.app.src.lib.component.abstract import Component
 
 
-class MedImage(Component):
+class MedicalImage(Component):
     """A component for displaying medical images.
 
     Args:
