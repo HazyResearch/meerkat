@@ -1,11 +1,13 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
 from meerkat import env
+from meerkat.dataframe import DataFrame
+from meerkat.interactive.endpoint import endpoint
 from meerkat.interactive.formatter.icon import IconFormatter
 
-from ..app.src.lib.component.core.medimage import MedImage
+from ..app.src.lib.component.core.medimage import MedicalImage
 from .base import FormatterGroup
 from .image import ImageFormatter
 
@@ -16,7 +18,7 @@ else:
 
 
 class MedicalImageFormatter(ImageFormatter):
-    component_class = MedImage
+    component_class = MedicalImage
     data_prop: str = "data"
 
     def __init__(
@@ -37,19 +39,26 @@ class MedicalImageFormatter(ImageFormatter):
         self.scrollable = scrollable
         self.show_toolbar = show_toolbar
 
-    def encode(self, cell: MedicalVolume, *, skip_copy: bool = False) -> str:
+        self.fetch_data = self.fetch_data.partial(self)
+
+    def encode(
+        self, cell: MedicalVolume, *, skip_copy: bool = False, dim: int = None
+    ) -> List[str]:
         """Encodes an image as a base64 string.
 
         Args:
             cell: The image to encode.
             dim: The dimension to slice along.
         """
-        from meerkat.columns.deferred.file import FileCell
+        from meerkat.columns.deferred.base import DeferredCell
 
-        dim = self.dim
-
-        if isinstance(cell, FileCell):
+        if isinstance(cell, DeferredCell):
             cell = cell()
+            return self.encode(cell, skip_copy=skip_copy, dim=dim)
+
+        if dim is None:
+            dim = self.dim
+
         if isinstance(dim, str):
             dim = cell.orientation.index(dim)
 
@@ -78,9 +87,22 @@ class MedicalImageFormatter(ImageFormatter):
         # TODO: Investigate why we need to pass MedicalImageFormatter to super.
         return [super(MedicalImageFormatter, self).encode(x) for x in arr_slices]
 
+    @endpoint()
+    def fetch_data(
+        self, df: DataFrame, column: str, index: int, dim: int = None
+    ) -> List[str]:
+        cell = df[column][index]
+        print(cell)
+        return self.encode(cell, dim=dim)
+
     @property
     def props(self) -> Dict[str, Any]:
-        return {"classes": self.classes, "show_toolbar": self.show_toolbar}
+        return {
+            "classes": self.classes,
+            "show_toolbar": self.show_toolbar,
+            "on_fetch": self.fetch_data,
+            "dim": self.dim,
+        }
 
     def html(self, cell: MedicalVolume) -> str:
         # TODO: Fix standard html rendering.

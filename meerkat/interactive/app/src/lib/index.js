@@ -34,7 +34,7 @@ export { default as Image } from './component/core/image/Image.svelte';
 export { default as Json } from './component/core/json/Json.svelte';
 export { default as Markdown } from './component/core/markdown/Markdown.svelte';
 export { default as Match } from './component/core/match/Match.svelte';
-export { default as MedImage } from './component/core/medimage/MedImage.svelte';
+export { default as MedicalImage } from './component/core/medimage/MedicalImage.svelte';
 export { default as MultiSelect } from './component/core/multiselect/MultiSelect.svelte';
 export { default as Number } from './component/core/number/Number.svelte';
 export { default as NumberInput } from './component/core/numberinput/NumberInput.svelte';

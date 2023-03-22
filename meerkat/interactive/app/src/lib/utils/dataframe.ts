@@ -25,6 +25,15 @@ export interface ColumnInfo {
 }
 
 /**
+ * Important metadata about the cell in a DataFrame.
+ */
+export interface CellInfo {
+    dfRefId: string;
+    columnName: string;
+    row: number;
+}
+
+/**
  * A chunk of a DataFrame holds the data for a subset of the rows and columns in a full
  * DataFrame that lives on the backend. 
  */
@@ -37,13 +46,16 @@ export class DataFrameChunk {
     rows: Array<Array<any>>
     fullLength: number
     primaryKey: string
+    refId: string | null;
 
     constructor(
         columnInfos: Array<ColumnInfo>,
         posidxs: Array<number>,
         rows: Array<Array<any>>,
         fullLength: number,
-        primaryKey: string
+        primaryKey: string,
+        // TODO: Determine if this should be a required field.
+        refId: string | null = null
     ) {
         this.columnInfos = columnInfos;
         this.columns = this.columnInfos.map((col: any) => col.name);
@@ -51,6 +63,7 @@ export class DataFrameChunk {
         this.rows = rows;
         this.fullLength = fullLength;
         this.primaryKey = primaryKey
+        this.refId = refId
 
         let primaryKeyIndex = this.columns.findIndex((c) => c === primaryKey);
         this.keyidxs = this.rows.map((row) => row[primaryKeyIndex])
@@ -64,6 +77,7 @@ export class DataFrameChunk {
         let columnInfo = this.columnInfos[columnIdx];
         return {
             data: this.rows[row][this.columns.indexOf(column)],
+            cellInfo: this.refId !== null ? {dfRefId: this.refId, columnName: column, row: row} : null,
             cellComponent: columnInfo.cellComponent,
             cellProps: columnInfo.cellProps,
             cellDataProp: columnInfo.cellDataProp,

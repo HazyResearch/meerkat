@@ -1,10 +1,12 @@
 <script lang="ts">
 	import DynamicComponent from '$lib/shared/DynamicComponent.svelte';
+	import type { CellInfo } from '$lib/utils/dataframe';
 	import { createEventDispatcher } from 'svelte';
 	import { setContext } from 'svelte/internal';
 	import { writable } from 'svelte/store';
 
 	export let data: any;
+	export let cellInfo: CellInfo;
 	export let cellComponent: string = '';
 	export let cellProps: object = {};
 	export let cellDataProp: string = 'data';
@@ -20,6 +22,9 @@
 	$: {
 		cellProps = { ...cellProps };
 		cellProps[cellDataProp] = data;
+		cellProps['cell_info'] = cellInfo;
+
+		console.log("propaganda", cellProps)
 
 		// iterate over cell_props and turn them into stores if they aren't already
 		for (const [key, value] of Object.entries(cellProps)) {
@@ -28,6 +33,8 @@
 			}
 		}
 	}
+
+	console.log("cellprops", cellProps)
 </script>
 
-<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable) }} />
+<DynamicComponent name={cellComponent} props={{ ...cellProps, editable: writable(editable)}} />

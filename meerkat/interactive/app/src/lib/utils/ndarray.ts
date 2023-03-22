@@ -64,16 +64,6 @@ export class NdArray {
 
         return new Uint8ClampedArray(this.data);
 
-
-
-        // const imageData = new Uint8Array(this.data);
-        // const string_char = imageData.reduce((data, byte) => {
-        //     return data + String.fromCharCode(byte);
-        // }, '');
-
-        // return 'https://picsum.photos/200/300';
-        //return `data:image/jpeg;base64,${btoa(string_char)}`;
-
     }
 
     public ndim(): number {

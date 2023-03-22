@@ -1,14 +1,21 @@
 <script lang="ts">
+	import type { CellInfo } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
 	import { Fullscreen, FullscreenExit, PlayFill, PauseFill } from 'svelte-bootstrap-icons';
+	import { dispatch } from '$lib/utils/api';
 
 	export let data: Array<string>;
 	export let classes: string = '';
-	export let numSlices: number = null;
+	export let dim: number;
 	export let showToolbar: boolean = false;
 	export let fps: number = 20;
+	export let onFetch: Endpoint;
+	
+	// Information about the cell
+	export let cellInfo;
 
-	export let onViewChange: Endpoint = null;
+	console.log("onfetch", onFetch)
+	console.log("cellInfo", cellInfo)
 
 	// Whether the image is fullscreen.
 	let isFullscreen: boolean = false;
@@ -17,18 +24,21 @@
 	// Whether the toolbar information should be shown.
 	let isToolbarActive: boolean = false;
 
-    // Transform properties.
-    let scale = 1.0;
-    let x = 0;
-    let y = 0;
-
 	// TODO: this should be reactive.
-	if (numSlices === null) {
-		numSlices = data.length;
-	}
-	let sliceNumber: number = Math.floor(numSlices / 2);
+	$: numSlices = data.length;
+	$: sliceNumber = Math.floor(numSlices / 2);
 
-	function boundSliceNumber(sliceNumber: number) {
+	function fetchData() {
+		console.log("dim", dim);
+		let promise = dispatch(onFetch["_self_id"], {
+			detail: { df: cellInfo.dfRefId, column: cellInfo.columnName, index: cellInfo.row, dim: dim }
+		});
+		promise.then((result) => {
+			data = result;
+		});
+	}
+
+	function clampSliceNumber(sliceNumber: number) {
 		return Math.min(Math.max(0, sliceNumber), numSlices - 1);
 	}
 
@@ -40,7 +50,7 @@
 		sliceNumber = Math.round(sliceNumber);
 
 		// Restrict slices to the range [0, numSlices-1].
-		sliceNumber = boundSliceNumber(sliceNumber);
+		sliceNumber = clampSliceNumber(sliceNumber);
 	}
 
 	function handleKeyPressFullscreen(event: KeyboardEvent) {
@@ -48,9 +58,9 @@
 		if (event.key === 'Escape') {
 			isFullscreen = false;
 		} else if (event.key === 'ArrowUp') {
-			sliceNumber = boundSliceNumber(sliceNumber - 1);
+			sliceNumber = clampSliceNumber(sliceNumber - 1);
 		} else if (event.key === 'ArrowDown') {
-			sliceNumber = boundSliceNumber(sliceNumber + 1);
+			sliceNumber = clampSliceNumber(sliceNumber + 1);
 		}
 	}
 
@@ -63,6 +73,9 @@
 		}
 	}
 
+	/**
+	 * Play the frames as a video.
+	 */
 	function play() {
 		isPlaying = true;
 		nextImage();
@@ -84,7 +97,7 @@
 				class={classes}
 				on:wheel|preventDefault={handleScroll}
 				alt="A medical image."
-                style="width: 100%; height: 100%; object-fit: contain;"
+				style="width: 100%; height: 100%; object-fit: contain;"
 			/>
 
 			<!-- Top toolbar -->
@@ -97,12 +110,18 @@
 				<!-- Slice label -->
 				<div class="button-container items-center">
 					{#if isToolbarActive}
-						<span
-							class="flex-1 px-1"
-							style="color: white; font-size: 0.8rem; font-weight: bold;"
-						>
+						<span class="flex-1 px-1" style="color: white; font-size: 0.8rem; font-weight: bold;">
 							Slice {sliceNumber + 1}/{numSlices}
 						</span>
+						<button
+							class="flex-1"
+							on:click={() => {
+								dim = (dim + 1) % 3;
+								fetchData();
+							}}
+						>
+							<PlayFill width={24} height={24} fill="white" />
+						</button>
 					{/if}
 				</div>
 			</div>
