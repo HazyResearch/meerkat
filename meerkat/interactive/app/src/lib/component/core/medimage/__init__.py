@@ -13,6 +13,7 @@ class OnFetchInterface(EventInterface):
     column: str
     index: int
     dim: Optional[int] = None
+    type: Optional[str] = None
 
 
 class MedicalImage(Component):
@@ -29,10 +30,13 @@ class MedicalImage(Component):
     classes: str = ""
     show_toolbar: bool = False
     dim: int
+    segmentation_column: str = ""
 
     # A function to call to encode the data.
     # This should be a variant of the MedicalImage.encode method.
     on_fetch: EndpointProperty[OnFetchInterface]
+
     # We need to declare this here to enable the dynamic component
     # wrapper forwarding.
+    # TODO: Add this to a generic CellComponent class.
     cell_info: Any = None

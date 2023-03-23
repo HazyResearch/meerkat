@@ -31,7 +31,6 @@ def dispatch(
 
     try:
         # Run the endpoint
-        print("endpoint", endpoint)
         result, modifications = endpoint.partial(**fn_kwargs).run()
     except Exception as e:
         # General exception should be converted to a HTTPException

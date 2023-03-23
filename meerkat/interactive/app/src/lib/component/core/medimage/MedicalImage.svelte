@@ -1,8 +1,17 @@
 <script lang="ts">
 	import type { CellInfo } from '$lib/utils/dataframe';
 	import type { Endpoint } from '$lib/utils/types';
-	import { Fullscreen, FullscreenExit, PlayFill, PauseFill } from 'svelte-bootstrap-icons';
+	import {
+		Fullscreen,
+		FullscreenExit,
+		PlayFill,
+		PauseFill,
+		Compass,
+		Palette
+	} from 'svelte-bootstrap-icons';
 	import { dispatch } from '$lib/utils/api';
+	import { BarLoader } from 'svelte-loading-spinners';
+	import Toolbar from '$lib/shared/common/Toolbar.svelte';
 
 	export let data: Array<string>;
 	export let classes: string = '';
@@ -10,12 +19,21 @@
 	export let showToolbar: boolean = false;
 	export let fps: number = 20;
 	export let onFetch: Endpoint;
-	
-	// Information about the cell
-	export let cellInfo;
+	export let segmentationColumn: string = '';
 
-	console.log("onfetch", onFetch)
-	console.log("cellInfo", cellInfo)
+	// Information about the cell
+	export let cellInfo: CellInfo;
+
+	// Cache the data for different dimensions.
+	// TODO: check if this affects performance.
+	const dataCache: any = {};
+	dataCache[dim] = data;
+
+	// Segmentation data (that can optionally be loaded in)
+	let isSegmentationActive: boolean = false;
+	let segmentation: Array<string> = null;
+	const segmentationCache: any = {};
+	// segmentationColumn = "";
 
 	// Whether the image is fullscreen.
 	let isFullscreen: boolean = false;
@@ -23,18 +41,59 @@
 	let isPlaying: boolean = false;
 	// Whether the toolbar information should be shown.
 	let isToolbarActive: boolean = false;
+	// Whether we should pin the toolbar.
+	let pinToolbar: boolean = false;
+	// Status of loading operations.
+	let status: string = '';
 
 	// TODO: this should be reactive.
 	$: numSlices = data.length;
 	$: sliceNumber = Math.floor(numSlices / 2);
 
 	function fetchData() {
-		console.log("dim", dim);
-		let promise = dispatch(onFetch["_self_id"], {
+		if (dim in dataCache) {
+			data = dataCache[dim];
+			return;
+		}
+		status = 'working';
+		let promise = dispatch(onFetch.endpointId, {
 			detail: { df: cellInfo.dfRefId, column: cellInfo.columnName, index: cellInfo.row, dim: dim }
 		});
+		promise
+			.then((result) => {
+				status = 'success';
+				dataCache[dim] = result;
+				data = result;
+			})
+			.catch(async (error) => {
+				status = 'error';
+			});
+		fetchSegmentation();
+	}
+
+	function fetchSegmentation() {
+		if (!isSegmentationActive) {
+			return;
+		}
+
+		if (dim in segmentationCache) {
+			segmentation = segmentationCache[dim];
+			return;
+		}
+		status = 'working';
+		let promise = dispatch(onFetch.endpointId, {
+			detail: {
+				df: cellInfo.dfRefId,
+				column: segmentationColumn,
+				index: cellInfo.row,
+				dim: dim,
+				type: 'segmentation'
+			}
+		});
 		promise.then((result) => {
-			data = result;
+			status = 'success';
+			segmentationCache[dim] = result;
+			segmentation = result;
 		});
 	}
 
@@ -46,7 +105,7 @@
 		if (numSlices === 1) {
 			return;
 		}
-		sliceNumber += event.deltaY * 0.1;
+		sliceNumber += event.deltaY * 0.15;
 		sliceNumber = Math.round(sliceNumber);
 
 		// Restrict slices to the range [0, numSlices-1].
@@ -90,80 +149,105 @@
 </script>
 
 {#if showToolbar}
-	<div class={isFullscreen ? 'fullscreen' : ''}>
-		<div class="image-container w-full h-full">
-			<img
-				src={data[sliceNumber]}
-				class={classes}
-				on:wheel|preventDefault={handleScroll}
-				alt="A medical image."
-				style="width: 100%; height: 100%; object-fit: contain;"
-			/>
+	<div
+		class={isFullscreen
+			? 'fullscreen'
+			: 'w-full h-full ' + (status === 'working' ? '' : 'bg-black')}
+	>
+		{#if status === 'working'}
+			<div class="flex justify-center items-center h-full">
+				<BarLoader size="80" color="#7c3aed" unit="px" duration="1s" />
+			</div>
+		{:else if status === 'error'}
+			<div class="flex justify-center items-center h-full">Error</div>
+		{:else}
+			<div class="image-container w-full h-full">
+				<div class="w-full h-full" style="position: relative;">
+					<img
+						src={data[sliceNumber]}
+						class={classes + 'z-index-0'}
+						on:wheel|preventDefault={handleScroll}
+						alt="A medical image."
+						style="position:absolute; : 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
+					/>
+					{#if isSegmentationActive}
+						<img
+							src={segmentation[sliceNumber]}
+							class={classes + 'z-index-2'}
+							on:wheel|preventDefault={handleScroll}
+							alt="A segmentation."
+							style="opacity: 0.7; position:absolute; : 0; left: 0; width: 100%; height: 100%; object-fit: contain;"
+						/>
+					{/if}
+				</div>
 
-			<!-- Top toolbar -->
-			<div
-				class="toolbar top-0 w-full"
-				on:mouseenter={() => (isToolbarActive = true)}
-				on:mouseleave={() => (isToolbarActive = false)}
-				on:wheel|preventDefault={handleScroll}
-			>
-				<!-- Slice label -->
-				<div class="button-container items-center">
-					{#if isToolbarActive}
-						<span class="flex-1 px-1" style="color: white; font-size: 0.8rem; font-weight: bold;">
-							Slice {sliceNumber + 1}/{numSlices}
-						</span>
+				<!-- Top toolbar -->
+				<Toolbar on:wheel={handleScroll} bind:isToolbarActive pin={pinToolbar} classes="px-3">
+					<span class="" style="color: white; font-size: 0.8rem; font-weight: bold;">
+						Slice {sliceNumber + 1}/{numSlices}
+					</span>
+
+					<div class={'grid gap-x-3 grid-cols-' +  + (1 + (segmentationColumn !== ""))}>
+						<!-- Reformat button -->
 						<button
-							class="flex-1"
 							on:click={() => {
 								dim = (dim + 1) % 3;
 								fetchData();
 							}}
 						>
+							<Compass width={24} height={24} fill="white" />
+						</button>
+
+						<!-- Segmentation button -->
+						{#if segmentationColumn != ''}
+							<button
+								on:click={() => {
+									isSegmentationActive = !isSegmentationActive;
+									fetchSegmentation();
+								}}
+							>
+								<Palette width={24} height={24} fill={isSegmentationActive ? 'yellow' : 'white'}/>
+							</button>
+						{/if}
+					</div>
+				</Toolbar>
+
+				<!-- Bottom toolbar -->
+				<!-- Play button -->
+				<!-- TODO fix handling of space bar key press -->
+				<Toolbar
+					on:wheel={handleScroll}
+					bind:isToolbarActive
+					pin={pinToolbar}
+					classes="px-3"
+					align="bottom"
+				>
+					{#if isPlaying}
+						<button
+							class=""
+							on:click={() => {
+								isPlaying = false;
+							}}
+						>
+							<PauseFill width={24} height={24} fill="white" />
+						</button>
+					{:else}
+						<button class="" on:click={play}>
 							<PlayFill width={24} height={24} fill="white" />
 						</button>
 					{/if}
-				</div>
-			</div>
 
-			<!-- Bottom toolbar -->
-			<!-- Play button -->
-			<!-- TODO fix handling of space bar key press -->
-			<div
-				class="toolbar bottom-1 w-full"
-				on:mouseenter={() => (isToolbarActive = true)}
-				on:mouseleave={() => (isToolbarActive = false)}
-				on:wheel|preventDefault={handleScroll}
-			>
-				<div class="button-container mx-1">
-					{#if isToolbarActive}
-						{#if isPlaying}
-							<button
-								class="flex-1"
-								on:click={() => {
-									isPlaying = false;
-								}}
-							>
-								<PauseFill width={24} height={24} fill="white" />
-							</button>
+					<!-- Fullscreen button -->
+					<button on:click={toggleFullscreen}>
+						{#if isFullscreen}
+							<FullscreenExit width={24} height={24} fill="white" />
 						{:else}
-							<button class="flex-1" on:click={play}>
-								<PlayFill width={24} height={24} fill="white" />
-							</button>
+							<Fullscreen width={24} height={24} fill="white" />
 						{/if}
-
-						<!-- Fullscreen button -->
-						<button on:click={toggleFullscreen}>
-							{#if isFullscreen}
-								<FullscreenExit width={24} height={24} fill="white" />
-							{:else}
-								<Fullscreen width={24} height={24} fill="white" />
-							{/if}
-						</button>
-					{/if}
-				</div>
+					</button>
+				</Toolbar>
 			</div>
-		</div>
+		{/if}
 	</div>
 {:else}
 	<img
@@ -201,7 +285,7 @@
 		position: relative;
 		z-index: 3;
 		display: flex;
-		/* justify-content: flex-end; */
+		justify-content: flex-end;
 		width: 100%;
 		height: 100%;
 	}
