@@ -12,6 +12,7 @@
 	export let df: DataFrameRef;
 	export let criteria: SortCriterion[];
 	export let title: string = '';
+	export let classes: string = '';
 
 	// Users may change criteria rapidly on the frontend.
 	// As such, sort needs to be performant.
@@ -124,7 +125,7 @@
 	}
 </script>
 
-<div class="bg-slate-100 py-2 rounded-lg z-30 flex flex-col my-1">
+<div class={"bg-slate-100 py-2 rounded-lg z-30 flex flex-col my-2" + classes}>
 	<div class="flex space-x-6">
 		{#if title != ''}
 			<div class="font-bold text-md text-slate-600 self-start pl-2">

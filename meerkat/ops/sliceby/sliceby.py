@@ -117,6 +117,7 @@ class SliceBy(IdentifiableMixin):
             else:
                 col = self.by[0]
                 out[col] = self.slice_keys
+                out = out.set_primary_key(col)
         return out
 
     def _get(self, slice_key: str, index, materialize: bool = False) -> List[Any]:

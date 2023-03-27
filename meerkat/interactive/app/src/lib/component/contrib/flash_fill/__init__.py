@@ -25,8 +25,6 @@ class FlashFill(div):
         manifest_cache_dir: str = "~/.cache/manifest",
         max_tokens: int = 1,
     ):
-        self.max_tokens = max_tokens
-
         df = df.view()
         if target_column not in df.columns:
             df[target_column] = ""
@@ -41,6 +39,7 @@ class FlashFill(div):
             os.path.expanduser(manifest_cache_dir)
         )
         os.makedirs(self.manifest_cache_dir, exist_ok=True)
+        self.max_tokens = max_tokens
 
     @property
     def prompt(self):

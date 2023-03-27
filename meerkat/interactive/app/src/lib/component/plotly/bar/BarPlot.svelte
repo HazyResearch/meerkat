@@ -7,9 +7,10 @@
 	export let df: DataFrameRef;
 	export let x: string;
 	export let y: string;
+	export let orientation: string = 'v';
 	export let config: Record<string, any> = { displayModeBar: false };
 	export let title: string;
-	export let on_click: Endpoint;
+	export let onClick: Endpoint;
 
 	$: data_promise = fetchChunk({
 		df: df,
@@ -17,13 +18,13 @@
 		columns: [x, y],
 		variants: ['small']
 	}).then((chunk) => {
-		console.log(chunk.primaryKey)
 		return [
 			{
 				x: chunk.getColumn(x).data,
 				y: chunk.getColumn(y).data,
 				keyidx: chunk.getColumn(chunk.primaryKey).data,
 				type: 'bar',
+				orientation: orientation
 			}
 		];
 	});
@@ -33,7 +34,6 @@
 	async function on_endpoint(endpoint: Endpoint, e) {
 		let data = await data_promise;
 		e.detail.points;
-		console.log(e);
 		if (endpoint) {
 			dispatch(endpoint.endpointId, {
 				detail: {
@@ -46,7 +46,7 @@
 
 {#await data_promise}
     <div class="bg-purple-50 text-center my-1">Loading Bar Plot...</div>
-    <Plot data={[]} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
+    <Plot data={[]} {layout} {config} on:click={(e) => on_endpoint(onClick, e)} />
 {:then data}
-	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(on_click, e)} />
+	<Plot {data} {layout} {config} on:click={(e) => on_endpoint(onClick, e)} />
 {/await}
