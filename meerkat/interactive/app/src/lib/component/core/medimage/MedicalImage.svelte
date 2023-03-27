@@ -33,7 +33,6 @@
 	let isSegmentationActive: boolean = false;
 	let segmentation: Array<string> = null;
 	const segmentationCache: any = {};
-	// segmentationColumn = "";
 
 	// Whether the image is fullscreen.
 	let isFullscreen: boolean = false;

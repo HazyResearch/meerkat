@@ -12,6 +12,7 @@ class Gallery(Component):
     selected: List[str] = []
     allow_selection: bool = False
     cell_size: int = 24
+    per_page: int = 20
 
     def __init__(
         self,
@@ -22,18 +23,20 @@ class Gallery(Component):
         selected: List[int] = [],
         allow_selection: bool = False,
         cell_size: int = 24,
+        per_page: int = 20,
     ):
         """Gallery view of a DataFrame.
 
         Args:
             df (DataFrame): The DataFrame to display.
             main_column (str): The column to display in the main gallery view.
-            tag_columns (List[str], optional): The columns to display as tags. \
+            tag_columns (List[str], optional): The columns to display as tags.
                 Defaults to [].
-            selected (List[int], optional): The indices of the rows selected in the \
+            selected (List[int], optional): The indices of the rows selected in the
                 gallery. Useful for labeling and other tasks. Defaults to [].
-            allow_selection (bool, optional): Whether to allow the user to select \
+            allow_selection (bool, optional): Whether to allow the user to select
                 rows. Defaults to False.
+            per_page (int, optional): The number of rows to display per page.
         """
         if main_column is None:
             main_column = df.columns[0]
@@ -47,6 +50,7 @@ class Gallery(Component):
             selected=selected,
             allow_selection=allow_selection,
             cell_size=cell_size,
+            per_page=per_page,
         )
 
     def _get_ipython_height(self):

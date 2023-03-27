@@ -232,7 +232,7 @@ class MedicalImageFormatter(ImageFormatter):
 class MedicalImageFormatterGroup(FormatterGroup):
     formatter_class: type = MedicalImageFormatter
 
-    def __init__(self, classes: str = ""):
+    def __init__(self, classes: str = "", dim: int = None, type: str = None):
         super().__init__(
             icon=IconFormatter(name="Image"),
             base=self.formatter_class(classes=classes),
@@ -247,6 +247,22 @@ class MedicalImageFormatterGroup(FormatterGroup):
                 classes=classes, scrollable=True, show_toolbar=True
             ),
         )
+
+        if dim is not None:
+            self.dim = dim
+        if type is not None:
+            self.type = type
+
+    @property
+    def dim(self):
+        return self["base"].dim
+
+    @dim.setter
+    def dim(self, value):
+        for v in self._dict.values():
+            v = _get_wrapped_formatter(v)
+            if isinstance(v, MedicalImageFormatter):
+                v.dim = value
 
     @property
     def type(self):
