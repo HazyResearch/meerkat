@@ -1,6 +1,9 @@
-from typing import Callable, Union, List
-from meerkat.tools.lazy_loader import LazyLoader
 from functools import partial
+from typing import Callable, List, Optional, Union
+
+from pydantic import BaseModel, validator
+
+from meerkat.tools.lazy_loader import LazyLoader
 
 manifest = LazyLoader("manifest")
 openai = LazyLoader("openai")
@@ -32,6 +35,11 @@ class TextCompletion(BaseEngine):
     @classmethod
     def with_openai(cls, key: str):
         return OpenAITextCompletion(key)
+
+    def configure(self, **kwargs):
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        self.engine = partial(self.engine, **kwargs)
+        return self
 
     def model(self, model: str):
         """The name of the model to use for completion."""
@@ -65,6 +73,99 @@ class TextCompletion(BaseEngine):
         return f"{self.__class__.__name__}()"
 
 
+class ChatCompletion(TextCompletion):
+    """
+    A chat completion engine that takes in a message
+    history and returns a completion.
+    """
+
+    @classmethod
+    def with_anthropic(cls, key: str):
+        return AnthropicChatCompletion(key)
+
+    @classmethod
+    def with_openai(cls, key: str):
+        return OpenAIChatCompletion(key)
+
+
+class Message(BaseModel):
+    role: str
+    content: str
+
+    @validator("role")
+    def role_must_be_system_or_user(cls, v):
+        if v not in ["system", "user"]:
+            raise ValueError("role must be system or user")
+        return v
+
+
+class OpenAIChatCompletion(ChatCompletion):
+    def __init__(
+        self,
+        key: str = None,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = None,
+        n: Optional[int] = None,
+        stop: Optional[Union[str, List[str]]] = None,
+    ):
+        self._check_import()
+        self.engine = partial(openai.ChatCompletion.create, api_key=key)
+        self.configure(
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_k=top_k,
+            top_p=top_p,
+            n=n,
+            stop=stop,
+        )
+
+    def _check_import(self):
+        try:
+            import openai
+        except ImportError:
+            raise ImportError(
+                "OpenAI is not installed. Install with `pip install meerkat[openai]`."
+            )
+
+    def model(self, model: str):
+        """The name of the model to use for completion."""
+        self.engine = partial(self.engine, model=model)
+        return self
+
+    def temperature(self, temperature: float):
+        """The temperature of the model. Higher values will result in more creative completions, but also more mistakes."""
+        self.engine = partial(self.engine, temperature=temperature)
+        return self
+
+    def help(self):
+        print(self.engine.__doc__)
+
+    def run(
+        self,
+        prompt: str,
+        history: List[Message] = [],
+        system_prompt: str = "You are a helpful assistant.",
+    ):
+        """Run the engine on a prompt."""
+        messages = (
+            [
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                }
+            ]
+            + [message.dict() for message in history]
+            + [{"role": "user", "content": prompt}]
+        )
+        response = self.engine(messages=messages)
+        self.response = response
+        return response["choices"][0]["message"]["content"]
+
+
 class OpenAITextCompletion(TextCompletion):
     """
     A text completion engine that takes in a prompt
@@ -72,11 +173,27 @@ class OpenAITextCompletion(TextCompletion):
     """
 
     def __init__(
-            self,
-            key: str,
-        ):
+        self,
+        key: str,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = None,
+        n: Optional[int] = None,
+        stop: Optional[Union[str, List[str]]] = None,
+    ):
         self._check_import()
         self.engine = partial(openai.Completion.create, api_key=key)
+        self.configure(
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_k=top_k,
+            top_p=top_p,
+            n=n,
+            stop=stop,
+        )
 
     def help(self):
         print(self.engine.__doc__)
