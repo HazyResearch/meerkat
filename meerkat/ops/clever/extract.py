@@ -97,10 +97,3 @@ def extract_to_schema(
     return column.map(
         lambda text: engine.run(prompt=prompt.format(text=text, schema=schema))
     )
-
-
-def _run_llm(row, to: str, engine: TextCompletion, in_ctx_examples: str):
-    """Run extraction for a single test row."""
-    return engine.run(
-        prompt=in_ctx_examples + "\n" + _prepare_row(row, column=to, is_test=True)
-    )
